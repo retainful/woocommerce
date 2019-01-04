@@ -1,0 +1,19 @@
+{
+  "name": "retainful-coupon",
+  "description": "Simple plugin to give coupons for users next order",
+  "require": {
+    "cmb2/cmb2": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Rnoc\\": "",
+      "Rnoc\\Retainful\\": "src/",
+      "Rnoc\\Retainful\\Admin\\": "src/admin/",
+      "Rnoc\\Retainful\\Library\\": "src/library/"
+    },
+    "files": [
+      "vendor/cmb2/cmb2/init.php",
+      "src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php"
+    ]
+  }
+}

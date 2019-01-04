@@ -1,0 +1,59 @@
+{
+  "name": "cmb2",
+  "title": "CMB2",
+  "version": "2.5.1",
+  "description": "CMB2 is a developer's toolkit for building metaboxes, custom fields, and forms for WordPress that will blow your mind.",
+  "main": "Gruntfile.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CMB2/CMB2"
+  },
+  "author": {
+    "name": "CMB2 team",
+    "email": "hello@cmb2.io",
+    "url": "https://cmb2.io"
+  },
+  "license": "GPLv2",
+  "bugs": {
+    "url": "https://github.com/CMB2/CMB2/issues"
+  },
+  "homepage": "https://cmb2.io",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-asciify": "~0.2.2",
+    "grunt-banner": "^0.6.0",
+    "grunt-checktextdomain": "^1.0.0",
+    "grunt-combine-media-queries": "~1.0.15",
+    "grunt-contrib-compress": "^0.11.0",
+    "grunt-contrib-cssmin": "^0.9.0",
+    "grunt-contrib-jshint": "~0.11.0",
+    "grunt-contrib-sass": "^0.7.4",
+    "grunt-contrib-uglify": "^0.4.1",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-csscomb": "~3.0.0-1",
+    "grunt-cssjanus": "^0.2.2",
+    "grunt-exec": "^0.4.6",
+    "grunt-githooks": "~0.3.1",
+    "grunt-newer": "^1.1.0",
+    "grunt-phpunit": "~0.3.3",
+    "grunt-potomo": "^3.1.1",
+    "grunt-update-submodules": "~0.4.1",
+    "grunt-wp-i18n": "~0.4.9",
+    "load-grunt-tasks": "^0.5.0"
+  },
+  "dependencies": {
+    "grunt-phpunit": "~0.3.6",
+    "grunt-contrib-sass": "~0.7.4",
+    "load-grunt-tasks": "~0.5.0",
+    "grunt-wp-i18n": "~0.4.9",
+    "grunt-contrib-compress": "~0.11.0",
+    "grunt-contrib-cssmin": "~0.9.0",
+    "grunt-contrib-uglify": "~0.4.1"
+  }
+}
