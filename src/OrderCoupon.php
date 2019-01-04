@@ -156,7 +156,7 @@ class OrderCoupon
                     'minimum_amount' => '',
                     'maximum_amount' => '',
                     'customer_email' => '',
-                    'type' => $discount_type
+                    'discount_type' => $discount_type
                 );
                 return $coupon;
             }
