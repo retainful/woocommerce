@@ -1,5 +1,5 @@
 {
-  "name": "woocommerce-retainful-coupon",
+  "name": "retainful/woocommerce",
   "description": "Simple plugin to give coupons for users next order",
   "require": {
     "cmb2/cmb2": "dev-master"

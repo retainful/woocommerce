@@ -26,20 +26,20 @@ class Settings
             //General settings tab
             $general_settings = new_cmb2_box(array(
                 'id' => $this->app_prefix . 'retainful',
-                'title' => __('Retainful Next Order Coupon', 'woocommerce-retainful-coupon'),
+                'title' => __('Retainful Next Order Coupon', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
                 'option_key' => $this->slug,
                 'tab_group' => $this->slug,
                 'parent_slug' => 'woocommerce',
-                'tab_title' => __('Next order coupon', 'woocommerce-retainful-coupon'),
-                'save_button' => __('Save', 'woocommerce-retainful-coupon')
+                'tab_title' => __('Next order coupon', RNOC_TEXT_DOMAIN),
+                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
-                'name' => __('Retainful App ID', 'woocommerce-retainful-coupon'),
+                'name' => __('Retainful App ID', RNOC_TEXT_DOMAIN),
                 'id' => $this->app_prefix . 'retainful_app_id',
                 'type' => 'retainful_app',
                 'default' => '',
-                'desc' => __('You can get your App-id from https://www.app.retainful.com', 'woocommerce-retainful-coupon')
+                'desc' => __('You can get your App-id from https://www.app.retainful.com', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
                 'id' => $this->app_prefix . 'is_retainful_connected',
@@ -48,56 +48,56 @@ class Settings
                 'attributes' => array('id' => 'is_retainful_app_connected')
             ));
             $general_settings->add_field(array(
-                'name' => __('Coupon type', 'woocommerce-retainful-coupon'),
+                'name' => __('Coupon type', RNOC_TEXT_DOMAIN),
                 'id' => $this->app_prefix . 'retainful_coupon_type',
                 'type' => 'radio',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
-                    '0' => __('Percentage', 'woocommerce-retainful-coupon'),
-                    '1' => __('Flat', 'woocommerce-retainful-coupon')
+                    '0' => __('Percentage', RNOC_TEXT_DOMAIN),
+                    '1' => __('Flat', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => '0'
             ));
             $general_settings->add_field(array(
-                'name' => __('Coupon value', 'woocommerce-retainful-coupon'),
+                'name' => __('Coupon value', RNOC_TEXT_DOMAIN),
                 'id' => $this->app_prefix . 'retainful_coupon_amount',
                 'type' => 'text',
                 'classes' => 'retainful-coupon-group',
                 'default' => ''
             ));
             $general_settings->add_field(array(
-                'name' => __('Apply coupon to', 'woocommerce-retainful-coupon'),
+                'name' => __('Apply coupon to', RNOC_TEXT_DOMAIN),
                 'id' => $this->app_prefix . 'retainful_coupon_applicable_to',
                 'type' => 'radio',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
-                    'all' => __('Allow any one to apply coupon', 'woocommerce-retainful-coupon'),
-                    'validate_on_checkout' => __('Allow the customer to apply coupon, but validate at checkout', 'woocommerce-retainful-coupon'),
-                    'login_users' => __('Allow customer to apply coupon only after login, but validate at checkout', 'woocommerce-retainful-coupon')
+                    'all' => __('Allow any one to apply coupon', RNOC_TEXT_DOMAIN),
+                    'validate_on_checkout' => __('Allow the customer to apply coupon, but validate at checkout', RNOC_TEXT_DOMAIN),
+                    'login_users' => __('Allow customer to apply coupon only after login, but validate at checkout', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => 'all'
             ));
             $general_settings->add_field(array(
-                'name' => __('Display coupon message after', 'woocommerce-retainful-coupon'),
+                'name' => __('Display coupon message after', RNOC_TEXT_DOMAIN),
                 'id' => $this->app_prefix . 'retainful_add_coupon_message_to',
                 'type' => 'select',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
-                    /*'woocommerce_email_header' => __('Header', 'woocommerce-retainful-coupon'),*/
-                    'woocommerce_email_order_details' => __('Order details', 'woocommerce-retainful-coupon'),
-                    'woocommerce_email_order_meta' => __('Order meta', 'woocommerce-retainful-coupon'),
-                    'woocommerce_email_customer_details' => __('Customer details', 'woocommerce-retainful-coupon'),
-                    /*'woocommerce_email_footer' => __('Footer', 'woocommerce-retainful-coupon')*/
+                    /*'woocommerce_email_header' => __('Header', RNOC_TEXT_DOMAIN),*/
+                    'woocommerce_email_order_details' => __('Order details', RNOC_TEXT_DOMAIN),
+                    'woocommerce_email_order_meta' => __('Order meta', RNOC_TEXT_DOMAIN),
+                    'woocommerce_email_customer_details' => __('Customer details', RNOC_TEXT_DOMAIN),
+                    /*'woocommerce_email_footer' => __('Footer', RNOC_TEXT_DOMAIN)*/
                 ),
                 'default' => 'woocommerce_email_customer_details'
             ));
             $general_settings->add_field(array(
-                'name' => __('Custom coupon message', 'woocommerce-retainful-coupon'),
+                'name' => __('Custom coupon message', RNOC_TEXT_DOMAIN),
                 'id' => $this->app_prefix . 'retainful_coupon_message',
                 'type' => 'wysiwyg',
                 'classes' => 'retainful-coupon-group',
                 'default' => '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p></div></div>',
-                'desc' => __('This message will attached to the Order Email.<br>Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_amount}}</b> - Coupon amount<br><br><br>', 'woocommerce-retainful-coupon')
+                'desc' => __('This message will attached to the Order Email.<br>Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_amount}}</b> - Coupon amount<br><br><br>', RNOC_TEXT_DOMAIN)
             ));
         });
     }
@@ -152,9 +152,9 @@ class Settings
     {
         $settings = get_option($this->slug);
         if (!empty($settings) && isset($settings[$this->app_prefix . 'retainful_coupon_message']) && !empty(isset($settings[$this->app_prefix . 'retainful_coupon_message']))) {
-            return __($settings[$this->app_prefix . 'retainful_coupon_message'], 'woocommerce-retainful-coupon');
+            return __($settings[$this->app_prefix . 'retainful_coupon_message'], RNOC_TEXT_DOMAIN);
         } else {
-            return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p></div></div>', 'woocommerce-retainful-coupon');
+            return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p></div></div>', RNOC_TEXT_DOMAIN);
         }
     }
 

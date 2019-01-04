@@ -24,12 +24,12 @@ class OrderCoupon
         $app_id = isset($_REQUEST['app_id']) ? $_REQUEST['app_id'] : '';
         $response = array();
         if (empty($app_id)) {
-            $response['error'] = __('Please enter App-Id', 'woocommerce-retainful-coupon');
+            $response['error'] = __('Please enter App-Id', RNOC_TEXT_DOMAIN);
         }
         if (empty($response)) {
             $is_api_enabled = $this->admin->isApiEnabled($app_id);
             if ($is_api_enabled) {
-                $response['success'] = __('Successfully connected to Retainful', 'woocommerce-retainful-coupon');
+                $response['success'] = __('Successfully connected to Retainful', RNOC_TEXT_DOMAIN);
             } else {
                 $response['error'] = __('Please enter Valid App-Id', 'retainful-coupon');
             }
