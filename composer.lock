@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d4e72ce86a68e3183bba0d9865aecd8",
+    "content-hash": "975a4aa9773f51599b96f0cd294bc722",
     "packages": [
         {
             "name": "cmb2/cmb2",

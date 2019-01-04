@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin name: Retainful next order
+ * Plugin name: Woocommerce Retainful order coupon
  * Plugin URI: http://www.flycart.org
  * Description: Simple plugin to give coupon codes and track coupons for woocommerce
  * Author: Flycart Technologies LLP
  * Author URI: https://www.flycart.org
- * Version: 1.0.0
- * Slug: retainful-coupon
- * Text Domain: retainful-coupon
+ * Version: 1.0
+ * Slug: woocommerce-retainful-coupon
+ * Text Domain: woocommerce-retainful-coupon
  * Domain Path: /i18n/languages/
  * Plugin URI: http://www.flycart.org
  * Requires at least: 4.6.1

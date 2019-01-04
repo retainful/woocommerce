@@ -30,17 +30,17 @@ class CMB2_Field_Retainful_App
                value="<?php echo $field_escaped_value; ?>" class="regular-text"/>
         <input type="hidden" id="retainful_ajax_path" value="<?php echo admin_url('admin-ajax.php') ?>">
         <button type="button" class="button button-primary"
-                id="validate_retainful_app_id"><?php echo (!$is_app_connected) ? __('Connect', 'retainful-coupon') : __('Re-Connect', 'retainful-coupon'); ?></button>
+                id="validate_retainful_app_id"><?php echo (!$is_app_connected) ? __('Connect', 'woocommerce-retainful-coupon') : __('Re-Connect', 'woocommerce-retainful-coupon'); ?></button>
         <div style="float: right;background: #fff;border: 1px solid #eee;color:#333;margin: 0 5px;padding: 5px 10px;display:inline-block;align-items:center;border-radius: 4px;box-shadow: 0 0 5px 0 #ddd;">
-            <h3 style="display:inline-block;font-family:'helvetica',sans-serif;margin: 0;font-weight: 600;font-size:18px;color: #333;"><?php echo __('Signup for free, Get your API key now!', 'retainful-coupon') ?></h3>
+            <h3 style="display:inline-block;font-family:'helvetica',sans-serif;margin: 0;font-weight: 600;font-size:18px;color: #333;"><?php echo __('Signup for free, Get your API key now!', 'woocommerce-retainful-coupon') ?></h3>
             <p style="font-family:'helvetica',sans-serif;margin: 0;display:inline-block;"><a
                         href="https://app.retainful.com" target="_blank"
-                        style="font-family:'helvetica',sans-serif;margin: 0 5px;display: inline-block;padding: 10px 20px;text-decoration: none;color:#fff;background:#385FF7;border-radius: 4px;font-weight: 600;"><?php echo __('Get your API Key', 'retainful-coupon'); ?></a>
+                        style="font-family:'helvetica',sans-serif;margin: 0 5px;display: inline-block;padding: 10px 20px;text-decoration: none;color:#fff;background:#385FF7;border-radius: 4px;font-weight: 600;"><?php echo __('Get your API Key', 'woocommerce-retainful-coupon'); ?></a>
             </p>
         </div>
         <br>
         <div class="retainful_app_validation_message"><p
-                    style="color:green;"><?php echo ($is_app_connected) ? __('Successfully connected to Retainful', 'retainful-coupon') : '' ?></p>
+                    style="color:green;"><?php echo ($is_app_connected) ? __('Successfully connected to Retainful', 'woocommerce-retainful-coupon') : '' ?></p>
         </div>
 
         <?php
