@@ -18,7 +18,7 @@
         let path = $("#retainful_ajax_path").val();
         let app_id = $("#retainful_app_id");
         let message = $(".retainful_app_validation_message");
-        message.html('');
+        message.html('<p>&nbsp;</p>');
         $("#submit-cmb").hide();
         $.ajax({
             url: path,
@@ -42,28 +42,4 @@
             }
         });
     }
-
-    /*$('#submit-cmb').click(function () {
-        let path = $("#retainful_ajax_path").val();
-        let app_id = $("#retainful_app_id");
-        $.ajax({
-            url: path,
-            type: 'POST',
-            dataType: "json",
-            data: {action: 'validateAppKey', app_id: app_id.val()},
-            success: function (response) {
-                console.log(response);
-                if (response.error) {
-                    $("#is_retainful_app_connected").val(0);
-                    app_id.val("");
-                    app_id.focus();
-                }
-                if (response.success) {
-                    $("#is_retainful_app_connected").val(1);
-                    $("#rnoc_retainful").submit();
-                }
-            }
-        });
-        return false;
-    });*/
 })(jQuery);

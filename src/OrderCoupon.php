@@ -228,7 +228,12 @@ class OrderCoupon
                 } else {
                     $user_id = get_post_meta($post->ID, 'user_id', true);
                     $email = get_post_meta($post->ID, 'email', true);
-                    if ($current_user_id == $user_id || $current_email == $email) return $post;
+                    if (!empty($current_user_id) || !empty($current_email)) {
+                        if ($current_user_id == $user_id || $current_email == $email)
+                            return $post;
+                    } else if (empty($current_user_id) && empty($current_email)) {
+                        return $post;
+                    }
                 }
             }
         }

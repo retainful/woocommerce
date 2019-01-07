@@ -73,7 +73,7 @@ class Settings
                 'options' => array(
                     'all' => __('Allow any one to apply coupon', RNOC_TEXT_DOMAIN),
                     'validate_on_checkout' => __('Allow the customer to apply coupon, but validate at checkout', RNOC_TEXT_DOMAIN),
-                    'login_users' => __('Allow customer to apply coupon only after login, but validate at checkout', RNOC_TEXT_DOMAIN)
+                    'login_users' => __('Allow customer to apply coupon only after login', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => 'all'
             ));

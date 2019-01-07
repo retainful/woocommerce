@@ -84,7 +84,7 @@ msgstr ""
 
 #: src/admin/Settings.php:76
 msgid ""
-"Allow customer to apply coupon only after login, but validate at checkout"
+"Allow customer to apply coupon only after login"
 msgstr ""
 
 #: src/admin/Settings.php:81
