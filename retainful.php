@@ -5,7 +5,7 @@
  * Description: Drive repeat purchases by sending single-use, unique coupon codes to customers for their next purchase
  * Author: Retainful
  * Author URI: https://www.retainful.com
- * Version: 1.0
+ * Version: 1.0.1
  * Slug: retainful-woocommerce
  * Text Domain: retainful-woocommerce
  * Domain Path: /i18n/languages/
@@ -18,15 +18,15 @@
 namespace Rnoc;
 if (!defined('ABSPATH')) exit;
 
+if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
+    wp_die('Unable to find packages!');
+}
+
 /**
  * Define the text domain
  */
 if(!defined('RNOC_TEXT_DOMAIN'))
     define('RNOC_TEXT_DOMAIN','retainful-woocommerce');
-
-if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
-    wp_die('Unable to find packages!');
-}
 
 require __DIR__ . '/vendor/autoload.php';
 

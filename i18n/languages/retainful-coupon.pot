@@ -1,118 +1,121 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Retainful coupon\n"
-"POT-Creation-Date: 2019-01-04 12:52+0530\n"
-"PO-Revision-Date: 2019-01-04 12:52+0530\n"
+"Project-Id-Version: Retainful-woocommerce\n"
+"POT-Creation-Date: 2019-01-07 10:31+0530\n"
+"PO-Revision-Date: 2019-01-07 10:31+0530\n"
 "Last-Translator: \n"
-"Language-Team: Flycart technologies\n"
+"Language-Team: Retainful\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.2\n"
-"X-Poedit-Basepath: ../server/Projects/wp/retainful-coupon/src\n"
+"X-Poedit-Basepath: ../server/Projects/wp/woocommerce\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-KeywordsList: __;_e;esc_html__;esc_html_e;esc_attr__;esc_attr_e\n"
 "X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: vendor\n"
+"X-Poedit-SearchPathExcluded-1: i18n\n"
 
-#: Main.php:75
+#: src/Main.php:75
 msgid "Woocommerce must be activated for Woocommerce category discount to work"
 msgstr ""
 
-#: OrderCoupon.php:27
+#: src/OrderCoupon.php:27
 msgid "Please enter App-Id"
 msgstr ""
 
-#: OrderCoupon.php:32
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:43
+#: src/OrderCoupon.php:32
+#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:43
 msgid "Successfully connected to Retainful"
 msgstr ""
 
-#: OrderCoupon.php:34
+#: src/OrderCoupon.php:34
 msgid "Please enter Valid App-Id"
 msgstr ""
 
-#: admin/Settings.php:29
+#: src/admin/Settings.php:29
 msgid "Retainful Next Order Coupon"
 msgstr ""
 
-#: admin/Settings.php:34
+#: src/admin/Settings.php:34
 msgid "Next order coupon"
 msgstr ""
 
-#: admin/Settings.php:35
+#: src/admin/Settings.php:35
 msgid "Save"
 msgstr ""
 
-#: admin/Settings.php:38
+#: src/admin/Settings.php:38
 msgid "Retainful App ID"
 msgstr ""
 
-#: admin/Settings.php:42
+#: src/admin/Settings.php:42
 msgid "You can get your App-id from https://www.app.retainful.com"
 msgstr ""
 
-#: admin/Settings.php:51
+#: src/admin/Settings.php:51
 msgid "Coupon type"
 msgstr ""
 
-#: admin/Settings.php:56
+#: src/admin/Settings.php:56
 msgid "Percentage"
 msgstr ""
 
-#: admin/Settings.php:57
+#: src/admin/Settings.php:57
 msgid "Flat"
 msgstr ""
 
-#: admin/Settings.php:62
+#: src/admin/Settings.php:62
 msgid "Coupon value"
 msgstr ""
 
-#: admin/Settings.php:69
+#: src/admin/Settings.php:69
 msgid "Apply coupon to"
 msgstr ""
 
-#: admin/Settings.php:74
+#: src/admin/Settings.php:74
 msgid "Allow any one to apply coupon"
 msgstr ""
 
-#: admin/Settings.php:75
+#: src/admin/Settings.php:75
 msgid "Allow the customer to apply coupon, but validate at checkout"
 msgstr ""
 
-#: admin/Settings.php:76
+#: src/admin/Settings.php:76
 msgid ""
 "Allow customer to apply coupon only after login, but validate at checkout"
 msgstr ""
 
-#: admin/Settings.php:81
+#: src/admin/Settings.php:81
 msgid "Display coupon message after"
 msgstr ""
 
-#: admin/Settings.php:87
+#: src/admin/Settings.php:87
 msgid "Order details"
 msgstr ""
 
-#: admin/Settings.php:88
+#: src/admin/Settings.php:88
 msgid "Order meta"
 msgstr ""
 
-#: admin/Settings.php:89
+#: src/admin/Settings.php:89
 msgid "Customer details"
 msgstr ""
 
-#: admin/Settings.php:95
+#: src/admin/Settings.php:95
 msgid "Custom coupon message"
 msgstr ""
 
-#: admin/Settings.php:100
+#: src/admin/Settings.php:100
 msgid ""
 "This message will attached to the Order Email.<br>Please use the below short "
 "codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - "
-"Coupon code<br><b>{{coupon_amount}}</b> - Coupon amount<br><br><br>"
+"Coupon code<br><b>{{coupon_amount}}</b> - Coupon amount<br><b>{{coupon_url}}"
+"</b> - Url to apply coupon automatically<br><br>"
 msgstr ""
 
-#: admin/Settings.php:157
+#: src/admin/Settings.php:157
 msgid ""
 "<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 style="
 "\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"
@@ -122,21 +125,25 @@ msgid ""
 "voucher for {{coupon_amount}} off your next order!</p><p style=\"text-align: "
 "center;\"><span style=\"line-height: 1.6; font-size: 18px; font-weight: 500; "
 "background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: "
-"#8d71db; text-decoration: none;\">{{coupon_code}}</span></p></div></div>"
+"#8d71db; text-decoration: none;\">{{coupon_code}}</span></p><p style=\"text-"
+"align: center; margin: 0;\"><a style=\"line-height: 1.8; font-size: 16px; "
+"font-weight: 500; background: #8D71DB; display: block; padding: 10px; "
+"border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-"
+"decoration: none;\" href=\"{{coupon_url}}\">Go! </a></p></div></div>"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:33
+#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:33
 msgid "Connect"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:33
+#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:33
 msgid "Re-Connect"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:35
+#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:35
 msgid "Signup for free, Get your API key now!"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:38
+#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:38
 msgid "Get your API Key"
 msgstr ""

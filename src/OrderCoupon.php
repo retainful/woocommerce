@@ -68,7 +68,8 @@ class OrderCoupon
                 if ($coupon_amount > 0) {
                     $string_to_replace = array(
                         '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
-                        '{{coupon_code}}' => $coupon_code
+                        '{{coupon_code}}' => $coupon_code,
+                        '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
                     );
                     $message = $this->admin->getCouponMessage();
                     foreach ($string_to_replace as $key => $value) {
@@ -88,12 +89,12 @@ class OrderCoupon
      */
     public static function addCouponToCheckout()
     {
-        $coupon_code = WC()->session->get('rnoc_coupon_code');
+        $coupon_code = WC()->session->get('retainful_coupon_code');
         $cart = WC()->cart;
         if (!empty($cart)) {
             if (!empty($coupon_code) && !WC()->cart->has_discount($coupon_code)) {
                 WC()->cart->add_discount($coupon_code);
-                WC()->session->__unset('rnoc_coupon_code');
+                WC()->session->__unset('retainful_coupon_code');
             }
         }
     }
@@ -103,11 +104,11 @@ class OrderCoupon
      */
     function setCouponToSession()
     {
-        if (isset($_REQUEST['rnoc_coupon_code'])) {
-            $coupon_code = WC()->session->get('rnoc_coupon_code');
+        if (isset($_REQUEST['retainful_coupon_code'])) {
+            $coupon_code = WC()->session->get('retainful_coupon_code');
             if (empty($coupon_code)) {
-                $coupon_code = esc_attr($_REQUEST['rnoc_coupon_code']);
-                WC()->session->set('rnoc_coupon_code', $coupon_code); // Set the coupon code in session
+                $coupon_code = esc_attr($_REQUEST['retainful_coupon_code']);
+                WC()->session->set('retainful_coupon_code', $coupon_code); // Set the coupon code in session
             }
         }
     }

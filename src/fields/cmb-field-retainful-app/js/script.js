@@ -19,6 +19,7 @@
         let app_id = $("#retainful_app_id");
         let message = $(".retainful_app_validation_message");
         message.html('');
+        $("#submit-cmb").hide();
         $.ajax({
             url: path,
             type: 'POST',
@@ -31,7 +32,6 @@
                     app_id.val("");
                     app_id.focus();
                     message.html('<p style="color:red;">' + response.error + '</p>');
-                    $("#submit-cmb").hide();
                 }
                 if (response.success) {
                     $("#is_retainful_app_connected").val(1);
