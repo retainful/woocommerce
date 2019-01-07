@@ -56,31 +56,34 @@ class OrderCoupon
     function attachOrderCoupon($order, $sent_to_admin, $plain_text, $email)
     {
         //if (!$sent_to_admin) {
-        $message = "";
-        $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
-        $coupon_details = $this->getCouponDetails($coupon_code);
-        if (!empty($coupon_details)) {
-            $post_id = $coupon_details->ID;
-            $coupon = get_post_meta($post_id);
-            if (!empty($coupon)) {
-                $coupon_type = isset($coupon['coupon_type'][0]) ? $coupon['coupon_type'][0] : 0;
-                $coupon_amount = isset($coupon['coupon_value'][0]) ? $coupon['coupon_value'][0] : 0;
-                if ($coupon_amount > 0) {
-                    $string_to_replace = array(
-                        '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
-                        '{{coupon_code}}' => $coupon_code,
-                        '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
-                    );
-                    $message = $this->admin->getCouponMessage();
-                    foreach ($string_to_replace as $key => $value) {
-                        $message = str_replace($key, $value, $message);
+        $is_api_enabled = $this->admin->isAppConnected();
+        if ($is_api_enabled) {
+            $message = "";
+            $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+            $coupon_details = $this->getCouponDetails($coupon_code);
+            if (!empty($coupon_details)) {
+                $post_id = $coupon_details->ID;
+                $coupon = get_post_meta($post_id);
+                if (!empty($coupon)) {
+                    $coupon_type = isset($coupon['coupon_type'][0]) ? $coupon['coupon_type'][0] : 0;
+                    $coupon_amount = isset($coupon['coupon_value'][0]) ? $coupon['coupon_value'][0] : 0;
+                    if ($coupon_amount > 0) {
+                        $string_to_replace = array(
+                            '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
+                            '{{coupon_code}}' => $coupon_code,
+                            '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
+                        );
+                        $message = $this->admin->getCouponMessage();
+                        foreach ($string_to_replace as $key => $value) {
+                            $message = str_replace($key, $value, $message);
+                        }
+                        $request_params = $this->getRequestParams($order);
+                        $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track', $request_params) . '" />';
                     }
-                    $request_params = $this->getRequestParams($order);
-                    $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track', $request_params) . '" />';
                 }
             }
+            echo $message;
         }
-        echo $message;
         //}
     }
 
