@@ -25,8 +25,14 @@ if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
 /**
  * Define the text domain
  */
-if(!defined('RNOC_TEXT_DOMAIN'))
-    define('RNOC_TEXT_DOMAIN','retainful-woocommerce');
+if (!defined('RNOC_TEXT_DOMAIN'))
+    define('RNOC_TEXT_DOMAIN', 'retainful-woocommerce');
+
+/**
+ * Current version of our app
+ */
+if (!defined('RNOC_VERSION'))
+    define('RNOC_VERSION', '1.0.1');
 
 require __DIR__ . '/vendor/autoload.php';
 

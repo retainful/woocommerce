@@ -9,10 +9,6 @@ class Main
 {
     public static $init;
     public $rnoc, $admin;
-    /**
-     * Current version of our app
-     */
-    const VERSION = 1.0;
 
     /**
      * Initiate the plugin
