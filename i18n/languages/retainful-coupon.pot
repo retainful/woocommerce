@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Retainful-woocommerce\n"
-"POT-Creation-Date: 2019-01-07 13:04+0530\n"
-"PO-Revision-Date: 2019-01-07 13:04+0530\n"
+"POT-Creation-Date: 2019-01-07 14:29+0530\n"
+"PO-Revision-Date: 2019-01-07 14:30+0530\n"
 "Last-Translator: \n"
 "Language-Team: Retainful\n"
 "Language: en\n"
@@ -39,7 +39,7 @@ msgid "Retainful Next Order Coupon"
 msgstr ""
 
 #: src/admin/Settings.php:34
-msgid "Next order coupon"
+msgid "Settings"
 msgstr ""
 
 #: src/admin/Settings.php:35
@@ -145,7 +145,7 @@ msgid "Get your API Key for free"
 msgstr ""
 
 #: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:46
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:58
+#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:57
 msgid ""
 "Increase sales & get more money per customer. Drive repeat purchases by "
 "automatically sending a\n"
@@ -156,10 +156,6 @@ msgstr ""
 msgid "Get your API Key"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:56
-msgid "Visit your dashboard for more information"
-msgstr ""
-
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:63
+#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:62
 msgid "Visit Dashboard!"
 msgstr ""

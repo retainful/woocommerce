@@ -53,7 +53,6 @@ class CMB2_Field_Retainful_App
                 <?php
             } else {
                 ?>
-                <h3 style="flex: 1;font-family:'helvetica',sans-serif;margin: 0;font-weight: 600;font-size:25px;color: #333;line-height:1.3;"><?php echo __('Visit your dashboard for more information', RNOC_TEXT_DOMAIN); ?></h3>
                 <p style="font-family:'helvetica',sans-serif;margin: 15px 0;color:#777;font-size: 17px;letter-spacing:0.02em;line-height:1.6;">
                     <?php echo __('Increase sales & get more money per customer. Drive repeat purchases by automatically sending a
                 single-use coupon for next purchase.', RNOC_TEXT_DOMAIN); ?>

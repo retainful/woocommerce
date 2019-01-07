@@ -31,7 +31,7 @@ class Settings
                 'option_key' => $this->slug,
                 'tab_group' => $this->slug,
                 'parent_slug' => 'woocommerce',
-                'tab_title' => __('Next order coupon', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Settings', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
@@ -124,7 +124,7 @@ class Settings
     function isAppConnected()
     {
         $settings = get_option($this->slug);
-        if (!empty($settings) && isset($settings[$this->app_prefix . 'is_retainful_connected']) && !empty(isset($settings[$this->app_prefix . 'is_retainful_connected']))) {
+        if (!empty($settings) && isset($settings[$this->app_prefix . 'is_retainful_connected']) && !empty($settings[$this->app_prefix . 'is_retainful_connected'])) {
             return true;
         }
         return false;
@@ -138,7 +138,7 @@ class Settings
     function getApiKey()
     {
         $settings = get_option($this->slug);
-        if (!empty($settings) && isset($settings[$this->app_prefix . 'retainful_app_id']) && !empty(isset($settings[$this->app_prefix . 'retainful_app_id']))) {
+        if (!empty($settings) && isset($settings[$this->app_prefix . 'retainful_app_id']) && !empty($settings[$this->app_prefix . 'retainful_app_id'])) {
             return $settings[$this->app_prefix . 'retainful_app_id'];
         }
         return NULL;

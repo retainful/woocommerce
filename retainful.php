@@ -18,6 +18,18 @@
 namespace Rnoc;
 if (!defined('ABSPATH')) exit;
 
+/**
+ * Check and abort if PHP version is is less them 5.6
+ */
+register_activation_hook(__FILE__, function () {
+    if (version_compare(phpversion(), '5.6', '<')) {
+        wp_die('Retainful-woocommerce requires minimum PHP version of 5.6');
+    }
+});
+
+/**
+ * Check for required packages
+ */
 if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
     wp_die('Unable to find packages!');
 }
