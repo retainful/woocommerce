@@ -266,7 +266,7 @@ class OrderCoupon
                 $new_coupon_code = strtoupper(uniqid());
                 $new_coupon_code = chunk_split($new_coupon_code, 5, '-');
                 $new_coupon_code = rtrim($new_coupon_code, '-');
-                $this->addNextOrderCouponToOrder($new_coupon_code, $order_id, $email);
+                $this->addNewCouponToOrder($new_coupon_code, $order_id, $email);
             } else {
                 $new_coupon_code = strtoupper($coupon);
             }
@@ -361,7 +361,7 @@ class OrderCoupon
      * @param $email
      * @return int|\WP_Error
      */
-    function addNextOrderCouponToOrder($new_coupon_code, $order_id, $email)
+    function addNewCouponToOrder($new_coupon_code, $order_id, $email)
     {
         $post = array(
             'post_title' => $new_coupon_code,

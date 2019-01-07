@@ -31,18 +31,41 @@ class CMB2_Field_Retainful_App
         <input type="hidden" id="retainful_ajax_path" value="<?php echo admin_url('admin-ajax.php') ?>">
         <button type="button" class="button button-primary"
                 id="validate_retainful_app_id"><?php echo (!$is_app_connected) ? __('Connect', RNOC_TEXT_DOMAIN) : __('Re-Connect', RNOC_TEXT_DOMAIN); ?></button>
-        <div style="float: right;background: #fff;border: 1px solid #eee;color:#333;margin: 0 5px;padding: 5px 10px;display:inline-block;align-items:center;border-radius: 4px;box-shadow: 0 0 5px 0 #ddd;">
-            <h3 style="display:inline-block;font-family:'helvetica',sans-serif;margin: 0;font-weight: 600;font-size:18px;color: #333;"><?php echo __('Signup for free, Get your API key now!', RNOC_TEXT_DOMAIN) ?></h3>
-            <p style="font-family:'helvetica',sans-serif;margin: 0;display:inline-block;"><a
-                        href="https://app.retainful.com" target="_blank"
-                        style="font-family:'helvetica',sans-serif;margin: 0 5px;display: inline-block;padding: 10px 20px;text-decoration: none;color:#fff;background:#385FF7;border-radius: 4px;font-weight: 600;"><?php echo __('Get your API Key', RNOC_TEXT_DOMAIN); ?></a>
-            </p>
-        </div>
-        <br>
-        <div class="retainful_app_validation_message"><p
+        <div class="retainful_app_validation_message" style="display:flex;"><p
                     style="color:green;"><?php echo ($is_app_connected) ? __('Successfully connected to Retainful', RNOC_TEXT_DOMAIN) : '' ?></p>
         </div>
-
+        <div style="display:block;background: #fff;border: 1px solid #eee;color:#333;padding: 20px;max-width: 100%;text-align:center;border-radius: 4px;box-shadow: 0 0 5px 0 #ddd;margin: auto;">
+            <p style="font-family:'helvetica',sans-serif;margin: 0 0 20px;">
+                <img src="https://www.retainful.com/images/retainful-logo.png" style="max-width: 150px;height: auto;"
+                     alt=""></p>
+            <?php
+            if (!$is_app_connected) {
+                ?>
+                <h3 style="flex: 1;font-family:'helvetica',sans-serif;margin: 0;font-weight: 600;font-size:25px;color: #333;line-height:1.3;"><?php echo __('Get your API Key for free', RNOC_TEXT_DOMAIN); ?></h3>
+                <p style="font-family:'helvetica',sans-serif;margin: 15px 0;color:#777;font-size: 17px;letter-spacing:0.02em;line-height:1.6;">
+                    <?php echo __('Increase sales & get more money per customer. Drive repeat purchases by automatically sending a
+                single-use coupon for next purchase.', RNOC_TEXT_DOMAIN); ?>
+                </p>
+                <p style="font-family:'helvetica',sans-serif;margin: 20px 0 0;">
+                    <a href="https://app.retainful.com" target="_blank"
+                       style="font-family:'helvetica',sans-serif;display: inline-block;font-size: 16px;padding: 10px 20px;text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 500;line-height:1.6;"><?php echo __('Get your API Key', RNOC_TEXT_DOMAIN); ?></a>
+                </p>
+                <?php
+            } else {
+                ?>
+                <h3 style="flex: 1;font-family:'helvetica',sans-serif;margin: 0;font-weight: 600;font-size:25px;color: #333;line-height:1.3;"><?php echo __('Visit your dashboard for more information', RNOC_TEXT_DOMAIN); ?></h3>
+                <p style="font-family:'helvetica',sans-serif;margin: 15px 0;color:#777;font-size: 17px;letter-spacing:0.02em;line-height:1.6;">
+                    <?php echo __('Increase sales & get more money per customer. Drive repeat purchases by automatically sending a
+                single-use coupon for next purchase.', RNOC_TEXT_DOMAIN); ?>
+                </p>
+                <p style="font-family:'helvetica',sans-serif;margin: 20px 0 0;">
+                    <a href="https://app.retainful.com/dashboard" target="_blank"
+                       style="font-family:'helvetica',sans-serif;display: inline-block;font-size: 16px;padding: 10px 20px;text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 500;line-height:1.6;"><?php echo __('Visit Dashboard!', RNOC_TEXT_DOMAIN); ?></a>
+                </p>
+                <?php
+            }
+            ?>
+        </div>
         <?php
     }
 
