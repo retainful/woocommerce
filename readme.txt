@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.0
 WC tested up to: 3.5.2
 Requires PHP: 5.6
-Stable tag: 1.0
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,7 +64,7 @@ Whether you are using the default transactional emails of WooCommerce or use an 
 
 **Insights and Analytics**
 
-The Retainful Dashboard shows you the conversions in real-time and know how much money you made through repeat purchases using Retainful coupons. See how many have opened the transactional emails.
+The Retainful Dashboard shows you the conversions in real-time and know how much money you made through repeat purchases using Retainful coupons. See how many have opened the transactional emails and more.
 
 ==Support==
 
@@ -86,12 +86,17 @@ We'd love to hear from you!
 
 = 1. Why do I need to create a Retainful account to use the plugin =
 Retainful is a Software-as-a-Service platform, built on the cloud. The plugin is a connector between your WooCommerce store and Retainful. By creating a free account, you can get the API Key for using the platform.
-And you can get access to the Insights and Analytics via the platform Dashboard.
+While the plugin handle the interface with WooCommerce, the email opens, conversion tracking and reporting, follow-ups are performed by the Retainful in the cloud.
+The Insights and Analytics are recorded and provided via the Platform's Dashboard.
 
-= 2. What is the Pricing for Retainful =
+= 2. Do you collect any data for conversion metrics? =
+
+Retainful records the conversions by using only the customer's email, OrderID and the order total. No other data is collected.
+
+= 3. What is the Pricing for Retainful =
 Retainful is free. Yes. There are no charges for using the services of the Retainful - Next Order Coupon for WooCommerce.
 
-= 3. Do I have to pay for support? =
+= 4. Do I have to pay for support? =
 No. There is no charges for support.
 
 == Screenshots ==
