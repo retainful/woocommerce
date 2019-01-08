@@ -5,7 +5,7 @@
  * Description: Drive repeat purchases by sending single-use, unique coupon codes to customers for their next purchase
  * Author: Retainful
  * Author URI: https://www.retainful.com
- * Version: 1.0.1
+ * Version: 1.0.2
  * Slug: retainful-woocommerce
  * Text Domain: retainful-woocommerce
  * Domain Path: /i18n/languages/
@@ -44,7 +44,7 @@ if (!defined('RNOC_TEXT_DOMAIN'))
  * Current version of our app
  */
 if (!defined('RNOC_VERSION'))
-    define('RNOC_VERSION', '1.0.1');
+    define('RNOC_VERSION', '1.0.2');
 
 require __DIR__ . '/vendor/autoload.php';
 
