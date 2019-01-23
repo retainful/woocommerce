@@ -8,4 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'b1dc14a640208cfcaca8b6e040770111' => $vendorDir . '/cmb2/cmb2/init.php',
     '5dabe93ffb7c784b4f1b242e4f523222' => $baseDir . '/src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php',
+    '5f1adb8b968396ea48729d44bcf4966e' => $baseDir . '/src/fields/cmb2-field-post-search-ajax/cmb-field-post-search-ajax.php',
+    '682d5b175c91812bf2aab8b4480e410b' => $baseDir . '/src/fields/cmb-field-select2/cmb-field-select2.php',
+    '0f004e69191bfffaff4f82a67a1e0403' => $baseDir . '/src/fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php',
 );

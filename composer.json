@@ -2,8 +2,9 @@
   "name": "retainful/woocommerce",
   "description": "Simple plugin to give coupons for users next order",
   "require": {
-    "cmb2/cmb2": "dev-master"
+    "cmb2/cmb2": "^2.5.1"
   },
+  "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
       "Rnoc\\": "",
@@ -13,7 +14,10 @@
     },
     "files": [
       "vendor/cmb2/cmb2/init.php",
-      "src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php"
+      "src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php",
+      "src/fields/cmb2-field-post-search-ajax/cmb-field-post-search-ajax.php",
+      "src/fields/cmb-field-select2/cmb-field-select2.php",
+      "src/fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php"
     ]
   }
 }

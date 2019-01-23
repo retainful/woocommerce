@@ -5,8 +5,8 @@
  * Description: Drive repeat purchases by sending single-use, unique coupon codes to customers for their next purchase
  * Author: Retainful
  * Author URI: https://www.retainful.com
- * Version: 1.0.2
- * Slug: retainful-woocommerce
+ * Version: 1.0.3
+ * Slug: retainful-next-order-coupon-for-woocommerce
  * Text Domain: retainful-woocommerce
  * Domain Path: /i18n/languages/
  * Plugin URI: https://www.retainful.com
@@ -15,7 +15,6 @@
  * WC tested up to: 3.5
  */
 
-namespace Rnoc;
 if (!defined('ABSPATH')) exit;
 
 /**
@@ -31,7 +30,7 @@ register_activation_hook(__FILE__, function () {
  * Check for required packages
  */
 if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
-    wp_die('Unable to find packages!');
+    return false;
 }
 
 /**
@@ -44,7 +43,13 @@ if (!defined('RNOC_TEXT_DOMAIN'))
  * Current version of our app
  */
 if (!defined('RNOC_VERSION'))
-    define('RNOC_VERSION', '1.0.2');
+    define('RNOC_VERSION', '1.0.3');
+
+/**
+ * Set base file URL
+ */
+if (!defined('RNOC_BASE_FILE'))
+    define('RNOC_BASE_FILE', plugin_basename(__FILE__));
 
 require __DIR__ . '/vendor/autoload.php';
 

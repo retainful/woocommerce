@@ -52,13 +52,14 @@ class Main
         add_action('woocommerce_cart_loaded_from_session', array($this->rnoc, 'addCouponToCheckout'), 10);
 
         //Attach coupon to email
-        //$add_email_message_to = (isset($option[$prefix . 'retainful_add_coupon_message_to'])) ? $option[$prefix . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
         $hook = $this->admin->couponMessageHook();
         if (!empty($hook))
             add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
 
         //Validate key
         add_action('wp_ajax_validateAppKey', array($this->rnoc, 'validateAppKey'));
+        //Settings link
+        add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
     }
 
 

@@ -5,9 +5,7 @@ if (!defined('ABSPATH')) exit;
 
 class RetainfulApi
 {
-    //public $domain = "https://c13061yiw2.execute-api.us-east-2.amazonaws.com/production/v1/";
     public $domain = "https://api.retainful.com/v1/";
-    //public $domain = "http://retainful.ngrok.io/v1/";
 
     /**
      * Validate API Key

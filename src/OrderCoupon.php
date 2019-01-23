@@ -47,6 +47,19 @@ class OrderCoupon
     }
 
     /**
+     * Add settings link
+     * @param $links
+     * @return array
+     */
+    function pluginActionLinks($links)
+    {
+        $action_links = array(
+            'settings' => '<a href="' . admin_url('admin.php?page=retainful') . '">' . __('Settings', RNOC_TEXT_DOMAIN) . '</a>',
+        );
+        return array_merge($action_links, $links);
+    }
+
+    /**
      * Attach the coupon details to Order
      * @param $order
      * @param $sent_to_admin
@@ -57,32 +70,57 @@ class OrderCoupon
     {
         if (!$sent_to_admin) {
             $is_api_enabled = $this->admin->isAppConnected();
-            if ($is_api_enabled) {
+            $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+            if ($is_api_enabled && !empty($coupon_code)) {
                 $message = "";
-                $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
                 $coupon_details = $this->getCouponDetails($coupon_code);
                 if (!empty($coupon_details)) {
                     $post_id = $coupon_details->ID;
-                    $coupon = get_post_meta($post_id);
-                    if (!empty($coupon)) {
-                        $coupon_type = isset($coupon['coupon_type'][0]) ? $coupon['coupon_type'][0] : 0;
-                        $coupon_amount = isset($coupon['coupon_value'][0]) ? $coupon['coupon_value'][0] : 0;
-                        if ($coupon_amount > 0) {
-                            $string_to_replace = array(
-                                '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
-                                '{{coupon_code}}' => $coupon_code,
-                                '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
-                            );
-                            $message = $this->admin->getCouponMessage();
-                            foreach ($string_to_replace as $key => $value) {
-                                $message = str_replace($key, $value, $message);
-                            }
+                    $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
+                    if ($coupon_amount > 0) {
+                        $coupon_type = get_post_meta($post_id, 'coupon_type', true);
+                        $string_to_replace = array(
+                            '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
+                            '{{coupon_code}}' => $coupon_code,
+                            '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
+                        );
+                        $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
+                        if (!empty($coupon_expiry_date)) {
+                            $string_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date);
+                        }
+                        $message = $this->admin->getCouponMessage();
+                        $message = str_replace(array_keys($string_to_replace), $string_to_replace, $message);
+                        $api_key = $this->admin->getApiKey();
+                        if (!empty($api_key)) {
                             $request_params = $this->getRequestParams($order);
                             $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track', $request_params) . '" />';
                         }
+
                     }
                 }
                 echo $message;
+            }
+        }
+    }
+
+    /**
+     * Format the date
+     * @param $date
+     * @param string $format
+     * @return string|null
+     */
+    function formatDate($date, $format = "F j, Y, g:i a")
+    {
+        if (empty($date))
+            return NULL;
+        if (function_exists('get_date_from_gmt')) {
+            return get_date_from_gmt(date('Y-m-d H:i:s', strtotime($date)), $format);
+        } else {
+            try {
+                $date = new \DateTime($date);
+                return $date->format($format);
+            } catch (\Exception $e) {
+                return NULL;
             }
         }
     }
@@ -110,7 +148,7 @@ class OrderCoupon
         if (isset($_REQUEST['retainful_coupon_code'])) {
             $coupon_code = WC()->session->get('retainful_coupon_code');
             if (empty($coupon_code)) {
-                $coupon_code = esc_attr($_REQUEST['retainful_coupon_code']);
+                $coupon_code = sanitize_text_field($_REQUEST['retainful_coupon_code']);
                 WC()->session->set('retainful_coupon_code', $coupon_code); // Set the coupon code in session
             }
         }
@@ -134,8 +172,11 @@ class OrderCoupon
             if (isset($coupon_details->ID) && !empty($coupon_details->ID) && !$is_coupon_already_applied) {
                 self::$applied_coupons = $coupon_code;
                 $discount_type = 'fixed_cart';
+                $usage_restrictions = $this->admin->getUsageRestrictions();
+                $app_prefix = isset($usage_restrictions['app_prefix']) ? $usage_restrictions['app_prefix'] : '';
                 $coupon_type = get_post_meta($coupon_details->ID, 'coupon_type', true);
                 $coupon_value = get_post_meta($coupon_details->ID, 'coupon_value', true);
+                $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
                 $remove_coupon = isset($_REQUEST['remove_coupon']) ? $_REQUEST['remove_coupon'] : false;
                 if ($remove_coupon == $coupon_code)
                     return false;
@@ -145,20 +186,22 @@ class OrderCoupon
                     'id' => 321123 . rand(2, 9),
                     'amount' => $coupon_value,
                     'individual_use' => false,
-                    'product_ids' => array(),
-                    'exclude_product_ids' => array(),
+                    'product_ids' => (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array(),
+                    'excluded_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
+                    //'exclude_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
                     'usage_limit' => '',
                     'usage_limit_per_user' => '',
                     'limit_usage_to_x_items' => '',
                     'usage_count' => '',
-                    'expiry_date' => '',
+                    'expiry_date' => $coupon_expiry_date,
                     'apply_before_tax' => 'yes',
                     'free_shipping' => false,
-                    'product_categories' => array(),
-                    'exclude_product_categories' => array(),
-                    'exclude_sale_items' => false,
-                    'minimum_amount' => '',
-                    'maximum_amount' => '',
+                    'product_categories' => (isset($usage_restrictions[$app_prefix . 'product_categories'])) ? $usage_restrictions[$app_prefix . 'product_categories'] : array(),
+                    'excluded_product_categories' => (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array(),
+                    //'exclude_product_categories' => (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array(),
+                    'exclude_sale_items' => (isset($usage_restrictions[$app_prefix . 'exclude_sale_items'])) ? true : false,
+                    'minimum_amount' => (isset($usage_restrictions[$app_prefix . 'minimum_spend']) && $usage_restrictions[$app_prefix . 'minimum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'minimum_spend'] : '',
+                    'maximum_amount' => (isset($usage_restrictions[$app_prefix . 'maximum_spend']) && $usage_restrictions[$app_prefix . 'maximum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'maximum_spend'] : '',
                     'customer_email' => '',
                     'discount_type' => $discount_type
                 );
@@ -170,10 +213,14 @@ class OrderCoupon
 
 
     /**
+     * Process after the Place order
      * @param $order_id
+     * @return bool
      */
     function onAfterPayment($order_id)
     {
+        if (empty($order_id))
+            return false;
         $is_api_enabled = $this->admin->isAppConnected();
         if ($is_api_enabled) {
             $order = $this->wc_functions->getOrder($order_id);
@@ -189,8 +236,12 @@ class OrderCoupon
                 }
             }
             //Handle API Requests
-            $this->admin->sendCouponDetails('track', $request_params);
+            $api_key = $this->admin->getApiKey();
+            if (!empty($api_key)) {
+                $this->admin->sendCouponDetails('track', $request_params);
+            }
         }
+        return true;
     }
 
     /**
@@ -201,9 +252,8 @@ class OrderCoupon
      */
     function isValidCoupon($coupon, $order = NULL)
     {
-        $post_args = array('post_type' => 'rnoc_order_coupon', 'numberposts' => '1', 'post_status' => 'publish', 'title' => strtoupper($coupon));
-        $posts = get_posts($post_args);
-        if (!empty($posts)) {
+        $coupon_details = $this->getCouponByCouponCode($coupon);
+        if (!empty($coupon_details) && $coupon_details->post_status == "publish") {
             $coupon_only_for = $this->admin->couponFor();
             $current_user_id = $current_email = '';
             if ($coupon_only_for != 'all') {
@@ -219,21 +269,19 @@ class OrderCoupon
                     }
                 }
             }
-            foreach ($posts as $post) {
-                if ($coupon_only_for == 'all') {
-                    return $post;
-                } else if ($coupon_only_for == 'login_users') {
-                    $user_id = get_post_meta($post->ID, 'user_id', true);
-                    if ($current_user_id == $user_id) return $post;
-                } else {
-                    $user_id = get_post_meta($post->ID, 'user_id', true);
-                    $email = get_post_meta($post->ID, 'email', true);
-                    if (!empty($current_user_id) || !empty($current_email)) {
-                        if ($current_user_id == $user_id || $current_email == $email)
-                            return $post;
-                    } else if (empty($current_user_id) && empty($current_email)) {
-                        return $post;
-                    }
+            if ($coupon_only_for == 'all') {
+                return $coupon_details;
+            } else if ($coupon_only_for == 'login_users') {
+                $user_id = get_post_meta($coupon_details->ID, 'user_id', true);
+                if ($current_user_id == $user_id) return $coupon_details;
+            } else {
+                $user_id = get_post_meta($coupon_details->ID, 'user_id', true);
+                $email = get_post_meta($coupon_details->ID, 'email', true);
+                if (!empty($current_user_id) || !empty($current_email)) {
+                    if ($current_user_id == $user_id || $current_email == $email)
+                        return $coupon_details;
+                } else if (empty($current_user_id) && empty($current_email)) {
+                    return $coupon_details;
                 }
             }
         }
@@ -247,6 +295,7 @@ class OrderCoupon
      */
     function getRequestParams($order)
     {
+        if (empty($order)) return array();
         return array(
             'order_id' => $this->wc_functions->getOrderId($order),
             'email' => $this->wc_functions->getOrderEmail($order),
@@ -260,28 +309,38 @@ class OrderCoupon
     }
 
     /**
+     * Create new coupon
      * @param $order_id
      * @param $data
+     * @return bool
      */
     function createNewCoupon($order_id, $data)
     {
+        $order_id = sanitize_key($order_id);
+        if (empty($order_id)) return false;
         $is_api_enabled = $this->admin->isAppConnected();
         if ($is_api_enabled) {
             $coupon = $this->isCouponFound($order_id);
             $order = $this->wc_functions->getOrder($order_id);
             if (empty($coupon)) {
                 $email = $this->wc_functions->getOrderEmail($order);
+                $order_date = $this->wc_functions->getOrderDate($order);
                 $new_coupon_code = strtoupper(uniqid());
                 $new_coupon_code = chunk_split($new_coupon_code, 5, '-');
                 $new_coupon_code = rtrim($new_coupon_code, '-');
-                $this->addNewCouponToOrder($new_coupon_code, $order_id, $email);
+                $this->addNewCouponToOrder($new_coupon_code, $order_id, $email, $order_date);
             } else {
                 $new_coupon_code = strtoupper($coupon);
             }
+            $new_coupon_code = sanitize_text_field($new_coupon_code);
+            if (empty($new_coupon_code))
+                return NULL;
             update_post_meta($order_id, '_rnoc_next_order_coupon', $new_coupon_code);
             $used_coupons = $this->wc_functions->getUsedCoupons($order);
             if (!empty($used_coupons)) {
                 foreach ($used_coupons as $used_coupon) {
+                    if (empty($used_coupon))
+                        continue;
                     $coupon_details = $this->getCouponDetails($used_coupon);
                     if (!empty($coupon_details)) {
                         update_post_meta($order_id, '_rnoc_next_order_coupon_applied', strtoupper($used_coupon));
@@ -290,6 +349,7 @@ class OrderCoupon
                 }
             }
         }
+        return true;
     }
 
     /**
@@ -299,24 +359,21 @@ class OrderCoupon
      */
     function getCouponDetails($coupon)
     {
-        $post_args = array('post_type' => 'rnoc_order_coupon', 'numberposts' => '1', 'title' => strtoupper($coupon));
-        $posts = get_posts($post_args);
-        if (!empty($posts)) {
+        $coupon_details = $this->getCouponByCouponCode($coupon);
+        if (!empty($coupon_details)) {
             $coupon_only_for = $this->admin->couponFor();
-            foreach ($posts as $post) {
-                if ($coupon_only_for == 'all') {
-                    return $post;
-                } else if ($coupon_only_for == 'login_users') {
-                    $user_id = get_post_meta($post->ID, 'user_id', true);
-                    $current_user_id = get_current_user_id();
-                    if ($current_user_id == $user_id) return $post;
-                } else {
-                    $user_id = get_post_meta($post->ID, 'user_id', true);
-                    $email = get_post_meta($post->ID, 'email', true);
-                    $current_email = $this->getCurrentEmail();
-                    $current_user_id = get_current_user_id();
-                    if ($current_user_id == $user_id || $current_email == $email) return $post;
-                }
+            if ($coupon_only_for == 'all') {
+                return $coupon_details;
+            } else if ($coupon_only_for == 'login_users') {
+                $user_id = get_post_meta($coupon_details->ID, 'user_id', true);
+                $current_user_id = get_current_user_id();
+                if ($current_user_id == $user_id) return $coupon_details;
+            } else {
+                $user_id = get_post_meta($coupon_details->ID, 'user_id', true);
+                $email = get_post_meta($coupon_details->ID, 'email', true);
+                $current_email = $this->getCurrentEmail();
+                $current_user_id = get_current_user_id();
+                if ($current_user_id == $user_id || $current_email == $email) return $coupon_details;
             }
         }
         return NULL;
@@ -359,7 +416,7 @@ class OrderCoupon
                 }
             }
         }
-        return $user_email;
+        return sanitize_email($user_email);
     }
 
     /**
@@ -367,10 +424,16 @@ class OrderCoupon
      * @param $new_coupon_code
      * @param $order_id
      * @param $email
+     * @param $order_date
      * @return int|\WP_Error
      */
-    function addNewCouponToOrder($new_coupon_code, $order_id, $email)
+    function addNewCouponToOrder($new_coupon_code, $order_id, $email, $order_date)
     {
+        $new_coupon_code = sanitize_text_field($new_coupon_code);
+        $order_id = sanitize_text_field($order_id);
+        $email = sanitize_email($email);
+        if (empty($new_coupon_code) || empty($order_id) || empty($email))
+            return NULL;
         $post = array(
             'post_title' => $new_coupon_code,
             'post_name' => $new_coupon_code . '-' . $order_id,
@@ -385,8 +448,9 @@ class OrderCoupon
             add_post_meta($id, 'email', $email);
             $user_id = get_current_user_id();
             add_post_meta($id, 'user_id', $user_id);
-            add_post_meta($id, 'coupon_type', isset($settings['coupon_type']) ? $settings['coupon_type'] : '0');
-            add_post_meta($id, 'coupon_value', isset($settings['coupon_amount']) ? $settings['coupon_amount'] : '0');
+            add_post_meta($id, 'coupon_type', isset($settings['coupon_type']) ? sanitize_text_field($settings['coupon_type']) : '0');
+            add_post_meta($id, 'coupon_value', isset($settings['coupon_amount']) ? sanitize_text_field($settings['coupon_amount']) : '0');
+            add_post_meta($id, 'coupon_expired_on', $this->admin->getCouponExpireDate($order_date));
         }
         return $id;
     }
@@ -398,11 +462,36 @@ class OrderCoupon
      */
     function isCouponFound($order_id)
     {
+        if (empty($order_id)) return NULL;
         $post_args = array('post_type' => 'rnoc_order_coupon', 'numberposts' => '1', 'post_status' => 'publish', 'meta_key' => 'order_id', 'meta_value' => $order_id);
         $posts = get_posts($post_args);
         if (!empty($posts)) {
-            if (isset($posts[0]->post_title)) {
-                return $posts[0]->post_title;
+            foreach ($posts as $post) {
+                if (isset($post->ID)) {
+                    $post_order_id = get_post_meta($post->ID, 'order_id', true);
+                    if (($post_order_id == $order_id) && isset($post->post_title)) {
+                        return $post->post_title;
+                    }
+                }
+            }
+        }
+        return NULL;
+    }
+
+    /**
+     * @param $coupon_code
+     * @return Object|null
+     */
+    function getCouponByCouponCode($coupon_code)
+    {
+        $coupon_code = sanitize_text_field($coupon_code);
+        if (empty($coupon_code)) return NULL;
+        $post_args = array('post_type' => 'rnoc_order_coupon', 'numberposts' => '1', 'title' => strtoupper($coupon_code));
+        $posts = get_posts($post_args);
+        if (!empty($posts)) {
+            foreach ($posts as $post) {
+                if (strtoupper($post->post_title) == strtoupper($coupon_code))
+                    return $post;
             }
         }
         return NULL;

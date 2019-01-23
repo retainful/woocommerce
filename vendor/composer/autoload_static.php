@@ -9,6 +9,9 @@ class ComposerStaticInit2c3f6b5b5b3606ee0b19c48fc257c832
     public static $files = array (
         'b1dc14a640208cfcaca8b6e040770111' => __DIR__ . '/..' . '/cmb2/cmb2/init.php',
         '5dabe93ffb7c784b4f1b242e4f523222' => __DIR__ . '/../..' . '/src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php',
+        '5f1adb8b968396ea48729d44bcf4966e' => __DIR__ . '/../..' . '/src/fields/cmb2-field-post-search-ajax/cmb-field-post-search-ajax.php',
+        '682d5b175c91812bf2aab8b4480e410b' => __DIR__ . '/../..' . '/src/fields/cmb-field-select2/cmb-field-select2.php',
+        '0f004e69191bfffaff4f82a67a1e0403' => __DIR__ . '/../..' . '/src/fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php',
     );
 
     public static $prefixLengthsPsr4 = array (
