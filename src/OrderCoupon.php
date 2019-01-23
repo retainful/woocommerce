@@ -93,7 +93,7 @@ class OrderCoupon
                         $api_key = $this->admin->getApiKey();
                         if (!empty($api_key)) {
                             $request_params = $this->getRequestParams($order);
-                            $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track', $request_params) . '" />';
+                            $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
                         }
 
                     }
