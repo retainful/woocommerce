@@ -437,9 +437,8 @@ class Settings
         if (!isset($params['email_open'])) {
             $params['email_open'] = 1;
         }
-        if (isset($params['new_coupon'])) {
-            $params['applied_coupon'] = $params['new_coupon'];
-            unset($params['new_coupon']);
+        if (isset($params['applied_coupon'])) {
+            unset($params['applied_coupon']);
         }
         if (isset($params['order_id'])) {
             unset($params['order_id']);
