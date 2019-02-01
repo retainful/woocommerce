@@ -148,4 +148,85 @@ class WcFunctions
         else
             return $price;
     }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return bool
+     */
+    function setSession($key,$value){
+        if(empty($key) || empty($value))
+            return false;
+        if(method_exists(WC()->session,'set')){
+            WC()->session->set($key,$value);
+        }
+        return true;
+    }
+
+    /**
+     * Get data from session
+     * @param $key
+     * @return array|string|null
+     */
+    function getSession($key){
+        if(empty($key))
+            return NULL;
+        if(method_exists(WC()->session,'get')){
+            return WC()->session->get($key);
+        }
+        return NULL;
+    }
+
+    /**
+     * Remove data from session
+     * @param $key
+     * @return bool
+     */
+    function removeSession($key){
+        if(empty($key))
+            return false;
+        if(method_exists(WC()->session,'__unset')){
+            WC()->session->__unset($key);
+        }
+        return true;
+    }
+
+    /**
+     * Check the coupon code is available on cart
+     * @param $discount_code
+     * @return bool
+     */
+    function hasDiscount($discount_code){
+        if(empty($discount_code))
+            return false;
+        if(method_exists(WC()->cart,'has_discount')){
+            return WC()->cart->has_discount($discount_code);
+        }
+        return false;
+    }
+
+    /**
+     * Add discount to cart
+     * @param $discount_code
+     * @return bool
+     */
+    function addDiscount($discount_code){
+        if(empty($discount_code))
+            return false;
+        if(method_exists(WC()->cart,'add_discount')){
+            return WC()->cart->add_discount($discount_code);
+        }
+        return false;
+    }
+
+    /**
+     * Get cart items
+     * @return array
+     */
+    function getCart(){
+        if(method_exists(WC()->cart,'get_cart')){
+            return WC()->cart->get_cart();
+        }
+        return array();
+    }
 }

@@ -128,15 +128,12 @@ class OrderCoupon
     /**
      * Add coupon to checkout
      */
-    public static function addCouponToCheckout()
+    public function addCouponToCheckout()
     {
-        $coupon_code = WC()->session->get('retainful_coupon_code');
-        $cart = WC()->cart;
-        if (!empty($cart)) {
-            if (!empty($coupon_code) && !WC()->cart->has_discount($coupon_code)) {
-                WC()->cart->add_discount($coupon_code);
-                WC()->session->__unset('retainful_coupon_code');
-            }
+        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+        if (!empty($coupon_code) && !empty($this->wc_functions->getCart()) && !$this->wc_functions->hasDiscount($coupon_code)) {
+            $this->wc_functions->addDiscount($coupon_code);
+            $this->wc_functions->removeSession('retainful_coupon_code');
         }
     }
 
@@ -146,10 +143,10 @@ class OrderCoupon
     function setCouponToSession()
     {
         if (isset($_REQUEST['retainful_coupon_code'])) {
-            $coupon_code = WC()->session->get('retainful_coupon_code');
+            $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
             if (empty($coupon_code)) {
                 $coupon_code = sanitize_text_field($_REQUEST['retainful_coupon_code']);
-                WC()->session->set('retainful_coupon_code', $coupon_code); // Set the coupon code in session
+                $this->wc_functions->setSession('retainful_coupon_code', $coupon_code); // Set the coupon code in session
             }
         }
     }
