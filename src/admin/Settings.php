@@ -116,6 +116,7 @@ class Settings
                 'option_key' => $this->slug . '_usage_restriction',
                 'tab_group' => $this->slug,
                 'parent_slug' => $this->slug,
+                'capability' => 'edit_shop_coupons',
                 'tab_title' => __('Usage restriction', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));

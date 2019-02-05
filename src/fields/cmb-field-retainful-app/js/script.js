@@ -43,5 +43,6 @@
                 }
             }
         });
+        $("#submit-cmb").show();
     }
 })(jQuery);
