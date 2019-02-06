@@ -261,6 +261,8 @@ class Settings
     {
         if ($this->isAppConnected()) {
             $usage_restrictions = get_option($this->slug . '_usage_restriction');
+            if (empty($usage_restrictions))
+                $usage_restrictions = array();
             return array_merge($usage_restrictions, array('app_prefix' => $this->app_prefix));
         } else {
             return array();
@@ -440,12 +442,6 @@ class Settings
         }
         if (isset($params['applied_coupon'])) {
             unset($params['applied_coupon']);
-        }
-        if (isset($params['order_id'])) {
-            unset($params['order_id']);
-        }
-        if (isset($params['total'])) {
-            unset($params['total']);
         }
         return $this->api->emailTrack($url, $params);
     }
