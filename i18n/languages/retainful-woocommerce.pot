@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Retainful-woocommerce\n"
-"POT-Creation-Date: 2019-01-22 11:50+0530\n"
-"PO-Revision-Date: 2019-01-22 11:51+0530\n"
+"POT-Creation-Date: 2019-02-07 18:01+0530\n"
+"PO-Revision-Date: 2019-02-07 18:02+0530\n"
 "Last-Translator: \n"
 "Language-Team: Retainful\n"
 "Language: en\n"
@@ -17,7 +17,25 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: vendor\n"
 "X-Poedit-SearchPathExcluded-1: i18n\n"
 
-#: src/Main.php:72
+#: retainful.php:44
+msgid "Retainful-woocommerce requires minimum PHP version of 5.6"
+msgstr ""
+
+#: retainful.php:47
+msgid ""
+"Woocommerce must installed and activated in-order to use Retainful-"
+"Woocommerce!"
+msgstr ""
+
+#: retainful.php:59
+msgid "Retainful-woocommerce requires minimum Woocommerce version of "
+msgstr ""
+
+#: retainful.php:59
+msgid "But your Woocommerce version is "
+msgstr ""
+
+#: src/Main.php:74
 msgid "Woocommerce must be activated for Woocommerce category discount to work"
 msgstr ""
 
@@ -42,7 +60,7 @@ msgstr ""
 msgid "Retainful Next Order Coupon"
 msgstr ""
 
-#: src/admin/Settings.php:36 src/admin/Settings.php:120
+#: src/admin/Settings.php:36 src/admin/Settings.php:121
 msgid "Save"
 msgstr ""
 
@@ -124,100 +142,100 @@ msgstr ""
 msgid "Retainful Coupon Usage Restrictions"
 msgstr ""
 
-#: src/admin/Settings.php:119
+#: src/admin/Settings.php:120
 msgid "Usage restriction"
 msgstr ""
 
-#: src/admin/Settings.php:124
+#: src/admin/Settings.php:125
 msgid "Minimum spend"
 msgstr ""
 
-#: src/admin/Settings.php:127
+#: src/admin/Settings.php:128
 msgid "Set the minimum spend(subtotal) allowed to use the coupon."
 msgstr ""
 
-#: src/admin/Settings.php:135
+#: src/admin/Settings.php:136
 msgid "Maximum spend"
 msgstr ""
 
-#: src/admin/Settings.php:138
+#: src/admin/Settings.php:139
 msgid "Set the maximum spend(subtotal) allowed to use the coupon."
 msgstr ""
 
-#: src/admin/Settings.php:146
+#: src/admin/Settings.php:147
 msgid "Coupon expires in "
 msgstr ""
 
-#: src/admin/Settings.php:149
+#: src/admin/Settings.php:150
 msgid ""
 "After the entered number of days coupon will automatically expired."
 "<br><b>Note: Please leave empty or put 0 to never expire.</b>"
 msgstr ""
 
-#: src/admin/Settings.php:150
+#: src/admin/Settings.php:151
 msgid " Day(s)"
 msgstr ""
 
-#: src/admin/Settings.php:160
+#: src/admin/Settings.php:161
 msgid "Exclude sale items"
 msgstr ""
 
-#: src/admin/Settings.php:163
+#: src/admin/Settings.php:164
 msgid ""
 "Check this box if the coupon should not apply to items on sale. Per-item "
 "coupons will only work if the item is not on sale. Per-cart coupons will "
 "only work if there are items in the cart that are not on sale."
 msgstr ""
 
-#: src/admin/Settings.php:166
+#: src/admin/Settings.php:167
 msgid "Products"
 msgstr ""
 
-#: src/admin/Settings.php:170
+#: src/admin/Settings.php:171
 msgid ""
 "Product that the coupon code will be applied to, or that need to be in the "
 "cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:172 src/admin/Settings.php:186
+#: src/admin/Settings.php:173 src/admin/Settings.php:187
 msgid "Choose products.."
 msgstr ""
 
-#: src/admin/Settings.php:180
+#: src/admin/Settings.php:181
 msgid "Exclude products"
 msgstr ""
 
-#: src/admin/Settings.php:184
+#: src/admin/Settings.php:185
 msgid ""
 "Product that the coupon code will not applied to, or cannot be in the cart "
 "in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:194
+#: src/admin/Settings.php:195
 msgid "Product Categories"
 msgstr ""
 
-#: src/admin/Settings.php:199 src/admin/Settings.php:209
+#: src/admin/Settings.php:200 src/admin/Settings.php:210
 msgid "Select categories"
 msgstr ""
 
-#: src/admin/Settings.php:201
+#: src/admin/Settings.php:202
 msgid ""
 "Product categories that the coupon code will be applied to, or that need to "
 "be in the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:204
+#: src/admin/Settings.php:205
 msgid "Exclude Categories"
 msgstr ""
 
-#: src/admin/Settings.php:211
+#: src/admin/Settings.php:212
 msgid ""
 "Product categories that the coupon code will not applied to, or cannot be in "
 "the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:342
+#: src/admin/Settings.php:345
 msgid ""
 "<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 style="
 "\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"

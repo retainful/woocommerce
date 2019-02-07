@@ -60,6 +60,19 @@ class OrderCoupon
     }
 
     /**
+     * Run the scheduled cron tasks with retainful
+     * @param array $params
+     * @return bool
+     *
+     */
+    function cronSendCouponDetails($params = array())
+    {
+        if (!isset($params) || empty($params))
+            return false;
+        return $this->admin->sendCouponDetails('track', $params);
+    }
+
+    /**
      * Attach the coupon details to Order
      * @param $order
      * @param $sent_to_admin
@@ -235,7 +248,8 @@ class OrderCoupon
             //Handle API Requests
             $api_key = $this->admin->getApiKey();
             if (!empty($api_key)) {
-                $this->admin->sendCouponDetails('track', $request_params);
+                $request_params['app_id'] = $api_key;
+                wp_schedule_single_event(time() + 60, 'retainful_cron_sync_coupon_details', array($request_params));
             }
         }
         return true;

@@ -60,6 +60,8 @@ class Main
         add_action('wp_ajax_validateAppKey', array($this->rnoc, 'validateAppKey'));
         //Settings link
         add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
+        //Sync the coupon details with retainful
+        add_action('retainful_cron_sync_coupon_details', array($this->rnoc, 'cronSendCouponDetails'), 1);
     }
 
 

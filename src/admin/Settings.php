@@ -231,7 +231,7 @@ class Settings
     {
         if (empty($ordered_date))
             return NULL;
-        $settings = get_option($this->slug . '_usage_restriction');
+        $settings = get_option($this->slug . '_usage_restriction', array());
         if (!empty($settings) && $this->isAppConnected() && isset($settings[$this->app_prefix . 'retainful_expire_days']) && !empty($settings[$this->app_prefix . 'retainful_expire_days'])) {
             try {
                 $expiry_date = new \DateTime($ordered_date);
@@ -260,7 +260,7 @@ class Settings
     function getUsageRestrictions()
     {
         if ($this->isAppConnected()) {
-            $usage_restrictions = get_option($this->slug . '_usage_restriction');
+            $usage_restrictions = get_option($this->slug . '_usage_restriction', array());
             if (empty($usage_restrictions))
                 $usage_restrictions = array();
             return array_merge($usage_restrictions, array('app_prefix' => $this->app_prefix));
@@ -311,7 +311,7 @@ class Settings
      */
     function isAppConnected()
     {
-        $settings = get_option($this->slug);
+        $settings = get_option($this->slug, array());
         if (!empty($settings) && isset($settings[$this->app_prefix . 'is_retainful_connected']) && !empty($settings[$this->app_prefix . 'is_retainful_connected'])) {
             return true;
         }
@@ -325,7 +325,7 @@ class Settings
      */
     function getApiKey()
     {
-        $settings = get_option($this->slug);
+        $settings = get_option($this->slug, array());
         if (!empty($settings) && isset($settings[$this->app_prefix . 'retainful_app_id']) && !empty($settings[$this->app_prefix . 'retainful_app_id'])) {
             return $settings[$this->app_prefix . 'retainful_app_id'];
         }
@@ -338,7 +338,7 @@ class Settings
      */
     function getCouponMessage()
     {
-        $settings = get_option($this->slug);
+        $settings = get_option($this->slug, array());
         if (!empty($settings) && isset($settings[$this->app_prefix . 'retainful_coupon_message']) && !empty(isset($settings[$this->app_prefix . 'retainful_coupon_message']))) {
             return __($settings[$this->app_prefix . 'retainful_coupon_message'], RNOC_TEXT_DOMAIN);
         } else {
@@ -353,7 +353,7 @@ class Settings
     function getCouponSettings()
     {
         $coupon = array();
-        $settings = get_option($this->slug);
+        $settings = get_option($this->slug, array());
         if (!empty($settings)) {
             $coupon['coupon_type'] = ($settings[$this->app_prefix . 'retainful_coupon_type']) ? $settings[$this->app_prefix . 'retainful_coupon_type'] : 0;
             $coupon['coupon_amount'] = ($settings[$this->app_prefix . 'retainful_coupon_amount']) ? $settings[$this->app_prefix . 'retainful_coupon_amount'] : 0;
@@ -368,7 +368,7 @@ class Settings
     function couponFor()
     {
         $coupon_applicable_for = 'all';
-        $settings = get_option($this->slug);
+        $settings = get_option($this->slug, array());
         if (!empty($settings)) {
             $coupon_applicable_for = ($settings[$this->app_prefix . 'retainful_coupon_applicable_to']) ? $settings[$this->app_prefix . 'retainful_coupon_applicable_to'] : 'all';
         }
@@ -382,7 +382,7 @@ class Settings
     function couponMessageHook()
     {
         $hook = 'woocommerce_email_customer_details';
-        $settings = get_option($this->slug);
+        $settings = get_option($this->slug, array());
         if (!empty($settings)) {
             $hook = ($settings[$this->app_prefix . 'retainful_add_coupon_message_to']) ? $settings[$this->app_prefix . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
         }
