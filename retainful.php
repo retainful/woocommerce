@@ -68,6 +68,7 @@ add_action('deactivated_plugin', 'detect_plugin_deactivation', 10, 2);
 function detect_plugin_deactivation($plugin, $network_activation)
 {
     if (in_array($plugin, array('woocommerce/woocommerce.php'))) {
+        deactivate_plugins(plugin_basename(__FILE__));
         //Todo - Deactivate this plugin
     }
 }

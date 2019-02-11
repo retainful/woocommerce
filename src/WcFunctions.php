@@ -154,11 +154,12 @@ class WcFunctions
      * @param $value
      * @return bool
      */
-    function setSession($key,$value){
-        if(empty($key) || empty($value))
+    function setSession($key, $value)
+    {
+        if (empty($key) || empty($value))
             return false;
-        if(method_exists(WC()->session,'set')){
-            WC()->session->set($key,$value);
+        if (method_exists(WC()->session, 'set')) {
+            WC()->session->set($key, $value);
         }
         return true;
     }
@@ -168,10 +169,11 @@ class WcFunctions
      * @param $key
      * @return array|string|null
      */
-    function getSession($key){
-        if(empty($key))
+    function getSession($key)
+    {
+        if (empty($key))
             return NULL;
-        if(method_exists(WC()->session,'get')){
+        if (method_exists(WC()->session, 'get')) {
             return WC()->session->get($key);
         }
         return NULL;
@@ -182,10 +184,11 @@ class WcFunctions
      * @param $key
      * @return bool
      */
-    function removeSession($key){
-        if(empty($key))
+    function removeSession($key)
+    {
+        if (empty($key))
             return false;
-        if(method_exists(WC()->session,'__unset')){
+        if (method_exists(WC()->session, '__unset')) {
             WC()->session->__unset($key);
         }
         return true;
@@ -196,10 +199,11 @@ class WcFunctions
      * @param $discount_code
      * @return bool
      */
-    function hasDiscount($discount_code){
-        if(empty($discount_code))
+    function hasDiscount($discount_code)
+    {
+        if (empty($discount_code))
             return false;
-        if(method_exists(WC()->cart,'has_discount')){
+        if (method_exists(WC()->cart, 'has_discount')) {
             return WC()->cart->has_discount($discount_code);
         }
         return false;
@@ -210,10 +214,11 @@ class WcFunctions
      * @param $discount_code
      * @return bool
      */
-    function addDiscount($discount_code){
-        if(empty($discount_code))
+    function addDiscount($discount_code)
+    {
+        if (empty($discount_code))
             return false;
-        if(method_exists(WC()->cart,'add_discount')){
+        if (method_exists(WC()->cart, 'add_discount')) {
             return WC()->cart->add_discount($discount_code);
         }
         return false;
@@ -223,10 +228,86 @@ class WcFunctions
      * Get cart items
      * @return array
      */
-    function getCart(){
-        if(method_exists(WC()->cart,'get_cart')){
+    function getCart()
+    {
+        if (method_exists(WC()->cart, 'get_cart')) {
             return WC()->cart->get_cart();
         }
         return array();
+    }
+
+    /**
+     * get Cart total from woocommerce
+     * @return int|mixed
+     */
+    function getCartTotal()
+    {
+        if (method_exists(WC()->cart, 'get_cart')) {
+            return WC()->cart->total;
+        }
+        return 0;
+    }
+
+    /**
+     * Get Item Id from Item object
+     * @param $item
+     * @return null
+     */
+    function getItemId($item)
+    {
+        if (method_exists($item, 'get_id')) {
+            return $item->get_id();
+        }
+        return NULL;
+    }
+
+    /**
+     * Get category Id of product
+     * @param $item
+     * @return null
+     */
+    function getCategoryId($item)
+    {
+        if (method_exists($item, 'get_category_ids')) {
+            return $item->get_category_ids();
+        }
+        return NULL;
+    }
+
+    /**
+     * Get the product ids list from cart
+     * @return array
+     */
+    function getProductIdsInCart()
+    {
+        $cart_items = $this->getCart();
+        $product_ids = array();
+        if (!empty($cart_items)) {
+            foreach ($cart_items as $key => $item) {
+                $product_ids[$key] = $this->getItemId($item['data']);
+            }
+        }
+        return array_unique($product_ids);
+    }
+
+    /**
+     * Get list of category ids from cart
+     * @return array
+     */
+    function getCategoryIdsOfProductInCart()
+    {
+        $cart_items = $this->getCart();
+        $category_ids = array();
+        if (!empty($cart_items)) {
+            foreach ($cart_items as $item) {
+                $categories = $this->getCategoryId($item['data']);
+                if (!empty($categories)) {
+                    foreach ($categories as $category) {
+                        $category_ids[] = $category;
+                    }
+                }
+            }
+        }
+        return array_unique($category_ids);
     }
 }

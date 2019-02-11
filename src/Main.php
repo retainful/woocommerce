@@ -62,6 +62,10 @@ class Main
         add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
         //Sync the coupon details with retainful
         add_action('retainful_cron_sync_coupon_details', array($this->rnoc, 'cronSendCouponDetails'), 1);
+        //Remove coupon code after placing order
+        add_action('woocommerce_thankyou', array($this->rnoc, 'removeCouponFromSession'), 10, 1);
+        //Remove Code from session
+        add_action('woocommerce_removed_coupon', array($this->rnoc, 'removeCouponFromCart'));
     }
 
 

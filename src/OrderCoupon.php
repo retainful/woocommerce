@@ -145,9 +145,97 @@ class OrderCoupon
     {
         $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
         if (!empty($coupon_code) && !empty($this->wc_functions->getCart()) && !$this->wc_functions->hasDiscount($coupon_code)) {
-            $this->wc_functions->addDiscount($coupon_code);
+            //Do not apply coupon until the coupon is valid
+            if ($this->checkCouponBeforeCouponApply($coupon_code)) {
+                $this->wc_functions->addDiscount($coupon_code);
+            }
+        }
+    }
+
+    /**
+     * Remove coupon on user request
+     * @param $remove_coupon
+     */
+    function removeCouponFromCart($remove_coupon)
+    {
+        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+        if (strtoupper($remove_coupon) == strtoupper($coupon_code)) {
+            $this->removeCouponFromSession();
+        }
+    }
+
+    /**
+     * Remove Coupon from sesssion
+     * @param $order_id
+     */
+    function removeCouponFromSession($order_id = "")
+    {
+        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+        if (!empty($coupon_code)) {
             $this->wc_functions->removeSession('retainful_coupon_code');
         }
+    }
+
+    /**
+     * Check that coupon is validated in retainful usage restriction
+     * @param $coupon_code
+     * @return bool
+     */
+    public function checkCouponBeforeCouponApply($coupon_code)
+    {
+        if (empty($coupon_code))
+            return false;
+        $usage_restrictions = $this->admin->getUsageRestrictions();
+        //Return true if there is any usage restriction
+        if (empty($usage_restrictions))
+            return true;
+        $app_prefix = isset($usage_restrictions['app_prefix']) ? $usage_restrictions['app_prefix'] : '';
+        $coupon_details = $this->isValidCoupon($coupon_code);
+        $return = array();
+        if (!empty($coupon_details)) {
+            //Check for coupon expired or not
+            $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
+            if (strtotime('Y-m-d H:i:s') > strtotime($coupon_expiry_date)) {
+                $this->wc_functions->removeSession('retainful_coupon_code');
+            }
+
+            $cart_total = $this->wc_functions->getCartTotal();
+            //Check for minimum spend
+            $minimum_spend = (isset($usage_restrictions[$app_prefix . 'minimum_spend']) && $usage_restrictions[$app_prefix . 'minimum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'minimum_spend'] : '';
+            if (!empty($minimum_spend) && $cart_total < $minimum_spend) {
+                array_push($return, false);
+            }
+            //Check for maximum spend
+            $maximum_spend = (isset($usage_restrictions[$app_prefix . 'maximum_spend']) && $usage_restrictions[$app_prefix . 'maximum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'maximum_spend'] : '';
+            if (!empty($maximum_spend) && $cart_total > $maximum_spend) {
+                array_push($return, false);
+            }
+            $products_in_cart = $this->wc_functions->getProductIdsInCart();
+            //Check for must in cart products
+            $must_in_cart_products = (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array();
+            if (!empty($must_in_cart_products) && count($products_in_cart) != count(array_intersect($must_in_cart_products, $products_in_cart))) {
+                array_push($return, false);
+            }
+            //Check for must not in products
+            $must_not_in_cart_products = (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array();
+            if (!empty($must_not_in_cart_products) && count(array_intersect($must_not_in_cart_products, $products_in_cart)) > 0) {
+                array_push($return, false);
+            }
+            $categories_in_cart = $this->wc_functions->getCategoryIdsOfProductInCart();
+            //Check for must in categories of cart
+            $must_in_cart_categories = (isset($usage_restrictions[$app_prefix . 'product_categories'])) ? $usage_restrictions[$app_prefix . 'product_categories'] : array();
+            if (!empty($must_in_cart_categories) && count(array_intersect($must_in_cart_categories, $categories_in_cart)) > 0) {
+                array_push($return, false);
+            }
+            //Check for must not in categories of cart
+            $must_not_in_cart_categories = (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array();
+            if (!empty($must_not_in_cart_categories) && count(array_intersect($must_not_in_cart_categories, $categories_in_cart)) > 0) {
+                array_push($return, false);
+            }
+        }
+        if (in_array(false, $return))
+            return false;
+        return true;
     }
 
     /**
@@ -175,7 +263,7 @@ class OrderCoupon
         if (empty($coupon_code))
             return $response;
         $coupon_details = $this->isValidCoupon($coupon_code);
-        if (!empty($coupon_details)) {
+        if (!empty($coupon_details) && $this->checkCouponBeforeCouponApply($coupon_code)) {
             $is_coupon_already_applied = false;
             if (!empty(self::$applied_coupons) && self::$applied_coupons != $coupon_code)
                 $is_coupon_already_applied = true;
@@ -187,18 +275,14 @@ class OrderCoupon
                 $coupon_type = get_post_meta($coupon_details->ID, 'coupon_type', true);
                 $coupon_value = get_post_meta($coupon_details->ID, 'coupon_value', true);
                 $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
-                $remove_coupon = isset($_REQUEST['remove_coupon']) ? $_REQUEST['remove_coupon'] : false;
-                if ($remove_coupon == $coupon_code)
-                    return false;
                 if ($coupon_type == 0)
                     $discount_type = 'percent';
                 $coupon = array(
                     'id' => 321123 . rand(2, 9),
                     'amount' => $coupon_value,
                     'individual_use' => false,
-                    'product_ids' => (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array(),
-                    'excluded_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
-                    //'exclude_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
+                    'product_ids' => array(),
+                    'excluded_product_ids' => array(),
                     'usage_limit' => '',
                     'usage_limit_per_user' => '',
                     'limit_usage_to_x_items' => '',
@@ -206,15 +290,15 @@ class OrderCoupon
                     'expiry_date' => $coupon_expiry_date,
                     'apply_before_tax' => 'yes',
                     'free_shipping' => false,
-                    'product_categories' => (isset($usage_restrictions[$app_prefix . 'product_categories'])) ? $usage_restrictions[$app_prefix . 'product_categories'] : array(),
-                    'excluded_product_categories' => (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array(),
-                    //'exclude_product_categories' => (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array(),
+                    'product_categories' => array(),
+                    'excluded_product_categories' => array(),
                     'exclude_sale_items' => (isset($usage_restrictions[$app_prefix . 'exclude_sale_items'])) ? true : false,
-                    'minimum_amount' => (isset($usage_restrictions[$app_prefix . 'minimum_spend']) && $usage_restrictions[$app_prefix . 'minimum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'minimum_spend'] : '',
-                    'maximum_amount' => (isset($usage_restrictions[$app_prefix . 'maximum_spend']) && $usage_restrictions[$app_prefix . 'maximum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'maximum_spend'] : '',
+                    'minimum_amount' => '',
+                    'maximum_amount' => '',
                     'customer_email' => '',
                     'discount_type' => $discount_type
                 );
+                /*echo '<pre>';print_r($coupon);echo'</pre>';die;*/
                 return $coupon;
             }
         }
