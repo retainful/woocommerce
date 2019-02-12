@@ -338,7 +338,8 @@ class OrderCoupon
                     'minimum_amount' => (isset($usage_restrictions[$app_prefix . 'minimum_spend']) && $usage_restrictions[$app_prefix . 'minimum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'minimum_spend'] : '',
                     'maximum_amount' => (isset($usage_restrictions[$app_prefix . 'maximum_spend']) && $usage_restrictions[$app_prefix . 'maximum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'maximum_spend'] : '',
                     'customer_email' => '',
-                    'discount_type' => $discount_type
+                    'discount_type' => $discount_type,
+                    'virtual' => true
                 );
                 return $coupon;
             }
