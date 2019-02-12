@@ -66,6 +66,12 @@ class Main
         add_action('woocommerce_thankyou', array($this->rnoc, 'removeCouponFromSession'), 10, 1);
         //Remove Code from session
         add_action('woocommerce_removed_coupon', array($this->rnoc, 'removeCouponFromCart'));
+        //Support for woocommerce email customizer
+        add_filter('woo_email_drag_and_drop_builder_retainful_settings_url', array($this->rnoc, 'wooEmailCustomizerRetainfulSettingsUrl'));
+        //Tell Email customizes about handling coupons..
+        add_filter('woo_email_drag_and_drop_builder_handling_retainful', '__return_true');
+        //
+        add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_content', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3     );
     }
 
 

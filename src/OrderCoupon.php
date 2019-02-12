@@ -59,6 +59,54 @@ class OrderCoupon
         return array_merge($action_links, $links);
     }
 
+
+    /**
+     * Send required details for email customizer
+     * @param $content
+     * @param $order
+     * @param $sending_email
+     * @return array
+     */
+    function wooEmailCustomizerRetainfulCouponContent($content, $order, $sending_email)
+    {
+        $content_to_replace = array();
+        $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+        if (!empty($coupon_code)) {
+            $coupon_details = $this->getCouponDetails($coupon_code);
+            if (!empty($coupon_details)) {
+                $post_id = $coupon_details->ID;
+                $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
+                if ($coupon_amount > 0) {
+                    $coupon_type = get_post_meta($post_id, 'coupon_type', true);
+                    $content_to_replace = array(
+                        '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
+                        '{{coupon_code}}' => $coupon_code,
+                        '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
+                    );
+                    $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
+                    if (!empty($coupon_expiry_date)) {
+                        $content_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date);
+                    }
+                    $is_api_enabled = $this->admin->isAppConnected();
+                    if (!empty($is_api_enabled) && $sending_email) {
+                        $request_params = $this->getRequestParams($order);
+                        $content_to_replace['{{coupon_track_link}}'] = '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
+                    }
+                }
+            }
+        }
+        return $content_to_replace;
+    }
+
+    /**
+     * Give url to Email customizer
+     * @return mixed
+     */
+    function wooEmailCustomizerRetainfulSettingsUrl()
+    {
+        return admin_url("admin.php?page=retainful");
+    }
+
     /**
      * Run the scheduled cron tasks with retainful
      * @param array $params
@@ -82,9 +130,8 @@ class OrderCoupon
     function attachOrderCoupon($order, $sent_to_admin, $plain_text, $email)
     {
         if (!$sent_to_admin) {
-            $is_api_enabled = $this->admin->isAppConnected();
             $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
-            if ($is_api_enabled && !empty($coupon_code)) {
+            if (!empty($coupon_code)) {
                 $message = "";
                 $coupon_details = $this->getCouponDetails($coupon_code);
                 if (!empty($coupon_details)) {
@@ -103,8 +150,8 @@ class OrderCoupon
                         }
                         $message = $this->admin->getCouponMessage();
                         $message = str_replace(array_keys($string_to_replace), $string_to_replace, $message);
-                        $api_key = $this->admin->getApiKey();
-                        if (!empty($api_key)) {
+                        $is_api_enabled = $this->admin->isAppConnected();
+                        if ($is_api_enabled) {
                             $request_params = $this->getRequestParams($order);
                             $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
                         }
@@ -159,7 +206,7 @@ class OrderCoupon
     function removeCouponFromCart($remove_coupon)
     {
         $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
-        if (strtoupper($remove_coupon) == strtoupper($coupon_code)) {
+        if (strtoupper($remove_coupon) == strtoupper($coupon_code) && $this->checkCouponBeforeCouponApply($remove_coupon)) {
             $this->removeCouponFromSession();
         }
     }
@@ -185,14 +232,15 @@ class OrderCoupon
     {
         if (empty($coupon_code))
             return false;
-        $usage_restrictions = $this->admin->getUsageRestrictions();
-        //Return true if there is any usage restriction
-        if (empty($usage_restrictions))
-            return true;
-        $app_prefix = isset($usage_restrictions['app_prefix']) ? $usage_restrictions['app_prefix'] : '';
-        $coupon_details = $this->isValidCoupon($coupon_code);
         $return = array();
+        $coupon_details = $this->isValidCoupon($coupon_code);
         if (!empty($coupon_details)) {
+            $usage_restrictions = $this->admin->getUsageRestrictions();
+            //Return true if there is any usage restriction
+            if (empty($usage_restrictions))
+                return true;
+            $app_prefix = isset($usage_restrictions['app_prefix']) ? $usage_restrictions['app_prefix'] : '';
+
             //Check for coupon expired or not
             $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
             if (strtotime('Y-m-d H:i:s') > strtotime($coupon_expiry_date)) {
@@ -213,25 +261,17 @@ class OrderCoupon
             $products_in_cart = $this->wc_functions->getProductIdsInCart();
             //Check for must in cart products
             $must_in_cart_products = (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array();
-            if (!empty($must_in_cart_products) && count($products_in_cart) != count(array_intersect($must_in_cart_products, $products_in_cart))) {
-                array_push($return, false);
-            }
-            //Check for must not in products
-            $must_not_in_cart_products = (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array();
-            if (!empty($must_not_in_cart_products) && count(array_intersect($must_not_in_cart_products, $products_in_cart)) > 0) {
+            if (!empty($must_in_cart_products) && count($must_in_cart_products) != count(array_intersect($must_in_cart_products, $products_in_cart))) {
                 array_push($return, false);
             }
             $categories_in_cart = $this->wc_functions->getCategoryIdsOfProductInCart();
             //Check for must in categories of cart
             $must_in_cart_categories = (isset($usage_restrictions[$app_prefix . 'product_categories'])) ? $usage_restrictions[$app_prefix . 'product_categories'] : array();
-            if (!empty($must_in_cart_categories) && count(array_intersect($must_in_cart_categories, $categories_in_cart)) > 0) {
+            if (!empty($must_in_cart_categories) && count($must_in_cart_categories) != count(array_intersect($must_in_cart_categories, $categories_in_cart))) {
                 array_push($return, false);
             }
-            //Check for must not in categories of cart
-            $must_not_in_cart_categories = (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array();
-            if (!empty($must_not_in_cart_categories) && count(array_intersect($must_not_in_cart_categories, $categories_in_cart)) > 0) {
-                array_push($return, false);
-            }
+        } else {
+            $this->removeCouponFromSession();
         }
         if (in_array(false, $return))
             return false;
@@ -263,7 +303,7 @@ class OrderCoupon
         if (empty($coupon_code))
             return $response;
         $coupon_details = $this->isValidCoupon($coupon_code);
-        if (!empty($coupon_details) && $this->checkCouponBeforeCouponApply($coupon_code)) {
+        if (!empty($coupon_details)) {
             $is_coupon_already_applied = false;
             if (!empty(self::$applied_coupons) && self::$applied_coupons != $coupon_code)
                 $is_coupon_already_applied = true;
@@ -281,8 +321,9 @@ class OrderCoupon
                     'id' => 321123 . rand(2, 9),
                     'amount' => $coupon_value,
                     'individual_use' => false,
-                    'product_ids' => array(),
-                    'excluded_product_ids' => array(),
+                    'product_ids' => (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array(),
+                    'excluded_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
+                    //'exclude_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
                     'usage_limit' => '',
                     'usage_limit_per_user' => '',
                     'limit_usage_to_x_items' => '',
@@ -290,15 +331,15 @@ class OrderCoupon
                     'expiry_date' => $coupon_expiry_date,
                     'apply_before_tax' => 'yes',
                     'free_shipping' => false,
-                    'product_categories' => array(),
-                    'excluded_product_categories' => array(),
+                    'product_categories' => (isset($usage_restrictions[$app_prefix . 'product_categories'])) ? $usage_restrictions[$app_prefix . 'product_categories'] : array(),
+                    'excluded_product_categories' => (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array(),
+                    //'exclude_product_categories' => (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array(),
                     'exclude_sale_items' => (isset($usage_restrictions[$app_prefix . 'exclude_sale_items'])) ? true : false,
-                    'minimum_amount' => '',
-                    'maximum_amount' => '',
+                    'minimum_amount' => (isset($usage_restrictions[$app_prefix . 'minimum_spend']) && $usage_restrictions[$app_prefix . 'minimum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'minimum_spend'] : '',
+                    'maximum_amount' => (isset($usage_restrictions[$app_prefix . 'maximum_spend']) && $usage_restrictions[$app_prefix . 'maximum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'maximum_spend'] : '',
                     'customer_email' => '',
                     'discount_type' => $discount_type
                 );
-                /*echo '<pre>';print_r($coupon);echo'</pre>';die;*/
                 return $coupon;
             }
         }
@@ -585,8 +626,9 @@ class OrderCoupon
         $posts = get_posts($post_args);
         if (!empty($posts)) {
             foreach ($posts as $post) {
-                if (strtoupper($post->post_title) == strtoupper($coupon_code))
+                if (strtoupper($post->post_title) == strtoupper($coupon_code)) {
                     return $post;
+                }
             }
         }
         return NULL;
