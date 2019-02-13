@@ -291,6 +291,40 @@ class WcFunctions
     }
 
     /**
+     * Check the item is in sale
+     * @param $item
+     * @return bool
+     */
+    function isProductInSale($item)
+    {
+        if (method_exists($item, 'is_on_sale')) {
+            if ($item->is_on_sale())
+                return true;
+            else
+                return false;
+        }
+        return false;
+    }
+
+    /**
+     * @return array
+     * Send all the products is sale
+     */
+    function getSaleProductIdsInCart()
+    {
+        $cart_items = $this->getCart();
+        $product_ids = array();
+        if (!empty($cart_items)) {
+            foreach ($cart_items as $key => $item) {
+                if ($this->isProductInSale($item['data'])) {
+                    $product_ids[$key] = $this->getItemId($item['data']);
+                }
+            }
+        }
+        return array_unique($product_ids);
+    }
+
+    /**
      * Get list of category ids from cart
      * @return array
      */

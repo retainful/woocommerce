@@ -31,7 +31,7 @@ class OrderCoupon
             if ($is_api_enabled) {
                 $response['success'] = __('Successfully connected to Retainful', RNOC_TEXT_DOMAIN);
             } else {
-                $response['error'] = __('Please enter Valid App-Id', 'retainful-coupon');
+                $response['error'] = __('Please enter Valid App-Id', RNOC_TEXT_DOMAIN);
             }
         }
         echo json_encode($response);
@@ -258,6 +258,11 @@ class OrderCoupon
                 array_push($return, false);
             }
             $products_in_cart = $this->wc_functions->getProductIdsInCart();
+            //Check the cart having only sale items
+            $sale_products_in_cart = $this->wc_functions->getSaleProductIdsInCart();
+            if (count($sale_products_in_cart) >= count($products_in_cart)) {
+                array_push($return, false);
+            }
             //Check for must in cart products
             $must_in_cart_products = (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array();
             if (!empty($must_in_cart_products) && count(array_intersect($must_in_cart_products, $products_in_cart)) == 0) {
@@ -267,6 +272,13 @@ class OrderCoupon
             //Check for must in categories of cart
             $must_in_cart_categories = (isset($usage_restrictions[$app_prefix . 'product_categories'])) ? $usage_restrictions[$app_prefix . 'product_categories'] : array();
             if (!empty($must_in_cart_categories) && count(array_intersect($must_in_cart_categories, $categories_in_cart)) == 0) {
+                array_push($return, false);
+            }
+            //Check for must in cart products and exclude products in cart are given
+            $must_not_in_cart_products = (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array();
+            $must_not_in_cart_categories = (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array();
+            if (array_intersect($must_not_in_cart_products, $must_in_cart_products) || array_intersect($must_in_cart_categories, $must_not_in_cart_categories)) {
+                $this->wc_functions->removeSession('retainful_coupon_code');
                 array_push($return, false);
             }
         } else {
