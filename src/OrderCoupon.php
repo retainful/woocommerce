@@ -147,6 +147,8 @@ class OrderCoupon
                         $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
                         if (!empty($coupon_expiry_date)) {
                             $string_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date);
+                        }else{
+                            $string_to_replace['{{coupon_expiry_date}}'] = '';
                         }
                         $message = $this->admin->getCouponMessage();
                         $message = str_replace(array_keys($string_to_replace), $string_to_replace, $message);
@@ -155,7 +157,6 @@ class OrderCoupon
                             $request_params = $this->getRequestParams($order);
                             $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
                         }
-
                     }
                 }
                 echo $message;
@@ -243,7 +244,7 @@ class OrderCoupon
 
             //Check for coupon expired or not
             $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
-            if (strtotime('Y-m-d H:i:s') > strtotime($coupon_expiry_date)) {
+            if (!empty($coupon_expiry_date) && strtotime('Y-m-d H:i:s') > strtotime($coupon_expiry_date)) {
                 $this->wc_functions->removeSession('retainful_coupon_code');
             }
 

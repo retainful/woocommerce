@@ -71,7 +71,7 @@ class Main
         //Tell Email customizes about handling coupons..
         add_filter('woo_email_drag_and_drop_builder_handling_retainful', '__return_true');
         //
-        add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_content', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3     );
+        add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_content', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3);
     }
 
 
@@ -81,10 +81,10 @@ class Main
     function checkDependencies()
     {
         if (!defined('WC_VERSION')) {
-            $this->showAdminNotice(__('Woocommerce must be activated for Woocommerce category discount to work', 'retainful-next-order-coupon'));
+            $this->showAdminNotice(__('Woocommerce must be activated for Retainful-Woocommerce to work', RNOC_TEXT_DOMAIN));
         } else {
-            if (version_compare(WC_VERSION, '2.0', '<')) {
-                $this->showAdminNotice('Your woocommerce version is ' . WC_VERSION . '. Some of the features of Woocommerce category discount will not work properly on this woocommerce version.');
+            if (version_compare(WC_VERSION, '2.5', '<')) {
+                $this->showAdminNotice(__('Your woocommerce version is ', RNOC_TEXT_DOMAIN) . WC_VERSION . __('. Some of the features of Retainful-Woocommerce will not work properly on this woocommerce version.', RNOC_TEXT_DOMAIN));
             }
         }
     }
