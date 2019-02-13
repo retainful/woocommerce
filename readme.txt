@@ -132,3 +132,6 @@ No. There is no charges for support.
 
 = 1.0.4 =
 * Fix: Changing parameter
+
+= 1.0.5 =
+* Fix: Auto apply coupon by clicking link given in coupon
