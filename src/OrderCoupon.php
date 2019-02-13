@@ -147,7 +147,7 @@ class OrderCoupon
                         $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
                         if (!empty($coupon_expiry_date)) {
                             $string_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date);
-                        }else{
+                        } else {
                             $string_to_replace['{{coupon_expiry_date}}'] = '';
                         }
                         $message = $this->admin->getCouponMessage();
@@ -241,13 +241,11 @@ class OrderCoupon
             if (empty($usage_restrictions))
                 return true;
             $app_prefix = isset($usage_restrictions['app_prefix']) ? $usage_restrictions['app_prefix'] : '';
-
             //Check for coupon expired or not
             $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
             if (!empty($coupon_expiry_date) && strtotime('Y-m-d H:i:s') > strtotime($coupon_expiry_date)) {
                 $this->wc_functions->removeSession('retainful_coupon_code');
             }
-
             $cart_total = $this->wc_functions->getCartTotal();
             //Check for minimum spend
             $minimum_spend = (isset($usage_restrictions[$app_prefix . 'minimum_spend']) && $usage_restrictions[$app_prefix . 'minimum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'minimum_spend'] : '';
@@ -262,13 +260,13 @@ class OrderCoupon
             $products_in_cart = $this->wc_functions->getProductIdsInCart();
             //Check for must in cart products
             $must_in_cart_products = (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array();
-            if (!empty($must_in_cart_products) && count($must_in_cart_products) != count(array_intersect($must_in_cart_products, $products_in_cart))) {
+            if (!empty($must_in_cart_products) && count(array_intersect($must_in_cart_products, $products_in_cart)) == 0) {
                 array_push($return, false);
             }
             $categories_in_cart = $this->wc_functions->getCategoryIdsOfProductInCart();
             //Check for must in categories of cart
             $must_in_cart_categories = (isset($usage_restrictions[$app_prefix . 'product_categories'])) ? $usage_restrictions[$app_prefix . 'product_categories'] : array();
-            if (!empty($must_in_cart_categories) && count($must_in_cart_categories) != count(array_intersect($must_in_cart_categories, $categories_in_cart))) {
+            if (!empty($must_in_cart_categories) && count(array_intersect($must_in_cart_categories, $categories_in_cart)) == 0) {
                 array_push($return, false);
             }
         } else {
