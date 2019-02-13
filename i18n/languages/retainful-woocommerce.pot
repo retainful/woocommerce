@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Retainful-woocommerce\n"
-"POT-Creation-Date: 2019-02-07 18:01+0530\n"
-"PO-Revision-Date: 2019-02-07 18:02+0530\n"
+"Project-Id-Version: Retainful woocommerce\n"
+"POT-Creation-Date: 2019-02-13 18:05+0530\n"
+"PO-Revision-Date: 2019-02-13 18:05+0530\n"
 "Last-Translator: \n"
 "Language-Team: Retainful\n"
 "Language: en\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.2.1\n"
-"X-Poedit-Basepath: ../server/Projects/wp/woocommerce\n"
+"X-Poedit-Basepath: ../retainful\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-KeywordsList: __;_e;esc_html__;esc_html_e;esc_attr__;esc_attr_e\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -35,8 +35,18 @@ msgstr ""
 msgid "But your Woocommerce version is "
 msgstr ""
 
-#: src/Main.php:74
-msgid "Woocommerce must be activated for Woocommerce category discount to work"
+#: src/Main.php:84
+msgid "Woocommerce must be activated for Retainful-Woocommerce to work"
+msgstr ""
+
+#: src/Main.php:87
+msgid "Your woocommerce version is "
+msgstr ""
+
+#: src/Main.php:87
+msgid ""
+". Some of the features of Retainful-Woocommerce will not work properly on "
+"this woocommerce version."
 msgstr ""
 
 #: src/OrderCoupon.php:27
