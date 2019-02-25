@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.0
 WC tested up to: 3.5.2
 Requires PHP: 5.6
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,3 +135,7 @@ No. There is no charges for support.
 
 = 1.0.5 =
 * Fix: Auto apply coupon by clicking link given in coupon
+
+= 1.0.6 =
+* New Feature: Individual coupon use
+* New Feature: Disconnect app from Retainful anytime
