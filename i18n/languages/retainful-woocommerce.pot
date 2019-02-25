@@ -1,136 +1,116 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Retainful woocommerce\n"
-"POT-Creation-Date: 2019-02-13 18:05+0530\n"
-"PO-Revision-Date: 2019-02-13 18:05+0530\n"
+"Project-Id-Version: retainful\n"
+"POT-Creation-Date: 2019-02-25 15:47+0530\n"
+"PO-Revision-Date: 2019-02-25 15:47+0530\n"
 "Last-Translator: \n"
-"Language-Team: Retainful\n"
+"Language-Team: retainful\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.2.1\n"
-"X-Poedit-Basepath: ../retainful\n"
+"X-Poedit-Basepath: ../plugins/retainful/src\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-KeywordsList: __;_e;esc_html__;esc_html_e;esc_attr__;esc_attr_e\n"
 "X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPathExcluded-0: vendor\n"
-"X-Poedit-SearchPathExcluded-1: i18n\n"
 
-#: retainful.php:44
-msgid "Retainful-woocommerce requires minimum PHP version of 5.6"
-msgstr ""
-
-#: retainful.php:47
-msgid ""
-"Woocommerce must installed and activated in-order to use Retainful-"
-"Woocommerce!"
-msgstr ""
-
-#: retainful.php:59
-msgid "Retainful-woocommerce requires minimum Woocommerce version of "
-msgstr ""
-
-#: retainful.php:59
-msgid "But your Woocommerce version is "
-msgstr ""
-
-#: src/Main.php:84
+#: Main.php:84
 msgid "Woocommerce must be activated for Retainful-Woocommerce to work"
 msgstr ""
 
-#: src/Main.php:87
+#: Main.php:87
 msgid "Your woocommerce version is "
 msgstr ""
 
-#: src/Main.php:87
+#: Main.php:87
 msgid ""
 ". Some of the features of Retainful-Woocommerce will not work properly on "
 "this woocommerce version."
 msgstr ""
 
-#: src/OrderCoupon.php:27
+#: OrderCoupon.php:27
 msgid "Please enter App-Id"
 msgstr ""
 
-#: src/OrderCoupon.php:32
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:35
+#: OrderCoupon.php:32
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:44
 msgid "Successfully connected to Retainful"
 msgstr ""
 
-#: src/OrderCoupon.php:34
+#: OrderCoupon.php:34
 msgid "Please enter Valid App-Id"
 msgstr ""
 
-#: src/OrderCoupon.php:57 src/admin/Settings.php:35
+#: OrderCoupon.php:57 admin/Settings.php:35
 msgid "Settings"
 msgstr ""
 
-#: src/admin/Settings.php:29
+#: admin/Settings.php:29
 msgid "Retainful Next Order Coupon"
 msgstr ""
 
-#: src/admin/Settings.php:36 src/admin/Settings.php:121
+#: admin/Settings.php:36 admin/Settings.php:121
 msgid "Save"
 msgstr ""
 
-#: src/admin/Settings.php:39
+#: admin/Settings.php:39
 msgid "Retainful App ID"
 msgstr ""
 
-#: src/admin/Settings.php:43
+#: admin/Settings.php:43
 msgid "You can get your App-id from https://www.app.retainful.com"
 msgstr ""
 
-#: src/admin/Settings.php:52
+#: admin/Settings.php:52
 msgid "Coupon type"
 msgstr ""
 
-#: src/admin/Settings.php:57
+#: admin/Settings.php:57
 msgid "Percentage"
 msgstr ""
 
-#: src/admin/Settings.php:58
+#: admin/Settings.php:58
 msgid "Flat"
 msgstr ""
 
-#: src/admin/Settings.php:63
+#: admin/Settings.php:63
 msgid "Coupon value"
 msgstr ""
 
-#: src/admin/Settings.php:74
+#: admin/Settings.php:74
 msgid "Apply coupon to"
 msgstr ""
 
-#: src/admin/Settings.php:79
+#: admin/Settings.php:79
 msgid "Allow any one to apply coupon"
 msgstr ""
 
-#: src/admin/Settings.php:80
+#: admin/Settings.php:80
 msgid "Allow the customer to apply coupon, but validate at checkout"
 msgstr ""
 
-#: src/admin/Settings.php:81
+#: admin/Settings.php:81
 msgid "Allow customer to apply coupon only after login"
 msgstr ""
 
-#: src/admin/Settings.php:86
+#: admin/Settings.php:86
 msgid "Display coupon message after"
 msgstr ""
 
-#: src/admin/Settings.php:91
+#: admin/Settings.php:91
 msgid "Order details"
 msgstr ""
 
-#: src/admin/Settings.php:92
+#: admin/Settings.php:92
 msgid "Order meta"
 msgstr ""
 
-#: src/admin/Settings.php:93
+#: admin/Settings.php:93
 msgid "Customer details"
 msgstr ""
 
-#: src/admin/Settings.php:98
+#: admin/Settings.php:98
 msgid ""
 "This message will attached to the Order Email.<br>Please use the below short "
 "codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - "
@@ -138,114 +118,124 @@ msgid ""
 "</b> - Url to apply coupon automatically"
 msgstr ""
 
-#: src/admin/Settings.php:99
+#: admin/Settings.php:99
 msgid ""
 "<br><b>{{coupon_expiry_date}}</b> - Coupon expiry date(If coupon does not "
 "have any expiry days,then this will not attach to the message).<br>"
 msgstr ""
 
-#: src/admin/Settings.php:104
+#: admin/Settings.php:104
 msgid "Custom coupon message"
 msgstr ""
 
-#: src/admin/Settings.php:114
+#: admin/Settings.php:114
 msgid "Retainful Coupon Usage Restrictions"
 msgstr ""
 
-#: src/admin/Settings.php:120
+#: admin/Settings.php:120
 msgid "Usage restriction"
 msgstr ""
 
-#: src/admin/Settings.php:125
+#: admin/Settings.php:125
 msgid "Minimum spend"
 msgstr ""
 
-#: src/admin/Settings.php:128
+#: admin/Settings.php:128
 msgid "Set the minimum spend(subtotal) allowed to use the coupon."
 msgstr ""
 
-#: src/admin/Settings.php:136
+#: admin/Settings.php:136
 msgid "Maximum spend"
 msgstr ""
 
-#: src/admin/Settings.php:139
+#: admin/Settings.php:139
 msgid "Set the maximum spend(subtotal) allowed to use the coupon."
 msgstr ""
 
-#: src/admin/Settings.php:147
+#: admin/Settings.php:147
 msgid "Coupon expires in "
 msgstr ""
 
-#: src/admin/Settings.php:150
+#: admin/Settings.php:150
 msgid ""
 "After the entered number of days coupon will automatically expired."
 "<br><b>Note: Please leave empty or put 0 to never expire.</b>"
 msgstr ""
 
-#: src/admin/Settings.php:151
+#: admin/Settings.php:151
 msgid " Day(s)"
 msgstr ""
 
-#: src/admin/Settings.php:161
+#: admin/Settings.php:161
+msgid "Individual use only"
+msgstr ""
+
+#: admin/Settings.php:164
+msgid ""
+"Check this box if the coupon cannot be used in conjunction with other "
+"coupons."
+msgstr ""
+
+#: admin/Settings.php:167
 msgid "Exclude sale items"
 msgstr ""
 
-#: src/admin/Settings.php:164
+#: admin/Settings.php:170
 msgid ""
 "Check this box if the coupon should not apply to items on sale. Per-item "
 "coupons will only work if the item is not on sale. Per-cart coupons will "
 "only work if there are items in the cart that are not on sale."
 msgstr ""
 
-#: src/admin/Settings.php:167
+#: admin/Settings.php:173
 msgid "Products"
 msgstr ""
 
-#: src/admin/Settings.php:171
+#: admin/Settings.php:177
 msgid ""
 "Product that the coupon code will be applied to, or that need to be in the "
 "cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:173 src/admin/Settings.php:187
+#: admin/Settings.php:179 admin/Settings.php:193
 msgid "Choose products.."
 msgstr ""
 
-#: src/admin/Settings.php:181
+#: admin/Settings.php:187
 msgid "Exclude products"
 msgstr ""
 
-#: src/admin/Settings.php:185
+#: admin/Settings.php:191
 msgid ""
 "Product that the coupon code will not applied to, or cannot be in the cart "
 "in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:195
+#: admin/Settings.php:201
 msgid "Product Categories"
 msgstr ""
 
-#: src/admin/Settings.php:200 src/admin/Settings.php:210
+#: admin/Settings.php:206 admin/Settings.php:216
 msgid "Select categories"
 msgstr ""
 
-#: src/admin/Settings.php:202
+#: admin/Settings.php:208
 msgid ""
 "Product categories that the coupon code will be applied to, or that need to "
 "be in the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:205
+#: admin/Settings.php:211
 msgid "Exclude Categories"
 msgstr ""
 
-#: src/admin/Settings.php:212
+#: admin/Settings.php:218
 msgid ""
 "Product categories that the coupon code will not applied to, or cannot be in "
 "the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:345
+#: admin/Settings.php:351
 msgid ""
 "<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 style="
 "\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"
@@ -262,38 +252,46 @@ msgid ""
 "decoration: none;\" href=\"{{coupon_url}}\">Go! </a></p></div></div>"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:33
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:34
 msgid "Connect"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:33
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:34
 msgid "Re-Connect"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:44
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:39
+msgid "Dis-connect"
+msgstr ""
+
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:45
+msgid "You have disconnected from Retainful!"
+msgstr ""
+
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:54
 msgid "Get your API Key for free"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:46
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:57
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:56
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:67
 msgid ""
 "Increase sales & get more money per customer. Drive repeat purchases by "
 "automatically sending a\n"
 "                single-use coupon for next purchase."
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:51
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:61
 msgid "Get your API Key"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:62
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:72
 msgid "Visit Dashboard!"
 msgstr ""
 
-#: src/fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php:28
+#: fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php:28
 msgid "Please connect to Retainful Inorder to use this features!"
 msgstr ""
 
-#: src/fields/cmb2-field-post-search-ajax/cmb-field-post-search-ajax.php:154
+#: fields/cmb2-field-post-search-ajax/cmb-field-post-search-ajax.php:154
 msgid "Error : Unauthorized action"
 msgstr ""
