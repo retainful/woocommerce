@@ -225,6 +225,32 @@ class WcFunctions
     }
 
     /**
+     * Add discount to cart
+     * @param $discount_code
+     * @return bool
+     */
+    function removeDiscount($discount_code)
+    {
+        if (empty($discount_code))
+            return false;
+        if (method_exists(WC()->cart, 'remove_coupon')) {
+            return WC()->cart->remove_coupon($discount_code);
+        }
+        return false;
+    }
+
+    /**
+     * get all coupons in cart
+     * @return array|bool
+     */
+    function getAppliedCouponsOfCart()
+    {
+        if (method_exists(WC()->cart, 'get_applied_coupons'))
+            return WC()->cart->get_applied_coupons();
+        return false;
+    }
+
+    /**
      * Get cart items
      * @return array
      */

@@ -158,6 +158,12 @@ class Settings
                     )
                 ));
                 $usage_restrictions->add_field(array(
+                    'name' => __('Individual use only', RNOC_TEXT_DOMAIN),
+                    'id' => $this->app_prefix . 'individual_use_only',
+                    'type' => 'checkbox',
+                    'desc' => __('Check this box if the coupon cannot be used in conjunction with other coupons.', RNOC_TEXT_DOMAIN)
+                ));
+                $usage_restrictions->add_field(array(
                     'name' => __('Exclude sale items', RNOC_TEXT_DOMAIN),
                     'id' => $this->app_prefix . 'exclude_sale_items',
                     'type' => 'checkbox',
@@ -400,7 +406,7 @@ class Settings
         if (!isset($params['app_id'])) {
             $params['app_id'] = $this->getApiKey();
         }
-        $response = $this->api->remoteGet($url, $params, true);
+        $response = $this->api->request($url, $params, true);
         if (isset($response->success) && $response->success) {
             //Do any stuff if success
             return true;

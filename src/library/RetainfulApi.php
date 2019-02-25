@@ -1,6 +1,9 @@
 <?php
 
 namespace Rnoc\Retainful\library;
+
+use Unirest\Request;
+
 if (!defined('ABSPATH')) exit;
 
 class RetainfulApi
@@ -14,7 +17,7 @@ class RetainfulApi
      */
     function validateApi($api_key)
     {
-        $response = $this->remoteGet($this->domain . 'app/' . $api_key);
+        $response = $this->request($this->domain . 'app/' . $api_key);
         if (isset($response->success) && $response->success)
             return true;
         else
@@ -28,38 +31,23 @@ class RetainfulApi
      * @param array $fields
      * @return array|bool|mixed|object|string
      */
-    function remoteGet($url, $fields = array(), $need_domain_in_suffix = false)
+    function request($url, $fields = array(), $need_domain_in_suffix = false)
     {
-        $response_data = '';
-        if (is_callable('curl_init')) {
-            try {
-                if (is_array($fields) && !empty($fields)) {
-                    $url = rtrim($url, '/');
-                    $url .= '?' . http_build_query($fields);
-                }
-                if ($need_domain_in_suffix)
-                    $url = $this->domain . $url;
-                $curl = curl_init();
-                curl_setopt($curl, CURLOPT_URL, $url);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_HEADER, false);
-                curl_setopt($curl, CURLOPT_HTTPHEADER, array('Origin: ' . $this->siteURL()));
-                curl_setopt($curl, CURLOPT_REFERER, $this->siteURL());
-                curl_setopt($curl, CURLOPT_AUTOREFERER, true);
-                $response_data = curl_exec($curl);
-                curl_close($curl);
-                if (is_string($response_data)) {
-                    try {
-                        $response_data = json_decode($response_data);
-                    } catch (\Exception $e) {
-
-                    }
-                }
-            } catch (\Exception $e) {
-                //
+        $response = '';
+        try {
+            $headers = array('Origin' => $this->siteURL());
+            if (is_array($fields) && !empty($fields)) {
+                $url = rtrim($url, '/');
+                $url .= '?' . http_build_query($fields);
             }
+            if ($need_domain_in_suffix)
+                $url = $this->domain . $url;
+            $response = Request::get($url, $headers);
+            $response = $response->body;
+        } catch (\Exception $e) {
+            $e->getMessage();
         }
-        return $response_data;
+        return $response;
     }
 
     /**

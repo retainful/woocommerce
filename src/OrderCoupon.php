@@ -323,6 +323,17 @@ class OrderCoupon
                 $discount_type = 'fixed_cart';
                 $usage_restrictions = $this->admin->getUsageRestrictions();
                 $app_prefix = isset($usage_restrictions['app_prefix']) ? $usage_restrictions['app_prefix'] : '';
+                if ((isset($usage_restrictions[$app_prefix . 'individual_use_only']))) {
+                    $coupons_added_to_cart = $this->wc_functions->getAppliedCouponsOfCart();
+                    if (!empty($coupons_added_to_cart)) {
+                        foreach ($coupons_added_to_cart as $key => $already_applied_coupon_code) {
+                            if ($already_applied_coupon_code != $coupon_code) {
+                                //remove coupon from cart
+                                $this->wc_functions->removeDiscount($already_applied_coupon_code);
+                            }
+                        }
+                    }
+                }
                 $coupon_type = get_post_meta($coupon_details->ID, 'coupon_type', true);
                 $coupon_value = get_post_meta($coupon_details->ID, 'coupon_value', true);
                 $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
@@ -331,7 +342,7 @@ class OrderCoupon
                 $coupon = array(
                     'id' => 321123 . rand(2, 9),
                     'amount' => $coupon_value,
-                    'individual_use' => false,
+                    'individual_use' => (isset($usage_restrictions[$app_prefix . 'individual_use_only'])) ? true : false,
                     'product_ids' => (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array(),
                     'excluded_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
                     //'exclude_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
