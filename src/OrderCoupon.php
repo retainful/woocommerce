@@ -260,7 +260,7 @@ class OrderCoupon
             $products_in_cart = $this->wc_functions->getProductIdsInCart();
             //Check the cart having only sale items
             $sale_products_in_cart = $this->wc_functions->getSaleProductIdsInCart();
-            if (count($sale_products_in_cart) >= count($products_in_cart)) {
+            if ((count($sale_products_in_cart) >= count($products_in_cart)) && isset($usage_restrictions[$app_prefix . 'exclude_sale_items'])) {
                 array_push($return, false);
             }
             //Check for must in cart products
@@ -323,7 +323,7 @@ class OrderCoupon
                 $discount_type = 'fixed_cart';
                 $usage_restrictions = $this->admin->getUsageRestrictions();
                 $app_prefix = isset($usage_restrictions['app_prefix']) ? $usage_restrictions['app_prefix'] : '';
-                if ((isset($usage_restrictions[$app_prefix . 'individual_use_only']))) {
+                /*if ((isset($usage_restrictions[$app_prefix . 'individual_use_only']))) {
                     $coupons_added_to_cart = $this->wc_functions->getAppliedCouponsOfCart();
                     if (!empty($coupons_added_to_cart)) {
                         foreach ($coupons_added_to_cart as $key => $already_applied_coupon_code) {
@@ -333,7 +333,7 @@ class OrderCoupon
                             }
                         }
                     }
-                }
+                }*/
                 $coupon_type = get_post_meta($coupon_details->ID, 'coupon_type', true);
                 $coupon_value = get_post_meta($coupon_details->ID, 'coupon_value', true);
                 $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
