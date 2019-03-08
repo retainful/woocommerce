@@ -62,14 +62,13 @@ class OrderCoupon
 
     /**
      * Send required details for email customizer
-     * @param $content
+     * @param $order_coupon_data
      * @param $order
      * @param $sending_email
      * @return array
      */
-    function wooEmailCustomizerRetainfulCouponContent($content, $order, $sending_email)
+    function wooEmailCustomizerRetainfulCouponContent($order_coupon_data, $order, $sending_email)
     {
-        $content_to_replace = array();
         $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
         if (!empty($coupon_code)) {
             $coupon_details = $this->getCouponDetails($coupon_code);
@@ -77,25 +76,63 @@ class OrderCoupon
                 $post_id = $coupon_details->ID;
                 $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
                 if ($coupon_amount > 0) {
-                    $coupon_type = get_post_meta($post_id, 'coupon_type', true);
-                    $content_to_replace = array(
-                        '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
-                        '{{coupon_code}}' => $coupon_code,
-                        '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
-                    );
-                    $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
-                    if (!empty($coupon_expiry_date)) {
-                        $content_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date);
-                    }
                     $is_api_enabled = $this->admin->isAppConnected();
+                    $tracker = '';
                     if (!empty($is_api_enabled) && $sending_email) {
                         $request_params = $this->getRequestParams($order);
-                        $content_to_replace['{{coupon_track_link}}'] = '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
+                        $tracker .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
+                    }
+                    $coupon_type = get_post_meta($post_id, 'coupon_type', true);
+                    $order_coupon_data = array(
+                        'wec_next_order_coupon_code' => $coupon_code,
+                        'wec_next_order_coupon' => $coupon_code . $tracker,
+                        'wec_next_order_coupon_value' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
+                        'woo_mb_site_url_link_with_coupon' => site_url() . '?retainful_coupon_code=' . $coupon_code,
+                    );
+                }
+            }
+        }
+        return $order_coupon_data;
+    }
+
+    /**
+     * Register retainful short codes with Email Customizer
+     * @param $short_codes
+     * @return mixed
+     */
+    function wooEmailCustomizerRegisterRetainfulShortCodes($short_codes)
+    {
+        if ($this->admin->isAppConnected()) {
+            $short_codes['retainful_coupon_expiry_date'] = "Next order coupon expiry date";
+        }
+        return $short_codes;
+    }
+
+    /**
+     * assign values for short codes
+     * @param $short_codes
+     * @param $order
+     * @param $sending_email
+     * @return mixed
+     */
+    function wooEmailCustomizerRetainfulShortCodesValues($short_codes, $order, $sending_email)
+    {
+        if ($this->admin->isAppConnected()) {
+            $short_codes['retainful_coupon_expiry_date'] = '';
+            $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+            if (!empty($coupon_code)) {
+                $coupon_details = $this->getCouponDetails($coupon_code);
+                if (!empty($coupon_details)) {
+                    $post_id = $coupon_details->ID;
+                    $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
+                    if (!empty($coupon_expiry_date)) {
+                        $date_format = $this->admin->getExpireDateFormat();
+                        $short_codes['retainful_coupon_expiry_date'] = $this->formatDate($coupon_expiry_date, $date_format);
                     }
                 }
             }
         }
-        return $content_to_replace;
+        return $short_codes;
     }
 
     /**
@@ -146,7 +183,8 @@ class OrderCoupon
                         );
                         $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
                         if (!empty($coupon_expiry_date)) {
-                            $string_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date);
+                            $date_format = $this->admin->getExpireDateFormat();
+                            $string_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date, $date_format);
                         } else {
                             $string_to_replace['{{coupon_expiry_date}}'] = '';
                         }

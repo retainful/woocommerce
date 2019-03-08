@@ -157,6 +157,14 @@ class Settings
                         'id' => 'app_coupon_expire_days'
                     )
                 ));
+
+                $usage_restrictions->add_field(array(
+                    'name' => __('Coupon expire date format ', RNOC_TEXT_DOMAIN),
+                    'id' => $this->app_prefix . 'expire_date_format',
+                    'type' => 'select',
+                    'default' => 'F j, Y, g:i a',
+                    'options' => $this->getDateFormatOptions()
+                ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Individual use only', RNOC_TEXT_DOMAIN),
                     'id' => $this->app_prefix . 'individual_use_only',
@@ -229,6 +237,25 @@ class Settings
     }
 
     /**
+     * Coupon expire date format list
+     * @return array
+     */
+    function getDateFormatOptions()
+    {
+        return array(
+            'jS D M g:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'jS D M g:i a'),
+            'jS D M, Y g:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'jS D M, Y g:i a'),
+            'F j, Y, g:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'F j, Y, g:i a'),
+            'Y-m-d' => get_date_from_gmt(date('Y-m-d h:i:s'), 'Y-m-d'),
+            'Y-m-d h:i:s' => get_date_from_gmt(date('Y-m-d h:i:s'), 'Y-m-d h:i:s'),
+            'Y-m-d h:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'Y-m-d h:i a'),
+            'd/m/Y' => get_date_from_gmt(date('Y-m-d h:i:s'), 'd/m/Y'),
+            'd/m/Y h:i:s' => get_date_from_gmt(date('Y-m-d h:i:s'), 'd/m/Y h:i:s'),
+            'd/m/Y h:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'd/m/Y h:i a'),
+        );
+    }
+
+    /**
      * Make coupon expire date from order date
      * @param $ordered_date
      * @return string|null
@@ -273,6 +300,19 @@ class Settings
         } else {
             return array();
         }
+    }
+
+    /**
+     * get coupon date format
+     * @return mixed|string
+     */
+    function getExpireDateFormat()
+    {
+        $usage_restriction = $this->getUsageRestrictions();
+        if (isset($usage_restriction[$this->app_prefix . 'expire_date_format']) && !empty($usage_restriction[$this->app_prefix . 'expire_date_format'])) {
+            return $usage_restriction[$this->app_prefix . 'expire_date_format'];
+        }
+        return 'F j, Y, g:i a';
     }
 
     /**

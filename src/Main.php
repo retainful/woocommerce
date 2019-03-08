@@ -67,11 +67,16 @@ class Main
         //Remove Code from session
         add_action('woocommerce_removed_coupon', array($this->rnoc, 'removeCouponFromCart'));
         //Support for woocommerce email customizer
+
         add_filter('woo_email_drag_and_drop_builder_retainful_settings_url', array($this->rnoc, 'wooEmailCustomizerRetainfulSettingsUrl'));
         //Tell Email customizes about handling coupons..
         add_filter('woo_email_drag_and_drop_builder_handling_retainful', '__return_true');
-        //
-        add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_content', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3);
+        //set coupon details for Email customizer
+        add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_data', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3);
+        //sent retainful additional short codes
+        add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array($this->rnoc, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
+        add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
+
     }
 
 
