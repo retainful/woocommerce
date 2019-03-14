@@ -41,6 +41,12 @@
                     $("#connect-to-retainful-loader").hide();
                     message.html('<p style="color:red;">' + response.error + '</p>');
                 }
+                if (response.error && app_id.val() === "") {
+                    app_id.focus();
+                    $("#submit-cmb").removeAttr('disabled');
+                    $("#connect-to-retainful-loader").hide();
+                    message.html('<p style="color:red;">' + response.error + '</p>');
+                }
                 if (response.success) {
                     $("#is_retainful_app_connected").val(1);
                     message.html('<p style="color:green;">' + response.success + '</p>');

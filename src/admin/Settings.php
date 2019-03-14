@@ -65,7 +65,7 @@ class Settings
                 'type' => 'text',
                 'classes' => 'retainful-coupon-group',
                 'default' => '',
-                'after' => '<p id="coupon_amount_error" style="color: red;;"></p>',
+                'after' => '<p><b>'.__('Note: If this field is empty, No coupon codes will generate!',RNOC_TEXT_DOMAIN).'</b></p><p id="coupon_amount_error" style="color: red;;"></p>',
                 'attributes' => array(
                     'id' => 'app_coupon_value'
                 )

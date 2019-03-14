@@ -22,24 +22,26 @@
         let error_msg = $("#coupon_amount_error");
         let coupon_type = $("input[name$=retainful_coupon_type]:checked").val();
         error_msg.html('');
-        let ex = /^[0-9]+\.?[0-9]*$/;
-        if (ex.test(coupon.val()) === false) {
-            error_msg.html('Invalid coupon value.');
-            coupon.focus();
-            return false;
-        } else {
-            if (coupon_type === "0") {
-                if (parseFloat(coupon.val()) < 0 || parseFloat(coupon.val()) > 100) {
-                    error_msg.html('For percentage coupon, coupon value must less then or equal to 100.');
-                    coupon.focus();
-                    return false;
+        if(coupon.val() !== "") {
+            let ex = /^[0-9]+\.?[0-9]*$/;
+            if (ex.test(coupon.val()) === false) {
+                error_msg.html('Invalid coupon value.');
+                coupon.focus();
+                return false;
+            } else {
+                if (coupon_type === "0") {
+                    if (parseFloat(coupon.val()) < 0 || parseFloat(coupon.val()) > 100) {
+                        error_msg.html('For percentage coupon, coupon value must less then or equal to 100.');
+                        coupon.focus();
+                        return false;
+                    }
                 }
             }
+            let val = coupon.val();
+            if (val.indexOf('.') > -1) {
+                val = parseFloat(val).toFixed(2);
+            }
+            coupon.val(val);
         }
-        let val = coupon.val();
-        if (val.indexOf('.') > -1) {
-            val = parseFloat(val).toFixed(2);
-        }
-        coupon.val(val);
     });
 })(jQuery);
