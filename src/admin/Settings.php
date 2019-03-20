@@ -7,7 +7,7 @@ use Rnoc\Retainful\library\RetainfulApi;
 
 class Settings
 {
-    public $app_prefix = 'rnoc_', $slug = 'retainful', $api;
+    public $slug = 'retainful', $api;
 
     /**
      * Settings constructor.
@@ -25,7 +25,7 @@ class Settings
         add_action('cmb2_admin_init', function () {
             //General settings tab
             $general_settings = new_cmb2_box(array(
-                'id' => $this->app_prefix . 'retainful',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful',
                 'title' => __('Retainful Next Order Coupon', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
                 'option_key' => $this->slug,
@@ -37,20 +37,20 @@ class Settings
             ));
             $general_settings->add_field(array(
                 'name' => __('Retainful App ID', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_app_id',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_app_id',
                 'type' => 'retainful_app',
                 'default' => '',
                 'desc' => __('You can get your App-id from https://www.app.retainful.com', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
-                'id' => $this->app_prefix . 'is_retainful_connected',
+                'id' => RNOC_PLUGIN_PREFIX . 'is_retainful_connected',
                 'type' => 'hidden',
                 'default' => 0,
                 'attributes' => array('id' => 'is_retainful_app_connected')
             ));
             $general_settings->add_field(array(
                 'name' => __('Coupon type', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_coupon_type',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
                 'type' => 'radio',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
@@ -61,18 +61,18 @@ class Settings
             ));
             $general_settings->add_field(array(
                 'name' => __('Coupon value', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_coupon_amount',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount',
                 'type' => 'text',
                 'classes' => 'retainful-coupon-group',
                 'default' => '',
-                'after' => '<p><b>'.__('Note: If this field is empty, No coupon codes will generate!',RNOC_TEXT_DOMAIN).'</b></p><p id="coupon_amount_error" style="color: red;;"></p>',
+                'after' => '<p><b>' . __('Note: If this field is empty, No coupon codes will generate!', RNOC_TEXT_DOMAIN) . '</b></p><p id="coupon_amount_error" style="color: red;;"></p>',
                 'attributes' => array(
                     'id' => 'app_coupon_value'
                 )
             ));
             $general_settings->add_field(array(
                 'name' => __('Apply coupon to', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_coupon_applicable_to',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to',
                 'type' => 'radio',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
@@ -84,7 +84,7 @@ class Settings
             ));
             $general_settings->add_field(array(
                 'name' => __('Display coupon message after', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_add_coupon_message_to',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to',
                 'type' => 'select',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
@@ -102,7 +102,7 @@ class Settings
             }
             $general_settings->add_field(array(
                 'name' => __('Custom coupon message', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_coupon_message',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_message',
                 'type' => 'wysiwyg',
                 'classes' => 'retainful-coupon-group',
                 'default' => '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>',
@@ -110,7 +110,7 @@ class Settings
             ));
             //Usage restrictions
             $usage_restrictions = new_cmb2_box(array(
-                'id' => $this->app_prefix . 'retainful_usage_restriction',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_usage_restriction',
                 'title' => __('Retainful Coupon Usage Restrictions', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
                 'option_key' => $this->slug . '_usage_restriction',
@@ -123,7 +123,7 @@ class Settings
             if ($this->isAppConnected()) {
                 $usage_restrictions->add_field(array(
                     'name' => __('Minimum spend', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'minimum_spend',
+                    'id' => RNOC_PLUGIN_PREFIX . 'minimum_spend',
                     'type' => 'text',
                     'desc' => __('Set the minimum spend(subtotal) allowed to use the coupon.', RNOC_TEXT_DOMAIN),
                     'attributes' => array(
@@ -134,7 +134,7 @@ class Settings
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Maximum spend', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'maximum_spend',
+                    'id' => RNOC_PLUGIN_PREFIX . 'maximum_spend',
                     'type' => 'text',
                     'desc' => __('Set the maximum spend(subtotal) allowed to use the coupon.', RNOC_TEXT_DOMAIN),
                     'attributes' => array(
@@ -145,7 +145,7 @@ class Settings
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Coupon expires in ', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'retainful_expire_days',
+                    'id' => RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
                     'type' => 'text_small',
                     'after' => '<p id="coupon_expire_error" style="color: red;"></p>' . __('After the entered number of days coupon will automatically expired.<br><b>Note: Please leave empty or put 0 to never expire.</b>', RNOC_TEXT_DOMAIN),
                     'desc' => __(' Day(s)', RNOC_TEXT_DOMAIN),
@@ -160,26 +160,26 @@ class Settings
 
                 $usage_restrictions->add_field(array(
                     'name' => __('Coupon expire date format ', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'expire_date_format',
+                    'id' => RNOC_PLUGIN_PREFIX . 'expire_date_format',
                     'type' => 'select',
                     'default' => 'F j, Y, g:i a',
                     'options' => $this->getDateFormatOptions()
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Individual use only', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'individual_use_only',
+                    'id' => RNOC_PLUGIN_PREFIX . 'individual_use_only',
                     'type' => 'checkbox',
                     'desc' => __('Check this box if the coupon cannot be used in conjunction with other coupons.', RNOC_TEXT_DOMAIN)
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Exclude sale items', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'exclude_sale_items',
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_sale_items',
                     'type' => 'checkbox',
                     'desc' => __('Check this box if the coupon should not apply to items on sale. Per-item coupons will only work if the item is not on sale. Per-cart coupons will only work if there are items in the cart that are not on sale.', RNOC_TEXT_DOMAIN)
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Products', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'products',
+                    'id' => RNOC_PLUGIN_PREFIX . 'products',
                     'type' => 'post_search_ajax',
                     'limit' => 10,
                     'desc' => __('Product that the coupon code will be applied to, or that need to be in the cart in order for the "Fixed cart discount" to be applied.', RNOC_TEXT_DOMAIN),
@@ -193,7 +193,7 @@ class Settings
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Exclude products', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'exclude_products',
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_products',
                     'type' => 'post_search_ajax',
                     'limit' => 10,
                     'desc' => __('Product that the coupon code will not applied to, or cannot be in the cart in order for the "Fixed cart discount" to be applied.', RNOC_TEXT_DOMAIN),
@@ -207,7 +207,7 @@ class Settings
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Product Categories', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'product_categories',
+                    'id' => RNOC_PLUGIN_PREFIX . 'product_categories',
                     'type' => 'pw_multiselect',
                     'options' => $this->getCategories(),
                     'attributes' => array(
@@ -217,7 +217,7 @@ class Settings
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Exclude Categories', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'exclude_product_categories',
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_product_categories',
                     'type' => 'pw_multiselect',
                     'options' => $this->getCategories(),
                     'attributes' => array(
@@ -228,7 +228,7 @@ class Settings
             } else {
                 $usage_restrictions->add_field(array(
                     'name' => '',
-                    'id' => $this->app_prefix . 'unlock_usage_restriction',
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
                     'type' => 'unlock_usage_restriction'
                 ));
             }
@@ -265,10 +265,10 @@ class Settings
         if (empty($ordered_date))
             return NULL;
         $settings = get_option($this->slug . '_usage_restriction', array());
-        if (!empty($settings) && $this->isAppConnected() && isset($settings[$this->app_prefix . 'retainful_expire_days']) && !empty($settings[$this->app_prefix . 'retainful_expire_days'])) {
+        if (!empty($settings) && $this->isAppConnected() && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days'])) {
             try {
                 $expiry_date = new \DateTime($ordered_date);
-                $expiry_date->add(new \DateInterval('P' . $settings[$this->app_prefix . 'retainful_expire_days'] . 'D'));
+                $expiry_date->add(new \DateInterval('P' . $settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days'] . 'D'));
                 return $expiry_date->format(\DateTime::ATOM);
             } catch (\Exception $e) {
                 return NULL;
@@ -296,7 +296,7 @@ class Settings
             $usage_restrictions = get_option($this->slug . '_usage_restriction', array());
             if (empty($usage_restrictions))
                 $usage_restrictions = array();
-            return array_merge($usage_restrictions, array('app_prefix' => $this->app_prefix));
+            return $usage_restrictions; array('app_prefix' => RNOC_PLUGIN_PREFIX);
         } else {
             return array();
         }
@@ -309,8 +309,8 @@ class Settings
     function getExpireDateFormat()
     {
         $usage_restriction = $this->getUsageRestrictions();
-        if (isset($usage_restriction[$this->app_prefix . 'expire_date_format']) && !empty($usage_restriction[$this->app_prefix . 'expire_date_format'])) {
-            return $usage_restriction[$this->app_prefix . 'expire_date_format'];
+        if (isset($usage_restriction[RNOC_PLUGIN_PREFIX . 'expire_date_format']) && !empty($usage_restriction[RNOC_PLUGIN_PREFIX . 'expire_date_format'])) {
+            return $usage_restriction[RNOC_PLUGIN_PREFIX . 'expire_date_format'];
         }
         return 'F j, Y, g:i a';
     }
@@ -358,7 +358,7 @@ class Settings
     function isAppConnected()
     {
         $settings = get_option($this->slug, array());
-        if (!empty($settings) && isset($settings[$this->app_prefix . 'is_retainful_connected']) && !empty($settings[$this->app_prefix . 'is_retainful_connected'])) {
+        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'])) {
             return true;
         }
         return false;
@@ -372,8 +372,8 @@ class Settings
     function getApiKey()
     {
         $settings = get_option($this->slug, array());
-        if (!empty($settings) && isset($settings[$this->app_prefix . 'retainful_app_id']) && !empty($settings[$this->app_prefix . 'retainful_app_id'])) {
-            return $settings[$this->app_prefix . 'retainful_app_id'];
+        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id'])) {
+            return $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id'];
         }
         return NULL;
     }
@@ -385,8 +385,8 @@ class Settings
     function getCouponMessage()
     {
         $settings = get_option($this->slug, array());
-        if (!empty($settings) && isset($settings[$this->app_prefix . 'retainful_coupon_message']) && !empty(isset($settings[$this->app_prefix . 'retainful_coupon_message']))) {
-            return __($settings[$this->app_prefix . 'retainful_coupon_message'], RNOC_TEXT_DOMAIN);
+        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']) && !empty(isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']))) {
+            return __($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'], RNOC_TEXT_DOMAIN);
         } else {
             return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>', RNOC_TEXT_DOMAIN);
         }
@@ -401,8 +401,8 @@ class Settings
         $coupon = array();
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
-            $coupon['coupon_type'] = ($settings[$this->app_prefix . 'retainful_coupon_type']) ? $settings[$this->app_prefix . 'retainful_coupon_type'] : 0;
-            $coupon['coupon_amount'] = ($settings[$this->app_prefix . 'retainful_coupon_amount']) ? $settings[$this->app_prefix . 'retainful_coupon_amount'] : 0;
+            $coupon['coupon_type'] = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] : 0;
+            $coupon['coupon_amount'] = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
         }
         return $coupon;
     }
@@ -416,7 +416,7 @@ class Settings
         $coupon_applicable_for = 'all';
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
-            $coupon_applicable_for = ($settings[$this->app_prefix . 'retainful_coupon_applicable_to']) ? $settings[$this->app_prefix . 'retainful_coupon_applicable_to'] : 'all';
+            $coupon_applicable_for = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to'] : 'all';
         }
         return $coupon_applicable_for;
     }
@@ -430,7 +430,7 @@ class Settings
         $hook = 'woocommerce_email_customer_details';
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
-            $hook = ($settings[$this->app_prefix . 'retainful_add_coupon_message_to']) ? $settings[$this->app_prefix . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
+            $hook = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
         }
         return $hook;
     }
