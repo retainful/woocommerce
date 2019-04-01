@@ -3,7 +3,7 @@
  * Class MAG_CMB2_Field_Post_Search_Ajax
  */
 if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
-	
+
 	class MAG_CMB2_Field_Post_Search_Ajax {
 
 		/**
@@ -28,7 +28,7 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 		/**
 		 * Render field
 		 */
-		public function render( $field, $value, $object_id, $object_type, $field_type ) {	
+		public function render( $field, $value, $object_id, $object_type, $field_type ) {
 			$this->setup_admin_scripts();
 			$field_name = $field->_name();
 
@@ -37,7 +37,7 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 				if( isset($value) && !empty($value) ){
 					if( !is_array($value) ){ $value = array($value); }
 					foreach($value as $val){
-						$handle = ($field->args( 'sortable' )) ? '<span class="hndl"></span>' : '';	
+						$handle = ($field->args( 'sortable' )) ? '<span class="hndl"></span>' : '';
 						if( $field->args( 'object_type' ) == 'user' ){
 							$guid 	= get_edit_user_link($val);
 							$user	= get_userdata($val);
@@ -50,7 +50,7 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 						echo '<li>'.$handle.'<input type="hidden" name="'.$field_name.'_results[]" value="'.$val.'"><a href="'.$guid.'" target="_blank" class="edit-link">'.$title.'</a><a class="remover"><span class="dashicons dashicons-no"></span><span class="dashicons dashicons-dismiss"></span></a></li>';
 					}
 				}
-				echo '</ul>';			
+				echo '</ul>';
 				$field_value = '';
 			}
 			else{
@@ -61,7 +61,7 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 				else{
 					$field_value = ($value ? get_the_title($value) : '');
 				}
-				echo $field_type->input( array( 
+				echo $field_type->input( array(
 					'type' 	=> 'hidden',
 					'name' 	=> $field_name . '_results',
 					'value' => $value,
@@ -69,7 +69,7 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 				) );
 			}
 
-			echo $field_type->input( array( 
+			echo $field_type->input( array(
 				'type' 			=> 'text',
 				'name' 			=> $field_name,
 				'id'			=> $field_name,
@@ -82,7 +82,7 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 				'data-queryargs'=> $field->args( 'query_args' ) ? htmlspecialchars( json_encode( $field->args( 'query_args' ) ), ENT_QUOTES, 'UTF-8' ) : ''
 			) );
 
-			echo '<img src="'.admin_url( 'images/spinner.gif' ).'" class="cmb-post-search-ajax-spinner" />';		
+			echo '<img src="'.admin_url( 'images/spinner.gif' ).'" class="cmb-post-search-ajax-spinner" />';
 
 			$field_type->_desc( true, true );
 
@@ -103,7 +103,7 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 		}
 
 		/**
-		 * Defines the url which is used to load local resources. Based on, and uses, 
+		 * Defines the url which is used to load local resources. Based on, and uses,
 		 * the CMB2_Utils class from the CMB2 library.
 		 */
 		public static function url( $path = '' ) {
@@ -118,7 +118,7 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 
 			/**
 			 * Use CMB2_Utils to gather the url from cmb2_fpsa_dir
-			 */	
+			 */
 			$cmb2_fpsa_url = CMB2_Utils::get_url_from_dir( $cmb2_fpsa_dir );
 
 			/**
@@ -139,7 +139,7 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 			wp_localize_script( 'mag-post-search-ajax', 'psa', array(
 				'ajaxurl' 	=> admin_url( 'admin-ajax.php' ),
 				'nonce'		=> wp_create_nonce( 'mag_cmb_post_search_ajax_get_results' )
-			) ); 
+			) );
 			wp_enqueue_script( 'mag-post-search-ajax' );
 			wp_enqueue_style( 'mag-post-search-ajax', self::url( 'css/mag-post-search-ajax.css' ), array(), self::VERSION );
 
@@ -183,14 +183,14 @@ if( ! class_exists( 'MAG_CMB2_Field_Post_Search_Ajax' ) ) {
 								'guid'	=> get_edit_post_link()
 							) );
 						endwhile;
-					endif;	
-				}				
+					endif;
+				}
 				wp_reset_postdata();
-				die( json_encode( $datas ) );			
+				die( json_encode( $datas ) );
 			}
 		}
 
 	}
-	
+
 }
 $mag_cmb2_field_post_search_ajax = new MAG_CMB2_Field_Post_Search_Ajax();

@@ -1,8 +1,8 @@
 (function ($) {
     'use strict';
     $(document).ready(function () {
-        let app_id = $("#retainful_app_id").val();
-        let is_connected = $("#is_retainful_app_connected").val();
+        var app_id = $("#retainful_app_id").val();
+        var is_connected = $("#is_retainful_app_connected").val();
         if (app_id !== "" && !is_connected) {
             $("#submit-cmb").attr('disabled', 'disabled');
         }
@@ -19,9 +19,9 @@
     });
 
     function validateKey() {
-        let path = $("#retainful_ajax_path").val();
-        let app_id = $("#retainful_app_id");
-        let message = $(".retainful_app_validation_message");
+        var path = $("#retainful_ajax_path").val();
+        var app_id = $("#retainful_app_id");
+        var message = $(".retainful_app_validation_message");
         $("#connect-to-retainful-loader").show();
         message.html('<p>&nbsp;</p>');
         $("#is_retainful_app_connected").val(0);
@@ -32,7 +32,7 @@
             url: path,
             type: 'POST',
             dataType: "json",
-            data: {action: 'validateAppKey', app_id: app_id.val()},
+            data: {action: 'validate_app_key', app_id: app_id.val()},
             success: function (response) {
                 if (response.error && app_id.val() !== "") {
                     app_id.val("");

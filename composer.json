@@ -16,8 +16,10 @@
     "files": [
       "vendor/cmb2/cmb2/init.php",
       "src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php",
-      "src/fields/cmb2-field-post-search-ajax/cmb-field-post-search-ajax.php",
+      "src/fields/cmb-field-post-search-ajax/cmb-field-post-search-ajax.php",
       "src/fields/cmb-field-select2/cmb-field-select2.php",
+      "src/fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php",
+      "src/fields/cmb-field-date-range-picker/cmb-field-date-range-picker.php",
       "src/fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php"
     ]
   }

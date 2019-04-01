@@ -3,27 +3,26 @@
         $(document).on("keypress keyup blur", "#app_coupon_value", function (event) {
             $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
             if ((event.which !== 46 || $(this).val().indexOf('.') !== -1) && (event.which < 48 || event.which > 57)) {
-                e.preventDefault();
+                event.preventDefault();
             }
         });
-        $(document).on("keypress keyup blur", "#app_coupon_expire_days", function (event) {
-            $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        $(document).on("keypress keyup blur", "#app_coupon_expire_days,.number_only_field", function (event) {
             if ((event.which < 48 || event.which > 57)) {
-                e.preventDefault();
+                event.preventDefault();
             }
         });
-        let is_usage_restriction = $("#unlock_usage_restriction").val();
-        if(is_usage_restriction === "1"){
+        var is_usage_restriction = $("#unlock_usage_restriction").val();
+        if (is_usage_restriction === "1") {
             $("#submit-cmb").hide();
         }
     });
     $(document).on("submit", "#rnoc_retainful", function () {
-        let coupon = $("#app_coupon_value");
-        let error_msg = $("#coupon_amount_error");
-        let coupon_type = $("input[name$=retainful_coupon_type]:checked").val();
+        var coupon = $("#app_coupon_value");
+        var error_msg = $("#coupon_amount_error");
+        var coupon_type = $("input[name$=retainful_coupon_type]:checked").val();
         error_msg.html('');
-        if(coupon.val() !== "") {
-            let ex = /^[0-9]+\.?[0-9]*$/;
+        if (coupon.val() !== "") {
+            var ex = /^[0-9]+\.?[0-9]*$/;
             if (ex.test(coupon.val()) === false) {
                 error_msg.html('Invalid coupon value.');
                 coupon.focus();
@@ -37,7 +36,7 @@
                     }
                 }
             }
-            let val = coupon.val();
+            var val = coupon.val();
             if (val.indexOf('.') > -1) {
                 val = parseFloat(val).toFixed(2);
             }

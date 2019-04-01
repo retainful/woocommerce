@@ -8,7 +8,7 @@ use Rnoc\Retainful\Admin\Settings;
 class Main
 {
     public static $init;
-    public $rnoc, $admin;
+    public $rnoc, $admin, $abandoned_cart;
 
     /**
      * Initiate the plugin
@@ -26,6 +26,7 @@ class Main
     {
         $this->rnoc = ($this->rnoc == NULL) ? new OrderCoupon() : $this->rnoc;
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
+        $this->abandoned_cart = ($this->abandoned_cart == NULL) ? new AbandonedCart() : $this->abandoned_cart;
         $this->activateEvents();
     }
 
@@ -61,7 +62,7 @@ class Main
             add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
 
         //Validate key
-        add_action('wp_ajax_validateAppKey', array($this->rnoc, 'validateAppKey'));
+        add_action('wp_ajax_validate_app_key', array($this->rnoc, 'validateAppKey'));
         //Settings link
         add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
         //Sync the coupon details with retainful
@@ -83,11 +84,43 @@ class Main
         add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array($this->rnoc, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
         add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
 
-        /*
-         * Retainful abandoned cart
-         */
-        add_action('woocommerce_cart_updated', array(&$this, 'wcal_store_cart_timestamp'));
-
+        if ($this->admin->isAppConnected()) {
+            /*
+             * Retainful abandoned cart
+             */
+            //Track and log user cart
+            add_action('woocommerce_cart_updated', array($this->abandoned_cart, 'userCartUpdated'));
+            //track guest user
+            add_action('woocommerce_after_checkout_billing_form', array($this->abandoned_cart, 'addTrackUserJs'));
+            add_action('wp_ajax_nopriv_save_retainful_guest_data', array($this->abandoned_cart, 'saveGuestData'));
+            //Add custom cron schedule events
+            add_filter('cron_schedules', array($this->abandoned_cart, 'registerNewCronType'));
+            // Send abandoned cart users email
+            if (!wp_next_scheduled('rnoc_abandoned_cart_send_email')) {
+                wp_schedule_event(time(), '5_minutes_rnoc_woocommerce', 'rnoc_abandoned_cart_send_email');
+            }
+            //Clear carts X day
+            if (!wp_next_scheduled('rnoc_retainful_clear_carts')) {
+                wp_schedule_event(time(), 'daily', 'rnoc_retainful_clear_carts');
+            }
+            add_action('rnoc_abandoned_cart_send_email', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
+            //add_action('woocommerce_init', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
+            //recover user cart
+            add_filter('template_include', array($this->abandoned_cart, 'recoverUserCart'), 99, 1);
+            add_action('woocommerce_new_order', array($this->abandoned_cart, 'purchaseComplete'));
+            //Admin
+            add_filter('wp_ajax_get_ajax_details_for_dashboard', array($this->abandoned_cart, 'getAjaxDetailsForDashboard'));
+            //add_action('woocommerce_init', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
+            //Process abandoned cart after user place order
+            add_filter('woocommerce_order_details_after_order_table', array($this->abandoned_cart, 'afterSessionDelivery'));
+            add_action('woocommerce_order_status_pending_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+            add_action('woocommerce_order_status_pending_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+            add_action('woocommerce_order_status_pending_to_on-hold_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+            add_action('woocommerce_order_status_failed_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+            add_action('woocommerce_order_status_failed_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+            add_filter('woocommerce_payment_complete_order_status', array($this->abandoned_cart, 'afterOrderComplete'), 10, 2);
+            add_filter('woocommerce_checkout_order_processed', array($this->abandoned_cart, 'orderPlaced'), 10, 1);
+        }
     }
 
     /**
@@ -136,6 +169,7 @@ class Main
                              `abandoned_cart_info` text COLLATE utf8_unicode_ci NOT NULL,
                              `abandoned_cart_time` int(11) NOT NULL,
                              `cart_ignored` enum('0','1') COLLATE utf8_unicode_ci NOT NULL,
+                             `is_notified` enum('0','1') DEFAULT '0' COLLATE utf8_unicode_ci NOT NULL,
                              `recovered_cart` int(11) NOT NULL,
                              `user_type` text,
                              `unsubscribe_link` enum('0','1') COLLATE utf8_unicode_ci NOT NULL,
@@ -147,6 +181,7 @@ class Main
         $guest_history_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . "guest_abandoned_cart_history";
         $guest_history_query = "CREATE TABLE IF NOT EXISTS $guest_history_table_name (
                 `id` int(15) NOT NULL AUTO_INCREMENT,
+                `session_id` varchar(50),
                 `billing_first_name` text,
                 `billing_last_name` text,
                 `billing_company_name` text,
@@ -171,6 +206,17 @@ class Main
                 PRIMARY KEY (`id`)
                 ) $rnoc_collate AUTO_INCREMENT=63000000";
         $wpdb->query($guest_history_query);
+
+        $sent_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . "email_sent_history";
+        $email_sent_query = "CREATE TABLE IF NOT EXISTS $sent_table_name (
+                        `id` int(11) NOT NULL auto_increment,
+                        `template_id` varchar(40) collate utf8_unicode_ci NOT NULL,
+                        `abandoned_order_id` int(11) NOT NULL,
+                        `sent_time` datetime NOT NULL,
+                        `sent_email_id` text COLLATE utf8_unicode_ci NOT NULL,
+                        PRIMARY KEY  (`id`)
+                        ) $rnoc_collate AUTO_INCREMENT=1 ";
+        $wpdb->query($email_sent_query);
     }
 
     function removeDependentTables()
