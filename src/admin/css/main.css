@@ -1,3 +1,19 @@
 .cmb2-options-page {
     max-width: 100% !important;
 }
+
+.button-red {
+    color: #fff !important;
+    background-color: #d9534f !important;
+    border-color: #d43f3a !important;
+    box-shadow: 0 1px 0 #d42d2a;
+    text-decoration: none;
+}
+
+.button-green {
+    color: #fff !important;
+    background-color: #5cb85c !important;
+    border-color: #4cae4c !important;
+    box-shadow: 0 1px 0 #3eae50;
+    text-decoration: none;
+}

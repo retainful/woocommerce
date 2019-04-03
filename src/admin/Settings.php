@@ -33,7 +33,7 @@ class Settings
                 'tab_group' => $this->slug,
                 'parent_slug' => 'woocommerce',
                 'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Settings', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Next order coupon', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
@@ -118,7 +118,7 @@ class Settings
                 'tab_group' => $this->slug,
                 'parent_slug' => $this->slug,
                 'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Usage restriction', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Coupon usage restriction', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             if ($is_app_connected) {
@@ -236,32 +236,33 @@ class Settings
                 ));
             }
             /*
-             * Adding abandoned cart settings
+             * Adding abandoned cart
              */
-            $abandoned_cart_dashboard = new_cmb2_box(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_dashboard',
-                'title' => __('Retainful Abandoned Cart Dashboard', RNOC_TEXT_DOMAIN),
+            //Abandoned cart
+            $abandoned_cart = new_cmb2_box(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart',
+                'title' => __('Retainful Abandoned Carts', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
-                'option_key' => $this->slug . '_abandoned_cart_dashboard',
+                'option_key' => $this->slug . '_abandoned_cart',
                 'tab_group' => $this->slug,
                 'parent_slug' => $this->slug,
                 'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Dashboard', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Abandoned / Recovered Carts', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             if ($is_app_connected) {
-                $abandoned_cart_dashboard->add_field(array(
+                $abandoned_cart->add_field(array(
                     'name' => __('Select date range', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
                     'type' => 'date_range_picker'
                 ));
-                $abandoned_cart_dashboard->add_field(array(
+                $abandoned_cart->add_field(array(
                     'name' => '',
                     'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
-                    'type' => 'abandoned_cart_dashboard'
+                    'type' => 'abandoned_cart_lists'
                 ));
             } else {
-                $abandoned_cart_dashboard->add_field(array(
+                $abandoned_cart->add_field(array(
                     'name' => '',
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
                     'type' => 'unlock_usage_restriction'
@@ -284,6 +285,7 @@ class Settings
                     'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'email_from_name',
                     'type' => 'text',
+                    'before_row' => '<h4>' . __("Abandoned Cart Email Templates", RNOC_TEXT_DOMAIN) . '</h4>',
                     'desc' => __('Enter the name that should appear in the email sent.', RNOC_TEXT_DOMAIN),
                     'default' => 'Admin'
                 ));
@@ -296,7 +298,7 @@ class Settings
                     'default' => $admin_email
                 ));
                 $abandoned_cart_email_templates->add_field(array(
-                    'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
+                    'name' => __('"Reply To " Address', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'email_reply_address',
                     'type' => 'text',
                     'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
@@ -334,20 +336,20 @@ class Settings
                     'default' => $email_template
                 ));
                 $abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                    'name' => __('Send this email', RNOC_TEXT_DOMAIN),
+                    'name' => __('Send this email in', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'template_sent_after',
-                    'type' => 'text_small',
+                    'type' => 'email_after',
                     'default' => '1',
-                    'desc' => __('Hour(s) after cart is abandoned.', RNOC_TEXT_DOMAIN),
+                    'desc' => __(' after cart is abandoned.', RNOC_TEXT_DOMAIN),
                     'attributes' => array('class' => 'number_only_field')
                 ));
                 $abandoned_cart_email_templates->add_group_field($group_field_id, array(
                     'name' => __('Active?', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'template_active',
-                    'type' => 'radio_inline',
+                    'type' => 'select',
                     'options' => array(
-                        0 => __('No', RNOC_TEXT_DOMAIN),
-                        1 => __('Yes', RNOC_TEXT_DOMAIN)
+                        1 => __('Yes', RNOC_TEXT_DOMAIN),
+                        0 => __('No', RNOC_TEXT_DOMAIN)
                     ),
                     'default' => 1
                 ));
@@ -359,61 +361,31 @@ class Settings
                     'type' => 'unlock_usage_restriction'
                 ));
             }
-            //Abandoned cart
-            $abandoned_cart = new_cmb2_box(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart',
-                'title' => __('Retainful Abandoned Carts', RNOC_TEXT_DOMAIN),
-                'object_types' => array('options-page'),
-                'option_key' => $this->slug . '_abandoned_cart',
-                'tab_group' => $this->slug,
-                'parent_slug' => $this->slug,
-                'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Abandoned carts', RNOC_TEXT_DOMAIN),
-                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
-            ));
-            if ($is_app_connected) {
-                $abandoned_cart->add_field(array(
-                    'name' => __('Select date range', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
-                    'type' => 'date_range_picker'
-                ));
-                $abandoned_cart->add_field(array(
-                    'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
-                    'type' => 'abandoned_cart_dashboard'
-                ));
-            } else {
-                $abandoned_cart->add_field(array(
-                    'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
-                    'type' => 'unlock_usage_restriction'
-                ));
-            }
-            //recovered cart
-            $recovered_cart = new_cmb2_box(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'retainful_recovered_cart',
+            //Reporting
+            $abandoned_cart_dashboard = new_cmb2_box(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_dashboard',
                 'title' => __('Retainful Abandoned Cart Dashboard', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
-                'option_key' => $this->slug . '_recovered_cart',
+                'option_key' => $this->slug . '_abandoned_cart_dashboard',
                 'tab_group' => $this->slug,
                 'parent_slug' => $this->slug,
                 'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Recovered carts', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Reports', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             if ($is_app_connected) {
-                $recovered_cart->add_field(array(
+                $abandoned_cart_dashboard->add_field(array(
                     'name' => __('Select date range', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
                     'type' => 'date_range_picker'
                 ));
-                $recovered_cart->add_field(array(
+                $abandoned_cart_dashboard->add_field(array(
                     'name' => '',
                     'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
                     'type' => 'abandoned_cart_dashboard'
                 ));
             } else {
-                $recovered_cart->add_field(array(
+                $abandoned_cart_dashboard->add_field(array(
                     'name' => '',
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
                     'type' => 'unlock_usage_restriction'
@@ -428,7 +400,7 @@ class Settings
                 'tab_group' => $this->slug,
                 'parent_slug' => $this->slug,
                 'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Abandoned cart(Settings)', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Abandoned cart settings', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             if ($is_app_connected) {
@@ -468,17 +440,6 @@ class Settings
                     'default' => 0
                 ));
                 $abandoned_cart_settings->add_field(array(
-                    'name' => __('Start tracking from Cart Page', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'track_guest_cart_from_cart_page',
-                    'type' => 'radio_inline',
-                    'options' => array(
-                        0 => __('No', RNOC_TEXT_DOMAIN),
-                        1 => __('Yes', RNOC_TEXT_DOMAIN)
-                    ),
-                    'desc' => __('Enable tracking of abandoned products & carts even if customer does not visit the checkout page or does not enter any details on the checkout page like Name or Email. Tracking will begin as soon as a visitor adds a product to their cart and visits the cart page.', RNOC_TEXT_DOMAIN),
-                    'default' => 1
-                ));
-                $abandoned_cart_settings->add_field(array(
                     'name' => __('Message to be displayed for Guest users when tracking their carts', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'guest_cart_capture_msg',
                     'type' => 'textarea',
@@ -487,7 +448,7 @@ class Settings
                 $abandoned_cart_settings->add_field(array(
                     'name' => __('Message to be displayed for registered users when tracking their carts.', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'logged_cart_capture_msg',
-                    'type' => 'text',
+                    'type' => 'textarea',
                     'desc' => __('In compliance with GDPR, add a message on the Shop & Product pages to inform Registered users of how their data is being used.<br><b>For example:</b>  Please check our Privacy Policy to see how we use your personal data.', RNOC_TEXT_DOMAIN)
                 ));
             } else {
@@ -498,7 +459,9 @@ class Settings
                 ));
             }
         });
-        $this->addScript();
+        if (is_admin()) {
+            $this->addScript();
+        }
     }
 
     /**

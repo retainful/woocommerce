@@ -430,7 +430,7 @@ class OrderCoupon
         $api_key = $this->admin->getApiKey();
         if (!empty($api_key)) {
             $request_params['app_id'] = $api_key;
-            wp_schedule_single_event(time() + 60, 'retainful_cron_sync_coupon_details', array($request_params));
+            as_schedule_single_action(time() + 60, 'retainful_cron_sync_coupon_details', array($request_params));
         }
         return true;
     }

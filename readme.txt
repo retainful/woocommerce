@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.0
 WC tested up to: 3.5.2
 Requires PHP: 5.6
-Stable tag: 1.0.7
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,3 +142,8 @@ No. There is no charges for support.
 
 = 1.0.7 =
 * New Feature: Integrated with WooCommerce Email Customizer with Drag and Drop Email Builder
+
+= 1.0.8 =
+* Fix: Allow plugin to create and manage coupons, If plugin is not connected to Retainful.
+
+= 1.0.9 =

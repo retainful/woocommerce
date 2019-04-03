@@ -216,55 +216,6 @@ class WcFunctions
     }
 
     /**
-     * Set session using core PHP function
-     * @param $key
-     * @param $value
-     */
-    function setPhpSession($key, $value)
-    {
-        if (session_id() === '') {
-            //session has not started
-            session_start();
-        }
-        $_SESSION[$key] = $value;
-    }
-
-    /**
-     * get session from Core PHP function
-     * @param $key
-     * @return null
-     */
-    function getPhpSession($key)
-    {
-        if (session_id() === '') {
-            //session has not started
-            session_start();
-        }
-        if (isset($_SESSION[$key])) {
-            return $_SESSION[$key];
-        }
-        return NULL;
-    }
-
-    /**
-     * Remove session value by php
-     * @param $key
-     * @return bool
-     */
-    function removePhpSession($key)
-    {
-        if (session_id() === '') {
-            //session has not started
-            session_start();
-        }
-        if (isset($_SESSION[$key])) {
-            unset($_SESSION[$key]);
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @param $key
      * @param $value
      * @return bool
@@ -290,6 +241,14 @@ class WcFunctions
             return NULL;
         if (method_exists(WC()->session, 'get')) {
             return WC()->session->get($key);
+        }
+        return NULL;
+    }
+
+    function getSessionCustomerId()
+    {
+        if (method_exists(WC()->session, 'get_customer_id')) {
+            return WC()->session->get_customer_id();
         }
         return NULL;
     }

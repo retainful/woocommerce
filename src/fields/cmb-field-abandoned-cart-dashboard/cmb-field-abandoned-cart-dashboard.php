@@ -74,6 +74,9 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                 display: none;
             }
         </style>
+        <script>
+            var no_ajax = false;
+        </script>
         <?php
     }
 
@@ -89,4 +92,4 @@ class CMB2_Field_Abandoned_Cart_Dashboard
     }
 }
 
-$cmb2_field_unlock_usage_restriction = new CMB2_Field_Abandoned_Cart_Dashboard();
+$cmb2_field_abandon_cart_dashboard = new CMB2_Field_Abandoned_Cart_Dashboard();
