@@ -97,13 +97,19 @@ class Main
             //track guest user
             add_action('woocommerce_after_checkout_billing_form', array($this->abandoned_cart, 'addTrackUserJs'));
             add_action('wp_ajax_nopriv_save_retainful_guest_data', array($this->abandoned_cart, 'saveGuestData'));
+            //recover user cart
+            add_filter('template_include', array($this->abandoned_cart, 'recoverUserCart'), 99, 1);
+            add_action('woocommerce_new_order', array($this->abandoned_cart, 'purchaseComplete'));
+            //Add tracking message
+            add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'guestGdprMessage'), 10, 1);
+            add_action('woocommerce_after_add_to_cart_button', array($this->abandoned_cart, 'userGdprMessage'), 10);
+            add_action('woocommerce_before_shop_loop', array($this->abandoned_cart, 'userGdprMessage'), 10);
+
             //Add custom cron schedule events
             add_action('plugins_loaded', array($this, 'actionSchedulerHooks'));
             add_action('rnoc_abandoned_clear_abandoned_carts', array($this->abandoned_cart, 'clearAbandonedCarts'));
             add_action('rnoc_abandoned_cart_send_email', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
-            //recover user cart
-            add_filter('template_include', array($this->abandoned_cart, 'recoverUserCart'), 99, 1);
-            add_action('woocommerce_new_order', array($this->abandoned_cart, 'purchaseComplete'));
+
             //Process abandoned cart after user place order
             add_action('woocommerce_order_status_pending_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
             add_action('woocommerce_order_status_pending_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
@@ -114,10 +120,6 @@ class Main
             add_filter('wp_ajax_get_ajax_details_for_dashboard', array($this->abandoned_cart, 'getAjaxDetailsForDashboard'));
             add_action('wp_ajax_view_abandoned_cart', array($this->abandoned_cart, 'viewAbandonedCart'));
             add_action('wp_ajax_remove_abandoned_cart', array($this->abandoned_cart, 'removeAbandonedCart'));
-            //Add tracking message
-            add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'guestGdprMessage'), 10, 1);
-            add_action('woocommerce_after_add_to_cart_button', array($this->abandoned_cart, 'userGdprMessage'), 10);
-            add_action('woocommerce_before_shop_loop', array($this->abandoned_cart, 'userGdprMessage'), 10);
         }
     }
 
@@ -128,10 +130,11 @@ class Main
     {
         if (function_exists('as_next_scheduled_action')) {
             if (!as_next_scheduled_action('rnoc_abandoned_clear_abandoned_carts')) {
-                as_schedule_recurring_action(time(), 300, 'rnoc_abandoned_clear_abandoned_carts');
+                as_schedule_recurring_action(time(), 86400, 'rnoc_abandoned_clear_abandoned_carts');
             }
             if (!as_next_scheduled_action('rnoc_abandoned_cart_send_email')) {
-                as_schedule_recurring_action(time(), 86400, 'rnoc_abandoned_cart_send_email');
+                as_schedule_recurring_action(time(), 300, 'rnoc_abandoned_cart_send_email');
+                //as_schedule_cron_action(time(),'*/5 * * * *','rnoc_abandoned_cart_send_email');
             }
         }
     }

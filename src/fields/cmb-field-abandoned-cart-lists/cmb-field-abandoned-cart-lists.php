@@ -191,14 +191,14 @@ class CMB2_Field_Abandoned_Cart_Lists
                                    class="button button-green"><?php echo __('View Order', RNOC_TEXT_DOMAIN); ?></a>
                                 <?php
                             } else {
-                                $vars = array(
+                                $view_cart_vars = array(
                                     'action' => 'view_abandoned_cart',
                                     'cart_id' => $carts->id
                                 );
-                                $url = admin_url('admin-ajax.php?' . http_build_query($vars));
+                                $view_cart_url = admin_url('admin-ajax.php?' . http_build_query($view_cart_vars));
                                 ?>
                                 <a class="button view-cart"
-                                   href="<?php echo $url; ?>"><?php echo __('View Cart', RNOC_TEXT_DOMAIN) ?></a>
+                                   href="<?php echo $view_cart_url; ?>"><?php echo __('View Cart', RNOC_TEXT_DOMAIN) ?></a>
                                 <?php
                             }
                             ?>

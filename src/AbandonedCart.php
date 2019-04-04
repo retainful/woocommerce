@@ -16,7 +16,8 @@ class AbandonedCart
         global $wpdb;
         $this->wc_functions = new WcFunctions();
         $this->admin = new Settings();
-        $this->start_end_dates = array('yesterday' => array('start_date' => date("Y/m/d", (current_time('timestamp') - 24 * 60 * 60)), 'end_date' => date("Y/m/d", (current_time('timestamp') - 7 * 24 * 60 * 60))),
+        $this->start_end_dates = array(
+            'yesterday' => array('start_date' => date("Y/m/d", (current_time('timestamp') - 24 * 60 * 60)), 'end_date' => date("Y/m/d", (current_time('timestamp') - 24 * 60 * 60))),
             'today' => array('start_date' => date("Y/m/d", (current_time('timestamp'))), 'end_date' => date("Y/m/d", (current_time('timestamp')))),
             'last_seven' => array('start_date' => date("Y/m/d", (current_time('timestamp') - 7 * 24 * 60 * 60)), 'end_date' => date("Y/m/d", (current_time('timestamp')))),
             'last_fifteen' => array('start_date' => date("Y/m/d", (current_time('timestamp') - 15 * 24 * 60 * 60)), 'end_date' => date("Y/m/d", (current_time('timestamp')))),
@@ -124,7 +125,7 @@ class AbandonedCart
             $customer_id = $this->wc_functions->getSessionCustomerId();
         }
         $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
-        if ($row == null) {
+        if (empty($row)) {
             $crawler_detect = new CrawlerDetect();
             if ($crawler_detect->isCrawler()) {
                 return;
@@ -174,8 +175,13 @@ class AbandonedCart
     {
         if ($user_name) {
             $user = get_user_by('login', $user_name);
-            if ($user) {
+            if (!empty($user)) {
                 $this->userSignedUp($user->ID);
+            } else {
+                $user = get_user_by('email', $user_name);
+                if ($user) {
+                    $this->userSignedUp($user->ID);
+                }
             }
         }
     }
@@ -198,9 +204,8 @@ class AbandonedCart
         }
         $customer_id = $this->wc_functions->getSessionCustomerId();
         $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
-        if ($row) {
-            $wpdb->query(
-                'DELETE FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $user_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL');
+        if (!empty($row)) {
+            $wpdb->query('DELETE FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $user_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL');
             $wpdb->update(
                 $this->cart_history_table,
                 array('customer_key' => $user_id), array('id' => $row->id), array('%s')
@@ -215,7 +220,7 @@ class AbandonedCart
     function sendAbandonedCartEmails()
     {
         $email_templates = $this->admin->getEmailTemplates();
-        if (isset($email_templates[RNOC_PLUGIN_PREFIX . 'templates_list']) && !empty($email_templates[RNOC_PLUGIN_PREFIX . 'templates_list'])) {
+        if (isset($email_templates[RNOC_PLUGIN_PREFIX . 'templates']) && !empty($email_templates[RNOC_PLUGIN_PREFIX . 'templates'])) {
             $hour_seconds = 3600;//60*60
             $day_seconds = 86400;//60*60*24
             foreach ($email_templates[RNOC_PLUGIN_PREFIX . 'templates'] as $template_id => $template) {
@@ -338,6 +343,23 @@ class AbandonedCart
                 }
             }
         }
+        //Remove all hooks
+        //$this->removeFinishedHooks();
+    }
+
+    /**
+     * Remove all hooks and schedule once
+     * @return bool
+     */
+    function removeFinishedHooks()
+    {
+        if (function_exists('as_unschedule_all_actions')) {
+            as_unschedule_all_actions('rnoc_abandoned_cart_send_email');
+            as_unschedule_all_actions('rnoc_abandoned_clear_abandoned_carts');
+            $main = new Main();
+            $main->actionSchedulerHooks();
+        }
+        return true;
     }
 
     /**
@@ -401,7 +423,7 @@ class AbandonedCart
                                                 <td>
                                                     <img src="' . $image_url . '" width="100px" />
                                                 </td>
-                                                <td>' . $product_name . '</td>
+                                                <td style="padding-top: 20px;padding-bottom: 20px;">' . $product_name . '</td>
                                                 <td>' . $quantity_total . '</td>
                                                 <td>' . $item_subtotal . '</td>
                                                 <td>' . $item_total_display . '</td>
@@ -413,8 +435,8 @@ class AbandonedCart
         $cart_html = '
                                         <table width="100%">
                                             <thead>
-                                            <tr>
-                                                <th>' . __("Item", RNOC_TEXT_DOMAIN) . '</th>
+                                            <tr align="center">
+                                                <th style="padding-top: 20px;padding-bottom: 20px;">' . __("Item", RNOC_TEXT_DOMAIN) . '</th>
                                                 <th>' . __("Name", RNOC_TEXT_DOMAIN) . '</th>
                                                 <th>' . __("Quantity", RNOC_TEXT_DOMAIN) . '</th>
                                                 <th>' . __("Price", RNOC_TEXT_DOMAIN) . '</th>
@@ -425,10 +447,9 @@ class AbandonedCart
                                             ' . $cart_line_items . '
                                             </tbody>
                                             <tfoot>
-                                            <tr align=“center”>
-                                                <td colspan=“3"></td>
-                                                <th>' . __('Cart Total', RNOC_TEXT_DOMAIN) . ':</th>
-                                                <td>' . $cart_total . '</td>
+                                            <tr align="right">
+                                                <th colspan="4" style="padding-bottom: 10px;padding-top: 10px;">' . __('Cart Total', RNOC_TEXT_DOMAIN) . ':</th>
+                                                <td align="center">' . $cart_total . '</td>
                                             </tr>
                                             </tfoot>
                                         </table>
@@ -477,7 +498,7 @@ class AbandonedCart
                 $cart_link = $this->decryptValidate($_GET['validate']);
                 parse_str($cart_link);
                 if (isset($url) && isset($abandoned_cart_id) && isset($session_id) && isset($email_sent)) {
-                    $abandoned_cart_history_query = "SELECT cart_contents,customer_key FROM `" . $this->cart_history_table . "` WHERE id = %d";
+                    $abandoned_cart_history_query = "SELECT cart_contents,customer_key FROM `" . $this->cart_history_table . "` WHERE id = %d AND cart_is_recovered=0";
                     $abandoned_cart_history_results = $wpdb->get_row($wpdb->prepare($abandoned_cart_history_query, $abandoned_cart_id), OBJECT);
                     $user_id = 0;
                     if (isset($abandoned_cart_history_results) && count($abandoned_cart_history_results) > 0) {
@@ -582,7 +603,8 @@ class AbandonedCart
         global $wpdb, $woocommerce;
         $current_time = current_time('timestamp');
         $recovery_cart_id = $this->wc_functions->getSession(RNOC_PLUGIN_PREFIX . 'recovered_cart_id');
-        if (!empty($recovery_cart_id)) {
+        $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE id = \'' . $recovery_cart_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
+        if (!empty($row)) {
             $wpdb->update(
                 $this->cart_history_table,
                 array('cart_is_recovered' => 1, 'cart_expiry' => $current_time, 'order_id' => $order_id), array('id' => $recovery_cart_id), array('%s', '%d', '%d')
