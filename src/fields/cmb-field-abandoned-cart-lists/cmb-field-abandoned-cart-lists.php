@@ -58,13 +58,11 @@ class CMB2_Field_Abandoned_Cart_Lists
             'perPage' => $limit
         );
         $pagination = new \Rnoc\Retainful\Library\Pagination($pagConfig);
-        $abandoned_cart_settings = $settings->getAbandonedCartSettings();
         $current_time = current_time('timestamp');
-        $cut_off_time_settings = isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_abandoned_time']) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_abandoned_time'] : 60;
-        $cart_cut_off_time = (intval($cut_off_time_settings) + 5) * 60;
         ?>
         <table width="100%" class="wp-list-table fixed striped">
             <tr>
+                <td width="20"><strong><?php echo __('Id', RNOC_TEXT_DOMAIN); ?></strong></td>
                 <td><strong><?php echo __('Cart Status', RNOC_TEXT_DOMAIN); ?></strong></td>
                 <td><strong><?php echo __('Cart Expired', RNOC_TEXT_DOMAIN); ?></strong></td>
                 <td><strong><?php echo __('Customer / IP', RNOC_TEXT_DOMAIN); ?></strong></td>
@@ -88,10 +86,13 @@ class CMB2_Field_Abandoned_Cart_Lists
                     ?>
                     <tr>
                         <td>
+                            <?php echo $carts->id ?>
+                        </td>
+                        <td>
                             <?php
                             if ($carts->cart_is_recovered == 1) {
                                 echo '<span style=\'color: green\'>' . __("Recovered", RNOC_TEXT_DOMAIN) . '</span>';
-                            } else if ($current_time - $carts->cart_expiry < $cart_cut_off_time) {
+                            } else if ($carts->cart_expiry > $current_time) {
                                 echo '<span style=\'color: orange\'>' . __("In Progress", RNOC_TEXT_DOMAIN) . '</span>';
                             } else {
                                 echo '<span style=\'color: red\'>' . __("Abandoned", RNOC_TEXT_DOMAIN) . '</span>';
@@ -217,6 +218,7 @@ class CMB2_Field_Abandoned_Cart_Lists
             }
             ?>
             <tr>
+                <td><strong><?php echo __('Id', RNOC_TEXT_DOMAIN); ?></strong></td>
                 <td><strong><?php echo __('Cart Status', RNOC_TEXT_DOMAIN); ?></strong></td>
                 <td><strong><?php echo __('Cart Expired', RNOC_TEXT_DOMAIN); ?></strong></td>
                 <td><strong><?php echo __('Customer / IP', RNOC_TEXT_DOMAIN); ?></strong></td>

@@ -109,6 +109,7 @@ class Main
             add_action('plugins_loaded', array($this, 'actionSchedulerHooks'));
             add_action('rnoc_abandoned_clear_abandoned_carts', array($this->abandoned_cart, 'clearAbandonedCarts'));
             add_action('rnoc_abandoned_cart_send_email', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
+            //add_action('woocommerce_init', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
 
             //Process abandoned cart after user place order
             add_action('woocommerce_order_status_pending_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));

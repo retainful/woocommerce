@@ -254,6 +254,45 @@ class WcFunctions
     }
 
     /**
+     * Add to cart
+     * @param $product_id
+     * @param int $variation_id
+     * @param int $quantity
+     * @param array $variation
+     * @param array $cart_item_data
+     * @return bool|string
+     */
+    function addToCart($product_id, $variation_id = 0, $quantity = 1, $variation = array(), $cart_item_data = array())
+    {
+        if (method_exists(WC()->cart, 'add_to_cart')) {
+            try {
+                WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation, $cart_item_data);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Set cart item quantity
+     * @param $cart_key
+     * @param int $quantity
+     * @return bool|string
+     */
+    function setQuantity($cart_key, $quantity = 1)
+    {
+        if (method_exists(WC()->cart, 'set_quantity')) {
+            try {
+                WC()->cart->set_quantity($cart_key, $quantity);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+        }
+        return true;
+    }
+
+    /**
      * Remove data from session
      * @param $key
      * @return bool
