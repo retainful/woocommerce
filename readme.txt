@@ -147,3 +147,4 @@ No. There is no charges for support.
 * Fix: Allow plugin to create and manage coupons, If plugin is not connected to Retainful.
 
 = 1.0.9 =
+* New Feature: Abandoned cart integrated
