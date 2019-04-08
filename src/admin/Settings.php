@@ -7,7 +7,7 @@ use Rnoc\Retainful\library\RetainfulApi;
 
 class Settings
 {
-    public $app_prefix = 'rnoc_', $slug = 'retainful', $api;
+    public $slug = 'retainful', $api;
 
     /**
      * Settings constructor.
@@ -23,34 +23,35 @@ class Settings
     function renderPage()
     {
         add_action('cmb2_admin_init', function () {
+            $is_app_connected = $this->isAppConnected();
             //General settings tab
             $general_settings = new_cmb2_box(array(
-                'id' => $this->app_prefix . 'retainful',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful',
                 'title' => __('Retainful Next Order Coupon', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
                 'option_key' => $this->slug,
                 'tab_group' => $this->slug,
                 'parent_slug' => 'woocommerce',
                 'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Settings', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Next order coupon', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
                 'name' => __('Retainful App ID', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_app_id',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_app_id',
                 'type' => 'retainful_app',
                 'default' => '',
                 'desc' => __('You can get your App-id from https://www.app.retainful.com', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
-                'id' => $this->app_prefix . 'is_retainful_connected',
+                'id' => RNOC_PLUGIN_PREFIX . 'is_retainful_connected',
                 'type' => 'hidden',
                 'default' => 0,
                 'attributes' => array('id' => 'is_retainful_app_connected')
             ));
             $general_settings->add_field(array(
                 'name' => __('Coupon type', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_coupon_type',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
                 'type' => 'radio',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
@@ -61,18 +62,18 @@ class Settings
             ));
             $general_settings->add_field(array(
                 'name' => __('Coupon value', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_coupon_amount',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount',
                 'type' => 'text',
                 'classes' => 'retainful-coupon-group',
                 'default' => '',
-                'after' => '<p><b>'.__('Note: If this field is empty, No coupon codes will generate!',RNOC_TEXT_DOMAIN).'</b></p><p id="coupon_amount_error" style="color: red;;"></p>',
+                'after' => '<p><b>' . __('Note: If this field is empty, No coupon codes will generate!', RNOC_TEXT_DOMAIN) . '</b></p><p id="coupon_amount_error" style="color: red;;"></p>',
                 'attributes' => array(
                     'id' => 'app_coupon_value'
                 )
             ));
             $general_settings->add_field(array(
                 'name' => __('Apply coupon to', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_coupon_applicable_to',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to',
                 'type' => 'radio',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
@@ -84,7 +85,7 @@ class Settings
             ));
             $general_settings->add_field(array(
                 'name' => __('Display coupon message after', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_add_coupon_message_to',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to',
                 'type' => 'select',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
@@ -97,12 +98,12 @@ class Settings
 
             $coupon_msg_desc = __('This message will attached to the Order Email.<br>Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_amount}}</b> - Coupon amount<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN);
             $pro_feature_coupon_msg_desc = __('<br><b>{{coupon_expiry_date}}</b> - Coupon expiry date(If coupon does not have any expiry days,then this will not attach to the message).<br>', RNOC_TEXT_DOMAIN);
-            if ($this->isAppConnected()) {
+            if ($is_app_connected) {
                 $coupon_msg_desc .= $pro_feature_coupon_msg_desc;
             }
             $general_settings->add_field(array(
                 'name' => __('Custom coupon message', RNOC_TEXT_DOMAIN),
-                'id' => $this->app_prefix . 'retainful_coupon_message',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_message',
                 'type' => 'wysiwyg',
                 'classes' => 'retainful-coupon-group',
                 'default' => '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>',
@@ -110,42 +111,44 @@ class Settings
             ));
             //Usage restrictions
             $usage_restrictions = new_cmb2_box(array(
-                'id' => $this->app_prefix . 'retainful_usage_restriction',
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_usage_restriction',
                 'title' => __('Retainful Coupon Usage Restrictions', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
                 'option_key' => $this->slug . '_usage_restriction',
                 'tab_group' => $this->slug,
                 'parent_slug' => $this->slug,
                 'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Usage restriction', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Coupon usage restriction', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
-            if ($this->isAppConnected()) {
+            if ($is_app_connected) {
                 $usage_restrictions->add_field(array(
                     'name' => __('Minimum spend', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'minimum_spend',
+                    'id' => RNOC_PLUGIN_PREFIX . 'minimum_spend',
                     'type' => 'text',
                     'desc' => __('Set the minimum spend(subtotal) allowed to use the coupon.', RNOC_TEXT_DOMAIN),
                     'attributes' => array(
                         'type' => 'number',
+                        'class' => 'number_only_field',
                         'min' => 0
                     ),
                     'default' => ''
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Maximum spend', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'maximum_spend',
+                    'id' => RNOC_PLUGIN_PREFIX . 'maximum_spend',
                     'type' => 'text',
                     'desc' => __('Set the maximum spend(subtotal) allowed to use the coupon.', RNOC_TEXT_DOMAIN),
                     'attributes' => array(
                         'type' => 'number',
+                        'class' => 'number_only_field',
                         'min' => 0
                     ),
                     'default' => ''
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Coupon expires in ', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'retainful_expire_days',
+                    'id' => RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
                     'type' => 'text_small',
                     'after' => '<p id="coupon_expire_error" style="color: red;"></p>' . __('After the entered number of days coupon will automatically expired.<br><b>Note: Please leave empty or put 0 to never expire.</b>', RNOC_TEXT_DOMAIN),
                     'desc' => __(' Day(s)', RNOC_TEXT_DOMAIN),
@@ -160,26 +163,26 @@ class Settings
 
                 $usage_restrictions->add_field(array(
                     'name' => __('Coupon expire date format ', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'expire_date_format',
+                    'id' => RNOC_PLUGIN_PREFIX . 'expire_date_format',
                     'type' => 'select',
                     'default' => 'F j, Y, g:i a',
                     'options' => $this->getDateFormatOptions()
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Individual use only', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'individual_use_only',
+                    'id' => RNOC_PLUGIN_PREFIX . 'individual_use_only',
                     'type' => 'checkbox',
                     'desc' => __('Check this box if the coupon cannot be used in conjunction with other coupons.', RNOC_TEXT_DOMAIN)
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Exclude sale items', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'exclude_sale_items',
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_sale_items',
                     'type' => 'checkbox',
                     'desc' => __('Check this box if the coupon should not apply to items on sale. Per-item coupons will only work if the item is not on sale. Per-cart coupons will only work if there are items in the cart that are not on sale.', RNOC_TEXT_DOMAIN)
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Products', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'products',
+                    'id' => RNOC_PLUGIN_PREFIX . 'products',
                     'type' => 'post_search_ajax',
                     'limit' => 10,
                     'desc' => __('Product that the coupon code will be applied to, or that need to be in the cart in order for the "Fixed cart discount" to be applied.', RNOC_TEXT_DOMAIN),
@@ -193,7 +196,7 @@ class Settings
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Exclude products', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'exclude_products',
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_products',
                     'type' => 'post_search_ajax',
                     'limit' => 10,
                     'desc' => __('Product that the coupon code will not applied to, or cannot be in the cart in order for the "Fixed cart discount" to be applied.', RNOC_TEXT_DOMAIN),
@@ -207,7 +210,7 @@ class Settings
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Product Categories', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'product_categories',
+                    'id' => RNOC_PLUGIN_PREFIX . 'product_categories',
                     'type' => 'pw_multiselect',
                     'options' => $this->getCategories(),
                     'attributes' => array(
@@ -217,7 +220,7 @@ class Settings
                 ));
                 $usage_restrictions->add_field(array(
                     'name' => __('Exclude Categories', RNOC_TEXT_DOMAIN),
-                    'id' => $this->app_prefix . 'exclude_product_categories',
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_product_categories',
                     'type' => 'pw_multiselect',
                     'options' => $this->getCategories(),
                     'attributes' => array(
@@ -228,12 +231,261 @@ class Settings
             } else {
                 $usage_restrictions->add_field(array(
                     'name' => '',
-                    'id' => $this->app_prefix . 'unlock_usage_restriction',
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
+                    'type' => 'unlock_usage_restriction'
+                ));
+            }
+            /*
+             * Adding abandoned cart
+             */
+            //Abandoned cart
+            $abandoned_cart = new_cmb2_box(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart',
+                'title' => __('Retainful Abandoned Carts', RNOC_TEXT_DOMAIN),
+                'object_types' => array('options-page'),
+                'option_key' => $this->slug . '_abandoned_cart',
+                'tab_group' => $this->slug,
+                'parent_slug' => $this->slug,
+                'capability' => 'edit_shop_coupons',
+                'tab_title' => __('Abandoned / Recovered Carts', RNOC_TEXT_DOMAIN),
+                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
+            ));
+            if ($is_app_connected) {
+                $abandoned_cart->add_field(array(
+                    'name' => __('Select date range', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
+                    'type' => 'date_range_picker'
+                ));
+                $abandoned_cart->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
+                    'type' => 'abandoned_cart_lists'
+                ));
+            } else {
+                $abandoned_cart->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
+                    'type' => 'unlock_usage_restriction'
+                ));
+            }
+            //Email templates
+            $abandoned_cart_email_templates = new_cmb2_box(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_email_templates',
+                'title' => __('Retainful Abandoned Cart Email Templates', RNOC_TEXT_DOMAIN),
+                'object_types' => array('options-page'),
+                'option_key' => $this->slug . '_abandoned_cart_email_templates',
+                'tab_group' => $this->slug,
+                'parent_slug' => $this->slug,
+                'capability' => 'edit_shop_coupons',
+                'tab_title' => __('Email Templates', RNOC_TEXT_DOMAIN),
+                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
+            ));
+            if ($is_app_connected) {
+                $abandoned_cart_email_templates->add_field(array(
+                    'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'email_from_name',
+                    'type' => 'text',
+                    'before_row' => '<h4>' . __("Abandoned Cart Email Templates", RNOC_TEXT_DOMAIN) . '</h4>',
+                    'desc' => __('Enter the name that should appear in the email sent.', RNOC_TEXT_DOMAIN),
+                    'default' => 'Admin'
+                ));
+                $admin_email = get_option('admin_email');
+                $abandoned_cart_email_templates->add_field(array(
+                    'name' => __('"From" Address', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'email_from_address',
+                    'type' => 'text',
+                    'desc' => __('Email address from which the reminder emails should be sent.', RNOC_TEXT_DOMAIN),
+                    'default' => $admin_email
+                ));
+                $abandoned_cart_email_templates->add_field(array(
+                    'name' => __('"Reply To " Address', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'email_reply_address',
+                    'type' => 'text',
+                    'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
+                    'default' => $admin_email
+                ));
+                $template_path = plugin_dir_url(__FILE__);
+                $email_template = wp_remote_fopen($template_path . 'templates/default-1.html');
+                $group_field_id = $abandoned_cart_email_templates->add_field(array(
+                    'id' => RNOC_PLUGIN_PREFIX . 'templates',
+                    'type' => 'group',
+                    'description' => __('Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.', RNOC_TEXT_DOMAIN),
+                    'options' => array(
+                        'group_title' => __('Email Template {#}', RNOC_TEXT_DOMAIN),
+                        'add_button' => __('Add Another Template', RNOC_TEXT_DOMAIN),
+                        'remove_button' => __('Remove Template', RNOC_TEXT_DOMAIN),
+                        'sortable' => false,
+                        'closed' => true
+                    ),
+                ));
+                /*$abandoned_cart_email_templates->add_group_field($group_field_id, array(
+                    'name' => __('Email Template Name', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'template_name',
+                    'type' => 'text'
+                ));*/
+                $abandoned_cart_email_templates->add_group_field($group_field_id, array(
+                    'name' => __('Email Subject', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'template_subject',
+                    'type' => 'text',
+                    'default' => 'Hey {{customer_name}}!! You left something in your cart'
+                ));
+                $abandoned_cart_email_templates->add_group_field($group_field_id, array(
+                    'name' => __('Email Body', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'template_body',
+                    'type' => 'wysiwyg',
+                    'default' => $email_template
+                ));
+                $abandoned_cart_email_templates->add_group_field($group_field_id, array(
+                    'name' => __('Send this email in', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'template_sent_after',
+                    'type' => 'email_after',
+                    'default' => '1',
+                    'desc' => __(' after cart is abandoned.', RNOC_TEXT_DOMAIN),
+                    'attributes' => array('class' => 'number_only_field')
+                ));
+                $abandoned_cart_email_templates->add_group_field($group_field_id, array(
+                    'name' => __('Active?', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'template_active',
+                    'type' => 'select',
+                    'options' => array(
+                        1 => __('Yes', RNOC_TEXT_DOMAIN),
+                        0 => __('No', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => 1
+                ));
+
+            } else {
+                $abandoned_cart_email_templates->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
+                    'type' => 'unlock_usage_restriction'
+                ));
+            }
+            //Reporting
+            $abandoned_cart_dashboard = new_cmb2_box(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_dashboard',
+                'title' => __('Retainful Abandoned Cart Dashboard', RNOC_TEXT_DOMAIN),
+                'object_types' => array('options-page'),
+                'option_key' => $this->slug . '_abandoned_cart_dashboard',
+                'tab_group' => $this->slug,
+                'parent_slug' => $this->slug,
+                'capability' => 'edit_shop_coupons',
+                'tab_title' => __('Reports', RNOC_TEXT_DOMAIN),
+                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
+            ));
+            if ($is_app_connected) {
+                $abandoned_cart_dashboard->add_field(array(
+                    'name' => __('Select date range', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
+                    'type' => 'date_range_picker'
+                ));
+                $abandoned_cart_dashboard->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
+                    'type' => 'abandoned_cart_dashboard'
+                ));
+            } else {
+                $abandoned_cart_dashboard->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
+                    'type' => 'unlock_usage_restriction'
+                ));
+            }
+            //Abandoned cart Settings
+            $abandoned_cart_settings = new_cmb2_box(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_settings',
+                'title' => __('Retainful Abandoned Cart Settings', RNOC_TEXT_DOMAIN),
+                'object_types' => array('options-page'),
+                'option_key' => $this->slug . '_abandoned_cart_settings',
+                'tab_group' => $this->slug,
+                'parent_slug' => $this->slug,
+                'capability' => 'edit_shop_coupons',
+                'tab_title' => __('Abandoned cart settings', RNOC_TEXT_DOMAIN),
+                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
+            ));
+            if ($is_app_connected) {
+                $abandoned_cart_settings->add_field(array(
+                    'name' => __('Cart abandoned cut-off time', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'cart_abandoned_time',
+                    'type' => 'text',
+                    'desc' => __('Consider cart abandoned after X minutes of item being added to cart & order not placed.', RNOC_TEXT_DOMAIN),
+                    'attributes' => array(
+                        'type' => 'number',
+                        'min' => 1,
+                        'class' => 'number_only_field'
+                    ),
+                    'default' => 60
+                ));
+                $abandoned_cart_settings->add_field(array(
+                    'name' => __('Automatically Delete Abandoned Orders after X days', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days',
+                    'type' => 'text',
+                    'desc' => __('Automatically delete abandoned cart orders after X days.', RNOC_TEXT_DOMAIN),
+                    'attributes' => array(
+                        'type' => 'number',
+                        'min' => 1,
+                        'class' => 'number_only_field'
+                    ),
+                    'default' => ''
+                ));
+                $abandoned_cart_settings->add_field(array(
+                    'name' => __('Email admin On Order Recovery', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'email_admin_on_recovery',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        0 => __('No', RNOC_TEXT_DOMAIN),
+                        1 => __('Yes', RNOC_TEXT_DOMAIN)
+                    ),
+                    'desc' => __('Sends email to Admin if an Abandoned Cart Order is recovered.', RNOC_TEXT_DOMAIN),
+                    'default' => 0
+                ));
+                $abandoned_cart_settings->add_field(array(
+                    'name' => __('Message to be displayed for Guest users when tracking their carts', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'guest_cart_capture_msg',
+                    'type' => 'textarea',
+                    'desc' => __('In compliance with GDPR, add a message on the Checkout page to inform Guest users of how their data is being used.<br><b>For example:</b> Your email address will help us support your shopping experience throughout the site. Please check our Privacy Policy to see how we use your personal data.', RNOC_TEXT_DOMAIN)
+                ));
+                $abandoned_cart_settings->add_field(array(
+                    'name' => __('Message to be displayed for registered users when tracking their carts.', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'logged_cart_capture_msg',
+                    'type' => 'textarea',
+                    'desc' => __('In compliance with GDPR, add a message on the Shop & Product pages to inform Registered users of how their data is being used.<br><b>For example:</b>  Please check our Privacy Policy to see how we use your personal data.', RNOC_TEXT_DOMAIN)
+                ));
+            } else {
+                $abandoned_cart_settings->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
                     'type' => 'unlock_usage_restriction'
                 ));
             }
         });
-        $this->addScript();
+        if (is_admin()) {
+            $this->addScript();
+        }
+    }
+
+    /**
+     * Get the abandoned cart settings
+     * @return array|mixed
+     */
+    function getAbandonedCartSettings()
+    {
+        $abandoned_cart = get_option($this->slug . '_abandoned_cart_settings', array());
+        if (empty($abandoned_cart))
+            $abandoned_cart = array();
+        return $abandoned_cart;
+    }
+
+    /**
+     * Get the abandoned cart settings
+     * @return array|mixed
+     */
+    function getEmailTemplates()
+    {
+        $abandoned_cart_email_templates = get_option($this->slug . '_abandoned_cart_email_templates', array());
+        if (empty($abandoned_cart_email_templates))
+            $abandoned_cart_email_templates = array();
+        return $abandoned_cart_email_templates;
     }
 
     /**
@@ -265,10 +517,10 @@ class Settings
         if (empty($ordered_date))
             return NULL;
         $settings = get_option($this->slug . '_usage_restriction', array());
-        if (!empty($settings) && $this->isAppConnected() && isset($settings[$this->app_prefix . 'retainful_expire_days']) && !empty($settings[$this->app_prefix . 'retainful_expire_days'])) {
+        if (!empty($settings) && $this->isAppConnected() && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days'])) {
             try {
                 $expiry_date = new \DateTime($ordered_date);
-                $expiry_date->add(new \DateInterval('P' . $settings[$this->app_prefix . 'retainful_expire_days'] . 'D'));
+                $expiry_date->add(new \DateInterval('P' . $settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days'] . 'D'));
                 return $expiry_date->format(\DateTime::ATOM);
             } catch (\Exception $e) {
                 return NULL;
@@ -284,6 +536,7 @@ class Settings
     {
         $asset_path = plugins_url('', __FILE__);
         wp_enqueue_script('retainful-app-main', $asset_path . '/js/app.js');
+        wp_enqueue_style('retainful-admin-css', $asset_path . '/css/main.css');
     }
 
     /**
@@ -296,7 +549,7 @@ class Settings
             $usage_restrictions = get_option($this->slug . '_usage_restriction', array());
             if (empty($usage_restrictions))
                 $usage_restrictions = array();
-            return array_merge($usage_restrictions, array('app_prefix' => $this->app_prefix));
+            return $usage_restrictions;
         } else {
             return array();
         }
@@ -309,8 +562,8 @@ class Settings
     function getExpireDateFormat()
     {
         $usage_restriction = $this->getUsageRestrictions();
-        if (isset($usage_restriction[$this->app_prefix . 'expire_date_format']) && !empty($usage_restriction[$this->app_prefix . 'expire_date_format'])) {
-            return $usage_restriction[$this->app_prefix . 'expire_date_format'];
+        if (isset($usage_restriction[RNOC_PLUGIN_PREFIX . 'expire_date_format']) && !empty($usage_restriction[RNOC_PLUGIN_PREFIX . 'expire_date_format'])) {
+            return $usage_restriction[RNOC_PLUGIN_PREFIX . 'expire_date_format'];
         }
         return 'F j, Y, g:i a';
     }
@@ -358,7 +611,7 @@ class Settings
     function isAppConnected()
     {
         $settings = get_option($this->slug, array());
-        if (!empty($settings) && isset($settings[$this->app_prefix . 'is_retainful_connected']) && !empty($settings[$this->app_prefix . 'is_retainful_connected'])) {
+        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'])) {
             return true;
         }
         return false;
@@ -372,8 +625,8 @@ class Settings
     function getApiKey()
     {
         $settings = get_option($this->slug, array());
-        if (!empty($settings) && isset($settings[$this->app_prefix . 'retainful_app_id']) && !empty($settings[$this->app_prefix . 'retainful_app_id'])) {
-            return $settings[$this->app_prefix . 'retainful_app_id'];
+        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id'])) {
+            return $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id'];
         }
         return NULL;
     }
@@ -385,8 +638,8 @@ class Settings
     function getCouponMessage()
     {
         $settings = get_option($this->slug, array());
-        if (!empty($settings) && isset($settings[$this->app_prefix . 'retainful_coupon_message']) && !empty(isset($settings[$this->app_prefix . 'retainful_coupon_message']))) {
-            return __($settings[$this->app_prefix . 'retainful_coupon_message'], RNOC_TEXT_DOMAIN);
+        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']) && !empty(isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']))) {
+            return __($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'], RNOC_TEXT_DOMAIN);
         } else {
             return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>', RNOC_TEXT_DOMAIN);
         }
@@ -401,8 +654,8 @@ class Settings
         $coupon = array();
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
-            $coupon['coupon_type'] = ($settings[$this->app_prefix . 'retainful_coupon_type']) ? $settings[$this->app_prefix . 'retainful_coupon_type'] : 0;
-            $coupon['coupon_amount'] = ($settings[$this->app_prefix . 'retainful_coupon_amount']) ? $settings[$this->app_prefix . 'retainful_coupon_amount'] : 0;
+            $coupon['coupon_type'] = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] : 0;
+            $coupon['coupon_amount'] = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
         }
         return $coupon;
     }
@@ -416,7 +669,7 @@ class Settings
         $coupon_applicable_for = 'all';
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
-            $coupon_applicable_for = ($settings[$this->app_prefix . 'retainful_coupon_applicable_to']) ? $settings[$this->app_prefix . 'retainful_coupon_applicable_to'] : 'all';
+            $coupon_applicable_for = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to'] : 'all';
         }
         return $coupon_applicable_for;
     }
@@ -430,7 +683,7 @@ class Settings
         $hook = 'woocommerce_email_customer_details';
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
-            $hook = ($settings[$this->app_prefix . 'retainful_add_coupon_message_to']) ? $settings[$this->app_prefix . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
+            $hook = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
         }
         return $hook;
     }

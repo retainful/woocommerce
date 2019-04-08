@@ -34,8 +34,7 @@ class OrderCoupon
                 $response['error'] = __('Please enter Valid App-Id', RNOC_TEXT_DOMAIN);
             }
         }
-        echo json_encode($response);
-        die;
+        wp_send_json($response);
     }
 
     /**
@@ -278,7 +277,6 @@ class OrderCoupon
             //Return true if there is any usage restriction
             if (empty($usage_restrictions))
                 return true;
-            $app_prefix = isset($usage_restrictions['app_prefix']) ? $usage_restrictions['app_prefix'] : '';
             //Check for coupon expired or not
             $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
             if (!empty($coupon_expiry_date) && strtotime('Y-m-d H:i:s') > strtotime($coupon_expiry_date)) {
@@ -286,35 +284,35 @@ class OrderCoupon
             }
             $cart_total = $this->wc_functions->getCartTotal();
             //Check for minimum spend
-            $minimum_spend = (isset($usage_restrictions[$app_prefix . 'minimum_spend']) && $usage_restrictions[$app_prefix . 'minimum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'minimum_spend'] : '';
+            $minimum_spend = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'minimum_spend']) && $usage_restrictions[RNOC_PLUGIN_PREFIX . 'minimum_spend'] > 0) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'minimum_spend'] : '';
             if (!empty($minimum_spend) && $cart_total < $minimum_spend) {
                 array_push($return, false);
             }
             //Check for maximum spend
-            $maximum_spend = (isset($usage_restrictions[$app_prefix . 'maximum_spend']) && $usage_restrictions[$app_prefix . 'maximum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'maximum_spend'] : '';
+            $maximum_spend = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'maximum_spend']) && $usage_restrictions[RNOC_PLUGIN_PREFIX . 'maximum_spend'] > 0) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'maximum_spend'] : '';
             if (!empty($maximum_spend) && $cart_total > $maximum_spend) {
                 array_push($return, false);
             }
             $products_in_cart = $this->wc_functions->getProductIdsInCart();
             //Check the cart having only sale items
             $sale_products_in_cart = $this->wc_functions->getSaleProductIdsInCart();
-            if ((count($sale_products_in_cart) >= count($products_in_cart)) && isset($usage_restrictions[$app_prefix . 'exclude_sale_items'])) {
+            if ((count($sale_products_in_cart) >= count($products_in_cart)) && isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_sale_items'])) {
                 array_push($return, false);
             }
             //Check for must in cart products
-            $must_in_cart_products = (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array();
+            $must_in_cart_products = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'products'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'products'] : array();
             if (!empty($must_in_cart_products) && count(array_intersect($must_in_cart_products, $products_in_cart)) == 0) {
                 array_push($return, false);
             }
             $categories_in_cart = $this->wc_functions->getCategoryIdsOfProductInCart();
             //Check for must in categories of cart
-            $must_in_cart_categories = (isset($usage_restrictions[$app_prefix . 'product_categories'])) ? $usage_restrictions[$app_prefix . 'product_categories'] : array();
+            $must_in_cart_categories = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'] : array();
             if (!empty($must_in_cart_categories) && count(array_intersect($must_in_cart_categories, $categories_in_cart)) == 0) {
                 array_push($return, false);
             }
             //Check for must in cart products and exclude products in cart are given
-            $must_not_in_cart_products = (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array();
-            $must_not_in_cart_categories = (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array();
+            $must_not_in_cart_products = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_products'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_products'] : array();
+            $must_not_in_cart_categories = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'] : array();
             if (array_intersect($must_not_in_cart_products, $must_in_cart_products) || array_intersect($must_in_cart_categories, $must_not_in_cart_categories)) {
                 $this->wc_functions->removeSession('retainful_coupon_code');
                 array_push($return, false);
@@ -360,8 +358,7 @@ class OrderCoupon
                 self::$applied_coupons = $coupon_code;
                 $discount_type = 'fixed_cart';
                 $usage_restrictions = $this->admin->getUsageRestrictions();
-                $app_prefix = isset($usage_restrictions['app_prefix']) ? $usage_restrictions['app_prefix'] : '';
-                /*if ((isset($usage_restrictions[$app_prefix . 'individual_use_only']))) {
+                /*if ((isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'individual_use_only']))) {
                     $coupons_added_to_cart = $this->wc_functions->getAppliedCouponsOfCart();
                     if (!empty($coupons_added_to_cart)) {
                         foreach ($coupons_added_to_cart as $key => $already_applied_coupon_code) {
@@ -380,10 +377,10 @@ class OrderCoupon
                 $coupon = array(
                     'id' => 321123 . rand(2, 9),
                     'amount' => $coupon_value,
-                    'individual_use' => (isset($usage_restrictions[$app_prefix . 'individual_use_only'])) ? true : false,
-                    'product_ids' => (isset($usage_restrictions[$app_prefix . 'products'])) ? $usage_restrictions[$app_prefix . 'products'] : array(),
-                    'excluded_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
-                    //'exclude_product_ids' => (isset($usage_restrictions[$app_prefix . 'exclude_products'])) ? $usage_restrictions[$app_prefix . 'exclude_products'] : array(),
+                    'individual_use' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'individual_use_only'])) ? true : false,
+                    'product_ids' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'products'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'products'] : array(),
+                    'excluded_product_ids' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_products'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_products'] : array(),
+                    //'exclude_product_ids' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_products'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_products'] : array(),
                     'usage_limit' => '',
                     'usage_limit_per_user' => '',
                     'limit_usage_to_x_items' => '',
@@ -391,12 +388,12 @@ class OrderCoupon
                     'expiry_date' => $coupon_expiry_date,
                     'apply_before_tax' => 'yes',
                     'free_shipping' => false,
-                    'product_categories' => (isset($usage_restrictions[$app_prefix . 'product_categories'])) ? $usage_restrictions[$app_prefix . 'product_categories'] : array(),
-                    'excluded_product_categories' => (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array(),
-                    //'exclude_product_categories' => (isset($usage_restrictions[$app_prefix . 'exclude_product_categories'])) ? $usage_restrictions[$app_prefix . 'exclude_product_categories'] : array(),
-                    'exclude_sale_items' => (isset($usage_restrictions[$app_prefix . 'exclude_sale_items'])) ? true : false,
-                    'minimum_amount' => (isset($usage_restrictions[$app_prefix . 'minimum_spend']) && $usage_restrictions[$app_prefix . 'minimum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'minimum_spend'] : '',
-                    'maximum_amount' => (isset($usage_restrictions[$app_prefix . 'maximum_spend']) && $usage_restrictions[$app_prefix . 'maximum_spend'] > 0) ? $usage_restrictions[$app_prefix . 'maximum_spend'] : '',
+                    'product_categories' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'] : array(),
+                    'excluded_product_categories' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'] : array(),
+                    //'exclude_product_categories' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'] : array(),
+                    'exclude_sale_items' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_sale_items'])) ? true : false,
+                    'minimum_amount' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'minimum_spend']) && $usage_restrictions[RNOC_PLUGIN_PREFIX . 'minimum_spend'] > 0) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'minimum_spend'] : '',
+                    'maximum_amount' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'maximum_spend']) && $usage_restrictions[RNOC_PLUGIN_PREFIX . 'maximum_spend'] > 0) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'maximum_spend'] : '',
                     'customer_email' => '',
                     'discount_type' => $discount_type,
                     'virtual' => true
@@ -435,7 +432,7 @@ class OrderCoupon
             $api_key = $this->admin->getApiKey();
             if (!empty($api_key)) {
                 $request_params['app_id'] = $api_key;
-                wp_schedule_single_event(time() + 60, 'retainful_cron_sync_coupon_details', array($request_params));
+                as_schedule_single_action(time() + 60, 'retainful_cron_sync_coupon_details', array($request_params));
             }
         }
         return true;

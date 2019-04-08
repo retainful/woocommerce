@@ -18,6 +18,54 @@ class WcFunctions
         return NULL;
     }
 
+    function getProduct($product_id)
+    {
+        if (function_exists('wc_get_product')) {
+            return wc_get_product($product_id);
+        }
+        return array();
+    }
+
+    function getProductImage($product)
+    {
+        if (method_exists($product, 'get_image')) {
+            return $product->get_image();
+        }
+        return NULL;
+    }
+
+    function getProductName($product)
+    {
+        if (method_exists($product, 'get_formatted_name')) {
+            return $product->get_formatted_name();
+        }
+        return NULL;
+    }
+
+    function getCartUrl()
+    {
+        if (function_exists('wc_get_cart_url')) {
+            $cart_page_link = wc_get_cart_url();
+        } else if (method_exists(WC()->cart, 'get_cart_url')) {
+            $cart_page_link = WC()->cart->get_cart_url();
+        } else {
+            $cart_page_id = wc_get_page_id('cart');
+            $cart_page_link = $cart_page_id ? get_permalink($cart_page_id) : '';
+        }
+        return $cart_page_link;
+    }
+
+    function getPage($page_id)
+    {
+        $page = NULL;
+        if (function_exists('wc_get_page_id')) {
+            $page = wc_get_page_id($page_id);
+        } else if (function_exists('woocommerce_get_page_id')) {
+            $page = woocommerce_get_page_id($page_id);
+        }
+        return $page;
+    }
+
     /**
      * Get order Email form order object
      * @param $order
@@ -27,6 +75,8 @@ class WcFunctions
     {
         if (method_exists($order, 'get_billing_email')) {
             return $order->get_billing_email();
+        } elseif (isset($order->billing_email)) {
+            return $order->billing_email;
         }
         return NULL;
     }
@@ -67,8 +117,22 @@ class WcFunctions
     {
         if (method_exists($order, 'get_id')) {
             return $order->get_id();
+        } elseif (isset($order->id)) {
+            return $order->id;
         }
         return NULL;
+    }
+
+    /**
+     * Set order note
+     * @param $order
+     * @param $note
+     */
+    function setOrderNote($order, $note)
+    {
+        if (method_exists($order, 'add_order_note')) {
+            $order->add_order_note($note);
+        }
     }
 
     /**
@@ -132,6 +196,8 @@ class WcFunctions
     {
         if (method_exists($order, 'get_user_id')) {
             return $order->get_user_id();
+        } elseif (isset($order->user_id)) {
+            return $order->user_id;
         }
         return NULL;
     }
@@ -177,6 +243,53 @@ class WcFunctions
             return WC()->session->get($key);
         }
         return NULL;
+    }
+
+    function getSessionCustomerId()
+    {
+        if (method_exists(WC()->session, 'get_customer_id')) {
+            return WC()->session->get_customer_id();
+        }
+        return NULL;
+    }
+
+    /**
+     * Add to cart
+     * @param $product_id
+     * @param int $variation_id
+     * @param int $quantity
+     * @param array $variation
+     * @param array $cart_item_data
+     * @return bool|string
+     */
+    function addToCart($product_id, $variation_id = 0, $quantity = 1, $variation = array(), $cart_item_data = array())
+    {
+        if (method_exists(WC()->cart, 'add_to_cart')) {
+            try {
+                WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation, $cart_item_data);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Set cart item quantity
+     * @param $cart_key
+     * @param int $quantity
+     * @return bool|string
+     */
+    function setQuantity($cart_key, $quantity = 1)
+    {
+        if (method_exists(WC()->cart, 'set_quantity')) {
+            try {
+                WC()->cart->set_quantity($cart_key, $quantity);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+        }
+        return true;
     }
 
     /**
@@ -260,6 +373,38 @@ class WcFunctions
             return WC()->cart->get_cart();
         }
         return array();
+    }
+
+    /**
+     * Get session cart items
+     * @return array
+     */
+    function getSessionCart()
+    {
+        if (function_exists('WC')) {
+            return WC()->session->cart;
+        } else {
+            global $woocommerce;
+            return $woocommerce->session->cart;
+        }
+    }
+
+    /**
+     * Get session cookie
+     * @return array
+     */
+    function getSessionCookie()
+    {
+        if (function_exists('WC')) {
+            if (method_exists(WC()->session, 'get_session_cookie')) {
+                return WC()->session->get_session_cookie();
+            } else {
+                return NULL;
+            }
+        } else {
+            global $woocommerce;
+            return $woocommerce->session->get_session_cookie();
+        }
     }
 
     /**
