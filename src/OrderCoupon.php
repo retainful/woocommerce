@@ -426,11 +426,14 @@ class OrderCoupon
                 wp_update_post($my_post);
             }
         }
-        //Handle API Requests
-        $api_key = $this->admin->getApiKey();
-        if (!empty($api_key)) {
-            $request_params['app_id'] = $api_key;
-            as_schedule_single_action(time() + 60, 'retainful_cron_sync_coupon_details', array($request_params));
+        $is_api_enabled = $this->admin->isAppConnected();
+        if ($is_api_enabled) {
+            //Handle API Requests
+            $api_key = $this->admin->getApiKey();
+            if (!empty($api_key)) {
+                $request_params['app_id'] = $api_key;
+                as_schedule_single_action(time() + 60, 'retainful_cron_sync_coupon_details', array($request_params));
+            }
         }
         return true;
     }
