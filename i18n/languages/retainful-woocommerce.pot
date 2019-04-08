@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: retainful\n"
-"POT-Creation-Date: 2019-03-12 17:54+0530\n"
-"PO-Revision-Date: 2019-03-12 17:54+0530\n"
+"POT-Creation-Date: 2019-04-08 14:18+0530\n"
+"PO-Revision-Date: 2019-04-08 14:18+0530\n"
 "Last-Translator: \n"
 "Language-Team: retainful\n"
 "Language: en\n"
@@ -15,106 +15,189 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;esc_html__;esc_html_e;esc_attr__;esc_attr_e\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: src/Main.php:89
+#: AbandonedCart.php:29
+msgid "Yesterday"
+msgstr ""
+
+#: AbandonedCart.php:30
+msgid "Today"
+msgstr ""
+
+#: AbandonedCart.php:31
+msgid "Last 7 days"
+msgstr ""
+
+#: AbandonedCart.php:32
+msgid "Last 15 days"
+msgstr ""
+
+#: AbandonedCart.php:33
+msgid "Last 30 days"
+msgstr ""
+
+#: AbandonedCart.php:34
+msgid "Last 90 days"
+msgstr ""
+
+#: AbandonedCart.php:35
+msgid "Last 365 days"
+msgstr ""
+
+#: AbandonedCart.php:36
+msgid "Custom"
+msgstr ""
+
+#: AbandonedCart.php:462
+msgid "Item"
+msgstr ""
+
+#: AbandonedCart.php:463
+msgid "Name"
+msgstr ""
+
+#: AbandonedCart.php:464
+msgid "Quantity"
+msgstr ""
+
+#: AbandonedCart.php:465
+msgid "Price"
+msgstr ""
+
+#: AbandonedCart.php:466
+msgid "Line Subtotal"
+msgstr ""
+
+#: AbandonedCart.php:474
+msgid "Cart Total"
+msgstr ""
+
+#: AbandonedCart.php:652 AbandonedCart.php:653
+msgid "New Customer Order - Recovered"
+msgstr ""
+
+#: Main.php:149
+msgid "Retainful-woocommerce requires minimum PHP version of 5.6"
+msgstr ""
+
+#: Main.php:152
+msgid ""
+"Woocommerce must installed and activated in-order to use Retainful-"
+"Woocommerce!"
+msgstr ""
+
+#: Main.php:164
+msgid "Retainful-woocommerce requires minimum Woocommerce version of "
+msgstr ""
+
+#: Main.php:164
+msgid "But your Woocommerce version is "
+msgstr ""
+
+#: Main.php:276
 msgid "Woocommerce must be activated for Retainful-Woocommerce to work"
 msgstr ""
 
-#: src/Main.php:92
+#: Main.php:279
 msgid "Your woocommerce version is "
 msgstr ""
 
-#: src/Main.php:92
+#: Main.php:279
 msgid ""
 ". Some of the features of Retainful-Woocommerce will not work properly on "
 "this woocommerce version."
 msgstr ""
 
-#: src/OrderCoupon.php:27
+#: OrderCoupon.php:27
 msgid "Please enter App-Id"
 msgstr ""
 
-#: src/OrderCoupon.php:32
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:44
+#: OrderCoupon.php:32
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:44
 msgid "Successfully connected to Retainful"
 msgstr ""
 
-#: src/OrderCoupon.php:34
+#: OrderCoupon.php:34
 msgid "Please enter Valid App-Id"
 msgstr ""
 
-#: src/OrderCoupon.php:57 src/admin/Settings.php:35
+#: OrderCoupon.php:56
 msgid "Settings"
 msgstr ""
 
-#: src/admin/Settings.php:29
+#: admin/Settings.php:30
 msgid "Retainful Next Order Coupon"
 msgstr ""
 
-#: src/admin/Settings.php:36 src/admin/Settings.php:121
+#: admin/Settings.php:36
+msgid "Next order coupon"
+msgstr ""
+
+#: admin/Settings.php:37 admin/Settings.php:122 admin/Settings.php:251
+#: admin/Settings.php:281 admin/Settings.php:374 admin/Settings.php:404
 msgid "Save"
 msgstr ""
 
-#: src/admin/Settings.php:39
+#: admin/Settings.php:40
 msgid "Retainful App ID"
 msgstr ""
 
-#: src/admin/Settings.php:43
+#: admin/Settings.php:44
 msgid "You can get your App-id from https://www.app.retainful.com"
 msgstr ""
 
-#: src/admin/Settings.php:52
+#: admin/Settings.php:53
 msgid "Coupon type"
 msgstr ""
 
-#: src/admin/Settings.php:57
+#: admin/Settings.php:58
 msgid "Percentage"
 msgstr ""
 
-#: src/admin/Settings.php:58
+#: admin/Settings.php:59
 msgid "Flat"
 msgstr ""
 
-#: src/admin/Settings.php:63
+#: admin/Settings.php:64
 msgid "Coupon value"
 msgstr ""
 
-#: src/admin/Settings.php:68
+#: admin/Settings.php:69
 msgid "Note: If this field is empty, No coupon codes will generate!"
 msgstr ""
 
-#: src/admin/Settings.php:74
+#: admin/Settings.php:75
 msgid "Apply coupon to"
 msgstr ""
 
-#: src/admin/Settings.php:79
+#: admin/Settings.php:80
 msgid "Allow any one to apply coupon"
 msgstr ""
 
-#: src/admin/Settings.php:80
+#: admin/Settings.php:81
 msgid "Allow the customer to apply coupon, but validate at checkout"
 msgstr ""
 
-#: src/admin/Settings.php:81
+#: admin/Settings.php:82
 msgid "Allow customer to apply coupon only after login"
 msgstr ""
 
-#: src/admin/Settings.php:86
+#: admin/Settings.php:87
 msgid "Display coupon message after"
 msgstr ""
 
-#: src/admin/Settings.php:91
+#: admin/Settings.php:92
 msgid "Order details"
 msgstr ""
 
-#: src/admin/Settings.php:92
+#: admin/Settings.php:93
 msgid "Order meta"
 msgstr ""
 
-#: src/admin/Settings.php:93
+#: admin/Settings.php:94
 msgid "Customer details"
 msgstr ""
 
-#: src/admin/Settings.php:98
+#: admin/Settings.php:99
 msgid ""
 "This message will attached to the Order Email.<br>Please use the below short "
 "codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - "
@@ -122,128 +205,289 @@ msgid ""
 "</b> - Url to apply coupon automatically"
 msgstr ""
 
-#: src/admin/Settings.php:99
+#: admin/Settings.php:100
 msgid ""
 "<br><b>{{coupon_expiry_date}}</b> - Coupon expiry date(If coupon does not "
 "have any expiry days,then this will not attach to the message).<br>"
 msgstr ""
 
-#: src/admin/Settings.php:104
+#: admin/Settings.php:105
 msgid "Custom coupon message"
 msgstr ""
 
-#: src/admin/Settings.php:114
+#: admin/Settings.php:115
 msgid "Retainful Coupon Usage Restrictions"
 msgstr ""
 
-#: src/admin/Settings.php:120
-msgid "Usage restriction"
+#: admin/Settings.php:121
+msgid "Coupon usage restriction"
 msgstr ""
 
-#: src/admin/Settings.php:125
+#: admin/Settings.php:126
 msgid "Minimum spend"
 msgstr ""
 
-#: src/admin/Settings.php:128
+#: admin/Settings.php:129
 msgid "Set the minimum spend(subtotal) allowed to use the coupon."
 msgstr ""
 
-#: src/admin/Settings.php:136
+#: admin/Settings.php:138
 msgid "Maximum spend"
 msgstr ""
 
-#: src/admin/Settings.php:139
+#: admin/Settings.php:141
 msgid "Set the maximum spend(subtotal) allowed to use the coupon."
 msgstr ""
 
-#: src/admin/Settings.php:147
+#: admin/Settings.php:150
 msgid "Coupon expires in "
 msgstr ""
 
-#: src/admin/Settings.php:150
+#: admin/Settings.php:153
 msgid ""
 "After the entered number of days coupon will automatically expired."
 "<br><b>Note: Please leave empty or put 0 to never expire.</b>"
 msgstr ""
 
-#: src/admin/Settings.php:151
+#: admin/Settings.php:154
 msgid " Day(s)"
 msgstr ""
 
-#: src/admin/Settings.php:162
+#: admin/Settings.php:165
 msgid "Coupon expire date format "
 msgstr ""
 
-#: src/admin/Settings.php:169
+#: admin/Settings.php:172
 msgid "Individual use only"
 msgstr ""
 
-#: src/admin/Settings.php:172
+#: admin/Settings.php:175
 msgid ""
 "Check this box if the coupon cannot be used in conjunction with other "
 "coupons."
 msgstr ""
 
-#: src/admin/Settings.php:175
+#: admin/Settings.php:178
 msgid "Exclude sale items"
 msgstr ""
 
-#: src/admin/Settings.php:178
+#: admin/Settings.php:181
 msgid ""
 "Check this box if the coupon should not apply to items on sale. Per-item "
 "coupons will only work if the item is not on sale. Per-cart coupons will "
 "only work if there are items in the cart that are not on sale."
 msgstr ""
 
-#: src/admin/Settings.php:181
+#: admin/Settings.php:184
 msgid "Products"
 msgstr ""
 
-#: src/admin/Settings.php:185
+#: admin/Settings.php:188
 msgid ""
 "Product that the coupon code will be applied to, or that need to be in the "
 "cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:187 src/admin/Settings.php:201
+#: admin/Settings.php:190 admin/Settings.php:204
 msgid "Choose products.."
 msgstr ""
 
-#: src/admin/Settings.php:195
+#: admin/Settings.php:198
 msgid "Exclude products"
 msgstr ""
 
-#: src/admin/Settings.php:199
+#: admin/Settings.php:202
 msgid ""
 "Product that the coupon code will not applied to, or cannot be in the cart "
 "in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:209
+#: admin/Settings.php:212
 msgid "Product Categories"
 msgstr ""
 
-#: src/admin/Settings.php:214 src/admin/Settings.php:224
+#: admin/Settings.php:217 admin/Settings.php:227
 msgid "Select categories"
 msgstr ""
 
-#: src/admin/Settings.php:216
+#: admin/Settings.php:219
 msgid ""
 "Product categories that the coupon code will be applied to, or that need to "
 "be in the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:219
+#: admin/Settings.php:222
 msgid "Exclude Categories"
 msgstr ""
 
-#: src/admin/Settings.php:226
+#: admin/Settings.php:229
 msgid ""
 "Product categories that the coupon code will not applied to, or cannot be in "
 "the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: src/admin/Settings.php:391
+#: admin/Settings.php:244
+msgid "Retainful Abandoned Carts"
+msgstr ""
+
+#: admin/Settings.php:250
+msgid "Abandoned / Recovered Carts"
+msgstr ""
+
+#: admin/Settings.php:255 admin/Settings.php:378
+msgid "Select date range"
+msgstr ""
+
+#: admin/Settings.php:274
+msgid "Retainful Abandoned Cart Email Templates"
+msgstr ""
+
+#: admin/Settings.php:280
+msgid "Email Templates"
+msgstr ""
+
+#: admin/Settings.php:285
+msgid "\"From\" Name"
+msgstr ""
+
+#: admin/Settings.php:288
+msgid "Abandoned Cart Email Templates"
+msgstr ""
+
+#: admin/Settings.php:289
+msgid "Enter the name that should appear in the email sent."
+msgstr ""
+
+#: admin/Settings.php:294
+msgid "\"From\" Address"
+msgstr ""
+
+#: admin/Settings.php:297
+msgid "Email address from which the reminder emails should be sent."
+msgstr ""
+
+#: admin/Settings.php:301
+msgid "\"Reply To \" Address"
+msgstr ""
+
+#: admin/Settings.php:304
+msgid ""
+"When a contact receives your email and clicks reply, which email address "
+"should that reply be sent to?"
+msgstr ""
+
+#: admin/Settings.php:312
+msgid ""
+"Add email templates at different intervals to maximize the possibility of "
+"recovering your abandoned carts."
+msgstr ""
+
+#: admin/Settings.php:314
+msgid "Email Template {#}"
+msgstr ""
+
+#: admin/Settings.php:315
+msgid "Add Another Template"
+msgstr ""
+
+#: admin/Settings.php:316
+msgid "Remove Template"
+msgstr ""
+
+#: admin/Settings.php:327
+msgid "Email Subject"
+msgstr ""
+
+#: admin/Settings.php:333
+msgid "Email Body"
+msgstr ""
+
+#: admin/Settings.php:339
+msgid "Send this email in"
+msgstr ""
+
+#: admin/Settings.php:343
+msgid " after cart is abandoned."
+msgstr ""
+
+#: admin/Settings.php:347
+msgid "Active?"
+msgstr ""
+
+#: admin/Settings.php:351 admin/Settings.php:437
+msgid "Yes"
+msgstr ""
+
+#: admin/Settings.php:352 admin/Settings.php:436
+msgid "No"
+msgstr ""
+
+#: admin/Settings.php:367
+msgid "Retainful Abandoned Cart Dashboard"
+msgstr ""
+
+#: admin/Settings.php:373
+msgid "Reports"
+msgstr ""
+
+#: admin/Settings.php:397
+msgid "Retainful Abandoned Cart Settings"
+msgstr ""
+
+#: admin/Settings.php:403
+msgid "Abandoned cart settings"
+msgstr ""
+
+#: admin/Settings.php:408
+msgid "Cart abandoned cut-off time"
+msgstr ""
+
+#: admin/Settings.php:411
+msgid ""
+"Consider cart abandoned after X minutes of item being added to cart & order "
+"not placed."
+msgstr ""
+
+#: admin/Settings.php:420
+msgid "Automatically Delete Abandoned Orders after X days"
+msgstr ""
+
+#: admin/Settings.php:423
+msgid "Automatically delete abandoned cart orders after X days."
+msgstr ""
+
+#: admin/Settings.php:432
+msgid "Email admin On Order Recovery"
+msgstr ""
+
+#: admin/Settings.php:439
+msgid "Sends email to Admin if an Abandoned Cart Order is recovered."
+msgstr ""
+
+#: admin/Settings.php:443
+msgid "Message to be displayed for Guest users when tracking their carts"
+msgstr ""
+
+#: admin/Settings.php:446
+msgid ""
+"In compliance with GDPR, add a message on the Checkout page to inform Guest "
+"users of how their data is being used.<br><b>For example:</b> Your email "
+"address will help us support your shopping experience throughout the site. "
+"Please check our Privacy Policy to see how we use your personal data."
+msgstr ""
+
+#: admin/Settings.php:449
+msgid "Message to be displayed for registered users when tracking their carts."
+msgstr ""
+
+#: admin/Settings.php:452
+msgid ""
+"In compliance with GDPR, add a message on the Shop & Product pages to inform "
+"Registered users of how their data is being used.<br><b>For example:</b>  "
+"Please check our Privacy Policy to see how we use your personal data."
+msgstr ""
+
+#: admin/Settings.php:644
 msgid ""
 "<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 style="
 "\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"
@@ -260,46 +504,520 @@ msgid ""
 "decoration: none;\" href=\"{{coupon_url}}\">Go! </a></p></div></div>"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:34
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:34
+#: fields/cmb-field-cart-filter/cmb-field-cart-filter.php:68
+msgid "Abandoned Carts"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:44
+msgid "Abandoned Amount"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:54
+#: fields/cmb-field-cart-filter/cmb-field-cart-filter.php:70
+msgid "Recovered Carts"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:64
+msgid "Recovered Amount"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:65
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:221
+msgid "Id"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:66
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:222
+msgid "Cart Status"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:67
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:223
+msgid "Cart Expired"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:68
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:224
+msgid "Customer / IP"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:69
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:225
+msgid "Customer Type"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:70
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:226
+msgid "Email"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:71
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:227
+msgid "Cart Value"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:72
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:228
+msgid "Action"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:94
+msgid "Recovered"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:96
+msgid "In Progress"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:98
+msgid "Abandoned"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:141
+msgid "REGISTERED"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:143
+msgid "GUEST"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:186
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:92
+msgid "Delete"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:192
+msgid "View Order"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:202
+msgid "View Cart"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:214
+msgid "No carts found!"
+msgstr ""
+
+#: fields/cmb-field-cart-filter/cmb-field-cart-filter.php:57
+msgid "Choose date"
+msgstr ""
+
+#: fields/cmb-field-cart-filter/cmb-field-cart-filter.php:63
+msgid "Show "
+msgstr ""
+
+#: fields/cmb-field-cart-filter/cmb-field-cart-filter.php:66
+msgid "All Carts"
+msgstr ""
+
+#: fields/cmb-field-cart-filter/cmb-field-cart-filter.php:72
+msgid "In-Progress Carts"
+msgstr ""
+
+#: fields/cmb-field-cart-filter/js/moment.min.js:1
+msgid ": "
+msgstr ""
+
+#: fields/cmb-field-email-after/cmb-field-email-after.php:34
+msgid "Hour(s)"
+msgstr ""
+
+#: fields/cmb-field-email-after/cmb-field-email-after.php:35
+msgid "Day(s)"
+msgstr ""
+
+#: fields/cmb-field-post-search-ajax/cmb-field-post-search-ajax.php:154
+msgid "Error : Unauthorized action"
+msgstr ""
+
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:34
 msgid "Connect"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:34
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:34
 msgid "Re-Connect"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:39
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:39
 msgid "Dis-connect"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:45
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:45
 msgid "You have disconnected from Retainful!"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:54
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:54
 msgid "Get your API Key for free"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:56
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:67
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:56
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:67
 msgid ""
 "Increase sales & get more money per customer. Drive repeat purchases by "
 "automatically sending a\n"
 "                single-use coupon for next purchase."
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:61
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:61
 msgid "Get your API Key"
 msgstr ""
 
-#: src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php:72
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:72
 msgid "Visit Dashboard!"
 msgstr ""
 
-#: src/fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php:28
+#: fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php:28
 msgid "Please connect to Retainful Inorder to use this features!"
 msgstr ""
 
-#: src/fields/cmb2-field-post-search-ajax/cmb-field-post-search-ajax.php:154
-msgid "Error : Unauthorized action"
+#: library/action-scheduler/classes/ActionScheduler_AdminView.php:53
+#: library/action-scheduler/classes/ActionScheduler_AdminView.php:68
+#: library/action-scheduler/classes/ActionScheduler_AdminView.php:69
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:89
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:19
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:30
+msgid "Scheduled Actions"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_InvalidActionException.php:22
+#, php-format
+msgid ""
+"Action [%s] has invalid arguments. It cannot be JSON decoded to an array."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:96
+msgid "Hook"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:97
+msgid "Status"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:98
+msgid "Arguments"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:99
+msgid "Group"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:100
+msgid "Recurrence"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:101
+msgid "Scheduled Date"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:102
+msgid "Log"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:122
+msgid "Claim ID"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:129
+msgid "Run"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:130
+msgid "Process the action now as if it were run as part of a queue"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:133
+msgid "Cancel"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:134
+msgid "Cancel the action now to avoid it being run in future"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:194
+msgid "Now!"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:227
+#, php-format
+msgid "Every %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:231
+#, php-format
+msgid "Cron %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:235
+msgid "Non-repeating"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:321
+#, php-format
+msgid ""
+"Maximum simultaneous batches already in progress (%s queues). No actions "
+"will be processed until the current batches are complete."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:336
+#, php-format
+msgid "Successfully executed action: %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:339
+#, php-format
+msgid "Successfully canceled action: %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:342
+#, php-format
+msgid "Successfully processed change for action: %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:347
+#, php-format
+msgid "Could not process change for action: \"%s\" (ID: %d). Error: %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:392
+#, php-format
+msgid " (%s ago)"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:394
+#, php-format
+msgid " (%s)"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_ListTable.php:531
+msgid "Search hook, args and claim ID"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Logger.php:61
+msgid "action created"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Logger.php:65
+msgid "action canceled"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Logger.php:69
+msgid "action started"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Logger.php:73
+msgid "action complete"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Logger.php:77
+#, php-format
+msgid "action failed: %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Logger.php:81
+#, php-format
+msgid "action timed out after %s seconds"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Logger.php:86
+#, php-format
+msgid "unexpected shutdown: PHP Fatal error %s in %s on line %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Logger.php:91
+msgid "action reset"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Logger.php:95
+msgid "action ignored"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_QueueRunner.php:110
+msgid "Every minute"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Store.php:152
+#: library/action-scheduler/classes/ActionScheduler_Store.php:169
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:264
+msgid "Invalid schedule. Cannot save action."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Store.php:181
+msgid "Complete"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Store.php:182
+msgid "Pending"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Store.php:183
+msgid "In-progress"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Store.php:184
+msgid "Failed"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_Store.php:185
+msgid "Canceled"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:31
+#, php-format
+msgid "The %s class can only be run within WP CLI."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:59
+msgid ""
+"There are too many concurrent batches, but the run is forced to continue."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:61
+msgid "There are too many concurrent batches."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:109
+msgid "The claim has been lost. Aborting current batch."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:135
+#, php-format
+msgid "Started processing action %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:152
+#, php-format
+msgid "Completed processing action %s with hook: %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:167
+#, php-format
+msgid "Error processing action %1$s: %2$s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:183
+msgid "Attempting to reduce used memory..."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_WPCLI_Scheduler_command.php:123
+#, php-format
+msgid "There was an error running the action scheduler: %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:100
+msgid "Action Scheduler"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:100
+msgid "This section shows scheduled action counts."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:103
+msgid "Action Status"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:105
+msgid "Count"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:106
+msgid "Oldest Scheduled Date"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:107
+msgid "Newest Scheduled Date"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:27
+#, php-format
+msgid "Error saving action: %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:51
+msgid "Unable to save action."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:437
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:448
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:474
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:744
+#, php-format
+msgid "Unidentified action %s"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:586
+msgid "Unable to claim actions. Database error."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:606
+#, php-format
+msgid "The group \"%s\" does not exist."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:667
+#, php-format
+msgid "Unable to unlock claim %s. Database error."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:681
+#, php-format
+msgid "Unable to unlock claim on action %s. Database error."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:692
+#, php-format
+msgid "Unable to mark failure on action %s. Database error."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:716
+msgid "Invalid action ID. No status found."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:20
+msgid "Scheduled actions are hooks triggered on a cetain date and time."
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:31
+msgid "Scheduled Action"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:33
+msgid "Add"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:34
+msgid "Add New Scheduled Action"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:35
+msgid "Edit"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:36
+msgid "Edit Scheduled Action"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:37
+msgid "New Scheduled Action"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:38
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:39
+msgid "View Action"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:40
+msgid "Search Scheduled Actions"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:41
+msgid "No actions found"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:42
+msgid "No actions found in trash"
+msgstr ""
+
+#: library/action-scheduler/classes/ActionScheduler_wpPostStore_TaxonomyRegistrar.php:14
+msgid "Action Group"
 msgstr ""
