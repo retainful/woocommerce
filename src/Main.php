@@ -3,7 +3,6 @@
 namespace Rnoc\Retainful;
 if (!defined('ABSPATH')) exit;
 
-use function Composer\Autoload\includeFile;
 use Rnoc\Retainful\Admin\Settings;
 
 class Main
@@ -85,42 +84,45 @@ class Main
         add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array($this->rnoc, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
         add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
 
-        if ($this->admin->isAppConnected()) {
-            /*
-             * Retainful abandoned cart
-             */
-            //Track and log user cart
-            add_action('woocommerce_cart_updated', array($this->abandoned_cart, 'userCartUpdated'));
-            add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'checkoutViewed'));
-            add_action('wp_authenticate', array($this->abandoned_cart, 'userLoggedOn'));
-            add_action('user_register', array($this->abandoned_cart, 'userSignedUp'));
-            //track guest user
-            add_action('woocommerce_after_checkout_billing_form', array($this->abandoned_cart, 'addTrackUserJs'));
-            add_action('wp_ajax_nopriv_save_retainful_guest_data', array($this->abandoned_cart, 'saveGuestData'));
-            //recover user cart
-            add_filter('template_include', array($this->abandoned_cart, 'recoverUserCart'), 99, 1);
-            add_action('woocommerce_new_order', array($this->abandoned_cart, 'purchaseComplete'));
-            //Add tracking message
-            add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'guestGdprMessage'), 10, 1);
-            add_action('woocommerce_after_add_to_cart_button', array($this->abandoned_cart, 'userGdprMessage'), 10);
-            add_action('woocommerce_before_shop_loop', array($this->abandoned_cart, 'userGdprMessage'), 10);
+        /*
+         * Retainful abandoned cart
+         */
+        //Track and log user cart
+        add_action('woocommerce_cart_updated', array($this->abandoned_cart, 'userCartUpdated'));
+        add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'checkoutViewed'));
+        add_action('wp_authenticate', array($this->abandoned_cart, 'userLoggedOn'));
+        add_action('user_register', array($this->abandoned_cart, 'userSignedUp'));
+        //track guest user
+        add_action('woocommerce_after_checkout_billing_form', array($this->abandoned_cart, 'addTrackUserJs'));
+        add_action('wp_ajax_nopriv_save_retainful_guest_data', array($this->abandoned_cart, 'saveGuestData'));
+        //recover user cart
+        add_filter('template_include', array($this->abandoned_cart, 'recoverUserCart'), 99, 1);
+        add_action('woocommerce_new_order', array($this->abandoned_cart, 'purchaseComplete'));
+        //Add tracking message
+        add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'guestGdprMessage'), 10, 1);
+        add_action('woocommerce_after_add_to_cart_button', array($this->abandoned_cart, 'userGdprMessage'), 10);
+        add_action('woocommerce_before_shop_loop', array($this->abandoned_cart, 'userGdprMessage'), 10);
 
-            //Add custom cron schedule events
-            add_action('plugins_loaded', array($this, 'actionSchedulerHooks'));
-            add_action('rnoc_abandoned_clear_abandoned_carts', array($this->abandoned_cart, 'clearAbandonedCarts'));
-            add_action('rnoc_abandoned_cart_send_email', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
-            //add_action('woocommerce_init', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
+        //Add custom cron schedule events
+        add_action('plugins_loaded', array($this, 'actionSchedulerHooks'));
+        add_action('rnoc_abandoned_clear_abandoned_carts', array($this->abandoned_cart, 'clearAbandonedCarts'));
+        add_action('rnoc_abandoned_cart_send_email', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
+        //add_action('woocommerce_init', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
 
-            //Process abandoned cart after user place order
-            add_action('woocommerce_order_status_pending_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
-            add_action('woocommerce_order_status_pending_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
-            add_action('woocommerce_order_status_pending_to_on-hold_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
-            add_action('woocommerce_order_status_failed_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
-            add_action('woocommerce_order_status_failed_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
-            //Admin
-            add_filter('wp_ajax_get_ajax_details_for_dashboard', array($this->abandoned_cart, 'getAjaxDetailsForDashboard'));
-            add_action('wp_ajax_view_abandoned_cart', array($this->abandoned_cart, 'viewAbandonedCart'));
-            add_action('wp_ajax_remove_abandoned_cart', array($this->abandoned_cart, 'removeAbandonedCart'));
+        //Process abandoned cart after user place order
+        add_action('woocommerce_order_status_pending_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+        add_action('woocommerce_order_status_pending_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+        add_action('woocommerce_order_status_pending_to_on-hold_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+        add_action('woocommerce_order_status_failed_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+        add_action('woocommerce_order_status_failed_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
+        //Admin
+        add_filter('wp_ajax_get_ajax_details_for_dashboard', array($this->abandoned_cart, 'getAjaxDetailsForDashboard'));
+        add_action('wp_ajax_view_abandoned_cart', array($this->abandoned_cart, 'viewAbandonedCart'));
+        add_action('wp_ajax_remove_abandoned_cart', array($this->abandoned_cart, 'removeAbandonedCart'));
+
+        $is_abandoned_tables_created = get_option('retainful_abandoned_cart_table_created', 0);
+        if (is_admin() && !$is_abandoned_tables_created) {
+            $this->createRequiredTables();
         }
     }
 
@@ -235,6 +237,7 @@ class Main
                         PRIMARY KEY  (`id`)
                         ) $rnoc_collate AUTO_INCREMENT=1 ";
         $wpdb->query($email_sent_query);
+        update_option('retainful_abandoned_cart_table_created', '1');
     }
 
     function removeDependentTables()

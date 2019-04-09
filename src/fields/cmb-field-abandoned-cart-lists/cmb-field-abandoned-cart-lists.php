@@ -210,7 +210,7 @@ class CMB2_Field_Abandoned_Cart_Lists
             } else {
                 ?>
                 <tr>
-                    <td colspan="6">
+                    <td colspan="8">
                         <p><?php echo __('No carts found!', RNOC_TEXT_DOMAIN); ?></p>
                     </td>
                 </tr>
@@ -228,7 +228,7 @@ class CMB2_Field_Abandoned_Cart_Lists
                 <td><strong><?php echo __('Action', RNOC_TEXT_DOMAIN); ?></strong></td>
             </tr>
             <tr>
-                <td colspan="6" align="right">
+                <td colspan="8" align="right">
                     <?php
                     echo $pagination->createLinks();
                     ?>

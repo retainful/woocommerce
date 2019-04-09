@@ -250,24 +250,16 @@ class Settings
                 'tab_title' => __('Abandoned / Recovered Carts', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
-            if ($is_app_connected) {
-                $abandoned_cart->add_field(array(
-                    'name' => __('Select date range', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
-                    'type' => 'date_range_picker'
-                ));
-                $abandoned_cart->add_field(array(
-                    'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
-                    'type' => 'abandoned_cart_lists'
-                ));
-            } else {
-                $abandoned_cart->add_field(array(
-                    'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
-                    'type' => 'unlock_usage_restriction'
-                ));
-            }
+            $abandoned_cart->add_field(array(
+                'name' => __('Select date range', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
+                'type' => 'date_range_picker'
+            ));
+            $abandoned_cart->add_field(array(
+                'name' => '',
+                'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
+                'type' => 'abandoned_cart_lists'
+            ));
             //Email templates
             $abandoned_cart_email_templates = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_email_templates',
@@ -280,87 +272,74 @@ class Settings
                 'tab_title' => __('Email Templates', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
-            if ($is_app_connected) {
-                $abandoned_cart_email_templates->add_field(array(
-                    'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'email_from_name',
-                    'type' => 'text',
-                    'before_row' => '<h4>' . __("Abandoned Cart Email Templates", RNOC_TEXT_DOMAIN) . '</h4>',
-                    'desc' => __('Enter the name that should appear in the email sent.', RNOC_TEXT_DOMAIN),
-                    'default' => 'Admin'
-                ));
-                $admin_email = get_option('admin_email');
-                $abandoned_cart_email_templates->add_field(array(
-                    'name' => __('"From" Address', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'email_from_address',
-                    'type' => 'text',
-                    'desc' => __('Email address from which the reminder emails should be sent.', RNOC_TEXT_DOMAIN),
-                    'default' => $admin_email
-                ));
-                $abandoned_cart_email_templates->add_field(array(
-                    'name' => __('"Reply To " Address', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'email_reply_address',
-                    'type' => 'text',
-                    'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
-                    'default' => $admin_email
-                ));
-                $template_path = plugin_dir_url(__FILE__);
-                $email_template = wp_remote_fopen($template_path . 'templates/default-1.html');
-                $group_field_id = $abandoned_cart_email_templates->add_field(array(
-                    'id' => RNOC_PLUGIN_PREFIX . 'templates',
-                    'type' => 'group',
-                    'description' => __('Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.', RNOC_TEXT_DOMAIN),
-                    'options' => array(
-                        'group_title' => __('Email Template {#}', RNOC_TEXT_DOMAIN),
-                        'add_button' => __('Add Another Template', RNOC_TEXT_DOMAIN),
-                        'remove_button' => __('Remove Template', RNOC_TEXT_DOMAIN),
-                        'sortable' => false,
-                        'closed' => true
-                    ),
-                ));
-                /*$abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                    'name' => __('Email Template Name', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'template_name',
-                    'type' => 'text'
-                ));*/
-                $abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                    'name' => __('Email Subject', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'template_subject',
-                    'type' => 'text',
-                    'default' => 'Hey {{customer_name}}!! You left something in your cart'
-                ));
-                $abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                    'name' => __('Email Body', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'template_body',
-                    'type' => 'wysiwyg',
-                    'default' => $email_template
-                ));
-                $abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                    'name' => __('Send this email in', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'template_sent_after',
-                    'type' => 'email_after',
-                    'default' => '1',
-                    'desc' => __(' after cart is abandoned.', RNOC_TEXT_DOMAIN),
-                    'attributes' => array('class' => 'number_only_field')
-                ));
-                $abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                    'name' => __('Active?', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'template_active',
-                    'type' => 'select',
-                    'options' => array(
-                        1 => __('Yes', RNOC_TEXT_DOMAIN),
-                        0 => __('No', RNOC_TEXT_DOMAIN)
-                    ),
-                    'default' => 1
-                ));
-
-            } else {
-                $abandoned_cart_email_templates->add_field(array(
-                    'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
-                    'type' => 'unlock_usage_restriction'
-                ));
-            }
+            $abandoned_cart_email_templates->add_field(array(
+                'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'email_from_name',
+                'type' => 'text',
+                'before_row' => '<h4>' . __("Abandoned Cart Email Templates", RNOC_TEXT_DOMAIN) . '</h4>',
+                'desc' => __('Enter the name that should appear in the email sent.', RNOC_TEXT_DOMAIN),
+                'default' => 'Admin'
+            ));
+            $admin_email = get_option('admin_email');
+            $abandoned_cart_email_templates->add_field(array(
+                'name' => __('"From" Address', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'email_from_address',
+                'type' => 'text',
+                'desc' => __('Email address from which the reminder emails should be sent.', RNOC_TEXT_DOMAIN),
+                'default' => $admin_email
+            ));
+            $abandoned_cart_email_templates->add_field(array(
+                'name' => __('"Reply To " Address', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'email_reply_address',
+                'type' => 'text',
+                'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
+                'default' => $admin_email
+            ));
+            $template_path = plugin_dir_url(__FILE__);
+            $email_template = wp_remote_fopen($template_path . 'templates/default-1.html');
+            $group_field_id = $abandoned_cart_email_templates->add_field(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'templates',
+                'type' => 'group',
+                'description' => __('Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.', RNOC_TEXT_DOMAIN),
+                'options' => array(
+                    'group_title' => __('Email Template {#}', RNOC_TEXT_DOMAIN),
+                    'add_button' => __('Add Another Template', RNOC_TEXT_DOMAIN),
+                    'remove_button' => __('Remove Template', RNOC_TEXT_DOMAIN),
+                    'sortable' => false,
+                    'closed' => true
+                ),
+            ));
+            $abandoned_cart_email_templates->add_group_field($group_field_id, array(
+                'name' => __('Email Subject', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'template_subject',
+                'type' => 'text',
+                'default' => 'Hey {{customer_name}}!! You left something in your cart'
+            ));
+            $abandoned_cart_email_templates->add_group_field($group_field_id, array(
+                'name' => __('Email Body', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'template_body',
+                'type' => 'wysiwyg',
+                'default' => $email_template,
+                'desc' => __('You can use following short codes in your email template:<br> <b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - Site link<br> <b>{{cart_recovery_link}}</b> - Link to recover user cart<br><b>{{user_cart}}</b> - Cart details', RNOC_TEXT_DOMAIN)
+            ));
+            $abandoned_cart_email_templates->add_group_field($group_field_id, array(
+                'name' => __('Send this email in', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'template_sent_after',
+                'type' => 'email_after',
+                'default' => '1',
+                'desc' => __(' after cart is abandoned.', RNOC_TEXT_DOMAIN),
+                'attributes' => array('class' => 'number_only_field')
+            ));
+            $abandoned_cart_email_templates->add_group_field($group_field_id, array(
+                'name' => __('Active?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'template_active',
+                'type' => 'select',
+                'options' => array(
+                    1 => __('Yes', RNOC_TEXT_DOMAIN),
+                    0 => __('No', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 1
+            ));
             //Reporting
             $abandoned_cart_dashboard = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_dashboard',
@@ -373,24 +352,16 @@ class Settings
                 'tab_title' => __('Reports', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
-            if ($is_app_connected) {
-                $abandoned_cart_dashboard->add_field(array(
-                    'name' => __('Select date range', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
-                    'type' => 'date_range_picker'
-                ));
-                $abandoned_cart_dashboard->add_field(array(
-                    'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
-                    'type' => 'abandoned_cart_dashboard'
-                ));
-            } else {
-                $abandoned_cart_dashboard->add_field(array(
-                    'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
-                    'type' => 'unlock_usage_restriction'
-                ));
-            }
+            $abandoned_cart_dashboard->add_field(array(
+                'name' => __('Select date range', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
+                'type' => 'date_range_picker'
+            ));
+            $abandoned_cart_dashboard->add_field(array(
+                'name' => '',
+                'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
+                'type' => 'abandoned_cart_dashboard'
+            ));
             //Abandoned cart Settings
             $abandoned_cart_settings = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_settings',
@@ -403,61 +374,58 @@ class Settings
                 'tab_title' => __('Abandoned cart settings', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
-            if ($is_app_connected) {
-                $abandoned_cart_settings->add_field(array(
-                    'name' => __('Cart abandoned cut-off time', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'cart_abandoned_time',
-                    'type' => 'text',
-                    'desc' => __('Consider cart abandoned after X minutes of item being added to cart & order not placed.', RNOC_TEXT_DOMAIN),
-                    'attributes' => array(
-                        'type' => 'number',
-                        'min' => 1,
-                        'class' => 'number_only_field'
-                    ),
-                    'default' => 60
-                ));
-                $abandoned_cart_settings->add_field(array(
-                    'name' => __('Automatically Delete Abandoned Orders after X days', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days',
-                    'type' => 'text',
-                    'desc' => __('Automatically delete abandoned cart orders after X days.', RNOC_TEXT_DOMAIN),
-                    'attributes' => array(
-                        'type' => 'number',
-                        'min' => 1,
-                        'class' => 'number_only_field'
-                    ),
-                    'default' => ''
-                ));
-                $abandoned_cart_settings->add_field(array(
-                    'name' => __('Email admin On Order Recovery', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'email_admin_on_recovery',
-                    'type' => 'radio_inline',
-                    'options' => array(
-                        0 => __('No', RNOC_TEXT_DOMAIN),
-                        1 => __('Yes', RNOC_TEXT_DOMAIN)
-                    ),
-                    'desc' => __('Sends email to Admin if an Abandoned Cart Order is recovered.', RNOC_TEXT_DOMAIN),
-                    'default' => 0
-                ));
-                $abandoned_cart_settings->add_field(array(
-                    'name' => __('Message to be displayed for Guest users when tracking their carts', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'guest_cart_capture_msg',
-                    'type' => 'textarea',
-                    'desc' => __('In compliance with GDPR, add a message on the Checkout page to inform Guest users of how their data is being used.<br><b>For example:</b> Your email address will help us support your shopping experience throughout the site. Please check our Privacy Policy to see how we use your personal data.', RNOC_TEXT_DOMAIN)
-                ));
-                $abandoned_cart_settings->add_field(array(
-                    'name' => __('Message to be displayed for registered users when tracking their carts.', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'logged_cart_capture_msg',
-                    'type' => 'textarea',
-                    'desc' => __('In compliance with GDPR, add a message on the Shop & Product pages to inform Registered users of how their data is being used.<br><b>For example:</b>  Please check our Privacy Policy to see how we use your personal data.', RNOC_TEXT_DOMAIN)
-                ));
-            } else {
-                $abandoned_cart_settings->add_field(array(
-                    'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
-                    'type' => 'unlock_usage_restriction'
-                ));
-            }
+            $abandoned_cart_settings->add_field(array(
+                'name' => __('When to consider a cart as abandoned?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'cart_abandoned_time',
+                'type' => 'text',
+                'desc' => __('In minutes. Example: You can consider a cart as abandoned 15 minutes after it was added', RNOC_TEXT_DOMAIN),
+                'attributes' => array(
+                    'type' => 'number',
+                    'min' => 1,
+                    'class' => 'number_only_field'
+                ),
+                'default' => 60
+            ));
+            $abandoned_cart_settings->add_field(array(
+                'name' => __('How many days to wait before automatically deleting the cart', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days',
+                'type' => 'text',
+                'desc' => __('Useful when you wanted the abandoned carts be removed after certain days', RNOC_TEXT_DOMAIN),
+                'attributes' => array(
+                    'type' => 'number',
+                    'min' => 1,
+                    'class' => 'number_only_field'
+                ),
+                'default' => ''
+            ));
+            $abandoned_cart_settings->add_field(array(
+                'name' => __('Should the store administrator get a notification when a cart is recovered', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'email_admin_on_recovery',
+                'type' => 'radio_inline',
+                'options' => array(
+                    0 => __('No', RNOC_TEXT_DOMAIN),
+                    1 => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'desc' => __('Useful if you wanted to get notified when a cart is recovered.', RNOC_TEXT_DOMAIN),
+                'default' => 0
+            ));
+            $abandoned_cart_settings->add_field(array(
+                'name' => __('Track real-time carts?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'track_real_time_cart',
+                'type' => 'radio_inline',
+                'options' => array(
+                    0 => __('No', RNOC_TEXT_DOMAIN),
+                    1 => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'desc' => __('If not enabled, only carts that are abandoned gets tracked (i.e, after customer leaves the site)', RNOC_TEXT_DOMAIN),
+                'default' => 1
+            ));
+            $abandoned_cart_settings->add_field(array(
+                'name' => __('Compliance: Message to show when tracking real-time carts', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'cart_capture_msg',
+                'type' => 'textarea',
+                'desc' => __('Under GDPR, it is mandatory to inform the users when we track their cart activity in real-time. If you are not tracking, you can leave this empty', RNOC_TEXT_DOMAIN)
+            ));
         });
         if (is_admin()) {
             $this->addScript();

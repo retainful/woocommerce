@@ -322,6 +322,7 @@ class AbandonedCart
                                             $validate_cart = $this->encryptValidate($encoding_cart);
                                             $cart_recovery_link = $site_url . '/?retainful_cart_action=recover&validate=' . $validate_cart;
                                             $replace = array(
+                                                'customer_name' => $customer_name,
                                                 'site_url' => $site_url,
                                                 'cart_recovery_link' => $cart_recovery_link,
                                                 'user_cart' => $cart_html,
@@ -703,6 +704,7 @@ class AbandonedCart
         $blank_cart = '""';
         $start_date = strtotime($start_date . ' 00:01:01');
         $end_date = strtotime($end_date . ' 23:59:59');
+        $current_time = current_time('timestamp');
         if ($count_only) {
             $select = 'COUNT(id) as count';
         } else {
@@ -713,10 +715,14 @@ class AbandonedCart
             $offset_limit = 'LIMIT ' . $limit . ' OFFSET ' . $start;
         }
         $get_only = '';
+        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
+        if (!$is_tracking_enabled) {
+            $get_only = ' AND cart_expiry <' . $current_time . ' ';
+        }
         if ($cart_type == 'recovered') {
             $get_only = ' AND cart_is_recovered=1 ';
         } else {
-            $current_time = current_time('timestamp');
             if ($cart_type == 'abandoned') {
                 $get_only = ' AND cart_is_recovered=0 AND cart_expiry <' . $current_time . ' ';
             } else if ($cart_type == 'progress') {
@@ -842,11 +848,12 @@ class AbandonedCart
      */
     function guestGdprMessage($fields)
     {
-        if (!is_user_logged_in()) {
-            $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
-            if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'guest_cart_capture_msg']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'guest_cart_capture_msg'])) {
+        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
+        if (!is_user_logged_in() && $is_tracking_enabled) {
+            if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
                 $existing_label = $fields['billing']['billing_email']['label'];
-                $fields['billing']['billing_email']['label'] = $existing_label . "<br><small>" . $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'guest_cart_capture_msg'] . "</small>";
+                $fields['billing']['billing_email']['label'] = $existing_label . "<br><small>" . $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] . "</small>";
             }
         }
         return $fields;
@@ -857,10 +864,11 @@ class AbandonedCart
      */
     function userGdprMessage()
     {
-        if (is_user_logged_in()) {
-            $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
-            if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'logged_cart_capture_msg']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'logged_cart_capture_msg'])) {
-                echo "<p><small>" . __($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'logged_cart_capture_msg'], RNOC_TEXT_DOMAIN) . "</small></p>";
+        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
+        if (is_user_logged_in() && $is_tracking_enabled) {
+            if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
+                echo "<p><small>" . __($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'], RNOC_TEXT_DOMAIN) . "</small></p>";
             }
         }
     }

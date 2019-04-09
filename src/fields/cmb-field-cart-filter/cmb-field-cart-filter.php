@@ -68,8 +68,16 @@ class CMB2_Field_Date_Range_Picker
                    class="button button-red"><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></a>
                 <a href="<?php echo $url . '&cart_type=recovered' ?>"
                    class="button button-green"><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></a>
-                <a href="<?php echo $url . '&cart_type=progress' ?>"
-                   class="button"><?php echo __('In-Progress Carts', RNOC_TEXT_DOMAIN); ?></a>
+                <?php
+                $abandoned_cart_settings = $abandoned_cart->admin->getAbandonedCartSettings();
+                $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
+                if ($is_tracking_enabled) {
+                    ?>
+                    <a href="<?php echo $url . '&cart_type=progress' ?>"
+                       class="button"><?php echo __('In-Progress Carts', RNOC_TEXT_DOMAIN); ?></a>
+                    <?php
+                }
+                ?>
                 </span>
                 <?php
             }
