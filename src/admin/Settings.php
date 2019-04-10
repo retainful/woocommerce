@@ -27,7 +27,7 @@ class Settings
             //General settings tab
             $general_settings = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful',
-                'title' => __('Retainful Next Order Coupon', RNOC_TEXT_DOMAIN),
+                'title' => __('Retainful - Abandoned Carts', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
                 'option_key' => $this->slug,
                 'tab_group' => $this->slug,

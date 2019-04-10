@@ -16,19 +16,19 @@ More than 69% of shoppers abandon their cart and leave your site without purchas
 The fact that you are losing 7 out of 10 potential customers is quite serious. Shopping cart abandonment is an acute problem faced by almost all eCommerce stores in the World.
 But research shows that at least 40 to 50% of these abandoned carts are recoverable.
 
-The best abandoned cart recovery solution is - Email Remainders. It is a proven fact that Cart recovery emails can recover at least 30% of the lost carts.
+The best abandoned cart recovery solution is - Email Remainders. It is a proven fact that abandoned cart recovery emails can recover at least 30% of the lost carts.
 
-Retainful helps you automate your abandoned cart recovery emails. You can schedule a series of timed email reminders that can be sent to the customers to recover the abandoned carts.
+Retainful helps automate your abandoned cart emails. You can schedule a series of timed email reminders that can be sent to the customers to recover your WooCommerce abandoned carts.
 
 **Here is an example**
 
 * Send the first email remainder 30 minutes after the customer abandoned the cart
 * Trigger another email reminder after 6 hours of abandonment automatically.
 * Remind the customer again a day after. This time, include a coupon code in the email.
-* Not recovered in 3 days? Send another remainder 3 days after
+* Not recovered in 3 days? Send another abandoned cart reminder 3 days after
 
-All these reminders can be scheduled and automatically sent. No need to manually send these emails.
-Retainful can automatically send these emails in the background.
+All these abandoned cart email reminders can be scheduled and automatically sent. No need to manually send these emails.
+Retainful can automatically send these abandoned cart reminders in the background.
 
 
 == What more Retainful can do for your WooCommerce Store? ==
@@ -48,15 +48,15 @@ promotional emails gets into the Promotions tab or in Junk. So Retainful helps y
 
 === Abandoned Cart Recovery Features ===
 
-* **Automatically send email remainders** when customers abandoned their cart
-* Customers can **recover their carts** with a single click. A unique recovery link is sent in the email.
-* Schedule a sequence of emails (at timed intervals) till recovering the cart.
-* **Unlimited abandoned cart recovery email templates** and email remainders.
+* **Automatically send abandoned cart emails** when customers abandon their cart
+* Customers can **recover their carts** with a single click. A unique recovery link is sent in the abandoned cart email.
+* Schedule a sequence of emails (at timed intervals) till customer recovers the cart.
+* **Unlimited abandoned cart recovery email templates** and email reminders.
 * Capture all abandoned carts including the guest carts.
-* Include the cart items and summary in the emails
+* Include the cart items and summary in the emails- Customers can see abandoned cart products in the email
 * Short codes for including customer's first name, last name. So you can make the cart recovery email more personalised.
 * Plugin **automatically stops sending the emails once the cart is recovered**
-* Extensive reporting - See abandoned, recovered, in-progress carts.
+* Extensive reporting - See abandoned carts, recovered, in-progress carts.
 * See **real-time carts**, i.e, carts of the customers who are purchasing in your site at the very moment
 * Compare **Abandoned Order value* and the *Recovered order** values
 * Notify store administrators when a cart is recovered (So you can thank your customer for coming back)
@@ -64,6 +64,8 @@ promotional emails gets into the Promotions tab or in Junk. So Retainful helps y
 NOTE: We are working very hard to improve the features and bring in more tools that help you recover carts smartly. If you have any features in your mind, please suggest us.
 
 === Next Order Coupon features ===
+
+****
 
 **Supercharge your transactional emails**
 
@@ -93,7 +95,7 @@ Whether you are using the default transactional emails of WooCommerce or use an 
 
 **Insights and Analytics**
 
-The Retainful Dashboard shows you the conversions in real-time and know how much money you made through repeat purchases using Retainful coupons. See how many have opened the transactional emails and more.
+The Retainful Dashboard shows you the conversions in real-time and know how much money you made through repeat purchases using Retainful coupons. See who have opened the cart recovery emails and the total revenue recovered from lost your carts.
 
 ==Support==
 
@@ -102,7 +104,7 @@ We'd love to hear from you!
 
 == Did not find a feature? ==
 
-We are working hard to bring in more features for cart recovery and customer retention. So please feel free to reach out if you have any feature requests.
+We are working hard to bring in more features to recover abandoned carts and customer retention. So please feel free to reach out if you have any feature requests.
 
 ==More about Retainful==
 
