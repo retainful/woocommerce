@@ -1,6 +1,7 @@
 <?php
 
 namespace Rnoc\Retainful;
+
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Settings;
@@ -9,15 +10,6 @@ class Main
 {
     public static $init;
     public $rnoc, $admin, $abandoned_cart;
-
-    /**
-     * Initiate the plugin
-     * @return Main
-     */
-    public static function instance()
-    {
-        return self::$init = (self::$init == NULL) ? new self() : self::$init;
-    }
 
     /**
      * Main constructor.
@@ -51,16 +43,13 @@ class Main
         add_action('woocommerce_order_status_completed', array($this->rnoc, 'onAfterPayment'), 10, 1);
         add_action('woocommerce_order_status_processing', array($this->rnoc, 'onAfterPayment'), 10, 1);
         add_action('woocommerce_order_status_on-hold', array($this->rnoc, 'onAfterPayment'), 10, 1);
-
         add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
         add_action('wp_head', array($this->rnoc, 'setCouponToSession'));
         add_action('woocommerce_cart_loaded_from_session', array($this->rnoc, 'addCouponToCheckout'), 10);
-
         //Attach coupon to email
         $hook = $this->admin->couponMessageHook();
         if (!empty($hook))
             add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
-
         //Validate key
         add_action('wp_ajax_validate_app_key', array($this->rnoc, 'validateAppKey'));
         //Settings link
@@ -71,7 +60,6 @@ class Main
         add_action('woocommerce_thankyou', array($this->rnoc, 'removeCouponFromSession'), 10, 1);
         //Remove Code from session
         add_action('woocommerce_removed_coupon', array($this->rnoc, 'removeCouponFromCart'));
-
         /*
          * Support for woocommerce email customizer
          */
@@ -83,7 +71,6 @@ class Main
         //sent retainful additional short codes
         add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array($this->rnoc, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
         add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
-
         /*
          * Retainful abandoned cart
          */
@@ -102,13 +89,11 @@ class Main
         add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'guestGdprMessage'), 10, 1);
         add_action('woocommerce_after_add_to_cart_button', array($this->abandoned_cart, 'userGdprMessage'), 10);
         add_action('woocommerce_before_shop_loop', array($this->abandoned_cart, 'userGdprMessage'), 10);
-
         //Add custom cron schedule events
         add_action('plugins_loaded', array($this, 'actionSchedulerHooks'));
         add_action('rnoc_abandoned_clear_abandoned_carts', array($this->abandoned_cart, 'clearAbandonedCarts'));
         add_action('rnoc_abandoned_cart_send_email', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
         //add_action('woocommerce_init', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
-
         //Process abandoned cart after user place order
         add_action('woocommerce_order_status_pending_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
         add_action('woocommerce_order_status_pending_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
@@ -119,11 +104,129 @@ class Main
         add_filter('wp_ajax_get_ajax_details_for_dashboard', array($this->abandoned_cart, 'getAjaxDetailsForDashboard'));
         add_action('wp_ajax_view_abandoned_cart', array($this->abandoned_cart, 'viewAbandonedCart'));
         add_action('wp_ajax_remove_abandoned_cart', array($this->abandoned_cart, 'removeAbandonedCart'));
-
+        add_action('wp_ajax_rnoc_save_email_template', array($this->abandoned_cart, 'saveEmailTemplate'));
+        add_action('wp_ajax_rnoc_activate_or_deactivate_template', array($this->abandoned_cart, 'changeTemplateStatus'));
+        add_action('wp_ajax_rnoc_remove_template', array($this->abandoned_cart, 'removeTemplate'));
+        add_action('wp_ajax_rnoc_edit_template', array($this->abandoned_cart, 'editTemplate'));
+        add_action('wp_ajax_rnoc_send_sample_email', array($this->abandoned_cart, 'sendSampleEmail'));
         $is_abandoned_tables_created = get_option('retainful_abandoned_cart_table_created', 0);
-        if (is_admin() && !$is_abandoned_tables_created) {
+        $is_abandoned_emails_tables_created = get_option('retainful_abandoned_emails_table_created', 0);
+        if (!$is_abandoned_tables_created || !$is_abandoned_emails_tables_created) {
             $this->createRequiredTables();
         }
+    }
+
+    /**
+     * Create required tabled needed for retainful abandoned cart
+     */
+    function createRequiredTables()
+    {
+        global $wpdb;
+        $rnoc_collate = '';
+        if ($wpdb->has_cap('collation')) {
+            $rnoc_collate = $wpdb->get_charset_collate();
+        }
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        //Create history table if table is not already exists
+        $history_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history';
+        $history_query = "CREATE TABLE IF NOT EXISTS $history_table_name (
+                            id int AUTO_INCREMENT, 
+                            customer_key char(32) NOT NULL, 
+                            cart_contents longtext NOT NULL, 
+                            cart_expiry bigint(20) NOT NULL, 
+                            cart_is_recovered tinyint(1) NOT NULL, 
+                            ip_address char(32), 
+                            item_count int NOT NULL, 
+                            order_id int,
+                            viewed_checkout tinyint(1) NOT NULL DEFAULT 0,
+                            show_on_funnel_report tinyint(1) NOT NULL DEFAULT 0,
+                            cart_total decimal(15,2),
+                            PRIMARY KEY (`id`)
+                            ) $rnoc_collate";
+        dbDelta($history_query);
+        //Create history table for guest if table is not already exists
+        $guest_history_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . "guest_abandoned_cart_history";
+        $guest_history_query = "CREATE TABLE IF NOT EXISTS $guest_history_table_name (
+                `id` int(15) NOT NULL AUTO_INCREMENT,
+                `session_id` varchar(50),
+                `billing_first_name` text,
+                `billing_last_name` text,
+                `billing_company_name` text,
+                `billing_address_1` text,
+                `billing_address_2` text,
+                `billing_city` text,
+                `billing_county` text,
+                `billing_zipcode` text,
+                `email_id` text,
+                `phone` text,
+                `ship_to_billing` text,
+                `order_notes` text,
+                `shipping_first_name` text,
+                `shipping_last_name` text,
+                `shipping_company_name` text,
+                `shipping_address_1` text,
+                `shipping_address_2` text,
+                `shipping_city` text,
+                `shipping_county` text,
+                `shipping_zipcode` double,
+                `shipping_charges` double,
+                PRIMARY KEY (`id`)
+                ) $rnoc_collate AUTO_INCREMENT=63000000";
+        dbDelta($guest_history_query);
+        $sent_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . "email_sent_history";
+        $email_sent_query = "CREATE TABLE IF NOT EXISTS $sent_table_name (
+                        `id` int(11) NOT NULL auto_increment,
+                        `template_id` varchar(40) collate utf8_unicode_ci NOT NULL,
+                        `abandoned_order_id` int(11) NOT NULL,
+                        `sent_time` datetime NOT NULL,
+                        `sent_email_id` text COLLATE utf8_unicode_ci NOT NULL,
+                        PRIMARY KEY  (`id`)
+                        ) $rnoc_collate AUTO_INCREMENT=1 ";
+        dbDelta($email_sent_query);
+        $email_templates_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . "email_templates";
+        $email_templates_query = "CREATE TABLE $email_templates_table_name (
+                                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                                  `subject` text NOT NULL,
+                                  `body` mediumtext NOT NULL,
+                                  `is_active` enum('0','1') NOT NULL,
+                                  `template_name` text NOT NULL,
+                                  `frequency` int(11) NOT NULL,
+                                  `default_template` enum('0','1') NOT NULL,
+                                  `day_or_hour` enum('Days','Hours') NOT NULL,
+                                  PRIMARY KEY  (`id`)
+                                ) $rnoc_collate AUTO_INCREMENT=1";
+        dbDelta($email_templates_query);
+        $this->insertDefaultEmailTemplate($email_templates_table_name);
+        update_option('retainful_abandoned_emails_table_created', '1');
+        update_option('retainful_abandoned_cart_table_created', '1');
+    }
+
+    /**
+     * Insert default email template
+     * @param $table
+     */
+    function insertDefaultEmailTemplate($table)
+    {
+        ob_start();
+        include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-1.html');
+        $content = ob_get_clean();
+        $email_body = addslashes($content);
+        global $wpdb;
+        $default_template = $wpdb->get_row('SELECT id FROM ' . $table . ' WHERE default_template = "1"');
+        if (empty($default_template)) {
+            $template_subject = "Hey {{customer_name}}!! You left something in your cart";
+            $query = 'INSERT INTO `' . $table . '` ( subject, body, is_active, frequency, day_or_hour, default_template,template_name )VALUES ( "' . $template_subject . '","' . $email_body . '","1","1","Hours","1","initial")';
+            $wpdb->query($query);
+        }
+    }
+
+    /**
+     * Initiate the plugin
+     * @return Main
+     */
+    public static function instance()
+    {
+        return self::$init = (self::$init == NULL) ? new self() : self::$init;
     }
 
     /**
@@ -170,79 +273,8 @@ class Main
         $this->createRequiredTables();
     }
 
-    /**
-     * Create required tabled needed for retainful abandoned cart
-     */
-    function createRequiredTables()
-    {
-        global $wpdb;
-        $rnoc_collate = '';
-        if ($wpdb->has_cap('collation')) {
-            $rnoc_collate = $wpdb->get_charset_collate();
-        }
-        //Create history table if table is not already exists
-        $history_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history';
-        $history_query = "CREATE TABLE IF NOT EXISTS $history_table_name (
-                            id int AUTO_INCREMENT, 
-                            customer_key char(32) NOT NULL, 
-                            cart_contents longtext NOT NULL, 
-                            cart_expiry bigint(20) NOT NULL, 
-                            cart_is_recovered tinyint(1) NOT NULL, 
-                            ip_address char(32), 
-                            item_count int NOT NULL, 
-                            order_id int,
-                            viewed_checkout tinyint(1) NOT NULL DEFAULT 0,
-                            show_on_funnel_report tinyint(1) NOT NULL DEFAULT 0,
-                            cart_total decimal(15,2),
-                            PRIMARY KEY (`id`)
-                            ) $rnoc_collate";
-        $wpdb->query($history_query);
-        //Create history table for guest if table is not already exists
-        $guest_history_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . "guest_abandoned_cart_history";
-        $guest_history_query = "CREATE TABLE IF NOT EXISTS $guest_history_table_name (
-                `id` int(15) NOT NULL AUTO_INCREMENT,
-                `session_id` varchar(50),
-                `billing_first_name` text,
-                `billing_last_name` text,
-                `billing_company_name` text,
-                `billing_address_1` text,
-                `billing_address_2` text,
-                `billing_city` text,
-                `billing_county` text,
-                `billing_zipcode` text,
-                `email_id` text,
-                `phone` text,
-                `ship_to_billing` text,
-                `order_notes` text,
-                `shipping_first_name` text,
-                `shipping_last_name` text,
-                `shipping_company_name` text,
-                `shipping_address_1` text,
-                `shipping_address_2` text,
-                `shipping_city` text,
-                `shipping_county` text,
-                `shipping_zipcode` double,
-                `shipping_charges` double,
-                PRIMARY KEY (`id`)
-                ) $rnoc_collate AUTO_INCREMENT=63000000";
-        $wpdb->query($guest_history_query);
-
-        $sent_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . "email_sent_history";
-        $email_sent_query = "CREATE TABLE IF NOT EXISTS $sent_table_name (
-                        `id` int(11) NOT NULL auto_increment,
-                        `template_id` varchar(40) collate utf8_unicode_ci NOT NULL,
-                        `abandoned_order_id` int(11) NOT NULL,
-                        `sent_time` datetime NOT NULL,
-                        `sent_email_id` text COLLATE utf8_unicode_ci NOT NULL,
-                        PRIMARY KEY  (`id`)
-                        ) $rnoc_collate AUTO_INCREMENT=1 ";
-        $wpdb->query($email_sent_query);
-        update_option('retainful_abandoned_cart_table_created', '1');
-    }
-
     function removeDependentTables()
     {
-
     }
 
     /**

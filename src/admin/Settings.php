@@ -1,6 +1,7 @@
 <?php
 
 namespace Rnoc\Retainful\Admin;
+
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\library\RetainfulApi;
@@ -95,7 +96,6 @@ class Settings
                 ),
                 'default' => 'woocommerce_email_customer_details'
             ));
-
             $coupon_msg_desc = __('This message will attached to the Order Email.<br>Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_amount}}</b> - Coupon amount<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN);
             $pro_feature_coupon_msg_desc = __('<br><b>{{coupon_expiry_date}}</b> - Coupon expiry date(If coupon does not have any expiry days,then this will not attach to the message).<br>', RNOC_TEXT_DOMAIN);
             if ($is_app_connected) {
@@ -160,7 +160,6 @@ class Settings
                         'id' => 'app_coupon_expire_days'
                     )
                 ));
-
                 $usage_restrictions->add_field(array(
                     'name' => __('Coupon expire date format ', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'expire_date_format',
@@ -295,50 +294,12 @@ class Settings
                 'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
                 'default' => $admin_email
             ));
-            $template_path = plugin_dir_url(__FILE__);
-            $email_template = wp_remote_fopen($template_path . 'templates/default-1.html');
-            $group_field_id = $abandoned_cart_email_templates->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'templates',
-                'type' => 'group',
-                'description' => __('Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.', RNOC_TEXT_DOMAIN),
-                'options' => array(
-                    'group_title' => __('Email Template {#}', RNOC_TEXT_DOMAIN),
-                    'add_button' => __('Add Another Template', RNOC_TEXT_DOMAIN),
-                    'remove_button' => __('Remove Template', RNOC_TEXT_DOMAIN),
-                    'sortable' => false,
-                    'closed' => true
-                ),
-            ));
-            $abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                'name' => __('Email Subject', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'template_subject',
-                'type' => 'text',
-                'default' => 'Hey {{customer_name}}!! You left something in your cart'
-            ));
-            $abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                'name' => __('Email Body', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'template_body',
-                'type' => 'wysiwyg',
-                'default' => $email_template,
-                'desc' => __('You can use following short codes in your email template:<br> <b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - Site link<br> <b>{{cart_recovery_link}}</b> - Link to recover user cart<br><b>{{user_cart}}</b> - Cart details', RNOC_TEXT_DOMAIN)
-            ));
-            $abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                'name' => __('Send this email in', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'template_sent_after',
-                'type' => 'email_after',
-                'default' => '1',
-                'desc' => __(' after cart is abandoned.', RNOC_TEXT_DOMAIN),
-                'attributes' => array('class' => 'number_only_field')
-            ));
-            $abandoned_cart_email_templates->add_group_field($group_field_id, array(
-                'name' => __('Active?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'template_active',
-                'type' => 'select',
-                'options' => array(
-                    1 => __('Yes', RNOC_TEXT_DOMAIN),
-                    0 => __('No', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 1
+            $abandoned_cart_email_templates->add_field(array(
+                'name' => '',
+                'id' => RNOC_PLUGIN_PREFIX . 'email_templates_list',
+                'type' => 'email_templates',
+                'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
+                'default' => $admin_email
             ));
             //Reporting
             $abandoned_cart_dashboard = new_cmb2_box(array(
@@ -448,7 +409,7 @@ class Settings
      * Get the abandoned cart settings
      * @return array|mixed
      */
-    function getEmailTemplates()
+    function getEmailTemplatesSettings()
     {
         $abandoned_cart_email_templates = get_option($this->slug . '_abandoned_cart_email_templates', array());
         if (empty($abandoned_cart_email_templates))
@@ -585,7 +546,6 @@ class Settings
         return false;
     }
 
-
     /**
      * Get Admin API key
      * @return String|null
@@ -690,7 +650,6 @@ class Settings
         fwrite($f, "\n\n Message: \n" . $message);
         fwrite($f, "Data " . json_encode($response));
         fclose($f);
-
     }
 
     /**

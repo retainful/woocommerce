@@ -7,8 +7,8 @@ use Rnoc\Retainful\Admin\Settings;
 
 class AbandonedCart
 {
-    public $wc_functions, $admin, $cart_history_table, $email_history_table, $guest_cart_history_table, $total_order_amount, $total_abandoned_cart_count, $total_recover_amount, $recovered_item;
     protected static $applied_coupons = NULL;
+    public $wc_functions, $admin, $cart_history_table, $email_history_table, $email_templates_table, $guest_cart_history_table, $total_order_amount, $total_abandoned_cart_count, $total_recover_amount, $recovered_item;
     public $start_end_dates = array(), $start_end_dates_label = array();
 
     function __construct()
@@ -38,6 +38,7 @@ class AbandonedCart
         $this->cart_history_table = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history';
         $this->guest_cart_history_table = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'guest_abandoned_cart_history';
         $this->email_history_table = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_sent_history';
+        $this->email_templates_table = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates';
     }
 
     /**
@@ -92,6 +93,31 @@ class AbandonedCart
                 }
             }
         }
+    }
+
+    /**
+     * get session user key
+     * @return array|string|null
+     */
+    function getUserSessionKey()
+    {
+        $session_key = $this->wc_functions->getSession(RNOC_PLUGIN_PREFIX . 'user_session_key');
+        if (empty($session_key)) {
+            $session_key = $this->generateToken();
+            $this->wc_functions->setSession(RNOC_PLUGIN_PREFIX . 'user_session_key', $session_key);
+        }
+        return $session_key;
+    }
+
+    /**
+     * Generate unique random Key
+     * @return string
+     */
+    function generateToken()
+    {
+        $rand = rand(10, 100000);
+        $id = uniqid();
+        return md5($id . $rand);
     }
 
     /**
@@ -170,31 +196,6 @@ class AbandonedCart
     }
 
     /**
-     * get session user key
-     * @return array|string|null
-     */
-    function getUserSessionKey()
-    {
-        $session_key = $this->wc_functions->getSession(RNOC_PLUGIN_PREFIX . 'user_session_key');
-        if (empty($session_key)) {
-            $session_key = $this->generateToken();
-            $this->wc_functions->setSession(RNOC_PLUGIN_PREFIX . 'user_session_key', $session_key);
-        }
-        return $session_key;
-    }
-
-    /**
-     * Generate unique random Key
-     * @return string
-     */
-    function generateToken()
-    {
-        $rand = rand(10, 100000);
-        $id = uniqid();
-        return md5($id . $rand);
-    }
-
-    /**
      * User logged in the store
      * @param $user_name
      */
@@ -242,21 +243,33 @@ class AbandonedCart
     }
 
     /**
+     * get active emails
+     * @return array|object|null
+     */
+    function getActiveEmailTemplates()
+    {
+        global $wpdb;
+        $email_template_query = "SELECT * FROM `" . $this->email_templates_table . "` WHERE  is_active < %s ";
+        return $wpdb->get_results($wpdb->prepare($email_template_query, 1));
+    }
+
+    /**
      * Automatically send customer recovery email
      * This function will call in every 5 minutes
      */
     function sendAbandonedCartEmails()
     {
-        $email_templates = $this->admin->getEmailTemplates();
-        if (isset($email_templates[RNOC_PLUGIN_PREFIX . 'templates']) && !empty($email_templates[RNOC_PLUGIN_PREFIX . 'templates'])) {
+        $email_templates = $this->getActiveEmailTemplates();
+        $email_templates_settings = $this->admin->getEmailTemplatesSettings();
+        if (!empty($email_templates)) {
             $hour_seconds = 3600;//60*60
             $day_seconds = 86400;//60*60*24
-            foreach ($email_templates[RNOC_PLUGIN_PREFIX . 'templates'] as $template_id => $template) {
-                if (isset($template[RNOC_PLUGIN_PREFIX . 'template_sent_after']['value']) && !empty($template[RNOC_PLUGIN_PREFIX . 'template_sent_after']['value']) && isset($template[RNOC_PLUGIN_PREFIX . 'template_active']) && $template[RNOC_PLUGIN_PREFIX . 'template_active'] && isset($template[RNOC_PLUGIN_PREFIX . 'template_body']) && !empty($template[RNOC_PLUGIN_PREFIX . 'template_body'])) {
+            foreach ($email_templates as $template) {
+                if ($template->frequency && !empty($template->body)) {
                     global $wpdb;
-                    $time = ($template[RNOC_PLUGIN_PREFIX . 'template_sent_after']['send_in'] == "day") ? $day_seconds : $hour_seconds;
+                    $time = ($template->day_or_hour == "Days") ? $day_seconds : $hour_seconds;
                     $current_time = current_time('timestamp');
-                    $time_to_send_template_after = $template[RNOC_PLUGIN_PREFIX . 'template_sent_after']['value'] * $time;
+                    $time_to_send_template_after = $template->frequency * $time;
                     $cart_time = $current_time - $time_to_send_template_after;
                     $to_remain_query = "SELECT * FROM `" . $this->cart_history_table . "` WHERE  cart_expiry < %d AND cart_is_recovered = %d AND order_id IS NULL";
                     $to_remain_histories = $wpdb->get_results($wpdb->prepare($to_remain_query, $cart_time, 0));
@@ -268,7 +281,7 @@ class AbandonedCart
                                     $history_id = $history->id;
                                     //Check each email template is sent or not
                                     $email_sent_history_query = "SELECT * FROM `" . $this->email_history_table . "` WHERE  template_id = %s AND abandoned_order_id = %d";
-                                    $email_sent_history = $wpdb->get_results($wpdb->prepare($email_sent_history_query, $template_id, $history_id));
+                                    $email_sent_history = $wpdb->get_results($wpdb->prepare($email_sent_history_query, $template->id, $history_id));
                                     if (empty($email_sent_history)) {
                                         $user_email = $user_first_name = $user_last_name = '';
                                         $customer_key = $history->customer_key;
@@ -296,20 +309,19 @@ class AbandonedCart
                                                 }
                                             }
                                         }
-
                                         //Process only if user email found
                                         if (!empty($user_email)) {
                                             $customer_name = $user_first_name . ' ' . $user_last_name;
-                                            $email_subject = $template[RNOC_PLUGIN_PREFIX . 'template_subject'];
+                                            $email_subject = $template->subject;
                                             if (empty($email_subject)) {
                                                 $email_subject = 'Hey {{customer_name}} You left something in your cart';
                                             }
                                             $email_subject = str_replace('{{customer_name}}', $customer_name, $email_subject);
-                                            $email_body = $template[RNOC_PLUGIN_PREFIX . 'template_body'];
+                                            $email_body = stripslashes($template->body);
                                             $cart_html = $this->getCartTable($cart_details);
                                             //Log about emil sent
                                             $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id ) VALUES ( %s, %s, '" . current_time('mysql') . "', %s )";
-                                            $wpdb->query($wpdb->prepare($email_sent_query, $template_id, $history_id, $user_email));
+                                            $wpdb->query($wpdb->prepare($email_sent_query, $template->id, $history_id, $user_email));
                                             $site_url = site_url();
                                             $cart_page_link = $this->wc_functions->getCartUrl();
                                             $need_to_encode = array(
@@ -326,15 +338,15 @@ class AbandonedCart
                                                 'site_url' => $site_url,
                                                 'cart_recovery_link' => $cart_recovery_link,
                                                 'user_cart' => $cart_html,
-                                                'site_footer' => '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . ' All rights reserved.'
+                                                'site_footer' => '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . __(' All rights reserved.', RNOC_TEXT_DOMAIN)
                                             );
                                             foreach ($replace as $short_code => $short_code_value) {
                                                 $email_body = str_replace('{{' . $short_code . '}}', $short_code_value, $email_body);
                                             }
-                                            $from_name = (isset($email_templates[RNOC_PLUGIN_PREFIX . 'email_from_name'])) ? $email_templates[RNOC_PLUGIN_PREFIX . 'email_from_name'] : 'Admin';
+                                            $from_name = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'] : 'Admin';
                                             $admin_email = get_option('admin_email');
-                                            $from_address = (isset($email_templates[RNOC_PLUGIN_PREFIX . 'email_from_address'])) ? $email_templates[RNOC_PLUGIN_PREFIX . 'email_from_address'] : $admin_email;
-                                            $replay_address = (isset($email_templates[RNOC_PLUGIN_PREFIX . 'email_reply_address'])) ? $email_templates[RNOC_PLUGIN_PREFIX . 'email_reply_address'] : $admin_email;
+                                            $from_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'] : $admin_email;
+                                            $replay_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'] : $admin_email;
                                             //Prepare for sending emails
                                             $headers = "From: " . $from_name . " <" . $from_address . ">" . "\r\n";
                                             $headers .= "Content-Type: text/html" . "\r\n";
@@ -348,55 +360,6 @@ class AbandonedCart
                         }
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Clear the cart after X Days
-     */
-    function clearAbandonedCarts()
-    {
-        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
-        if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'])) {
-            global $wpdb;
-            $delete_ac_after_days_time = $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'] * 86400;
-            $current_time = current_time('timestamp');
-            $check_time = $current_time - $delete_ac_after_days_time;
-            $query = "SELECT id FROM `" . $this->cart_history_table . "" . "` WHERE cart_is_recovered = 0 AND cart_expiry < %s";
-            $carts = $wpdb->get_results($wpdb->prepare($query, $check_time));
-            if (!empty($carts)) {
-                foreach ($carts as $cart) {
-                    $wpdb->delete($this->cart_history_table, array('id' => $cart->id));
-                }
-            }
-        }
-        //Remove all hooks
-        $this->removeFinishedHooks();
-    }
-
-    /**
-     * Remove all hooks and schedule once
-     * @return bool
-     */
-    function removeFinishedHooks()
-    {
-        global $wpdb;
-        $wpdb->query("delete from `" . $wpdb->prefix . "posts` where post_title like '%rnoc_abandoned_cart_send_email%' OR post_title like '%rnoc_abandoned_clear_abandoned_carts%' AND post_status like '%publish%'");
-        return true;
-    }
-
-    /**
-     * delete abandoned cart from admin panel
-     */
-    function removeAbandonedCart()
-    {
-        if (isset($_REQUEST['cart_id']) && !empty($_REQUEST['cart_id'])) {
-            global $wpdb;
-            $row = $wpdb->get_row("SELECT id FROM `" . $this->cart_history_table . "` WHERE id = " . $_REQUEST['cart_id'], OBJECT);
-            if (!empty($row)) {
-                $wpdb->delete($this->cart_history_table, array('id' => $_REQUEST['cart_id']));
-                wp_send_json(array('success' => true));
             }
         }
     }
@@ -494,15 +457,52 @@ class AbandonedCart
     }
 
     /**
-     * Decrypt the key
-     * @param $key
-     * @return string
+     * Clear the cart after X Days
      */
-    function decryptValidate($key)
+    function clearAbandonedCarts()
     {
-        $key = urldecode($key);
-        $key = str_rot13($key);
-        return urldecode(base64_decode($key));
+        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'])) {
+            global $wpdb;
+            $delete_ac_after_days_time = $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'] * 86400;
+            $current_time = current_time('timestamp');
+            $check_time = $current_time - $delete_ac_after_days_time;
+            $query = "SELECT id FROM `" . $this->cart_history_table . "" . "` WHERE cart_is_recovered = 0 AND cart_expiry < %s";
+            $carts = $wpdb->get_results($wpdb->prepare($query, $check_time));
+            if (!empty($carts)) {
+                foreach ($carts as $cart) {
+                    $wpdb->delete($this->cart_history_table, array('id' => $cart->id));
+                }
+            }
+        }
+        //Remove all hooks
+        $this->removeFinishedHooks();
+    }
+
+    /**
+     * Remove all hooks and schedule once
+     * @return bool
+     */
+    function removeFinishedHooks()
+    {
+        global $wpdb;
+        $wpdb->query("delete from `" . $wpdb->prefix . "posts` where post_title like '%rnoc_abandoned_cart_send_email%' OR post_title like '%rnoc_abandoned_clear_abandoned_carts%' AND post_status like '%publish%'");
+        return true;
+    }
+
+    /**
+     * delete abandoned cart from admin panel
+     */
+    function removeAbandonedCart()
+    {
+        if (isset($_REQUEST['cart_id']) && !empty($_REQUEST['cart_id'])) {
+            global $wpdb;
+            $row = $wpdb->get_row("SELECT id FROM `" . $this->cart_history_table . "` WHERE id = " . $_REQUEST['cart_id'], OBJECT);
+            if (!empty($row)) {
+                $wpdb->delete($this->cart_history_table, array('id' => $_REQUEST['cart_id']));
+                wp_send_json(array('success' => true));
+            }
+        }
     }
 
     /**
@@ -555,6 +555,18 @@ class AbandonedCart
             }
         }
         return $template;
+    }
+
+    /**
+     * Decrypt the key
+     * @param $key
+     * @return string
+     */
+    function decryptValidate($key)
+    {
+        $key = urldecode($key);
+        $key = str_rot13($key);
+        return urldecode(base64_decode($key));
     }
 
     /**
@@ -685,6 +697,64 @@ class AbandonedCart
     }
 
     /**
+     * get abandoned cart dashboard for ajax request
+     */
+    function getAjaxDetailsForDashboard()
+    {
+        if (isset($_REQUEST['start']) && isset($_REQUEST['end'])) {
+            $start_date = $_REQUEST['start'];
+            $end_date = $_REQUEST['end'];
+        } else {
+            $start_date = $this->start_end_dates['last_seven']['start_date'];
+            $end_date = $this->start_end_dates['last_seven']['end_date'];
+        }
+        $response = $this->getStaticsForDashboard($start_date, $end_date);
+        wp_send_json($response);
+    }
+
+    /**
+     * get the abandoned cart details
+     * @param $start_date
+     * @param $end_date
+     * @return array
+     */
+    function getStaticsForDashboard($start_date, $end_date)
+    {
+        $cart_histories = $this->getAbandonedCartsOfDate($start_date, $end_date);
+        $recovered_carts = $recovered_total = $abandoned_cart = $abandoned_total = 0;
+        if (!empty($cart_histories)) {
+            $current_time = current_time('timestamp');
+            foreach ($cart_histories as $key => $value) {
+                $product_details = json_decode($value->cart_contents);
+                $line_total = 0;
+                if (false != $product_details && is_object($product_details) && count(get_object_vars($product_details)) > 0) {
+                    foreach ($product_details as $k => $v) {
+                        if ($v->line_subtotal_tax != 0 && $v->line_subtotal_tax > 0) {
+                            $line_total = $line_total + $v->line_total + $v->line_subtotal_tax;
+                        } else {
+                            $line_total = $line_total + $v->line_total;
+                        }
+                    }
+                }
+                if ($value->cart_is_recovered == 1) {
+                    $recovered_carts += 1;
+                    $recovered_total += $line_total;
+                } else if ($value->cart_expiry > $current_time) {
+                } else {
+                    $abandoned_cart += 1;
+                    $abandoned_total += $line_total;
+                }
+            }
+        }
+        return array(
+            'recovered_carts' => $recovered_carts,
+            'recovered_total' => $this->wc_functions->formatPrice($recovered_total),
+            'abandoned_carts' => $abandoned_cart,
+            'abandoned_total' => $this->wc_functions->formatPrice($abandoned_total)
+        );
+    }
+
+    /**
      * Get the abandoned cart of particular timestamp
      * @param $start_date
      * @param $end_date
@@ -749,61 +819,13 @@ class AbandonedCart
     }
 
     /**
-     * get abandoned cart dashboard for ajax request
+     * get all email templates
+     * @return array|object|null
      */
-    function getAjaxDetailsForDashboard()
+    function getEmailTemplates()
     {
-        if (isset($_REQUEST['start']) && isset($_REQUEST['end'])) {
-            $start_date = $_REQUEST['start'];
-            $end_date = $_REQUEST['end'];
-        } else {
-            $start_date = $this->start_end_dates['last_seven']['start_date'];
-            $end_date = $this->start_end_dates['last_seven']['end_date'];
-        }
-        $response = $this->getStaticsForDashboard($start_date, $end_date);
-        wp_send_json($response);
-    }
-
-    /**
-     * get the abandoned cart details
-     * @param $start_date
-     * @param $end_date
-     * @return array
-     */
-    function getStaticsForDashboard($start_date, $end_date)
-    {
-        $cart_histories = $this->getAbandonedCartsOfDate($start_date, $end_date);
-        $recovered_carts = $recovered_total = $abandoned_cart = $abandoned_total = 0;
-        if (!empty($cart_histories)) {
-            $current_time = current_time('timestamp');
-            foreach ($cart_histories as $key => $value) {
-                $product_details = json_decode($value->cart_contents);
-                $line_total = 0;
-                if (false != $product_details && is_object($product_details) && count(get_object_vars($product_details)) > 0) {
-                    foreach ($product_details as $k => $v) {
-                        if ($v->line_subtotal_tax != 0 && $v->line_subtotal_tax > 0) {
-                            $line_total = $line_total + $v->line_total + $v->line_subtotal_tax;
-                        } else {
-                            $line_total = $line_total + $v->line_total;
-                        }
-                    }
-                }
-                if ($value->cart_is_recovered == 1) {
-                    $recovered_carts += 1;
-                    $recovered_total += $line_total;
-                } else if ($value->cart_expiry > $current_time) {
-                } else {
-                    $abandoned_cart += 1;
-                    $abandoned_total += $line_total;
-                }
-            }
-        }
-        return array(
-            'recovered_carts' => $recovered_carts,
-            'recovered_total' => $this->wc_functions->formatPrice($recovered_total),
-            'abandoned_carts' => $abandoned_cart,
-            'abandoned_total' => $this->wc_functions->formatPrice($abandoned_total)
-        );
+        global $wpdb;
+        return $wpdb->get_results("select template_name,id,is_active,frequency,day_or_hour,default_template from {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_templates");
     }
 
     /**
@@ -871,5 +893,191 @@ class AbandonedCart
                 echo "<p><small>" . __($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'], RNOC_TEXT_DOMAIN) . "</small></p>";
             }
         }
+    }
+
+    /**
+     * Create or update template view
+     */
+    function saveEmailTemplate()
+    {
+        $template_id = 0;
+        if (isset($_REQUEST['data']) && !empty($_REQUEST['data'])) {
+            $data = $_REQUEST['data'];
+            if (isset($data['id'])) {
+                $template = $this->getTemplate($data['id']);
+                $template_name = sanitize_text_field((isset($data['template_name'])) ? $data['template_name'] : '');
+                $subject = sanitize_text_field((isset($data['subject'])) ? $data['subject'] : '');
+                $body = stripslashes((isset($data['body'])) ? $data['body'] : '');
+                $frequency = intval((isset($data['frequency'])) ? $data['frequency'] : 1);
+                $day_or_hour = sanitize_text_field((isset($data['day_or_hour'])) ? $data['day_or_hour'] : 'Hours');
+                $is_active = intval((isset($data['active'])) ? $data['active'] : 1);
+                global $wpdb;
+                if (!empty($template)) {
+                    $template_id = $template->id;
+                    $query_update = "UPDATE `" . $this->email_templates_table . "` SET template_name=%s, subject=%s, body=%s, frequency=%s, day_or_hour=%s, is_active=%s WHERE id=%d";
+                    $wpdb->query($wpdb->prepare($query_update, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $template_id));
+                } else {
+                    $insert_query = "INSERT INTO `" . $this->email_templates_table . "`(template_name, subject, body, frequency, day_or_hour, is_active) VALUES ( %s,%s,%s,%d,%s,%s)";
+                    $wpdb->query($wpdb->prepare($insert_query, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active));
+                    $template_id = $wpdb->insert_id;
+                }
+            }
+        }
+        wp_send_json(array('id' => $template_id, 'success' => true, 'message' => __('Template saved successfully!', RNOC_TEXT_DOMAIN)));
+    }
+
+    /**
+     * Change the template status
+     */
+    function changeTemplateStatus()
+    {
+        $response = array();
+        if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
+            $template = $this->getTemplate(intval($_REQUEST['id']));
+            $is_active = (isset($_REQUEST['is_active'])) ? $_REQUEST['is_active'] : 0;
+            if (!empty($template)) {
+                global $wpdb;
+                $query_update = "UPDATE `" . $this->email_templates_table . "` SET is_active=%s WHERE id=%d";
+                $wpdb->query($wpdb->prepare($query_update, $is_active, $template->id));
+            } else {
+                $response['error'] = true;
+                $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);
+            }
+        } else {
+            $response['error'] = true;
+            $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);
+        }
+        wp_send_json($response);
+    }
+
+    /**
+     * Remove the template
+     */
+    function removeTemplate()
+    {
+        $response = array();
+        if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
+            $template = $this->getTemplate(intval($_REQUEST['id']));
+            if (!empty($template)) {
+                global $wpdb;
+                $query_update = "DELETE FROM `" . $this->email_templates_table . "` WHERE id=%d";
+                $wpdb->query($wpdb->prepare($query_update, $template->id));
+            } else {
+                $response['error'] = true;
+                $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);
+            }
+        } else {
+            $response['error'] = true;
+            $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);
+        }
+        wp_send_json($response);
+    }
+
+    /**
+     * Remove the template
+     */
+    function sendSampleEmail()
+    {
+        $response = array();
+        if (isset($_REQUEST['email_to']) && !empty($_REQUEST['email_to']) && isset($_REQUEST['body']) && !empty($_REQUEST['body'])) {
+            $template = stripslashes($_REQUEST['body']);
+            $send_to = sanitize_text_field($_REQUEST['email_to']);
+            $customer_name = 'Customer Name';
+            $admin_email = 'test@test.com';
+            if (is_user_logged_in()) {
+                $current_user = wp_get_current_user();
+                $customer_name = $current_user->user_login;
+                $admin_email = $current_user->user_email;
+            }
+            $email_subject = $_REQUEST['subject'];
+            if (empty($email_subject)) {
+                $email_subject = 'Hey {{customer_name}} You left something in your cart';
+            }
+            $email_subject = str_replace('{{customer_name}}', $customer_name, $email_subject);
+            $cart_html = '
+                <table width="100%">
+                    <thead>
+                    <tr align="center">
+                        <th style="padding-top: 20px;padding-bottom: 20px;">' . __("Item", RNOC_TEXT_DOMAIN) . '</th>
+                        <th>' . __("Name", RNOC_TEXT_DOMAIN) . '</th>
+                        <th>' . __("Quantity", RNOC_TEXT_DOMAIN) . '</th>
+                        <th>' . __("Price", RNOC_TEXT_DOMAIN) . '</th>
+                        <th>' . __("Line Subtotal", RNOC_TEXT_DOMAIN) . '</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><img src="' . RNOC_PLUGIN_URL . 'src/assets/images/sample-product.jpg" width="100px"></td>
+                        <td>' . __("Sample product", RNOC_TEXT_DOMAIN) . '</td>
+                        <td>' . __("2", RNOC_TEXT_DOMAIN) . '</td>
+                        <td>' . $this->wc_functions->formatPrice(100) . '</td>
+                        <td>' . $this->wc_functions->formatPrice(200) . '</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr align="right">
+                        <th colspan="4" style="padding-bottom: 10px;padding-top: 10px;">' . __('Cart Total', RNOC_TEXT_DOMAIN) . ':</th>
+                        <td align="center">' . $this->wc_functions->formatPrice(200) . '</td>
+                    </tr>
+                    </tfoot>
+                </table>';
+            $replace = array(
+                'customer_name' => $customer_name,
+                'site_url' => '',
+                'cart_recovery_link' => '',
+                'user_cart' => $cart_html,
+                'site_footer' => '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . __(' All rights reserved.', RNOC_TEXT_DOMAIN)
+            );
+            foreach ($replace as $short_code => $short_code_value) {
+                $template = str_replace('{{' . $short_code . '}}', $short_code_value, $template);
+            }
+            $from_name = 'Admin';
+            $from_address = $admin_email;
+            $replay_address = $admin_email;
+            //Prepare for sending emails
+            $headers = "From: " . $from_name . " <" . $from_address . ">" . "\r\n";
+            $headers .= "Content-Type: text/html" . "\r\n";
+            $headers .= "Reply-To:  " . $replay_address . " " . "\r\n";
+            //Send mail
+            wc_mail($send_to, $email_subject, $template, $headers);
+        } else {
+            $response['error'] = true;
+            $response['message'] = __('Email address and Email body required', RNOC_TEXT_DOMAIN);
+        }
+        wp_send_json($response);
+    }
+
+    /**
+     * Remove the template
+     */
+    function editTemplate()
+    {
+        $response = array();
+        if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
+            $template = $this->getTemplate(intval($_REQUEST['id']));
+            if (!empty($template)) {
+                $response['template'] = $template;
+            } else {
+                $response['error'] = true;
+                $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);
+            }
+        } else {
+            $response['error'] = true;
+            $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);
+        }
+        wp_send_json($response);
+    }
+
+    /**
+     * get template by id
+     * @param $id
+     * @return array|object|void|null
+     */
+    function getTemplate($id)
+    {
+        $id = intval($id);
+        global $wpdb;
+        $query = "SELECT * FROM `" . $this->email_templates_table . "` WHERE id = %d";
+        return $wpdb->get_row($wpdb->prepare($query, $id), OBJECT);
     }
 }

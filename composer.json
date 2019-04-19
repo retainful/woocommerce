@@ -23,7 +23,7 @@
       "src/fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php",
       "src/fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php",
       "src/fields/cmb-field-cart-filter/cmb-field-cart-filter.php",
-      "src/fields/cmb-field-email-after/cmb-field-email-after.php",
+      "src/fields/cmb-field-email-templates/cmb-field-email-templates.php",
       "src/fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php"
     ]
   }
