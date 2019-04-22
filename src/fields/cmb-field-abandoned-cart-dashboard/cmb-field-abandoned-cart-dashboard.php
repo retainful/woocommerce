@@ -3,7 +3,6 @@ if (!defined('ABSPATH')) exit;
 
 class CMB2_Field_Abandoned_Cart_Dashboard
 {
-
     /**
      * Current version number
      */
@@ -25,7 +24,18 @@ class CMB2_Field_Abandoned_Cart_Dashboard
         $this->setupAdminScripts();
         $abandoned_cart_obj = new \Rnoc\Retainful\AbandonedCart();
         $start_end_dates = $abandoned_cart_obj->start_end_dates;
-        $cart_details = $abandoned_cart_obj->getStaticsForDashboard($start_end_dates['last_seven']['start_date'], $start_end_dates['last_seven']['end_date']);
+        $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_seven';
+        if ($duration != "custom") {
+            $start_date = $start_end_dates[$duration]['start_date'];
+            $end_date = $start_end_dates[$duration]['end_date'];
+        } else if (isset($_GET['start']) && isset($_GET['end'])) {
+            $start_date = $_GET['start'];
+            $end_date = $_GET['start'];
+        } else {
+            $start_date = $start_end_dates['last_seven']['start_date'];
+            $end_date = $start_end_dates['last_seven']['end_date'];
+        }
+        $cart_details = $abandoned_cart_obj->getStaticsForDashboard($start_date, $end_date);
         ?>
         <div class="rnoc_counter_container">
             <div class="rnoc_counter_widget widget_violet">
@@ -69,14 +79,6 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                 </div>
             </div>
         </div>
-        <style>
-            #submit-cmb {
-                display: none;
-            }
-        </style>
-        <script>
-            var no_ajax = false;
-        </script>
         <?php
     }
 

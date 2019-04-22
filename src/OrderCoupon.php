@@ -280,7 +280,7 @@ class OrderCoupon
             //Check for coupon expired or not
             $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
             if (!empty($coupon_expiry_date) && strtotime('Y-m-d H:i:s') > strtotime($coupon_expiry_date)) {
-                $this->wc_functions->removeSession('retainful_coupon_code');
+                $this->removeCouponFromSession();
             }
             $cart_total = $this->wc_functions->getCartTotal();
             //Check for minimum spend
@@ -358,17 +358,6 @@ class OrderCoupon
                 self::$applied_coupons = $coupon_code;
                 $discount_type = 'fixed_cart';
                 $usage_restrictions = $this->admin->getUsageRestrictions();
-                /*if ((isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'individual_use_only']))) {
-                    $coupons_added_to_cart = $this->wc_functions->getAppliedCouponsOfCart();
-                    if (!empty($coupons_added_to_cart)) {
-                        foreach ($coupons_added_to_cart as $key => $already_applied_coupon_code) {
-                            if ($already_applied_coupon_code != $coupon_code) {
-                                //remove coupon from cart
-                                $this->wc_functions->removeDiscount($already_applied_coupon_code);
-                            }
-                        }
-                    }
-                }*/
                 $coupon_type = get_post_meta($coupon_details->ID, 'coupon_type', true);
                 $coupon_value = get_post_meta($coupon_details->ID, 'coupon_value', true);
                 $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);

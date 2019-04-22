@@ -31,25 +31,9 @@
     });
 
     function getAbandonedCartDetails(start, end) {
-        var path = $("#retainful_ajax_path").val();
-        if (no_ajax) {
-            var duration = $('#duration').val();
-            var cart_type = $('#cart_type').val();
-            var url = '&start=' + start + '&end=' + end + '&page_number=' + page_number + '&cart_type=' + cart_type + '&duration=' + duration;
-            window.location.href = page_url + url;
-        } else {
-            $.ajax({
-                url: path,
-                type: 'POST',
-                dataType: "json",
-                data: {action: 'get_ajax_details_for_dashboard', start: start, end: end},
-                success: function (response) {
-                    $("#rnoc_abandoned_carts").html(response.abandoned_carts);
-                    $("#rnoc_abandoned_total").html(response.abandoned_total);
-                    $("#rnoc_recovered_carts").html(response.recovered_carts);
-                    $("#rnoc_recovered_total").html(response.recovered_total);
-                }
-            });
-        }
+        var duration = $('#duration').val();
+        var cart_type = $('#cart_type').val();
+        var url = '&start=' + start + '&end=' + end + '&page_number=' + page_number + '&cart_type=' + cart_type + '&duration=' + duration;
+        window.location.href = page_url + url;
     }
 })(jQuery);

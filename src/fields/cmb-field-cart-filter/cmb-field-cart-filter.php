@@ -3,7 +3,6 @@ if (!defined('ABSPATH')) exit;
 
 class CMB2_Field_Date_Range_Picker
 {
-
     /**
      * Current version number
      */
@@ -34,10 +33,6 @@ class CMB2_Field_Date_Range_Picker
         } else {
             $selected_dates = $start_end_dates['last_seven']['start_date'] . ' - ' . $start_end_dates['last_seven']['end_date'];
         }
-        $url_arr = array(
-            'page' => $abandoned_cart->admin->slug . '_abandoned_cart'
-        );
-        $url = admin_url('admin.php?' . http_build_query($url_arr));
         ?>
         <script>
             var start_end_dates = <?php echo json_encode($start_end_dates); ?>;
@@ -50,38 +45,13 @@ class CMB2_Field_Date_Range_Picker
                     <option value="<?php echo $key; ?>" <?php echo ($duration == $key) ? 'selected' : ''; ?>> <?php echo $value; ?></option>
                     <?php
                 }
-                $cart_type = isset($_GET['cart_type']) ? $_GET['cart_type'] : 'all';
                 ?>
             </select>
             <span style=" <?php echo ($duration == 'custom') ? '' : 'display:none'; ?>" class="show_none">
             <b><?php echo __('Choose date', RNOC_TEXT_DOMAIN) ?>:</b>
             <input type="text" name="daterange" id="date_range" value="<?php echo $selected_dates; ?>"/>
             </span>
-            <?php
-            if (isset($_GET['page']) && $_GET['page'] == $abandoned_cart->admin->slug . '_abandoned_cart') {
-                ?><span>
-                <b><?php echo __('Show ', RNOC_TEXT_DOMAIN) ?>:</b>
-                <input type="hidden" value="<?php echo $cart_type; ?>" id="cart_type">
-                <a href="<?php echo $url . '&cart_type=all' ?>"
-                   class="button button-primary"><?php echo __('All Carts', RNOC_TEXT_DOMAIN); ?></a>
-                <a href="<?php echo $url . '&cart_type=abandoned' ?>"
-                   class="button button-red"><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></a>
-                <a href="<?php echo $url . '&cart_type=recovered' ?>"
-                   class="button button-green"><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></a>
-                <?php
-                $abandoned_cart_settings = $abandoned_cart->admin->getAbandonedCartSettings();
-                $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
-                if ($is_tracking_enabled) {
-                    ?>
-                    <a href="<?php echo $url . '&cart_type=progress' ?>"
-                       class="button"><?php echo __('In-Progress Carts', RNOC_TEXT_DOMAIN); ?></a>
-                    <?php
-                }
-                ?>
-                </span>
-                <?php
-            }
-            ?>
+
         </div>
         <input type="hidden" id="retainful_ajax_path" value="<?php echo admin_url('admin-ajax.php') ?>">
         <?php

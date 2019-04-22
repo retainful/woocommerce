@@ -75,6 +75,11 @@ class CMB2_Field_Retainful_App
             }
             ?>
         </div>
+        <style>
+            #submit-cmb{
+                display: none;
+            }
+        </style>
         <?php
     }
 

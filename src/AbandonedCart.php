@@ -697,22 +697,6 @@ class AbandonedCart
     }
 
     /**
-     * get abandoned cart dashboard for ajax request
-     */
-    function getAjaxDetailsForDashboard()
-    {
-        if (isset($_REQUEST['start']) && isset($_REQUEST['end'])) {
-            $start_date = $_REQUEST['start'];
-            $end_date = $_REQUEST['end'];
-        } else {
-            $start_date = $this->start_end_dates['last_seven']['start_date'];
-            $end_date = $this->start_end_dates['last_seven']['end_date'];
-        }
-        $response = $this->getStaticsForDashboard($start_date, $end_date);
-        wp_send_json($response);
-    }
-
-    /**
      * get the abandoned cart details
      * @param $start_date
      * @param $end_date

@@ -248,7 +248,7 @@ class CMB2_Field_Abandoned_Cart_Lists
         <?php
     }
 
-    /**
+    /**±
      * Enqueue scripts and styles
      */
     public function setupAdminScripts()
