@@ -1,6 +1,7 @@
 <?php
 
 namespace Rnoc\Retainful;
+
 if (!defined('ABSPATH')) exit;
 
 class WcFunctions
@@ -231,6 +232,22 @@ class WcFunctions
     }
 
     /**
+     * @param $key
+     * @param $value
+     * @return bool
+     */
+    function setPHPSession($key, $value)
+    {
+        if (empty($key) || empty($value))
+            return false;
+        if (!session_id()) {
+            session_start();
+        }
+        $_SESSION[$key] = $value;
+        return true;
+    }
+
+    /**
      * Get data from session
      * @param $key
      * @return array|string|null
@@ -241,6 +258,24 @@ class WcFunctions
             return NULL;
         if (method_exists(WC()->session, 'get')) {
             return WC()->session->get($key);
+        }
+        return NULL;
+    }
+
+    /**
+     * Get data from session
+     * @param $key
+     * @return array|string|null
+     */
+    function getPHPSession($key)
+    {
+        if (empty($key))
+            return NULL;
+        if (!session_id()) {
+            session_start();
+        }
+        if (isset($_SESSION[$key])) {
+            return $_SESSION[$key];
         }
         return NULL;
     }
@@ -303,6 +338,24 @@ class WcFunctions
             return false;
         if (method_exists(WC()->session, '__unset')) {
             WC()->session->__unset($key);
+        }
+        return true;
+    }
+
+    /**
+     * Remove data from session
+     * @param $key
+     * @return bool
+     */
+    function removePHPSession($key)
+    {
+        if (empty($key))
+            return false;
+        if (!session_id()) {
+            session_start();
+        }
+        if (isset($_SESSION[$key])) {
+            unset($_SESSION[$key]);
         }
         return true;
     }
@@ -414,7 +467,7 @@ class WcFunctions
     function getCartTotal()
     {
         if (method_exists(WC()->cart, 'get_cart')) {
-            return WC()->cart->total;
+            return WC()->cart->subtotal;
         }
         return 0;
     }

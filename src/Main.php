@@ -44,7 +44,7 @@ class Main
         add_action('woocommerce_order_status_processing', array($this->rnoc, 'onAfterPayment'), 10, 1);
         add_action('woocommerce_order_status_on-hold', array($this->rnoc, 'onAfterPayment'), 10, 1);
         add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
-        add_action('wp_head', array($this->rnoc, 'setCouponToSession'));
+        add_action('woocommerce_init', array($this->rnoc, 'setCouponToSession'));
         add_action('woocommerce_cart_loaded_from_session', array($this->rnoc, 'addCouponToCheckout'), 10);
         //Attach coupon to email
         $hook = $this->admin->couponMessageHook();
@@ -312,6 +312,36 @@ class Main
             if (version_compare(WC_VERSION, '2.5', '<')) {
                 $this->showAdminNotice(__('Your woocommerce version is ', RNOC_TEXT_DOMAIN) . WC_VERSION . __('. Some of the features of Retainful-Woocommerce will not work properly on this woocommerce version.', RNOC_TEXT_DOMAIN));
             }
+        }
+        $this->doMigration();
+    }
+
+    /**
+     * Migrate data required for v 1.1.3
+     */
+    function doMigration()
+    {
+        $is_migrated = get_option('retainful_v_1_1_3_migration_completed', 0);
+        if (!$is_migrated) {
+            $slug = $this->admin->slug;
+            $retainful_page = get_option($slug, array());
+            $licence_page = get_option($slug . '_license', array());
+            $usage_restriction_page = get_option($slug . '_usage_restriction', array());
+            if (empty($licence_page)) {
+                $licence_data = array(
+                    RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => (isset($retainful_page[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'])) ? $retainful_page[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] : 0,
+                    RNOC_PLUGIN_PREFIX . 'retainful_app_id' => (isset($retainful_page[RNOC_PLUGIN_PREFIX . 'retainful_app_id'])) ? $retainful_page[RNOC_PLUGIN_PREFIX . 'retainful_app_id'] : ''
+                );
+                update_option($slug . '_license', $licence_data);
+            }
+            unset($retainful_page[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'], $retainful_page[RNOC_PLUGIN_PREFIX . 'retainful_app_id']);
+            $retainful_data = array_merge($retainful_page, $usage_restriction_page);
+            update_option($slug, $retainful_data);
+            delete_option($slug . '_usage_restriction');
+            $abandoned_cart_data = get_option($slug . '_abandoned_cart_settings', array());
+            update_option($slug . '_settings', $abandoned_cart_data);
+            delete_option($slug . '_abandoned_cart_settings');
+            update_option('retainful_v_1_1_3_migration_completed', 1);
         }
     }
 

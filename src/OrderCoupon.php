@@ -1,6 +1,7 @@
 <?php
 
 namespace Rnoc\Retainful;
+
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Settings;
@@ -53,11 +54,10 @@ class OrderCoupon
     function pluginActionLinks($links)
     {
         $action_links = array(
-            'settings' => '<a href="' . admin_url('admin.php?page=retainful') . '">' . __('Settings', RNOC_TEXT_DOMAIN) . '</a>',
+            'settings' => '<a href="' . admin_url('admin.php?page=retainful_settings') . '">' . __('Settings', RNOC_TEXT_DOMAIN) . '</a>',
         );
         return array_merge($action_links, $links);
     }
-
 
     /**
      * Send required details for email customizer
@@ -228,7 +228,7 @@ class OrderCoupon
      */
     public function addCouponToCheckout()
     {
-        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+        $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
         if (!empty($coupon_code) && !empty($this->wc_functions->getCart()) && !$this->wc_functions->hasDiscount($coupon_code)) {
             //Do not apply coupon until the coupon is valid
             if ($this->checkCouponBeforeCouponApply($coupon_code)) {
@@ -243,7 +243,7 @@ class OrderCoupon
      */
     function removeCouponFromCart($remove_coupon)
     {
-        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+        $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
         if (strtoupper($remove_coupon) == strtoupper($coupon_code) && $this->checkCouponBeforeCouponApply($remove_coupon)) {
             $this->removeCouponFromSession();
         }
@@ -255,9 +255,9 @@ class OrderCoupon
      */
     function removeCouponFromSession($order_id = "")
     {
-        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+        $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
         if (!empty($coupon_code)) {
-            $this->wc_functions->removeSession('retainful_coupon_code');
+            $this->wc_functions->removePHPSession('retainful_coupon_code');
         }
     }
 
@@ -280,7 +280,7 @@ class OrderCoupon
             //Check for coupon expired or not
             $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
             if (!empty($coupon_expiry_date) && strtotime('Y-m-d H:i:s') > strtotime($coupon_expiry_date)) {
-                $this->removeCouponFromSession();
+                array_push($return, false);
             }
             $cart_total = $this->wc_functions->getCartTotal();
             //Check for minimum spend
@@ -314,7 +314,6 @@ class OrderCoupon
             $must_not_in_cart_products = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_products'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_products'] : array();
             $must_not_in_cart_categories = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'] : array();
             if (array_intersect($must_not_in_cart_products, $must_in_cart_products) || array_intersect($must_in_cart_categories, $must_not_in_cart_categories)) {
-                $this->wc_functions->removeSession('retainful_coupon_code');
                 array_push($return, false);
             }
         } else {
@@ -331,10 +330,10 @@ class OrderCoupon
     function setCouponToSession()
     {
         if (isset($_REQUEST['retainful_coupon_code'])) {
-            $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+            $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
             if (empty($coupon_code)) {
                 $coupon_code = sanitize_text_field($_REQUEST['retainful_coupon_code']);
-                $this->wc_functions->setSession('retainful_coupon_code', $coupon_code); // Set the coupon code in session
+                $this->wc_functions->setPHPSession('retainful_coupon_code', $coupon_code); // Set the coupon code in session
             }
         }
     }
@@ -392,7 +391,6 @@ class OrderCoupon
         }
         return $response;
     }
-
 
     /**
      * Process after the Place order

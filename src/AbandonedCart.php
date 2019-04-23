@@ -249,7 +249,7 @@ class AbandonedCart
     function getActiveEmailTemplates()
     {
         global $wpdb;
-        $email_template_query = "SELECT * FROM `" . $this->email_templates_table . "` WHERE  is_active < %s ";
+        $email_template_query = "SELECT * FROM `" . $this->email_templates_table . "` WHERE  is_active = %s ";
         return $wpdb->get_results($wpdb->prepare($email_template_query, 1));
     }
 
