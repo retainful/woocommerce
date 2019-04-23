@@ -157,11 +157,13 @@ class CMB2_Field_Email_After
                     </div>
                 </div>
                 <div class="cmb-row table-layout">
-                    <div class="cmb-th">
+                    <div class="cmb-td">
                         <button type="button" data-path="<?php echo admin_url('admin-ajax.php'); ?>"
-                                class="button button-primary save-email-template"><?php echo __('Save Template', RNOC_TEXT_DOMAIN); ?></button>
+                                class="button button-primary save-email-template"><?php echo __('Save', RNOC_TEXT_DOMAIN); ?></button>
+                        <button type="button" data-path="<?php echo admin_url('admin-ajax.php'); ?>"
+                                class="button button-green save-close-email-template"><?php echo __('Save and close', RNOC_TEXT_DOMAIN); ?></button>
                         <button type="button"
-                                class="button button-red reload-button"><?php echo __('Cancel', RNOC_TEXT_DOMAIN); ?></button>
+                                class="button button-red reload-button"><?php echo __('Close', RNOC_TEXT_DOMAIN); ?></button>
                     </div>
                 </div>
             </div>

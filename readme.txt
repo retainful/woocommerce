@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.1.1
 WC tested up to: 3.5.2
 Requires PHP: 5.6
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -178,3 +178,6 @@ No. There is no charges for support.
 
 = 1.1.2 =
 * New Feature: Send test email of any email template
+
+= 1.1.3 =
+* Improvement: Settings optimized

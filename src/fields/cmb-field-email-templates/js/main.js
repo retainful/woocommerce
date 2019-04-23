@@ -107,7 +107,16 @@
         $(".create-or-edit-template-form").show();
     }
 
+    $(document).on('click', '.save-close-email-template', function () {
+        var path = $(this).data('path');
+        saveTemplate(true, path);
+    });
     $(document).on('click', '.save-email-template', function () {
+        var path = $(this).data('path');
+        saveTemplate(false, path);
+    });
+
+    function saveTemplate(reload, path) {
         var template = $('.create-or-edit-template-form').find('select, textarea, input');
         var formdata = template.serializeArray();
         var data = {};
@@ -122,7 +131,7 @@
                 data['body'] = editorContent;
             }
         });
-        var path = $(this).data('path');
+
         $.ajax({
             url: path,
             type: 'POST',
@@ -132,9 +141,11 @@
                 if (response.success) {
                     $("#field_id").val(response.id);
                     alert(response.message);
-                    //window.location.reload();
+                    if (reload) {
+                        window.location.reload();
+                    }
                 }
             }
         });
-    });
+    }
 })(jQuery);
