@@ -635,15 +635,17 @@ class AbandonedCart
             $customer_id = $this->getUserSessionKey();
         }
         $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
-        if ($current_time < $row->cart_expiry) {
-            $wpdb->update($this->cart_history_table, array(/*'cart_expiry' => $current_time,*/
-                'order_id' => $order_id), array('id' => $row->id), array(/*'%s',*/
-                '%d'));
-        } else {
-            $wpdb->update($this->cart_history_table, array('cart_is_recovered' => 1,/* 'cart_expiry' => $current_time,*/
-                'order_id' => $order_id), array('id' => $row->id), array('%s',/* '%d',*/
-                    '%d')
-            );
+        if(!empty($row)) {
+            if ($current_time < $row->cart_expiry) {
+                $wpdb->update($this->cart_history_table, array(/*'cart_expiry' => $current_time,*/
+                    'order_id' => $order_id), array('id' => $row->id), array(/*'%s',*/
+                    '%d'));
+            } else {
+                $wpdb->update($this->cart_history_table, array('cart_is_recovered' => 1,/* 'cart_expiry' => $current_time,*/
+                    'order_id' => $order_id), array('id' => $row->id), array('%s',/* '%d',*/
+                        '%d')
+                );
+            }
         }
     }
 

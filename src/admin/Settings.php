@@ -104,7 +104,7 @@ class Settings
                 'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
                 'default' => $admin_email
             ));
-            //General settings tab
+            //Next order tab
             $next_order_coupon = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful',
                 'title' => __('Retainful - Abandoned Carts', RNOC_TEXT_DOMAIN),
@@ -149,6 +149,17 @@ class Settings
                     'login_users' => __('Allow customer to apply coupon only after login', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => 'all'
+            ));
+            $next_order_coupon->add_field(array(
+                'name' => __('Allow next order coupons for orders created in the backend and also for old orders (when resending the email notification)', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon',
+                'type' => 'radio',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => '1',
+                'after' => '<p><b>' . __('The unique code will be generated when you try re-sending the email notification for an order in the backend', RNOC_TEXT_DOMAIN) . '</b></p>',
             ));
             $next_order_coupon->add_field(array(
                 'name' => __('Display coupon message after', RNOC_TEXT_DOMAIN),
@@ -578,6 +589,22 @@ class Settings
             $coupon['coupon_amount'] = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
         }
         return $coupon;
+    }
+
+    /**
+     * get coupon settings from admin
+     * @return bool
+     */
+    function autoGenerateCouponsForOldOrders()
+    {
+        $generate = true;
+        $settings = get_option($this->slug, array());
+        if (!empty($settings)) {
+            if (isset($settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon']) && $settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon'] == 0) {
+                $generate = false;
+            }
+        }
+        return $generate;
     }
 
     /**

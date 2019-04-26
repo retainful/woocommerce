@@ -153,7 +153,16 @@ class OrderCoupon
     {
         if (!isset($params) || empty($params))
             return false;
-        return $this->admin->sendCouponDetails('track', $params);
+        foreach ($params as $order_id) {
+            $api_key = $this->admin->getApiKey();
+            if ($this->admin->isAppConnected() && !empty($api_key)) {
+                $order = $this->wc_functions->getOrder($order_id);
+                $request_params = $this->getRequestParams($order);
+                $request_params['app_id'] = $api_key;
+                return $this->admin->sendCouponDetails('track', $request_params);
+            }
+        }
+        return false;
     }
 
     /**
@@ -165,39 +174,44 @@ class OrderCoupon
      */
     function attachOrderCoupon($order, $sent_to_admin, $plain_text, $email)
     {
-        if (!$sent_to_admin) {
+        $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+        if ($this->admin->autoGenerateCouponsForOldOrders()) {
+            $order_id = $this->wc_functions->getOrderId($order);
+            //Create new coupon if coupon not found for order while sending the email
+            $this->createNewCoupon($order_id, array());
+            $this->scheduleSync($order_id);
             $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
-            if (!empty($coupon_code)) {
-                $message = "";
-                $coupon_details = $this->getCouponDetails($coupon_code);
-                if (!empty($coupon_details)) {
-                    $post_id = $coupon_details->ID;
-                    $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
-                    if ($coupon_amount > 0) {
-                        $coupon_type = get_post_meta($post_id, 'coupon_type', true);
-                        $string_to_replace = array(
-                            '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
-                            '{{coupon_code}}' => $coupon_code,
-                            '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
-                        );
-                        $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
-                        if (!empty($coupon_expiry_date)) {
-                            $date_format = $this->admin->getExpireDateFormat();
-                            $string_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date, $date_format);
-                        } else {
-                            $string_to_replace['{{coupon_expiry_date}}'] = '';
-                        }
-                        $message = $this->admin->getCouponMessage();
-                        $message = str_replace(array_keys($string_to_replace), $string_to_replace, $message);
-                        $is_api_enabled = $this->admin->isAppConnected();
-                        if ($is_api_enabled) {
-                            $request_params = $this->getRequestParams($order);
-                            $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
-                        }
+        }
+        if (!empty($coupon_code)) {
+            $message = "";
+            $coupon_details = $this->getCouponDetails($coupon_code);
+            if (!empty($coupon_details)) {
+                $post_id = $coupon_details->ID;
+                $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
+                if ($coupon_amount > 0) {
+                    $coupon_type = get_post_meta($post_id, 'coupon_type', true);
+                    $string_to_replace = array(
+                        '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
+                        '{{coupon_code}}' => $coupon_code,
+                        '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
+                    );
+                    $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
+                    if (!empty($coupon_expiry_date)) {
+                        $date_format = $this->admin->getExpireDateFormat();
+                        $string_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date, $date_format);
+                    } else {
+                        $string_to_replace['{{coupon_expiry_date}}'] = '';
+                    }
+                    $message = $this->admin->getCouponMessage();
+                    $message = str_replace(array_keys($string_to_replace), $string_to_replace, $message);
+                    $is_api_enabled = $this->admin->isAppConnected();
+                    if ($is_api_enabled && !$sent_to_admin) {
+                        $request_params = $this->getRequestParams($order);
+                        $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
                     }
                 }
-                echo $message;
             }
+            echo $message;
         }
     }
 
@@ -250,10 +264,9 @@ class OrderCoupon
     }
 
     /**
-     * Remove Coupon from sesssion
-     * @param $order_id
+     * Remove Coupon from session
      */
-    function removeCouponFromSession($order_id = "")
+    function removeCouponFromSession()
     {
         $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
         if (!empty($coupon_code)) {
@@ -413,16 +426,24 @@ class OrderCoupon
                 wp_update_post($my_post);
             }
         }
+        $this->scheduleSync($order_id);
+        return true;
+    }
+
+    /**
+     * Schedule sync
+     * @param $order_id
+     */
+    function scheduleSync($order_id)
+    {
         $is_api_enabled = $this->admin->isAppConnected();
         if ($is_api_enabled) {
             //Handle API Requests
             $api_key = $this->admin->getApiKey();
             if (!empty($api_key)) {
-                $request_params['app_id'] = $api_key;
-                as_schedule_single_action(time() + 60, 'retainful_cron_sync_coupon_details', array($request_params));
+                as_schedule_single_action(time() + 60, 'retainful_cron_sync_coupon_details', array($order_id));
             }
         }
-        return true;
     }
 
     /**
@@ -501,15 +522,23 @@ class OrderCoupon
         if (empty($order_id)) return false;
         $coupon = $this->isCouponFound($order_id);
         $order = $this->wc_functions->getOrder($order_id);
+        $email = $this->wc_functions->getOrderEmail($order);
+        //Sometime email not found in the order object when order created from backend. So, get  from the request
+        if (empty($email)) {
+            $email = (isset($_REQUEST['_billing_email']) && !empty($_REQUEST['_billing_email'])) ? $_REQUEST['_billing_email'] : '';
+        }
+        $order_date = $this->wc_functions->getOrderDate($order);
         if (empty($coupon)) {
-            $email = $this->wc_functions->getOrderEmail($order);
-            $order_date = $this->wc_functions->getOrderDate($order);
             $new_coupon_code = strtoupper(uniqid());
             $new_coupon_code = chunk_split($new_coupon_code, 5, '-');
             $new_coupon_code = rtrim($new_coupon_code, '-');
             $this->addNewCouponToOrder($new_coupon_code, $order_id, $email, $order_date);
         } else {
             $new_coupon_code = strtoupper($coupon);
+            $coupon_details = $this->getCouponDetails($new_coupon_code);
+            if (empty($coupon_details)) {
+                $this->addNewCouponToOrder($new_coupon_code, $order_id, $email, $order_date);
+            }
         }
         $new_coupon_code = sanitize_text_field($new_coupon_code);
         if (empty($new_coupon_code))
