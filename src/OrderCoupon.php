@@ -145,22 +145,20 @@ class OrderCoupon
 
     /**
      * Run the scheduled cron tasks with retainful
-     * @param array $params
+     * @param $order_id
      * @return bool
      *
      */
-    function cronSendCouponDetails($params = array())
+    function cronSendCouponDetails($order_id)
     {
-        if (!isset($params) || empty($params))
+        if (!isset($order_id) || empty($order_id))
             return false;
-        foreach ($params as $order_id) {
-            $api_key = $this->admin->getApiKey();
-            if ($this->admin->isAppConnected() && !empty($api_key)) {
-                $order = $this->wc_functions->getOrder($order_id);
-                $request_params = $this->getRequestParams($order);
-                $request_params['app_id'] = $api_key;
-                return $this->admin->sendCouponDetails('track', $request_params);
-            }
+        $api_key = $this->admin->getApiKey();
+        if ($this->admin->isAppConnected() && !empty($api_key)) {
+            $order = $this->wc_functions->getOrder($order_id);
+            $request_params = $this->getRequestParams($order);
+            $request_params['app_id'] = $api_key;
+            return $this->admin->sendCouponDetails('track', $request_params);
         }
         return false;
     }
