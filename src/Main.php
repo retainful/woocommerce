@@ -39,7 +39,6 @@ class Main
         });
         //Get events
         add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
-        add_action('woocommerce_process_shop_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
         add_action('woocommerce_payment_complete', array($this->rnoc, 'onAfterPayment'), 10, 1);
         add_action('woocommerce_order_status_completed', array($this->rnoc, 'onAfterPayment'), 10, 1);
         add_action('woocommerce_order_status_processing', array($this->rnoc, 'onAfterPayment'), 10, 1);

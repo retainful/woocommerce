@@ -174,12 +174,14 @@ class OrderCoupon
      */
     function attachOrderCoupon($order, $sent_to_admin, $plain_text, $email)
     {
-        $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+        $coupon_code = '';
         if ($this->admin->autoGenerateCouponsForOldOrders()) {
             $order_id = $this->wc_functions->getOrderId($order);
             //Create new coupon if coupon not found for order while sending the email
-            $this->createNewCoupon($order_id, array());
+            $coupon_code = $this->createNewCoupon($order_id, array());
             $this->scheduleSync($order_id);
+        }
+        if(empty($coupon_code)) {
             $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
         }
         if (!empty($coupon_code)) {
@@ -556,7 +558,7 @@ class OrderCoupon
                 }
             }
         }
-        return true;
+        return $new_coupon_code;
     }
 
     /**
