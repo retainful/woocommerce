@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.1.1
 WC tested up to: 3.5.2
 Requires PHP: 5.6
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,3 +185,6 @@ No. There is no charges for support.
 = 1.1.4 =
 * New Feature: Automatically creates coupon for old orders, while sending email notifications.
 * Improvement: Send coupon code along admin notification.
+
+= 1.1.5 =
+* Fix: Scheduling events issue fixed
