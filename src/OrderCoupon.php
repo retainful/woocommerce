@@ -179,7 +179,7 @@ class OrderCoupon
             $coupon_code = $this->createNewCoupon($order_id, array());
             $this->scheduleSync($order_id);
         }
-        if(empty($coupon_code)) {
+        if (empty($coupon_code)) {
             $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
         }
         if (!empty($coupon_code)) {

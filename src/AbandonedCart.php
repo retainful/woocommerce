@@ -52,7 +52,7 @@ class AbandonedCart
             if (!isset($woocommerce->session)) {
                 return;
             }
-            //$user_session_id = $this->wc_functions->getSessionCustomerId();
+            //$user_session_id = $this->wc_functions->getPHPSessionCustomerId();
             $user_session_id = $this->getUserSessionKey();
             if (!empty($user_session_id) && isset($_POST['billing_email'])) {
                 global $wpdb, $woocommerce;
@@ -101,10 +101,10 @@ class AbandonedCart
      */
     function getUserSessionKey()
     {
-        $session_key = $this->wc_functions->getSession(RNOC_PLUGIN_PREFIX . 'user_session_key');
+        $session_key = $this->wc_functions->getPHPSession(RNOC_PLUGIN_PREFIX . 'user_session_key');
         if (empty($session_key)) {
             $session_key = $this->generateToken();
-            $this->wc_functions->setSession(RNOC_PLUGIN_PREFIX . 'user_session_key', $session_key);
+            $this->wc_functions->setPHPSession(RNOC_PLUGIN_PREFIX . 'user_session_key', $session_key);
         }
         return $session_key;
     }
@@ -137,7 +137,7 @@ class AbandonedCart
     function userCartUpdated()
     {
         global $wpdb, $woocommerce;
-        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        $abandoned_cart_settings = $this->admin->getAdminSettings();
         $current_time = current_time('timestamp');
         $cut_off_time_settings = isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_abandoned_time']) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_abandoned_time'] : 60;
         $cart_cut_off_time = intval($cut_off_time_settings) * 60;
@@ -149,7 +149,7 @@ class AbandonedCart
             if (!isset($woocommerce->session)) {
                 return;
             }
-            //$customer_id = $this->wc_functions->getSessionCustomerId();
+            //$customer_id = $this->wc_functions->getPHPSessionCustomerId();
             $customer_id = $this->getUserSessionKey();
         }
         $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
@@ -230,7 +230,7 @@ class AbandonedCart
         if (!isset($woocommerce->session)) {
             return;
         }
-        //$customer_id = $this->wc_functions->getSessionCustomerId();
+        //$customer_id = $this->wc_functions->getPHPSessionCustomerId();
         $customer_id = $this->getUserSessionKey();
         $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
         if (!empty($row)) {
@@ -461,7 +461,7 @@ class AbandonedCart
      */
     function clearAbandonedCarts()
     {
-        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        $abandoned_cart_settings = $this->admin->getAdminSettings();
         if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'])) {
             global $wpdb;
             $delete_ac_after_days_time = $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'] * 86400;
@@ -527,7 +527,7 @@ class AbandonedCart
                     $user_id = 0;
                     if (!empty($abandoned_cart_history_results)) {
                         $user_id = $abandoned_cart_history_results->customer_key;
-                        $this->wc_functions->setSession(RNOC_PLUGIN_PREFIX . 'recovered_cart_id', $abandoned_cart_id);
+                        $this->wc_functions->setPHPSession(RNOC_PLUGIN_PREFIX . 'recovered_cart_id', $abandoned_cart_id);
                         //if guest
                         if (!is_numeric($user_id)) {
                             $this->autoLoadUserCart($abandoned_cart_history_results->cart_contents, $abandoned_cart_id, $session_id);
@@ -631,7 +631,7 @@ class AbandonedCart
             if (!isset($woocommerce->session)) {
                 return;
             }
-            //$customer_id = $this->wc_functions->getSessionCustomerId();
+            //$customer_id = $this->wc_functions->getPHPSessionCustomerId();
             $customer_id = $this->getUserSessionKey();
         }
         $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
@@ -655,7 +655,7 @@ class AbandonedCart
      */
     function notifyAdminOnRecovery($order_id)
     {
-        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        $abandoned_cart_settings = $this->admin->getAdminSettings();
         $email_admin_recovery = isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'email_admin_on_recovery']) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'email_admin_on_recovery'] : 0;
         if ($email_admin_recovery) {
             global $wpdb;
@@ -771,7 +771,7 @@ class AbandonedCart
             $offset_limit = 'LIMIT ' . $limit . ' OFFSET ' . $start;
         }
         $get_only = '';
-        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        $abandoned_cart_settings = $this->admin->getAdminSettings();
         $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
         if (!$is_tracking_enabled) {
             $get_only = ' AND cart_expiry <' . $current_time . ' ';
@@ -856,7 +856,7 @@ class AbandonedCart
      */
     function guestGdprMessage($fields)
     {
-        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        $abandoned_cart_settings = $this->admin->getAdminSettings();
         $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
         if (!is_user_logged_in() && $is_tracking_enabled) {
             if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
@@ -872,7 +872,7 @@ class AbandonedCart
      */
     function userGdprMessage()
     {
-        $abandoned_cart_settings = $this->admin->getAbandonedCartSettings();
+        $abandoned_cart_settings = $this->admin->getAdminSettings();
         $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
         if (is_user_logged_in() && $is_tracking_enabled) {
             if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
@@ -1057,7 +1057,7 @@ class AbandonedCart
     /**
      * get template by id
      * @param $id
-     * @return array|object|void|null
+     * @return array|object|null
      */
     function getTemplate($id)
     {

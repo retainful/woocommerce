@@ -53,7 +53,7 @@ class CMB2_Field_Cart_Table_Filter
             <a href="<?php echo $url . '&cart_type=recovered&' . http_build_query($date_arr) ?>"
                class="button button-green"><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></a>
             <?php
-            $abandoned_cart_settings = $abandoned_cart->admin->getAbandonedCartSettings();
+            $abandoned_cart_settings = $abandoned_cart->admin->getAdminSettings();
             $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
             if ($is_tracking_enabled) {
                 ?>

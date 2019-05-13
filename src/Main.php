@@ -37,6 +37,7 @@ class Main
         add_action('init', function () {
             $this->rnoc->init();
         });
+        do_action('rnoc_initiated');
         //Get events
         add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
         add_action('woocommerce_payment_complete', array($this->rnoc, 'onAfterPayment'), 10, 1);

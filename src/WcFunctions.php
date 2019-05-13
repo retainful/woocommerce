@@ -568,4 +568,17 @@ class WcFunctions
         }
         return array_unique($category_ids);
     }
+
+    /**
+     * get coupon code from coupon object
+     * @param $coupon
+     * @return null
+     */
+    function getCouponCode($coupon)
+    {
+        if (method_exists($coupon, 'get_code')) {
+            return $coupon->get_code();
+        }
+        return NULL;
+    }
 }

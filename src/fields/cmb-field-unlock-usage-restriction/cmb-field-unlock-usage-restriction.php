@@ -73,11 +73,6 @@ class CMB2_Field_Unlock_Usage_Restriction
             </div>
             <input type="hidden" id="unlock_usage_restriction" value="1"/>
         </div>
-        <style>
-            #submit-cmb {
-                display: none;
-            }
-        </style>
         <?php
     }
 }
