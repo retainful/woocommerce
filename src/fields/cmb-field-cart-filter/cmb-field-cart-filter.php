@@ -70,4 +70,4 @@ class CMB2_Field_Date_Range_Picker
     }
 }
 
-$cmb2_field_unlock_usage_restriction = new CMB2_Field_Date_Range_Picker();
+new CMB2_Field_Date_Range_Picker();

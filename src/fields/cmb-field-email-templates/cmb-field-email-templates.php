@@ -156,6 +156,9 @@ class CMB2_Field_Email_After
                         <em><?php echo __('Enter email id to receive an test email.', RNOC_TEXT_DOMAIN); ?></em>
                     </div>
                 </div>
+                <?php
+                do_action('rnoc_email_templates_extra_fields');
+                ?>
                 <div class="cmb-row table-layout">
                     <div class="cmb-td">
                         <button type="button" data-path="<?php echo admin_url('admin-ajax.php'); ?>"

@@ -13,15 +13,23 @@ class RetainfulApi
     /**
      * Validate API Key
      * @param $api_key
-     * @return bool
+     * @return bool|array
      */
     function validateApi($api_key)
     {
         $response = $this->request($this->domain . 'app/' . $api_key);
-        if (isset($response->success) && $response->success)
-            return true;
-        else
+        if (isset($response->success) && $response->success) {
+            $plan = isset($response->plan) ? strtolower($response->plan) : 'free';
+            $status = isset($response->status) ? strtolower($response->status) : 'active';
+            $period_end = isset($response->period_end) ? strtolower($response->period_end) : 'never';
+            return array(
+                'plan' => $plan,
+                'status' => $status,
+                'expired_on' => $period_end
+            );
+        } else {
             return false;
+        }
     }
 
     /**

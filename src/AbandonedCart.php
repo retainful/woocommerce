@@ -486,7 +486,7 @@ class AbandonedCart
     function removeFinishedHooks()
     {
         global $wpdb;
-        $wpdb->query("delete from `" . $wpdb->prefix . "posts` where post_title like '%rnoc_abandoned_cart_send_email%' OR post_title like '%rnoc_abandoned_clear_abandoned_carts%' AND post_status like '%publish%'");
+        $wpdb->query("delete from `" . $wpdb->prefix . "posts` where (post_title like '%rnoc_abandoned_cart_send_email%' OR post_title like '%rnoc_abandoned_clear_abandoned_carts%') AND post_status like 'publish' AND post_type='scheduled-action'");
         return true;
     }
 

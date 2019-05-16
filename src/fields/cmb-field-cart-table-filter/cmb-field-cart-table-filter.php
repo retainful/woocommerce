@@ -67,4 +67,4 @@ class CMB2_Field_Cart_Table_Filter
     }
 }
 
-$cmb2_field_unlock_usage_restriction = new CMB2_Field_Cart_Table_Filter();
+new CMB2_Field_Cart_Table_Filter();

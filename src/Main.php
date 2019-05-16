@@ -114,6 +114,57 @@ class Main
         if (!$is_abandoned_tables_created || !$is_abandoned_emails_tables_created) {
             $this->createRequiredTables();
         }
+        //Premium check
+        add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
+    }
+
+    /**
+     * Schedule the action scheduler hooks
+     */
+    function actionSchedulerHooks()
+    {
+        if (function_exists('as_next_scheduled_action')) {
+            if (!as_next_scheduled_action('rnoc_abandoned_clear_abandoned_carts')) {
+                as_schedule_recurring_action(time(), 86400, 'rnoc_abandoned_clear_abandoned_carts');
+            }
+            if (!as_next_scheduled_action('rnocp_check_user_plan')) {
+                as_schedule_recurring_action(time(), 604800, 'rnocp_check_user_plan');
+            }
+            if (!as_next_scheduled_action('rnoc_abandoned_cart_send_email')) {
+                as_schedule_recurring_action(time(), 300, 'rnoc_abandoned_cart_send_email');
+            }
+        }
+    }
+
+    /**
+     * Check and update the user plan
+     */
+    function checkUserPlan()
+    {
+        $api_key = $this->admin->getApiKey();
+        if (!empty($api_key)) {
+            $this->admin->isApiEnabled($api_key);
+            $this->removeFinishedHooks();
+        }
+    }
+
+    /**
+     * Remove all hooks and schedule once
+     * @return bool
+     */
+    function removeFinishedHooks()
+    {
+        global $wpdb;
+        $res = true;
+        $scheduled_actions = $wpdb->get_results("SELECT ID from `" . $wpdb->prefix . "posts` where post_title like '%rnocp_check_user_plan%' AND post_status like 'publish' AND  post_type='scheduled-action'");
+        if (!empty($scheduled_actions)) {
+            foreach ($scheduled_actions as $action) {
+                if (!wp_delete_post($action->ID, true)) {
+                    $res = false;
+                }
+            }
+        }
+        return $res;
     }
 
     /**
@@ -227,22 +278,6 @@ class Main
     public static function instance()
     {
         return self::$init = (self::$init == NULL) ? new self() : self::$init;
-    }
-
-    /**
-     * Schedule the action scheduler hooks
-     */
-    function actionSchedulerHooks()
-    {
-        if (function_exists('as_next_scheduled_action')) {
-            if (!as_next_scheduled_action('rnoc_abandoned_clear_abandoned_carts')) {
-                as_schedule_recurring_action(time(), 86400, 'rnoc_abandoned_clear_abandoned_carts');
-            }
-            if (!as_next_scheduled_action('rnoc_abandoned_cart_send_email')) {
-                as_schedule_recurring_action(time(), 300, 'rnoc_abandoned_cart_send_email');
-                //as_schedule_cron_action(time(),'*/5 * * * *','rnoc_abandoned_cart_send_email');
-            }
-        }
     }
 
     /**

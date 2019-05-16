@@ -25,7 +25,9 @@
       "src/fields/cmb-field-cart-filter/cmb-field-cart-filter.php",
       "src/fields/cmb-field-email-templates/cmb-field-email-templates.php",
       "src/fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php",
-      "src/fields/cmb-field-unlock-usage-restriction/cmb-field-unlock-usage-restriction.php",
+      "src/fields/cmb-field-unlock-features/cmb-field-unlock-features.php",
+      "src/fields/cmb-field-upgrade-premium/cmb-field-upgrade-premium.php",
+      "src/fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php",
       "src/fields/cmb-field-tabs/cmb-field-tabs.php"
     ]
   }

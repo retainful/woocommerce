@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-class CMB2_Field_Unlock_Usage_Restriction
+class CMB2_Field_Unlock_Features
 {
     /**
      * Current version number
@@ -13,15 +13,22 @@ class CMB2_Field_Unlock_Usage_Restriction
      */
     public function __construct()
     {
-        add_filter('cmb2_render_unlock_usage_restriction', array($this, 'render_unlock_usage_restriction'), 10, 5);
+        add_filter('cmb2_render_unlock_features', array($this, 'render_unlock_features'), 10, 5);
     }
 
     /**
-     * Render select box field
+     * features unlock field
+     * @param $field
+     * @param $field_escaped_value
+     * @param $field_object_id
+     * @param $field_object_type
+     * @param $field_type_object
      */
-    public function render_unlock_usage_restriction($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
+    public function render_unlock_features($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
     {
+        $for = isset($field->args['for']) ? $field->args['for'] : 'usage_restriction';
         $admin = new \Rnoc\Retainful\Admin\Settings();
+        $redirect_url = isset($field->args['redirect_url']) ? $field->args['redirect_url'] : admin_url('admin.php?page=' . $admin->slug . '_license');
         ?>
         <style>
             .overlay-container {
@@ -62,19 +69,18 @@ class CMB2_Field_Unlock_Usage_Restriction
             }
         </style>
         <div class="overlay-container">
-            <img src="<?php echo RNOC_PLUGIN_URL ?>src/assets/images/pro-coupon-usage-restriction.png" width="100%"
+            <img src="<?php echo RNOC_PLUGIN_URL ?>src/assets/images/<?php echo $for; ?>.png" width="100%"
                  class="overlay-image">
             <div class="container-middle">
                 <div class="overlay-text"><span
                             class="dashicons-lock dashicons"></span><?php echo __('Unlock this features!', RNOC_TEXT_DOMAIN) ?>
                     <br><br>
-                    <a href="<?php echo admin_url('admin.php?page='.$admin->slug.'_license'); ?>"><?php echo __('Click Here!', RNOC_TEXT_DOMAIN); ?></a>
+                    <a href="<?php echo $redirect_url; ?>" target="_blank"><?php echo __('Click Here!', RNOC_TEXT_DOMAIN); ?></a>
                 </div>
             </div>
-            <input type="hidden" id="unlock_usage_restriction" value="1"/>
         </div>
         <?php
     }
 }
 
-$cmb2_field_unlock_usage_restriction = new CMB2_Field_Unlock_Usage_Restriction();
+$cmb2_field_unlock_features = new CMB2_Field_Unlock_Features();

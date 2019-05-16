@@ -277,7 +277,7 @@ class Settings
                 $next_order_coupon->add_field(array(
                     'name' => __('Product Categories', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'product_categories',
-                    'type' => 'rnoc_pw_multiselect',
+                    'type' => 'pw_multiselect',
                     'options' => $this->getCategories(),
                     'attributes' => array(
                         'placeholder' => __('Select categories', RNOC_TEXT_DOMAIN)
@@ -287,7 +287,7 @@ class Settings
                 $next_order_coupon->add_field(array(
                     'name' => __('Exclude Categories', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'exclude_product_categories',
-                    'type' => 'rnoc_pw_multiselect',
+                    'type' => 'pw_multiselect',
                     'options' => $this->getCategories(),
                     'attributes' => array(
                         'placeholder' => __('Select categories', RNOC_TEXT_DOMAIN)
@@ -297,26 +297,10 @@ class Settings
             } else {
                 $next_order_coupon->add_field(array(
                     'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_usage_restriction',
-                    'type' => 'unlock_usage_restriction'
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_features',
+                    'type' => 'unlock_features'
                 ));
             }
-            //Settings
-            $tabs_array = array(
-                array(
-                    'id' => 'general-settings',
-                    'icon' => 'dashicons-admin-site',
-                    'title' => __('General', RNOC_TEXT_DOMAIN),
-                    'fields' => array(
-                        RNOC_PLUGIN_PREFIX . 'cart_abandoned_time',
-                        RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days',
-                        RNOC_PLUGIN_PREFIX . 'email_admin_on_recovery',
-                        RNOC_PLUGIN_PREFIX . 'track_real_time_cart',
-                        RNOC_PLUGIN_PREFIX . 'cart_capture_msg',
-                    ),
-                )
-            );
-            $tabs_array = apply_filters('rnoc_extra_settings_tab', $tabs_array);
             $general_settings = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_settings',
                 'title' => __('Settings', RNOC_TEXT_DOMAIN),
@@ -327,8 +311,7 @@ class Settings
                 'parent_slug' => $this->slug,
                 'capability' => 'edit_shop_coupons',
                 'tab_title' => __('Settings', RNOC_TEXT_DOMAIN),
-                'save_button' => __('Save', RNOC_TEXT_DOMAIN),
-                'tabs' => $tabs_array
+                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
                 'name' => __('When to consider a cart as abandoned?', RNOC_TEXT_DOMAIN),
@@ -382,8 +365,64 @@ class Settings
                 'type' => 'textarea',
                 'desc' => __('Under GDPR, it is mandatory to inform the users when we track their cart activity in real-time. If you are not tracking, you can leave this empty', RNOC_TEXT_DOMAIN)
             ));
-            //Popup modal settings
-            apply_filters('rnoc_extra_settings_fields', $general_settings);
+            //Premium Addon
+            $plan_details = $this->getPlanDetails();
+            $plan = isset($plan_details['plan']) ? $plan_details['plan'] : 'free';
+            $tabs_array = array();
+            if (in_array($plan, array('pro', 'business'))) {
+                if (defined('RNOCP_VERSION')) {
+                    $tabs_array = array(
+                        array(
+                            'id' => 'general-settings',
+                            'icon' => 'dashicons-admin-plugins',
+                            'title' => __('Addon Lists', RNOC_TEXT_DOMAIN),
+                            'fields' => array(
+                                RNOC_PLUGIN_PREFIX . 'premium_addon'
+                            ),
+                        )
+                    );
+                    $tabs_array = apply_filters('rnoc_premium_addon_tab', $tabs_array);
+                }
+            }
+            $premium_addon = new_cmb2_box(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_premium_addon',
+                'title' => __('Premium', RNOC_TEXT_DOMAIN),
+                'object_types' => array('options-page'),
+                'option_key' => $this->slug . '_premium',
+                'tab_group' => $this->slug,
+                'vertical_tabs' => true,
+                'parent_slug' => $this->slug,
+                'capability' => 'edit_shop_coupons',
+                'tab_title' => __('Premium', RNOC_TEXT_DOMAIN),
+                'save_button' => __('Save', RNOC_TEXT_DOMAIN),
+                'tabs' => $tabs_array
+            ));
+            if (in_array($plan, array('pro', 'business'))) {
+                if (defined('RNOCP_VERSION')) {
+                    $premium_addon->add_field(array(
+                        'name' => '',
+                        'id' => RNOC_PLUGIN_PREFIX . 'premium_addon',
+                        'type' => 'premium_addon_list',
+                        'default' => '',
+                    ));
+                    //Popup modal settings
+                    apply_filters('rnoc_premium_addon_tab_content', $premium_addon);
+                } else {
+                    $premium_addon->add_field(array(
+                        'name' => '',
+                        'id' => RNOC_PLUGIN_PREFIX . 'unlock_features',
+                        'type' => 'upgrade_premium',
+                        'before' => '<style>#submit-cmb{display: none;}</style>'
+                    ));
+                }
+            } else {
+                $premium_addon->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_features',
+                    'type' => 'upgrade_premium',
+                    'before' => '<style>#submit-cmb{display: none;}</style>'
+                ));
+            }
             //License
             $license = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'license',
@@ -422,6 +461,18 @@ class Settings
     function getAdminSettings()
     {
         $abandoned_cart = get_option($this->slug . '_settings', array());
+        if (empty($abandoned_cart))
+            $abandoned_cart = array();
+        return $abandoned_cart;
+    }
+
+    /**
+     * Get the abandoned cart settings
+     * @return array|mixed
+     */
+    function getPremiumAddonSettings()
+    {
+        $abandoned_cart = get_option($this->slug . '_premium', array());
         if (empty($abandoned_cart))
             $abandoned_cart = array();
         return $abandoned_cart;
@@ -541,18 +592,50 @@ class Settings
     }
 
     /**
+     * get the plan details of the API
+     * @return array|mixed
+     */
+    function getPlanDetails()
+    {
+        $plan_details = get_option('rnoc_plan_details', array());
+        if (empty($plan_details)) {
+            $api_key = $this->getApiKey();
+            if (!empty($api_key)) {
+                $this->isApiEnabled($api_key);
+                $plan_details = get_option('rnoc_plan_details', array());
+            }
+        }
+        if (empty($plan_details)) {
+            $plan_details = array(
+                'plan' => 'free',
+                'status' => 'active',
+                'expired_on' => 'never'
+            );
+        }
+        return $plan_details;
+    }
+
+    /**
      * Check fo entered API key is valid or not
      * @param string $api_key
      * @return bool
      */
     function isApiEnabled($api_key = "")
     {
-        if (empty($api_key))
+        if (empty($api_key)) {
             $api_key = $this->getApiKey();
-        if (!empty($api_key))
-            return $this->api->validateApi($api_key);
-        else
+        }
+        if (!empty($api_key)) {
+            if ($details = $this->api->validateApi($api_key)) {
+                update_option('rnoc_plan_details', $details);
+                update_option('rnoc_last_plan_checked', current_time('timestamp'));
+                return true;
+            } else {
+                return false;
+            }
+        } else {
             return false;
+        }
     }
 
     /**
