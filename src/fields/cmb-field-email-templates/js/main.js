@@ -117,6 +117,7 @@
     });
 
     function saveTemplate(reload, path) {
+        $('#email_template_body-tmce').trigger('click');
         var template = $('.create-or-edit-template-form').find('select, textarea, input');
         var formdata = template.serializeArray();
         var data = {};

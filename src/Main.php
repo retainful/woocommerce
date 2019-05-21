@@ -116,6 +116,18 @@ class Main
         }
         //Premium check
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
+        $this->checkApi();
+    }
+
+    /**
+     * check api is valid or not on 3 days once
+     */
+    function checkApi()
+    {
+        $last_checked = get_option('rnoc_last_plan_checked', NULL);
+        if (empty($last_checked) || (current_time('timestamp') > intval($last_checked) + 259200)) {
+            $this->checkUserPlan();
+        }
     }
 
     /**
