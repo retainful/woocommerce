@@ -45,8 +45,37 @@ class CMB2_Field_Premium_Addon_List
             </div>
             <?php
         } else {
+            $available_addon_list = array(
+                array(
+                    'title' => 'Add to cart popup',
+                    'description' => 'Add to cart popup desc',
+                )
+            );
             ?>
-            <p style="color: red;text-align: center"><?php echo __('No addon available', RNOC_TEXT_DOMAIN); ?></p>
+            <div class="rnoc-grid-container">
+                <?php
+                foreach ($available_addon_list as $addon) {
+                    ?>
+                    <div class="rnoc-grid-cell">
+                        <div class="header"><?php echo $addon['title']; ?></div>
+                        <div class="description"><p><?php
+                                $description = $addon['description'];
+                                if (strlen($description) > 300) {
+                                    echo substr($description, 0, 300) . '...';
+                                } else {
+                                    echo ucfirst($description);
+                                }
+                                ?></p>
+                        </div>
+                        <div class="footer">
+                            <a href="https://app.retainful.com" target="_blank"
+                               class="button"><?php echo __('Upgrade to premium', RNOC_TEXT_DOMAIN); ?></a>
+                        </div>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
             <?php
         }
         ?>

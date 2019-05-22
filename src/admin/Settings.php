@@ -368,19 +368,18 @@ class Settings
             //Premium Addon
             $plan_details = $this->getPlanDetails();
             $plan = isset($plan_details['plan']) ? $plan_details['plan'] : 'free';
-            $tabs_array = array();
+            $tabs_array = array(
+                array(
+                    'id' => 'general-settings',
+                    'icon' => 'dashicons-admin-plugins',
+                    'title' => __('Addon Lists', RNOC_TEXT_DOMAIN),
+                    'fields' => array(
+                        RNOC_PLUGIN_PREFIX . 'premium_addon'
+                    ),
+                )
+            );
             if (in_array($plan, array('pro', 'business'))) {
                 if (defined('RNOCP_VERSION')) {
-                    $tabs_array = array(
-                        array(
-                            'id' => 'general-settings',
-                            'icon' => 'dashicons-admin-plugins',
-                            'title' => __('Addon Lists', RNOC_TEXT_DOMAIN),
-                            'fields' => array(
-                                RNOC_PLUGIN_PREFIX . 'premium_addon'
-                            ),
-                        )
-                    );
                     $tabs_array = apply_filters('rnoc_premium_addon_tab', $tabs_array);
                 }
             }
@@ -397,31 +396,17 @@ class Settings
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN),
                 'tabs' => $tabs_array
             ));
+            $premium_addon->add_field(array(
+                'name' => '',
+                'id' => RNOC_PLUGIN_PREFIX . 'premium_addon',
+                'type' => 'premium_addon_list',
+                'default' => '',
+            ));
             if (in_array($plan, array('pro', 'business'))) {
                 if (defined('RNOCP_VERSION')) {
-                    $premium_addon->add_field(array(
-                        'name' => '',
-                        'id' => RNOC_PLUGIN_PREFIX . 'premium_addon',
-                        'type' => 'premium_addon_list',
-                        'default' => '',
-                    ));
                     //Popup modal settings
                     apply_filters('rnoc_premium_addon_tab_content', $premium_addon);
-                } else {
-                    $premium_addon->add_field(array(
-                        'name' => '',
-                        'id' => RNOC_PLUGIN_PREFIX . 'unlock_features',
-                        'type' => 'upgrade_premium',
-                        'before' => '<style>#submit-cmb{display: none;}</style>'
-                    ));
                 }
-            } else {
-                $premium_addon->add_field(array(
-                    'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_features',
-                    'type' => 'upgrade_premium',
-                    'before' => '<style>#submit-cmb{display: none;}</style>'
-                ));
             }
             //License
             $license = new_cmb2_box(array(
