@@ -26,17 +26,12 @@ class CMB2_Field_Premium_Addon_List
                     <div class="rnoc-grid-cell">
                         <div class="header"><?php echo $addon->title(); ?></div>
                         <div class="description"><p><?php
-                                $description = $addon->description();
-                                if (strlen($description) > 300) {
-                                    echo substr($description, 0, 300) . '...';
-                                } else {
-                                    echo ucfirst($description);
-                                }
+                                echo $addon->description();
                                 ?></p>
                         </div>
                         <div class="footer">
-                            <button type="button" class="view-addon-btn button"
-                                    data-slug="<?php echo $addon->slug(); ?>"><?php echo __('View', RNOC_TEXT_DOMAIN); ?></button>
+                            <button type="button" class="view-addon-btn button button-green"
+                                    data-slug="<?php echo $addon->slug(); ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
                         </div>
                     </div>
                     <?php
@@ -47,29 +42,27 @@ class CMB2_Field_Premium_Addon_List
         } else {
             $available_addon_list = array(
                 array(
-                    'title' => 'Add to cart popup',
-                    'description' => 'Add to cart popup desc',
+                    'title' => 'Add to Cart popup (Premium)',
+                    'description' => 'Collect customer email at the time of adding to cart. This will help you recover the cart even if they abandon before checkout.',
                 )
             );
             ?>
             <div class="rnoc-grid-container">
                 <?php
+                $library = new Rnoc\Retainful\library\RetainfulApi();
+                $premium_url = $library->upgradePremiumUrl();
                 foreach ($available_addon_list as $addon) {
                     ?>
                     <div class="rnoc-grid-cell">
                         <div class="header"><?php echo $addon['title']; ?></div>
                         <div class="description"><p><?php
-                                $description = $addon['description'];
-                                if (strlen($description) > 300) {
-                                    echo substr($description, 0, 300) . '...';
-                                } else {
-                                    echo ucfirst($description);
-                                }
+                                echo $addon['description'];
                                 ?></p>
                         </div>
                         <div class="footer">
-                            <a href="https://app.retainful.com" target="_blank"
-                               class="button"><?php echo __('Upgrade to premium', RNOC_TEXT_DOMAIN); ?></a>
+                            <a href="<?php echo $premium_url; ?>"
+                               target="_blank"
+                               class="button button-green"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN); ?></a>
                         </div>
                     </div>
                     <?php

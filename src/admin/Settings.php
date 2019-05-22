@@ -372,7 +372,7 @@ class Settings
                 array(
                     'id' => 'general-settings',
                     'icon' => 'dashicons-admin-plugins',
-                    'title' => __('Addon Lists', RNOC_TEXT_DOMAIN),
+                    'title' => __('Add-ons List', RNOC_TEXT_DOMAIN),
                     'fields' => array(
                         RNOC_PLUGIN_PREFIX . 'premium_addon'
                     ),
@@ -437,6 +437,16 @@ class Settings
         if (is_admin()) {
             $this->addScript();
         }
+    }
+
+    /**
+     * Get the user current plan
+     * @return mixed|string
+     */
+    function getUserActivePlan()
+    {
+        $plan_details = $this->getPlanDetails();
+        return strtolower(isset($plan_details['plan']) ? $plan_details['plan'] : 'free');
     }
 
     /**

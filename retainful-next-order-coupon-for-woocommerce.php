@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin name: Retainful - Next order coupon for WooCommerce
+ * Plugin name: Retainful - Abandoned Cart Recovery Emails and Next Order Coupons
  * Plugin URI: https://www.retainful.com
- * Description: Drive repeat purchases by sending single-use, unique coupon codes to customers for their next purchase
+ * Description: Recover abandoned carts and drive repeat purchases by sending single-use, unique coupon codes to customers for their next purchase
  * Author: Retainful
  * Author URI: https://www.retainful.com
  * Version: 1.1.6

@@ -23,6 +23,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
     {
         $this->setupAdminScripts();
         $abandoned_cart_obj = new \Rnoc\Retainful\AbandonedCart();
+        $admin = new \Rnoc\Retainful\Admin\Settings();
         $start_end_dates = $abandoned_cart_obj->start_end_dates;
         $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_seven';
         if ($duration != "custom") {
@@ -36,9 +37,16 @@ class CMB2_Field_Abandoned_Cart_Dashboard
             $end_date = $start_end_dates['last_seven']['end_date'];
         }
         $cart_details = $abandoned_cart_obj->getStaticsForDashboard($start_date, $end_date);
+        $plan = $admin->getUserActivePlan();
+        $width_class = 'rnoc_width_23';
+        $is_free_user = false;
+        if (!in_array($plan, array('pro', 'business'))) {
+            $width_class = 'rnoc_width_18';
+            $is_free_user = true;
+        }
         ?>
         <div class="rnoc_counter_container">
-            <div class="rnoc_counter_widget widget_violet">
+            <div class="rnoc_counter_widget widget_violet <?php echo $width_class; ?>">
                 <div class="rnoc_counter_container">
                     <div class="rnoc_widget_title_container">
                         <span class="rnoc_counter_title"><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></span>
@@ -48,7 +56,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                     </div>
                 </div>
             </div>
-            <div class="rnoc_counter_widget widget_orange">
+            <div class="rnoc_counter_widget widget_orange <?php echo $width_class; ?>">
                 <div class="rnoc_counter_container">
                     <div class="rnoc_widget_title_container">
                         <span class="rnoc_counter_title"><?php echo __('Abandoned Amount', RNOC_TEXT_DOMAIN); ?></span>
@@ -58,7 +66,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                     </div>
                 </div>
             </div>
-            <div class="rnoc_counter_widget widget_blue">
+            <div class="rnoc_counter_widget widget_blue <?php echo $width_class; ?>">
                 <div class="rnoc_counter_container">
                     <div class="rnoc_widget_title_container">
                         <span class="rnoc_counter_title"><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></span>
@@ -68,7 +76,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                     </div>
                 </div>
             </div>
-            <div class="rnoc_counter_widget widget_green">
+            <div class="rnoc_counter_widget widget_green <?php echo $width_class; ?>">
                 <div class="rnoc_counter_container">
                     <div class="rnoc_widget_title_container">
                         <span class="rnoc_counter_title"><?php echo __('Recovered Amount', RNOC_TEXT_DOMAIN); ?></span>
@@ -78,6 +86,23 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                     </div>
                 </div>
             </div>
+            <?php
+            if ($is_free_user) {
+                ?>
+                <div class="rnoc_counter_widget widget_red <?php echo $width_class; ?>">
+                    <div class="rnoc_counter_container">
+                        <div class="rnoc_counter_box">
+                            <?php
+                            echo __('Upgrade to premium for more feature', RNOC_TEXT_DOMAIN);
+                            ?>
+                            <br>
+                            <a href="<?php echo '' ?>" target="_blank"><?php echo __('Upgrade', RNOC_TEXT_DOMAIN) ?></a>
+                        </div>
+                    </div>
+                </div>
+                <?php
+            }
+            ?>
         </div>
         <?php
     }

@@ -7,32 +7,77 @@
     position: relative;
     min-width: 150px;
     margin-right: 2%;
-    width: 23%;
     float: left;
-    background-color: #FFF;
-    color: #FFF;
+    color: #FFFFFF !important;
 }
 
-.rnoc_counter_widget.widget_violet{
+.rnoc_width_23 {
+    width: 23% !important;
+}
+
+.rnoc_width_18 {
+    width: 18% !important;
+}
+
+.rnoc_counter_widget.widget_violet {
     background: #5a3bb3;
-}.rnoc_counter_widget.widget_green{
+}
+
+.rnoc_counter_widget.widget_green {
     background: #01a300;
-}.rnoc_counter_widget.widget_orange{
+}
+
+.rnoc_counter_widget.widget_orange {
     background: #ea8906;
-}.rnoc_counter_widget.widget_blue{
+}
+
+.rnoc_counter_widget.widget_blue {
     background: #0192a5;
+}
+
+.rnoc_counter_widget.widget_red {
+    background: #ffffff;
+    color: #000000 !important;
+}
+
+.rnoc_counter_box {
+    box-shadow: 2px 2px 21px 1px #eee;
+    padding: 15px;
+    line-height: 25px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.rnoc_counter_box a {
+    display: inline-block;
+    padding: 8px 20px;
+    line-height: 1.6;
+    width: auto;
+    font-size: 14px;
+    margin-top: 10px;
+    border-radius: 4px;
+    background: #6772e5;
+    border-color: #6772e5;
+    color: #ffffff;
+    text-decoration: none;
 }
 
 .rnoc_counter_container .rnoc_counter_widget .rnoc_widget_title_container {
     text-align: center;
     padding: 8px;
 }
+
 .rnoc_counter_container .rnoc_counter_widget .rnoc_counter_title {
     font-size: 14px;
 }
 
 .rnoc_counter_container .rnoc_counter_widget .rnoc_counter_body {
-    padding: 0.5em;
+    padding: 30px;
     text-align: center;
     font-size: 2em;
+}
+
+.rnoc_counter_container .rnoc_counter_widget .rnoc_counter_body a {
+    text-decoration: none;
+    color: #ffffff !important;
 }

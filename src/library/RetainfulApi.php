@@ -9,6 +9,16 @@ if (!defined('ABSPATH')) exit;
 class RetainfulApi
 {
     public $domain = "https://api.retainful.com/v1/";
+    public $app_url = "https://app.retainful.com/";
+
+    /**
+     * Upgrade premium URL
+     * @return string
+     */
+    function upgradePremiumUrl()
+    {
+        return $this->app_url . '?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
+    }
 
     /**
      * Validate API Key
