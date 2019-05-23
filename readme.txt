@@ -2,8 +2,8 @@
 Contributors: retainful
 Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
 Requires at least: 4.0
-Tested up to: 5.1.1
-WC tested up to: 3.5.2
+Tested up to: 5.2.1
+WC tested up to: 3.6.2
 Requires PHP: 5.6
 Stable tag: 1.1.6
 License: GPLv2 or later
@@ -188,3 +188,6 @@ No. There is no charges for support.
 
 = 1.1.5 =
 * Fix: Scheduling events issue fixed
+
+= 1.1.6 =
+* New Feature:

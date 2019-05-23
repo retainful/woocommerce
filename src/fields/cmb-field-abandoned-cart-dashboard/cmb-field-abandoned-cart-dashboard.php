@@ -94,9 +94,11 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                         <div class="rnoc_counter_box">
                             <?php
                             echo __('Upgrade to premium for more feature', RNOC_TEXT_DOMAIN);
+                            $api = new \Rnoc\Retainful\library\RetainfulApi();
                             ?>
                             <br>
-                            <a href="<?php echo '' ?>" target="_blank"><?php echo __('Upgrade', RNOC_TEXT_DOMAIN) ?></a>
+                            <a href="<?php echo $api->upgradePremiumUrl(); ?>"
+                               target="_blank"><?php echo __('Upgrade', RNOC_TEXT_DOMAIN) ?></a>
                         </div>
                     </div>
                 </div>
@@ -114,8 +116,6 @@ class CMB2_Field_Abandoned_Cart_Dashboard
     {
         $asset_path = apply_filters('cmb2_field_abandoned_cart_dashboard_asset_path', plugins_url('', __FILE__));
         wp_enqueue_style('abandoned-cart-dashboard', $asset_path . '/css/main.css');
-        /*wp_enqueue_script('abandoned-cart-dashboard-chart-js', $asset_path . '/js/chart.min.js');
-        wp_enqueue_script('abandoned-cart-dashboard-init-chart-js', $asset_path . '/js/main.js');*/
     }
 }
 
