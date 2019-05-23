@@ -44,6 +44,10 @@ class CMB2_Field_Premium_Addon_List
                 array(
                     'title' => 'Add to Cart popup (Premium)',
                     'description' => 'Collect customer email at the time of adding to cart. This will help you recover the cart even if they abandon before checkout.',
+                ),
+                array(
+                    'title' => 'Coupon for email entry (Premium)',
+                    'description' => 'Encourage customers to enter the email to get a coupon code. This way you will come to know the customer email and can recover cart even if they abandon before checkout',
                 )
             );
             ?>

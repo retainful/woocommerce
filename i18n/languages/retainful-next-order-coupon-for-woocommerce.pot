@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: retainful\n"
-"POT-Creation-Date: 2019-05-23 10:42+0530\n"
-"PO-Revision-Date: 2019-05-23 10:42+0530\n"
+"POT-Creation-Date: 2019-05-23 11:54+0530\n"
+"PO-Revision-Date: 2019-05-23 11:54+0530\n"
 "Last-Translator: \n"
 "Language-Team: retainful\n"
 "Language: en\n"
@@ -137,7 +137,7 @@ msgid "Please enter App-Id"
 msgstr ""
 
 #: OrderCoupon.php:33
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:44
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:46
 msgid "Successfully connected to Retainful"
 msgstr ""
 
@@ -511,11 +511,13 @@ msgid "Recovered Amount"
 msgstr ""
 
 #: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:96
-msgid "Upgrade to premium for more feature"
+msgid "Get more features like Email collection at add to cart & coupons"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:99
-msgid "Upgrade"
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:101
+#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:69
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:97
+msgid "Upgrade to Premium"
 msgstr ""
 
 #: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:65
@@ -726,10 +728,6 @@ msgstr ""
 msgid "Go to Configuration"
 msgstr ""
 
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:65
-msgid "Upgrade to Premium"
-msgstr ""
-
 #: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:34
 msgid "Connect"
 msgstr ""
@@ -738,32 +736,47 @@ msgstr ""
 msgid "Re-Connect"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:39
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:41
 msgid "Dis-connect"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:45
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:47
 msgid "You have disconnected from Retainful!"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:54
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:58
 msgid "Get your API Key for free"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:56
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:67
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:60
 msgid ""
 "Increase sales & get more money per customer. Drive repeat purchases by "
 "automatically sending a\n"
-"                single-use coupon for next purchase."
+"                single-use coupon for next purchase. Unlock this feature by "
+"getting the App ID."
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:61
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:64
+msgid "Unlock this feature by getting the App ID."
+msgstr ""
+
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:69
 msgid "Get your API Key"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:72
-msgid "Visit Dashboard!"
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:83
+msgid ""
+"Visit Retainful Dashboard to view the analytics for your next order coupons."
+msgstr ""
+
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:86
+msgid "Dashboard"
+msgstr ""
+
+#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:93
+msgid ""
+"Upgrade to Premium and get more features like Email Collection during add to "
+"cart and Coupon for email entry."
 msgstr ""
 
 #: fields/cmb-field-unlock-features/cmb-field-unlock-features.php:76

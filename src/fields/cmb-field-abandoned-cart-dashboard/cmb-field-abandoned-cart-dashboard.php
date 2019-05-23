@@ -93,12 +93,12 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                     <div class="rnoc_counter_container">
                         <div class="rnoc_counter_box">
                             <?php
-                            echo __('Upgrade to premium for more feature', RNOC_TEXT_DOMAIN);
+                            echo __('Get more features like Email collection at add to cart & coupons', RNOC_TEXT_DOMAIN);
                             $api = new \Rnoc\Retainful\library\RetainfulApi();
                             ?>
                             <br>
                             <a href="<?php echo $api->upgradePremiumUrl(); ?>"
-                               target="_blank"><?php echo __('Upgrade', RNOC_TEXT_DOMAIN) ?></a>
+                               target="_blank"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN) ?></a>
                         </div>
                     </div>
                 </div>
