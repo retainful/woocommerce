@@ -26,7 +26,7 @@ class CMB2_Field_Unlock_Features
      */
     public function render_unlock_features($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
     {
-        $for = isset($field->args['for']) ? $field->args['for'] : 'usage_restriction';
+        $for = isset($field->args['for']) ? $field->args['for'] : 'pro-coupon-usage-restriction';
         $admin = new \Rnoc\Retainful\Admin\Settings();
         $redirect_url = isset($field->args['redirect_url']) ? $field->args['redirect_url'] : admin_url('admin.php?page=' . $admin->slug . '_license');
         ?>
@@ -75,7 +75,8 @@ class CMB2_Field_Unlock_Features
                 <div class="overlay-text"><span
                             class="dashicons-lock dashicons"></span><?php echo __('Unlock this features!', RNOC_TEXT_DOMAIN) ?>
                     <br><br>
-                    <a href="<?php echo $redirect_url; ?>" target="_blank"><?php echo __('Click Here!', RNOC_TEXT_DOMAIN); ?></a>
+                    <a href="<?php echo $redirect_url; ?>"
+                       target="_blank"><?php echo __('Click Here!', RNOC_TEXT_DOMAIN); ?></a>
                 </div>
             </div>
         </div>

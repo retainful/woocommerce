@@ -23,6 +23,7 @@ class Settings
      */
     function renderPage()
     {
+        add_filter('cmb2_override_meta_save', array($this, 'save_custom_data'), 10, 2);
         add_action('cmb2_admin_init', function () {
             $is_app_connected = $this->isAppConnected();
             /*
@@ -74,36 +75,44 @@ class Settings
                 'tab_title' => __('Email Templates', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
-            $abandoned_cart_email_templates->add_field(array(
-                'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'email_from_name',
-                'type' => 'text',
-                'before_row' => '<h4>' . __("Abandoned Cart Email Templates", RNOC_TEXT_DOMAIN) . '</h4>',
-                'desc' => __('Enter the name that should appear in the email sent.', RNOC_TEXT_DOMAIN),
-                'default' => 'Admin'
-            ));
-            $admin_email = get_option('admin_email');
-            $abandoned_cart_email_templates->add_field(array(
-                'name' => __('"From" Address', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'email_from_address',
-                'type' => 'text',
-                'desc' => __('Email address from which the reminder emails should be sent.', RNOC_TEXT_DOMAIN),
-                'default' => $admin_email
-            ));
-            $abandoned_cart_email_templates->add_field(array(
-                'name' => __('"Reply To " Address', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'email_reply_address',
-                'type' => 'text',
-                'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
-                'default' => $admin_email
-            ));
-            $abandoned_cart_email_templates->add_field(array(
-                'name' => '',
-                'id' => RNOC_PLUGIN_PREFIX . 'email_templates_list',
-                'type' => 'email_templates',
-                'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
-                'default' => $admin_email
-            ));
+            if (!isset($_REQUEST['action'])) {
+                $abandoned_cart_email_templates->add_field(array(
+                    'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'email_from_name',
+                    'type' => 'text',
+                    'before_row' => '<h4>' . __("Abandoned Cart Email Templates", RNOC_TEXT_DOMAIN) . '</h4>',
+                    'desc' => __('Enter the name that should appear in the email sent.', RNOC_TEXT_DOMAIN),
+                    'default' => 'Admin'
+                ));
+                $admin_email = get_option('admin_email');
+                $abandoned_cart_email_templates->add_field(array(
+                    'name' => __('"From" Address', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'email_from_address',
+                    'type' => 'text',
+                    'desc' => __('Email address from which the reminder emails should be sent.', RNOC_TEXT_DOMAIN),
+                    'default' => $admin_email
+                ));
+                $abandoned_cart_email_templates->add_field(array(
+                    'name' => __('"Reply To " Address', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'email_reply_address',
+                    'type' => 'text',
+                    'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
+                    'default' => $admin_email
+                ));
+                $abandoned_cart_email_templates->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'email_templates_list',
+                    'type' => 'email_templates',
+                    'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
+                    'default' => $admin_email
+                ));
+            } else {
+                $abandoned_cart_email_templates->add_field(array(
+                    'name' => '',
+                    'id' => 'email_template_edit',
+                    'type' => 'email_template_edit'
+                ));
+            }
             //Next order tab
             $next_order_coupon = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful',
@@ -125,6 +134,7 @@ class Settings
                     '0' => __('Percentage', RNOC_TEXT_DOMAIN),
                     '1' => __('Flat', RNOC_TEXT_DOMAIN)
                 ),
+                'before_row' => '<p class="submit"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="' . __("Save", RNOC_TEXT_DOMAIN) . '"></p>',
                 'default' => '0'
             ));
             $next_order_coupon->add_field(array(

@@ -107,8 +107,8 @@ class Main
         add_action('wp_ajax_rnoc_save_email_template', array($this->abandoned_cart, 'saveEmailTemplate'));
         add_action('wp_ajax_rnoc_activate_or_deactivate_template', array($this->abandoned_cart, 'changeTemplateStatus'));
         add_action('wp_ajax_rnoc_remove_template', array($this->abandoned_cart, 'removeTemplate'));
-        add_action('wp_ajax_rnoc_edit_template', array($this->abandoned_cart, 'editTemplate'));
         add_action('wp_ajax_rnoc_send_sample_email', array($this->abandoned_cart, 'sendSampleEmail'));
+        add_action('wp_ajax_rnoc_get_template_by_id', array($this->abandoned_cart, 'getEmailTemplate'));
         $is_abandoned_tables_created = get_option('retainful_abandoned_cart_table_created', 0);
         $is_abandoned_emails_tables_created = get_option('retainful_abandoned_emails_table_created', 0);
         if (!$is_abandoned_tables_created || !$is_abandoned_emails_tables_created) {

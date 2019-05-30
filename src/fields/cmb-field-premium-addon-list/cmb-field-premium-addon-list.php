@@ -51,6 +51,11 @@ class CMB2_Field_Premium_Addon_List
                 )
             );
             ?>
+            <style>
+                #submit-cmb {
+                    display: none;
+                }
+            </style>
             <div class="rnoc-grid-container">
                 <?php
                 $library = new Rnoc\Retainful\library\RetainfulApi();

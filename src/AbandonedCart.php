@@ -635,7 +635,7 @@ class AbandonedCart
             $customer_id = $this->getUserSessionKey();
         }
         $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
-        if(!empty($row)) {
+        if (!empty($row)) {
             if ($current_time < $row->cart_expiry) {
                 $wpdb->update($this->cart_history_table, array(/*'cart_expiry' => $current_time,*/
                     'order_id' => $order_id), array('id' => $row->id), array(/*'%s',*/
@@ -1033,25 +1033,27 @@ class AbandonedCart
         wp_send_json($response);
     }
 
-    /**
-     * Remove the template
-     */
-    function editTemplate()
+    function getEmailTemplate()
     {
-        $response = array();
-        if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
-            $template = $this->getTemplate(intval($_REQUEST['id']));
-            if (!empty($template)) {
-                $response['template'] = $template;
+        $template_id = (isset($_REQUEST['id'])) ? sanitize_key($_REQUEST['id']) : 0;
+        $template_type = (isset($_REQUEST['type'])) ? sanitize_key($_REQUEST['type']) : 'free';
+        $content = '';
+        $success = false;
+        if (!empty($template_id) && !empty($template_type)) {
+            if ($template_type == "free") {
+                if (file_exists(RNOC_PLUGIN_PATH . 'src/admin/templates/default-' . $template_id . '.html')) {
+                    ob_start();
+                    include RNOC_PLUGIN_PATH . 'src/admin/templates/default-' . $template_id . '.html';
+                    $content = ob_get_clean();
+                    $success = true;
+                } else {
+                    $content = __('Sorry, Template not found', RNOC_TEXT_DOMAIN);
+                }
             } else {
-                $response['error'] = true;
-                $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);
+                $content = __('Will come soon for you! :)', RNOC_TEXT_DOMAIN);
             }
-        } else {
-            $response['error'] = true;
-            $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);
         }
-        wp_send_json($response);
+        wp_send_json(array('success' => $success, 'content' => $content));
     }
 
     /**

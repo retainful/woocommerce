@@ -17,3 +17,6 @@
     box-shadow: 0 1px 0 #3eae50;
     text-decoration: none;
 }
+p.submit{
+    text-align: right !important;
+}

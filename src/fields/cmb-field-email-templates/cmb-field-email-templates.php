@@ -43,6 +43,7 @@ class CMB2_Field_Email_After
         </div>
         <?php
         $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
+        $settings = new \Rnoc\Retainful\Admin\Settings();
         $templates = $abandoned_cart->getEmailTemplates();
         ?>
         <p style="text-align: center;"><?php echo __("Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.", RNOC_TEXT_DOMAIN) ?></p>
@@ -71,8 +72,9 @@ class CMB2_Field_Email_After
                                 </label>
                             </td>
                             <td>
-                                <button type="button" data-template="<?php echo $template->id ?>"
-                                        class="button button-green edit-email-template"><?php echo __('Edit', RNOC_TEXT_DOMAIN) ?></button>
+                                <a type="button"
+                                   href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&action=edit-template&template=' . $template->id) ?>"
+                                   class="button button-green"><?php echo __('Edit', RNOC_TEXT_DOMAIN) ?></a>
                                 <button type="button" data-template="<?php echo $template->id ?>"
                                         class="button button-red remove-email-template"><?php echo __('Delete', RNOC_TEXT_DOMAIN) ?></button>
                             </td>
@@ -92,83 +94,8 @@ class CMB2_Field_Email_After
                 </tbody>
             </table>
             <div class="force-center">
-                <a href="javascript:" data-path="<?php echo admin_url('admin-ajax.php'); ?>"
-                   data-id="0"
+                <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&action=create-email-template'); ?>"
                    class="button button-primary create-or-add-template"><?php echo __('Create New Template', RNOC_TEXT_DOMAIN) ?></a>
-            </div>
-        </div>
-        <div class="create-or-edit-template-form">
-            <div class="cmb2-metabox cmb-field-list">
-                <div class="cmb-row table-layout">
-                    <div class="cmb-th">
-                        <label><?php echo __('Template Name'); ?></label>
-                    </div>
-                    <div class="cmb-td">
-                        <input name="template_name" type="text" class="regular-text" id="field_template_name">
-                        <input name="id" type="hidden" class="regular-text" value="0" id="field_id">
-                    </div>
-                </div>
-                <div class="cmb-row table-layout">
-                    <div class="cmb-th">
-                        <label><?php echo __('Template Subject'); ?></label>
-                    </div>
-                    <div class="cmb-td">
-                        <input name="subject" type="text" class="regular-text" id="field_subject">
-                        <br>
-                        <em><?php echo __('Use <b>{{customer_name}}</b> - To display Customer name', RNOC_TEXT_DOMAIN); ?></em>
-                    </div>
-                </div>
-                <div class="cmb-row table-layout">
-                    <div class="cmb-th">
-                        <label><?php echo __('Email Body'); ?></label>
-                    </div>
-                    <div class="cmb-td">
-                        <?php
-                        wp_editor('', 'email_template_body', $settings = array('editor_height' => '500'));
-                        echo __('You can use following short codes in your email template:<br> <b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - Site link<br> <b>{{cart_recovery_link}}</b> - Link to recover user cart<br><b>{{user_cart}}</b> - Cart details', RNOC_TEXT_DOMAIN)
-                        ?>
-                    </div>
-                </div>
-                <div class="cmb-row table-layout">
-                    <div class="cmb-th">
-                        <label><?php echo __('Send this email in'); ?></label>
-                    </div>
-                    <div class="cmb-td">
-                        <input type="text" class="number_only_field" name="frequency" value="1" id="field_frequency">
-                        <select name="day_or_hour" id="field_day_or_hour">
-                            <option value="Hours"><?php echo __('Hour(s)', RNOC_TEXT_DOMAIN) ?></option>
-                            <option value="Days"><?php echo __('Day(s)', RNOC_TEXT_DOMAIN) ?></option>
-                        </select>
-                        <em><?php echo __('after cart is abandoned.', RNOC_TEXT_DOMAIN); ?></em>
-                    </div>
-                </div>
-                <div class="cmb-row table-layout">
-                    <div class="cmb-th">
-                        <label><?php echo __('Send a test email to'); ?></label>
-                    </div>
-                    <div class="cmb-td">
-                        <input type="text" class="regular-text" id="test_mail_to">
-                        <button type="button" data-path="<?php echo admin_url('admin-ajax.php'); ?>"
-                                class="send-test-email button"><?php echo __('Send a test Email', RNOC_TEXT_DOMAIN); ?></button>
-                        <span id="sending_email_loader"
-                              style="display: none;"><?php echo __('Sending...', RNOC_TEXT_DOMAIN); ?></span>
-                        <br>
-                        <em><?php echo __('Enter email id to receive an test email.', RNOC_TEXT_DOMAIN); ?></em>
-                    </div>
-                </div>
-                <?php
-                do_action('rnoc_email_templates_extra_fields');
-                ?>
-                <div class="cmb-row table-layout">
-                    <div class="cmb-td">
-                        <button type="button" data-path="<?php echo admin_url('admin-ajax.php'); ?>"
-                                class="button button-primary save-email-template"><?php echo __('Save', RNOC_TEXT_DOMAIN); ?></button>
-                        <button type="button" data-path="<?php echo admin_url('admin-ajax.php'); ?>"
-                                class="button button-green save-close-email-template"><?php echo __('Save and close', RNOC_TEXT_DOMAIN); ?></button>
-                        <button type="button"
-                                class="button button-red reload-button"><?php echo __('Close', RNOC_TEXT_DOMAIN); ?></button>
-                    </div>
-                </div>
             </div>
         </div>
         <?php
