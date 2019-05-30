@@ -1050,7 +1050,13 @@ class AbandonedCart
                     $content = __('Sorry, Template not found', RNOC_TEXT_DOMAIN);
                 }
             } else {
-                $content = __('Will come soon for you! :)', RNOC_TEXT_DOMAIN);
+                $template = apply_filters('rnoc_get_email_template_by_id', $template_id);
+                if (!empty($template)) {
+                    $content = $template;
+                    $success = true;
+                } else {
+                    $content = __('Sorry, Template not found', RNOC_TEXT_DOMAIN);
+                }
             }
         }
         wp_send_json(array('success' => $success, 'content' => $content));

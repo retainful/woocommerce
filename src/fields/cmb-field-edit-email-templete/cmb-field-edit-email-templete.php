@@ -76,51 +76,50 @@ class CMB2_Field_Edit_Email_Template
                     </div>
                     <div class="cmb-td">
                         <div class="rnoc-grid">
-                            <div class="grid-column">
-                                <div class="template-preview"
-                                     style="background-image: url('<?php echo RNOC_PLUGIN_URL . 'src/admin/templates/preview/1.png'; ?>')"></div>
-                                <button data-template="1" type="button" class="insert-template"
-                                        data-type="free"><?php echo __('Insert template', RNOC_TEXT_DOMAIN); ?></button>
-                            </div>
-                            <div class="grid-column">
-                                <div class="template-preview"
-                                     style="background-image: url('<?php echo RNOC_PLUGIN_URL . 'src/admin/templates/preview/2.png'; ?>')"></div>
-                                <button data-template="2" type="button" class="insert-template"
-                                        data-type="free"><?php echo __('Insert template', RNOC_TEXT_DOMAIN); ?></button>
-                            </div>
-                            <div class="grid-column">
-                                <div class="template-preview"
-                                     style="background-image: url('<?php echo RNOC_PLUGIN_URL . 'src/admin/templates/preview/3.png'; ?>')"></div>
-                                <button data-template="3" type="button" class="insert-template"
-                                        data-type="free"><?php echo __('Insert template', RNOC_TEXT_DOMAIN); ?></button>
-                            </div>
-                            <div class="grid-column">
-                                <div class="template-preview"
-                                     style="background-image: url('<?php echo RNOC_PLUGIN_URL . 'src/admin/templates/preview/4.png'; ?>')">
-                                    <div class="overlay"><?php echo __('Premium', RNOC_TEXT_DOMAIN); ?></div>
+                            <?php
+                            for ($i = 1; $i <= 3; $i++) {
+                                ?>
+                                <div class="grid-column">
+                                    <div class="template-preview"
+                                         style="background-image: url('<?php echo RNOC_PLUGIN_URL . 'src/admin/templates/preview/' . $i . '.png'; ?>')"></div>
+                                    <button data-template="<?php echo $i; ?>" type="button" class="insert-template"
+                                            data-type="free"><?php echo __('Insert template', RNOC_TEXT_DOMAIN); ?></button>
                                 </div>
-                                <div class="get-now-btn"><a
-                                            href="<?php echo $api->upgradePremiumUrl(); ?>"><span class="dashicons dashicons-lock"></span><?php echo __('Unlock', RNOC_TEXT_DOMAIN); ?></a>
-                                </div>
-                            </div>
-                            <div class="grid-column">
-                                <div class="template-preview"
-                                     style="background-image: url('<?php echo RNOC_PLUGIN_URL . 'src/admin/templates/preview/5.png'; ?>')">
-                                    <div class="overlay"><?php echo __('Premium', RNOC_TEXT_DOMAIN); ?></div>
-                                </div>
-                                <div class="get-now-btn"><a
-                                            href="<?php echo $api->upgradePremiumUrl(); ?>"><span class="dashicons dashicons-lock"></span><?php echo __('Unlock', RNOC_TEXT_DOMAIN); ?></a>
-                                </div>
-                            </div>
-                            <div class="grid-column">
-                                <div class="template-preview"
-                                     style="background-image: url('<?php echo RNOC_PLUGIN_URL . 'src/admin/templates/preview/6.png'; ?>')">
-                                    <div class="overlay"><?php echo __('Premium', RNOC_TEXT_DOMAIN); ?></div>
-                                </div>
-                                <div class="get-now-btn"><a
-                                            href="<?php echo $api->upgradePremiumUrl(); ?>"><span class="dashicons dashicons-lock"></span><?php echo __('Unlock', RNOC_TEXT_DOMAIN); ?></a>
-                                </div>
-                            </div>
+                                <?php
+                            }
+                            $premium_templates = array();
+                            $premium_templates = apply_filters('rnoc_premium_templates_list', $premium_templates);
+                            if (empty($premium_templates)) {
+                                for ($i = 1; $i <= 3; $i++) {
+                                    ?>
+                                    <div class="grid-column">
+                                        <div class="template-preview"
+                                             style="background-image: url('<?php echo RNOC_PLUGIN_URL . 'src/admin/templates/preview/premium-' . $i . '.png'; ?>')">
+                                            <div class="overlay"><?php echo __('Premium', RNOC_TEXT_DOMAIN); ?></div>
+                                        </div>
+                                        <div class="get-now-btn"><a
+                                                    href="<?php echo $api->upgradePremiumUrl(); ?>"><span
+                                                        class="dashicons dashicons-lock"></span><?php echo __('Unlock', RNOC_TEXT_DOMAIN); ?>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <?php
+                                }
+                            } else {
+                                foreach ($premium_templates as $id) {
+                                    ?>
+                                    <div class="grid-column">
+                                        <div class="template-preview"
+                                             style="background-image: url('<?php echo RNOC_PLUGIN_URL . 'src/admin/templates/preview/premium-' . $id . '.png'; ?>')">
+                                            <div class="overlay"><?php echo __('Premium', RNOC_TEXT_DOMAIN); ?></div>
+                                        </div>
+                                        <button data-template="<?php echo $id; ?>" type="button" class="insert-template"
+                                                data-type="premium"><?php echo __('Insert template', RNOC_TEXT_DOMAIN); ?></button>
+                                    </div>
+                                    <?php
+                                }
+                            }
+                            ?>
                         </div>
                         <?php
                         wp_editor(isset($template->body) ? $template->body : '', 'email_template_body');

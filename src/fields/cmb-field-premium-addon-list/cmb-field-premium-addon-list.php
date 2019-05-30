@@ -22,19 +22,22 @@ class CMB2_Field_Premium_Addon_List
             <div class="rnoc-grid-container">
                 <?php
                 foreach ($available_addon_list as $addon) {
-                    ?>
-                    <div class="rnoc-grid-cell">
-                        <div class="header"><?php echo $addon->title(); ?></div>
-                        <div class="description"><p><?php
-                                echo $addon->description();
-                                ?></p>
+                    $title = $addon->title();
+                    if (!empty($title)) {
+                        ?>
+                        <div class="rnoc-grid-cell">
+                            <div class="header"><?php echo $title; ?></div>
+                            <div class="description"><p><?php
+                                    echo $addon->description();
+                                    ?></p>
+                            </div>
+                            <div class="footer">
+                                <button type="button" class="view-addon-btn button button-green"
+                                        data-slug="<?php echo $addon->slug(); ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
+                            </div>
                         </div>
-                        <div class="footer">
-                            <button type="button" class="view-addon-btn button button-green"
-                                    data-slug="<?php echo $addon->slug(); ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
-                        </div>
-                    </div>
-                    <?php
+                        <?php
+                    }
                 }
                 ?>
             </div>
