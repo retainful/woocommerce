@@ -61,16 +61,16 @@
         },
         {
             "name": "jaybizzle/crawler-detect",
-            "version": "v1.2.81",
+            "version": "v1.2.82",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JayBizzle/Crawler-Detect.git",
-                "reference": "ffb1880f8e9610569d3bc70dc90bf07db311471d"
+                "reference": "48522d4b3495ac8eef2a7298f128f35d7ea3f49b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JayBizzle/Crawler-Detect/zipball/ffb1880f8e9610569d3bc70dc90bf07db311471d",
-                "reference": "ffb1880f8e9610569d3bc70dc90bf07db311471d",
+                "url": "https://api.github.com/repos/JayBizzle/Crawler-Detect/zipball/48522d4b3495ac8eef2a7298f128f35d7ea3f49b",
+                "reference": "48522d4b3495ac8eef2a7298f128f35d7ea3f49b",
                 "shasum": ""
             },
             "require": {
@@ -106,7 +106,7 @@
                 "crawlerdetect",
                 "php crawler detect"
             ],
-            "time": "2019-04-23T20:02:21+00:00"
+            "time": "2019-05-21T20:51:49+00:00"
         },
         {
             "name": "jaybizzle/laravel-crawler-detect",
