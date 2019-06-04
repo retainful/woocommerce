@@ -19,6 +19,14 @@ class WcFunctions
         return NULL;
     }
 
+    function getAvailableOrderStatuses()
+    {
+        if (function_exists('wc_get_order_statuses')) {
+            return wc_get_order_statuses();
+        }
+        return array();
+    }
+
     function getProduct($product_id)
     {
         if (function_exists('wc_get_product')) {
@@ -91,6 +99,19 @@ class WcFunctions
     {
         if (method_exists($order, 'get_used_coupons')) {
             return $order->get_used_coupons();
+        }
+        return NULL;
+    }
+
+    /**
+     * Get status of order
+     * @param $order
+     * @return null
+     */
+    function getStatus($order)
+    {
+        if (method_exists($order, 'get_status')) {
+            return $order->get_status();
         }
         return NULL;
     }

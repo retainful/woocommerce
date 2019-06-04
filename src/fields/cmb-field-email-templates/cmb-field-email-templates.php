@@ -73,7 +73,7 @@ class CMB2_Field_Email_After
                             </td>
                             <td>
                                 <a type="button"
-                                   href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&action=edit-template&template=' . $template->id) ?>"
+                                   href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=edit-template&template=' . $template->id) ?>"
                                    class="button button-green"><?php echo __('Edit', RNOC_TEXT_DOMAIN) ?></a>
                                 <button type="button" data-template="<?php echo $template->id ?>"
                                         class="button button-red remove-email-template"><?php echo __('Delete', RNOC_TEXT_DOMAIN) ?></button>

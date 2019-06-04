@@ -5,6 +5,7 @@ namespace Rnoc\Retainful\Admin;
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\library\RetainfulApi;
+use Rnoc\Retainful\WcFunctions;
 
 class Settings
 {
@@ -75,7 +76,7 @@ class Settings
                 'tab_title' => __('Email Templates', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
-            if (!isset($_REQUEST['action'])) {
+            if (!isset($_REQUEST['task'])) {
                 $abandoned_cart_email_templates->add_field(array(
                     'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'email_from_name',
@@ -126,6 +127,15 @@ class Settings
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             $next_order_coupon->add_field(array(
+                'name' => __('Order Status', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'preferred_order_status',
+                'type' => 'pw_multiselect',
+                'options' => $this->availableOrderStatuses(),
+                'default' => array('all'),
+                'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN),
+                'before_row' => '<p class="submit"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="' . __("Save", RNOC_TEXT_DOMAIN) . '"></p>',
+            ));
+            $next_order_coupon->add_field(array(
                 'name' => __('Coupon type', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
                 'type' => 'radio',
@@ -134,7 +144,6 @@ class Settings
                     '0' => __('Percentage', RNOC_TEXT_DOMAIN),
                     '1' => __('Flat', RNOC_TEXT_DOMAIN)
                 ),
-                'before_row' => '<p class="submit"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="' . __("Save", RNOC_TEXT_DOMAIN) . '"></p>',
                 'default' => '0'
             ));
             $next_order_coupon->add_field(array(
@@ -449,6 +458,17 @@ class Settings
         }
     }
 
+    function availableOrderStatuses()
+    {
+        $default = array('all' => __('All', RNOC_TEXT_DOMAIN));
+        $woo_functions = new WcFunctions();
+        $woo_statuses = $woo_functions->getAvailableOrderStatuses();
+        if (is_array($woo_statuses)) {
+            return array_merge($default, $woo_statuses);
+        }
+        return $default;
+    }
+
     /**
      * Get the user current plan
      * @return mixed|string
@@ -700,18 +720,31 @@ class Settings
 
     /**
      * get coupon settings from admin
+     * @return array
+     */
+    function getCouponValidOrderStatuses()
+    {
+        $statuses = array('all');
+        $settings = get_option($this->slug, array());
+        if (!empty($settings)) {
+            return isset($settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status'] : $statuses;
+        }
+        return $statuses;
+    }
+
+    /**
+     * get coupon settings from admin
      * @return bool
      */
     function autoGenerateCouponsForOldOrders()
     {
-        $generate = true;
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
             if (isset($settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon']) && $settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon'] == 0) {
-                $generate = false;
+                return false;
             }
         }
-        return $generate;
+        return true;
     }
 
     /**

@@ -169,12 +169,16 @@ class OrderCoupon
      * @param $sent_to_admin
      * @param $plain_text
      * @param $email
+     * @return bool
      */
     function attachOrderCoupon($order, $sent_to_admin, $plain_text, $email)
     {
+        $order_id = $this->wc_functions->getOrderId($order);
+        if (!$this->hasValidOrderStatus($order_id)) {
+            return false;
+        }
         $coupon_code = '';
         if ($this->admin->autoGenerateCouponsForOldOrders()) {
-            $order_id = $this->wc_functions->getOrderId($order);
             //Create new coupon if coupon not found for order while sending the email
             $coupon_code = $this->createNewCoupon($order_id, array());
             $this->scheduleSync($order_id);
@@ -511,6 +515,26 @@ class OrderCoupon
     }
 
     /**
+     * Check for order has valid order status to generate coupon
+     * @param $order_id
+     * @return bool
+     */
+    function hasValidOrderStatus($order_id)
+    {
+        $valid_order_statuses = $this->admin->getCouponValidOrderStatuses();
+        if (!empty($valid_order_statuses)) {
+            if (!in_array('all', $valid_order_statuses)) {
+                $order = $this->wc_functions->getOrder($order_id);
+                $status = 'wc-' . $this->wc_functions->getStatus($order);
+                if (!in_array($status, $valid_order_statuses)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * Create new coupon
      * @param $order_id
      * @param $data
@@ -521,6 +545,9 @@ class OrderCoupon
         $order_id = sanitize_key($order_id);
         if (empty($order_id)) return false;
         $coupon = $this->isCouponFound($order_id);
+        if (!$this->hasValidOrderStatus($order_id)) {
+            return NULL;
+        }
         $order = $this->wc_functions->getOrder($order_id);
         $email = $this->wc_functions->getOrderEmail($order);
         //Sometime email not found in the order object when order created from backend. So, get  from the request
