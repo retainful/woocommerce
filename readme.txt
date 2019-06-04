@@ -220,3 +220,6 @@ No. There is no charges for support.
 
 = 1.1.7 =
 * New Feature: Free abandoned cart emails, with single click usage
+
+= 1.1.8 =
+* New Feature: Generate coupons only for particular order status
