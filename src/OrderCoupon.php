@@ -211,6 +211,9 @@ class OrderCoupon
                     $is_api_enabled = $this->admin->isAppConnected();
                     if ($is_api_enabled && !$sent_to_admin) {
                         $request_params = $this->getRequestParams($order);
+                        if (isset($request_params['new_coupon']) && empty($request_params['new_coupon'])) {
+                            $request_params['new_coupon'] = $coupon_code;
+                        }
                         $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
                     }
                 }
