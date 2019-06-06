@@ -94,7 +94,7 @@ class CMB2_Field_Email_After
                 </tbody>
             </table>
             <div class="force-center">
-                <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&action=create-email-template'); ?>"
+                <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=create-email-template'); ?>"
                    class="button button-primary create-or-add-template"><?php echo __('Create New Template', RNOC_TEXT_DOMAIN) ?></a>
             </div>
         </div>

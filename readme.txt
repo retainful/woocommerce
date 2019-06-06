@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.2.1
 WC tested up to: 3.6.4
 Requires PHP: 5.6
-Stable tag: 1.1.8
+Stable tag: 1.1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -223,3 +223,9 @@ No. There is no charges for support.
 
 = 1.1.8 =
 * New Feature: Generate coupons only for particular order status
+
+= 1.1.9 =
+* Fix: Problem in creating new Email template
+* Improvement: Save Email-Template before sending the test E-Mail
+* Fix: Next order coupon Coupon expiry date issue
+* Fix: Next order coupon exclude products not saved issue

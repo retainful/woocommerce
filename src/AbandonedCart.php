@@ -975,7 +975,7 @@ class AbandonedCart
                 $customer_name = $current_user->user_login;
                 $admin_email = $current_user->user_email;
             }
-            $email_subject = $_REQUEST['subject'];
+            $email_subject = sanitize_text_field($_REQUEST['subject']);
             if (empty($email_subject)) {
                 $email_subject = 'Hey {{customer_name}} You left something in your cart';
             }

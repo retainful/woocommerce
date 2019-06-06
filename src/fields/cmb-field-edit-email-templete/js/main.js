@@ -1,9 +1,10 @@
 (function ($) {
     var path = email_template.path;
     $(document).on('click', '.send-test-email', function () {
+        $(".save-email-template").trigger('click');
         var editorContent = "";
         var email_to = $("#test_mail_to").val();
-        var subject = $("#subject").val();
+        var subject = $("#field_subject").val();
         if (tinyMCE.activeEditor != null) {
             editorContent = tinyMCE.activeEditor.getContent();
         }
@@ -60,13 +61,28 @@
             success: function (response) {
                 if (response.success) {
                     $("#field_id").val(response.id);
-                    alert(response.message);
+                    showAlert('success', response.message);
                     if (reload) {
                         window.location.href = redirect_to;
                     }
                 }
             }
         });
+    }
+
+    function showAlert(type = "success", message = "") {
+        var alert = $('.rnoc-alert');
+        alert.show();
+        if (type === "success") {
+            alert.addClass('success-alert');
+        } else {
+            alert.addClass('error-alert');
+        }
+        alert.html(message);
+        window.setTimeout(function () {
+            alert.hide();
+        }, 3000)
+
     }
 
     $(document).on('click', '.insert-template', function () {

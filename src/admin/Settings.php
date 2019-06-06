@@ -543,7 +543,7 @@ class Settings
     {
         if (empty($ordered_date))
             return NULL;
-        $settings = get_option($this->slug . '_usage_restriction', array());
+        $settings = get_option($this->slug, array());
         if (!empty($settings) && $this->isAppConnected() && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days'])) {
             try {
                 $expiry_date = new \DateTime($ordered_date);

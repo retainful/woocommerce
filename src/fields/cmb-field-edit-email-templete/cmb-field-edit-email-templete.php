@@ -39,6 +39,20 @@ class CMB2_Field_Edit_Email_Template
         $api = new \Rnoc\Retainful\library\RetainfulApi();
         ?>
         </form>
+        <div class="rnoc-alert"
+             style="display:none;padding: 15px;position: fixed;top:40px;right: 10px;min-width: 250px;z-index: 9999;border-radius: 5px">
+        </div>
+        <style>
+            .error-alert {
+                background: red;
+                color: white;
+            }
+
+            .success-alert {
+                background: green;
+                color: white;
+            }
+        </style>
         <h3>
             <?php
             echo __('Add Or Edit Email Template');
