@@ -5,6 +5,7 @@ namespace Rnoc\Retainful;
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Integrations\Currency;
 
 class Main
 {
@@ -37,6 +38,7 @@ class Main
         add_action('init', function () {
             $this->rnoc->init();
         });
+        new Currency();
         do_action('rnoc_initiated');
         //Get events
         add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
@@ -114,9 +116,25 @@ class Main
         if (!$is_abandoned_tables_created || !$is_abandoned_emails_tables_created) {
             $this->createRequiredTables();
         }
+        $is_retainful_v1_2_0_migration_completed = get_option('is_retainful_v1_2_0_migration_completed', 0);
+        if (!$is_retainful_v1_2_0_migration_completed) {
+            $this->migrationV120();
+        }
         //Premium check
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
         $this->checkApi();
+    }
+
+    /**
+     * Migration to v1.2.0
+     */
+    function migrationV120()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history';
+        $query = "ALTER TABLE {$table_name} ADD COLUMN `currency_code` VARCHAR (255) DEFAULT NULL";
+        $wpdb->query($query);
+        update_option('is_retainful_v1_2_0_migration_completed', '1');
     }
 
     /**

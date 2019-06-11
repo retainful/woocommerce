@@ -227,12 +227,13 @@ class WcFunctions
     /**
      * Format the price
      * @param $price
+     * @param $arg
      * @return string
      */
-    function formatPrice($price)
+    function formatPrice($price, $arg = array())
     {
         if (function_exists('wc_price'))
-            return wc_price($price);
+            return wc_price($price, $arg);
         else
             return $price;
     }
@@ -599,6 +600,18 @@ class WcFunctions
     {
         if (method_exists($coupon, 'get_code')) {
             return $coupon->get_code();
+        }
+        return NULL;
+    }
+
+    /**
+     * get the default currency
+     * @return string|null
+     */
+    function getDefaultCurrency()
+    {
+        if (function_exists('get_woocommerce_currency')) {
+            return get_woocommerce_currency();
         }
         return NULL;
     }

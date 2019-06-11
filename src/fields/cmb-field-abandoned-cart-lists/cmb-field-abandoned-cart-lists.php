@@ -3,7 +3,6 @@ if (!defined('ABSPATH')) exit;
 
 class CMB2_Field_Abandoned_Cart_Lists
 {
-
     /**
      * Current version number
      */
@@ -24,6 +23,7 @@ class CMB2_Field_Abandoned_Cart_Lists
     {
         $this->setupAdminScripts();
         $abandoned_cart_obj = new \Rnoc\Retainful\AbandonedCart();
+        $base_currency = $abandoned_cart_obj->getBaseCurrency();
         $settings = new \Rnoc\Retainful\Admin\Settings();
         $start_end_dates = $abandoned_cart_obj->start_end_dates;
         $limit = 20;
@@ -162,22 +162,30 @@ class CMB2_Field_Abandoned_Cart_Lists
                         </td>
                         <td>
                             <?php
-                            if ($carts->cart_total == NULL) {
-                                $product_details = json_decode($carts->cart_contents);
-                                $line_total = 0;
-                                if (false != $product_details && is_object($product_details) && count(get_object_vars($product_details)) > 0) {
-                                    foreach ($product_details as $k => $v) {
-                                        if ($v->line_subtotal_tax != 0 && $v->line_subtotal_tax > 0) {
-                                            $line_total = $line_total + $v->line_total + $v->line_subtotal_tax;
-                                        } else {
-                                            $line_total = $line_total + $v->line_total;
-                                        }
+                            /*if ($carts->cart_total == NULL) {*/
+                            $product_details = json_decode($carts->cart_contents);
+                            $line_total = 0;
+                            if (false != $product_details && is_object($product_details) && count(get_object_vars($product_details)) > 0) {
+                                foreach ($product_details as $k => $v) {
+                                    if ($v->line_subtotal_tax != 0 && $v->line_subtotal_tax > 0) {
+                                        $line_total = $line_total + $v->line_total + $v->line_subtotal_tax;
+                                    } else {
+                                        $line_total = $line_total + $v->line_total;
                                     }
                                 }
-                            } else {
-                                $line_total = $carts->cart_total;
                             }
-                            echo $abandoned_cart_obj->wc_functions->formatPrice($line_total);
+                            /*} else {
+                                $line_total = $carts->cart_total;
+                            }*/
+                            echo $abandoned_cart_obj->wc_functions->formatPrice($line_total, array('currency' => $carts->currency_code));
+                            if ($base_currency !== $carts->currency_code && !empty($carts->currency_code) && !empty($base_currency)) {
+                                $exchange_rate = $abandoned_cart_obj->getCurrencyRate($carts->currency_code);
+                                $base_currency_price = $abandoned_cart_obj->convertToCurrency($line_total, $exchange_rate);
+                                $base_currency_price = $abandoned_cart_obj->wc_functions->formatPrice($base_currency_price);
+                                if (!empty($base_currency_price)) {
+                                    echo "&nbsp;<b>({$base_currency_price})</b>";
+                                }
+                            }
                             ?>
                         </td>
                         <td>

@@ -152,6 +152,7 @@ class AbandonedCart
             //$customer_id = $this->wc_functions->getPHPSessionCustomerId();
             $customer_id = $this->getUserSessionKey();
         }
+        $currency_code = $this->getCurrentCurrencyCode();
         $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
         if (empty($row)) {
             $crawler_detect = new CrawlerDetect();
@@ -163,8 +164,8 @@ class AbandonedCart
                 return;
             }
             $wpdb->insert($this->cart_history_table,
-                array('customer_key' => $customer_id, 'cart_contents' => json_encode($this->wc_functions->getCart()), 'cart_expiry' => $current_time + $cart_cut_off_time, 'cart_is_recovered' => 0, 'show_on_funnel_report' => 1, 'ip_address' => $_SERVER['REMOTE_ADDR'], 'item_count' => $cart->cart_contents_count, 'cart_total' => $cart->cart_contents_total),
-                array('%s', '%s', '%d', '%d', '%d', '%s', '%d')
+                array('currency_code' => $currency_code, 'customer_key' => $customer_id, 'cart_contents' => json_encode($this->wc_functions->getCart()), 'cart_expiry' => $current_time + $cart_cut_off_time, 'cart_is_recovered' => 0, 'show_on_funnel_report' => 1, 'ip_address' => $_SERVER['REMOTE_ADDR'], 'item_count' => $cart->cart_contents_count, 'cart_total' => $cart->cart_contents_total),
+                array('%s', '%s', '%s', '%d', '%d', '%d', '%s', '%d')
             );
         } else {
             $update_values = null;
@@ -174,7 +175,8 @@ class AbandonedCart
                     'ip_address' => $_SERVER['REMOTE_ADDR'],
                     'item_count' => $cart->cart_contents_count,
                     'cart_total' => $cart->cart_contents_total,
-                    'viewed_checkout' => true
+                    'viewed_checkout' => true,
+                    'currency_code' => $currency_code
                 );
             } else {
                 $update_values = array(
@@ -182,7 +184,8 @@ class AbandonedCart
                     /*'cart_expiry' => $current_time,*/
                     'ip_address' => $_SERVER['REMOTE_ADDR'],
                     'item_count' => $cart->cart_contents_count,
-                    'cart_total' => $cart->cart_contents_total
+                    'cart_total' => $cart->cart_contents_total,
+                    'currency_code' => $currency_code
                 );
             }
             $wpdb->update(
@@ -318,7 +321,7 @@ class AbandonedCart
                                             }
                                             $email_subject = str_replace('{{customer_name}}', $customer_name, $email_subject);
                                             $email_body = stripslashes($template->body);
-                                            $cart_html = $this->getCartTable($cart_details);
+                                            $cart_html = $this->getCartTable($cart_details, $history->currency_code);
                                             //Log about emil sent
                                             $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id ) VALUES ( %s, %s, '" . current_time('mysql') . "', %s )";
                                             $wpdb->query($wpdb->prepare($email_sent_query, $template->id, $history_id, $user_email));
@@ -367,12 +370,14 @@ class AbandonedCart
     /**
      * get the cart table by the cart data
      * @param $cart_details
+     * @param $currency_code
      * @return string
      */
-    function getCartTable($cart_details)
+    function getCartTable($cart_details, $currency_code)
     {
         $cart_total = $item_subtotal = $item_total = 0;
         $sub_line_prod_name = $cart_line_items = '';
+        $currency_arg = array('currency' => $currency_code);
         foreach ($cart_details as $key => $cart) {
             $quantity_total = $cart->quantity;
             $product_id = $cart->product_id;
@@ -390,8 +395,8 @@ class AbandonedCart
             //  Line total
             $item_total = $item_subtotal;
             $item_subtotal = $item_subtotal / $quantity_total;
-            $item_total_display = $this->wc_functions->formatPrice($item_total);
-            $item_subtotal = $this->wc_functions->formatPrice($item_subtotal);
+            $item_total_display = $this->wc_functions->formatPrice($item_total, $currency_arg);
+            $item_subtotal = $this->wc_functions->formatPrice($item_subtotal, $currency_arg);
             if (function_exists('preg_match')) {
                 $product = $this->wc_functions->getProduct($product_id);
                 $image_html = $this->wc_functions->getProductImage($product);
@@ -418,7 +423,7 @@ class AbandonedCart
             $cart_total += $item_total;
             $item_subtotal = $item_total = 0;
         }
-        $cart_total = $this->wc_functions->formatPrice($cart_total);
+        $cart_total = $this->wc_functions->formatPrice($cart_total, $currency_arg);
         $cart_html = '
                                         <table width="100%">
                                             <thead>
@@ -522,7 +527,7 @@ class AbandonedCart
                 $cart_link = $this->decryptValidate($_GET['validate']);
                 parse_str($cart_link);
                 if (isset($url) && isset($abandoned_cart_id) && isset($session_id) && isset($email_sent)) {
-                    $abandoned_cart_history_query = "SELECT cart_contents,customer_key FROM `" . $this->cart_history_table . "` WHERE id = %d AND cart_is_recovered=0";
+                    $abandoned_cart_history_query = "SELECT cart_contents,customer_key,currency_code FROM `" . $this->cart_history_table . "` WHERE id = %d AND cart_is_recovered=0";
                     $abandoned_cart_history_results = $wpdb->get_row($wpdb->prepare($abandoned_cart_history_query, $abandoned_cart_id), OBJECT);
                     $user_id = 0;
                     if (!empty($abandoned_cart_history_results)) {
@@ -530,6 +535,7 @@ class AbandonedCart
                         $this->wc_functions->setPHPSession(RNOC_PLUGIN_PREFIX . 'recovered_cart_id', $abandoned_cart_id);
                         //if guest
                         if (!is_numeric($user_id)) {
+                            add_action('rnoc_set_current_currency_code', $abandoned_cart_history_results->currency_code);
                             $this->autoLoadUserCart($abandoned_cart_history_results->cart_contents, $abandoned_cart_id, $session_id);
                         } else {
                             // if registered user
@@ -709,6 +715,7 @@ class AbandonedCart
         $cart_histories = $this->getAbandonedCartsOfDate($start_date, $end_date);
         $recovered_carts = $recovered_total = $abandoned_cart = $abandoned_total = 0;
         if (!empty($cart_histories)) {
+            $base_currency = $this->getBaseCurrency();
             $current_time = current_time('timestamp');
             foreach ($cart_histories as $key => $value) {
                 $product_details = json_decode($value->cart_contents);
@@ -729,6 +736,11 @@ class AbandonedCart
                 } else {
                     $abandoned_cart += 1;
                     $abandoned_total += $line_total;
+                }
+                if ($base_currency !== $value->currency_code && !empty($value->currency_code) && !empty($base_currency)) {
+                    $exchange_rate = $this->getCurrencyRate($value->currency_code);
+                    $abandoned_total = $this->convertToCurrency($abandoned_total, $exchange_rate);
+                    $recovered_total = $this->convertToCurrency($recovered_total, $exchange_rate);
                 }
             }
         }
@@ -764,7 +776,7 @@ class AbandonedCart
         if ($count_only) {
             $select = 'COUNT(id) as count';
         } else {
-            $select = 'id,cart_expiry,cart_contents,cart_is_recovered,NULL AS cart_value,customer_key,ip_address,order_id,viewed_checkout,cart_total';
+            $select = 'id,cart_expiry,cart_contents,cart_is_recovered,NULL AS cart_value,customer_key,ip_address,order_id,viewed_checkout,cart_total,currency_code';
         }
         $offset_limit = '';
         if (!empty($limit)) {
@@ -841,7 +853,7 @@ class AbandonedCart
                 if (!empty($cart_details)) {
                     echo
                         '<div style="min-width:600px">
-                            ' . $this->getCartTable($cart_details) . '
+                            ' . $this->getCartTable($cart_details, $row->currency_code) . '
                         </div>';
                     die;
                 }
@@ -1033,6 +1045,9 @@ class AbandonedCart
         wp_send_json($response);
     }
 
+    /**
+     * Get email template by ID
+     */
     function getEmailTemplate()
     {
         $template_id = (isset($_REQUEST['id'])) ? sanitize_key($_REQUEST['id']) : 0;
@@ -1073,5 +1088,49 @@ class AbandonedCart
         global $wpdb;
         $query = "SELECT * FROM `" . $this->email_templates_table . "` WHERE id = %d";
         return $wpdb->get_row($wpdb->prepare($query, $id), OBJECT);
+    }
+
+    /**
+     * get the active currency code
+     * @return String|null
+     */
+    function getCurrentCurrencyCode()
+    {
+        $default_currency = $this->getBaseCurrency();
+        return apply_filters('rnoc_get_current_currency_code', $default_currency);
+    }
+
+    /**
+     * Convert price to another price as per currency rate
+     * @param $price
+     * @param $rate
+     * @return float|int
+     */
+    function convertToCurrency($price, $rate)
+    {
+        if (!empty($price) && !empty($rate)) {
+            return $price / $rate;
+        }
+        return $price;
+    }
+
+    /**
+     * get the rate for particular currency code
+     * @param $currency_code
+     * @return float|null
+     */
+    function getCurrencyRate($currency_code)
+    {
+        $val = 0;
+        return apply_filters('rnoc_get_currency_rate', $val, $currency_code);
+    }
+
+    /**
+     * Check the site has multi currency
+     * @return bool
+     */
+    function getBaseCurrency()
+    {
+        return $this->wc_functions->getDefaultCurrency();
     }
 }

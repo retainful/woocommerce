@@ -12,6 +12,7 @@
       "Rnoc\\": "",
       "Rnoc\\Retainful\\": "src/",
       "Rnoc\\Retainful\\Admin\\": "src/admin/",
+      "Rnoc\\Retainful\\Integrations\\": "src/integrations/",
       "Rnoc\\Retainful\\Library\\": "src/library/"
     },
     "files": [
