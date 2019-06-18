@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.2.1
 WC tested up to: 3.6.4
 Requires PHP: 5.6
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -229,3 +229,9 @@ No. There is no charges for support.
 * Improvement: Save Email-Template before sending the test E-Mail
 * Fix: Next order coupon Coupon expiry date issue
 * Fix: Next order coupon exclude products not saved issue
+
+= 1.2.0 =
+* Fix: Multi currency issue with VillaTheme
+
+= 1.2.1 =
+* Fix: session issue
