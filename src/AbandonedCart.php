@@ -512,10 +512,9 @@ class AbandonedCart
 
     /**
      * recover cart info
-     * @param $template
      * @return mixed
      */
-    function recoverUserCart($template)
+    function recoverUserCart()
     {
         if (isset($_GET['retainful_cart_action']) && isset($_GET['validate'])) {
             if ($_GET['retainful_cart_action'] == 'recover' && !empty($_GET['validate'])) {
@@ -535,7 +534,6 @@ class AbandonedCart
                         $this->wc_functions->setPHPSession(RNOC_PLUGIN_PREFIX . 'recovered_cart_id', $abandoned_cart_id);
                         //if guest
                         if (!is_numeric($user_id)) {
-                            add_action('rnoc_set_current_currency_code', $abandoned_cart_history_results->currency_code);
                             $this->autoLoadUserCart($abandoned_cart_history_results->cart_contents, $abandoned_cart_id, $session_id);
                         } else {
                             // if registered user
@@ -549,6 +547,7 @@ class AbandonedCart
                                 exit;
                             }
                         }
+                        apply_filters('rnoc_set_current_currency_code', $abandoned_cart_history_results->currency_code);
                     }
                     if (empty($user_id)) {
                         echo "Link expired";
@@ -560,7 +559,6 @@ class AbandonedCart
                 }
             }
         }
-        return $template;
     }
 
     /**

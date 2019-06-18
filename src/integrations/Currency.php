@@ -8,7 +8,7 @@ class Currency
     {
         add_filter('rnoc_get_current_currency_code', array($this, 'getCurrentCurrencyCode'));
         add_filter('rnoc_get_currency_rate', array($this, 'getCurrencyRate'), 10, 2);
-        add_action('rnoc_set_current_currency_code', array($this, 'setCurrentCurrency'));
+        add_filter('rnoc_set_current_currency_code', array($this, 'setCurrentCurrency'));
     }
 
     function getCurrentCurrencyCode($default_currency_code)

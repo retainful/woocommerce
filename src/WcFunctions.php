@@ -262,9 +262,7 @@ class WcFunctions
     {
         if (empty($key) || empty($value))
             return false;
-        if (!session_id()) {
-            session_start();
-        }
+        $this->startPHPSession();
         $_SESSION[$key] = $value;
         return true;
     }
@@ -293,9 +291,7 @@ class WcFunctions
     {
         if (empty($key))
             return NULL;
-        if (!session_id()) {
-            session_start();
-        }
+        $this->startPHPSession();
         if (isset($_SESSION[$key])) {
             return $_SESSION[$key];
         }
@@ -373,9 +369,7 @@ class WcFunctions
     {
         if (empty($key))
             return false;
-        if (!session_id()) {
-            session_start();
-        }
+        $this->startPHPSession();
         if (isset($_SESSION[$key])) {
             unset($_SESSION[$key]);
         }
@@ -614,5 +608,15 @@ class WcFunctions
             return get_woocommerce_currency();
         }
         return NULL;
+    }
+
+    /**
+     * start the PHP session securely
+     */
+    function startPHPSession()
+    {
+        if (!session_id() && !headers_sent()) {
+            session_start();
+        }
     }
 }
