@@ -45,12 +45,16 @@ class CMB2_Field_Premium_Addon_List
         } else {
             $available_addon_list = array(
                 array(
-                    'title' => 'Add to Cart popup (Premium)',
-                    'description' => 'Collect customer email at the time of adding to cart. This will help you recover the cart even if they abandon before checkout.',
+                    'title' => __('Add to Cart Popup for Email collection (Premium)', RNOC_TEXT_DOMAIN),
+                    'description' => __('Collect customer email at the time of adding to cart. This will help you recover the cart even if they abandon before checkout.', RNOC_TEXT_DOMAIN),
                 ),
                 array(
-                    'title' => 'Coupon for email entry (Premium)',
-                    'description' => 'Encourage customers to enter the email to get a coupon code. This way you will come to know the customer email and can recover cart even if they abandon before checkout',
+                    'title' => __('Coupon For Email Collection (Premium)', RNOC_TEXT_DOMAIN),
+                    'description' => __('Encourage customers to enter the email to get a coupon code. This way you will come to know the customer email and can recover cart even if they abandon before checkout', RNOC_TEXT_DOMAIN),
+                ),
+                array(
+                    'title' => __('Countdown Timer (Premium)', RNOC_TEXT_DOMAIN),
+                    'description' => __('Give a clear deadline to grab the offer and add urgency using Countdown timer', RNOC_TEXT_DOMAIN),
                 )
             );
             ?>
