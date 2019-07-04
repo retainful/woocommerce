@@ -60,17 +60,21 @@ class CMB2_Field_Abandoned_Cart_Lists
         $pagination = new \Rnoc\Retainful\Library\Pagination($pagConfig);
         $current_time = current_time('timestamp');
         ?>
-        <table width="100%" class="wp-list-table fixed striped">
-            <tr>
-                <td width="20"><strong><?php echo __('Id', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Cart Status', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Cart Expired', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Customer / IP', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Customer Type', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Email', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Cart Value', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Action', RNOC_TEXT_DOMAIN); ?></strong></td>
+
+
+        <table class="table">
+            <thead class="bg-light">
+            <tr class="border-0">
+                <th class="border-0" style="width: 40px;"><?php echo __('Id', RNOC_TEXT_DOMAIN); ?></th>
+                <th class="border-0"><?php echo __('Cart Status', RNOC_TEXT_DOMAIN); ?></th>
+                <th class="border-0"><?php echo __('Cart Expired', RNOC_TEXT_DOMAIN); ?></th>
+                <th class="border-0"><?php echo __('Customer / IP', RNOC_TEXT_DOMAIN); ?></th>
+                <th class="border-0"><?php echo __('Email', RNOC_TEXT_DOMAIN); ?></th>
+                <th class="border-0"><?php echo __('Cart Value', RNOC_TEXT_DOMAIN); ?></th>
+                <th class="border-0" style="width: 90px;"><?php echo __('Action', RNOC_TEXT_DOMAIN); ?></th>
             </tr>
+            </thead>
+            <tbody>
             <?php
             if (!empty($cart_lists)) {
                 global $wpdb;
@@ -88,17 +92,27 @@ class CMB2_Field_Abandoned_Cart_Lists
                         <td>
                             <?php echo $carts->id ?>
                         </td>
-                        <td>
-                            <?php
-                            if ($carts->cart_is_recovered == 1) {
-                                echo '<span style=\'color: green\'>' . __("Recovered", RNOC_TEXT_DOMAIN) . '</span>';
-                            } else if ($carts->cart_expiry > $current_time) {
-                                echo '<span style=\'color: orange\'>' . __("In Progress", RNOC_TEXT_DOMAIN) . '</span>';
-                            } else {
-                                echo '<span style=\'color: red\'>' . __("Abandoned", RNOC_TEXT_DOMAIN) . '</span>';
-                            }
+                        <?php
+                        if ($carts->cart_is_recovered == 1) {
                             ?>
-                        </td>
+                            <td class="rcd-clr"><span
+                                        class="status-dot rcd-bg mr-1"><?php echo __("Recovered", RNOC_TEXT_DOMAIN); ?></span>
+                            </td>
+                            <?php
+                        } else if ($carts->cart_expiry > $current_time) {
+                            ?>
+                            <td class="in-prs-clr"><span
+                                        class="status-dot in-prs-bg mr-1"><?php echo __("In Progress", RNOC_TEXT_DOMAIN); ?></span>
+                            </td>
+                            <?php
+                        } else {
+                            ?>
+                            <td class="abd-clr"><span
+                                        class="status-dot abd-bg mr-1"><?php echo __("Abandoned", RNOC_TEXT_DOMAIN); ?></span>
+                            </td>
+                            <?php
+                        }
+                        ?>
                         <td>
                             <?php
                             echo date('Y-m-d', $carts->cart_expiry)
@@ -134,13 +148,15 @@ class CMB2_Field_Abandoned_Cart_Lists
                                 }
                             }
                             ?>
-                        </td>
-                        <td>
                             <?php
                             if (is_numeric($carts->customer_key)) {
-                                echo __('REGISTERED', RNOC_TEXT_DOMAIN);
+                                ?>
+                                <span class="user_dt"><?php echo __('Registered', RNOC_TEXT_DOMAIN) ?></span>
+                                <?php
                             } else {
-                                echo __('GUEST', RNOC_TEXT_DOMAIN);
+                                ?>
+                                <span class="guest_dt"><?php echo __('Guest', RNOC_TEXT_DOMAIN) ?></span>
+                                <?php
                             }
                             ?>
                         </td>
@@ -189,15 +205,13 @@ class CMB2_Field_Abandoned_Cart_Lists
                             ?>
                         </td>
                         <td>
-                            <a class="button button-red remove-cart-btn"
-                               data-ajax="<?php echo admin_url('admin-ajax.php'); ?>"
-                               data-cart="<?php echo $carts->id ?>"><?php echo __('Delete', RNOC_TEXT_DOMAIN) ?></a>
                             <?php
                             if ($carts->cart_is_recovered == 1) {
                                 ?>
-                                <a href="<?php echo get_edit_post_link($carts->order_id); ?>"
-                                   target="_blank"
-                                   class="button button-green"><?php echo __('View Order', RNOC_TEXT_DOMAIN); ?></a>
+                                <a class="btn_action  btn-view"
+                                   href="<?php echo get_edit_post_link($carts->order_id); ?>"
+                                   target="_blank"><span
+                                            class="dashicons_action dashicons dashicons-visibility"></span></a>
                                 <?php
                             } else {
                                 $view_cart_vars = array(
@@ -206,11 +220,15 @@ class CMB2_Field_Abandoned_Cart_Lists
                                 );
                                 $view_cart_url = admin_url('admin-ajax.php?' . http_build_query($view_cart_vars));
                                 ?>
-                                <a class="button view-cart"
-                                   href="<?php echo $view_cart_url; ?>"><?php echo __('View Cart', RNOC_TEXT_DOMAIN) ?></a>
+                                <a class="btn_action  btn-view view-cart" href="<?php echo $view_cart_url; ?>"><span
+                                            class="dashicons_action dashicons dashicons-visibility"></span></a>
                                 <?php
                             }
                             ?>
+                            <a class="btn_action  btn-danger remove-cart-btn" href="javascript:;"
+                               data-ajax="<?php echo admin_url('admin-ajax.php'); ?>"
+                               data-cart="<?php echo $carts->id ?>"><span
+                                        class="dashicons_action dashicons dashicons-trash"></span></a>
                         </td>
                     </tr>
                     <?php
@@ -225,24 +243,19 @@ class CMB2_Field_Abandoned_Cart_Lists
                 <?php
             }
             ?>
-            <tr>
-                <td><strong><?php echo __('Id', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Cart Status', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Cart Expired', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Customer / IP', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Customer Type', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Email', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Cart Value', RNOC_TEXT_DOMAIN); ?></strong></td>
-                <td><strong><?php echo __('Action', RNOC_TEXT_DOMAIN); ?></strong></td>
-            </tr>
-            <tr>
-                <td colspan="8" align="right">
-                    <?php
-                    echo $pagination->createLinks();
-                    ?>
-                </td>
-            </tr>
+            </tbody>
         </table>
+        <?php
+        if (!empty($cart_lists)) {
+            ?>
+            <div class="table_data_dp">
+                <?php
+                echo $pagination->createLinks();
+                ?>
+            </div>
+            <?php
+        }
+        ?>
         <style>
             #submit-cmb {
                 display: none;

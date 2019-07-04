@@ -34,28 +34,37 @@ class CMB2_Field_Email_After
     {
         $this->setupAdminScripts();
         ?>
-        <div>
-            <input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary no-hide"
-                   value="Save">
+        
+			<div>
+				<input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary no-hide" value="Save">
+			</div>
+		<div class="main_email_tt">
+			<div class="email-template">
+				<h3><?php echo __('Email Templates', RNOC_TEXT_DOMAIN) ?></h3>			
+				<?php
+				$abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
+				$settings = new \Rnoc\Retainful\Admin\Settings();
+				$templates = $abandoned_cart->getEmailTemplates();
+				?>
+				<p style="text-align: center;"><?php echo __("Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.", RNOC_TEXT_DOMAIN) ?></p>
+			</div>
+			<div class="force-center1">
+                <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=create-email-template'); ?>"
+                   class="create-new-template"><?php echo __('Create New Template', RNOC_TEXT_DOMAIN) ?></a>
+            </div>
         </div>
-        <div>
-            <h3 style="text-align: center;"><?php echo __('Email Templates', RNOC_TEXT_DOMAIN) ?></h3>
-        </div>
-        <?php
-        $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-        $settings = new \Rnoc\Retainful\Admin\Settings();
-        $templates = $abandoned_cart->getEmailTemplates();
-        ?>
-        <p style="text-align: center;"><?php echo __("Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.", RNOC_TEXT_DOMAIN) ?></p>
-        <div class="email-templates-list">
-            <table width="100%">
-                <tr>
-                    <th><?php echo __('Template Name', RNOC_TEXT_DOMAIN); ?></th>
-                    <th><?php echo __('Template Sent After', RNOC_TEXT_DOMAIN); ?></th>
-                    <th><?php echo __('Active?', RNOC_TEXT_DOMAIN); ?></th>
-                    <th><?php echo __('Action', RNOC_TEXT_DOMAIN); ?></th>
-                </tr>
-                <tbody>
+			
+			
+			<table class="table">
+				<thead class="bg-light">
+					<tr class="border-0">
+						<th class="border-0"><?php echo __('Template Name', RNOC_TEXT_DOMAIN); ?></th>
+						<th class="border-0"><?php echo __('Template Sent After', RNOC_TEXT_DOMAIN); ?></th>
+						<th class="border-0"><?php echo __('Active?', RNOC_TEXT_DOMAIN); ?></th>
+						<th class="border-0" style="width: 45px;"><?php echo __('Action', RNOC_TEXT_DOMAIN); ?></th>
+					</tr>
+				</thead>
+			<tbody>
                 <?php
                 if (!empty($templates)) {
                     foreach ($templates as $template) {
@@ -74,9 +83,10 @@ class CMB2_Field_Email_After
                             <td>
                                 <a type="button"
                                    href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=edit-template&template=' . $template->id) ?>"
-                                   class="button button-green"><?php echo __('Edit', RNOC_TEXT_DOMAIN) ?></a>
+                                   class="btn_action  btn-view"><span class="dashicons_action_view dashicons dashicons-visibility"></span></a>								   
+								
                                 <button type="button" data-template="<?php echo $template->id ?>"
-                                        class="button button-red remove-email-template"><?php echo __('Delete', RNOC_TEXT_DOMAIN) ?></button>
+                                        class="btn_action  btn-danger remove-email-template"><span class="dashicons_action dashicons dashicons-trash"></span></button>
                             </td>
                         </tr>
                         <?php
@@ -93,11 +103,7 @@ class CMB2_Field_Email_After
                 ?>
                 </tbody>
             </table>
-            <div class="force-center">
-                <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=create-email-template'); ?>"
-                   class="button button-primary create-or-add-template"><?php echo __('Create New Template', RNOC_TEXT_DOMAIN) ?></a>
-            </div>
-        </div>
+			<div class="table_data_dp"></div>
         <?php
     }
 }

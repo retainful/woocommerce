@@ -47,7 +47,7 @@ class CMB2_Field_Cart_Table_Filter
         <div class="abandoned_cart_filter">
             <input type="hidden" value="<?php echo $cart_type; ?>" id="cart_type">
             <a href="<?php echo $url . '&cart_type=all&' . http_build_query($date_arr) ?>"
-               class="button button-primary"><?php echo __('All Carts', RNOC_TEXT_DOMAIN); ?></a>
+               class="button button-primary-first"><?php echo __('All Carts', RNOC_TEXT_DOMAIN); ?></a>
             <a href="<?php echo $url . '&cart_type=abandoned&' . http_build_query($date_arr) ?>"
                class="button button-red"><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></a>
             <a href="<?php echo $url . '&cart_type=recovered&' . http_build_query($date_arr) ?>"
@@ -58,7 +58,7 @@ class CMB2_Field_Cart_Table_Filter
             if ($is_tracking_enabled) {
                 ?>
                 <a href="<?php echo $url . '&cart_type=progress&' . http_build_query($date_arr) ?>"
-                   class="button"><?php echo __('In-Progress Carts', RNOC_TEXT_DOMAIN); ?></a>
+                   class="button button-secondary-last"><?php echo __('In-Progress Carts', RNOC_TEXT_DOMAIN); ?></a>
                 <?php
             }
             ?>

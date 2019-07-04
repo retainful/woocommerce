@@ -37,8 +37,8 @@
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width:56px;
+    height: 24px;
 }
 
 .switch input {
@@ -51,10 +51,10 @@
     position: absolute;
     cursor: pointer;
     top: 0;
-    left: 0;
+    left: 3px;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color:#bfc8da;
     -webkit-transition: .4s;
     transition: .4s;
 }
@@ -62,19 +62,18 @@
 .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
+    height: 20px;
+    width: 20px;
     left: 4px;
-    bottom: 4px;
+    bottom: 2px;
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
 }
 
 input:checked + .slider {
-    background-color: #0085ba;
+    background-color: #0198e0;
 }
-
 input:focus + .slider {
     box-shadow: 0 0 1px #0085ba;
 }
@@ -100,4 +99,178 @@ input:checked + .slider:before {
 
 #email_template_body_ifr {
     min-height: 500px;
+}
+
+
+.cmb-td {
+    font-family: DM Sans,sans-serif!important;
+}
+
+.table {
+	font-size: 13px;
+	width: 100%;
+	border-spacing: 0;
+	border-collapse: separate;
+	font-family: DM Sans,sans-serif!important;
+}
+.table>thead>tr>td,
+.table>thead>tr>th
+{
+	padding:14px 12px;
+}
+.table>tbody>tr>td,
+.table>tbody>tr>th,
+.table>tfoot>tr>td,
+.table>tfoot>tr>th
+ {
+    padding: 18px 12px;
+    border-top-width: 1px;
+    border-top-style: solid;
+}
+.table-bordered>tbody>tr:first-child>td {
+    background:#ecf1fb;
+    color: #292b35;
+    font-size: 14px;
+    font-weight: bold;
+    padding:15px 12px;
+}
+.table {
+    margin-bottom: 0px;
+}
+.table td, .table th {
+    padding: 10px;
+    vertical-align: middle;
+    border-top: 1px solid #eceef2;
+    font-weight: 600;
+    color: #1e2b3d;
+}
+.table > tbody > tr:last-child
+{
+	border-bottom: 1px solid #eceef2;
+}
+.bg-light {
+    background-color: #f4f7fd !important;
+}
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 0px solid #f9fbfc;
+    border-top: 0px solid #f9fbfc;
+}
+.table thead th, .table th {
+    color: #88929c;
+    font-weight: 700;
+}
+.table-bordered {
+    border: 1px solid #e6e6f2;
+}
+
+.table-bordered td,
+.table-bordered th {
+    border: 1px solid #e6e6f2;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(230, 230, 242, .5);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(230, 230, 242, .5);
+}
+
+.create-new-template {
+    display: inline-block;
+    font-size: 15px;
+    line-height: 45px;
+    height: 45px;
+    margin: 15px 0px;
+    padding: 0px 35px 0px;
+    background: #F27052;
+    border-color: #F27052;
+    color: #ffffff;
+    text-decoration: none;	
+    font-weight: 700;
+    border-radius: 4px;
+}
+.main_email_tt
+ {
+    display: inline-block;
+    width: 100%;
+    position: relative;
+    margin-top: 45px;
+    margin-bottom: 20px;
+}
+.force-center1
+{
+    float: right;
+}
+.email-template p
+{
+    font-weight: 600;
+    color: #1e2b3d;
+    font-size: 14px;
+    margin: 6px 0px;
+}
+.email-template h3
+{
+    color: #2d2f3a;
+    font-family: DM Sans,sans-serif!important;
+    font-size: 30px;
+    font-weight: 700;
+	margin: 0px;
+}
+.force-center1 a:hover
+{
+    color: #fff;
+	box-shadow: 0px 4px 3px rgba(126, 142, 177, 0.40);
+}
+.email-template
+{
+    float: left;
+}
+.btn-view {
+    color: #fff;
+    background: #9eabc5;
+    border: 1px solid #9eabc5;
+}
+.btn-danger {
+    color: #fff;
+    background:#e24344;
+	border:1px solid #e24344;
+	cursor: pointer;
+}
+.btn-view:hover {
+    color: #9eabc5;
+    border:1px solid #9eabc5;
+	background:none;
+}
+.btn-danger:hover {
+    color: #e24344;
+    border:1px solid #e24344;
+	background:none;
+}
+.btn_action {
+    padding: 5px 6px;
+    line-height: 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+}
+.dashicons_action
+{
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 20px;
+}
+.dashicons_action_view {
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 32px;
+}.table_data_dp {
+    display: block;
+    width: 100%;
+    border-top: 1px solid #ecf1fb;
+    padding: 0px;
+    margin: 0px;
+}
+.tr-action {
+    width: 45px;
 }
