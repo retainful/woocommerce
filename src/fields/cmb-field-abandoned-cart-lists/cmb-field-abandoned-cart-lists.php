@@ -151,16 +151,16 @@ class CMB2_Field_Abandoned_Cart_Lists
                             <?php
                             if (is_numeric($carts->customer_key)) {
                                 ?>
-                                <span class="user_dt"><?php echo __('Registered', RNOC_TEXT_DOMAIN) ?></span>
+                                <span class="customer-type user_dt"><?php echo __('Registered', RNOC_TEXT_DOMAIN) ?></span>
                                 <?php
                             } else {
                                 ?>
-                                <span class="guest_dt"><?php echo __('Guest', RNOC_TEXT_DOMAIN) ?></span>
+                                <span class="customer-type guest_dt"><?php echo __('Guest', RNOC_TEXT_DOMAIN) ?></span>
                                 <?php
                             }
                             ?>
                         </td>
-                        <td>
+                        <td class="email-section">
                             <?php
                             $user = get_userdata($carts->customer_key);
                             if ($user) {
@@ -204,11 +204,11 @@ class CMB2_Field_Abandoned_Cart_Lists
                             }
                             ?>
                         </td>
-                        <td>
+                        <td class="action-section">
                             <?php
                             if ($carts->cart_is_recovered == 1) {
                                 ?>
-                                <a class="btn_action  btn-view"
+                                <a class="btn_plg btn-view"
                                    href="<?php echo get_edit_post_link($carts->order_id); ?>"
                                    target="_blank"><span
                                             class="dashicons_action dashicons dashicons-visibility"></span></a>
@@ -220,12 +220,12 @@ class CMB2_Field_Abandoned_Cart_Lists
                                 );
                                 $view_cart_url = admin_url('admin-ajax.php?' . http_build_query($view_cart_vars));
                                 ?>
-                                <a class="btn_action  btn-view view-cart" href="<?php echo $view_cart_url; ?>"><span
+                                <a class="btn_plg btn-view view-cart" href="<?php echo $view_cart_url; ?>"><span
                                             class="dashicons_action dashicons dashicons-visibility"></span></a>
                                 <?php
                             }
                             ?>
-                            <a class="btn_action  btn-danger remove-cart-btn" href="javascript:;"
+                            <a class="btn_plg btn-danger remove-cart-btn" href="javascript:;"
                                data-ajax="<?php echo admin_url('admin-ajax.php'); ?>"
                                data-cart="<?php echo $carts->id ?>"><span
                                         class="dashicons_action dashicons dashicons-trash"></span></a>

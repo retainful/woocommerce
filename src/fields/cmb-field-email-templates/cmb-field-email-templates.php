@@ -34,76 +34,120 @@ class CMB2_Field_Email_After
     {
         $this->setupAdminScripts();
         ?>
-        
-			<div>
-				<input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary no-hide" value="Save">
-			</div>
-		<div class="main_email_tt">
-			<div class="email-template">
-				<h3><?php echo __('Email Templates', RNOC_TEXT_DOMAIN) ?></h3>			
-				<?php
-				$abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-				$settings = new \Rnoc\Retainful\Admin\Settings();
-				$templates = $abandoned_cart->getEmailTemplates();
-				?>
-				<p style="text-align: center;"><?php echo __("Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.", RNOC_TEXT_DOMAIN) ?></p>
-			</div>
-			<div class="force-center1">
-                <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=create-email-template'); ?>"
-                   class="create-new-template"><?php echo __('Create New Template', RNOC_TEXT_DOMAIN) ?></a>
-            </div>
+
+        <div>
+            <input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary no-hide" value="Save">
         </div>
-			
-			
-			<table class="table">
-				<thead class="bg-light">
-					<tr class="border-0">
-						<th class="border-0"><?php echo __('Template Name', RNOC_TEXT_DOMAIN); ?></th>
-						<th class="border-0"><?php echo __('Template Sent After', RNOC_TEXT_DOMAIN); ?></th>
-						<th class="border-0"><?php echo __('Active?', RNOC_TEXT_DOMAIN); ?></th>
-						<th class="border-0" style="width: 45px;"><?php echo __('Action', RNOC_TEXT_DOMAIN); ?></th>
-					</tr>
-				</thead>
-			<tbody>
+        <div class="main_email_tt">
+            <div class="email-template">
+                <h3><?php echo __('Email Templates', RNOC_TEXT_DOMAIN) ?></h3>
                 <?php
-                if (!empty($templates)) {
-                    foreach ($templates as $template) {
-                        ?>
-                        <tr id="template-no-<?php echo $template->id ?>">
-                            <td><?php echo $template->template_name; ?></td>
-                            <td><?php echo $template->frequency . ' ' . $template->day_or_hour . ' ' . __('After Abandonment') ?></td>
-                            <td>
+                $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
+                $settings = new \Rnoc\Retainful\Admin\Settings();
+                $templates = $abandoned_cart->getEmailTemplates();
+                ?>
+                <p style="text-align: center;"><?php echo __("Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.", RNOC_TEXT_DOMAIN) ?></p>
+            </div>
+
+        </div>
+
+        <ul class="timeline">
+            <li class="timeline-event">
+                <label class="timeline-event-icon edit-brd"><span class="dashicons dashicons-yes icon-edit"></span></label>
+                <div class="timeline-event-copy">
+                    <p class="timeline-event-thumbnail">1 Hours After Abandonment</p>
+                    <div class="time-inner">
+                        <div class="message-head clearfix">
+                            <div class="avatar"><a href="./index.php?qa=user&amp;qa_1=Oleg+Kolesnichenko"><img src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png"></a></div>
+                            <div class="user-detail">
+                                <h5 class="handle">Favorite Items</h5>
+                                <span class="qa-message-when-data">Shop</span>
+                            </div>
+                            <div class="user-detail">
+                                <h5 class="handle">Number of Email Send</h5>
+                                <span class="qa-message-when-data"><span class="dashicons dashicons-email-alt send-email"></span> 145</span>
+                            </div>
+                            <div class="user-detail user_active">
                                 <label class="switch">
-                                    <input type="checkbox"
-                                           value="1" <?php echo ($template->is_active == 1) ? ' checked' : ''; ?>
-                                           class="is-template-active" data-template="<?php echo $template->id ?>">
+                                    <input type="checkbox" value="1" checked="" class="is-template-active" data-template="1">
                                     <span class="slider round"></span>
                                 </label>
-                            </td>
-                            <td>
-                                <a type="button"
-                                   href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=edit-template&template=' . $template->id) ?>"
-                                   class="btn_action  btn-view"><span class="dashicons_action_view dashicons dashicons-visibility"></span></a>								   
-								
-                                <button type="button" data-template="<?php echo $template->id ?>"
-                                        class="btn_action  btn-danger remove-email-template"><span class="dashicons_action dashicons dashicons-trash"></span></button>
-                            </td>
-                        </tr>
-                        <?php
-                    }
-                } else {
-                    ?>
-                    <tr>
-                        <td colspan="4">
-                            <p class="force-center text-danger"><?php echo __('No email templates found! So, No emails were sent!', RNOC_TEXT_DOMAIN); ?></p>
-                        </td>
-                    </tr>
-                    <?php
-                }
-                ?>
-                </tbody>
-            </table>
-			<div class="table_data_dp"></div>
+                            </div>
+                            <div class="user-option">
+                                <button type="button" class="email-button email-btn-edit">Edit</button>
+                                <button type="button" class="email-button email-btn-delete">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="timeline-event">
+                <label class="timeline-event-icon delete-brd"><span class="dashicons dashicons-no-alt icon-delete"></span></label>
+                <div class="timeline-event-copy">
+                    <p class="timeline-event-thumbnail">1 Hours After Abandonment</p>
+                    <div class="time-inner">
+                        <div class="message-head clearfix">
+                            <div class="avatar"><a href="./index.php?qa=user&amp;qa_1=Oleg+Kolesnichenko"><img src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png"></a></div>
+                            <div class="user-detail">
+                                <h5 class="handle">Favorite Items</h5>
+                                <span class="qa-message-when-data">Shop</span>
+                            </div>
+                            <div class="user-detail">
+                                <h5 class="handle">Number of Email Send</h5>
+                                <span class="qa-message-when-data"><span class="dashicons dashicons-email-alt send-email"></span> 25</span>
+                            </div>
+                            <div class="user-detail user_active">
+                                <label class="switch">
+                                    <input type="checkbox" value="1" checked="" class="is-template-active" data-template="1">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="user-option">
+                                <button type="button" class="email-button email-btn-edit">Edit</button>
+                                <button type="button" class="email-button email-btn-delete">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="timeline-event">
+                <label class="timeline-event-icon edit-brd"><span class="dashicons dashicons-yes icon-edit"></span></label>
+                <div class="timeline-event-copy">
+                    <p class="timeline-event-thumbnail">1 Hours After Abandonment</p>
+                    <div class="time-inner">
+                        <div class="message-head clearfix">
+                            <div class="avatar"><a href="./index.php?qa=user&amp;qa_1=Oleg+Kolesnichenko"><img src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png"></a></div>
+                            <div class="user-detail">
+                                <h5 class="handle">Favorite Items</h5>
+                                <span class="qa-message-when-data">Shop</span>
+                            </div>
+                            <div class="user-detail">
+                                <h5 class="handle">Number of Email Send</h5>
+                                <span class="qa-message-when-data"><span class="dashicons dashicons-email-alt send-email"></span> 200</span>
+                            </div>
+                            <div class="user-detail user_active">
+                                <label class="switch">
+                                    <input type="checkbox" value="1" checked="" class="is-template-active" data-template="1">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="user-option">
+                                <button type="button" class="email-button email-btn-edit">Edit</button>
+                                <button type="button" class="email-button email-btn-delete">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <div class="force-center1">
+            <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=create-email-template'); ?>"
+               class="create-new-template"><?php echo __('Create New Template', RNOC_TEXT_DOMAIN) ?></a>
+        </div>
+
+
+
         <?php
     }
 }
