@@ -821,7 +821,8 @@ class AbandonedCart
     function getEmailTemplates()
     {
         global $wpdb;
-        return $wpdb->get_results("select template_name,id,is_active,frequency,day_or_hour,default_template from {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_templates");
+        $query = "SELECT t.template_name, t.id, t.is_active, t.frequency, t.day_or_hour, t.default_template, t.subject, (select count(id) from {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_sent_history where template_id = t.id) AS emails_sent FROM {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_templates AS t;";
+        return $wpdb->get_results($query);
     }
 
     /**
@@ -935,6 +936,11 @@ class AbandonedCart
                 global $wpdb;
                 $query_update = "UPDATE `" . $this->email_templates_table . "` SET is_active=%s WHERE id=%d";
                 $wpdb->query($wpdb->prepare($query_update, $is_active, $template->id));
+                if (!empty($is_active)) {
+                    $response['message'] = __('Template activated successfully!', RNOC_TEXT_DOMAIN);
+                } else {
+                    $response['message'] = __('Template de-activated successfully!', RNOC_TEXT_DOMAIN);
+                }
             } else {
                 $response['error'] = true;
                 $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);

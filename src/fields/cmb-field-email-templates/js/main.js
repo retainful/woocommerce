@@ -17,6 +17,8 @@
             success: function (response) {
                 if (response.error) {
                     alert(response.message);
+                } else {
+                    window.location.reload();
                 }
             }
         });

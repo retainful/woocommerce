@@ -21,10 +21,10 @@ class Pagination
     protected $lastLink = 'Last';
     protected $fullTagOpen = '<ul class="pagination">';
     protected $fullTagClose = '</ul>';
-    protected $firstTagOpen = '';
-    protected $firstTagClose = '<li>';
-    protected $lastTagOpen = '</li>';
-    protected $lastTagClose = '';
+    protected $firstTagOpen = '<li>';
+    protected $firstTagClose = '</li>';
+    protected $lastTagOpen = '<li>';
+    protected $lastTagClose = '</li>';
     protected $curTagOpen = '<li><a class="active" href="#">';
     protected $curTagClose = '</a></li>';
     protected $nextTagOpen = '<li>';
