@@ -45,7 +45,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
             $is_free_user = true;
         }
         ?>
-        <div class="rnoc_counter_container">
+        <div class="rnoc_counter_container retainful_abandoned_container">
             <div class="rnoc_counter_widget widget_violet card_main_box <?php echo $width_class; ?>">
                 <div class="rnoc_counter_container">
 					<div class="avatar-lg avatar-lg-1">

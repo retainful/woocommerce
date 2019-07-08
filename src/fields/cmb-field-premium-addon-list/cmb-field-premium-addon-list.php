@@ -19,21 +19,20 @@ class CMB2_Field_Premium_Addon_List
         $available_addon_list = apply_filters('rnoc_get_premium_addon_list', array());
         if (!empty($available_addon_list)) {
             ?>
-            <div class="rnoc-grid-container">
+            <div class="rnoc-grid-container retainful_premium_card_box">
                 <?php
                 foreach ($available_addon_list as $addon) {
                     $title = $addon->title();
                     if (!empty($title)) {
                         ?>
-                        <div class="rnoc-grid-cell">
-                            <div class="header"><?php echo $title; ?></div>
-                            <div class="description"><p><?php
+                        <div class="rnoc-grid-cell retainful_premium_grid">
+                            <div class="header retainful_premium_heading"><?php echo $title; ?></div>
+                            <div class="retainful_premium_para"><p><?php
                                     echo $addon->description();
                                     ?></p>
                             </div>
                             <div class="footer">
-                                <button type="button" class="view-addon-btn button button-green"
-                                        data-slug="<?php echo $addon->slug(); ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
+                                <button type="button" class="view-addon-btn button button-green button-premium"   data-slug="<?php echo $addon->slug(); ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
                             </div>
                         </div>
                         <?php
@@ -63,22 +62,22 @@ class CMB2_Field_Premium_Addon_List
                     display: none;
                 }
             </style>
-            <div class="rnoc-grid-container">
+            <div class="rnoc-grid-container retainful_premium_card_box">
                 <?php
                 $library = new Rnoc\Retainful\library\RetainfulApi();
                 $premium_url = $library->upgradePremiumUrl();
                 foreach ($available_addon_list as $addon) {
                     ?>
-                    <div class="rnoc-grid-cell">
-                        <div class="header"><?php echo $addon['title']; ?></div>
-                        <div class="description"><p><?php
+                    <div class="rnoc-grid-cell retainful_premium_grid">
+                        <div class="header retainful_premium_heading"><?php echo $addon['title']; ?></div>
+                        <div class="retainful_premium_para"><p><?php
                                 echo $addon['description'];
                                 ?></p>
                         </div>
                         <div class="footer">
                             <a href="<?php echo $premium_url; ?>"
                                target="_blank"
-                               class="button button-green"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN); ?></a>
+                               class="button button-green button-premium"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN); ?></a>
                         </div>
                     </div>
                     <?php
@@ -97,13 +96,12 @@ class CMB2_Field_Premium_Addon_List
         <style>
             .rnoc-grid-container {
                 display: grid;
-                grid-template-columns: 24% 25% 25% 24%;
-                grid-gap: 10px;
+                grid-template-columns: 32% 32% 32%;
+                grid-gap: 30px;
                 padding: 10px;
             }
 
             .rnoc-grid-container .rnoc-grid-cell {
-                box-shadow: 2px 2px 5px 3px #e2e2e2;
                 padding: 10px;
                 border-radius: 2px;
             }
@@ -118,6 +116,101 @@ class CMB2_Field_Premium_Addon_List
                 text-align: justify;
 
             }
+            .retainful_premium_card_box .retainful_premium_grid{
+                background: #f4f7fd;
+                border-radius: 4px;
+                box-shadow: 0px 4px 3px rgba(126, 142, 177, 0.04);
+                margin-bottom: 20px;
+                padding: 20px 20px;
+            }
+            .retainful_premium_card_box .retainful_premium_grid .retainful_premium_heading
+            {
+                padding: 0px 5px 0px 5px;
+                text-align: center;
+                font-size: 25px;
+                color: #2d2f3a;
+                font-weight: 800;
+                line-height: 36px;
+            }
+            .retainful_premium_card_box .retainful_premium_grid .retainful_premium_para p
+            {
+                padding: 5px 20px;
+                text-align: center;
+                font-size: 14px;
+                color: #6c747a;
+                line-height: 22px;
+                font-weight: 500;
+            }
+            .retainful_premium_card_box .retainful_premium_grid .footer
+            {
+                text-align: center;
+            }
+            .retainful_premium_card_box .retainful_premium_grid .button-premium {
+                color: #fff;
+                background-color: #2dcb73 !important;
+                display: inline-block;
+                text-decoration: none;
+                font-size: 15px;
+                font-weight: 500;
+                line-height: 45px;
+                height: 45px;
+                margin: 0;
+                padding: 0px 45px 0px;
+                cursor: pointer;
+                border-width: 0px;
+                border-style: solid;
+                -webkit-appearance: none;
+                border-radius: 5px;
+                white-space: nowrap;
+                box-sizing: border-box;
+                margin-right: 28px;
+                box-shadow: 0px 4px 3px rgba(126, 142, 177, 0.40);
+            }
+            .retainful_premium_card_box .retainful_premium_grid .button-premium:hover
+            {
+                color: #fff;
+                box-shadow: 0px 7px 6px rgba(126, 142, 177, 0.40);
+            }
+            @media only screen and (max-width: 1350px) {
+
+                .retainful_premium_card_box .retainful_premium_grid .button-premium {
+                    line-height: 35px;
+                    height: 40px;
+                    margin: 0;
+                    padding: 0px 14px 0px;
+                }
+                .retainful_premium_card_box .retainful_premium_grid {
+                    background: #f4f7fd;
+                    border-radius: 4px;
+                    box-shadow: 0px 4px 3px rgba(126, 142, 177, 0.04);
+                    margin-bottom: 20px;
+                    padding: 14px 10px;
+                }
+                .retainful_premium_card_box .retainful_premium_grid .retainful_premium_heading {
+                    padding: 5px 5px 0px 5px;
+                    text-align: center;
+                    font-size: 19px;
+                    color: #2d2f3a;
+                    font-weight: 800;
+                    line-height: 26px;
+                    margin-right: 0px;
+                }
+                .retainful_premium_card_box .retainful_premium_grid .retainful_premium_para p {
+                    padding: 5px 3px;
+                    text-align: center;
+                    font-size: 14px;
+                    color: #6c747a;
+                    line-height: 22px;
+                    font-weight: 500;
+                }
+                @media only screen and (max-width: 1024px) {
+                    .retainful_premium_card_box {
+                        display: block;
+                        grid-template-columns: 24% 25% 25% 24%;
+                        grid-gap: 10px;
+                        padding: 10px;
+                    }
+                }
         </style>
         <?php
     }

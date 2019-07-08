@@ -49,18 +49,18 @@ class CMB2_Field_Email_After
                 <p style="text-align: center;"><?php echo __("Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.", RNOC_TEXT_DOMAIN) ?></p>
             </div>
         </div>
-
-        <ul class="timeline">
+        <div class="retainful_abandoned_email_main">
+        <ul class="retainful_abandoned_email">
             <?php
             if (!empty($templates)) {
                 foreach ($templates as $template) {
                     ?>
-                    <li class="timeline-event" id="template-no-<?php echo $template->id ?>">
-                        <label class="timeline-event-icon <?php echo ($template->is_active == 1) ? ' edit-brd' : ' delete-brd'; ?>"><span
+                    <li class="retainful_abandoned_email-event" id="template-no-<?php echo $template->id ?>">
+                        <label class="retainful_abandoned_email-event-icon <?php echo ($template->is_active == 1) ? ' edit-brd' : ' delete-brd'; ?>"><span
                                     class="dashicons <?php echo ($template->is_active == 1) ? ' dashicons-yes icon-edit' : ' dashicons-no-alt icon-delete'; ?>"></span></label>
-                        <div class="timeline-event-copy">
-                            <p class="timeline-event-thumbnail"><?php echo $template->frequency . ' ' . $template->day_or_hour . ' ' . __('After Abandonment', RNOC_TEXT_DOMAIN) ?></p>
-                            <div class="time-inner">
+                        <div class="retainful_abandoned_email-event-copy">
+                            <p class="retainful_abandoned_email-event-thumbnail"><?php echo $template->frequency . ' ' . $template->day_or_hour . ' ' . __('After Abandonment', RNOC_TEXT_DOMAIN) ?></p>
+                            <div class="retainful_abandoned_email-inner">
                                 <div class="message-head clearfix">
                                     <!--<div class="avatar"><a href="./index.php?qa=user&amp;qa_1=Oleg+Kolesnichenko"><img
                                                     src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png"></a></div>-->
@@ -107,6 +107,7 @@ class CMB2_Field_Email_After
             }
             ?>
         </ul>
+        </div>
 
         <div class="force-center1">
             <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=create-email-template'); ?>"
