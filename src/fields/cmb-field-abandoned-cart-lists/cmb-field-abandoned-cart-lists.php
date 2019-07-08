@@ -26,7 +26,7 @@ class CMB2_Field_Abandoned_Cart_Lists
         $base_currency = $abandoned_cart_obj->getBaseCurrency();
         $settings = new \Rnoc\Retainful\Admin\Settings();
         $start_end_dates = $abandoned_cart_obj->start_end_dates;
-        $limit = 2;
+        $limit = 20;
         $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_seven';
         if ($duration != "custom") {
             $start_date = $start_end_dates[$duration]['start_date'];

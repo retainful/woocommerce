@@ -197,8 +197,8 @@ input:checked + .slider:before {
     display: block;
     width: 100%;
     border-top: 1px solid #ecf1fb;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
 }
 .tr-action {
     width: 45px;
@@ -223,14 +223,15 @@ input:checked + .slider:before {
     left: 2em;
     width: 0px;
     height: 94%;
-    border: 1px dashed #d2d7da;
     border-width: 0.7px;
+    border-color:#d2d7da ;
+    border-style: dashed;
 }
 .retainful_abandoned_email_main .retainful_abandoned_email-inner {
     background: #f4f7fd;
     border-radius: 4px;
-    box-shadow: 0px 3px 3px rgba(126, 142, 177, 0.10);
-    margin-bottom: 0px;
+    box-shadow: 0 3px 3px rgba(126, 142, 177, 0.10);
+    margin-bottom: 0;
     padding: 15px 15px;
     border: 1px solid #ecf0f7;
 }
@@ -344,20 +345,20 @@ input:checked + .slider:before {
 .retainful_abandoned_email_main .user-option a
 {
     background: #0198e0;
-    border: 0px solid #0198e0;
-    box-shadow: 0px 3px 3px rgba(126, 142, 177, 0.15);
+    border: 0 solid #0198e0;
+    box-shadow: 0 3px 3px rgba(126, 142, 177, 0.15);
     text-decoration: none;
 }
 .retainful_abandoned_email_main .user-option a:hover
 {
-    box-shadow: 0px 5px 6px rgba(126, 142, 177, 0.4);
+    box-shadow: 0 5px 6px rgba(126, 142, 177, 0.4);
     color: #fff;
 }
 .retainful_abandoned_email_main .email-btn-delete
 {
     background: #e24344;
-    border: 0px solid #e24344;
-    box-shadow: 0px 3px 3px rgba(126, 142, 177, 0.15);
+    border: 0 solid #e24344;
+    box-shadow: 0 3px 3px rgba(126, 142, 177, 0.15);
 }
 .retainful_abandoned_email_main .send-email {
     color: #2eb533;
