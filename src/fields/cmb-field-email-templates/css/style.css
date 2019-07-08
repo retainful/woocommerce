@@ -204,9 +204,13 @@ input:checked + .slider:before {
     width: 45px;
 }
 
-
+.retainful_abandoned_email_main
+{
+    margin: 0 auto 1%;
+    position: relative;
+    max-width: 100%
+}
 .retainful_abandoned_email_main .retainful_abandoned_email {
-    margin: 4em auto;
     position: relative;
     max-width: 100%
 }

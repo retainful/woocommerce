@@ -26,6 +26,9 @@ class CMB2_Field_Premium_Addon_List
                     if (!empty($title)) {
                         ?>
                         <div class="rnoc-grid-cell retainful_premium_grid">
+                            <div class="avatar-lg-bg">
+                                <i class="dashicons dashicons-cart retain-icon-premium"></i>
+                            </div>
                             <div class="header retainful_premium_heading"><?php echo $title; ?></div>
                             <div class="retainful_premium_para"><p><?php
                                     echo $addon->description();
@@ -69,6 +72,9 @@ class CMB2_Field_Premium_Addon_List
                 foreach ($available_addon_list as $addon) {
                     ?>
                     <div class="rnoc-grid-cell retainful_premium_grid">
+                        <div class="avatar-lg-bg">
+                            <i class="dashicons dashicons-cart retain-icon-premium"></i>
+                        </div>
                         <div class="header retainful_premium_heading"><?php echo $addon['title']; ?></div>
                         <div class="retainful_premium_para"><p><?php
                                 echo $addon['description'];
@@ -112,7 +118,7 @@ class CMB2_Field_Premium_Addon_List
                 text-transform: capitalize;
             }
 
-            .rnoc-grid-cell .description {
+            .rnoc-grid-cell  {
                 text-align: justify;
 
             }
@@ -171,8 +177,25 @@ class CMB2_Field_Premium_Addon_List
                 color: #fff;
                 box-shadow: 0px 7px 6px rgba(126, 142, 177, 0.40);
             }
-            @media only screen and (max-width: 1350px) {
+            .retainful_premium_card_box .retainful_premium_grid .avatar-lg-bg {
+                height: 3.9rem;
+                text-align: center;
+                width: 3.9rem;
+                margin: 15px auto;
+                border-radius: 50%;
+                background: rgba(45, 203, 115, 0.21);
 
+            }
+            .retainful_premium_card_box .retainful_premium_grid .retain-icon-premium
+            {
+                font-size: 25px;
+                color: #21c76b;
+                line-height: 60px;
+                padding: 0px 0px;
+                position: relative;
+                right: 2px;
+            }
+            @media only screen and (max-width: 1350px) {
                 .retainful_premium_card_box .retainful_premium_grid .button-premium {
                     line-height: 35px;
                     height: 40px;
