@@ -28,6 +28,44 @@ class CMB2_Field_Email_After
     }
 
     /**
+     * Sort array by key
+     * @param $array
+     * @param $on
+     * @param int $order
+     * @return array
+     */
+    function sortArray($array, $on, $order = SORT_ASC)
+    {
+        $new_array = array();
+        $sortable_array = array();
+        if (count($array) > 0) {
+            foreach ($array as $k => $v) {
+                if (is_array($v)) {
+                    foreach ($v as $k2 => $v2) {
+                        if ($k2 == $on) {
+                            $sortable_array[$k] = $v2;
+                        }
+                    }
+                } else {
+                    $sortable_array[$k] = $v;
+                }
+            }
+            switch ($order) {
+                case SORT_ASC:
+                    asort($sortable_array);
+                    break;
+                case SORT_DESC:
+                    arsort($sortable_array);
+                    break;
+            }
+            foreach ($sortable_array as $k => $v) {
+                $new_array[$k] = $array[$k];
+            }
+        }
+        return $new_array;
+    }
+
+    /**
      * Render select box field
      */
     public function render_email_templates($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
@@ -50,68 +88,75 @@ class CMB2_Field_Email_After
             </div>
         </div>
         <div class="retainful_abandoned_email_main">
-        <ul class="retainful_abandoned_email">
-            <?php
-            if (!empty($templates)) {
-                foreach ($templates as $template) {
-                    ?>
-                    <li class="retainful_abandoned_email-event" id="template-no-<?php echo $template->id ?>">
-                        <label class="retainful_abandoned_email-event-icon <?php echo ($template->is_active == 1) ? ' edit-brd' : ' delete-brd'; ?>"><span
-                                    class="dashicons <?php echo ($template->is_active == 1) ? ' dashicons-yes icon-edit' : ' dashicons-no-alt icon-delete'; ?>"></span></label>
-                        <div class="retainful_abandoned_email-event-copy">
-                            <p class="retainful_abandoned_email-event-thumbnail"><?php echo $template->frequency . ' ' . $template->day_or_hour . ' ' . __('After Abandonment', RNOC_TEXT_DOMAIN) ?></p>
-                            <div class="retainful_abandoned_email-inner">
-                                <div class="message-head clearfix">
-                                    <!--<div class="avatar"><a href="./index.php?qa=user&amp;qa_1=Oleg+Kolesnichenko"><img
-                                                    src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png"></a></div>-->
-                                    <div class="user-detail">
-                                        <h5 class="handle"><?php echo $template->template_name; ?></h5>
-                                        <span class="qa-message-when-data"><?php
-                                            $subject = $template->subject;
-                                            $subject = str_replace('{{customer_name}}', 'Customer', $subject);
-                                            echo $subject; ?></span>
-                                    </div>
-                                    <div class="user-detail">
-                                        <h5 class="handle"><?php echo __('Number of Emails sent', RNOC_TEXT_DOMAIN); ?></h5>
-                                        <span class="qa-message-when-data"><span
-                                                    class="dashicons dashicons-email-alt send-email"></span> <?php echo $template->emails_sent ?></span>
-                                    </div>
-                                    <div class="user-detail user_active">
-                                        <label class="switch">
-                                            <input type="checkbox"
-                                                   value="1" <?php echo ($template->is_active == 1) ? ' checked' : ''; ?>
-                                                   class="is-template-active"
-                                                   data-template="<?php echo $template->id ?>">
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                    <div class="user-option">
-                                        <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=edit-template&template=' . $template->id) ?>"
-                                           class="email-button email-btn-edit"><?php echo __('Edit', RNOC_TEXT_DOMAIN); ?></a>
-                                        <button type="button"
-                                                class="email-button email-btn-delete remove-email-template"
-                                                data-template="<?php echo $template->id ?>"><?php echo __('Delete', RNOC_TEXT_DOMAIN) ?></button>
+            <ul class="retainful_abandoned_email">
+                <?php
+                $arranged_templates = array();
+                if (!empty($templates)) {
+                    foreach ($templates as $template) {
+                        $in_sec = ($template->day_or_hour == "Days") ? 86400 : 3600;
+                        $choosen_time = intval($template->frequency) * $in_sec;
+                        $arranged_templates[] = array('time' => $choosen_time, 'template' => $template);
+                    }
+                    $arranged_templates = $this->sortArray($arranged_templates, 'time');
+                }
+                if (!empty($arranged_templates)) {
+                    foreach ($arranged_templates as $arranged_template) {
+                        $template = $arranged_template['template'];
+                        ?>
+                        <li class="retainful_abandoned_email-event" id="template-no-<?php echo $template->id ?>">
+                            <label class="retainful_abandoned_email-event-icon <?php echo ($template->is_active == 1) ? ' edit-brd' : ' delete-brd'; ?>"><span
+                                        class="dashicons <?php echo ($template->is_active == 1) ? ' dashicons-yes icon-edit' : ' dashicons-no-alt icon-delete'; ?>"></span></label>
+                            <div class="retainful_abandoned_email-event-copy">
+                                <p class="retainful_abandoned_email-event-thumbnail"><?php echo __('Send ', RNOC_TEXT_DOMAIN) . $template->frequency . ' ' . $template->day_or_hour . ' ' . __('After Abandonment', RNOC_TEXT_DOMAIN) ?></p>
+                                <div class="retainful_abandoned_email-inner">
+                                    <div class="message-head clearfix">
+                                        <div class="user-detail">
+                                            <h5 class="handle"><?php echo $template->template_name; ?></h5>
+                                            <span class="qa-message-when-data"><b><?php echo __('Subject: ', RNOC_TEXT_DOMAIN) ?></b><?php
+                                                echo $template->subject; ?></span>
+                                        </div>
+                                        <div class="user-detail">
+                                            <span class="qa-message-when-data"><span
+                                                        class="dashicons dashicons-email-alt send-email"></span> <?php echo $template->emails_sent ?></span>
+                                            <span><?php echo __('sent', RNOC_TEXT_DOMAIN); ?></span>
+                                        </div>
+                                        <div class="user-detail">
+                                            <h5 class="handle"><?php echo __('Enable / Disable', RNOC_TEXT_DOMAIN); ?></h5>
+                                            <label class="switch">
+                                                <input type="checkbox"
+                                                       value="1" <?php echo ($template->is_active == 1) ? ' checked' : ''; ?>
+                                                       class="is-template-active"
+                                                       data-template="<?php echo $template->id ?>">
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+                                        <div class="user-option">
+                                            <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=edit-template&template=' . $template->id) ?>"
+                                               class="email-button email-btn-edit"><?php echo __('Edit', RNOC_TEXT_DOMAIN); ?></a>
+                                            <button type="button"
+                                                    class="email-button email-btn-delete remove-email-template"
+                                                    data-template="<?php echo $template->id ?>"><?php echo __('Delete', RNOC_TEXT_DOMAIN) ?></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
+                        </li>
+                        <?php
+                    }
+                } else {
+                    ?>
+                    <tr>
+                        <p class="force-center text-danger"><?php echo __('No email templates found! So, No emails were sent!', RNOC_TEXT_DOMAIN); ?></p>
+                    </tr>
                     <?php
                 }
-            } else {
                 ?>
-                <tr>
-                    <p class="force-center text-danger"><?php echo __('No email templates found! So, No emails were sent!', RNOC_TEXT_DOMAIN); ?></p>
-                </tr>
-                <?php
-            }
-            ?>
-        </ul>
+            </ul>
         </div>
 
         <div class="force-center1">
             <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=create-email-template'); ?>"
-               class="create-new-template"><?php echo __('Create New Template', RNOC_TEXT_DOMAIN) ?></a>
+               class="create-new-template"><?php echo __('Create New Email Template', RNOC_TEXT_DOMAIN) ?></a>
         </div>
         <?php
     }

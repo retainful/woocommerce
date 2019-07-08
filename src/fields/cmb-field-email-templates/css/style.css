@@ -54,7 +54,7 @@
     left: 3px;
     right: 0;
     bottom: 0;
-    background-color:#a4b2d0;
+    background-color:#e24343;
     -webkit-transition: .4s;
     transition: .4s;
 }
@@ -72,7 +72,7 @@
 }
 
 input:checked + .slider {
-    background-color: #0198e0;
+    background-color: #2dcb73;
 }
 input:focus + .slider {
     box-shadow: 0 0 1px #0085ba;
@@ -228,12 +228,12 @@ input:checked + .slider:before {
     border-style: dashed;
 }
 .retainful_abandoned_email_main .retainful_abandoned_email-inner {
-    background: #f4f7fd;
+    background: #fff5ed;
     border-radius: 4px;
-    box-shadow: 0 3px 3px rgba(126, 142, 177, 0.10);
+    box-shadow: 0 3px 3px #fde7d6;
     margin-bottom: 0;
     padding: 15px 15px;
-    border: 1px solid #ecf0f7;
+    border: 1px solid #fde7d6;
 }
 .retainful_abandoned_email_main .retainful_abandoned_email-event {
     position: relative;

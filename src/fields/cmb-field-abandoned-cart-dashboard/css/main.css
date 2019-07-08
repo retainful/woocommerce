@@ -58,8 +58,8 @@
     font-size: 15px;
     line-height: 45px;
     height: 45px;
-    margin: 15px 0px;
-    padding: 0px 45px 0px;
+    margin: 15px 0;
+    padding: 0 45px 0;
     background: #F27052;
     border-color: #F27052;
     color: #ffffff;
@@ -99,23 +99,23 @@
     margin-top: -1px;
     background: #fff ;
     border: 1px solid #e2e7f3 ;
-    box-shadow: 0 0px 0px rgba(0,0,0,.00);
+    box-shadow: 0 0 0 rgba(0,0,0,.00);
 }
 .retainful_abandoned_container .card_main_box
 {
-    padding: 40px 0px;
+    padding: 40px 0;
 }
 
 .retainful_abandoned_container .rnoc_counter_widget.card_main_box {
-	background: #f4f7fd;
+	background: #fff5ed;
     border-radius: 4px;
-    box-shadow: 0px 4px 3px rgba(126, 142, 177, 0.04);
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
 	margin-bottom: 20px;
 }
 .retainful_abandoned_container .avatar-lg {
     height: 3.9rem;
     width: 3.9rem;
-    margin: 0px auto;
+    margin: 0 auto;
     border-radius: 50%;
 }
 .retainful_abandoned_container .rnoc_counter_widget .card-box-value {
@@ -127,7 +127,7 @@
 }
 .retainful_abandoned_container .rnoc_counter_widget .card-box-name {
     text-align: center;
-    padding: 0px;
+    padding: 0;
     color: #6c747a;
     font-size: 16px ;
     font-weight: 600;
@@ -146,7 +146,7 @@
 }
 .img_icon {
     padding: 29%;
-    margin-top: 0px;
+    margin-top: 0;
     width: 42%;
 }
 .woocommerce-Price-currencySymbol{
@@ -154,7 +154,7 @@
 }
 .upgrade-premium_box
 {
-    box-shadow: 0px 4px 3px rgba(126, 142, 177, 0.04);
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
     padding: 55px 20px;
     font-size: 16px;
     text-align: center;
@@ -166,7 +166,7 @@
 	background: #9eabc5;
     font-weight: 600!important;
     border-color: #0198e0 #0198e0 #0198e0;
-    box-shadow: 0 0px 0 #0198e0;
+    box-shadow: 0 0 0 #0198e0;
     color: #fff;
     text-decoration: none;
     text-shadow:none !important;
@@ -179,16 +179,16 @@
     line-height: 45px;
     height: 45px;
     margin: 0;
-    padding: 0px 45px 0px;
+    padding: 0 45px 0;
     cursor: pointer;
-    border-width: 0px;
+    border-width: 0;
     border-style: solid;
     -webkit-appearance: none;
     border-radius:5px;
     white-space: nowrap;
     box-sizing: border-box;
     margin-right: 28px;
-	    box-shadow: 0px 4px 3px rgba(126, 142, 177, 0.40);
+	    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.40);
 }
 .abandoned_cart_filter .filter_by {
     font-weight: 700;
@@ -198,16 +198,16 @@
 }
 .abandoned_cart_filter a:hover
 {
-    box-shadow: 0px 4px 3px rgba(126, 142, 177, 0.40);
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.40);
 }
 .upgrade-premium_box a:hover
 {
-    box-shadow: 0px 4px 3px rgba(126, 142, 177, 0.40);
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.40);
 }
 .abandoned_cart_filter a:hover
 {
     color: #fff;
-	box-shadow: 0px 7px 6px rgba(126, 142, 177, 0.40);
+	box-shadow: 0 7px 6px rgba(126, 142, 177, 0.40);
 }
 .button-abandoned {
     color: #fff;
@@ -219,12 +219,12 @@
 }
 .wp-core-ui .button, .wp-core-ui .button-secondary {
     border-color: #ccc;
-    box-shadow: 0 0px 0 #fff;
+    box-shadow: 0 0 0 #fff;
     vertical-align: top;
 }
 .button-secondary {
     border-color: #0198e0;
-    box-shadow: 0 0px 0 #fff;
+    box-shadow: 0 0 0 #fff;
     vertical-align: top;
 }
 .button-secondary-last
@@ -265,7 +265,7 @@
     padding:15px 12px;
 }
 .retainful_abandoned_table{
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 .retainful_abandoned_table td, .retainful_abandoned_table th {
     padding: 10px;
@@ -279,8 +279,8 @@
 }
 .retainful_abandoned_table thead th {
     vertical-align: bottom;
-    border-bottom: 0px solid #f9fbfc;
-    border-top: 0px solid #f9fbfc;
+    border-bottom: 0 solid #f9fbfc;
+    border-top: 0 solid #f9fbfc;
 }
 .retainful_abandoned_table thead th, .retainful_abandoned_table th {
     color: #88929c;
@@ -350,13 +350,13 @@
     display: block;
     width: 100%;
     border-top: 1px solid #ecf1fb;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .dataTables_info
 {
     float: left;
-	margin: 25px 0px 20px;
+	margin: 25px 0 20px;
 	font-weight: 500;
     color: #525252;
 }
@@ -457,7 +457,7 @@
     border-radius: 4px;
     color: #fff;
     font-weight: 100;
-    margin-top: 0px;
+    margin-top: 0;
     text-align: center;
     position: relative;
     font-size: 10px;
@@ -496,7 +496,7 @@
         font-size: 14px;
         line-height: 39px;
         height: 40px;
-        padding: 0px 30px 0px;
+        padding: 0 30px 0;
         margin-right: 20px;
     }
     .btn-view {
@@ -512,7 +512,7 @@
     .abandoned_cart_filter .wp-ui-filters {
         line-height: 37px;
         height: 38px;
-        padding: 0px 15px 0px;
+        padding: 0 15px 0;
         margin-right: 18px;
     }
     .abd-bg {

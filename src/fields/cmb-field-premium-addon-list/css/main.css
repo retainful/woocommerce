@@ -1,0 +1,143 @@
+.rnoc-grid-container {
+    display: grid;
+    grid-template-columns: 32% 32% 32%;
+    grid-gap: 30px;
+    padding: 10px;
+}
+
+.rnoc-grid-container .rnoc-grid-cell {
+    padding: 10px;
+    border-radius: 2px;
+}
+
+.rnoc-grid-cell .header {
+    font-weight: 800;
+    font-size: large;
+    text-transform: capitalize;
+}
+
+.rnoc-grid-cell {
+    text-align: justify;
+
+}
+
+.retainful_premium_card_box .retainful_premium_grid {
+    background: #fff5ed;
+    border-radius: 4px;
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
+    margin-bottom: 20px;
+    padding: 20px 20px;
+}
+
+.retainful_premium_card_box .retainful_premium_grid .retainful_premium_heading {
+    padding: 0 5px 0 5px;
+    text-align: center;
+    font-size: 25px;
+    color: #2d2f3a;
+    font-weight: 800;
+    line-height: 36px;
+}
+
+.retainful_premium_card_box .retainful_premium_grid .retainful_premium_para p {
+    padding: 5px 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #6c747a;
+    line-height: 22px;
+    font-weight: 500;
+}
+
+.retainful_premium_card_box .retainful_premium_grid .footer {
+    text-align: center;
+}
+
+.retainful_premium_card_box .retainful_premium_grid .button-premium {
+    color: #fff;
+    background-color: #2dcb73 !important;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 45px;
+    height: 45px;
+    margin: 0;
+    padding: 0 45px 0;
+    cursor: pointer;
+    border-width: 0;
+    border-style: solid;
+    -webkit-appearance: none;
+    border-radius: 5px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    margin-right: 28px;
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.40);
+}
+
+.retainful_premium_card_box .retainful_premium_grid .button-premium:hover {
+    color: #fff;
+    box-shadow: 0 7px 6px rgba(126, 142, 177, 0.40);
+}
+
+.retainful_premium_card_box .retainful_premium_grid .avatar-lg-bg {
+    height: 3.9rem;
+    text-align: center;
+    width: 3.9rem;
+    margin: 15px auto;
+    border-radius: 50%;
+    background: rgba(45, 203, 115, 0.21);
+
+}
+
+.retainful_premium_card_box .retainful_premium_grid .retain-icon-premium {
+    font-size: 25px;
+    color: #21c76b;
+    line-height: 60px;
+    padding: 0 0;
+    position: relative;
+    right: 2px;
+}
+
+@media only screen and (max-width: 1350px) {
+    .retainful_premium_card_box .retainful_premium_grid .button-premium {
+        line-height: 35px;
+        height: 40px;
+        margin: 0;
+        padding: 0 14px 0;
+    }
+
+    .retainful_premium_card_box .retainful_premium_grid {
+        background: #f4f7fd;
+        border-radius: 4px;
+        box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
+        margin-bottom: 20px;
+        padding: 14px 10px;
+    }
+
+    .retainful_premium_card_box .retainful_premium_grid .retainful_premium_heading {
+        padding: 5px 5px 0 5px;
+        text-align: center;
+        font-size: 19px;
+        color: #2d2f3a;
+        font-weight: 800;
+        line-height: 26px;
+        margin-right: 0;
+    }
+
+    .retainful_premium_card_box .retainful_premium_grid .retainful_premium_para p {
+        padding: 5px 3px;
+        text-align: center;
+        font-size: 14px;
+        color: #6c747a;
+        line-height: 22px;
+        font-weight: 500;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .retainful_premium_card_box {
+        display: block;
+        grid-template-columns: 24% 25% 25% 24%;
+        grid-gap: 10px;
+        padding: 10px;
+    }
+}
