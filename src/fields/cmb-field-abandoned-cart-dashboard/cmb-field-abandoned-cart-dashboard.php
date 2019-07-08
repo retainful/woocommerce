@@ -60,7 +60,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                 </div>
             </div>
             <div class="rnoc_counter_widget widget_orange card_main_box <?php echo $width_class; ?>">
-                <div class="rnoc_counter_container">				
+                <div class="rnoc_countcmb-type-abandoned-cart-dashboarder_container">
 					<div class="avatar-lg avatar-lg-2">
 						<img src="<?php echo RNOC_PLUGIN_URL; ?>src/assets/images/icon-2.png" class="img_icon" alt="Abandoned Carts">
 					</div>					

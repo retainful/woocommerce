@@ -92,7 +92,7 @@
 
 
 
-/*-- New Style--*/
+/*  UI Design - Retainful Style */
 
 .cmb2-options-page .cmb2-metabox>.cmb2-id-rnoc-abandoned-cart-report {
     padding: 1em;
@@ -451,7 +451,7 @@ tr.group:hover {
 	padding: 2px 6px;
     border-radius: 4px;
     color: #fff;
-    font-weight: 500;
+    font-weight: 100;
     margin-top: 0px;
     text-align: center;
     position: relative;
