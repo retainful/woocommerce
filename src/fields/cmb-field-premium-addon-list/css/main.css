@@ -141,3 +141,6 @@
         padding: 10px;
     }
 }
+#submit-cmb {
+    display: none;
+}

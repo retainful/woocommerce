@@ -24,10 +24,56 @@ class Main
     }
 
     /**
+     * Register all the required end points
+     */
+    function registerEndPoints()
+    {
+        //Register custom endpoint for API
+        register_rest_route('retainful-api/v1', '/verify', array(
+            'methods' => 'GET',
+            'callback' => array($this, 'verifyAppId')
+        ));
+    }
+
+    /**
+     * verify the app id
+     * @param $data
+     * @return \WP_REST_Response
+     */
+    function verifyAppId($data)
+    {
+        $app_id = sanitize_text_field($data->get_param('app_id'));
+        $site_url = site_url();
+        if ($details = $this->admin->api->validateApi($app_id)) {
+            $response = array(
+                'success' => true,
+                'message' => 'API validated successfully!',
+                'data' => array(
+                    'domain' => $site_url
+                )
+            );
+            $status = 200;
+        } else {
+            $response = array(
+                'success' => false,
+                'message' => 'Failed to validate API',
+                'data' => array(
+                    'domain' => $site_url
+                )
+            );
+            $status = 400;
+        }
+        $response_object = new \WP_REST_Response($response);
+        $response_object->set_status($status);
+        return $response_object;
+    }
+
+    /**
      * Activate the required events
      */
     function activateEvents()
     {
+        add_action('rest_api_init', array($this, 'registerEndPoints'));
         //Create and alter the tables for abandoned carts and also check for woocommerce installed
         register_activation_hook(RNOC_FILE, array($this, 'validatePluginActivation'));
         //Detect woocommerce plugin deactivation
@@ -295,11 +341,19 @@ class Main
         include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-1.html');
         $content = ob_get_clean();
         $email_body = addslashes($content);
+        ob_start();
+        include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-2.html');
+        $content1 = ob_get_clean();
+        $email_body1 = addslashes($content1);
+        ob_start();
+        include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-3.html');
+        $content2 = ob_get_clean();
+        $email_body2 = addslashes($content2);
         global $wpdb;
         $default_template = $wpdb->get_row('SELECT id FROM ' . $table . ' WHERE default_template = "1"');
         if (empty($default_template)) {
             $template_subject = "Hey {{customer_name}}!! You left something in your cart";
-            $query = 'INSERT INTO `' . $table . '` ( subject, body, is_active, frequency, day_or_hour, default_template,template_name )VALUES ( "' . $template_subject . '","' . $email_body . '","1","1","Hours","1","initial")';
+            $query = 'INSERT INTO `' . $table . '` ( subject, body, is_active, frequency, day_or_hour, default_template,template_name )VALUES ( "' . $template_subject . '","' . $email_body . '","1","1","Hours","1","initial"),( "' . $template_subject . '","' . $email_body1 . '","0","1","Hours","6","After 6 hours"),( "' . $template_subject . '","' . $email_body2 . '","0","1","Days","1","After 1 day")';
             $wpdb->query($query);
         }
     }

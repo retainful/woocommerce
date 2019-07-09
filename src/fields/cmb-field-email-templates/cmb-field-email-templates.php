@@ -117,11 +117,10 @@ class CMB2_Field_Email_After
                                         </div>
                                         <div class="user-detail">
                                             <span class="qa-message-when-data"><span
-                                                        class="dashicons dashicons-email-alt send-email"></span> <?php echo $template->emails_sent ?></span>
-                                            <span><?php echo __('sent', RNOC_TEXT_DOMAIN); ?></span>
+                                                        class="dashicons dashicons-email-alt send-email"></span> <?php echo $template->emails_sent ?> <?php echo __('Emails', RNOC_TEXT_DOMAIN); ?></span>
+                                            <h5 class="handle"><?php echo __('sent', RNOC_TEXT_DOMAIN); ?></h5>
                                         </div>
                                         <div class="user-detail">
-                                            <h5 class="handle"><?php echo __('Enable / Disable', RNOC_TEXT_DOMAIN); ?></h5>
                                             <label class="switch">
                                                 <input type="checkbox"
                                                        value="1" <?php echo ($template->is_active == 1) ? ' checked' : ''; ?>
@@ -129,6 +128,7 @@ class CMB2_Field_Email_After
                                                        data-template="<?php echo $template->id ?>">
                                                 <span class="slider round"></span>
                                             </label>
+                                            <h5 class="handle"><?php echo ($template->is_active == 1) ? __('Enabled', RNOC_TEXT_DOMAIN) : __('Disabled', RNOC_TEXT_DOMAIN); ?></h5>
                                         </div>
                                         <div class="user-option">
                                             <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=edit-template&template=' . $template->id) ?>"
