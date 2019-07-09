@@ -467,9 +467,10 @@ class AbandonedCart
     function clearAbandonedCarts()
     {
         $abandoned_cart_settings = $this->admin->getAdminSettings();
-        if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'])) {
+        $cart_expiry_days = intval((isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'] : 90);
+        if ($cart_expiry_days) {
             global $wpdb;
-            $delete_ac_after_days_time = $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'] * 86400;
+            $delete_ac_after_days_time = $cart_expiry_days * 86400;
             $current_time = current_time('timestamp');
             $check_time = $current_time - $delete_ac_after_days_time;
             $query = "SELECT id FROM `" . $this->cart_history_table . "" . "` WHERE cart_is_recovered = 0 AND cart_expiry < %s";

@@ -34,46 +34,49 @@ class Main
         add_action('deactivated_plugin', array($this, 'detectPluginDeactivation'), 10, 2);
         //Check for dependencies
         add_action('plugins_loaded', array($this, 'checkDependencies'));
+        add_action('rnocp_activation_trigger', array($this, 'checkUserPlan'));
         //Activate CMB2 functions
         add_action('init', function () {
             $this->rnoc->init();
         });
         new Currency();
         do_action('rnoc_initiated');
-        //Get events
-        add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
-        add_action('woocommerce_payment_complete', array($this->rnoc, 'onAfterPayment'), 10, 1);
-        add_action('woocommerce_order_status_completed', array($this->rnoc, 'onAfterPayment'), 10, 1);
-        add_action('woocommerce_order_status_processing', array($this->rnoc, 'onAfterPayment'), 10, 1);
-        add_action('woocommerce_order_status_on-hold', array($this->rnoc, 'onAfterPayment'), 10, 1);
-        add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
-        add_action('woocommerce_init', array($this->rnoc, 'setCouponToSession'));
-        add_action('woocommerce_cart_loaded_from_session', array($this->rnoc, 'addCouponToCheckout'), 10);
-        //Attach coupon to email
-        $hook = $this->admin->couponMessageHook();
-        if (!empty($hook))
-            add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
+        if ($this->admin->isNextOrderCouponEnabled()) {
+            //Get events
+            add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
+            add_action('woocommerce_payment_complete', array($this->rnoc, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_order_status_completed', array($this->rnoc, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_order_status_processing', array($this->rnoc, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_order_status_on-hold', array($this->rnoc, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
+            add_action('woocommerce_init', array($this->rnoc, 'setCouponToSession'));
+            add_action('woocommerce_cart_loaded_from_session', array($this->rnoc, 'addCouponToCheckout'), 10);
+            //Attach coupon to email
+            $hook = $this->admin->couponMessageHook();
+            if (!empty($hook))
+                add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
+            //Sync the coupon details with retainful
+            add_action('retainful_cron_sync_coupon_details', array($this->rnoc, 'cronSendCouponDetails'), 1);
+            //Remove coupon code after placing order
+            add_action('woocommerce_thankyou', array($this->rnoc, 'removeCouponFromSession'), 10, 1);
+            //Remove Code from session
+            add_action('woocommerce_removed_coupon', array($this->rnoc, 'removeCouponFromCart'));
+            /*
+             * Support for woocommerce email customizer
+             */
+            add_filter('woo_email_drag_and_drop_builder_retainful_settings_url', array($this->rnoc, 'wooEmailCustomizerRetainfulSettingsUrl'));
+            //Tell Email customizes about handling coupons..
+            add_filter('woo_email_drag_and_drop_builder_handling_retainful', '__return_true');
+            //set coupon details for Email customizer
+            add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_data', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3);
+            //sent retainful additional short codes
+            add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array($this->rnoc, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
+            add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
+        }
         //Validate key
         add_action('wp_ajax_validate_app_key', array($this->rnoc, 'validateAppKey'));
         //Settings link
         add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
-        //Sync the coupon details with retainful
-        add_action('retainful_cron_sync_coupon_details', array($this->rnoc, 'cronSendCouponDetails'), 1);
-        //Remove coupon code after placing order
-        add_action('woocommerce_thankyou', array($this->rnoc, 'removeCouponFromSession'), 10, 1);
-        //Remove Code from session
-        add_action('woocommerce_removed_coupon', array($this->rnoc, 'removeCouponFromCart'));
-        /*
-         * Support for woocommerce email customizer
-         */
-        add_filter('woo_email_drag_and_drop_builder_retainful_settings_url', array($this->rnoc, 'wooEmailCustomizerRetainfulSettingsUrl'));
-        //Tell Email customizes about handling coupons..
-        add_filter('woo_email_drag_and_drop_builder_handling_retainful', '__return_true');
-        //set coupon details for Email customizer
-        add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_data', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3);
-        //sent retainful additional short codes
-        add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array($this->rnoc, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
-        add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
         /*
          * Retainful abandoned cart
          */

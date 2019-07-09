@@ -87,7 +87,7 @@ class CMB2_Field_Premium_Addon_List
                     ?>
                     <div class="rnoc-grid-cell retainful_premium_grid">
                         <div class="avatar-lg-bg">
-                            <i class="dashicons <?php echo $addon['description']; ?> retain-icon-premium"></i>
+                            <i class="dashicons <?php echo $addon['icon']; ?> retain-icon-premium"></i>
                         </div>
                         <div class="header retainful_premium_heading"><?php echo $addon['title']; ?></div>
                         <div class="retainful_premium_para"><p><?php

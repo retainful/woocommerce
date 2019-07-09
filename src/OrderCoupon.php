@@ -54,7 +54,10 @@ class OrderCoupon
     function pluginActionLinks($links)
     {
         $action_links = array(
+            'abandoned_carts' => '<a href="' . admin_url('admin.php?page=retainful_abandoned_cart') . '">' . __('Abandoned carts', RNOC_TEXT_DOMAIN) . '</a>',
+            'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', RNOC_TEXT_DOMAIN) . '</a>',
             'settings' => '<a href="' . admin_url('admin.php?page=retainful_settings') . '">' . __('Settings', RNOC_TEXT_DOMAIN) . '</a>',
+            'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('License', RNOC_TEXT_DOMAIN) . '</a>',
         );
         return array_merge($action_links, $links);
     }
