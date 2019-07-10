@@ -201,44 +201,68 @@ class CMB2_Field_Edit_Email_Template
                 .grid-column {
                     display: inline-block;
                     width: 15%;
-                    cursor: pointer;
                     margin: 0.5%;
+                    padding: 5px;
+                    box-shadow: 0 2px 4px rgba(126,142,177,.12);
+                    cursor: pointer;
+                    border: 1px solid #eeeeee;
+                    border-bottom: 3px solid transparent;
+                    text-align: center;
+                    border-radius: 5px;
+                    margin-bottom: 30px;
+                    transition: all .3s ease-in-out;
+                }
+                .grid-column:hover{
+                    box-shadow: 0 5px 25px 0 rgba(0,0,100,.1);
+                    border-bottom: 3px solid #7abe4d;
                 }
 
                 .grid-column .insert-template {
-                    padding: 10px;
-                    background: #dddddd;
-                    font-size: 16px;
-                    width: 100%;
-                    font-weight: 600;
-                    color: #000000;
-                    border: 2px solid #dddddd;
+                    display: inline-block;
+                    padding: 10px 30px;
+                    text-align: center;
+                    font-size: 15px;
+                    font-weight: 500;
+                    margin: 20px 0 10px;
+                    text-transform: capitalize;
+                    white-space: nowrap;
+                    border-radius: 4px;
+                    box-sizing: border-box;
+                    transition: .2s;
+                    text-decoration: none;
+                    background: #6772e5;
+                    border: 1px solid #6772e5;
+                    color: #ffffff;
                 }
 
                 .grid-column .overlay {
                     position: relative;
-                    background: #f00;
+                    background: linear-gradient(136.14deg,#8cce17 0%,#54B22E 100%);
                     color: #fff;
                     font-size: 13px;
                     font-weight: 600;
                     padding: 8px;
                     border-radius: 0 20px 20px 0;
                     display: inline-block;
-                    box-shadow: 2px 2px 4px 1px #777;
-                }
-
-                .grid-column .get-now-btn {
-                    background: red;
-                    padding: 10px 0;
-                    text-align: center;
-                    width: 100%;
+                    box-shadow: 0 2px 4px rgba(126,142,177,.12);
                 }
 
                 .grid-column .get-now-btn a {
-                    color: white;
+                    display: inline-block;
+                    padding: 10px 30px;
+                    text-align: center;
+                    font-size: 15px;
+                    font-weight: 500;
+                    margin: 20px 0 10px;
+                    text-transform: capitalize;
+                    white-space: nowrap;
+                    border-radius: 4px;
+                    box-sizing: border-box;
+                    transition: .2s;
                     text-decoration: none;
-                    font-size: 16px;
-                    font-weight: 600;
+                    background: red;
+                    border: 1px solid red;
+                    color: #ffffff;
                 }
 
                 .template-preview {

@@ -22,29 +22,37 @@
 }
 
 .retainful_premium_card_box .retainful_premium_grid {
-    background: #fff5ed;
-    border-radius: 4px;
-    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
-    margin-bottom: 20px;
-    padding: 20px 20px;
+    padding: 20px 20px 30px;
+    box-shadow: 0 2px 4px rgba(126,142,177,.12);
+    border: 1px solid #eee;
+    border-bottom: 3px solid transparent;
+    text-align: center;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    transition: all .3s ease-in-out;
+}
+.retainful_premium_card_box .retainful_premium_grid:hover{
+    box-shadow: 0 5px 25px 0 rgba(0,0,100,.1);
+    border-bottom: 3px solid #54B22E;
 }
 
 .retainful_premium_card_box .retainful_premium_grid .retainful_premium_heading {
     padding: 0 5px 0 5px;
     text-align: center;
-    font-size: 25px;
+    font-size: 23px;
     color: #2d2f3a;
-    font-weight: 800;
-    line-height: 36px;
+    font-weight: 500;
+    line-height: 1.33;
 }
 
 .retainful_premium_card_box .retainful_premium_grid .retainful_premium_para p {
-    padding: 5px 20px;
+    padding: 0 20px 10px;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     color: #6c747a;
-    line-height: 22px;
-    font-weight: 500;
+    line-height: 1.7;
+    font-weight: 400;
+    margin: 10px 0;
 }
 
 .retainful_premium_card_box .retainful_premium_grid .footer {
@@ -53,15 +61,15 @@
 
 .retainful_premium_card_box .retainful_premium_grid .button-premium {
     color: #fff;
-    background-color: #2dcb73 !important;
+    background: linear-gradient(136.14deg,#8cce17 0%,#54B22E 100%);
     display: inline-block;
     text-decoration: none;
     font-size: 15px;
     font-weight: 500;
-    line-height: 45px;
-    height: 45px;
+    line-height: 1.7;
+    height: auto;
     margin: 0;
-    padding: 0 45px 0;
+    padding: 10px 30px;
     cursor: pointer;
     border-width: 0;
     border-style: solid;
@@ -84,13 +92,13 @@
     width: 3.9rem;
     margin: 15px auto;
     border-radius: 50%;
-    background: rgba(45, 203, 115, 0.21);
+    background: #f0ffea;
 
 }
 
 .retainful_premium_card_box .retainful_premium_grid .retain-icon-premium {
     font-size: 25px;
-    color: #21c76b;
+    color: #54B22E;
     line-height: 60px;
     padding: 0 0;
     position: relative;
@@ -98,38 +106,15 @@
 }
 
 @media only screen and (max-width: 1350px) {
-    .retainful_premium_card_box .retainful_premium_grid .button-premium {
-        line-height: 35px;
-        height: 40px;
-        margin: 0;
-        padding: 0 14px 0;
-    }
-
-    .retainful_premium_card_box .retainful_premium_grid {
-        background: #f4f7fd;
-        border-radius: 4px;
-        box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
-        margin-bottom: 20px;
-        padding: 14px 10px;
-    }
 
     .retainful_premium_card_box .retainful_premium_grid .retainful_premium_heading {
         padding: 5px 5px 0 5px;
-        text-align: center;
         font-size: 19px;
-        color: #2d2f3a;
-        font-weight: 800;
-        line-height: 26px;
         margin-right: 0;
     }
 
     .retainful_premium_card_box .retainful_premium_grid .retainful_premium_para p {
-        padding: 5px 3px;
-        text-align: center;
         font-size: 14px;
-        color: #6c747a;
-        line-height: 22px;
-        font-weight: 500;
     }
 }
 
@@ -140,7 +125,4 @@
         grid-gap: 10px;
         padding: 10px;
     }
-}
-#submit-cmb {
-    display: none;
 }

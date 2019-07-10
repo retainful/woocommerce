@@ -20,3 +20,17 @@
 p.submit{
     text-align: right !important;
 }
+
+.nav-tab-wrapper .nav-tab {
+    padding: 15px 20px;
+    background: #ffffff;
+    color: #74777b;
+    line-height: 1;
+    transition: all 0.2s;
+}
+.nav-tab-wrapper .nav-tab.nav-tab-active, .nav-tab-wrapper .nav-tab:hover {
+    background: none;
+    box-shadow: inset 0 3px 0 #f27052;
+    border-top-color: #f27052;
+    color: #f27052;
+}
