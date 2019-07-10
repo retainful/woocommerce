@@ -59,8 +59,9 @@ class Main
             $response_code = 'UNKNOWN_ERROR';
         }
         $response = array(
-            'success' => (!in_array($response_code, array('INSTALLED_CONNECTED', 'UNKNOWN_ERROR'))) ? true : false,
-            'message' => $response_code,
+            'success' => ($response_code == 'INSTALLED_CONNECTED') ? true : false,
+            'message' => '',
+            'code' => $response_code,
             'data' => array(
                 'domain' => $site_url
             )
