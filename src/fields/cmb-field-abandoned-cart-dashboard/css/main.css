@@ -15,9 +15,6 @@
     float: left;
     color: #FFFFFF !important;
 }
-.rnoc_counter_container .rnoc_counter_widget:last-child{
-    margin-right: 0;
-}
 
 .rnoc_width_23 {
     width: 23% !important;
@@ -61,10 +58,10 @@
     font-size: 15px;
     line-height: 45px;
     height: 45px;
-    margin: 20px 0 0;
-    padding: 3px 30px;
-    background: #ff9900;
-    border-color: #ff9900;
+    margin: 15px 0;
+    padding: 0 45px 0;
+    background: #F27052;
+    border-color: #F27052;
     color: #ffffff;
     text-decoration: none;
     border-radius: 4px;
@@ -72,8 +69,7 @@
 
 .rnoc_counter_container .rnoc_counter_widget .rnoc_widget_title_container {
     text-align: center;
-    padding: 8px 0;
-    display: inline-block;
+    padding: 8px;
 }
 
 .rnoc_counter_container .rnoc_counter_widget .rnoc_counter_title {
@@ -109,44 +105,32 @@
 {
     padding: 40px 0;
 }
-.retainful_abandoned_container{
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-}
+
 .retainful_abandoned_container .rnoc_counter_widget.card_main_box {
-    padding: 20px;
-	background: #fff;
+	background: #fff5ed;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(126,142,177,.12);
-    border: 1px solid #eee;
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
 	margin-bottom: 20px;
-    transition: 0.2s;
-    flex: 1;
-}
-.retainful_abandoned_container .rnoc_counter_widget.card_main_box:hover {
-    box-shadow: 0 5px 25px 0 rgba(0,0,100,.1);
 }
 .retainful_abandoned_container .avatar-lg {
-    height: 2.9rem;
-    width: 2.9rem;
+    height: 3.9rem;
+    width: 3.9rem;
     margin: 0 auto;
     border-radius: 50%;
-    float: right;
 }
 .retainful_abandoned_container .rnoc_counter_widget .card-box-value {
-    padding: 10px 5px 10px 5px;
-    text-align: left;
+    padding: 22px 5px 10px 5px;
+    text-align: center;
     font-size: 40px;
-    color: #4a4a4a;
-    font-weight: 600;
+    color: #2d2f3a;
+    font-weight: 800;
 }
 .retainful_abandoned_container .rnoc_counter_widget .card-box-name {
     text-align: center;
     padding: 0;
     color: #6c747a;
-    font-size: 17px ;
-    font-weight: 500;
+    font-size: 16px ;
+    font-weight: 600;
 }
 .avatar-lg-1 {
     background:#d2eafd;
@@ -170,16 +154,13 @@
 }
 .upgrade-premium_box
 {
-    box-shadow: 0 2px 4px rgba(126,142,177,.12);
-    border-radius: 4px;
-    padding: 30px;
-    font-size: 25px;
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
+    padding: 55px 20px;
+    font-size: 16px;
     text-align: center;
-    background: linear-gradient(136.14deg,#8cce17 0%,#54B22E 100%);
-    line-height: 1.4;
+    background: #fff5ed;
+    line-height: 25px;
     vertical-align: middle;
-    color: #fff;
-    font-weight: 600;
 }
 .wp-core-ui .button-primary {
 	background: #9eabc5;
@@ -193,12 +174,12 @@
 .abandoned_cart_filter .wp-ui-filters{
     display: inline-block;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 37px;
-    height: 35px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 45px;
+    height: 45px;
     margin: 0;
-    padding: 0 15px 0;
+    padding: 0 45px 0;
     cursor: pointer;
     border-width: 0;
     border-style: solid;
@@ -206,9 +187,8 @@
     border-radius:5px;
     white-space: nowrap;
     box-sizing: border-box;
-    margin-right: 10px;
-    box-shadow: 0 2px 4px rgba(126,142,177,.12);
-    transition: 0.2s;
+    margin-right: 28px;
+	    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.40);
 }
 .abandoned_cart_filter .filter_by {
     font-weight: 700;
@@ -226,15 +206,16 @@
 }
 .abandoned_cart_filter a:hover
 {
+    color: #fff;
 	box-shadow: 0 7px 6px rgba(126, 142, 177, 0.40);
 }
-.abandoned_cart_filter .button-abandoned {
-    color: #e24344;
-    background-color: #ffeaea;
+.button-abandoned {
+    color: #fff;
+    background-color: #e24344 ;
 }
-.abandoned_cart_filter .button-recovered {
-    color: #2dcb73;
-    background-color: #dfffed;
+.abandoned_cart_filter  .button-recovered {
+    color: #fff ;
+    background-color: #2dcb73;
 }
 .wp-core-ui .button, .wp-core-ui .button-secondary {
     border-color: #ccc;
@@ -246,15 +227,15 @@
     box-shadow: 0 0 0 #fff;
     vertical-align: top;
 }
-.abandoned_cart_filter .button-secondary-last
+.button-secondary-last
  {
-    color: #0198e0;
-    background-color: #e0f5ff;
+	color: #fff ;
+    background-color: #0198e0 ;
 }
-.abandoned_cart_filter .button-primary-first
+.button-primary-first
 {
-    color: #fff;
-    background-color: #f27052;
+	color: #fff;
+    background-color: #2d2f3a;
 }
 .retainful_abandoned_table {
 	font-size: 13px;
@@ -341,13 +322,13 @@
 }
 .retainful_abandoned_table .abd-bg
 {
-    background-color:#ffeaea;
-	padding: 12px 20px;
+    background-color:#ffd7d3;
+	padding: 12px 60px;
 }
 .retainful_abandoned_table .rcd-bg
 {
     background-color: #e0f7e9;
-    padding: 12px 20px;
+    padding: 12px 60px;
 }
 .retainful_abandoned_table .mr-1
 {
@@ -472,14 +453,15 @@
     line-height: 20px;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .customer-type{
-	padding: 5px 10px;
+	padding: 2px 6px;
     border-radius: 4px;
     color: #fff;
-    font-weight: 600;
+    font-weight: 100;
     margin-top: 0;
     text-align: center;
     position: relative;
     font-size: 10px;
+    letter-spacing: 0.7px;
     bottom: 1px;
 	display: inline-block;
 }
@@ -582,17 +564,4 @@
         font-weight: 700;
         font-size: 14px;
     }
-}
-
-.abandoned_cart_filter .custom-select {
-    font-weight: 500;
-    color: #333;
-    border: 1px solid #eee;
-    display: inline-block;
-    height: calc(2.25rem + 2px);
-    padding: .375rem 1.75rem .375rem .75rem;
-    line-height: 1.5;
-    vertical-align: middle;
-    background: #fff;
-    border-radius: .25rem;
 }
