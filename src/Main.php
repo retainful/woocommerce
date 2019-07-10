@@ -44,27 +44,29 @@ class Main
     {
         $app_id = sanitize_text_field($data->get_param('app_id'));
         $site_url = site_url();
-        if ($details = $this->admin->api->validateApi($app_id)) {
-            $response = array(
-                'success' => true,
-                'message' => 'API validated successfully!',
-                'data' => array(
-                    'domain' => $site_url
-                )
-            );
-            $status = 200;
+        $entered_app_id = $this->admin->getApiKey();
+        $is_app_connected = $this->admin->isAppConnected();
+        $response_code = NULL;
+        if (empty($entered_app_id)) {
+            $response_code = 'INSTALLED_NO_APP_ID_FOUND';
+        } elseif (!empty($entered_app_id) && !$is_app_connected) {
+            $response_code = 'INSTALLED_NOT_CONNECTED';
+        } elseif (!empty($entered_app_id) && $app_id != $entered_app_id) {
+            $response_code = 'INSTALLED_CONNECTED_DIFFERENT_APP_ID';
+        } elseif (!empty($entered_app_id) && $app_id == $entered_app_id && $is_app_connected) {
+            $response_code = 'INSTALLED_CONNECTED';
         } else {
-            $response = array(
-                'success' => false,
-                'message' => 'Failed to validate API',
-                'data' => array(
-                    'domain' => $site_url
-                )
-            );
-            $status = 400;
+            $response_code = 'UNKNOWN_ERROR';
         }
+        $response = array(
+            'success' => (!in_array($response_code, array('INSTALLED_CONNECTED', 'UNKNOWN_ERROR'))) ? true : false,
+            'message' => $response_code,
+            'data' => array(
+                'domain' => $site_url
+            )
+        );
         $response_object = new \WP_REST_Response($response);
-        $response_object->set_status($status);
+        $response_object->set_status(200);
         return $response_object;
     }
 
