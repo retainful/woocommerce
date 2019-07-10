@@ -38,7 +38,7 @@ class CMB2_Field_Date_Range_Picker
             var start_end_dates = <?php echo json_encode($start_end_dates); ?>;
         </script>
         <div class="abandoned_cart_filter">
-            <select id="duration" name="duration">
+            <select id="duration" name="duration" class="custom-select">
                 <?php
                 foreach ($start_end_dates_select as $key => $value) {
                     ?>

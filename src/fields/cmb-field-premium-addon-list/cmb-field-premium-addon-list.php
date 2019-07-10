@@ -74,6 +74,11 @@ class CMB2_Field_Premium_Addon_List
                 )
             );
             ?>
+            <style>
+                #submit-cmb {
+                    display: none;
+                }
+            </style>
             <div class="rnoc-grid-container retainful_premium_card_box">
                 <?php
                 $library = new Rnoc\Retainful\library\RetainfulApi();
@@ -106,16 +111,6 @@ class CMB2_Field_Premium_Addon_List
             jQuery('.view-addon-btn').click(function () {
                 var slug = jQuery(this).data('slug');
                 jQuery('#<?php echo RNOC_PLUGIN_PREFIX; ?>retainful_premium_addon-tab-' + slug).trigger('click');
-            });
-            jQuery('.cmb-tabs div').click(function () {
-                var save_btn = jQuery('#submit-cmb');
-                var id = jQuery(this).attr('id');
-                console.log(save_btn);
-                if (id === "rnoc_retainful_premium_addon-tab-general-settings") {
-                    save_btn.hide();
-                } else {
-                    save_btn.show();
-                }
             });
         </script>
         <?php
