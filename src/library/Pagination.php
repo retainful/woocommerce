@@ -16,23 +16,23 @@ class Pagination
     protected $numLinks = 2;
     protected $currentPage = 0;
     protected $firstLink = 'First';
-    protected $nextLink = 'Next &raquo;';
-    protected $prevLink = '&laquo; Prev';
+    protected $nextLink = '&raquo;';
+    protected $prevLink = '&laquo;';
     protected $lastLink = 'Last';
-    protected $fullTagOpen = '<div class="pagination">';
-    protected $fullTagClose = '</div>';
-    protected $firstTagOpen = '';
-    protected $firstTagClose = '&nbsp;';
-    protected $lastTagOpen = '&nbsp;';
-    protected $lastTagClose = '';
-    protected $curTagOpen = '&nbsp;<b>';
-    protected $curTagClose = '</b>';
-    protected $nextTagOpen = '&nbsp;';
-    protected $nextTagClose = '&nbsp;';
-    protected $prevTagOpen = '&nbsp;';
-    protected $prevTagClose = '';
-    protected $numTagOpen = '&nbsp;';
-    protected $numTagClose = '';
+    protected $fullTagOpen = '<ul class="pagination">';
+    protected $fullTagClose = '</ul>';
+    protected $firstTagOpen = '<li>';
+    protected $firstTagClose = '</li>';
+    protected $lastTagOpen = '<li>';
+    protected $lastTagClose = '</li>';
+    protected $curTagOpen = '<li><a class="active" href="#">';
+    protected $curTagClose = '</a></li>';
+    protected $nextTagOpen = '<li>';
+    protected $nextTagClose = '</li>';
+    protected $prevTagOpen = '<li>';
+    protected $prevTagClose = '</li>';
+    protected $numTagOpen = '<li>';
+    protected $numTagClose = '</li>';
     protected $showCount = true;
     protected $currentOffset = 0;
     protected $queryStringSegment = 'page_number';
@@ -70,6 +70,7 @@ class Pagination
         if ($numPages == 1) {
             if ($this->showCount) {
                 $info = 'Showing : ' . $this->totalRows;
+                $info = ' <div class="dataTables_info">' . $info . '</div>';
                 return $info;
             } else {
                 return '';
@@ -89,21 +90,6 @@ class Pagination
 
         // Links content string variable
         $output = '';
-
-        // Showing links notification
-        if ($this->showCount) {
-            $currentOffset = ($this->currentPage > 1) ? ($this->currentPage - 1) * $this->perPage : $this->currentPage;
-            $info = 'Showing ' . $currentOffset . ' to ';
-
-            if (($currentOffset + $this->perPage) <= $this->totalRows)
-                $info .= $this->currentPage * $this->perPage;
-            else
-                $info .= $this->totalRows;
-
-            $info .= ' of ' . $this->totalRows . ' | ';
-
-            $output .= $info;
-        }
 
         $this->numLinks = (int)$this->numLinks;
 
@@ -154,7 +140,18 @@ class Pagination
         $output = preg_replace("#([^:])//+#", "\\1/", $output);
         // Add the wrapper HTML if exists
         $output = $this->fullTagOpen . $output . $this->fullTagClose;
-
+        // Showing links notification
+        if ($this->showCount) {
+            $currentOffset = ($this->currentPage > 1) ? ($this->currentPage - 1) * $this->perPage : $this->currentPage;
+            $info = 'Showing ' . $currentOffset . ' to ';
+            if (($currentOffset + $this->perPage) <= $this->totalRows)
+                $info .= $this->currentPage * $this->perPage;
+            else
+                $info .= $this->totalRows;
+            $info .= ' of ' . $this->totalRows;
+            $info = ' <div class="dataTables_info">' . $info . '</div>';
+            $output .= $info;
+        }
         return $output;
     }
 }

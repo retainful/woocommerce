@@ -390,6 +390,17 @@ class Settings
                 'default' => 1
             ));
             $general_settings->add_field(array(
+                'name' => __('Show guest cart?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard',
+                'type' => 'radio_inline',
+                'options' => array(
+                    0 => __('No', RNOC_TEXT_DOMAIN),
+                    1 => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'desc' => __('If not enabled, Guest carts will not shown in your Abandoned cart dashboard.', RNOC_TEXT_DOMAIN),
+                'default' => 1
+            ));
+            $general_settings->add_field(array(
                 'name' => __('Compliance: Message to show when tracking real-time carts', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'cart_capture_msg',
                 'type' => 'textarea',
