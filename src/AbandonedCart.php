@@ -467,9 +467,10 @@ class AbandonedCart
     function clearAbandonedCarts()
     {
         $abandoned_cart_settings = $this->admin->getAdminSettings();
-        if (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'])) {
+        $cart_expiry_days = intval((isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days']) && !empty($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'] : 90);
+        if ($cart_expiry_days) {
             global $wpdb;
-            $delete_ac_after_days_time = $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days'] * 86400;
+            $delete_ac_after_days_time = $cart_expiry_days * 86400;
             $current_time = current_time('timestamp');
             $check_time = $current_time - $delete_ac_after_days_time;
             $query = "SELECT id FROM `" . $this->cart_history_table . "" . "` WHERE cart_is_recovered = 0 AND cart_expiry < %s";
@@ -795,6 +796,11 @@ class AbandonedCart
                 $get_only = ' AND cart_is_recovered=0 AND cart_expiry >' . $current_time . ' ';
             }
         }
+        $admin_settings = $this->admin->getAdminSettings();
+        $show_guest_cart = intval((isset($admin_settings[RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard'])) ? $admin_settings[RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard'] : 1);
+        if (empty($show_guest_cart)) {
+            $get_only = ' AND Length(customer_key) < 32 ';
+        }
         $query = "SELECT $select
                   FROM $this->cart_history_table
                   WHERE cart_contents NOT LIKE '$blank_cart_info_guest' AND cart_contents NOT LIKE '$blank_cart'
@@ -821,7 +827,8 @@ class AbandonedCart
     function getEmailTemplates()
     {
         global $wpdb;
-        return $wpdb->get_results("select template_name,id,is_active,frequency,day_or_hour,default_template from {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_templates");
+        $query = "SELECT t.template_name, t.id, t.is_active, t.frequency, t.day_or_hour, t.default_template, t.subject, (select count(id) from {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_sent_history where template_id = t.id) AS emails_sent FROM {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_templates AS t;";
+        return $wpdb->get_results($query);
     }
 
     /**
@@ -935,6 +942,11 @@ class AbandonedCart
                 global $wpdb;
                 $query_update = "UPDATE `" . $this->email_templates_table . "` SET is_active=%s WHERE id=%d";
                 $wpdb->query($wpdb->prepare($query_update, $is_active, $template->id));
+                if (!empty($is_active)) {
+                    $response['message'] = __('Template activated successfully!', RNOC_TEXT_DOMAIN);
+                } else {
+                    $response['message'] = __('Template de-activated successfully!', RNOC_TEXT_DOMAIN);
+                }
             } else {
                 $response['error'] = true;
                 $response['message'] = __('Invalid Request', RNOC_TEXT_DOMAIN);

@@ -127,13 +127,24 @@ class Settings
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             $next_order_coupon->add_field(array(
+                'name' => __('Enable next order coupon?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon',
+                'type' => 'radio',
+                'classes' => 'retainful-coupon-group',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => '1',
+                'before_row' => '<p class="submit"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="' . __("Save", RNOC_TEXT_DOMAIN) . '"></p>'
+            ));
+            $next_order_coupon->add_field(array(
                 'name' => __('Order Status', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'preferred_order_status',
                 'type' => 'pw_multiselect',
                 'options' => $this->availableOrderStatuses(),
                 'default' => array('all'),
-                'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN),
-                'before_row' => '<p class="submit"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="' . __("Save", RNOC_TEXT_DOMAIN) . '"></p>',
+                'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN)
             ));
             $next_order_coupon->add_field(array(
                 'name' => __('Coupon type', RNOC_TEXT_DOMAIN),
@@ -354,7 +365,7 @@ class Settings
                     'min' => 1,
                     'class' => 'number_only_field'
                 ),
-                'default' => ''
+                'default' => 90
             ));
             $general_settings->add_field(array(
                 'name' => __('Should the store administrator get a notification when a cart is recovered', RNOC_TEXT_DOMAIN),
@@ -376,6 +387,17 @@ class Settings
                     1 => __('Yes', RNOC_TEXT_DOMAIN)
                 ),
                 'desc' => __('If not enabled, only carts that are abandoned gets tracked (i.e, after customer leaves the site)', RNOC_TEXT_DOMAIN),
+                'default' => 1
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Show guest cart?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard',
+                'type' => 'radio_inline',
+                'options' => array(
+                    0 => __('No', RNOC_TEXT_DOMAIN),
+                    1 => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'desc' => __('If not enabled, Guest carts will not shown in your Abandoned cart dashboard.', RNOC_TEXT_DOMAIN),
                 'default' => 1
             ));
             $general_settings->add_field(array(
@@ -700,6 +722,20 @@ class Settings
             return __($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'], RNOC_TEXT_DOMAIN);
         } else {
             return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>', RNOC_TEXT_DOMAIN);
+        }
+    }
+
+    /**
+     * Check is next order coupon enabled
+     * @return bool
+     */
+    function isNextOrderCouponEnabled()
+    {
+        $settings = get_option($this->slug, array());
+        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']) && empty($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon'])) {
+            return false;
+        } else {
+            return true;
         }
     }
 

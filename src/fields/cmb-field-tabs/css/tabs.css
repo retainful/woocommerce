@@ -35,14 +35,20 @@
 
 .cmb-tabs-wrap .cmb-tabs .cmb-tab .cmb-tab-icon {
     margin-right: 5px;
+    color: #2d2f3a;
+}
+.cmb-tabs-wrap .cmb-tabs .cmb-tab-title
+{
+    color: #2d2f3a;
+    font-weight: 600;
 }
 
 .cmb-tabs-wrap .cmb-tabs .cmb-tab:hover {
-    background-color: #f8f8f8;
+    background-color: #f4f7fd;
 }
 
 .cmb-tabs-wrap .cmb-tabs .cmb-tab.active {
-    background-color: #fff;
+    background-color: #f4f7fd;
 }
 
 .cmb-tabs-wrap .cmb2-wrap {
@@ -66,8 +72,8 @@
 
 .cmb-tabs-wrap.cmb-tabs-vertical .cmb-tabs {
     -ms-flex-preferred-size: 200px;
-    flex-basis: 200px;
-    max-width: 200px;
+    flex-basis: 260px;
+    max-width: 260px;
 
     border-bottom: none;
     border-right: 1px solid #eee;
@@ -78,7 +84,7 @@
 .cmb-tabs-wrap.cmb-tabs-vertical .cmb-tabs .cmb-tab {
     float: none;
     border-right: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ebedf1;
 }
 
 /* Widget area */

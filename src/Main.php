@@ -24,56 +24,108 @@ class Main
     }
 
     /**
+     * Register all the required end points
+     */
+    function registerEndPoints()
+    {
+        //Register custom endpoint for API
+        register_rest_route('retainful-api/v1', '/verify', array(
+            'methods' => 'GET',
+            'callback' => array($this, 'verifyAppId')
+        ));
+    }
+
+    /**
+     * verify the app id
+     * @param $data
+     * @return \WP_REST_Response
+     */
+    function verifyAppId($data)
+    {
+        $app_id = sanitize_text_field($data->get_param('app_id'));
+        $site_url = site_url();
+        $entered_app_id = $this->admin->getApiKey();
+        $is_app_connected = $this->admin->isAppConnected();
+        $response_code = NULL;
+        if (empty($entered_app_id)) {
+            $response_code = 'INSTALLED_NO_APP_ID_FOUND';
+        } elseif (!empty($entered_app_id) && !$is_app_connected) {
+            $response_code = 'INSTALLED_NOT_CONNECTED';
+        } elseif (!empty($entered_app_id) && $app_id != $entered_app_id) {
+            $response_code = 'INSTALLED_CONNECTED_DIFFERENT_APP_ID';
+        } elseif (!empty($entered_app_id) && $app_id == $entered_app_id && $is_app_connected) {
+            $response_code = 'INSTALLED_CONNECTED';
+        } else {
+            $response_code = 'UNKNOWN_ERROR';
+        }
+        $response = array(
+            'success' => ($response_code == 'INSTALLED_CONNECTED') ? true : false,
+            'message' => '',
+            'code' => $response_code,
+            'data' => array(
+                'domain' => $site_url
+            )
+        );
+        $response_object = new \WP_REST_Response($response);
+        $response_object->set_status(200);
+        return $response_object;
+    }
+
+    /**
      * Activate the required events
      */
     function activateEvents()
     {
+        add_action('rest_api_init', array($this, 'registerEndPoints'));
         //Create and alter the tables for abandoned carts and also check for woocommerce installed
         register_activation_hook(RNOC_FILE, array($this, 'validatePluginActivation'));
         //Detect woocommerce plugin deactivation
         add_action('deactivated_plugin', array($this, 'detectPluginDeactivation'), 10, 2);
         //Check for dependencies
         add_action('plugins_loaded', array($this, 'checkDependencies'));
+        add_action('rnocp_activation_trigger', array($this, 'checkUserPlan'));
         //Activate CMB2 functions
         add_action('init', function () {
             $this->rnoc->init();
         });
         new Currency();
         do_action('rnoc_initiated');
-        //Get events
-        add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
-        add_action('woocommerce_payment_complete', array($this->rnoc, 'onAfterPayment'), 10, 1);
-        add_action('woocommerce_order_status_completed', array($this->rnoc, 'onAfterPayment'), 10, 1);
-        add_action('woocommerce_order_status_processing', array($this->rnoc, 'onAfterPayment'), 10, 1);
-        add_action('woocommerce_order_status_on-hold', array($this->rnoc, 'onAfterPayment'), 10, 1);
-        add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
-        add_action('woocommerce_init', array($this->rnoc, 'setCouponToSession'));
-        add_action('woocommerce_cart_loaded_from_session', array($this->rnoc, 'addCouponToCheckout'), 10);
-        //Attach coupon to email
-        $hook = $this->admin->couponMessageHook();
-        if (!empty($hook))
-            add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
+        if ($this->admin->isNextOrderCouponEnabled()) {
+            //Get events
+            add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
+            add_action('woocommerce_payment_complete', array($this->rnoc, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_order_status_completed', array($this->rnoc, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_order_status_processing', array($this->rnoc, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_order_status_on-hold', array($this->rnoc, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
+            add_action('woocommerce_init', array($this->rnoc, 'setCouponToSession'));
+            add_action('woocommerce_cart_loaded_from_session', array($this->rnoc, 'addCouponToCheckout'), 10);
+            //Attach coupon to email
+            $hook = $this->admin->couponMessageHook();
+            if (!empty($hook))
+                add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
+            //Sync the coupon details with retainful
+            add_action('retainful_cron_sync_coupon_details', array($this->rnoc, 'cronSendCouponDetails'), 1);
+            //Remove coupon code after placing order
+            add_action('woocommerce_thankyou', array($this->rnoc, 'removeCouponFromSession'), 10, 1);
+            //Remove Code from session
+            add_action('woocommerce_removed_coupon', array($this->rnoc, 'removeCouponFromCart'));
+            /*
+             * Support for woocommerce email customizer
+             */
+            add_filter('woo_email_drag_and_drop_builder_retainful_settings_url', array($this->rnoc, 'wooEmailCustomizerRetainfulSettingsUrl'));
+            //Tell Email customizes about handling coupons..
+            add_filter('woo_email_drag_and_drop_builder_handling_retainful', '__return_true');
+            //set coupon details for Email customizer
+            add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_data', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3);
+            //sent retainful additional short codes
+            add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array($this->rnoc, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
+            add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
+        }
         //Validate key
         add_action('wp_ajax_validate_app_key', array($this->rnoc, 'validateAppKey'));
         //Settings link
         add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
-        //Sync the coupon details with retainful
-        add_action('retainful_cron_sync_coupon_details', array($this->rnoc, 'cronSendCouponDetails'), 1);
-        //Remove coupon code after placing order
-        add_action('woocommerce_thankyou', array($this->rnoc, 'removeCouponFromSession'), 10, 1);
-        //Remove Code from session
-        add_action('woocommerce_removed_coupon', array($this->rnoc, 'removeCouponFromCart'));
-        /*
-         * Support for woocommerce email customizer
-         */
-        add_filter('woo_email_drag_and_drop_builder_retainful_settings_url', array($this->rnoc, 'wooEmailCustomizerRetainfulSettingsUrl'));
-        //Tell Email customizes about handling coupons..
-        add_filter('woo_email_drag_and_drop_builder_handling_retainful', '__return_true');
-        //set coupon details for Email customizer
-        add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_data', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3);
-        //sent retainful additional short codes
-        add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array($this->rnoc, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
-        add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
         /*
          * Retainful abandoned cart
          */
@@ -292,11 +344,19 @@ class Main
         include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-1.html');
         $content = ob_get_clean();
         $email_body = addslashes($content);
+        ob_start();
+        include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-2.html');
+        $content1 = ob_get_clean();
+        $email_body1 = addslashes($content1);
+        ob_start();
+        include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-3.html');
+        $content2 = ob_get_clean();
+        $email_body2 = addslashes($content2);
         global $wpdb;
         $default_template = $wpdb->get_row('SELECT id FROM ' . $table . ' WHERE default_template = "1"');
         if (empty($default_template)) {
             $template_subject = "Hey {{customer_name}}!! You left something in your cart";
-            $query = 'INSERT INTO `' . $table . '` ( subject, body, is_active, frequency, day_or_hour, default_template,template_name )VALUES ( "' . $template_subject . '","' . $email_body . '","1","1","Hours","1","initial")';
+            $query = 'INSERT INTO `' . $table . '` ( subject, body, is_active, frequency, day_or_hour, default_template,template_name )VALUES ( "' . $template_subject . '","' . $email_body . '","1","1","Hours","1","initial"),( "' . $template_subject . '","' . $email_body1 . '","0","1","Hours","6","After 6 hours"),( "' . $template_subject . '","' . $email_body2 . '","0","1","Days","1","After 1 day")';
             $wpdb->query($query);
         }
     }

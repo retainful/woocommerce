@@ -12,27 +12,40 @@ class CMB2_Field_Premium_Addon_List
     }
 
     /**
+     * Enqueue scripts and styles
+     */
+    public function setupAdminScripts()
+    {
+        $asset_path = apply_filters('cmb2_field_abandoned_cart_dashboard_asset_path', plugins_url('', __FILE__));
+        wp_enqueue_style('abandoned-cart-email-template', $asset_path . '/css/main.css');
+    }
+
+    /**
      * Render select box field
      */
     function render_premium_addon_list($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
     {
+        $this->setupAdminScripts();
         $available_addon_list = apply_filters('rnoc_get_premium_addon_list', array());
         if (!empty($available_addon_list)) {
             ?>
-            <div class="rnoc-grid-container">
+            <div class="rnoc-grid-container retainful_premium_card_box">
                 <?php
                 foreach ($available_addon_list as $addon) {
                     $title = $addon->title();
                     if (!empty($title)) {
                         ?>
-                        <div class="rnoc-grid-cell">
-                            <div class="header"><?php echo $title; ?></div>
-                            <div class="description"><p><?php
+                        <div class="rnoc-grid-cell retainful_premium_grid">
+                            <div class="avatar-lg-bg">
+                                <i class="dashicons <?php echo $addon->icon(); ?> retain-icon-premium"></i>
+                            </div>
+                            <div class="header retainful_premium_heading"><?php echo $title; ?></div>
+                            <div class="retainful_premium_para"><p><?php
                                     echo $addon->description();
                                     ?></p>
                             </div>
                             <div class="footer">
-                                <button type="button" class="view-addon-btn button button-green"
+                                <button type="button" class="view-addon-btn button button-green button-premium"
                                         data-slug="<?php echo $addon->slug(); ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
                             </div>
                         </div>
@@ -47,38 +60,39 @@ class CMB2_Field_Premium_Addon_List
                 array(
                     'title' => __('Add to Cart Popup for Email collection (Premium)', RNOC_TEXT_DOMAIN),
                     'description' => __('Collect customer email at the time of adding to cart. This will help you recover the cart even if they abandon before checkout.', RNOC_TEXT_DOMAIN),
+                    'icon' => 'dashicons-cart'
                 ),
                 array(
                     'title' => __('Coupon For Email Collection (Premium)', RNOC_TEXT_DOMAIN),
                     'description' => __('Encourage customers to enter the email to get a coupon code. This way you will come to know the customer email and can recover cart even if they abandon before checkout', RNOC_TEXT_DOMAIN),
+                    'icon' => 'dashicons-tag'
                 ),
                 array(
                     'title' => __('Countdown Timer (Premium)', RNOC_TEXT_DOMAIN),
                     'description' => __('Give a clear deadline to grab the offer and add urgency using Countdown timer', RNOC_TEXT_DOMAIN),
+                    'icon' => 'dashicons-clock'
                 )
             );
             ?>
-            <style>
-                #submit-cmb {
-                    display: none;
-                }
-            </style>
-            <div class="rnoc-grid-container">
+            <div class="rnoc-grid-container retainful_premium_card_box">
                 <?php
                 $library = new Rnoc\Retainful\library\RetainfulApi();
                 $premium_url = $library->upgradePremiumUrl();
                 foreach ($available_addon_list as $addon) {
                     ?>
-                    <div class="rnoc-grid-cell">
-                        <div class="header"><?php echo $addon['title']; ?></div>
-                        <div class="description"><p><?php
+                    <div class="rnoc-grid-cell retainful_premium_grid">
+                        <div class="avatar-lg-bg">
+                            <i class="dashicons <?php echo $addon['icon']; ?> retain-icon-premium"></i>
+                        </div>
+                        <div class="header retainful_premium_heading"><?php echo $addon['title']; ?></div>
+                        <div class="retainful_premium_para"><p><?php
                                 echo $addon['description'];
                                 ?></p>
                         </div>
                         <div class="footer">
                             <a href="<?php echo $premium_url; ?>"
                                target="_blank"
-                               class="button button-green"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN); ?></a>
+                               class="button button-green button-premium"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN); ?></a>
                         </div>
                     </div>
                     <?php
@@ -93,32 +107,17 @@ class CMB2_Field_Premium_Addon_List
                 var slug = jQuery(this).data('slug');
                 jQuery('#<?php echo RNOC_PLUGIN_PREFIX; ?>retainful_premium_addon-tab-' + slug).trigger('click');
             });
+            jQuery('.cmb-tabs div').click(function () {
+                var save_btn = jQuery('#submit-cmb');
+                var id = jQuery(this).attr('id');
+                console.log(save_btn);
+                if (id === "rnoc_retainful_premium_addon-tab-general-settings") {
+                    save_btn.hide();
+                } else {
+                    save_btn.show();
+                }
+            });
         </script>
-        <style>
-            .rnoc-grid-container {
-                display: grid;
-                grid-template-columns: 24% 25% 25% 24%;
-                grid-gap: 10px;
-                padding: 10px;
-            }
-
-            .rnoc-grid-container .rnoc-grid-cell {
-                box-shadow: 2px 2px 5px 3px #e2e2e2;
-                padding: 10px;
-                border-radius: 2px;
-            }
-
-            .rnoc-grid-cell .header {
-                font-weight: 800;
-                font-size: large;
-                text-transform: capitalize;
-            }
-
-            .rnoc-grid-cell .description {
-                text-align: justify;
-
-            }
-        </style>
         <?php
     }
 

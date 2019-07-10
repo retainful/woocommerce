@@ -1,3 +1,8 @@
+
+.cmb-form {
+    font-family: DM Sans,sans-serif!important;
+}
+
 .rnoc_counter_container {
     width: 100%;
 }
@@ -50,16 +55,16 @@
 
 .rnoc_counter_box a {
     display: inline-block;
-    padding: 8px 20px;
-    line-height: 1.6;
-    width: auto;
-    font-size: 14px;
-    margin-top: 10px;
-    border-radius: 4px;
-    background: #6772e5;
-    border-color: #6772e5;
+    font-size: 15px;
+    line-height: 45px;
+    height: 45px;
+    margin: 15px 0;
+    padding: 0 45px 0;
+    background: #F27052;
+    border-color: #F27052;
     color: #ffffff;
     text-decoration: none;
+    border-radius: 4px;
 }
 
 .rnoc_counter_container .rnoc_counter_widget .rnoc_widget_title_container {
@@ -80,4 +85,483 @@
 .rnoc_counter_container .rnoc_counter_widget .rnoc_counter_body a {
     text-decoration: none;
     color: #ffffff !important;
+}
+.rnoc_counter_box a {
+    font-weight: 700;
+}
+
+
+
+/*  UI Design - Retainful Style */
+
+.retainful_abandoned_container .cmb2-options-page .cmb2-metabox>.cmb2-id-rnoc-abandoned-cart-report {
+    padding: 1em;
+    margin-top: -1px;
+    background: #fff ;
+    border: 1px solid #e2e7f3 ;
+    box-shadow: 0 0 0 rgba(0,0,0,.00);
+}
+.retainful_abandoned_container .card_main_box
+{
+    padding: 40px 0;
+}
+
+.retainful_abandoned_container .rnoc_counter_widget.card_main_box {
+	background: #fff5ed;
+    border-radius: 4px;
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
+	margin-bottom: 20px;
+}
+.retainful_abandoned_container .avatar-lg {
+    height: 3.9rem;
+    width: 3.9rem;
+    margin: 0 auto;
+    border-radius: 50%;
+}
+.retainful_abandoned_container .rnoc_counter_widget .card-box-value {
+    padding: 22px 5px 10px 5px;
+    text-align: center;
+    font-size: 40px;
+    color: #2d2f3a;
+    font-weight: 800;
+}
+.retainful_abandoned_container .rnoc_counter_widget .card-box-name {
+    text-align: center;
+    padding: 0;
+    color: #6c747a;
+    font-size: 16px ;
+    font-weight: 600;
+}
+.avatar-lg-1 {
+    background:#d2eafd;
+}
+.avatar-lg-2 {
+    background:#e4e0fb;
+}
+.avatar-lg-3 {
+    background:#ffedc4;
+}
+.avatar-lg-4 {
+    background:#d5f5d0;
+}
+.img_icon {
+    padding: 29%;
+    margin-top: 0;
+    width: 42%;
+}
+.woocommerce-Price-currencySymbol{
+    margin-right: 10px
+}
+.upgrade-premium_box
+{
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.04);
+    padding: 55px 20px;
+    font-size: 16px;
+    text-align: center;
+    background: #fff5ed;
+    line-height: 25px;
+    vertical-align: middle;
+}
+.wp-core-ui .button-primary {
+	background: #9eabc5;
+    font-weight: 600!important;
+    border-color: #0198e0 #0198e0 #0198e0;
+    box-shadow: 0 0 0 #0198e0;
+    color: #fff;
+    text-decoration: none;
+    text-shadow:none !important;
+}
+.abandoned_cart_filter .wp-ui-filters{
+    display: inline-block;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 45px;
+    height: 45px;
+    margin: 0;
+    padding: 0 45px 0;
+    cursor: pointer;
+    border-width: 0;
+    border-style: solid;
+    -webkit-appearance: none;
+    border-radius:5px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    margin-right: 28px;
+	    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.40);
+}
+.abandoned_cart_filter .filter_by {
+    font-weight: 700;
+    color: #2d2f3a;
+    font-size: 15px;
+    padding-right: 15px
+}
+.abandoned_cart_filter a:hover
+{
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.40);
+}
+.upgrade-premium_box a:hover
+{
+    box-shadow: 0 4px 3px rgba(126, 142, 177, 0.40);
+}
+.abandoned_cart_filter a:hover
+{
+    color: #fff;
+	box-shadow: 0 7px 6px rgba(126, 142, 177, 0.40);
+}
+.button-abandoned {
+    color: #fff;
+    background-color: #e24344 ;
+}
+.abandoned_cart_filter  .button-recovered {
+    color: #fff ;
+    background-color: #2dcb73;
+}
+.wp-core-ui .button, .wp-core-ui .button-secondary {
+    border-color: #ccc;
+    box-shadow: 0 0 0 #fff;
+    vertical-align: top;
+}
+.button-secondary {
+    border-color: #0198e0;
+    box-shadow: 0 0 0 #fff;
+    vertical-align: top;
+}
+.button-secondary-last
+ {
+	color: #fff ;
+    background-color: #0198e0 ;
+}
+.button-primary-first
+{
+	color: #fff;
+    background-color: #2d2f3a;
+}
+.retainful_abandoned_table {
+	font-size: 13px;
+	width: 100%;
+	border-spacing: 0;
+	border-collapse: separate
+}
+.retainful_abandoned_table>thead>tr>td,
+.retainful_abandoned_table>thead>tr>th
+{
+	padding:14px 12px;
+}
+.retainful_abandoned_table>tbody>tr>td,
+.retainful_abandoned_table>tbody>tr>th,
+.retainful_abandoned_table>tfoot>tr>td,
+.retainful_abandoned_table>tfoot>tr>th
+ {
+    padding: 18px 12px;
+    border-top-width: 1px;
+    border-top-style: solid;
+}
+.table-bordered>tbody>tr:first-child>td {
+    background:#ecf1fb;
+    color: #292b35;
+    font-size: 14px;
+    font-weight: bold;
+    padding:15px 12px;
+}
+.retainful_abandoned_table{
+    margin-bottom: 0;
+}
+.retainful_abandoned_table td, .retainful_abandoned_table th {
+    padding: 10px;
+    vertical-align: middle;
+    border-top: 1px solid #eceef2;
+    font-weight: 600;
+    color: #1e2b3d;
+}
+.retainful_abandoned_table .bg-light {
+    background-color: #f4f7fd;
+}
+.retainful_abandoned_table thead th {
+    vertical-align: bottom;
+    border-bottom: 0 solid #f9fbfc;
+    border-top: 0 solid #f9fbfc;
+}
+.retainful_abandoned_table thead th, .retainful_abandoned_table th {
+    color: #88929c;
+    font-weight: 700;
+}
+.table-bordered {
+    border: 1px solid #e6e6f2;
+}
+
+.table-bordered td,
+.table-bordered th {
+    border: 1px solid #e6e6f2;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(230, 230, 242, .5);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(230, 230, 242, .5);
+}
+
+.retainful_abandoned_table tr.group,
+.retainful_abandoned_table tr.group:hover {
+    background-color: #5969ff ;
+    color: #fff;
+    font-size: 18px;
+}
+.retainful_abandoned_table .status-dot {
+    border-radius:6px;
+    padding: 4px;
+    display: inline-block;
+    margin-right: 3px;
+}
+.retainful_abandoned_table .in-prs-bg
+{
+    background-color:rgba(1, 152, 224, 0.20);
+	padding: 12px 60px;
+}
+.retainful_abandoned_table .abd-bg
+{
+    background-color:#ffd7d3;
+	padding: 12px 60px;
+}
+.retainful_abandoned_table .rcd-bg
+{
+    background-color: #e0f7e9;
+    padding: 12px 60px;
+}
+.retainful_abandoned_table .mr-1
+{
+    margin-right:7px;
+}
+.retainful_abandoned_table .in-prs-clr
+{
+	color:#0198e0;
+}
+.retainful_abandoned_table .abd-clr
+{
+	color:#f13536;
+}
+.retainful_abandoned_table .rcd-clr
+{
+	color:#18c364;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .table_data_dp {
+    display: block;
+    width: 100%;
+    border-top: 1px solid #ecf1fb;
+    padding: 0;
+    margin: 0;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .dataTables_info
+{
+    float: left;
+	margin: 25px 0 20px;
+	font-weight: 500;
+    color: #525252;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .pagination
+{
+    margin: 0;
+    padding: 0;
+    float: right;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .pagination ul {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	vertical-align: baseline;
+	background: 0 0;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .pagination li {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .pagination li a {
+    border: 1px solid #dee6f7;
+    color: #525252;
+    text-decoration: none;
+    display: inline-block;
+    transition: all .8s ease 0s;
+    height: 33px;
+    line-height: 33px;
+    margin: 0 1px 0 0;
+    padding: 0;
+    text-align: center;
+    width: 35px;
+    margin-top: 16px;
+    margin-bottom: 2px;
+    font-weight: 600;
+    border-radius: 3px;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .pagination li a:hover {
+    background-color:#e2ecff;
+    color: #333;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .pagination li a.active {
+    background-color: #f4f7fd;
+    color: #333;
+}
+
+.cmb2-id-rnoc-abandoned-cart-dashboard .btn_plg {
+    padding: 5px 6px;
+    line-height: 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+	color: #fff;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .btn-view {
+
+    background: #9eabc5;
+    border: 1px solid #9eabc5;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .btn-danger {
+    background:#e24344;
+	border:1px solid #e24344;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .action-section .btn-view:hover {
+    color: #9eabc5;
+    border:1px solid #9eabc5;
+	background:#fff;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .action-section .btn-danger:hover {
+    color: #e24344 ;
+    border:1px solid #e24344;
+	background:#fff;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .email-section a
+{
+    font-weight: 600;
+    color: #1e2b3d; 
+    text-decoration: none;
+}
+.email-sectiona a:hover{
+	color: #1e2b3d; 
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .btn_action {
+    padding: 5px 6px;
+    line-height: 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .dashicons_action
+{
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 20px;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .customer-type{
+	padding: 2px 6px;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: 100;
+    margin-top: 0;
+    text-align: center;
+    position: relative;
+    font-size: 10px;
+    letter-spacing: 0.7px;
+    bottom: 1px;
+	display: inline-block;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .user_dt {
+    background: #008fd4;  
+	width: 55px;
+}
+.cmb2-id-rnoc-abandoned-cart-dashboard .guest_dt {
+    background: #efa22d;
+	width: 35px;
+}
+
+
+
+@media only screen and (max-width: 1350px)
+{
+    .rnoc_counter_container .rnoc_counter_widget .card-box-value {
+        padding: 22px 5px 10px 5px;
+        text-align: center;
+        font-size: 32px;
+        color: #2d2f3a;
+        font-weight: 800;
+    }
+    .btn-view {
+        display: inline-block;
+        margin-bottom: 12px;
+    }
+}
+@media only screen and (max-width: 1247px)
+{
+    .wp-ui-filters {
+        font-size: 14px;
+        line-height: 39px;
+        height: 40px;
+        padding: 0 30px 0;
+        margin-right: 20px;
+    }
+    .btn-view {
+        display: inline-block;
+        margin-bottom: 12px;
+    }
+}
+@media only screen and (max-width: 1024px)
+{
+    .rnoc_counter_container .rnoc_counter_widget {
+        min-width: 47%;
+    }
+    .abandoned_cart_filter .wp-ui-filters {
+        line-height: 37px;
+        height: 38px;
+        padding: 0 15px 0;
+        margin-right: 18px;
+    }
+    .abd-bg {
+        background-color: #ffd7d3;
+        padding: 8px 30px;
+    }
+    .rcd-bg {
+        background-color: #e0f7e9;
+        padding: 8px 30px;
+    }
+    .in-prs-bg
+    {
+        padding: 8px 30px;
+    }
+    .retainful_abandoned_table>tbody>tr>td, .retainful_abandoned_table>tbody>tr>th, .retainful_abandoned_table>tfoot>tr>td, .retainful_abandoned_table>tfoot>tr>th {
+        padding: 16px 4px;
+        font-size: 12px;
+    }
+    .retainful_abandoned_table thead th, .retainful_abandoned_table th {
+        color: #88929c;
+        font-weight: 700;
+        font-size: 12px;
+    }
+    .btn-view {
+        display: inline-block;
+        margin-bottom: 12px;
+    }
+}
+@media only screen and (max-width: 601px)
+
+{
+    .rnoc_counter_container .rnoc_counter_widget {
+        min-width: 88%;
+    }
+    .abandoned_cart_filter .wp-ui-filters {
+        display: block;
+        margin-bottom: 5px;
+        margin-top: 15px;
+    }
+    .retainful_abandoned_table {
+        width: 90%;
+    }
+    .retainful_abandoned_table>tbody>tr>td, .retainful_abandoned_table>tbody>tr>th, .retainful_abandoned_table>tfoot>tr>td, .retainful_abandoned_table>tfoot>tr>th {
+        padding: 16px 4px;
+        font-size: 14px;
+    }
+    .retainful_abandoned_table thead th, .retainful_abandoned_table th {
+        color: #88929c;
+        font-weight: 700;
+        font-size: 14px;
+    }
 }
