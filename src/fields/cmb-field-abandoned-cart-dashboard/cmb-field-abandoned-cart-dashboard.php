@@ -48,54 +48,56 @@ class CMB2_Field_Abandoned_Cart_Dashboard
         <div class="rnoc_counter_container retainful_abandoned_container">
             <div class="rnoc_counter_widget widget_violet card_main_box <?php echo $width_class; ?>">
                 <div class="rnoc_counter_container">
-                    <div class="rnoc_widget_title_container">
-                        <span class="rnoc_counter_title card-box-name "><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></span>
-                    </div>
 					<div class="avatar-lg avatar-lg-1">
 						<img src="<?php echo RNOC_PLUGIN_URL; ?>src/assets/images/icon-1.png" class="img_icon" alt="Abandoned Carts">
-					</div>
+					</div>                    
                     <div class="rnoc_counter_body card-box-value " id="rnoc_abandoned_carts">
                         <?php echo $cart_details['abandoned_carts']; ?> 
+                    </div>
+					<div class="rnoc_widget_title_container">
+                        <span class="rnoc_counter_title card-box-name "><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></span>
                     </div>
                 </div>
             </div>
             <div class="rnoc_counter_widget widget_orange card_main_box <?php echo $width_class; ?>">
                 <div class="rnoc_countcmb-type-abandoned-cart-dashboarder_container">
-                    <div class="rnoc_widget_title_container">
-                        <span class="rnoc_counter_title card-box-name"><?php echo __('Abandoned Amount', RNOC_TEXT_DOMAIN); ?></span>
-                    </div>
 					<div class="avatar-lg avatar-lg-2">
 						<img src="<?php echo RNOC_PLUGIN_URL; ?>src/assets/images/icon-2.png" class="img_icon" alt="Abandoned Carts">
 					</div>					
 					<div class="rnoc_counter_body card-box-value" id="rnoc_abandoned_total">
                         <?php echo $cart_details['abandoned_total']; ?> 
                     </div>
+                    <div class="rnoc_widget_title_container">
+                        <span class="rnoc_counter_title card-box-name"><?php echo __('Abandoned Amount', RNOC_TEXT_DOMAIN); ?></span>
+                    </div>
+                  
                 </div>
             </div>
             <div class="rnoc_counter_widget widget_blue card_main_box <?php echo $width_class; ?>">
                 <div class="rnoc_counter_container">
-                    <div class="rnoc_widget_title_container">
-                        <span class="rnoc_counter_title card-box-name"><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></span>
-                    </div>
-                    <div class="avatar-lg avatar-lg-3">
+					<div class="avatar-lg avatar-lg-3">
 						<img src="<?php echo RNOC_PLUGIN_URL; ?>src/assets/images/icon-3.png" class="img_icon" alt="Abandoned Carts">
 					</div>
 					<div class="rnoc_counter_body card-box-value" id="rnoc_recovered_carts">
                         <?php echo $cart_details['recovered_carts']; ?> 
                     </div>
+                    <div class="rnoc_widget_title_container">
+                        <span class="rnoc_counter_title card-box-name"><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></span>
+                    </div>                   
                 </div>
             </div>
             <div class="rnoc_counter_widget widget_green card_main_box <?php echo $width_class; ?>">
                 <div class="rnoc_counter_container">
-                    <div class="rnoc_widget_title_container">
-                        <span class="rnoc_counter_title card-box-name"><?php echo __('Recovered Amount', RNOC_TEXT_DOMAIN); ?></span>
-                    </div>
 					<div class="avatar-lg avatar-lg-4">
 						<img src="<?php echo RNOC_PLUGIN_URL; ?>src/assets/images/icon-4.png" class="img_icon" alt="Abandoned Carts">
 					</div>
 					<div class="rnoc_counter_body card-box-value" id="rnoc_recovered_total">
                         <?php echo $cart_details['recovered_total']; ?> 
                     </div>
+                    <div class="rnoc_widget_title_container">
+                        <span class="rnoc_counter_title card-box-name"><?php echo __('Recovered Amount', RNOC_TEXT_DOMAIN); ?></span>
+                    </div>
+                   
                 </div>
             </div>
             <?php
