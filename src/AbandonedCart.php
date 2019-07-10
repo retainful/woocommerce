@@ -796,8 +796,7 @@ class AbandonedCart
                 $get_only = ' AND cart_is_recovered=0 AND cart_expiry >' . $current_time . ' ';
             }
         }
-        $admin_settings = $this->admin->getAdminSettings();
-        $show_guest_cart = intval((isset($admin_settings[RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard'])) ? $admin_settings[RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard'] : 1);
+        $show_guest_cart = intval((isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard'] : 1);
         if (empty($show_guest_cart)) {
             $get_only = ' AND Length(customer_key) < 32 ';
         }
