@@ -33,3 +33,11 @@ p.submit{
     border-top-color: #f27052;
     color: #f27052;
 }
+
+.cmb2-wrap input[type="text"], .cmb2-wrap input[type="number"] {
+    font-size: 14px;
+    max-width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    height: auto;
+}

@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.2.1
 WC tested up to: 3.6.4
 Requires PHP: 5.6
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -235,3 +235,7 @@ No. There is no charges for support.
 
 = 1.2.1 =
 * Fix: session issue
+
+= 1.2.2 =
+*Improvement: UI/UX improved
+*Improvement: Option added to disable Next order coupon
