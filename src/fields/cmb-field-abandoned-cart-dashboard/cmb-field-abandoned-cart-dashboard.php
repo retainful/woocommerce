@@ -101,7 +101,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
             <?php
             if ($is_free_user) {
                 ?>
-                <div class="rnoc_counter_widget widget_red   <?php echo $width_class; ?>">
+                <div class="rnoc_counter_widget widget_red card_main_box card_premium_box  <?php echo $width_class; ?>">
                     <div class="rnoc_counter_container">
                         <div class="rnoc_counter_box upgrade-premium_box">
                             <?php

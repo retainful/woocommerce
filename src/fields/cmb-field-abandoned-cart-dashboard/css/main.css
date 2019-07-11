@@ -1,52 +1,42 @@
 .cmb-form {
     font-family: DM Sans,sans-serif!important;
 }
-
 .rnoc_counter_container {
     width: 100%;
 }
-
 .rnoc_counter_container .rnoc_counter_widget {
     display: inline-block;
     position: relative;
     min-width: 150px;
-    margin-right: 2%;
+    margin-right: 15px;
     float: left;
     color: #FFFFFF !important;
 }
 .rnoc_counter_container .rnoc_counter_widget:last-child{
     margin-right: 0;
 }
-
 .rnoc_width_23 {
     width: 23% !important;
 }
-
 .rnoc_width_18 {
     width: 18% !important;
 }
-
 .rnoc_counter_widget.widget_violet {
     background: #5a3bb3;
 }
-
 .rnoc_counter_widget.widget_green {
     background: #01a300;
 }
-
 .rnoc_counter_widget.widget_orange {
     background: #ea8906;
 }
-
 .rnoc_counter_widget.widget_blue {
     background: #0192a5;
 }
-
 .rnoc_counter_widget.widget_red {
     background: #ffffff;
     color: #000000 !important;
 }
-
 .rnoc_counter_box {
     box-shadow: 2px 2px 21px 1px #eee;
     padding: 15px;
@@ -54,13 +44,12 @@
     font-size: 16px;
     text-align: center;
 }
-
 .rnoc_counter_box a {
     display: inline-block;
     font-size: 15px;
-    line-height: 30px;
-    height: 35px;
-    margin: 10px 0 0;
+    line-height: 45px;
+    height: 45px;
+    margin: 20px 0 0;
     padding: 3px 30px;
     background: #ff9900;
     border-color: #ff9900;
@@ -68,23 +57,19 @@
     text-decoration: none;
     border-radius: 4px;
 }
-
 .rnoc_counter_container .rnoc_counter_widget .rnoc_widget_title_container {
     text-align: center;
     padding: 8px 0;
     display: inline-block;
 }
-
 .rnoc_counter_container .rnoc_counter_widget .rnoc_counter_title {
     font-size: 14px;
 }
-
 .rnoc_counter_container .rnoc_counter_widget .rnoc_counter_body {
     padding: 30px;
     text-align: center;
     font-size: 2em;
 }
-
 .rnoc_counter_container .rnoc_counter_widget .rnoc_counter_body a {
     text-decoration: none;
     color: #ffffff !important;
@@ -92,11 +77,7 @@
 .rnoc_counter_box a {
     font-weight: 700;
 }
-
-
-
 /*  UI Design - Retainful Style */
-
 .retainful_abandoned_container .cmb2-options-page .cmb2-metabox>.cmb2-id-rnoc-abandoned-cart-report {
     padding: 1em;
     margin-top: -1px;
@@ -121,6 +102,9 @@
     margin-bottom: 20px;
     transition: 0.2s;
     flex: 1;
+}
+.retainful_abandoned_container .rnoc_counter_widget.card_main_box.card_premium_box{
+    background: #54B22E;
 }
 .retainful_abandoned_container .rnoc_counter_widget.card_main_box:hover {
     box-shadow: 0 5px 25px 0 rgba(0,0,100,.1);
@@ -170,8 +154,8 @@
 {
     box-shadow: 0 2px 4px rgba(126,142,177,.12);
     border-radius: 4px;
-    padding: 15px;
-    font-size: 16px;
+    font-size: 21px;
+    padding: 0;
     text-align: center;
     background: #54B22E;
     line-height: 1.4;
@@ -311,20 +295,16 @@
 .table-bordered {
     border: 1px solid #e6e6f2;
 }
-
 .table-bordered td,
 .table-bordered th {
     border: 1px solid #e6e6f2;
 }
-
 .table-striped tbody tr:nth-of-type(odd) {
     background-color: rgba(230, 230, 242, .5);
 }
-
 .table-hover tbody tr:hover {
     background-color: rgba(230, 230, 242, .5);
 }
-
 .retainful_abandoned_table tr.group,
 .retainful_abandoned_table tr.group:hover {
     background-color: #5969ff ;
@@ -423,7 +403,6 @@
     background-color: #f4f7fd;
     color: #333;
 }
-
 .cmb2-id-rnoc-abandoned-cart-dashboard .btn_plg {
     padding: 8px 10px;
     line-height: 20px;
@@ -490,9 +469,6 @@
     background: #efa22d;
     width: 35px;
 }
-
-
-
 @media only screen and (max-width: 1350px)
 {
     .rnoc_counter_container .rnoc_counter_widget .card-box-value {
@@ -559,7 +535,6 @@
     }
 }
 @media only screen and (max-width: 601px)
-
 {
     .rnoc_counter_container .rnoc_counter_widget {
         min-width: 88%;
@@ -582,7 +557,6 @@
         font-size: 14px;
     }
 }
-
 .abandoned_cart_filter .custom-select {
     font-weight: 500;
     color: #333;
