@@ -36,7 +36,9 @@ class CMB2_Field_Cart_Table_Filter
         }
         $date_arr = array(
             'start' => $start_date,
-            'end' => $end_date
+            'end' => $end_date,
+            'duration' => $duration,
+            'page_number'=>1
         );
         $url_arr = array(
             'page' => $abandoned_cart->admin->slug . '_abandoned_cart'
