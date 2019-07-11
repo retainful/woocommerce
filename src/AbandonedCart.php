@@ -410,42 +410,67 @@ class AbandonedCart
                 $variation = $this->wc_functions->getProduct($variation_id);
                 $product_name = $this->wc_functions->getProductName($variation);
             }
-            $cart_line_items .= '
-                                            <tr align="center">
-                                                <td>
-                                                    <img src="' . $image_url . '" width="100px" />
-                                                </td>
-                                                <td style="padding-top: 20px;padding-bottom: 20px;">' . $product_name . '</td>
-                                                <td>' . $quantity_total . '</td>
-                                                <td>' . $item_subtotal . '</td>
-                                                <td>' . $item_total_display . '</td>
-                                            </tr>';
+            $cart_line_items .= '<tr style="line-height: 25px;padding: 20px 0px 20px;">
+                        <td>
+                        <img alt="' . $product_name . '" height="auto" src="' . $image_url . '"width="80">
+                        </td>
+                        <td>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $product_name . '</span>
+                        </td>
+                        <td>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $quantity_total . '</span>
+                        </td>
+                        <td>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $item_subtotal . '</span>
+                        </td>
+                        <td>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $item_total_display . '</span>
+                        </td>
+                    </tr>';
             $cart_total += $item_total;
             $item_subtotal = $item_total = 0;
         }
         $cart_total = $this->wc_functions->formatPrice($cart_total, $currency_arg);
-        $cart_html = '
-                                        <table width="100%">
-                                            <thead>
-                                            <tr align="center">
-                                                <th style="padding-top: 20px;padding-bottom: 20px;">' . __("Item", RNOC_TEXT_DOMAIN) . '</th>
-                                                <th>' . __("Name", RNOC_TEXT_DOMAIN) . '</th>
-                                                <th>' . __("Quantity", RNOC_TEXT_DOMAIN) . '</th>
-                                                <th>' . __("Price", RNOC_TEXT_DOMAIN) . '</th>
-                                                <th>' . __("Line Subtotal", RNOC_TEXT_DOMAIN) . '</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            ' . $cart_line_items . '
-                                            </tbody>
-                                            <tfoot>
-                                            <tr align="right">
-                                                <th colspan="4" style="padding-bottom: 10px;padding-top: 10px;">' . __('Cart Total', RNOC_TEXT_DOMAIN) . ':</th>
-                                                <td align="center">' . $cart_total . '</td>
-                                            </tr>
-                                            </tfoot>
-                                        </table>
-                                        ';
+        $cart_html = '<table cellspacing="0" cellpadding="0" border="0" class="el-table__header"
+               style="width: 600px;padding: 0px 20px;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;">
+            <thead>
+                    <tr style="text-align: left;">
+                        <th style="line-height: 56px;width: 20%;padding: 2% 0px;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;text-align: left;">Item </span>
+                        </th>
+                        <th style="width: 20%;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Name</span>
+                        </th>
+                        <th style="width: 17%;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Price</span>
+                        </th>
+                        <th style="width: 20%;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Quantity</span>
+                        </th>
+                        <th style="width: 23%;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Line Subtotal</span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    ' . $cart_line_items . '
+                    </tbody>
+                </table>
+                <table cellspacing="0" cellpadding="0" border="0" class="el-table__header"
+                       style="width: 600px;padding: 0px 20px;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;">
+                    <tbody>
+                    <tr style="background-color:#fff;">
+        
+                        <td style="vertical-align:top;padding: 15px 40px;text-align: right;border-top: 1px solid #e5e5e5;width: 80%;border-bottom: 1px solid #e5e5e5;">
+                            <span style="font-weight: 800;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 15px;">Cart Total</span>
+                        </td>
+                        <td style="vertical-align:top;padding: 15px 0px;text-align: left;border-top: 1px solid #e5e5e5;width: 20%;border-bottom: 1px solid #e5e5e5;">
+                            <span style="font-weight: 800;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 14px;font-size: 15px;">' . $cart_total . '</span>
+                        </td>
+        
+                    </tr>
+                    </tbody>
+                </table>';
         return $cart_html;
     }
 
@@ -1002,31 +1027,61 @@ class AbandonedCart
             }
             $email_subject = str_replace('{{customer_name}}', $customer_name, $email_subject);
             $cart_html = '
-                <table width="100%">
+                <table cellspacing="0" cellpadding="0" border="0" class="el-table__header"
+               style="width: 600px;padding: 0px 20px;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;">
                     <thead>
-                    <tr align="center">
-                        <th style="padding-top: 20px;padding-bottom: 20px;">' . __("Item", RNOC_TEXT_DOMAIN) . '</th>
-                        <th>' . __("Name", RNOC_TEXT_DOMAIN) . '</th>
-                        <th>' . __("Quantity", RNOC_TEXT_DOMAIN) . '</th>
-                        <th>' . __("Price", RNOC_TEXT_DOMAIN) . '</th>
-                        <th>' . __("Line Subtotal", RNOC_TEXT_DOMAIN) . '</th>
+                    <tr style="text-align: left;">
+                        <th style="line-height: 56px;width: 20%;padding: 2% 0px;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;text-align: left;">Item </span>
+                        </th>
+                        <th style="width: 20%;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Name</span>
+                        </th>
+                        <th style="width: 17%;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Price</span>
+                        </th>
+                        <th style="width: 20%;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Quantity</span>
+                        </th>
+                        <th style="width: 23%;">
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Line Subtotal</span>
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td><img src="' . RNOC_PLUGIN_URL . 'src/assets/images/sample-product.jpg" width="100px"></td>
-                        <td>' . __("Sample product", RNOC_TEXT_DOMAIN) . '</td>
-                        <td>' . __("2", RNOC_TEXT_DOMAIN) . '</td>
-                        <td>' . $this->wc_functions->formatPrice(100) . '</td>
-                        <td>' . $this->wc_functions->formatPrice(200) . '</td>
+                    <tr style="line-height: 25px;padding: 20px 0px 20px;">
+                        <td>
+                        <img alt="Sample product" height="auto" src="' . RNOC_PLUGIN_URL . 'src/assets/images/sample-product.jpg"width="80">
+                        </td>
+                        <td>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">Sample product</span>
+                        </td>
+                        <td>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">2</span>
+                        </td>
+                        <td>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $this->wc_functions->formatPrice(100) . '</span>
+                        </td>
+                        <td>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $this->wc_functions->formatPrice(200) . '</span>
+                        </td>
                     </tr>
                     </tbody>
-                    <tfoot>
-                    <tr align="right">
-                        <th colspan="4" style="padding-bottom: 10px;padding-top: 10px;">' . __('Cart Total', RNOC_TEXT_DOMAIN) . ':</th>
-                        <td align="center">' . $this->wc_functions->formatPrice(200) . '</td>
+                </table>
+                <table cellspacing="0" cellpadding="0" border="0" class="el-table__header"
+                       style="width: 600px;padding: 0px 20px;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;">
+                    <tbody>
+                    <tr style="background-color:#fff;">
+        
+                        <td style="vertical-align:top;padding: 15px 40px;text-align: right;border-top: 1px solid #e5e5e5;width: 80%;border-bottom: 1px solid #e5e5e5;">
+                            <span style="font-weight: 800;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 15px;">Cart Total</span>
+                        </td>
+                        <td style="vertical-align:top;padding: 15px 0px;text-align: left;border-top: 1px solid #e5e5e5;width: 20%;border-bottom: 1px solid #e5e5e5;">
+                            <span style="font-weight: 800;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 14px;font-size: 15px;">' . $this->wc_functions->formatPrice(200) . '</span>
+                        </td>
+        
                     </tr>
-                    </tfoot>
+                    </tbody>
                 </table>';
             $replace = array(
                 'customer_name' => $customer_name,
