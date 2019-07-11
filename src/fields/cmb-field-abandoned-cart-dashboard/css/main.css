@@ -47,8 +47,8 @@
 .rnoc_counter_box a {
     display: inline-block;
     font-size: 15px;
-    line-height: 45px;
-    height: 45px;
+    line-height: 1.4;
+    height: auto;
     margin: 20px 0 0;
     padding: 3px 30px;
     background: #ff9900;
@@ -404,9 +404,11 @@
     color: #333;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .btn_plg {
+    display: inline-block;
     padding: 8px 10px;
     line-height: 20px;
     margin-right: 5px;
+    margin-bottom: 5px;
     border-radius: 4px;
     color: #fff;
 }
