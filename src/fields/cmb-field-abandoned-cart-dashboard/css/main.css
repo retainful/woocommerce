@@ -1,4 +1,3 @@
-
 .cmb-form {
     font-family: DM Sans,sans-serif!important;
 }
@@ -59,9 +58,9 @@
 .rnoc_counter_box a {
     display: inline-block;
     font-size: 15px;
-    line-height: 45px;
-    height: 45px;
-    margin: 20px 0 0;
+    line-height: 30px;
+    height: 35px;
+    margin: 10px 0 0;
     padding: 3px 30px;
     background: #ff9900;
     border-color: #ff9900;
@@ -116,11 +115,10 @@
 }
 .retainful_abandoned_container .rnoc_counter_widget.card_main_box {
     padding: 20px;
-	background: #fff;
+    background: #fff0e9;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(126,142,177,.12);
-    border: 1px solid #eee;
-	margin-bottom: 20px;
+    margin-bottom: 20px;
     transition: 0.2s;
     flex: 1;
 }
@@ -138,15 +136,15 @@
     padding: 10px 5px 10px 5px;
     text-align: left;
     font-size: 40px;
-    color: #4a4a4a;
+    color: #2a2a2a;
     font-weight: 600;
 }
 .retainful_abandoned_container .rnoc_counter_widget .card-box-name {
     text-align: center;
     padding: 0;
-    color: #6c747a;
-    font-size: 17px ;
-    font-weight: 500;
+    color: #39424b;
+    font-size: 16px ;
+    font-weight: 600;
 }
 .avatar-lg-1 {
     background:#d2eafd;
@@ -172,17 +170,17 @@
 {
     box-shadow: 0 2px 4px rgba(126,142,177,.12);
     border-radius: 4px;
-    padding: 30px;
-    font-size: 25px;
+    padding: 15px;
+    font-size: 16px;
     text-align: center;
-    background: linear-gradient(136.14deg,#8cce17 0%,#54B22E 100%);
+    background: #54B22E;
     line-height: 1.4;
     vertical-align: middle;
     color: #fff;
     font-weight: 600;
 }
 .wp-core-ui .button-primary {
-	background: #9eabc5;
+    background: #9eabc5;
     font-weight: 600!important;
     border-color: #0198e0 #0198e0 #0198e0;
     box-shadow: 0 0 0 #0198e0;
@@ -196,23 +194,28 @@
     font-size: 14px;
     font-weight: 600;
     line-height: 37px;
-    height: 35px;
+    height: 37px;
     margin: 0;
     padding: 0 15px 0;
     cursor: pointer;
-    border-width: 0;
-    border-style: solid;
     -webkit-appearance: none;
-    border-radius:5px;
+    border-radius: 30px;
     white-space: nowrap;
     box-sizing: border-box;
     margin-right: 10px;
-    box-shadow: 0 2px 4px rgba(126,142,177,.12);
     transition: 0.2s;
+    background: #fff0e9;
+    border: 1px solid #eee;
+    color: #ff7f45;
+}
+.abandoned_cart_filter .wp-ui-filters.active{
+    background: #ff7f45;
+    color: #ffffff;
+    border-color: #ff7f45;
 }
 .abandoned_cart_filter .filter_by {
     font-weight: 700;
-    color: #2d2f3a;
+    color: #888888;
     font-size: 15px;
     padding-right: 15px
 }
@@ -226,7 +229,7 @@
 }
 .abandoned_cart_filter a:hover
 {
-	box-shadow: 0 7px 6px rgba(126, 142, 177, 0.40);
+    box-shadow: 0 7px 6px rgba(126, 142, 177, 0.40);
 }
 .abandoned_cart_filter .button-abandoned {
     color: #e24344;
@@ -247,7 +250,7 @@
     vertical-align: top;
 }
 .abandoned_cart_filter .button-secondary-last
- {
+{
     color: #0198e0;
     background-color: #e0f5ff;
 }
@@ -257,21 +260,21 @@
     background-color: #f27052;
 }
 .retainful_abandoned_table {
-	font-size: 13px;
-	width: 100%;
-	border-spacing: 0;
-	border-collapse: separate
+    font-size: 13px;
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: separate
 }
 .retainful_abandoned_table>thead>tr>td,
 .retainful_abandoned_table>thead>tr>th
 {
-	padding:14px 12px;
+    padding:14px 12px;
 }
 .retainful_abandoned_table>tbody>tr>td,
 .retainful_abandoned_table>tbody>tr>th,
 .retainful_abandoned_table>tfoot>tr>td,
 .retainful_abandoned_table>tfoot>tr>th
- {
+{
     padding: 18px 12px;
     border-top-width: 1px;
     border-top-style: solid;
@@ -294,7 +297,7 @@
     color: #1e2b3d;
 }
 .retainful_abandoned_table .bg-light {
-    background-color: #f4f7fd;
+    background-color: #fff0e9;
 }
 .retainful_abandoned_table thead th {
     vertical-align: bottom;
@@ -302,8 +305,8 @@
     border-top: 0 solid #f9fbfc;
 }
 .retainful_abandoned_table thead th, .retainful_abandoned_table th {
-    color: #88929c;
-    font-weight: 700;
+    color: #39424b;
+    font-weight: 600;
 }
 .table-bordered {
     border: 1px solid #e6e6f2;
@@ -329,25 +332,22 @@
     font-size: 18px;
 }
 .retainful_abandoned_table .status-dot {
-    border-radius:6px;
-    padding: 4px;
+    border-radius: 50px;
     display: inline-block;
-    margin-right: 3px;
+    padding: 10px 15px;
+    font-size: 13px;
 }
 .retainful_abandoned_table .in-prs-bg
 {
     background-color:rgba(1, 152, 224, 0.20);
-	padding: 12px 60px;
 }
 .retainful_abandoned_table .abd-bg
 {
     background-color:#ffeaea;
-	padding: 12px 20px;
 }
 .retainful_abandoned_table .rcd-bg
 {
     background-color: #e0f7e9;
-    padding: 12px 20px;
 }
 .retainful_abandoned_table .mr-1
 {
@@ -355,15 +355,15 @@
 }
 .retainful_abandoned_table .in-prs-clr
 {
-	color:#0198e0;
+    color:#0198e0;
 }
 .retainful_abandoned_table .abd-clr
 {
-	color:#f13536;
+    color:#f13536;
 }
 .retainful_abandoned_table .rcd-clr
 {
-	color:#18c364;
+    color:#18c364;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .table_data_dp {
     display: block;
@@ -375,8 +375,8 @@
 .cmb2-id-rnoc-abandoned-cart-dashboard .dataTables_info
 {
     float: left;
-	margin: 25px 0 20px;
-	font-weight: 500;
+    margin: 25px 0 20px;
+    font-weight: 500;
     color: #525252;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .pagination
@@ -386,17 +386,17 @@
     float: right;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .pagination ul {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	outline: 0;
-	vertical-align: baseline;
-	background: 0 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    vertical-align: baseline;
+    background: 0 0;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .pagination li {
-	display: inline;
-	margin: 0;
-	padding: 0;
+    display: inline;
+    margin: 0;
+    padding: 0;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .pagination li a {
     border: 1px solid #dee6f7;
@@ -425,39 +425,38 @@
 }
 
 .cmb2-id-rnoc-abandoned-cart-dashboard .btn_plg {
-    padding: 5px 6px;
+    padding: 8px 10px;
     line-height: 20px;
     margin-right: 5px;
-    border-radius: 3px;
-	color: #fff;
+    border-radius: 4px;
+    color: #fff;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .btn-view {
-
-    background: #9eabc5;
-    border: 1px solid #9eabc5;
+    background: #0585f9;
+    border: 1px solid #0585f9;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .btn-danger {
-    background:#e24344;
-	border:1px solid #e24344;
+    background:#f13536;
+    border:1px solid #f13536;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .action-section .btn-view:hover {
-    color: #9eabc5;
-    border:1px solid #9eabc5;
-	background:#fff;
+    color: #0585f9;
+    border:1px solid #0585f9;
+    background:#fff;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .action-section .btn-danger:hover {
-    color: #e24344 ;
-    border:1px solid #e24344;
-	background:#fff;
+    color: #f13536 ;
+    border:1px solid #f13536;
+    background:#fff;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .email-section a
 {
     font-weight: 600;
-    color: #1e2b3d; 
+    color: #1e2b3d;
     text-decoration: none;
 }
 .email-sectiona a:hover{
-	color: #1e2b3d; 
+    color: #1e2b3d;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .btn_action {
     padding: 5px 6px;
@@ -472,24 +471,24 @@
     line-height: 20px;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .customer-type{
-	padding: 5px 10px;
+    padding: 5px 10px;
     border-radius: 4px;
     color: #fff;
     font-weight: 600;
     margin-top: 0;
     text-align: center;
     position: relative;
-    font-size: 10px;
+    font-size: 11px;
     bottom: 1px;
-	display: inline-block;
+    display: inline-block;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .user_dt {
-    background: #008fd4;  
-	width: 55px;
+    background: #0585f9;
+    width: 55px;
 }
 .cmb2-id-rnoc-abandoned-cart-dashboard .guest_dt {
     background: #efa22d;
-	width: 35px;
+    width: 35px;
 }
 
 

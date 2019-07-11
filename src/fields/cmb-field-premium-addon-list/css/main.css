@@ -4,23 +4,18 @@
     grid-gap: 30px;
     padding: 10px;
 }
-
 .rnoc-grid-container .rnoc-grid-cell {
     padding: 10px;
     border-radius: 2px;
 }
-
 .rnoc-grid-cell .header {
     font-weight: 800;
     font-size: large;
     text-transform: capitalize;
 }
-
 .rnoc-grid-cell {
     text-align: justify;
-
 }
-
 .retainful_premium_card_box .retainful_premium_grid {
     padding: 20px 20px 30px;
     box-shadow: 0 2px 4px rgba(126,142,177,.12);
@@ -35,7 +30,6 @@
     box-shadow: 0 5px 25px 0 rgba(0,0,100,.1);
     border-bottom: 3px solid #54B22E;
 }
-
 .retainful_premium_card_box .retainful_premium_grid .retainful_premium_heading {
     padding: 0 5px 0 5px;
     text-align: center;
@@ -44,7 +38,6 @@
     font-weight: 500;
     line-height: 1.33;
 }
-
 .retainful_premium_card_box .retainful_premium_grid .retainful_premium_para p {
     padding: 0 20px 10px;
     text-align: center;
@@ -54,14 +47,12 @@
     font-weight: 400;
     margin: 10px 0;
 }
-
 .retainful_premium_card_box .retainful_premium_grid .footer {
     text-align: center;
 }
-
 .retainful_premium_card_box .retainful_premium_grid .button-premium {
     color: #fff;
-    background: linear-gradient(136.14deg,#8cce17 0%,#54B22E 100%);
+    background: #54B22E;
     display: inline-block;
     text-decoration: none;
     font-size: 15px;
@@ -80,12 +71,10 @@
     margin-right: 28px;
     box-shadow: 0 4px 3px rgba(126, 142, 177, 0.40);
 }
-
 .retainful_premium_card_box .retainful_premium_grid .button-premium:hover {
     color: #fff;
     box-shadow: 0 7px 6px rgba(126, 142, 177, 0.40);
 }
-
 .retainful_premium_card_box .retainful_premium_grid .avatar-lg-bg {
     height: 3.9rem;
     text-align: center;
@@ -93,9 +82,7 @@
     margin: 15px auto;
     border-radius: 50%;
     background: #f0ffea;
-
 }
-
 .retainful_premium_card_box .retainful_premium_grid .retain-icon-premium {
     font-size: 25px;
     color: #54B22E;
@@ -104,20 +91,16 @@
     position: relative;
     right: 2px;
 }
-
 @media only screen and (max-width: 1350px) {
-
     .retainful_premium_card_box .retainful_premium_grid .retainful_premium_heading {
         padding: 5px 5px 0 5px;
         font-size: 19px;
         margin-right: 0;
     }
-
     .retainful_premium_card_box .retainful_premium_grid .retainful_premium_para p {
         font-size: 14px;
     }
 }
-
 @media only screen and (max-width: 1024px) {
     .retainful_premium_card_box {
         display: block;

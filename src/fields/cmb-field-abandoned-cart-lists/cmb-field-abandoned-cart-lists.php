@@ -173,8 +173,9 @@ class CMB2_Field_Abandoned_Cart_Lists
                                 }
                             } elseif (!empty($guest_email)) {
                                 echo '<a href="mailto:' . $guest_email . '">' . $guest_email . '</a>';
-                            } else {
-                                echo __('Guest cart', RNOC_TEXT_DOMAIN);
+                            } else { ?>
+                                <span class="light-grey"><?php echo __('This is guest cart', RNOC_TEXT_DOMAIN); ?></span>
+                                <?php
                             }
                             ?>
                         </td>

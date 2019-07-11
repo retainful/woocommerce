@@ -45,7 +45,7 @@ class CMB2_Field_Premium_Addon_List
                                     ?></p>
                             </div>
                             <div class="footer">
-                                <button type="button" class="view-addon-btn button button-green button-premium"
+                                <button type="button" class="view-addon-btn button button-premium"
                                         data-slug="<?php echo $addon->slug(); ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
                             </div>
                         </div>
@@ -92,7 +92,7 @@ class CMB2_Field_Premium_Addon_List
                         <div class="footer">
                             <a href="<?php echo $premium_url; ?>"
                                target="_blank"
-                               class="button button-green button-premium"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN); ?></a>
+                               class="button button-premium"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN); ?></a>
                         </div>
                     </div>
                     <?php

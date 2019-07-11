@@ -105,7 +105,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
                     <div class="rnoc_counter_container">
                         <div class="rnoc_counter_box upgrade-premium_box">
                             <?php
-                            echo __('Get more features like Email collection at add to cart & coupons', RNOC_TEXT_DOMAIN);
+                            echo __('Get more features like Email collection popup, Countdown timer & coupons', RNOC_TEXT_DOMAIN);
                             $api = new \Rnoc\Retainful\library\RetainfulApi();
                             ?>
                             <br>

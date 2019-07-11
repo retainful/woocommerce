@@ -44,22 +44,22 @@ class CMB2_Field_Cart_Table_Filter
         $url = admin_url('admin.php?' . http_build_query($url_arr));
         $cart_type = isset($_GET['cart_type']) ? $_GET['cart_type'] : 'all';
         ?>
-        <div class="abandoned_cart_filter">
-			<span class="filter_by">Filter by :</span>
+        <div class="abandoned_cart_filter text-right">
+            <span class="filter_by">Filter by :</span>
             <input type="hidden" value="<?php echo $cart_type; ?>" id="cart_type">
             <a href="<?php echo $url . '&cart_type=all&' . http_build_query($date_arr) ?>"
-               class="wp-ui-filters button-primary-first"><?php echo __('All Carts', RNOC_TEXT_DOMAIN); ?></a>
+               class="wp-ui-filters active"><?php echo __('All Carts', RNOC_TEXT_DOMAIN); ?></a>
             <a href="<?php echo $url . '&cart_type=abandoned&' . http_build_query($date_arr) ?>"
-               class="wp-ui-filters button-abandoned"><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></a>
+               class="wp-ui-filters"><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></a>
             <a href="<?php echo $url . '&cart_type=recovered&' . http_build_query($date_arr) ?>"
-               class="wp-ui-filters button-recovered"><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></a>
+               class="wp-ui-filters"><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></a>
             <?php
             $abandoned_cart_settings = $abandoned_cart->admin->getAdminSettings();
             $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
             if ($is_tracking_enabled) {
                 ?>
                 <a href="<?php echo $url . '&cart_type=progress&' . http_build_query($date_arr) ?>"
-                   class="wp-ui-filters button-secondary-last"><?php echo __('In-Progress Carts', RNOC_TEXT_DOMAIN); ?></a>
+                   class="wp-ui-filters"><?php echo __('In-Progress Carts', RNOC_TEXT_DOMAIN); ?></a>
                 <?php
             }
             ?>

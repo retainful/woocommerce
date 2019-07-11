@@ -1,7 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=DM+Sans:400,500,700&display=swap');
+
+.option-retainful_abandoned_cart {
+    font-family: DM Sans, sans-serif !important;
+}
 .cmb2-options-page {
     max-width: 100% !important;
 }
-
 .button-red {
     color: #fff !important;
     background-color: #d9534f !important;
@@ -9,7 +13,6 @@
     box-shadow: 0 1px 0 #d42d2a;
     text-decoration: none;
 }
-
 .button-green {
     color: #fff !important;
     background-color: #5cb85c !important;
@@ -29,15 +32,23 @@ p.submit{
 }
 .nav-tab-wrapper .nav-tab.nav-tab-active, .nav-tab-wrapper .nav-tab:hover {
     background: none;
-    box-shadow: inset 0 3px 0 #f27052;
-    border-top-color: #f27052;
-    color: #f27052;
+    box-shadow: inset 0 3px 0 #ff7f45;
+    border-top-color: #ff7f45;
+    color: #ff7f45;
 }
-
 .cmb2-wrap input[type="text"], .cmb2-wrap input[type="number"] {
     font-size: 14px;
     max-width: 100%;
     padding: 10px;
     border-radius: 4px;
     height: auto;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.light-grey {
+    font-weight: 700;
+    color: #888888;
 }
