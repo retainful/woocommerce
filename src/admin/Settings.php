@@ -475,7 +475,8 @@ class Settings
                 'attributes' => array('id' => 'is_retainful_app_connected')
             ));
         });
-        if (is_admin()) {
+        $page = isset($_GET['page']) ? $_GET['page'] : NULL;
+        if (is_admin() && in_array($page, array('retainful_abandoned_cart', 'retainful_abandoned_cart_email_templates', 'retainful', 'retainful_settings', 'retainful_premium', 'retainful_license'))) {
             $this->addScript();
         }
     }
