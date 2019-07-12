@@ -20,7 +20,7 @@ Recover abandoned carts in WooCommerce with a single click using Retainful. Driv
 7 out of 10 potential shoppers leave your store without buying. But you can reduce the cart abandonment rate and recover the lost sales by sending a well timed, sequence of email reminders.
 It is a proven fact that abandoned cart recovery emails can recover at least 30% of the lost sales.
 
-Retainful automates your abandoned cart emails. You can schedule a series of timed email reminders that can be sent to the customers to recover your WooCommerce abandoned carts.
+Retainful automates your abandoned cart recovery. You can schedule a series of timed email reminders that can be sent to the customers to recover your WooCommerce abandoned carts.
 
 **Here is an example:**
 
@@ -37,17 +37,17 @@ Retainful can automatically send these abandoned cart reminders in the backgroun
 In addition to abandoned cart recovery emails, Retainful also helps you drive repeat purchases by sending single-use, unique coupon codes for the next purchase.
 The customer can redeem this coupon code during their next purchase. This helps you retain your existing customers, get repeated orders and earn more dollars per customer.
 
-[Demo](https://demo.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=demo) | [Documentation](https://wwww.retainful.com/docs??utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
+[Demo](https://demo.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=demo) | [Documentation](https://wwww.retainful.com/docs?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
 
 ==Features (Free Version) ==
 
 === Abandoned Cart Recovery Features: ===
 
 * **Automatically send abandoned cart emails** when customers abandon their cart
+* Capture all abandoned carts including the guest carts.
 * Customers can **recover their carts** with a single click. A unique recovery link is sent in the abandoned cart email.
 * Schedule a sequence of emails (at timed intervals) till customer recovers the cart.
 * **Unlimited abandoned cart recovery email templates** and email reminders.
-* Capture all abandoned carts including the guest carts.
 * Include the cart items and summary in the emails- Customers can see abandoned cart products in the email
 * Short codes for including customer's first name, last name. So you can make the cart recovery email more personalised.
 * Plugin **automatically stops sending the emails once the cart is recovered**
@@ -116,6 +116,7 @@ The feature implements the two proven psychological motivators - Urgency and FOM
 
 Not every visitor will be ready to input their email address at the time of adding an item to cart. Instead of plainly asking for the email, you can say "get a 10% discount code in your email. Please enter your email".
 This will encourage the customer to enter their email ID to get the coupon code. Retainful allows you to collect the Email ID and send an email with the coupon code.
+[Learn more about incentivizing your visitors](https://www.retainful.com/docs/woocommerce/coupon-for-email-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=docs)
 
 **Auto apply coupon**
 
