@@ -545,10 +545,7 @@ class AbandonedCart
         if (isset($_GET['retainful_cart_action']) && isset($_GET['validate'])) {
             if ($_GET['retainful_cart_action'] == 'recover' && !empty($_GET['validate'])) {
                 global $wpdb;
-                if (session_id() === '') {
-                    //session has not started
-                    session_start();
-                }
+                $this->wc_functions->startPHPSession();
                 $cart_link = $this->decryptValidate($_GET['validate']);
                 parse_str($cart_link);
                 if (isset($url) && isset($abandoned_cart_id) && isset($session_id) && isset($email_sent)) {
@@ -576,8 +573,7 @@ class AbandonedCart
                         apply_filters('rnoc_set_current_currency_code', $abandoned_cart_history_results->currency_code);
                     }
                     if (empty($user_id)) {
-                        echo "Link expired";
-                        die;
+                        wc_add_notice(__('It seems, your cart has expired!'),'error');
                     }
                     if ($email_sent > 0 && is_numeric($email_sent)) {
                         wp_redirect($url);
