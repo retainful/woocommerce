@@ -63,10 +63,10 @@ class CMB2_Field_Date_Range_Picker
     public function setupAdminScripts()
     {
         $asset_path = apply_filters('cmb2_field_abandoned_cart_dashboard_asset_path', plugins_url('', __FILE__));
-        wp_enqueue_script('retainful-date-range-picker-moment-js', $asset_path . '/js/moment.min.js');
-        wp_enqueue_script('retainful-date-range-date-picker-js', $asset_path . '/js/daterangepicker.js');
-        wp_enqueue_script('retainful-date-range-picker-init-js', $asset_path . '/js/date_pick.js', '', '', true);
-        wp_enqueue_style('retainful-date-range-picker-css', $asset_path . '/css/daterangepicker.css');
+        wp_enqueue_script('retainful-date-range-picker-moment-js', $asset_path . '/js/moment.min.js', array(), RNOC_VERSION);
+        wp_enqueue_script('retainful-date-range-date-picker-js', $asset_path . '/js/daterangepicker.js', array(), RNOC_VERSION);
+        wp_enqueue_script('retainful-date-range-picker-init-js', $asset_path . '/js/date_pick.js', array(), RNOC_VERSION, true);
+        wp_enqueue_style('retainful-date-range-picker-css', $asset_path . '/css/daterangepicker.css', array(), RNOC_VERSION);
     }
 }
 

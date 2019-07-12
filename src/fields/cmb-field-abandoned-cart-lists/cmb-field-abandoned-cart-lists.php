@@ -278,10 +278,10 @@ class CMB2_Field_Abandoned_Cart_Lists
     public function setupAdminScripts()
     {
         $asset_path = apply_filters('cmb2_field_abandoned_cart_dashboard_asset_path', plugins_url('', __FILE__));
-        wp_enqueue_style('abandoned-cart-dashboard', $asset_path . '/css/main.css');
-        wp_enqueue_script('abandoned-cart-cart-fancybox-js', $asset_path . '/js/fancybox.min.js');
-        wp_enqueue_script('abandoned-cart-cart-fancybox-init-js', $asset_path . '/js/main.js');
-        wp_enqueue_style('abandoned-cart-cart-fancybox-css', $asset_path . '/css/fancybox.min.css');
+        wp_enqueue_style('abandoned-cart-dashboard', $asset_path . '/css/main.css', array(), RNOC_VERSION);
+        wp_enqueue_script('abandoned-cart-cart-fancybox-js', $asset_path . '/js/fancybox.min.js', array(), RNOC_VERSION);
+        wp_enqueue_script('abandoned-cart-cart-fancybox-init-js', $asset_path . '/js/main.js', array(), RNOC_VERSION);
+        wp_enqueue_style('abandoned-cart-cart-fancybox-css', $asset_path . '/css/fancybox.min.css', array(), RNOC_VERSION);
     }
 }
 

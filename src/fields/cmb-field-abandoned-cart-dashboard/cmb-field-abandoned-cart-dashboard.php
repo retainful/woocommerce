@@ -127,7 +127,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
     public function setupAdminScripts()
     {
         $asset_path = apply_filters('cmb2_field_abandoned_cart_dashboard_asset_path', plugins_url('', __FILE__));
-        wp_enqueue_style('abandoned-cart-dashboard', $asset_path . '/css/main.css');
+        wp_enqueue_style('abandoned-cart-dashboard', $asset_path . '/css/main.css', array(), RNOC_VERSION);
     }
 }
 
