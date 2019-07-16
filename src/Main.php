@@ -6,6 +6,7 @@ if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Integrations\Currency;
+use Rnoc\Retainful\Integrations\MultiLingual;
 
 class Main
 {
@@ -76,9 +77,9 @@ class Main
      */
     function activateEvents()
     {
+        add_action('retainful_plugin_activated', array($this, 'createRequiredTables'));
+        //add end points
         add_action('rest_api_init', array($this, 'registerEndPoints'));
-        //Create and alter the tables for abandoned carts and also check for woocommerce installed
-        register_activation_hook(RNOC_FILE, array($this, 'validatePluginActivation'));
         //Detect woocommerce plugin deactivation
         add_action('deactivated_plugin', array($this, 'detectPluginDeactivation'), 10, 2);
         //Check for dependencies
@@ -148,7 +149,7 @@ class Main
         add_action('plugins_loaded', array($this, 'actionSchedulerHooks'));
         add_action('rnoc_abandoned_clear_abandoned_carts', array($this->abandoned_cart, 'clearAbandonedCarts'));
         add_action('rnoc_abandoned_cart_send_email', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
-        //add_action('woocommerce_init', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
+        add_action('woocommerce_init', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
         //Process abandoned cart after user place order
         add_action('woocommerce_order_status_pending_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
         add_action('woocommerce_order_status_pending_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
@@ -172,6 +173,10 @@ class Main
         if (!$is_retainful_v1_2_0_migration_completed) {
             $this->migrationV120();
         }
+        $is_retainful_v1_2_3_migration_completed = get_option('is_retainful_v1_2_3_migration_completed', 0);
+        if (!$is_retainful_v1_2_3_migration_completed) {
+            $this->migrationV123();
+        }
         //Premium check
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
         $this->checkApi();
@@ -187,6 +192,25 @@ class Main
         $query = "ALTER TABLE {$table_name} ADD COLUMN `currency_code` VARCHAR (255) DEFAULT NULL";
         $wpdb->query($query);
         update_option('is_retainful_v1_2_0_migration_completed', '1');
+    }
+
+    /**
+     * Migration to v1.2.3
+     */
+    function migrationV123()
+    {
+        global $wpdb;
+        $lang_helper = new MultiLingual();
+        $default_language = $lang_helper->getDefaultLanguage();
+        $history_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history';
+        $emails_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates';
+        $query = "ALTER TABLE {$history_table_name} ADD COLUMN `language_code` VARCHAR (255) DEFAULT NULL";
+        $email_query = "ALTER TABLE {$emails_table_name} ADD COLUMN `language_code` VARCHAR (255) DEFAULT NULL";
+        $update_default_language_query = "UPDATE `{$emails_table_name}` SET `language_code` = '{$default_language}' WHERE `language_code` IS NULL;";
+        $wpdb->query($query);
+        $wpdb->query($email_query);
+        $wpdb->query($update_default_language_query);
+        update_option('is_retainful_v1_2_3_migration_completed', '1');
     }
 
     /**
@@ -368,34 +392,6 @@ class Main
     public static function instance()
     {
         return self::$init = (self::$init == NULL) ? new self() : self::$init;
-    }
-
-    /**
-     * Check and abort if PHP version is is less them 5.6 and does not met the required woocommerce version
-     */
-    function validatePluginActivation()
-    {
-        if (version_compare(phpversion(), '5.6', '<')) {
-            exit(__('Retainful-woocommerce requires minimum PHP version of 5.6', RNOC_TEXT_DOMAIN));
-        }
-        if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
-            exit(__('Woocommerce must installed and activated in-order to use Retainful-Woocommerce!', RNOC_TEXT_DOMAIN));
-        } else {
-            if (!function_exists('get_plugins'))
-                require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-            $plugin_folder = get_plugins('/' . 'woocommerce');
-            $plugin_file = 'woocommerce.php';
-            $wc_installed_version = NULL;
-            $wc_required_version = '2.5';
-            if (isset($plugin_folder[$plugin_file]['Version'])) {
-                $wc_installed_version = $plugin_folder[$plugin_file]['Version'];
-            }
-            if (version_compare($wc_required_version, $wc_installed_version, '>=')) {
-                exit(__('Retainful-woocommerce requires minimum Woocommerce version of ', RNOC_TEXT_DOMAIN) . ' ' . $wc_required_version . '. ' . __('But your Woocommerce version is ', RNOC_TEXT_DOMAIN) . ' ' . $wc_installed_version);
-            }
-        }
-        //Create abandoned cart related tables
-        $this->createRequiredTables();
     }
 
     function removeDependentTables()

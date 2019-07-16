@@ -4,6 +4,7 @@ namespace Rnoc\Retainful;
 
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Integrations\MultiLingual;
 
 class AbandonedCart
 {
@@ -153,6 +154,9 @@ class AbandonedCart
             $customer_id = $this->getUserSessionKey();
         }
         $currency_code = $this->getCurrentCurrencyCode();
+        $language_helper = new MultiLingual();
+        $active_language = $language_helper->getCurrentLanguage();
+        $language_code = (!empty($active_language)) ? $active_language : $language_helper->getDefaultLanguage();
         $row = $wpdb->get_row('SELECT * FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_id . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
         if (empty($row)) {
             $crawler_detect = new CrawlerDetect();
@@ -164,8 +168,8 @@ class AbandonedCart
                 return;
             }
             $wpdb->insert($this->cart_history_table,
-                array('currency_code' => $currency_code, 'customer_key' => $customer_id, 'cart_contents' => json_encode($this->wc_functions->getCart()), 'cart_expiry' => $current_time + $cart_cut_off_time, 'cart_is_recovered' => 0, 'show_on_funnel_report' => 1, 'ip_address' => $_SERVER['REMOTE_ADDR'], 'item_count' => $cart->cart_contents_count, 'cart_total' => $cart->cart_contents_total),
-                array('%s', '%s', '%s', '%d', '%d', '%d', '%s', '%d')
+                array('language_code' => $language_code, 'currency_code' => $currency_code, 'customer_key' => $customer_id, 'cart_contents' => json_encode($this->wc_functions->getCart()), 'cart_expiry' => $current_time + $cart_cut_off_time, 'cart_is_recovered' => 0, 'show_on_funnel_report' => 1, 'ip_address' => $_SERVER['REMOTE_ADDR'], 'item_count' => $cart->cart_contents_count, 'cart_total' => $cart->cart_contents_total),
+                array('%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%d')
             );
         } else {
             $update_values = null;
@@ -176,7 +180,8 @@ class AbandonedCart
                     'item_count' => $cart->cart_contents_count,
                     'cart_total' => $cart->cart_contents_total,
                     'viewed_checkout' => true,
-                    'currency_code' => $currency_code
+                    'currency_code' => $currency_code,
+                    'language_code' => $language_code
                 );
             } else {
                 $update_values = array(
@@ -185,7 +190,8 @@ class AbandonedCart
                     'ip_address' => $_SERVER['REMOTE_ADDR'],
                     'item_count' => $cart->cart_contents_count,
                     'cart_total' => $cart->cart_contents_total,
-                    'currency_code' => $currency_code
+                    'currency_code' => $currency_code,
+                    'language_code' => $language_code
                 );
             }
             $wpdb->update(
@@ -278,7 +284,7 @@ class AbandonedCart
                     $to_remain_histories = $wpdb->get_results($wpdb->prepare($to_remain_query, $cart_time, 0));
                     if (!empty($to_remain_histories)) {
                         foreach ($to_remain_histories as $history) {
-                            if (isset($history->cart_contents)) {
+                            if (isset($history->cart_contents) && $template->language_code == $history->language_code) {
                                 $cart_details = json_decode($history->cart_contents);
                                 if (!empty($cart_details)) {
                                     $history_id = $history->id;
@@ -335,7 +341,7 @@ class AbandonedCart
                                             );
                                             $encoding_cart = http_build_query($need_to_encode);
                                             $validate_cart = $this->encryptValidate($encoding_cart);
-                                            $cart_recovery_link = $site_url . '/?retainful_cart_action=recover&validate=' . $validate_cart;
+                                            $cart_recovery_link = $site_url . '/?retainful_cart_action=recover&validate=' . $validate_cart . '&lang=' . $history->language_code;
                                             $replace = array(
                                                 'customer_name' => $customer_name,
                                                 'site_url' => $site_url,
@@ -436,19 +442,19 @@ class AbandonedCart
             <thead>
                     <tr style="text-align: left;">
                         <th style="line-height: 56px;width: 20%;padding: 2% 0px;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;text-align: left;">Item </span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;text-align: left;">' . __("Item", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                         <th style="width: 20%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Name</span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Name", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                         <th style="width: 17%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Price</span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Quantity", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                         <th style="width: 20%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Quantity</span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Price", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                         <th style="width: 23%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Line Subtotal</span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Line Subtotal", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                     </tr>
                     </thead>
@@ -462,7 +468,7 @@ class AbandonedCart
                     <tr style="background-color:#fff;">
         
                         <td style="vertical-align:top;padding: 15px 40px;text-align: right;border-top: 1px solid #e5e5e5;width: 80%;border-bottom: 1px solid #e5e5e5;">
-                            <span style="font-weight: 800;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 15px;">Cart Total</span>
+                            <span style="font-weight: 800;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 15px;">' . __("cart Total", RNOC_TEXT_DOMAIN) . '</span>
                         </td>
                         <td style="vertical-align:top;padding: 15px 0px;text-align: left;border-top: 1px solid #e5e5e5;width: 20%;border-bottom: 1px solid #e5e5e5;">
                             <span style="font-weight: 800;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 14px;font-size: 15px;">' . $cart_total . '</span>
@@ -842,12 +848,16 @@ class AbandonedCart
 
     /**
      * get all email templates
+     * @param $language_code string
      * @return array|object|null
      */
-    function getEmailTemplates()
+    function getEmailTemplates($language_code = NULL)
     {
         global $wpdb;
-        $query = "SELECT t.template_name, t.id, t.is_active, t.frequency, t.day_or_hour, t.default_template, t.subject, (select count(id) from {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_sent_history where template_id = t.id) AS emails_sent FROM {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_templates AS t;";
+        $query = "SELECT t.template_name, t.id, t.is_active, t.frequency, t.day_or_hour, t.default_template, t.subject, (select count(id) from {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_sent_history where template_id = t.id) AS emails_sent FROM {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_templates AS t";
+        if (!empty($language_code)) {
+            $query .= " WHERE t.language_code='{$language_code}'";
+        }
         return $wpdb->get_results($query);
     }
 
@@ -934,14 +944,17 @@ class AbandonedCart
                 $frequency = intval((isset($data['frequency'])) ? $data['frequency'] : 1);
                 $day_or_hour = sanitize_text_field((isset($data['day_or_hour'])) ? $data['day_or_hour'] : 'Hours');
                 $is_active = intval((isset($data['active'])) ? $data['active'] : 1);
+                $lang_helper = new MultiLingual();
+                $default_lang = $lang_helper->getDefaultLanguage();
+                $language_code = sanitize_text_field((isset($data['language_code'])) ? $data['language_code'] : $default_lang);
                 global $wpdb;
                 if (!empty($template)) {
                     $template_id = $template->id;
-                    $query_update = "UPDATE `" . $this->email_templates_table . "` SET template_name=%s, subject=%s, body=%s, frequency=%s, day_or_hour=%s, is_active=%s WHERE id=%d";
-                    $wpdb->query($wpdb->prepare($query_update, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $template_id));
+                    $query_update = "UPDATE `" . $this->email_templates_table . "` SET template_name=%s, subject=%s, body=%s, frequency=%s, day_or_hour=%s, is_active=%s, language_code=%s WHERE id=%d";
+                    $wpdb->query($wpdb->prepare($query_update, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $language_code, $template_id));
                 } else {
-                    $insert_query = "INSERT INTO `" . $this->email_templates_table . "`(template_name, subject, body, frequency, day_or_hour, is_active) VALUES ( %s,%s,%s,%d,%s,%s)";
-                    $wpdb->query($wpdb->prepare($insert_query, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active));
+                    $insert_query = "INSERT INTO `" . $this->email_templates_table . "`(template_name, subject, body, frequency, day_or_hour, is_active,language_code) VALUES ( %s,%s,%s,%d,%s,%s,%s)";
+                    $wpdb->query($wpdb->prepare($insert_query, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $language_code));
                     $template_id = $wpdb->insert_id;
                 }
             }
@@ -1028,19 +1041,19 @@ class AbandonedCart
                     <thead>
                     <tr style="text-align: left;">
                         <th style="line-height: 56px;width: 20%;padding: 2% 0px;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;text-align: left;">Item </span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;text-align: left;">' . __("Item", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                         <th style="width: 20%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Name</span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Name", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                         <th style="width: 17%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Price</span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Quantity", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                         <th style="width: 20%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Quantity</span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Price", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                         <th style="width: 23%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">Line Subtotal</span>
+                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Line Subtotal", RNOC_TEXT_DOMAIN) . ' </span>
                         </th>
                     </tr>
                     </thead>
@@ -1070,7 +1083,7 @@ class AbandonedCart
                     <tr style="background-color:#fff;">
         
                         <td style="vertical-align:top;padding: 15px 40px;text-align: right;border-top: 1px solid #e5e5e5;width: 80%;border-bottom: 1px solid #e5e5e5;">
-                            <span style="font-weight: 800;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 15px;">Cart Total</span>
+                            <span style="font-weight: 800;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 15px;">' . __("Cart Total", RNOC_TEXT_DOMAIN) . '</span>
                         </td>
                         <td style="vertical-align:top;padding: 15px 0px;text-align: left;border-top: 1px solid #e5e5e5;width: 20%;border-bottom: 1px solid #e5e5e5;">
                             <span style="font-weight: 800;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 14px;font-size: 15px;">' . $this->wc_functions->formatPrice(200) . '</span>

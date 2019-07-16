@@ -70,26 +70,45 @@ class CMB2_Field_Email_After
      */
     public function render_email_templates($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
     {
+        $language_helper = new \Rnoc\Retainful\Integrations\MultiLingual();
+        $available_languages = $language_helper->getAvailableLanguages();
+        $default_language = $language_helper->getDefaultLanguage();
+        $current_language = $language_helper->getCurrentLanguage();
+        $active_language = (isset($_GET['language_code'])) ? $_GET['language_code'] : $default_language;
         $this->setupAdminScripts();
         ?>
-
         <div>
             <input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary no-hide" value="Save">
         </div>
         <div class="main_email_tt">
             <div class="email-template">
                 <h3><?php echo __('Email Templates', RNOC_TEXT_DOMAIN) ?></h3>
-                <?php
-                $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-                $settings = new \Rnoc\Retainful\Admin\Settings();
-                $templates = $abandoned_cart->getEmailTemplates();
-                ?>
                 <p style="text-align: center;"><?php echo __("Add email templates at different intervals to maximize the possibility of recovering your abandoned carts.", RNOC_TEXT_DOMAIN) ?></p>
             </div>
         </div>
+        <?php
+        if (!empty($available_languages)) {
+            ?>
+            <div class="nav-tab-wrapper">
+                <?php
+                foreach ($available_languages as $language) {
+                    $lang_code = $language['code'];
+                    ?>
+                    <a class="nav-tab <?php echo ($lang_code == $active_language) ? 'nav-tab-active' : '' ?>"
+                       href="<?php echo admin_url('admin.php?' . http_build_query(array('page' => $_GET['page'], 'language_code' => $lang_code))) ?>"><?php echo $language['native_name']; ?></a>
+                    <?php
+                }
+                ?>
+            </div>
+            <?php
+        }
+        ?>
         <div class="retainful_abandoned_email_main">
             <ul class="retainful_abandoned_email">
                 <?php
+                $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
+                $settings = new \Rnoc\Retainful\Admin\Settings();
+                $templates = $abandoned_cart->getEmailTemplates($active_language);
                 $arranged_templates = array();
                 if (!empty($templates)) {
                     foreach ($templates as $template) {
@@ -132,7 +151,7 @@ class CMB2_Field_Email_After
                                             </label>
                                         </div>
                                         <div class="user-option">
-                                            <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=edit-template&template=' . $template->id) ?>"
+                                            <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=edit-template&template=' . $template->id) ?>&language_code=<?php echo $active_language ?>"
                                                class="email-button email-btn-edit"><?php echo __('Edit', RNOC_TEXT_DOMAIN); ?></a>
                                             <button type="button"
                                                     class="email-button email-btn-delete remove-email-template"
@@ -156,7 +175,7 @@ class CMB2_Field_Email_After
         </div>
 
         <div class="force-center1">
-            <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=create-email-template'); ?>"
+            <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates&task=create-email-template'); ?>&language_code=<?php echo $active_language ?>"
                class="create-new-template"><?php echo __('Create New Email Template', RNOC_TEXT_DOMAIN) ?></a>
         </div>
         <?php

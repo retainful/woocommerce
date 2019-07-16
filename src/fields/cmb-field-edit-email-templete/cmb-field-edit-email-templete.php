@@ -37,6 +37,8 @@ class CMB2_Field_Edit_Email_Template
         $template = $abandoned_cart->getTemplate($template_id);
         $settings = new \Rnoc\Retainful\Admin\Settings();
         $api = new \Rnoc\Retainful\library\RetainfulApi();
+        $language_helper = new \Rnoc\Retainful\Integrations\MultiLingual();
+        $default_language = $language_helper->getDefaultLanguage();
         ?>
         </form>
         <div class="rnoc-alert"
@@ -68,6 +70,8 @@ class CMB2_Field_Edit_Email_Template
                         <input name="template_name" type="text" class="regular-text"
                                value="<?php echo isset($template->template_name) ? $template->template_name : '' ?>"
                                id="field_template_name">
+                        <input type="hidden" name="language_code"
+                               value="<?php echo(isset($_GET['language_code']) ? $_GET['language_code'] : $default_language) ?>"/>
                         <input name="id" type="hidden" class="regular-text"
                                value="<?php echo isset($template->id) ? $template->id : 0 ?>" id="field_id">
                     </div>
@@ -178,7 +182,7 @@ class CMB2_Field_Edit_Email_Template
                         <button type="button" data-path="<?php echo admin_url('admin-ajax.php'); ?>"
                                 class="button button-primary save-email-template"><?php echo __('Save', RNOC_TEXT_DOMAIN); ?></button>
                         <button type="button" data-path="<?php echo admin_url('admin-ajax.php'); ?>"
-                                data-redirectto="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates'); ?>"
+                                data-redirectto="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates'); ?>&language_code=<?php echo (isset($_GET['language_code'])) ? $_GET['language_code'] : $default_language ?>"
                                 class="button button-green save-close-email-template"><?php echo __('Save and close', RNOC_TEXT_DOMAIN); ?></button>
                         <a href="<?php echo admin_url('admin.php?page=' . $settings->slug . '_abandoned_cart_email_templates'); ?>"
                            class="button button-red reload-button"><?php echo __('Close', RNOC_TEXT_DOMAIN); ?></a>
