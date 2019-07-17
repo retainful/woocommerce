@@ -24,7 +24,7 @@ if (!defined('RNOC_TEXT_DOMAIN'))
  * Current version of our app
  */
 if (!defined('RNOC_VERSION'))
-    define('RNOC_VERSION', '1.2.2');
+    define('RNOC_VERSION', '1.2.3');
 /**
  * Set base file URL
  */

@@ -139,7 +139,7 @@ class Main
         add_action('woocommerce_after_checkout_billing_form', array($this->abandoned_cart, 'addTrackUserJs'));
         add_action('wp_ajax_nopriv_save_retainful_guest_data', array($this->abandoned_cart, 'saveGuestData'));
         //recover user cart
-        add_filter('init', array($this->abandoned_cart, 'recoverUserCart'), 99, 1);
+        add_action('wp_loaded', array($this->abandoned_cart, 'recoverUserCart'), 99, 1);
         add_action('woocommerce_new_order', array($this->abandoned_cart, 'purchaseComplete'));
         //Add tracking message
         add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'guestGdprMessage'), 10, 1);
