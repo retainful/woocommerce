@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.2.1
 WC tested up to: 3.6.4
 Requires PHP: 5.6
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -252,5 +252,8 @@ No. There is no charges for support.
 *Improvement: UI/UX improved
 *Improvement: Option added to disable Next order coupon
 
-= 1.2.2 =
+= 1.2.3 =
 *Improvement: Support for Multilingual added
+
+= 1.2.4 =
+*Fix: Auto login to recover user cart issue fix
