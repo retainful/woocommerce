@@ -561,21 +561,7 @@ class AbandonedCart
                     if (!empty($abandoned_cart_history_results)) {
                         $user_id = $abandoned_cart_history_results->customer_key;
                         $this->wc_functions->setPHPSession(RNOC_PLUGIN_PREFIX . 'recovered_cart_id', $abandoned_cart_id);
-                        //if guest
-                        if (!is_numeric($user_id)) {
-                            $this->autoLoadUserCart($abandoned_cart_history_results->cart_contents, $abandoned_cart_id, $session_id);
-                        } else {
-                            // if registered user
-                            $user = wp_set_current_user($user_id);
-                            $user_login = $user->data->user_login;
-                            wp_set_auth_cookie($user_id);
-                            wc_load_persistent_cart($user_login, $user);
-                            do_action('wp_login', $user_login, $user);
-                            if (isset($sign_in) && is_wp_error($sign_in)) {
-                                echo $sign_in->get_error_message();
-                                exit;
-                            }
-                        }
+                        $this->autoLoadUserCart($abandoned_cart_history_results->cart_contents, $abandoned_cart_id, $session_id);
                         apply_filters('rnoc_set_current_currency_code', $abandoned_cart_history_results->currency_code);
                     }
                     if (empty($user_id)) {
