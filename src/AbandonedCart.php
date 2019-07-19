@@ -418,7 +418,7 @@ class AbandonedCart
             }
             $cart_line_items .= '<tr style="line-height: 25px;padding: 20px 0px 20px;">
                         <td>
-                        <img alt="' . $product_name . '" height="auto" src="' . $image_url . '"width="80">
+                        <img alt="' . stripslashes(strip_tags($product_name)) . '" height="auto" src="' . $image_url . '"width="80">
                         </td>
                         <td>
                             <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $product_name . '</span>
