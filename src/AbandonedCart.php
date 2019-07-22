@@ -384,6 +384,7 @@ class AbandonedCart
         $cart_total = $item_subtotal = $item_total = 0;
         $sub_line_prod_name = $cart_line_items = '';
         $currency_arg = array('currency' => $currency_code);
+        $line_items = array();
         foreach ($cart_details as $key => $cart) {
             $quantity_total = $cart->quantity;
             $product_id = $cart->product_id;
@@ -416,70 +417,35 @@ class AbandonedCart
                 $variation = $this->wc_functions->getProduct($variation_id);
                 $product_name = $this->wc_functions->getProductName($variation);
             }
-            $cart_line_items .= '<tr style="line-height: 25px;padding: 20px 0px 20px;">
-                        <td>
-                        <img alt="' . stripslashes(strip_tags($product_name)) . '" height="auto" src="' . $image_url . '"width="80">
-                        </td>
-                        <td>
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $product_name . '</span>
-                        </td>
-                        <td>
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $quantity_total . '</span>
-                        </td>
-                        <td>
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $item_subtotal . '</span>
-                        </td>
-                        <td>
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $item_total_display . '</span>
-                        </td>
-                    </tr>';
+            $line_items[] = array('name' => $product_name, 'image_url' => $image_url, 'quantity_total' => $quantity_total, 'item_subtotal' => $item_subtotal, 'item_total_display' => $item_total_display);
             $cart_total += $item_total;
             $item_subtotal = $item_total = 0;
         }
         $cart_total = $this->wc_functions->formatPrice($cart_total, $currency_arg);
-        $cart_html = '<table cellspacing="0" cellpadding="0" border="0" class="el-table__header"
-               style="width: 600px;padding: 0px 20px;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;">
-            <thead>
-                    <tr style="text-align: left;">
-                        <th style="line-height: 56px;width: 20%;padding: 2% 0px;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;text-align: left;">' . __("Item", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                        <th style="width: 20%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Name", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                        <th style="width: 17%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Quantity", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                        <th style="width: 20%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Price", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                        <th style="width: 23%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Line Subtotal", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    ' . $cart_line_items . '
-                    </tbody>
-                </table>
-                <table cellspacing="0" cellpadding="0" border="0" class="el-table__header"
-                       style="width: 600px;padding: 0px 20px;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;">
-                    <tbody>
-                    <tr style="background-color:#fff;">
-        
-                        <td style="vertical-align:top;padding: 15px 40px;text-align: right;border-top: 1px solid #e5e5e5;width: 80%;border-bottom: 1px solid #e5e5e5;">
-                            <span style="font-weight: 800;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 15px;">' . __("cart Total", RNOC_TEXT_DOMAIN) . '</span>
-                        </td>
-                        <td style="vertical-align:top;padding: 15px 0px;text-align: left;border-top: 1px solid #e5e5e5;width: 20%;border-bottom: 1px solid #e5e5e5;">
-                            <span style="font-weight: 800;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 14px;font-size: 15px;">' . $cart_total . '</span>
-                        </td>
-        
-                    </tr>
-                    </tbody>
-                </table>';
-        return $cart_html;
+        $override_path = get_theme_file_path('retainful/templates/abandoned_cart.php');
+        $cart_template_path = RNOC_PLUGIN_PATH . 'src/admin/templates/abandoned_cart.php';
+        if (file_exists($override_path)) {
+            $cart_template_path = $override_path;
+        }
+        return $this->getTemplateContent($cart_template_path, array('line_items' => $line_items, 'cart_total' => $cart_total));
     }
 
+    /**
+     * get the template content
+     * @param $path
+     * @param array $params
+     * @return mixed|null
+     */
+    function getTemplateContent($path, $params = array())
+    {
+        if (file_exists($path)) {
+            ob_start();
+            extract($params);
+            include $path;
+            return ob_get_clean();
+        }
+        return NULL;
+    }
     /**
      * Encrypt the key
      * @param $key
