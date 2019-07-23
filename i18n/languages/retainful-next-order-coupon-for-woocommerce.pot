@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: retainful\n"
-"POT-Creation-Date: 2019-07-12 11:47+0530\n"
-"PO-Revision-Date: 2019-07-12 11:47+0530\n"
+"POT-Creation-Date: 2019-07-23 17:47+0530\n"
+"PO-Revision-Date: 2019-07-23 17:47+0530\n"
 "Last-Translator: \n"
 "Language-Team: retainful\n"
 "Language: en\n"
@@ -15,102 +15,108 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;esc_html__;esc_html_e;esc_attr__;esc_attr_e\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: AbandonedCart.php:29
+#: AbandonedCart.php:30
 msgid "Yesterday"
 msgstr ""
 
-#: AbandonedCart.php:30
+#: AbandonedCart.php:31
 msgid "Today"
 msgstr ""
 
-#: AbandonedCart.php:31
+#: AbandonedCart.php:32
 msgid "Last 7 days"
 msgstr ""
 
-#: AbandonedCart.php:32
+#: AbandonedCart.php:33
 msgid "Last 15 days"
 msgstr ""
 
-#: AbandonedCart.php:33
+#: AbandonedCart.php:34
 msgid "Last 30 days"
 msgstr ""
 
-#: AbandonedCart.php:34
+#: AbandonedCart.php:35
 msgid "Last 90 days"
 msgstr ""
 
-#: AbandonedCart.php:35
+#: AbandonedCart.php:36
 msgid "Last 365 days"
 msgstr ""
 
-#: AbandonedCart.php:36
+#: AbandonedCart.php:37
 msgid "Custom"
 msgstr ""
 
-#: AbandonedCart.php:344 AbandonedCart.php:1087
+#: AbandonedCart.php:350 AbandonedCart.php:1052
 msgid " All rights reserved."
 msgstr ""
 
-#: AbandonedCart.php:576
+#: AbandonedCart.php:534
 msgid "It seems, your cart has expired!"
 msgstr ""
 
-#: AbandonedCart.php:693 AbandonedCart.php:694
+#: AbandonedCart.php:651 AbandonedCart.php:652
 msgid "New Customer Order - Recovered"
 msgstr ""
 
-#: AbandonedCart.php:949
+#: AbandonedCart.php:914
 msgid "Template saved successfully!"
 msgstr ""
 
-#: AbandonedCart.php:966
+#: AbandonedCart.php:931
 msgid "Template activated successfully!"
 msgstr ""
 
-#: AbandonedCart.php:968
+#: AbandonedCart.php:933
 msgid "Template de-activated successfully!"
 msgstr ""
 
-#: AbandonedCart.php:972 AbandonedCart.php:976 AbandonedCart.php:995
-#: AbandonedCart.php:999
+#: AbandonedCart.php:937 AbandonedCart.php:941 AbandonedCart.php:960
+#: AbandonedCart.php:964
 msgid "Invalid Request"
 msgstr ""
 
-#: AbandonedCart.php:1103
+#: AbandonedCart.php:996 admin/templates/abandoned_cart.php:6
+msgid "Item"
+msgstr ""
+
+#: AbandonedCart.php:999 admin/templates/abandoned_cart.php:9
+msgid "Name"
+msgstr ""
+
+#: AbandonedCart.php:1002 admin/templates/abandoned_cart.php:12
+msgid "Quantity"
+msgstr ""
+
+#: AbandonedCart.php:1005 admin/templates/abandoned_cart.php:15
+msgid "Price"
+msgstr ""
+
+#: AbandonedCart.php:1008 admin/templates/abandoned_cart.php:18
+msgid "Line Subtotal"
+msgstr ""
+
+#: AbandonedCart.php:1038
+msgid "Cart Total"
+msgstr ""
+
+#: AbandonedCart.php:1068
 msgid "Email address and Email body required"
 msgstr ""
 
-#: AbandonedCart.php:1125 AbandonedCart.php:1133
+#: AbandonedCart.php:1090 AbandonedCart.php:1098
 msgid "Sorry, Template not found"
 msgstr ""
 
-#: Main.php:379
-msgid "Retainful-woocommerce requires minimum PHP version of 5.6"
-msgstr ""
-
-#: Main.php:382
-msgid ""
-"Woocommerce must installed and activated in-order to use Retainful-"
-"Woocommerce!"
-msgstr ""
-
-#: Main.php:394
-msgid "Retainful-woocommerce requires minimum Woocommerce version of "
-msgstr ""
-
-#: Main.php:394
-msgid "But your Woocommerce version is "
-msgstr ""
-
-#: Main.php:436
+#: Main.php:432
 msgid "Woocommerce must be activated for Retainful-Woocommerce to work"
 msgstr ""
 
-#: Main.php:439
+#: Main.php:435
 msgid "Your woocommerce version is "
 msgstr ""
 
-#: Main.php:439
+#: Main.php:435
 msgid ""
 ". Some of the features of Retainful-Woocommerce will not work properly on "
 "this woocommerce version."
@@ -156,7 +162,7 @@ msgstr ""
 #: admin/Settings.php:43 admin/Settings.php:77 admin/Settings.php:127
 #: admin/Settings.php:139 admin/Settings.php:344 admin/Settings.php:437
 #: admin/Settings.php:462
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:179
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:183
 msgid "Save"
 msgstr ""
 
@@ -169,7 +175,7 @@ msgid "Retainful Abandoned Cart Email Templates"
 msgstr ""
 
 #: admin/Settings.php:76
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:81
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:85
 msgid "Email Templates"
 msgstr ""
 
@@ -482,8 +488,8 @@ msgid "Add-ons List"
 msgstr ""
 
 #: admin/Settings.php:429 admin/Settings.php:436
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:112
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:128
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:116
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:132
 msgid "Premium"
 msgstr ""
 
@@ -514,6 +520,10 @@ msgid ""
 "font-weight: 500; background: #8D71DB; display: block; padding: 10px; "
 "border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-"
 "decoration: none;\" href=\"{{coupon_url}}\">Go! </a></p></div></div>"
+msgstr ""
+
+#: admin/templates/abandoned_cart.php:57
+msgid "cart Total"
 msgstr ""
 
 #: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:52
@@ -627,36 +637,36 @@ msgstr ""
 msgid "Are you sure?"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:58
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:60
 msgid "Add Or Edit Email Template"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:65
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:67
 msgid "Template Name"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:77
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:81
 msgid "Template Subject"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:84
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:88
 msgid "Use <b>{{customer_name}}</b> - To display Customer name"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:89
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:93
 msgid "Email Body"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:100
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:131
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:104
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:135
 msgid "Insert template"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:116
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:120
 msgid "Unlock"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:140
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:144
 msgid ""
 "You can use following short codes in your email template:<br> "
 "<b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - "
@@ -664,91 +674,89 @@ msgid ""
 "cart<br><b>{{user_cart}}</b> - Cart details"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:146
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:150
 msgid "Send this email in"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:153
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:157
 msgid "Hour(s)"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:154
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:158
 msgid "Day(s)"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:156
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:160
 msgid "after cart is abandoned."
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:161
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:165
 msgid "Send a test email to"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:166
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:170
 msgid "Send a test Email"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:168
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:172
 msgid "Sending..."
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:170
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:174
 msgid "Enter email id to receive an test email."
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:182
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:186
 msgid "Save and close"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:184
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:188
 msgid "Close"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:87
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:86
 msgid ""
 "Add email templates at different intervals to maximize the possibility of "
 "recovering your abandoned carts."
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:110
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:129
 msgid "Send "
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:110
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:129
 msgid "After Abandonment"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:116
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:135
 msgid "Subject: "
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:121
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:140
 msgid "Sent Emails"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:125
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:144
 msgid "Enabled"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:125
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:144
 msgid "Disabled"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:136
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:35
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:155
 msgid "Edit"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:139
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:92
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:158
 msgid "Delete"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:150
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:169
 msgid "No email templates found! So, No emails were sent!"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:160
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:179
 msgid "Create New Email Template"
 msgstr ""
 
@@ -847,351 +855,4 @@ msgstr ""
 
 #: fields/cmb-field-unlock-features/cmb-field-unlock-features.php:79
 msgid "Click Here!"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_AdminView.php:53
-#: library/action-scheduler/classes/ActionScheduler_AdminView.php:68
-#: library/action-scheduler/classes/ActionScheduler_AdminView.php:69
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:89
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:19
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:30
-msgid "Scheduled Actions"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_InvalidActionException.php:22
-#, php-format
-msgid ""
-"Action [%s] has invalid arguments. It cannot be JSON decoded to an array."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:96
-msgid "Hook"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:97
-msgid "Status"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:98
-msgid "Arguments"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:99
-msgid "Group"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:100
-msgid "Recurrence"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:101
-msgid "Scheduled Date"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:102
-msgid "Log"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:122
-msgid "Claim ID"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:129
-msgid "Run"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:130
-msgid "Process the action now as if it were run as part of a queue"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:133
-msgid "Cancel"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:134
-msgid "Cancel the action now to avoid it being run in future"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:194
-msgid "Now!"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:227
-#, php-format
-msgid "Every %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:231
-#, php-format
-msgid "Cron %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:235
-msgid "Non-repeating"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:321
-#, php-format
-msgid ""
-"Maximum simultaneous batches already in progress (%s queues). No actions "
-"will be processed until the current batches are complete."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:336
-#, php-format
-msgid "Successfully executed action: %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:339
-#, php-format
-msgid "Successfully canceled action: %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:342
-#, php-format
-msgid "Successfully processed change for action: %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:347
-#, php-format
-msgid "Could not process change for action: \"%s\" (ID: %d). Error: %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:392
-#, php-format
-msgid " (%s ago)"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:394
-#, php-format
-msgid " (%s)"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_ListTable.php:531
-msgid "Search hook, args and claim ID"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Logger.php:61
-msgid "action created"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Logger.php:65
-msgid "action canceled"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Logger.php:69
-msgid "action started"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Logger.php:73
-msgid "action complete"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Logger.php:77
-#, php-format
-msgid "action failed: %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Logger.php:81
-#, php-format
-msgid "action timed out after %s seconds"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Logger.php:86
-#, php-format
-msgid "unexpected shutdown: PHP Fatal error %s in %s on line %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Logger.php:91
-msgid "action reset"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Logger.php:95
-msgid "action ignored"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_QueueRunner.php:110
-msgid "Every minute"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Store.php:152
-#: library/action-scheduler/classes/ActionScheduler_Store.php:169
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:264
-msgid "Invalid schedule. Cannot save action."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Store.php:181
-msgid "Complete"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Store.php:182
-msgid "Pending"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Store.php:183
-msgid "In-progress"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Store.php:184
-msgid "Failed"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_Store.php:185
-msgid "Canceled"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:31
-#, php-format
-msgid "The %s class can only be run within WP CLI."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:59
-msgid ""
-"There are too many concurrent batches, but the run is forced to continue."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:61
-msgid "There are too many concurrent batches."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:109
-msgid "The claim has been lost. Aborting current batch."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:135
-#, php-format
-msgid "Started processing action %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:152
-#, php-format
-msgid "Completed processing action %s with hook: %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:167
-#, php-format
-msgid "Error processing action %1$s: %2$s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_WPCLI_QueueRunner.php:183
-msgid "Attempting to reduce used memory..."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_WPCLI_Scheduler_command.php:123
-#, php-format
-msgid "There was an error running the action scheduler: %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:100
-msgid "Action Scheduler"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:100
-msgid "This section shows scheduled action counts."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:103
-msgid "Action Status"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:105
-msgid "Count"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:106
-msgid "Oldest Scheduled Date"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wcSystemStatus.php:107
-msgid "Newest Scheduled Date"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:27
-#, php-format
-msgid "Error saving action: %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:51
-msgid "Unable to save action."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:437
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:448
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:474
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:744
-#, php-format
-msgid "Unidentified action %s"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:586
-msgid "Unable to claim actions. Database error."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:606
-#, php-format
-msgid "The group \"%s\" does not exist."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:667
-#, php-format
-msgid "Unable to unlock claim %s. Database error."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:681
-#, php-format
-msgid "Unable to unlock claim on action %s. Database error."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:692
-#, php-format
-msgid "Unable to mark failure on action %s. Database error."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore.php:716
-msgid "Invalid action ID. No status found."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:20
-msgid "Scheduled actions are hooks triggered on a cetain date and time."
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:31
-msgid "Scheduled Action"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:33
-msgid "Add"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:34
-msgid "Add New Scheduled Action"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:36
-msgid "Edit Scheduled Action"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:37
-msgid "New Scheduled Action"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:38
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:39
-msgid "View Action"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:40
-msgid "Search Scheduled Actions"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:41
-msgid "No actions found"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_PostTypeRegistrar.php:42
-msgid "No actions found in trash"
-msgstr ""
-
-#: library/action-scheduler/classes/ActionScheduler_wpPostStore_TaxonomyRegistrar.php:14
-msgid "Action Group"
 msgstr ""
