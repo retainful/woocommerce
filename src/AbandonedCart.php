@@ -357,11 +357,19 @@ class AbandonedCart
                                             $from_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'] : $admin_email;
                                             $replay_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'] : $admin_email;
                                             //Prepare for sending emails
-                                            $headers = "From: " . $from_name . " <" . $from_address . ">" . "\r\n";
-                                            $headers .= "Content-Type: text/html" . "\r\n";
-                                            $headers .= "Reply-To:  " . $replay_address . " " . "\r\n";
+                                            $charset = (function_exists('get_bloginfo')) ? get_bloginfo('charset') : 'UTF-8';
+                                            //Prepare for sending emails
+                                            $headers = array(
+                                                "From: \"$from_name\" <$from_address>",
+                                                "Return-Path: <" . $from_address . ">",
+                                                "Reply-To: \"" . $from_name . "\" <" . $replay_address . ">",
+                                                "MIME-Version: 1.0",
+                                                "X-Mailer: PHP" . phpversion(),
+                                                "Content-Type: text/html; charset=\"" . $charset . "\""
+                                            );
+                                            $header = implode("\n", $headers);
                                             //Send mail
-                                            wc_mail($user_email, $email_subject, $email_body, $headers);
+                                            wc_mail($user_email, $email_subject, $email_body, $header);
                                         }
                                     }
                                 }
@@ -510,7 +518,6 @@ class AbandonedCart
 
     /**
      * recover cart info
-     * @return mixed
      */
     function recoverUserCart()
     {
@@ -650,9 +657,17 @@ class AbandonedCart
                     $order = $this->wc_functions->getOrder($order_id);
                     $email_heading = __('New Customer Order - Recovered', RNOC_TEXT_DOMAIN);
                     $email_subject = __('New Customer Order - Recovered', RNOC_TEXT_DOMAIN);
-                    $user_email = get_option('admin_email');
-                    $headers[] = "From: Admin <" . $user_email . ">";
-                    $headers[] = "Content-Type: text/html";
+                    $admin_email = get_option('admin_email');
+                    $charset = (function_exists('get_bloginfo')) ? get_bloginfo('charset') : 'UTF-8';
+                    $headers = array(
+                        "From: \"Admin\" <$admin_email>",
+                        "Return-Path: <" . $admin_email . ">",
+                        "Reply-To: \"Admin\" <" . $admin_email . ">",
+                        "MIME-Version: 1.0",
+                        "X-Mailer: PHP" . phpversion(),
+                        "Content-Type: text/html; charset=\"" . $charset . "\""
+                    );
+                    $header = implode("\n", $headers);
                     // Buffer
                     ob_start();
                     // Get mail template
@@ -665,7 +680,7 @@ class AbandonedCart
                     ));
                     // Get contents
                     $email_body = ob_get_clean();
-                    wc_mail($user_email, $email_subject, $email_body, $headers);
+                    wc_mail($admin_email, $email_subject, $email_body, $header);
                     update_post_meta($order_id, 'woocommerce_retainful_recovered_email_sent', 'yes');
                 }
             }
@@ -1058,11 +1073,19 @@ class AbandonedCart
             $from_address = $admin_email;
             $replay_address = $admin_email;
             //Prepare for sending emails
-            $headers = "From: " . $from_name . " <" . $from_address . ">" . "\r\n";
-            $headers .= "Content-Type: text/html" . "\r\n";
-            $headers .= "Reply-To:  " . $replay_address . " " . "\r\n";
+            $charset = (function_exists('get_bloginfo')) ? get_bloginfo('charset') : 'UTF-8';
+            //Prepare for sending emails
+            $headers = array(
+                "From: \"$from_name\" <$from_address>",
+                "Return-Path: <" . $from_address . ">",
+                "Reply-To: \"" . $from_name . "\" <" . $replay_address . ">",
+                "MIME-Version: 1.0",
+                "X-Mailer: PHP" . phpversion(),
+                "Content-Type: text/html; charset=\"" . $charset . "\""
+            );
+            $header = implode("\n", $headers);
             //Send mail
-            wc_mail($send_to, $email_subject, $template, $headers);
+            wc_mail($send_to, $email_subject, $template, $header);
         } else {
             $response['error'] = true;
             $response['message'] = __('Email address and Email body required', RNOC_TEXT_DOMAIN);

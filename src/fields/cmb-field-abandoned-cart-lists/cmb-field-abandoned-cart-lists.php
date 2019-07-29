@@ -67,7 +67,7 @@ class CMB2_Field_Abandoned_Cart_Lists
             <tr class="border-0">
                 <th class="border-0" style="width: 40px;"><?php echo __('Id', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Cart Status', RNOC_TEXT_DOMAIN); ?></th>
-                <th class="border-0"><?php echo __('Cart Expired', RNOC_TEXT_DOMAIN); ?></th>
+                <th class="border-0"><?php echo __('Date', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Customer / IP', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Email', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Cart Value', RNOC_TEXT_DOMAIN); ?></th>
@@ -115,7 +115,7 @@ class CMB2_Field_Abandoned_Cart_Lists
                         ?>
                         <td>
                             <?php
-                            echo date('Y-m-d', $carts->cart_expiry)
+                            echo date('Y-m-d H:i A', $carts->cart_expiry)
                             ?>
                         </td>
                         <td>

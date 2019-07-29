@@ -117,7 +117,7 @@ class CMB2_Field_Edit_Email_Template
                                         </div>
                                         <div class="get-now-btn"><a
                                                     href="<?php echo $api->upgradePremiumUrl(); ?>"><span
-                                                        class="dashicons dashicons-lock"></span><?php echo __('Unlock', RNOC_TEXT_DOMAIN); ?>
+                                                        class="dashicons dashicons-lock"></span><?php echo __('Upgrade to Premium to Unlock', RNOC_TEXT_DOMAIN); ?>
                                             </a>
                                         </div>
                                     </div>
@@ -261,7 +261,6 @@ class CMB2_Field_Edit_Email_Template
                     font-weight: 500;
                     margin: 20px 0 10px;
                     text-transform: capitalize;
-                    white-space: nowrap;
                     border-radius: 4px;
                     box-sizing: border-box;
                     transition: .2s;
@@ -269,6 +268,7 @@ class CMB2_Field_Edit_Email_Template
                     background: red;
                     border: 1px solid red;
                     color: #ffffff;
+                    line-height: 25px;
                 }
 
                 .template-preview {
