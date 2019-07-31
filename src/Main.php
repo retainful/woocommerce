@@ -177,6 +177,11 @@ class Main
         if (!$is_retainful_v1_2_3_migration_completed) {
             $this->migrationV123();
         }
+
+        $is_retainful_v1_2_5_migration_completed = get_option('is_retainful_v1_2_5_migration_completed', 0);
+        if (!$is_retainful_v1_2_5_migration_completed) {
+            $this->migrationV125();
+        }
         //Premium check
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
         $this->checkApi();
@@ -192,6 +197,18 @@ class Main
         $query = "ALTER TABLE {$table_name} ADD COLUMN `currency_code` VARCHAR (255) DEFAULT NULL";
         $wpdb->query($query);
         update_option('is_retainful_v1_2_0_migration_completed', '1');
+    }
+
+    /**
+     * Migration to v1.2.5
+     */
+    function migrationV125()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates';
+        $query = "ALTER TABLE {$table_name} ADD COLUMN `extra` TEXT DEFAULT NULL";
+        $wpdb->query($query);
+        update_option('is_retainful_v1_2_5_migration_completed', '1');
     }
 
     /**

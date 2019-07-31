@@ -114,6 +114,26 @@ class Settings
                     'type' => 'email_template_edit'
                 ));
             }
+            //Sent Emails Tab
+            /*$sent_emails_list = new_cmb2_box(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_sent_emails',
+                'title' => __('Sent E-Mails', RNOC_TEXT_DOMAIN),
+                'parent_slug' => $this->slug,
+                'capability' => 'edit_shop_coupons',
+                'object_types' => array('options-page'),
+                'option_key' => $this->slug,
+                'tab_group' => $this->slug,
+                'tab_title' => __('Sent E-Mails', RNOC_TEXT_DOMAIN),
+                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
+            ));
+            $sent_emails_list->add_field(array(
+                'name' => __('Order Status', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'preferred_order_status',
+                'type' => 'pw_multiselect',
+                'options' => $this->availableOrderStatuses(),
+                'default' => array('all'),
+                'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN)
+            ));*/
             //Next order tab
             $next_order_coupon = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful',

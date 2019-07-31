@@ -229,6 +229,7 @@ class AbandonedCart
      */
     function userSignedUp($user_id)
     {
+        echo $user_id;
         global $wpdb;
         global $woocommerce;
         //Don't create a record unless a user is logging in with something in their cart
@@ -342,11 +343,15 @@ class AbandonedCart
                                             $encoding_cart = http_build_query($need_to_encode);
                                             $validate_cart = $this->encryptValidate($encoding_cart);
                                             $cart_recovery_link = $site_url . '/?retainful_cart_action=recover&validate=' . $validate_cart . '&lang=' . $history->language_code;
+                                            $extra_fields = (isset($template->extra)) ? $template->extra : '{}';
+                                            $extra_data = json_decode($extra_fields, true);
+                                            $selected_coupon = isset($extra_data['coupon_code']) ? $extra_data['coupon_code'] : '';
                                             $replace = array(
                                                 'customer_name' => $customer_name,
                                                 'site_url' => $site_url,
                                                 'cart_recovery_link' => $cart_recovery_link,
                                                 'user_cart' => $cart_html,
+                                                'recovery_coupon' => $selected_coupon,
                                                 'site_footer' => '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . __(' All rights reserved.', RNOC_TEXT_DOMAIN)
                                             );
                                             foreach ($replace as $short_code => $short_code_value) {
@@ -901,29 +906,28 @@ class AbandonedCart
     function saveEmailTemplate()
     {
         $template_id = 0;
-        if (isset($_REQUEST['data']) && !empty($_REQUEST['data'])) {
-            $data = $_REQUEST['data'];
-            if (isset($data['id'])) {
-                $template = $this->getTemplate($data['id']);
-                $template_name = sanitize_text_field((isset($data['template_name'])) ? $data['template_name'] : '');
-                $subject = sanitize_text_field((isset($data['subject'])) ? $data['subject'] : '');
-                $body = stripslashes((isset($data['body'])) ? $data['body'] : '');
-                $frequency = intval((isset($data['frequency'])) ? $data['frequency'] : 1);
-                $day_or_hour = sanitize_text_field((isset($data['day_or_hour'])) ? $data['day_or_hour'] : 'Hours');
-                $is_active = intval((isset($data['active'])) ? $data['active'] : 1);
-                $lang_helper = new MultiLingual();
-                $default_lang = $lang_helper->getDefaultLanguage();
-                $language_code = sanitize_text_field((isset($data['language_code'])) ? $data['language_code'] : $default_lang);
-                global $wpdb;
-                if (!empty($template)) {
-                    $template_id = $template->id;
-                    $query_update = "UPDATE `" . $this->email_templates_table . "` SET template_name=%s, subject=%s, body=%s, frequency=%s, day_or_hour=%s, is_active=%s, language_code=%s WHERE id=%d";
-                    $wpdb->query($wpdb->prepare($query_update, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $language_code, $template_id));
-                } else {
-                    $insert_query = "INSERT INTO `" . $this->email_templates_table . "`(template_name, subject, body, frequency, day_or_hour, is_active,language_code) VALUES ( %s,%s,%s,%d,%s,%s,%s)";
-                    $wpdb->query($wpdb->prepare($insert_query, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $language_code));
-                    $template_id = $wpdb->insert_id;
-                }
+        $data = $_REQUEST;
+        if (isset($data['id'])) {
+            $template = $this->getTemplate($data['id']);
+            $template_name = sanitize_text_field((isset($data['template_name'])) ? $data['template_name'] : '');
+            $subject = sanitize_text_field((isset($data['subject'])) ? $data['subject'] : '');
+            $body = stripslashes((isset($data['body'])) ? $data['body'] : '');
+            $frequency = intval((isset($data['frequency'])) ? $data['frequency'] : 1);
+            $day_or_hour = sanitize_text_field((isset($data['day_or_hour'])) ? $data['day_or_hour'] : 'Hours');
+            $is_active = intval((isset($data['active'])) ? $data['active'] : 1);
+            $extra = isset($data['extra']) && is_array($data['extra']) ? json_encode($data['extra']) : '{}';
+            $lang_helper = new MultiLingual();
+            $default_lang = $lang_helper->getDefaultLanguage();
+            $language_code = sanitize_text_field((isset($data['language_code'])) ? $data['language_code'] : $default_lang);
+            global $wpdb;
+            if (!empty($template)) {
+                $template_id = $template->id;
+                $query_update = "UPDATE `" . $this->email_templates_table . "` SET template_name=%s, subject=%s, body=%s, frequency=%s, day_or_hour=%s, is_active=%s,extra=%s, language_code=%s WHERE id=%d";
+                $wpdb->query($wpdb->prepare($query_update, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $extra, $language_code, $template_id));
+            } else {
+                $insert_query = "INSERT INTO `" . $this->email_templates_table . "`(template_name, subject, body, frequency, day_or_hour, is_active,language_code,extra) VALUES ( %s,%s,%s,%d,%s,%s,%s,%s)";
+                $wpdb->query($wpdb->prepare($insert_query, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $language_code, $extra));
+                $template_id = $wpdb->insert_id;
             }
         }
         wp_send_json(array('id' => $template_id, 'success' => true, 'message' => __('Template saved successfully!', RNOC_TEXT_DOMAIN)));
@@ -989,6 +993,7 @@ class AbandonedCart
         $response = array();
         if (isset($_REQUEST['email_to']) && !empty($_REQUEST['email_to']) && isset($_REQUEST['body']) && !empty($_REQUEST['body'])) {
             $template = stripslashes($_REQUEST['body']);
+            $coupon_code = stripslashes(isset($_REQUEST['coupon_code']) ? $_REQUEST['coupon_code'] : '');
             $send_to = sanitize_text_field($_REQUEST['email_to']);
             $customer_name = 'Customer Name';
             $admin_email = 'test@test.com';
@@ -1002,66 +1007,17 @@ class AbandonedCart
                 $email_subject = 'Hey {{customer_name}} You left something in your cart';
             }
             $email_subject = str_replace('{{customer_name}}', $customer_name, $email_subject);
-            $cart_html = '
-                <table cellspacing="0" cellpadding="0" border="0" class="el-table__header"
-               style="width: 600px;padding: 0px 20px;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;">
-                    <thead>
-                    <tr style="text-align: left;">
-                        <th style="line-height: 56px;width: 20%;padding: 2% 0px;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;text-align: left;">' . __("Item", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                        <th style="width: 20%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Name", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                        <th style="width: 17%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Quantity", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                        <th style="width: 20%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Price", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                        <th style="width: 23%;">
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 16px;">' . __("Line Subtotal", RNOC_TEXT_DOMAIN) . ' </span>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr style="line-height: 25px;padding: 20px 0px 20px;">
-                        <td>
-                        <img alt="Sample product" height="auto" src="' . RNOC_PLUGIN_URL . 'src/assets/images/sample-product.jpg"width="80">
-                        </td>
-                        <td>
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">Sample product</span>
-                        </td>
-                        <td>
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">2</span>
-                        </td>
-                        <td>
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $this->wc_functions->formatPrice(100) . '</span>
-                        </td>
-                        <td>
-                            <span style="white-space: normal;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;">' . $this->wc_functions->formatPrice(200) . '</span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <table cellspacing="0" cellpadding="0" border="0" class="el-table__header"
-                       style="width: 600px;padding: 0px 20px;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;">
-                    <tbody>
-                    <tr style="background-color:#fff;">
-        
-                        <td style="vertical-align:top;padding: 15px 40px;text-align: right;border-top: 1px solid #e5e5e5;width: 80%;border-bottom: 1px solid #e5e5e5;">
-                            <span style="font-weight: 800;line-height: 24px;padding-left: 15px;font-family: Lato,Helvetica,sans-serif;padding-right: 15px;font-size: 15px;">' . __("Cart Total", RNOC_TEXT_DOMAIN) . '</span>
-                        </td>
-                        <td style="vertical-align:top;padding: 15px 0px;text-align: left;border-top: 1px solid #e5e5e5;width: 20%;border-bottom: 1px solid #e5e5e5;">
-                            <span style="font-weight: 800;line-height: 24px;padding-left: 0px;font-family: Lato,Helvetica,sans-serif;padding-right: 14px;font-size: 15px;">' . $this->wc_functions->formatPrice(200) . '</span>
-                        </td>
-        
-                    </tr>
-                    </tbody>
-                </table>';
+            $override_path = get_theme_file_path('retainful/templates/abandoned_cart.php');
+            $cart_template_path = RNOC_PLUGIN_PATH . 'src/admin/templates/abandoned_cart.php';
+            if (file_exists($override_path)) {
+                $cart_template_path = $override_path;
+            }
+            $line_items[] = array('name' => 'Sample product', 'image_url' => RNOC_PLUGIN_URL . 'src/assets/images/sample-product.jpg', 'quantity_total' => 2, 'item_subtotal' => $this->wc_functions->formatPrice(100), 'item_total_display' => $this->wc_functions->formatPrice(200));
+            $cart_html = $this->getTemplateContent($cart_template_path, array('line_items' => $line_items, 'cart_total' => $this->wc_functions->formatPrice(200)));
             $replace = array(
                 'customer_name' => $customer_name,
                 'site_url' => '',
+                'recovery_coupon' => $coupon_code,
                 'cart_recovery_link' => '',
                 'user_cart' => $cart_html,
                 'site_footer' => '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . __(' All rights reserved.', RNOC_TEXT_DOMAIN)

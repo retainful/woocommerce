@@ -39,6 +39,8 @@ class CMB2_Field_Edit_Email_Template
         $api = new \Rnoc\Retainful\library\RetainfulApi();
         $language_helper = new \Rnoc\Retainful\Integrations\MultiLingual();
         $default_language = $language_helper->getDefaultLanguage();
+        $extra_fields = (isset($template->extra)) ? $template->extra : '{}';
+        $extra_data = json_decode($extra_fields, true);
         ?>
         </form>
         <div class="rnoc-alert"
@@ -64,7 +66,7 @@ class CMB2_Field_Edit_Email_Template
             <div class="cmb2-metabox cmb-field-list">
                 <div class="cmb-row table-layout">
                     <div class="cmb-th">
-                        <label for="field_template_name"><?php echo __('Template Name'); ?></label>
+                        <label for="field_template_name"><?php echo __('Template Name', RNOC_TEXT_DOMAIN); ?></label>
                     </div>
                     <div class="cmb-td">
                         <input name="template_name" type="text" class="regular-text"
@@ -78,7 +80,7 @@ class CMB2_Field_Edit_Email_Template
                 </div>
                 <div class="cmb-row table-layout">
                     <div class="cmb-th">
-                        <label for="field_subject"><?php echo __('Template Subject'); ?></label>
+                        <label for="field_subject"><?php echo __('Template Subject', RNOC_TEXT_DOMAIN); ?></label>
                     </div>
                     <div class="cmb-td">
                         <input name="subject" type="text"
@@ -90,7 +92,31 @@ class CMB2_Field_Edit_Email_Template
                 </div>
                 <div class="cmb-row table-layout">
                     <div class="cmb-th">
-                        <label><?php echo __('Email Body'); ?></label>
+                        <label for="field_coupon_code"><?php echo __('Coupon code for recovery email', RNOC_TEXT_DOMAIN); ?></label>
+                    </div>
+                    <div class="cmb-td">
+                        <select name="extra[coupon_code]"
+                                class="regular-text" id="field_coupon_code">
+                            <option value=""><?php echo __('Select', RNOC_TEXT_DOMAIN) ?></option>
+                            <?php
+                            $selected = isset($extra_data['coupon_code']) ? $extra_data['coupon_code'] : '';
+                            $coupons_list = $this->getWooCouponCodes();
+                            if (!empty($coupons_list)) {
+                                foreach ($coupons_list as $key => $value) {
+                                    ?>
+                                    <option value="<?php echo $value; ?>" <?php echo ($key == $selected) ? 'selected' : '' ?>> <?php echo $value; ?></option>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </select>
+                        <br>
+                        <em><?php echo __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOCP_TEXT_DOMAIN); ?></em>
+                    </div>
+                </div>
+                <div class="cmb-row table-layout">
+                    <div class="cmb-th">
+                        <label><?php echo __('Email Body', RNOC_TEXT_DOMAIN); ?></label>
                     </div>
                     <div class="cmb-td">
                         <div class="rnoc-grid">
@@ -141,7 +167,7 @@ class CMB2_Field_Edit_Email_Template
                         </div>
                         <?php
                         wp_editor(isset($template->body) ? $template->body : '', 'email_template_body');
-                        echo __('You can use following short codes in your email template:<br> <b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - Site link<br> <b>{{cart_recovery_link}}</b> - Link to recover user cart<br><b>{{user_cart}}</b> - Cart details', RNOC_TEXT_DOMAIN)
+                        echo __('You can use following short codes in your email template:<br> <b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - Site link<br> <b>{{cart_recovery_link}}</b> - Link to recover user cart<br><b>{{user_cart}}</b> - Cart details<br><b>{{recovery_coupon}}</b> - Coupon code to send along with recovery mail,Please choose the coupon above.', RNOC_TEXT_DOMAIN)
                         ?>
                     </div>
                 </div>
@@ -287,6 +313,16 @@ class CMB2_Field_Edit_Email_Template
                 }
             </style>
         <?php
+    }
+
+    /**
+     * select coupon
+     * @return array
+     */
+    function getWooCouponCodes()
+    {
+        $posts = get_posts(array('post_type' => 'shop_coupon', 'post_status' => 'publish'));
+        return wp_list_pluck($posts, 'post_title', 'post_title');
     }
 }
 

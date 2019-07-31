@@ -5,6 +5,7 @@
         var editorContent = "";
         var email_to = $("#test_mail_to").val();
         var subject = $("#field_subject").val();
+        var coupon_code = $("#field_coupon_code").val();
         if (tinyMCE.activeEditor != null) {
             editorContent = tinyMCE.activeEditor.getContent();
         }
@@ -15,7 +16,7 @@
                 url: email_template.path,
                 type: 'POST',
                 dataType: "json",
-                data: {action: 'rnoc_send_sample_email', email_to: email_to, body: editorContent, subject: subject},
+                data: {action: 'rnoc_send_sample_email', email_to: email_to, body: editorContent, subject: subject,coupon_code:coupon_code},
                 success: function (response) {
                     if (response.error) {
                         alert(response.message);
@@ -41,6 +42,7 @@
         var template = $('.create-or-edit-template-form').find('select, textarea, input');
         var formdata = template.serializeArray();
         var data = {};
+        data['action'] = 'rnoc_save_email_template';
         $(formdata).each(function (index, obj) {
             if (obj.name !== "email_template_body") {
                 data[obj.name] = obj.value;
@@ -52,12 +54,11 @@
                 data['body'] = editorContent;
             }
         });
-
         $.ajax({
             url: path,
             type: 'POST',
             dataType: "json",
-            data: {action: 'rnoc_save_email_template', data: data},
+            data: data,
             success: function (response) {
                 if (response.success) {
                     $("#field_id").val(response.id);
