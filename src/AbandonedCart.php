@@ -229,7 +229,6 @@ class AbandonedCart
      */
     function userSignedUp($user_id)
     {
-        echo $user_id;
         global $wpdb;
         global $woocommerce;
         //Don't create a record unless a user is logging in with something in their cart
