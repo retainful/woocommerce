@@ -274,7 +274,7 @@ class AbandonedCart
             $hour_seconds = 3600;//60*60
             $day_seconds = 86400;//60*60*24
             foreach ($email_templates as $template) {
-                if ($template->frequency && !empty($template->body)) {
+                if ($template->frequency && !empty($template->frequency) && !empty($template->body)) {
                     global $wpdb;
                     $time = ($template->day_or_hour == "Days") ? $day_seconds : $hour_seconds;
                     $current_time = current_time('timestamp');
@@ -1135,5 +1135,32 @@ class AbandonedCart
     function getBaseCurrency()
     {
         return $this->wc_functions->getDefaultCurrency();
+    }
+
+    /**
+     * get the emails sent history
+     * @param $start
+     * @param $limit
+     * @param string $order_by
+     * @param string $order_by_value
+     * @return array|object|null
+     */
+    function sentEmailsHistory($start, $limit, $order_by = "sent_time", $order_by_value = "DESC")
+    {
+        global $wpdb;
+        $email_sent_history_query = "SELECT * FROM `" . $this->email_history_table . "` ORDER BY {$order_by} {$order_by_value} LIMIT {$limit} OFFSET {$start}";
+        return $wpdb->get_results($email_sent_history_query);
+    }
+
+    /**
+     * get the count of number of emails sent
+     * @return mixed
+     */
+    function getTotalEmailsSent()
+    {
+        global $wpdb;
+        $email_sent_history_count_query = "SELECT count(id) as total_mails_sent FROM `" . $this->email_history_table . "`";
+        $count = $wpdb->get_row($email_sent_history_count_query);
+        return $count->total_mails_sent;
     }
 }

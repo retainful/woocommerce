@@ -115,25 +115,22 @@ class Settings
                 ));
             }
             //Sent Emails Tab
-            /*$sent_emails_list = new_cmb2_box(array(
+            $sent_emails_list = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_sent_emails',
-                'title' => __('Sent E-Mails', RNOC_TEXT_DOMAIN),
+                'title' => __('Abandoned cart sent E-mails', RNOC_TEXT_DOMAIN),
+                'object_types' => array('options-page'),
+                'option_key' => $this->slug . '_abandoned_cart_sent_emails',
+                'tab_group' => $this->slug,
                 'parent_slug' => $this->slug,
                 'capability' => 'edit_shop_coupons',
-                'object_types' => array('options-page'),
-                'option_key' => $this->slug,
-                'tab_group' => $this->slug,
                 'tab_title' => __('Sent E-Mails', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
             $sent_emails_list->add_field(array(
-                'name' => __('Order Status', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'preferred_order_status',
-                'type' => 'pw_multiselect',
-                'options' => $this->availableOrderStatuses(),
-                'default' => array('all'),
-                'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN)
-            ));*/
+                'name' => '',
+                'id' => RNOC_PLUGIN_PREFIX . 'sent_emails_list',
+                'type' => 'abandoned_cart_sent_emails'
+            ));
             //Next order tab
             $next_order_coupon = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful',
@@ -496,7 +493,7 @@ class Settings
             ));
         });
         $page = isset($_GET['page']) ? $_GET['page'] : NULL;
-        if (is_admin() && in_array($page, array('retainful_abandoned_cart', 'retainful_abandoned_cart_email_templates', 'retainful', 'retainful_settings', 'retainful_premium', 'retainful_license'))) {
+        if (is_admin() && in_array($page, array('retainful_abandoned_cart', 'retainful_abandoned_cart_email_templates', 'retainful', 'retainful_settings', 'retainful_premium', 'retainful_license', 'retainful_abandoned_cart_sent_emails'))) {
             $this->addScript();
         }
     }
