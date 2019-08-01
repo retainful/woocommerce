@@ -111,7 +111,7 @@ class CMB2_Field_Edit_Email_Template
                             ?>
                         </select>
                         <br>
-                        <em><?php echo __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOCP_TEXT_DOMAIN); ?></em>
+                        <em><?php echo __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN); ?></em>
                     </div>
                 </div>
                 <div class="cmb-row table-layout">

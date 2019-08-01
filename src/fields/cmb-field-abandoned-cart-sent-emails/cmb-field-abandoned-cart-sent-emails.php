@@ -21,7 +21,6 @@ class CMB2_Field_Abandoned_Cart_Sent_Emails
      */
     public function render_abandoned_cart_sent_emails($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
     {
-//        $this->setupAdminScripts();
         $abandoned_cart_obj = new \Rnoc\Retainful\AbandonedCart();
         $settings = new \Rnoc\Retainful\Admin\Settings();
         $limit = 20;
@@ -43,13 +42,12 @@ class CMB2_Field_Abandoned_Cart_Sent_Emails
         );
         $pagination = new \Rnoc\Retainful\Library\Pagination($pagConfig);
         ?>
-
-
         <table class="retainful_abandoned_table">
             <thead class="bg-light">
             <tr class="border-0">
                 <th class="border-0"><?php echo __('Date', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Email', RNOC_TEXT_DOMAIN); ?></th>
+                <th class="border-0"><?php echo __('Subject', RNOC_TEXT_DOMAIN); ?></th>
             </tr>
             </thead>
             <tbody>
@@ -64,6 +62,9 @@ class CMB2_Field_Abandoned_Cart_Sent_Emails
                         <td class="email-section">
                             <a href="mailto:<?php echo $email->sent_email_id ?>"><?php echo $email->sent_email_id ?></a>
                         </td>
+                        <td class="email-section">
+                            <?php echo $email->subject ?>
+                        </td>
                     </tr>
                     <?php
                 }
@@ -71,7 +72,7 @@ class CMB2_Field_Abandoned_Cart_Sent_Emails
                 ?>
                 <tr>
                     <td colspan="8">
-                        <p><?php echo __('No E-Mails sent!', RNOC_TEXT_DOMAIN); ?></p>
+                        <p style="text-align: center;color: red"><?php echo __('No E-Mails sent!', RNOC_TEXT_DOMAIN); ?></p>
                     </td>
                 </tr>
                 <?php
@@ -96,15 +97,6 @@ class CMB2_Field_Abandoned_Cart_Sent_Emails
             }
         </style>
         <?php
-    }
-
-    /**±
-     * Enqueue scripts and styles
-     */
-    public function setupAdminScripts()
-    {
-        $asset_path = apply_filters('cmb2_field_abandoned_cart_dashboard_asset_path', plugins_url('', __FILE__));
-        wp_enqueue_style('abandoned-cart-dashboard', $asset_path . '/css/main.css', array(), RNOC_VERSION);
     }
 }
 

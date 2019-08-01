@@ -329,8 +329,8 @@ class AbandonedCart
                                             $email_body = stripslashes($template->body);
                                             $cart_html = $this->getCartTable($cart_details, $history->currency_code);
                                             //Log about emil sent
-                                            $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id ) VALUES ( %s, %s, '" . current_time('mysql') . "', %s )";
-                                            $wpdb->query($wpdb->prepare($email_sent_query, $template->id, $history_id, $user_email));
+                                            $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id,subject ) VALUES ( %s, %s, '" . current_time('mysql') . "', %s, %s )";
+                                            $wpdb->query($wpdb->prepare($email_sent_query, $template->id, $history_id, $user_email, $email_subject));
                                             $site_url = site_url();
                                             $cart_page_link = $this->wc_functions->getCartUrl();
                                             $need_to_encode = array(
@@ -1148,7 +1148,7 @@ class AbandonedCart
     function sentEmailsHistory($start, $limit, $order_by = "sent_time", $order_by_value = "DESC")
     {
         global $wpdb;
-        $email_sent_history_query = "SELECT * FROM `" . $this->email_history_table . "` ORDER BY {$order_by} {$order_by_value} LIMIT {$limit} OFFSET {$start}";
+        $email_sent_history_query = "SELECT history.sent_time,history.sent_email_id,(CASE WHEN history.subject IS NULL THEN template.subject ELSE history.subject END) as subject FROM `{$this->email_history_table}` as history LEFT JOIN `{$this->email_templates_table}` as template ON history.template_id = template.id ORDER BY {$order_by} {$order_by_value} LIMIT {$limit} OFFSET {$start}";
         return $wpdb->get_results($email_sent_history_query);
     }
 

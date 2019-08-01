@@ -178,7 +178,7 @@ class Main
             $this->migrationV123();
         }
 
-        $is_retainful_v1_2_5_migration_completed = get_option('is_retainful_v1_2_5_migration_completed', 0);
+        $is_retainful_v1_2_5_migration_completed = get_option('is_retainful_v1_25_migration_completed', 0);
         if (!$is_retainful_v1_2_5_migration_completed) {
             $this->migrationV125();
         }
@@ -208,7 +208,10 @@ class Main
         $table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates';
         $query = "ALTER TABLE {$table_name} ADD COLUMN `extra` TEXT DEFAULT NULL";
         $wpdb->query($query);
-        update_option('is_retainful_v1_2_5_migration_completed', '1');
+        $history_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_sent_history';
+        $history_query = "ALTER TABLE {$history_table_name} ADD COLUMN `subject` TEXT DEFAULT NULL";
+        $wpdb->query($history_query);
+        update_option('is_retainful_v1_25_migration_completed', '1');
     }
 
     /**
