@@ -28,44 +28,6 @@ class CMB2_Field_Email_After
     }
 
     /**
-     * Sort array by key
-     * @param $array
-     * @param $on
-     * @param int $order
-     * @return array
-     */
-    function sortArray($array, $on, $order = SORT_ASC)
-    {
-        $new_array = array();
-        $sortable_array = array();
-        if (count($array) > 0) {
-            foreach ($array as $k => $v) {
-                if (is_array($v)) {
-                    foreach ($v as $k2 => $v2) {
-                        if ($k2 == $on) {
-                            $sortable_array[$k] = $v2;
-                        }
-                    }
-                } else {
-                    $sortable_array[$k] = $v;
-                }
-            }
-            switch ($order) {
-                case SORT_ASC:
-                    asort($sortable_array);
-                    break;
-                case SORT_DESC:
-                    arsort($sortable_array);
-                    break;
-            }
-            foreach ($sortable_array as $k => $v) {
-                $new_array[$k] = $array[$k];
-            }
-        }
-        return $new_array;
-    }
-
-    /**
      * Render select box field
      */
     public function render_email_templates($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
@@ -108,19 +70,9 @@ class CMB2_Field_Email_After
                 <?php
                 $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
                 $settings = new \Rnoc\Retainful\Admin\Settings();
-                $templates = $abandoned_cart->getEmailTemplates($active_language);
-                $arranged_templates = array();
-                if (!empty($templates)) {
-                    foreach ($templates as $template) {
-                        $in_sec = ($template->day_or_hour == "Days") ? 86400 : 3600;
-                        $choosen_time = intval($template->frequency) * $in_sec;
-                        $arranged_templates[] = array('time' => $choosen_time, 'template' => $template);
-                    }
-                    $arranged_templates = $this->sortArray($arranged_templates, 'time');
-                }
+                $arranged_templates = $abandoned_cart->getEmailTemplates($active_language);
                 if (!empty($arranged_templates)) {
-                    foreach ($arranged_templates as $arranged_template) {
-                        $template = $arranged_template['template'];
+                    foreach ($arranged_templates as $template) {
                         ?>
                         <li class="retainful_abandoned_email-event" id="template-no-<?php echo $template->id ?>">
                             <label class="retainful_abandoned_email-event-icon <?php echo ($template->is_active == 1) ? ' edit-brd' : ' delete-brd'; ?>"><span
@@ -133,8 +85,7 @@ class CMB2_Field_Email_After
                                             <h5 class="handle"><?php echo $template->template_name; ?></h5>
                                             <span class="qa-message-when-data">
                                                 <span class="handle-label"><?php echo __('Subject: ', RNOC_TEXT_DOMAIN) ?></span>
-                                                    <b><?php
-                                                        echo $template->subject; ?></b></span>
+                                                    <b><?php echo $template->subject; ?></b></span>
                                         </div>
                                         <div class="user-option">
                                             <h5 class="handle-label"><?php echo __('Sent Emails', RNOC_TEXT_DOMAIN); ?></h5>

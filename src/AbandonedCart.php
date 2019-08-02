@@ -9,7 +9,7 @@ use Rnoc\Retainful\Integrations\MultiLingual;
 class AbandonedCart
 {
     protected static $applied_coupons = NULL;
-    public $wc_functions, $admin, $cart_history_table, $email_history_table, $email_templates_table, $guest_cart_history_table, $total_order_amount, $total_abandoned_cart_count, $total_recover_amount, $recovered_item;
+    public $wc_functions, $admin, $cart_history_table, $email_queue_table, $email_history_table, $email_templates_table, $guest_cart_history_table, $total_order_amount, $total_abandoned_cart_count, $total_recover_amount, $recovered_item;
     public $start_end_dates = array(), $start_end_dates_label = array();
 
     function __construct()
@@ -39,6 +39,7 @@ class AbandonedCart
         $this->cart_history_table = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history';
         $this->guest_cart_history_table = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'guest_abandoned_cart_history';
         $this->email_history_table = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_sent_history';
+        $this->email_queue_table = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_email_queue';
         $this->email_templates_table = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates';
     }
 
@@ -133,6 +134,23 @@ class AbandonedCart
     }
 
     /**
+     * Schedule email templates to queue
+     * @param $cart_id
+     * @param $expired_time
+     */
+    function scheduleEmailTemplate($cart_id, $expired_time)
+    {
+        global $wpdb;
+        $query = "SELECT template.id, template.send_after_time FROM `{$this->email_templates_table}` AS template LEFT JOIN `{$this->email_queue_table}` AS queue ON queue.template_id = template.id AND queue.cart_id = {$cart_id}  WHERE queue.template_id IS NULL AND(SELECT count(id) FROM `{$this->email_history_table}` WHERE template_id=queue.template_id AND abandoned_order_id = queue.cart_id) = 0 AND template.is_active ='1' ORDER BY template.send_after_time ASC LIMIT 1";
+        $result = $wpdb->get_row($query);
+        if (!empty($result)) {
+            $insert_query = "INSERT INTO `{$this->email_queue_table}` (template_id, cart_id, is_completed,run_at) VALUES ('%d','%d','%d','%d')";
+            $run_at = $expired_time + $result->send_after_time;
+            $wpdb->query($wpdb->prepare($insert_query, array($result->id, $cart_id, 0, $run_at)));
+        }
+    }
+
+    /**
      * Capture the cart and insert the information of the cart into DataBase.
      */
     function userCartUpdated()
@@ -145,6 +163,15 @@ class AbandonedCart
         $cart = $woocommerce->cart;
         if (is_user_logged_in()) {
             $customer_id = get_current_user_id();
+            $customer_session_key = $this->getUserSessionKey();
+            $guest_row = $wpdb->get_row('SELECT id FROM ' . $this->cart_history_table . ' WHERE customer_key = \'' . $customer_session_key . '\' AND cart_is_recovered = 0 AND order_id IS NULL LIMIT 1', OBJECT);
+            if (!empty($guest_row)) {
+                $wpdb->update(
+                    $this->cart_history_table,
+                    array('customer_key' => $customer_id),
+                    array('id' => $guest_row->id)
+                );
+            }
         } else {
             //Can't look up the customer in this situation.
             if (!isset($woocommerce->session)) {
@@ -171,6 +198,7 @@ class AbandonedCart
                 array('language_code' => $language_code, 'currency_code' => $currency_code, 'customer_key' => $customer_id, 'cart_contents' => json_encode($this->wc_functions->getCart()), 'cart_expiry' => $current_time + $cart_cut_off_time, 'cart_is_recovered' => 0, 'show_on_funnel_report' => 1, 'ip_address' => $_SERVER['REMOTE_ADDR'], 'item_count' => $cart->cart_contents_count, 'cart_total' => $cart->cart_contents_total),
                 array('%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%d')
             );
+            $this->scheduleEmailTemplate($wpdb->insert_id, $current_time + $cart_cut_off_time);
         } else {
             $update_values = null;
             if (is_checkout() || $current_time - $cart_cut_off_time > $row->cart_expiry) {
@@ -263,12 +291,128 @@ class AbandonedCart
     }
 
     /**
+     * Delete the queue
+     * @param $queue_id
+     */
+    function deleteQueue($queue_id)
+    {
+        global $wpdb;
+        $wpdb->delete($this->email_queue_table, array('id' => $queue_id), $where_format = null);
+    }
+
+    /**
      * Automatically send customer recovery email
      * This function will call in every 5 minutes
      */
     function sendAbandonedCartEmails()
     {
-        $email_templates = $this->getActiveEmailTemplates();
+        global $wpdb;
+        $current_time = current_time('timestamp');
+        $to_remain_history_query = "SELECT history.*,queue.id as queue_id,template.language_code as template_language_code,template.id as template_id,template.subject,template.extra ,template.body FROM `{$this->email_queue_table}` AS queue LEFT JOIN `{$this->cart_history_table}` AS history ON history.id = queue.cart_id LEFT JOIN `{$this->email_templates_table}` as template ON template.id = queue.template_id WHERE queue.is_completed = 0 AND queue.run_at < {$current_time} AND history.cart_is_recovered = 0 AND history.order_id IS NULL";
+        $to_remain_histories = $wpdb->get_results($to_remain_history_query);
+        if (!empty($to_remain_histories)) {
+            $email_templates_settings = $this->admin->getEmailTemplatesSettings();
+            foreach ($to_remain_histories as $history) {
+                if (isset($history->cart_contents) && $history->template_language_code == $history->language_code) {
+                    $cart_details = json_decode($history->cart_contents);
+                    if (!empty($cart_details)) {
+                        $history_id = $history->id;
+                        //Check each email template is sent or not
+                        $email_sent_history_query = "SELECT * FROM `" . $this->email_history_table . "` WHERE  template_id = %s AND abandoned_order_id = %d";
+                        $email_sent_history = $wpdb->get_results($wpdb->prepare($email_sent_history_query, $history->template_id, $history_id));
+                        if (empty($email_sent_history)) {
+                            $user_email = $user_first_name = $user_last_name = '';
+                            $customer_key = $history->customer_key;
+                            if (!is_numeric($customer_key)) {
+                                $query_guest = "SELECT billing_first_name, billing_last_name, email_id FROM `" . $this->guest_cart_history_table . "` WHERE session_id = %s";
+                                $results_guest = $wpdb->get_row($wpdb->prepare($query_guest, $customer_key), OBJECT);
+                                if (!empty($results_guest) && isset($results_guest->email_id)) {
+                                    $user_email = $results_guest->email_id;
+                                    $user_first_name = $results_guest->billing_first_name;
+                                    $user_last_name = $results_guest->billing_last_name;
+                                }
+                            } else if (is_numeric($customer_key)) {
+                                $user_email = get_user_meta($customer_key, 'billing_email', true);
+                                $user_first_name = get_user_meta($customer_key, 'billing_first_name', true);
+                                $user_last_name = get_user_meta($customer_key, 'billing_last_name', true);
+                                $user_data = get_userdata($customer_key);
+                                if (isset($user_first_name) && $user_first_name == "") {
+                                    if (isset($user_data->display_name)) {
+                                        $user_first_name = $user_data->display_name;
+                                    }
+                                }
+                                if (isset($user_email) && $user_email == "") {
+                                    if (isset($user_data->user_email)) {
+                                        $user_email = $user_data->user_email;
+                                    }
+                                }
+                            }
+                            //Process only if user email found
+                            if (!empty($user_email)) {
+                                $customer_name = $user_first_name . ' ' . $user_last_name;
+                                $email_subject = $history->subject;
+                                if (empty($email_subject)) {
+                                    $email_subject = 'Hey {{customer_name}} You left something in your cart';
+                                }
+                                $email_subject = str_replace('{{customer_name}}', $customer_name, $email_subject);
+                                $email_body = stripslashes($history->body);
+                                $cart_html = $this->getCartTable($cart_details, $history->currency_code);
+                                //Log about emil sent
+                                $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id,subject ) VALUES ( %s, %s, %s, %s, %s )";
+                                $wpdb->query($wpdb->prepare($email_sent_query, $history->template_id, $history_id, current_time('mysql'), $user_email, $email_subject));
+                                $this->scheduleEmailTemplate($history->id, $history->cart_expiry);
+                                $this->deleteQueue($history->queue_id);
+                                $site_url = site_url();
+                                $cart_page_link = $this->wc_functions->getCartUrl();
+                                $need_to_encode = array(
+                                    'url' => $cart_page_link,
+                                    'email_sent' => $wpdb->insert_id,
+                                    'abandoned_cart_id' => $history_id,
+                                    'session_id' => $customer_key
+                                );
+                                $encoding_cart = http_build_query($need_to_encode);
+                                $validate_cart = $this->encryptValidate($encoding_cart);
+                                $cart_recovery_link = $site_url . '/?retainful_cart_action=recover&validate=' . $validate_cart . '&lang=' . $history->language_code;
+                                $extra_fields = (isset($history->extra)) ? $history->extra : '{}';
+                                $extra_data = json_decode($extra_fields, true);
+                                $selected_coupon = isset($extra_data['coupon_code']) ? $extra_data['coupon_code'] : '';
+                                $replace = array(
+                                    'customer_name' => $customer_name,
+                                    'site_url' => $site_url,
+                                    'cart_recovery_link' => $cart_recovery_link,
+                                    'user_cart' => $cart_html,
+                                    'recovery_coupon' => $selected_coupon,
+                                    'site_footer' => '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . __(' All rights reserved.', RNOC_TEXT_DOMAIN)
+                                );
+                                foreach ($replace as $short_code => $short_code_value) {
+                                    $email_body = str_replace('{{' . $short_code . '}}', $short_code_value, $email_body);
+                                }
+                                $from_name = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'] : 'Admin';
+                                $admin_email = get_option('admin_email');
+                                $from_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'] : $admin_email;
+                                $replay_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'] : $admin_email;
+                                //Prepare for sending emails
+                                $charset = (function_exists('get_bloginfo')) ? get_bloginfo('charset') : 'UTF-8';
+                                //Prepare for sending emails
+                                $headers = array(
+                                    "From: \"$from_name\" <$from_address>",
+                                    "Return-Path: <" . $from_address . ">",
+                                    "Reply-To: \"" . $from_name . "\" <" . $replay_address . ">",
+                                    "MIME-Version: 1.0",
+                                    "X-Mailer: PHP" . phpversion(),
+                                    "Content-Type: text/html; charset=\"" . $charset . "\""
+                                );
+                                $header = implode("\n", $headers);
+                                //Send mail
+                                wc_mail($user_email, $email_subject, $email_body, $header);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return;
+        /*$email_templates = $this->getActiveEmailTemplates();
         $email_templates_settings = $this->admin->getEmailTemplatesSettings();
         if (!empty($email_templates)) {
             $hour_seconds = 3600;//60*60
@@ -329,8 +473,8 @@ class AbandonedCart
                                             $email_body = stripslashes($template->body);
                                             $cart_html = $this->getCartTable($cart_details, $history->currency_code);
                                             //Log about emil sent
-                                            $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id,subject ) VALUES ( %s, %s, '" . current_time('mysql') . "', %s, %s )";
-                                            $wpdb->query($wpdb->prepare($email_sent_query, $template->id, $history_id, $user_email, $email_subject));
+                                            $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id,subject ) VALUES ( %s, %s, %s, %s, %s )";
+                                            $wpdb->query($wpdb->prepare($email_sent_query, $template->id, $history_id, current_time('mysql'), $user_email, $email_subject));
                                             $site_url = site_url();
                                             $cart_page_link = $this->wc_functions->getCartUrl();
                                             $need_to_encode = array(
@@ -382,7 +526,7 @@ class AbandonedCart
                     }
                 }
             }
-        }
+        }*/
     }
 
     /**
@@ -825,10 +969,11 @@ class AbandonedCart
     function getEmailTemplates($language_code = NULL)
     {
         global $wpdb;
-        $query = "SELECT t.template_name, t.id, t.is_active, t.frequency, t.day_or_hour, t.default_template, t.subject, (select count(id) from {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_sent_history where template_id = t.id) AS emails_sent FROM {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_templates AS t";
+        $query = "SELECT t.template_name, t.id, t.is_active, t.frequency, t.day_or_hour, t.default_template, t.subject, (select count(id) from {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_sent_history where template_id = t.id) AS emails_sent FROM {$wpdb->prefix}" . RNOC_PLUGIN_PREFIX . "email_templates AS t ";
         if (!empty($language_code)) {
             $query .= " WHERE t.language_code='{$language_code}'";
         }
+        $query .= ' ORDER BY t.send_after_time ASC';
         return $wpdb->get_results($query);
     }
 
@@ -913,6 +1058,8 @@ class AbandonedCart
             $body = stripslashes((isset($data['body'])) ? $data['body'] : '');
             $frequency = intval((isset($data['frequency'])) ? $data['frequency'] : 1);
             $day_or_hour = sanitize_text_field((isset($data['day_or_hour'])) ? $data['day_or_hour'] : 'Hours');
+            $time = ($day_or_hour == "Days") ? 86400 : 3600;
+            $time_to_send_template_after = $frequency * $time;
             $is_active = intval((isset($data['active'])) ? $data['active'] : 1);
             $extra = isset($data['extra']) && is_array($data['extra']) ? json_encode($data['extra']) : '{}';
             $lang_helper = new MultiLingual();
@@ -921,11 +1068,11 @@ class AbandonedCart
             global $wpdb;
             if (!empty($template)) {
                 $template_id = $template->id;
-                $query_update = "UPDATE `" . $this->email_templates_table . "` SET template_name=%s, subject=%s, body=%s, frequency=%s, day_or_hour=%s, is_active=%s,extra=%s, language_code=%s WHERE id=%d";
-                $wpdb->query($wpdb->prepare($query_update, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $extra, $language_code, $template_id));
+                $query_update = "UPDATE `" . $this->email_templates_table . "` SET template_name=%s, subject=%s, body=%s, frequency=%s, day_or_hour=%s, is_active=%s,extra=%s, language_code=%s, send_after_time=%d WHERE id=%d";
+                $wpdb->query($wpdb->prepare($query_update, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $extra, $language_code, $time_to_send_template_after, $template_id));
             } else {
-                $insert_query = "INSERT INTO `" . $this->email_templates_table . "`(template_name, subject, body, frequency, day_or_hour, is_active,language_code,extra) VALUES ( %s,%s,%s,%d,%s,%s,%s,%s)";
-                $wpdb->query($wpdb->prepare($insert_query, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $language_code, $extra));
+                $insert_query = "INSERT INTO `" . $this->email_templates_table . "`(template_name, subject, body, frequency, day_or_hour, is_active,language_code,extra,send_after_time) VALUES ( %s,%s,%s,%d,%s,%s,%s,%s,%d)";
+                $wpdb->query($wpdb->prepare($insert_query, $template_name, $subject, $body, $frequency, $day_or_hour, $is_active, $language_code, $extra, $time_to_send_template_after));
                 $template_id = $wpdb->insert_id;
             }
         }

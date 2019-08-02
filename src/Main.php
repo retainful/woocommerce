@@ -149,7 +149,7 @@ class Main
         add_action('wp_loaded', array($this, 'actionSchedulerHooks'));
         add_action('rnoc_abandoned_clear_abandoned_carts', array($this->abandoned_cart, 'clearAbandonedCarts'));
         add_action('rnoc_abandoned_cart_send_email', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
-        //add_action('woocommerce_init', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
+        add_action('wp_loaded', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
         //Process abandoned cart after user place order
         add_action('woocommerce_order_status_pending_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
         add_action('woocommerce_order_status_pending_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
@@ -166,7 +166,8 @@ class Main
         add_action('wp_ajax_rnoc_get_template_by_id', array($this->abandoned_cart, 'getEmailTemplate'));
         $is_abandoned_tables_created = get_option('retainful_abandoned_cart_table_created', 0);
         $is_abandoned_emails_tables_created = get_option('retainful_abandoned_emails_table_created', 0);
-        if (!$is_abandoned_tables_created || !$is_abandoned_emails_tables_created) {
+        $is_abandoned_emails_queue_tables_created = get_option('retainful_abandoned_email_queue_table_created', 0);
+        if (!$is_abandoned_tables_created || !$is_abandoned_emails_tables_created || !$is_abandoned_emails_queue_tables_created) {
             $this->createRequiredTables();
         }
         $is_retainful_v1_2_0_migration_completed = get_option('is_retainful_v1_2_0_migration_completed', 0);
@@ -178,7 +179,7 @@ class Main
             $this->migrationV123();
         }
 
-        $is_retainful_v1_2_5_migration_completed = get_option('is_retainful_v1_25_migration_completed', 0);
+        $is_retainful_v1_2_5_migration_completed = get_option('is_retainful_v1_2__5_migration_completed', 0);
         if (!$is_retainful_v1_2_5_migration_completed) {
             $this->migrationV125();
         }
@@ -208,10 +209,30 @@ class Main
         $table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates';
         $query = "ALTER TABLE {$table_name} ADD COLUMN `extra` TEXT DEFAULT NULL";
         $wpdb->query($query);
+        $this->modifyEmailTemplatesDate();
         $history_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_sent_history';
         $history_query = "ALTER TABLE {$history_table_name} ADD COLUMN `subject` TEXT DEFAULT NULL";
         $wpdb->query($history_query);
-        update_option('is_retainful_v1_25_migration_completed', '1');
+        update_option('is_retainful_v1_2__5_migration_completed', '1');
+    }
+
+    function modifyEmailTemplatesDate()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates';
+        $query = "ALTER TABLE {$table_name} ADD COLUMN `send_after_time` bigint(20) DEFAULT NULL";
+        $wpdb->query($query);
+        $query = "SELECT id,frequency,day_or_hour FROM {$table_name} ";
+        $templates = $wpdb->get_results($query);
+        if (!empty($templates)) {
+            $hour_seconds = 3600;//60*60
+            $day_seconds = 86400;
+            foreach ($templates as $template) {
+                $time = ($template->day_or_hour == "Days") ? $day_seconds : $hour_seconds;
+                $time_to_send_template_after = $template->frequency * $time;
+                $wpdb->update($table_name, array('send_after_time' => $time_to_send_template_after), array('id' => $template->id), array('%d', '%d'));
+            }
+        }
     }
 
     /**
@@ -305,6 +326,17 @@ class Main
         }
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         //Create history table if table is not already exists
+        $queue_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_email_queue';
+        $queue_table_query = "CREATE TABLE IF NOT EXISTS $queue_table_name (
+                            id int AUTO_INCREMENT, 
+                            template_id int NOT NULL, 
+                            cart_id int NOT NULL, 
+                            is_completed int NOT NULL, 
+                            run_at bigint(20) NOT NULL, 
+                            extra_data longtext,
+                            PRIMARY KEY (`id`)
+                            ) $rnoc_collate";
+        dbDelta($queue_table_query);
         $history_table_name = $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history';
         $history_query = "CREATE TABLE IF NOT EXISTS $history_table_name (
                             id int AUTO_INCREMENT, 
@@ -376,6 +408,7 @@ class Main
         $this->insertDefaultEmailTemplate($email_templates_table_name);
         update_option('retainful_abandoned_emails_table_created', '1');
         update_option('retainful_abandoned_cart_table_created', '1');
+        update_option('retainful_abandoned_email_queue_table_created', '1');
     }
 
     /**
