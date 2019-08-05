@@ -71,6 +71,11 @@ class CMB2_Field_Premium_Addon_List
                     'title' => __('Countdown Timer (Premium)', RNOC_TEXT_DOMAIN),
                     'description' => __('Give a clear deadline to grab the offer and add urgency using Countdown timer', RNOC_TEXT_DOMAIN),
                     'icon' => 'dashicons-clock'
+                ),
+                array(
+                    'title' => __('IP Filter (Premium)', RNOC_TEXT_DOMAIN),
+                    'description' => __('Exclude capturing carts from selected IPs or a range of IPs.', RNOC_TEXT_DOMAIN),
+                    'icon' => 'dashicons-clock'
                 )
             );
             ?>

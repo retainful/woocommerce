@@ -19,5 +19,8 @@
                 }
             }
         });
-    })
+    });
+    $(document).on('change', '#select_all_abandoned_carts', function () {
+        $('input:checkbox').not(this).prop('checked', this.checked);
+    });
 })(jQuery);

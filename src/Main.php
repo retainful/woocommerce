@@ -21,7 +21,8 @@ class Main
         $this->rnoc = ($this->rnoc == NULL) ? new OrderCoupon() : $this->rnoc;
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         $this->abandoned_cart = ($this->abandoned_cart == NULL) ? new AbandonedCart() : $this->abandoned_cart;
-        $this->activateEvents();
+        //$this->activateEvents();
+        add_action('init', array($this, 'activateEvents'));
     }
 
     /**
@@ -86,9 +87,7 @@ class Main
         add_action('plugins_loaded', array($this, 'checkDependencies'));
         add_action('rnocp_activation_trigger', array($this, 'checkUserPlan'));
         //Activate CMB2 functions
-        add_action('init', function () {
-            $this->rnoc->init();
-        });
+        $this->rnoc->init();
         new Currency();
         do_action('rnoc_initiated');
         if ($this->admin->isNextOrderCouponEnabled()) {
@@ -130,14 +129,17 @@ class Main
         /*
          * Retainful abandoned cart
          */
+        $track_user_cart = apply_filters('rnoc_track_abandoned_carts', 1);
         //Track and log user cart
-        add_action('woocommerce_cart_updated', array($this->abandoned_cart, 'userCartUpdated'));
-        add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'checkoutViewed'));
-        add_action('wp_authenticate', array($this->abandoned_cart, 'userLoggedOn'));
-        add_action('user_register', array($this->abandoned_cart, 'userSignedUp'));
-        //track guest user
-        add_action('woocommerce_after_checkout_billing_form', array($this->abandoned_cart, 'addTrackUserJs'));
-        add_action('wp_ajax_nopriv_save_retainful_guest_data', array($this->abandoned_cart, 'saveGuestData'));
+        if ($track_user_cart) {
+            add_action('woocommerce_cart_updated', array($this->abandoned_cart, 'userCartUpdated'));
+            add_filter('woocommerce_checkout_fields', array($this->abandoned_cart, 'checkoutViewed'));
+            add_action('wp_authenticate', array($this->abandoned_cart, 'userLoggedOn'));
+            add_action('user_register', array($this->abandoned_cart, 'userSignedUp'));
+            //track guest user
+            add_action('woocommerce_after_checkout_billing_form', array($this->abandoned_cart, 'addTrackUserJs'));
+            add_action('wp_ajax_nopriv_save_retainful_guest_data', array($this->abandoned_cart, 'saveGuestData'));
+        }
         //recover user cart
         add_action('wp_loaded', array($this->abandoned_cart, 'recoverUserCart'), 99, 1);
         add_action('woocommerce_new_order', array($this->abandoned_cart, 'purchaseComplete'));
@@ -149,7 +151,7 @@ class Main
         add_action('wp_loaded', array($this, 'actionSchedulerHooks'));
         add_action('rnoc_abandoned_clear_abandoned_carts', array($this->abandoned_cart, 'clearAbandonedCarts'));
         add_action('rnoc_abandoned_cart_send_email', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
-        add_action('wp_loaded', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
+        //add_action('wp_loaded', array($this->abandoned_cart, 'sendAbandonedCartEmails'));
         //Process abandoned cart after user place order
         add_action('woocommerce_order_status_pending_to_processing_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
         add_action('woocommerce_order_status_pending_to_completed_notification', array($this->abandoned_cart, 'notifyAdminOnRecovery'));
@@ -159,6 +161,9 @@ class Main
         //Admin
         add_action('wp_ajax_view_abandoned_cart', array($this->abandoned_cart, 'viewAbandonedCart'));
         add_action('wp_ajax_remove_abandoned_cart', array($this->abandoned_cart, 'removeAbandonedCart'));
+        add_action('wp_ajax_remove_abandoned_cart_multiple', array($this->abandoned_cart, 'removeAbandonedCartMultiple'));
+        add_action('wp_ajax_empty_abandoned_cart_history', array($this->abandoned_cart, 'emptyTheAbandonedCartHistory'));
+        add_action('wp_ajax_empty_email_queue', array($this->abandoned_cart, 'emptyTheQueueTable'));
         add_action('wp_ajax_rnoc_save_email_template', array($this->abandoned_cart, 'saveEmailTemplate'));
         add_action('wp_ajax_rnoc_activate_or_deactivate_template', array($this->abandoned_cart, 'changeTemplateStatus'));
         add_action('wp_ajax_rnoc_remove_template', array($this->abandoned_cart, 'removeTemplate'));

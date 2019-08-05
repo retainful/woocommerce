@@ -38,12 +38,13 @@ class CMB2_Field_Abandoned_Cart_Lists
             $start_date = $start_end_dates['last_seven']['start_date'];
             $end_date = $start_end_dates['last_seven']['end_date'];
         }
+        $show_only = isset($_GET['show_only']) ? $_GET['show_only'] : 'all';
         $cart_type = isset($_GET['cart_type']) ? $_GET['cart_type'] : 'all';
         $page_number = (isset($_GET['page_number'])) ? ($_GET['page_number']) : 1;
         $start = ($page_number - 1) * $limit;
-        $total_carts = $abandoned_cart_obj->getAbandonedCartsOfDate($start_date, $end_date, true, 0, 0, $cart_type);
+        $total_carts = $abandoned_cart_obj->getAbandonedCartsOfDate($start_date, $end_date, true, 0, 0, $cart_type, $show_only);
         $count = ($total_carts[0]->count) ? $total_carts[0]->count : 0;
-        $cart_lists = $abandoned_cart_obj->getCartLists($start_date, $end_date, $start, $limit, $cart_type);
+        $cart_lists = $abandoned_cart_obj->getCartLists($start_date, $end_date, $start, $limit, $cart_type, $show_only);
         $url_arr = array(
             'page' => $settings->slug . '_abandoned_cart',
             'start' => $start_date,
@@ -60,11 +61,12 @@ class CMB2_Field_Abandoned_Cart_Lists
         $pagination = new \Rnoc\Retainful\Library\Pagination($pagConfig);
         $current_time = current_time('timestamp');
         ?>
-
-
         <table class="retainful_abandoned_table">
             <thead class="bg-light">
             <tr class="border-0">
+                <th class="border-0" style="width: 40px;">
+                    <input type="checkbox" name="select_all" id="select_all_abandoned_carts">
+                </th>
                 <th class="border-0" style="width: 40px;"><?php echo __('Id', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Cart Status', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Date', RNOC_TEXT_DOMAIN); ?></th>
@@ -89,6 +91,10 @@ class CMB2_Field_Abandoned_Cart_Lists
                     }
                     ?>
                     <tr>
+                        <td>
+                            <input type="checkbox" name="delete_selected_carts[]" class="abandon-cart-list"
+                                   value="<?php echo $carts->id ?>"/>
+                        </td>
                         <td>
                             <?php echo $carts->id ?>
                         </td>

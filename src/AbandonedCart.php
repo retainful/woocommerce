@@ -141,7 +141,7 @@ class AbandonedCart
     function scheduleEmailTemplate($cart_id, $expired_time)
     {
         global $wpdb;
-        $query = "SELECT template.id,template.send_after_time FROM `{$this->email_templates_table}` as template WHERE template.id NOT IN (select template_id FROM `{$this->email_queue_table}` WHERE cart_id = {$cart_id}) AND template.id NOT IN (select template_id FROM `{$this->email_history_table}` WHERE abandoned_order_id = {$cart_id}) AND template.is_active = '1' ORDER BY template.send_after_time ASC LIMIT 1";
+        $query = "SELECT template.id,template.send_after_time FROM `{$this->email_templates_table}` as template WHERE template.id NOT IN (select template_id FROM `{$this->email_queue_table}` WHERE cart_id = {$cart_id}) AND template.id NOT IN (select template_id FROM `{$this->email_history_table}` WHERE abandoned_order_id = {$cart_id}) ORDER BY template.send_after_time ASC LIMIT 1";
         $result = $wpdb->get_row($query);
         if (!empty($result)) {
             $last_sent_email_query = "SELECT sent_time FROM {$this->email_history_table} WHERE abandoned_order_id = {$cart_id} ORDER BY id DESC";
@@ -424,121 +424,6 @@ class AbandonedCart
             }
         }
         return;
-        /*$email_templates = $this->getActiveEmailTemplates();
-        $email_templates_settings = $this->admin->getEmailTemplatesSettings();
-        if (!empty($email_templates)) {
-            $hour_seconds = 3600;//60*60
-            $day_seconds = 86400;//60*60*24
-            foreach ($email_templates as $template) {
-                if ($template->frequency && !empty($template->frequency) && !empty($template->body)) {
-                    global $wpdb;
-                    $time = ($template->day_or_hour == "Days") ? $day_seconds : $hour_seconds;
-                    $current_time = current_time('timestamp');
-                    $time_to_send_template_after = $template->frequency * $time;
-                    $cart_time = $current_time - $time_to_send_template_after;
-                    $to_remain_query = "SELECT * FROM `" . $this->cart_history_table . "` WHERE  cart_expiry < %d AND cart_is_recovered = %d AND order_id IS NULL";
-                    $to_remain_histories = $wpdb->get_results($wpdb->prepare($to_remain_query, $cart_time, 0));
-                    if (!empty($to_remain_histories)) {
-                        foreach ($to_remain_histories as $history) {
-                            if (isset($history->cart_contents) && $template->language_code == $history->language_code) {
-                                $cart_details = json_decode($history->cart_contents);
-                                if (!empty($cart_details)) {
-                                    $history_id = $history->id;
-                                    //Check each email template is sent or not
-                                    $email_sent_history_query = "SELECT * FROM `" . $this->email_history_table . "` WHERE  template_id = %s AND abandoned_order_id = %d";
-                                    $email_sent_history = $wpdb->get_results($wpdb->prepare($email_sent_history_query, $template->id, $history_id));
-                                    if (empty($email_sent_history)) {
-                                        $user_email = $user_first_name = $user_last_name = '';
-                                        $customer_key = $history->customer_key;
-                                        if (!is_numeric($customer_key)) {
-                                            $query_guest = "SELECT billing_first_name, billing_last_name, email_id FROM `" . $this->guest_cart_history_table . "` WHERE session_id = %s";
-                                            $results_guest = $wpdb->get_row($wpdb->prepare($query_guest, $customer_key), OBJECT);
-                                            if (!empty($results_guest) && isset($results_guest->email_id)) {
-                                                $user_email = $results_guest->email_id;
-                                                $user_first_name = $results_guest->billing_first_name;
-                                                $user_last_name = $results_guest->billing_last_name;
-                                            }
-                                        } else if (is_numeric($customer_key)) {
-                                            $user_email = get_user_meta($customer_key, 'billing_email', true);
-                                            $user_first_name = get_user_meta($customer_key, 'billing_first_name', true);
-                                            $user_last_name = get_user_meta($customer_key, 'billing_last_name', true);
-                                            $user_data = get_userdata($customer_key);
-                                            if (isset($user_first_name) && $user_first_name == "") {
-                                                if (isset($user_data->display_name)) {
-                                                    $user_first_name = $user_data->display_name;
-                                                }
-                                            }
-                                            if (isset($user_email) && $user_email == "") {
-                                                if (isset($user_data->user_email)) {
-                                                    $user_email = $user_data->user_email;
-                                                }
-                                            }
-                                        }
-                                        //Process only if user email found
-                                        if (!empty($user_email)) {
-                                            $customer_name = $user_first_name . ' ' . $user_last_name;
-                                            $email_subject = $template->subject;
-                                            if (empty($email_subject)) {
-                                                $email_subject = 'Hey {{customer_name}} You left something in your cart';
-                                            }
-                                            $email_subject = str_replace('{{customer_name}}', $customer_name, $email_subject);
-                                            $email_body = stripslashes($template->body);
-                                            $cart_html = $this->getCartTable($cart_details, $history->currency_code);
-                                            //Log about emil sent
-                                            $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id,subject ) VALUES ( %s, %s, %s, %s, %s )";
-                                            $wpdb->query($wpdb->prepare($email_sent_query, $template->id, $history_id, current_time('mysql'), $user_email, $email_subject));
-                                            $site_url = site_url();
-                                            $cart_page_link = $this->wc_functions->getCartUrl();
-                                            $need_to_encode = array(
-                                                'url' => $cart_page_link,
-                                                'email_sent' => $wpdb->insert_id,
-                                                'abandoned_cart_id' => $history_id,
-                                                'session_id' => $customer_key
-                                            );
-                                            $encoding_cart = http_build_query($need_to_encode);
-                                            $validate_cart = $this->encryptValidate($encoding_cart);
-                                            $cart_recovery_link = $site_url . '/?retainful_cart_action=recover&validate=' . $validate_cart . '&lang=' . $history->language_code;
-                                            $extra_fields = (isset($template->extra)) ? $template->extra : '{}';
-                                            $extra_data = json_decode($extra_fields, true);
-                                            $selected_coupon = isset($extra_data['coupon_code']) ? $extra_data['coupon_code'] : '';
-                                            $replace = array(
-                                                'customer_name' => $customer_name,
-                                                'site_url' => $site_url,
-                                                'cart_recovery_link' => $cart_recovery_link,
-                                                'user_cart' => $cart_html,
-                                                'recovery_coupon' => $selected_coupon,
-                                                'site_footer' => '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . __(' All rights reserved.', RNOC_TEXT_DOMAIN)
-                                            );
-                                            foreach ($replace as $short_code => $short_code_value) {
-                                                $email_body = str_replace('{{' . $short_code . '}}', $short_code_value, $email_body);
-                                            }
-                                            $from_name = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'] : 'Admin';
-                                            $admin_email = get_option('admin_email');
-                                            $from_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'] : $admin_email;
-                                            $replay_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'] : $admin_email;
-                                            //Prepare for sending emails
-                                            $charset = (function_exists('get_bloginfo')) ? get_bloginfo('charset') : 'UTF-8';
-                                            //Prepare for sending emails
-                                            $headers = array(
-                                                "From: \"$from_name\" <$from_address>",
-                                                "Return-Path: <" . $from_address . ">",
-                                                "Reply-To: \"" . $from_name . "\" <" . $replay_address . ">",
-                                                "MIME-Version: 1.0",
-                                                "X-Mailer: PHP" . phpversion(),
-                                                "Content-Type: text/html; charset=\"" . $charset . "\""
-                                            );
-                                            $header = implode("\n", $headers);
-                                            //Send mail
-                                            wc_mail($user_email, $email_subject, $email_body, $header);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
     }
 
     /**
@@ -673,6 +558,23 @@ class AbandonedCart
                 $wpdb->delete($this->cart_history_table, array('id' => $_REQUEST['cart_id']));
                 wp_send_json(array('success' => true));
             }
+        }
+    }
+
+    /**
+     * delete multiple abandoned cart from admin panel
+     */
+    function removeAbandonedCartMultiple()
+    {
+        if (isset($_REQUEST['cart_list']) && is_array($_REQUEST['cart_list']) && !empty($_REQUEST['cart_list'])) {
+            global $wpdb;
+            foreach ($_REQUEST['cart_list'] as $cart_id) {
+                $row = $wpdb->get_row("SELECT id FROM `" . $this->cart_history_table . "` WHERE id = " . $cart_id, OBJECT);
+                if (!empty($row)) {
+                    $wpdb->delete($this->cart_history_table, array('id' => $cart_id));
+                }
+            }
+            wp_send_json(array('success' => true));
         }
     }
 
@@ -913,9 +815,10 @@ class AbandonedCart
      * @param int $start
      * @param int $limit
      * @param string $cart_type
+     * @param string $show_only
      * @return array|object|null
      */
-    function getAbandonedCartsOfDate($start_date, $end_date, $count_only = false, $start = 0, $limit = 0, $cart_type = 'all')
+    function getAbandonedCartsOfDate($start_date, $end_date, $count_only = false, $start = 0, $limit = 0, $cart_type = 'all', $show_only = 'all')
     {
         if (empty($start_date) || empty($end_date)) {
             return array();
@@ -941,7 +844,11 @@ class AbandonedCart
         if (!$is_tracking_enabled) {
             $get_only = ' AND cart_expiry <' . $current_time . ' ';
         }
-        if ($cart_type == 'recovered') {
+        if ($cart_type == "guest_cart") {
+            $get_only = ' AND Length(customer_key) > 31 ';
+        } elseif ($cart_type == "registered_cart") {
+            $get_only = ' AND Length(customer_key) < 31 ';
+        } elseif ($cart_type == 'recovered') {
             $get_only = ' AND cart_is_recovered=1 ';
         } else {
             if ($cart_type == 'abandoned') {
@@ -974,6 +881,28 @@ class AbandonedCart
     }
 
     /**
+     * Empty the abandoned cart history table
+     */
+    function emptyTheAbandonedCartHistory()
+    {
+        global $wpdb;
+        $truncate_query = "TRUNCATE TABLE `{$this->cart_history_table}`";
+        $wpdb->query($truncate_query);
+        wp_send_json(array('success' => true));
+    }
+
+    /**
+     * Empty the abandoned cart history table
+     */
+    function emptyTheQueueTable()
+    {
+        global $wpdb;
+        $truncate_query = "TRUNCATE TABLE `{$this->email_queue_table}`";
+        $wpdb->query($truncate_query);
+        wp_send_json(array('success' => true));
+    }
+
+    /**
      * get all email templates
      * @param $language_code string
      * @return array|object|null
@@ -996,11 +925,12 @@ class AbandonedCart
      * @param $offset
      * @param $limit
      * @param $cart_type
+     * @param $show_only
      * @return array
      */
-    function getCartLists($start_date, $end_date, $offset, $limit, $cart_type)
+    function getCartLists($start_date, $end_date, $offset, $limit, $cart_type, $show_only)
     {
-        return $this->getAbandonedCartsOfDate($start_date, $end_date, false, $offset, $limit, $cart_type);
+        return $this->getAbandonedCartsOfDate($start_date, $end_date, false, $offset, $limit, $cart_type, $show_only);
     }
 
     /**
