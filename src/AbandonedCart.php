@@ -141,11 +141,23 @@ class AbandonedCart
     function scheduleEmailTemplate($cart_id, $expired_time)
     {
         global $wpdb;
-        $query = "SELECT template.id, template.send_after_time FROM `{$this->email_templates_table}` AS template LEFT JOIN `{$this->email_queue_table}` AS queue ON queue.template_id = template.id AND queue.cart_id = {$cart_id}  WHERE queue.template_id IS NULL AND(SELECT count(id) FROM `{$this->email_history_table}` WHERE template_id=queue.template_id AND abandoned_order_id = queue.cart_id) = 0 AND template.is_active ='1' ORDER BY template.send_after_time ASC LIMIT 1";
+        $query = "SELECT template.id,template.send_after_time FROM `{$this->email_templates_table}` as template WHERE template.id NOT IN (select template_id FROM `{$this->email_queue_table}` WHERE cart_id = {$cart_id}) AND template.id NOT IN (select template_id FROM `{$this->email_history_table}` WHERE abandoned_order_id = {$cart_id}) AND template.is_active = '1' ORDER BY template.send_after_time ASC LIMIT 1";
         $result = $wpdb->get_row($query);
         if (!empty($result)) {
+            $last_sent_email_query = "SELECT sent_time FROM {$this->email_history_table} WHERE abandoned_order_id = {$cart_id} ORDER BY id DESC";
+            $last_sent_email = $wpdb->get_row($last_sent_email_query);
+            if (!empty($last_sent_email)) {
+                $last_sent_time = strtotime($last_sent_email->sent_time);
+                $current_template_next_sent_time = current_time('timestamp') + $result->send_after_time;
+                $difference = $current_template_next_sent_time - $last_sent_time;
+                if ($difference < 0) {
+                    $difference = $result->send_after_time;
+                }
+                $run_at = current_time('timestamp') + $difference;
+            } else {
+                $run_at = $expired_time + $result->send_after_time;
+            }
             $insert_query = "INSERT INTO `{$this->email_queue_table}` (template_id, cart_id, is_completed,run_at) VALUES ('%d','%d','%d','%d')";
-            $run_at = $expired_time + $result->send_after_time;
             $wpdb->query($wpdb->prepare($insert_query, array($result->id, $cart_id, 0, $run_at)));
         }
     }
@@ -308,7 +320,7 @@ class AbandonedCart
     {
         global $wpdb;
         $current_time = current_time('timestamp');
-        $to_remain_history_query = "SELECT history.*,queue.id as queue_id,template.language_code as template_language_code,template.id as template_id,template.subject,template.extra ,template.body FROM `{$this->email_queue_table}` AS queue LEFT JOIN `{$this->cart_history_table}` AS history ON history.id = queue.cart_id LEFT JOIN `{$this->email_templates_table}` as template ON template.id = queue.template_id WHERE queue.is_completed = 0 AND queue.run_at < {$current_time} AND history.cart_is_recovered = 0 AND history.order_id IS NULL";
+        $to_remain_history_query = "SELECT history.*,queue.id as queue_id,template.language_code as template_language_code,queue.template_id as template_id,template.subject,template.extra ,template.body FROM `{$this->email_queue_table}` AS queue LEFT JOIN `{$this->cart_history_table}` AS history ON history.id = queue.cart_id LEFT JOIN `{$this->email_templates_table}` as template ON template.id = queue.template_id WHERE queue.is_completed = 0 AND queue.run_at < {$current_time} AND history.cart_is_recovered = 0 AND history.order_id IS NULL";
         $to_remain_histories = $wpdb->get_results($to_remain_history_query);
         if (!empty($to_remain_histories)) {
             $email_templates_settings = $this->admin->getEmailTemplatesSettings();
@@ -318,7 +330,7 @@ class AbandonedCart
                     if (!empty($cart_details)) {
                         $history_id = $history->id;
                         //Check each email template is sent or not
-                        $email_sent_history_query = "SELECT * FROM `" . $this->email_history_table . "` WHERE  template_id = %s AND abandoned_order_id = %d";
+                        $email_sent_history_query = "SELECT * FROM `" . $this->email_history_table . "` WHERE  template_id = %d AND abandoned_order_id = %d";
                         $email_sent_history = $wpdb->get_results($wpdb->prepare($email_sent_history_query, $history->template_id, $history_id));
                         if (empty($email_sent_history)) {
                             $user_email = $user_first_name = $user_last_name = '';
