@@ -95,23 +95,31 @@ class CMB2_Field_Edit_Email_Template
                         <label for="field_coupon_code"><?php echo __('Coupon code for recovery email', RNOC_TEXT_DOMAIN); ?></label>
                     </div>
                     <div class="cmb-td">
-                        <select name="extra[coupon_code]"
-                                class="regular-text" id="field_coupon_code">
-                            <option value=""><?php echo __('Select', RNOC_TEXT_DOMAIN) ?></option>
-                            <?php
-                            $selected = isset($extra_data['coupon_code']) ? $extra_data['coupon_code'] : '';
-                            $coupons_list = $this->getWooCouponCodes();
-                            if (!empty($coupons_list)) {
-                                foreach ($coupons_list as $key => $value) {
-                                    ?>
-                                    <option value="<?php echo $value; ?>" <?php echo ($key == $selected) ? 'selected' : '' ?>> <?php echo $value; ?></option>
-                                    <?php
-                                }
-                            }
+                        <?php
+                        if ($settings->isProPlan()) {
                             ?>
-                        </select>
-                        <br>
-                        <em><?php echo __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN); ?></em>
+                            <select name="extra[coupon_code]"
+                                    class="regular-text" id="field_coupon_code">
+                                <option value=""><?php echo __('Select', RNOC_TEXT_DOMAIN) ?></option>
+                                <?php
+                                $selected = isset($extra_data['coupon_code']) ? $extra_data['coupon_code'] : '';
+                                $coupons_list = $this->getWooCouponCodes();
+                                if (!empty($coupons_list)) {
+                                    foreach ($coupons_list as $key => $value) {
+                                        ?>
+                                        <option value="<?php echo $value; ?>" <?php echo ($key == $selected) ? 'selected' : '' ?>> <?php echo $value; ?></option>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <br>
+                            <em><?php echo __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN); ?></em>
+                            <?php
+                        } else {
+                            echo $settings->unlockPremiumLink();
+                        }
+                        ?>
                     </div>
                 </div>
                 <div class="cmb-row table-layout">
@@ -167,7 +175,10 @@ class CMB2_Field_Edit_Email_Template
                         </div>
                         <?php
                         wp_editor(isset($template->body) ? $template->body : '', 'email_template_body');
-                        echo __('You can use following short codes in your email template:<br> <b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - Site link<br> <b>{{cart_recovery_link}}</b> - Link to recover user cart<br><b>{{user_cart}}</b> - Cart details<br><b>{{recovery_coupon}}</b> - Coupon code to send along with recovery mail,Please choose the coupon above.', RNOC_TEXT_DOMAIN)
+                        echo __('You can use following short codes in your email template:<br> <b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - Site link<br> <b>{{cart_recovery_link}}</b> - Link to recover user cart<br><b>{{user_cart}}</b> - Cart details<br>', RNOC_TEXT_DOMAIN);
+                        if ($settings->isProPlan()) {
+                            echo __('<b>{{recovery_coupon}}</b> - Coupon code to send along with recovery mail,Please choose the coupon above.', RNOC_TEXT_DOMAIN);
+                        }
                         ?>
                     </div>
                 </div>
@@ -234,7 +245,6 @@ class CMB2_Field_Edit_Email_Template
                     margin: 0.5%;
                     padding: 5px;
                     box-shadow: 0 2px 4px rgba(126, 142, 177, .12);
-                    cursor: pointer;
                     border: 1px solid #eeeeee;
                     border-bottom: 3px solid transparent;
                     text-align: center;
@@ -264,6 +274,7 @@ class CMB2_Field_Edit_Email_Template
                     background: #6772e5;
                     border: 1px solid #6772e5;
                     color: #ffffff;
+                    cursor: pointer;
                 }
 
                 .grid-column .overlay {

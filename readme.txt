@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.2.1
 WC tested up to: 3.6.4
 Requires PHP: 5.6
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -257,3 +257,7 @@ No. There is no charges for support.
 
 = 1.2.4 =
 *Fix: Auto login to recover user cart issue fix
+
+= 1.2.5 =
+*New Feature: New page added to view sent recovery E-mails
+*Fix: Issue fix for Queueing the abandoned cart recovery E-mails

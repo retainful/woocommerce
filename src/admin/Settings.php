@@ -424,8 +424,6 @@ class Settings
                 'desc' => __('Under GDPR, it is mandatory to inform the users when we track their cart activity in real-time. If you are not tracking, you can leave this empty', RNOC_TEXT_DOMAIN)
             ));
             //Premium Addon
-            $plan_details = $this->getPlanDetails();
-            $plan = isset($plan_details['plan']) ? $plan_details['plan'] : 'free';
             $tabs_array = array(
                 array(
                     'id' => 'general-settings',
@@ -436,21 +434,21 @@ class Settings
                     ),
                 )
             );
-            if (in_array($plan, array('pro', 'business'))) {
+            if ($this->isProPlan()) {
                 if (defined('RNOCP_VERSION')) {
                     $tabs_array = apply_filters('rnoc_premium_addon_tab', $tabs_array);
                 }
             }
             $premium_addon = new_cmb2_box(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_premium_addon',
-                'title' => __('Premium', RNOC_TEXT_DOMAIN),
+                'title' => __('Premium Features', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
                 'option_key' => $this->slug . '_premium',
                 'tab_group' => $this->slug,
                 'vertical_tabs' => true,
                 'parent_slug' => $this->slug,
                 'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Premium', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Premium Features', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN),
                 'tabs' => $tabs_array
             ));
@@ -460,7 +458,7 @@ class Settings
                 'type' => 'premium_addon_list',
                 'default' => '',
             ));
-            if (in_array($plan, array('pro', 'business'))) {
+            if ($this->isProPlan()) {
                 if (defined('RNOCP_VERSION')) {
                     //Popup modal settings
                     apply_filters('rnoc_premium_addon_tab_content', $premium_addon);
@@ -516,7 +514,7 @@ class Settings
     function getUserActivePlan()
     {
         $plan_details = $this->getPlanDetails();
-        return strtolower(isset($plan_details['plan']) ? $plan_details['plan'] : 'free');
+        return strtolower(trim(isset($plan_details['plan']) ? $plan_details['plan'] : 'free'));
     }
 
     /**
@@ -678,6 +676,25 @@ class Settings
             );
         }
         return $plan_details;
+    }
+
+    /**
+     * Check the user plan is pro
+     * @return bool
+     */
+    function isProPlan()
+    {
+        $plan = $this->getUserActivePlan();
+        return (strtolower($plan) == 'pro');
+    }
+
+    /**
+     * Link to unlock premium
+     * @return string
+     */
+    function unlockPremiumLink()
+    {
+        return '<a href="' . $this->api->upgradePremiumUrl() . '">' . __("Unlock this feature by upgrading to Premium", RNOC_TEXT_DOMAIN) . '</a>';
     }
 
     /**

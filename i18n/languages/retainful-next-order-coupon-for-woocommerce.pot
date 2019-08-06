@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: retainful\n"
-"POT-Creation-Date: 2019-07-23 17:47+0530\n"
-"PO-Revision-Date: 2019-07-23 17:47+0530\n"
+"POT-Creation-Date: 2019-08-06 16:46+0530\n"
+"PO-Revision-Date: 2019-08-06 16:46+0530\n"
 "Last-Translator: \n"
 "Language-Team: retainful\n"
 "Language: en\n"
@@ -47,76 +47,52 @@ msgstr ""
 msgid "Custom"
 msgstr ""
 
-#: AbandonedCart.php:350 AbandonedCart.php:1052
+#: AbandonedCart.php:397 AbandonedCart.php:1111
 msgid " All rights reserved."
 msgstr ""
 
-#: AbandonedCart.php:534
+#: AbandonedCart.php:603
 msgid "It seems, your cart has expired!"
 msgstr ""
 
-#: AbandonedCart.php:651 AbandonedCart.php:652
+#: AbandonedCart.php:720 AbandonedCart.php:721
 msgid "New Customer Order - Recovered"
 msgstr ""
 
-#: AbandonedCart.php:914
+#: AbandonedCart.php:1021
 msgid "Template saved successfully!"
 msgstr ""
 
-#: AbandonedCart.php:931
+#: AbandonedCart.php:1038
 msgid "Template activated successfully!"
 msgstr ""
 
-#: AbandonedCart.php:933
+#: AbandonedCart.php:1040
 msgid "Template de-activated successfully!"
 msgstr ""
 
-#: AbandonedCart.php:937 AbandonedCart.php:941 AbandonedCart.php:960
-#: AbandonedCart.php:964
+#: AbandonedCart.php:1044 AbandonedCart.php:1048 AbandonedCart.php:1067
+#: AbandonedCart.php:1071
 msgid "Invalid Request"
 msgstr ""
 
-#: AbandonedCart.php:996 admin/templates/abandoned_cart.php:6
-msgid "Item"
-msgstr ""
-
-#: AbandonedCart.php:999 admin/templates/abandoned_cart.php:9
-msgid "Name"
-msgstr ""
-
-#: AbandonedCart.php:1002 admin/templates/abandoned_cart.php:12
-msgid "Quantity"
-msgstr ""
-
-#: AbandonedCart.php:1005 admin/templates/abandoned_cart.php:15
-msgid "Price"
-msgstr ""
-
-#: AbandonedCart.php:1008 admin/templates/abandoned_cart.php:18
-msgid "Line Subtotal"
-msgstr ""
-
-#: AbandonedCart.php:1038
-msgid "Cart Total"
-msgstr ""
-
-#: AbandonedCart.php:1068
+#: AbandonedCart.php:1135
 msgid "Email address and Email body required"
 msgstr ""
 
-#: AbandonedCart.php:1090 AbandonedCart.php:1098
+#: AbandonedCart.php:1157 AbandonedCart.php:1165
 msgid "Sorry, Template not found"
 msgstr ""
 
-#: Main.php:432
+#: Main.php:490
 msgid "Woocommerce must be activated for Retainful-Woocommerce to work"
 msgstr ""
 
-#: Main.php:435
+#: Main.php:493
 msgid "Your woocommerce version is "
 msgstr ""
 
-#: Main.php:435
+#: Main.php:493
 msgid ""
 ". Some of the features of Retainful-Woocommerce will not work properly on "
 "this woocommerce version."
@@ -143,15 +119,15 @@ msgstr ""
 msgid "Add-ons"
 msgstr ""
 
-#: OrderCoupon.php:59 admin/Settings.php:336 admin/Settings.php:343
+#: OrderCoupon.php:59 admin/Settings.php:353 admin/Settings.php:360
 msgid "Settings"
 msgstr ""
 
-#: OrderCoupon.php:60 admin/Settings.php:455 admin/Settings.php:461
+#: OrderCoupon.php:60 admin/Settings.php:470 admin/Settings.php:476
 msgid "License"
 msgstr ""
 
-#: admin/Settings.php:36 admin/Settings.php:120
+#: admin/Settings.php:36 admin/Settings.php:137
 msgid "Retainful - Abandoned Carts"
 msgstr ""
 
@@ -160,9 +136,9 @@ msgid "Abandoned / Recovered Carts"
 msgstr ""
 
 #: admin/Settings.php:43 admin/Settings.php:77 admin/Settings.php:127
-#: admin/Settings.php:139 admin/Settings.php:344 admin/Settings.php:437
-#: admin/Settings.php:462
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:183
+#: admin/Settings.php:144 admin/Settings.php:156 admin/Settings.php:361
+#: admin/Settings.php:452 admin/Settings.php:477
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:220
 msgid "Save"
 msgstr ""
 
@@ -175,7 +151,7 @@ msgid "Retainful Abandoned Cart Email Templates"
 msgstr ""
 
 #: admin/Settings.php:76
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:85
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:47
 msgid "Email Templates"
 msgstr ""
 
@@ -209,99 +185,107 @@ msgid ""
 "should that reply be sent to?"
 msgstr ""
 
+#: admin/Settings.php:120
+msgid "Abandoned cart sent E-mails"
+msgstr ""
+
 #: admin/Settings.php:126
+msgid "Sent E-Mails"
+msgstr ""
+
+#: admin/Settings.php:143
 msgid "Next order coupon"
 msgstr ""
 
-#: admin/Settings.php:130
+#: admin/Settings.php:147
 msgid "Enable next order coupon?"
 msgstr ""
 
-#: admin/Settings.php:135 admin/Settings.php:188 admin/Settings.php:375
-#: admin/Settings.php:386 admin/Settings.php:397
+#: admin/Settings.php:152 admin/Settings.php:205 admin/Settings.php:392
+#: admin/Settings.php:403 admin/Settings.php:414
 msgid "No"
 msgstr ""
 
-#: admin/Settings.php:136 admin/Settings.php:189 admin/Settings.php:376
-#: admin/Settings.php:387 admin/Settings.php:398
+#: admin/Settings.php:153 admin/Settings.php:206 admin/Settings.php:393
+#: admin/Settings.php:404 admin/Settings.php:415
 msgid "Yes"
 msgstr ""
 
-#: admin/Settings.php:142
+#: admin/Settings.php:159
 msgid "Order Status"
 msgstr ""
 
-#: admin/Settings.php:147
+#: admin/Settings.php:164
 msgid ""
 "<b>Note</b>: Coupon code will not generate until the order meet the choosed "
 "order status."
 msgstr ""
 
-#: admin/Settings.php:150
+#: admin/Settings.php:167
 msgid "Coupon type"
 msgstr ""
 
-#: admin/Settings.php:155
+#: admin/Settings.php:172
 msgid "Percentage"
 msgstr ""
 
-#: admin/Settings.php:156
+#: admin/Settings.php:173
 msgid "Flat"
 msgstr ""
 
-#: admin/Settings.php:161
+#: admin/Settings.php:178
 msgid "Coupon value"
 msgstr ""
 
-#: admin/Settings.php:166
+#: admin/Settings.php:183
 msgid "Note: If this field is empty, No coupon codes will generate!"
 msgstr ""
 
-#: admin/Settings.php:172
+#: admin/Settings.php:189
 msgid "Apply coupon to"
 msgstr ""
 
-#: admin/Settings.php:177
+#: admin/Settings.php:194
 msgid "Allow any one to apply coupon"
 msgstr ""
 
-#: admin/Settings.php:178
+#: admin/Settings.php:195
 msgid "Allow the customer to apply coupon, but validate at checkout"
 msgstr ""
 
-#: admin/Settings.php:179
+#: admin/Settings.php:196
 msgid "Allow customer to apply coupon only after login"
 msgstr ""
 
-#: admin/Settings.php:184
+#: admin/Settings.php:201
 msgid ""
 "Allow next order coupons for orders created in the backend and also for old "
 "orders (when resending the email notification)"
 msgstr ""
 
-#: admin/Settings.php:192
+#: admin/Settings.php:209
 msgid ""
 "The unique code will be generated when you try re-sending the email "
 "notification for an order in the backend"
 msgstr ""
 
-#: admin/Settings.php:195
+#: admin/Settings.php:212
 msgid "Display coupon message after"
 msgstr ""
 
-#: admin/Settings.php:200
+#: admin/Settings.php:217
 msgid "Order details"
 msgstr ""
 
-#: admin/Settings.php:201
+#: admin/Settings.php:218
 msgid "Order meta"
 msgstr ""
 
-#: admin/Settings.php:202
+#: admin/Settings.php:219
 msgid "Customer details"
 msgstr ""
 
-#: admin/Settings.php:206
+#: admin/Settings.php:223
 msgid ""
 "This message will attached to the Order Email.<br>Please use the below short "
 "codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - "
@@ -309,203 +293,205 @@ msgid ""
 "</b> - Url to apply coupon automatically"
 msgstr ""
 
-#: admin/Settings.php:207
+#: admin/Settings.php:224
 msgid ""
 "<br><b>{{coupon_expiry_date}}</b> - Coupon expiry date(If coupon does not "
 "have any expiry days,then this will not attach to the message).<br>"
 msgstr ""
 
-#: admin/Settings.php:212
+#: admin/Settings.php:229
 msgid "Custom coupon message"
 msgstr ""
 
-#: admin/Settings.php:218
+#: admin/Settings.php:235
 msgid "Coupon Usage Restriction"
 msgstr ""
 
-#: admin/Settings.php:223
+#: admin/Settings.php:240
 msgid "Minimum spend"
 msgstr ""
 
-#: admin/Settings.php:226
+#: admin/Settings.php:243
 msgid "Set the minimum spend(subtotal) allowed to use the coupon."
 msgstr ""
 
-#: admin/Settings.php:235
+#: admin/Settings.php:252
 msgid "Maximum spend"
 msgstr ""
 
-#: admin/Settings.php:238
+#: admin/Settings.php:255
 msgid "Set the maximum spend(subtotal) allowed to use the coupon."
 msgstr ""
 
-#: admin/Settings.php:247
+#: admin/Settings.php:264
 msgid "Coupon expires in "
 msgstr ""
 
-#: admin/Settings.php:250
+#: admin/Settings.php:267
 msgid ""
 "After the entered number of days coupon will automatically expired."
 "<br><b>Note: Please leave empty or put 0 to never expire.</b>"
 msgstr ""
 
-#: admin/Settings.php:251
+#: admin/Settings.php:268
 msgid " Day(s)"
 msgstr ""
 
-#: admin/Settings.php:261
+#: admin/Settings.php:278
 msgid "Coupon expire date format "
 msgstr ""
 
-#: admin/Settings.php:268
+#: admin/Settings.php:285
 msgid "Individual use only"
 msgstr ""
 
-#: admin/Settings.php:271
+#: admin/Settings.php:288
 msgid ""
 "Check this box if the coupon cannot be used in conjunction with other "
 "coupons."
 msgstr ""
 
-#: admin/Settings.php:274
+#: admin/Settings.php:291
 msgid "Exclude sale items"
 msgstr ""
 
-#: admin/Settings.php:277
+#: admin/Settings.php:294
 msgid ""
 "Check this box if the coupon should not apply to items on sale. Per-item "
 "coupons will only work if the item is not on sale. Per-cart coupons will "
 "only work if there are items in the cart that are not on sale."
 msgstr ""
 
-#: admin/Settings.php:280
+#: admin/Settings.php:297
 msgid "Products"
 msgstr ""
 
-#: admin/Settings.php:284
+#: admin/Settings.php:301
 msgid ""
 "Product that the coupon code will be applied to, or that need to be in the "
 "cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: admin/Settings.php:286 admin/Settings.php:300
+#: admin/Settings.php:303 admin/Settings.php:317
 msgid "Choose products.."
 msgstr ""
 
-#: admin/Settings.php:294
+#: admin/Settings.php:311
 msgid "Exclude products"
 msgstr ""
 
-#: admin/Settings.php:298
+#: admin/Settings.php:315
 msgid ""
 "Product that the coupon code will not applied to, or cannot be in the cart "
 "in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: admin/Settings.php:308
+#: admin/Settings.php:325
 msgid "Product Categories"
 msgstr ""
 
-#: admin/Settings.php:313 admin/Settings.php:323
+#: admin/Settings.php:330 admin/Settings.php:340
 msgid "Select categories"
 msgstr ""
 
-#: admin/Settings.php:315
+#: admin/Settings.php:332
 msgid ""
 "Product categories that the coupon code will be applied to, or that need to "
 "be in the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: admin/Settings.php:318
+#: admin/Settings.php:335
 msgid "Exclude Categories"
 msgstr ""
 
-#: admin/Settings.php:325
+#: admin/Settings.php:342
 msgid ""
 "Product categories that the coupon code will not applied to, or cannot be in "
 "the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: admin/Settings.php:347
+#: admin/Settings.php:364
 msgid "When to consider a cart as abandoned?"
 msgstr ""
 
-#: admin/Settings.php:350
+#: admin/Settings.php:367
 msgid ""
 "In minutes. Example: You can consider a cart as abandoned 15 minutes after "
 "it was added"
 msgstr ""
 
-#: admin/Settings.php:359
+#: admin/Settings.php:376
 msgid "How many days to wait before automatically deleting the cart"
 msgstr ""
 
-#: admin/Settings.php:362
+#: admin/Settings.php:379
 msgid ""
 "Useful when you wanted the abandoned carts be removed after certain days"
 msgstr ""
 
-#: admin/Settings.php:371
+#: admin/Settings.php:388
 msgid ""
 "Should the store administrator get a notification when a cart is recovered"
 msgstr ""
 
-#: admin/Settings.php:378
+#: admin/Settings.php:395
 msgid "Useful if you wanted to get notified when a cart is recovered."
 msgstr ""
 
-#: admin/Settings.php:382
+#: admin/Settings.php:399
 msgid "Track real-time carts?"
 msgstr ""
 
-#: admin/Settings.php:389
+#: admin/Settings.php:406
 msgid ""
 "If not enabled, only carts that are abandoned gets tracked (i.e, after "
 "customer leaves the site)"
 msgstr ""
 
-#: admin/Settings.php:393
+#: admin/Settings.php:410
 msgid "Show guest cart?"
 msgstr ""
 
-#: admin/Settings.php:400
+#: admin/Settings.php:417
 msgid ""
 "If not enabled, Guest carts will not shown in your Abandoned cart dashboard."
 msgstr ""
 
-#: admin/Settings.php:404
+#: admin/Settings.php:421
 msgid "Compliance: Message to show when tracking real-time carts"
 msgstr ""
 
-#: admin/Settings.php:407
+#: admin/Settings.php:424
 msgid ""
 "Under GDPR, it is mandatory to inform the users when we track their cart "
 "activity in real-time. If you are not tracking, you can leave this empty"
 msgstr ""
 
-#: admin/Settings.php:416
+#: admin/Settings.php:431
 msgid "Add-ons List"
 msgstr ""
 
-#: admin/Settings.php:429 admin/Settings.php:436
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:116
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:132
-msgid "Premium"
+#: admin/Settings.php:444 admin/Settings.php:451
+msgid "Premium Features"
 msgstr ""
 
-#: admin/Settings.php:465
+#: admin/Settings.php:480
 msgid "License / App ID"
 msgstr ""
 
-#: admin/Settings.php:469
+#: admin/Settings.php:484
 msgid "You can get your App-id from https://www.app.retainful.com"
 msgstr ""
 
-#: admin/Settings.php:486
+#: admin/Settings.php:501
 msgid "All"
 msgstr ""
 
-#: admin/Settings.php:725
+#: admin/Settings.php:697
+msgid "Unlock this feature by upgrading to Premium"
+msgstr ""
+
+#: admin/Settings.php:759
 msgid ""
 "<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 style="
 "\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"
@@ -522,93 +508,121 @@ msgid ""
 "decoration: none;\" href=\"{{coupon_url}}\">Go! </a></p></div></div>"
 msgstr ""
 
-#: admin/templates/abandoned_cart.php:57
-msgid "cart Total"
+#: admin/templates/abandoned_cart.php:6
+msgid "Item"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:52
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:55
+#: admin/templates/abandoned_cart.php:9
+msgid "Qty"
+msgstr ""
+
+#: admin/templates/abandoned_cart.php:12
+msgid "Price"
+msgstr ""
+
+#: admin/templates/abandoned_cart.php:15
+msgid "Total"
+msgstr ""
+
+#: admin/templates/abandoned_cart.php:54
+msgid "Cart Total"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:51
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:64
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:84
 msgid "Abandoned Carts"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:65
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:64
 msgid "Abandoned Amount"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:78
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:57
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:77
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:65
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:86
 msgid "Recovered Carts"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:91
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:90
 msgid "Recovered Amount"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:108
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:107
 msgid ""
 "Get more features like Email collection popup, Countdown timer & coupons"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:113
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:95
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:112
+#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:100
 #: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:93
 msgid "Upgrade to Premium"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:68
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:70
 msgid "Id"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:69
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:71
 msgid "Cart Status"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:70
-msgid "Cart Expired"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:71
-msgid "Customer / IP"
-msgstr ""
-
 #: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:72
-msgid "Email"
+#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:48
+msgid "Date"
 msgstr ""
 
 #: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:73
-msgid "Cart Value"
+msgid "Customer / IP"
 msgstr ""
 
 #: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:74
+#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:49
+msgid "Email"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:75
+msgid "Cart Value"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:76
 msgid "Action"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:99
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:105
 msgid "Recovered"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:105
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:111
 msgid "In Progress"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:111
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:117
 msgid "Abandoned"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:154
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:160
 msgid "Registered"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:158
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:164
 msgid "Guest"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:177
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:183
 msgid "This is guest cart"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:243
+#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:249
 msgid "No carts found!"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:50
+msgid "Subject"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:75
+msgid "No E-Mails sent!"
 msgstr ""
 
 #: fields/cmb-field-cart-filter/cmb-field-cart-filter.php:51
@@ -619,12 +633,50 @@ msgstr ""
 msgid ": "
 msgstr ""
 
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:51
+msgid "Bulk Actions"
+msgstr ""
+
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:52
+msgid "Delete Selected"
+msgstr ""
+
 #: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:53
+msgid "Empty abandoned cart history"
+msgstr ""
+
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:55
+msgid "Empty E-mail queue"
+msgstr ""
+
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:58
+msgid "Apply"
+msgstr ""
+
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:61
+msgid "Filter by"
+msgstr ""
+
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:63
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:82
 msgid "All Carts"
 msgstr ""
 
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:64
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:71
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:93
 msgid "In-Progress Carts"
+msgstr ""
+
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:75
+msgid "Guest Carts"
+msgstr ""
+
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:76
+msgid "Registered Carts"
+msgstr ""
+
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:79
+msgid "Quick Filter"
 msgstr ""
 
 #: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:26
@@ -637,126 +689,151 @@ msgstr ""
 msgid "Are you sure?"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:60
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:62
 msgid "Add Or Edit Email Template"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:67
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:69
 msgid "Template Name"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:81
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:83
 msgid "Template Subject"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:88
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:90
 msgid "Use <b>{{customer_name}}</b> - To display Customer name"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:93
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:95
+msgid "Coupon code for recovery email"
+msgstr ""
+
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:103
+msgid "Select"
+msgstr ""
+
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:117
+msgid ""
+"<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If "
+"none found, please create the coupon code in WooCommerce -> Coupons"
+msgstr ""
+
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:127
 msgid "Email Body"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:104
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:135
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:138
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:169
 msgid "Insert template"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:120
-msgid "Unlock"
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:150
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:166
+msgid "Premium"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:144
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:154
+msgid "Upgrade to Premium to Unlock"
+msgstr ""
+
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:178
 msgid ""
 "You can use following short codes in your email template:<br> "
 "<b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - "
 "Site link<br> <b>{{cart_recovery_link}}</b> - Link to recover user "
-"cart<br><b>{{user_cart}}</b> - Cart details"
+"cart<br><b>{{user_cart}}</b> - Cart details<br>"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:150
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:180
+msgid ""
+"<b>{{recovery_coupon}}</b> - Coupon code to send along with recovery mail,"
+"Please choose the coupon above."
+msgstr ""
+
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:187
 msgid "Send this email in"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:157
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:194
 msgid "Hour(s)"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:158
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:195
 msgid "Day(s)"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:160
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:197
 msgid "after cart is abandoned."
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:165
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:202
 msgid "Send a test email to"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:170
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:207
 msgid "Send a test Email"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:172
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:209
 msgid "Sending..."
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:174
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:211
 msgid "Enter email id to receive an test email."
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:186
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:223
 msgid "Save and close"
 msgstr ""
 
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:188
+#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:225
 msgid "Close"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:86
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:48
 msgid ""
 "Add email templates at different intervals to maximize the possibility of "
 "recovering your abandoned carts."
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:129
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:81
 msgid "Send "
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:129
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:81
 msgid "After Abandonment"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:135
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:87
 msgid "Subject: "
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:140
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:91
 msgid "Sent Emails"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:144
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:95
 msgid "Enabled"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:144
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:95
 msgid "Disabled"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:155
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:106
 msgid "Edit"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:158
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:109
 msgid "Delete"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:169
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:120
 msgid "No email templates found! So, No emails were sent!"
 msgstr ""
 
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:179
+#: fields/cmb-field-email-templates/cmb-field-email-templates.php:130
 msgid "Create New Email Template"
 msgstr ""
 
@@ -796,6 +873,14 @@ msgstr ""
 #: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:72
 msgid ""
 "Give a clear deadline to grab the offer and add urgency using Countdown timer"
+msgstr ""
+
+#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:76
+msgid "IP Filter (Premium)"
+msgstr ""
+
+#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:77
+msgid "Exclude capturing carts from selected IPs or a range of IPs."
 msgstr ""
 
 #: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:31

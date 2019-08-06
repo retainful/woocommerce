@@ -37,10 +37,9 @@ class CMB2_Field_Abandoned_Cart_Dashboard
             $end_date = $start_end_dates['last_seven']['end_date'];
         }
         $cart_details = $abandoned_cart_obj->getStaticsForDashboard($start_date, $end_date);
-        $plan = $admin->getUserActivePlan();
         $width_class = 'rnoc_width_23';
         $is_free_user = false;
-        if (!in_array($plan, array('pro', 'business'))) {
+        if (!$admin->isProPlan()) {
             $width_class = 'rnoc_width_18';
             $is_free_user = true;
         }

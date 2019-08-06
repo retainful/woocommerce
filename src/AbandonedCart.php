@@ -141,7 +141,7 @@ class AbandonedCart
     function scheduleEmailTemplate($cart_id, $expired_time)
     {
         global $wpdb;
-        $query = "SELECT template.id,template.send_after_time FROM `{$this->email_templates_table}` as template WHERE template.id NOT IN (select template_id FROM `{$this->email_queue_table}` WHERE cart_id = {$cart_id}) AND template.id NOT IN (select template_id FROM `{$this->email_history_table}` WHERE abandoned_order_id = {$cart_id}) ORDER BY template.send_after_time ASC LIMIT 1";
+        $query = "SELECT template.id,template.send_after_time FROM `{$this->email_templates_table}` as template WHERE template.id NOT IN (select template_id FROM `{$this->email_queue_table}` WHERE cart_id = {$cart_id}) AND template.id NOT IN (select template_id FROM `{$this->email_history_table}` WHERE abandoned_order_id = {$cart_id}) AND template.language_code = (SELECT `language_code` FROM `{$this->cart_history_table}` WHERE id={$cart_id}) ORDER BY template.send_after_time ASC LIMIT 1";
         $result = $wpdb->get_row($query);
         if (!empty($result)) {
             $last_sent_email_query = "SELECT sent_time FROM {$this->email_history_table} WHERE abandoned_order_id = {$cart_id} ORDER BY id DESC";

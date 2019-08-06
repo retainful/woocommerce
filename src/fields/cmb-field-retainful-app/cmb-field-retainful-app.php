@@ -82,7 +82,7 @@ class CMB2_Field_Retainful_App
                            style="display: inline-block;font-size: 16px;padding: 10px 20px;text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;line-height:1.6;"><?php echo __('Dashboard', RNOC_TEXT_DOMAIN); ?></a>
                     </div>
                     <?php
-                    if (!in_array($plan, array('pro', 'business'))) {
+                    if (!$admin_settings->isProPlan()) {
                         ?>
                         <div class="premium-msg">
                             <p style="margin: 15px 0;color:#777;font-size: 17px;line-height:1.6;">

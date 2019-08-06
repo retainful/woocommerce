@@ -125,37 +125,6 @@ class CMB2_Field_Premium_Addon_List
         </script>
         <?php
     }
-
-    /**
-     * get all the available addon list
-     * @return array|mixed|object
-     */
-    function getAddonsList()
-    {
-        $addon_list = get_option('rnoc_available_addon', '{}');
-        $addon_list_updated_on = get_option('rnoc_addon_list_updated_at', NULL);
-        $update_addon_list = true;
-        if (!empty($addon_list_updated_on)) {
-            if ($addon_list_updated_on < current_time('timestamp')) {
-                $update_addon_list = false;
-            }
-        }
-        if ($update_addon_list) {
-            if (function_exists('file_get_contents')) {
-                //TODO: Change the json CDN api
-                $remote_addon_list = file_get_contents('https://api.jsonbin.io/b/5cdab7bb14c2b53c0914a41b/6');
-                if (empty($remote_addon_list)) {
-                    $addon_list = '{}';
-                } else {
-                    $addon_list = $remote_addon_list;
-                }
-                update_option('rnoc_available_addon', $addon_list);
-                update_option('rnoc_addon_list_updated_at', current_time('timestamp'));
-            }
-        }
-        $list = json_decode($addon_list);
-        return $list;
-    }
 }
 
 new CMB2_Field_Premium_Addon_List();
