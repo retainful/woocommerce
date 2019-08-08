@@ -48,6 +48,9 @@ class AbandonedCart
      */
     function saveGuestData()
     {
+        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+            return;
+        }
         if (!is_user_logged_in()) {
             global $woocommerce;
             //Can't look up the customer in this situation.
@@ -167,6 +170,9 @@ class AbandonedCart
      */
     function userCartUpdated()
     {
+        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+            return false;
+        }
         global $wpdb, $woocommerce;
         $abandoned_cart_settings = $this->admin->getAdminSettings();
         $current_time = current_time('timestamp');
@@ -250,6 +256,9 @@ class AbandonedCart
      */
     function userLoggedOn($user_name)
     {
+        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+            return;
+        }
         if ($user_name) {
             $user = get_user_by('login', $user_name);
             if (!empty($user)) {
@@ -269,6 +278,9 @@ class AbandonedCart
      */
     function userSignedUp($user_id)
     {
+        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+            return;
+        }
         global $wpdb;
         global $woocommerce;
         //Don't create a record unless a user is logging in with something in their cart
@@ -754,6 +766,9 @@ class AbandonedCart
      */
     function addTrackUserJs()
     {
+        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+            return;
+        }
         $asset_path = plugins_url('', __FILE__);
         wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'capture_guest_details', $asset_path . '/assets/js/track_guest.js', '', '', true);
         wp_localize_script(RNOC_PLUGIN_PREFIX . 'capture_guest_details', 'retainful_guest_capture_params', array('ajax_url' => admin_url('admin-ajax.php')));
