@@ -48,7 +48,7 @@ class AbandonedCart
      */
     function saveGuestData()
     {
-        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+        if ($this->canTrackAbandonedCarts() == false) {
             return;
         }
         if (!is_user_logged_in()) {
@@ -170,8 +170,8 @@ class AbandonedCart
      */
     function userCartUpdated()
     {
-        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
-            return false;
+        if ($this->canTrackAbandonedCarts() == false) {
+            return;
         }
         global $wpdb, $woocommerce;
         $abandoned_cart_settings = $this->admin->getAdminSettings();
@@ -256,7 +256,7 @@ class AbandonedCart
      */
     function userLoggedOn($user_name)
     {
-        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+        if ($this->canTrackAbandonedCarts() == false) {
             return;
         }
         if ($user_name) {
@@ -278,7 +278,7 @@ class AbandonedCart
      */
     function userSignedUp($user_id)
     {
-        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+        if ($this->canTrackAbandonedCarts() == false) {
             return;
         }
         global $wpdb;
@@ -766,7 +766,7 @@ class AbandonedCart
      */
     function addTrackUserJs()
     {
-        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+        if ($this->canTrackAbandonedCarts() == false) {
             return;
         }
         $asset_path = plugins_url('', __FILE__);
@@ -1266,5 +1266,16 @@ class AbandonedCart
         $email_sent_history_count_query = "SELECT count(id) as total_mails_sent FROM `" . $this->email_history_table . "`";
         $count = $wpdb->get_row($email_sent_history_count_query);
         return $count->total_mails_sent;
+    }
+
+    /**
+     * need to track carts or not
+     */
+    function canTrackAbandonedCarts()
+    {
+        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
+            return false;
+        }
+        return true;
     }
 }
