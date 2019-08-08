@@ -64,20 +64,29 @@ if (!function_exists('RnocValidatePluginActivation')) {
         if (version_compare(phpversion(), '5.6', '<')) {
             exit(__('Retainful-woocommerce requires minimum PHP version of 5.6', RNOC_TEXT_DOMAIN));
         }
-        if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
-            exit(__('Woocommerce must installed and activated in-order to use Retainful-Woocommerce!', RNOC_TEXT_DOMAIN));
-        } else {
-            if (!function_exists('get_plugins'))
-                require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-            $plugin_folder = get_plugins('/' . 'woocommerce');
-            $plugin_file = 'woocommerce.php';
-            $wc_installed_version = NULL;
-            $wc_required_version = '2.5';
-            if (isset($plugin_folder[$plugin_file]['Version'])) {
-                $wc_installed_version = $plugin_folder[$plugin_file]['Version'];
+        if (is_multisite()) {
+            if (!function_exists('is_plugin_active_for_network')) {
+                require_once(ABSPATH . '/wp-admin/includes/plugin.php');
             }
-            if (version_compare($wc_required_version, $wc_installed_version, '>=')) {
-                exit(__('Retainful-woocommerce requires minimum Woocommerce version of ', RNOC_TEXT_DOMAIN) . ' ' . $wc_required_version . '. ' . __('But your Woocommerce version is ', RNOC_TEXT_DOMAIN) . ' ' . $wc_installed_version);
+            if (!is_plugin_active_for_network('woocommerce/woocommerce.php')) {
+                exit(__('Woocommerce must installed and activated in-order to use Retainful-Woocommerce!', RNOC_TEXT_DOMAIN));
+            }
+        } else {
+            if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+                exit(__('Woocommerce must installed and activated in-order to use Retainful-Woocommerce!', RNOC_TEXT_DOMAIN));
+            } else {
+                if (!function_exists('get_plugins'))
+                    require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+                $plugin_folder = get_plugins('/' . 'woocommerce');
+                $plugin_file = 'woocommerce.php';
+                $wc_installed_version = NULL;
+                $wc_required_version = '2.5';
+                if (isset($plugin_folder[$plugin_file]['Version'])) {
+                    $wc_installed_version = $plugin_folder[$plugin_file]['Version'];
+                }
+                if (version_compare($wc_required_version, $wc_installed_version, '>=')) {
+                    exit(__('Retainful-woocommerce requires minimum Woocommerce version of ', RNOC_TEXT_DOMAIN) . ' ' . $wc_required_version . '. ' . __('But your Woocommerce version is ', RNOC_TEXT_DOMAIN) . ' ' . $wc_installed_version);
+                }
             }
         }
         do_action('retainful_plugin_activated');
