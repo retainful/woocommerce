@@ -13,7 +13,7 @@ Recover abandoned carts in WooCommerce with a single click using Retainful. Driv
 
 == Description ==
 
-[Retainful](https://wwww.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=visit_site) helps you recover WooCommerce abandoned carts with a single click. It can automatically send a series of email reminders when customers abandon their carts in your shop.
+[Retainful](https://www.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=visit_site) helps you recover WooCommerce abandoned carts with a single click. It can automatically send a series of email reminders when customers abandon their carts in your shop.
 
 == Abandoned Cart Recovery in WooCommerce ==
 
@@ -37,7 +37,7 @@ Retainful can automatically send these abandoned cart reminders in the backgroun
 In addition to abandoned cart recovery emails, Retainful also helps you drive repeat purchases by sending single-use, unique coupon codes for the next purchase.
 The customer can redeem this coupon code during their next purchase. This helps you retain your existing customers, get repeated orders and earn more dollars per customer.
 
-[Demo](https://demo.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=demo) | [Documentation](https://wwww.retainful.com/docs?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
+[Demo](https://demo.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=demo) | [Documentation](https://www.retainful.com/docs?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
 
 ==Features (Free Version) ==
 
