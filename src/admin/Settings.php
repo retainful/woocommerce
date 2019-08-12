@@ -685,7 +685,8 @@ class Settings
     function isProPlan()
     {
         $plan = $this->getUserActivePlan();
-        return (strtolower($plan) == 'pro');
+        $plan = strtolower($plan);
+        return (in_array($plan, array('pro', 'business')));
     }
 
     /**
