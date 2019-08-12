@@ -78,6 +78,8 @@ class Main
      */
     function activateEvents()
     {
+        //Register deactivation hook
+        register_deactivation_hook(RNOC_FILE, array($this, 'onPluginDeactivation'));
         add_action('retainful_plugin_activated', array($this, 'createRequiredTables'));
         //add end points
         add_action('rest_api_init', array($this, 'registerEndPoints'));
@@ -193,6 +195,21 @@ class Main
         $this->checkApi();
     }
 
+    function onPluginDeactivation()
+    {
+        $this->removeAllScheduledActions();
+    }
+
+    /**
+     * Remove all actions without any knowledge
+     */
+    function removeAllScheduledActions()
+    {
+        $this->abandoned_cart->removeFinishedHooks('rnoc_abandoned_clear_abandoned_carts');
+        $this->abandoned_cart->removeFinishedHooks('rnoc_abandoned_cart_send_email');
+        $this->abandoned_cart->removeFinishedHooks('rnocp_check_user_plan');
+    }
+
     /**
      * Migration to v1.2.0
      */
@@ -283,7 +300,7 @@ class Main
                 as_schedule_recurring_action(time(), 604800, 'rnocp_check_user_plan');
             }
             if (!as_next_scheduled_action('rnoc_abandoned_cart_send_email')) {
-                as_schedule_recurring_action(time(), 300, 'rnoc_abandoned_cart_send_email');
+                as_schedule_recurring_action(time(), 900, 'rnoc_abandoned_cart_send_email');
             }
         }
     }
@@ -296,27 +313,8 @@ class Main
         $api_key = $this->admin->getApiKey();
         if (!empty($api_key)) {
             $this->admin->isApiEnabled($api_key);
-            $this->removeFinishedHooks();
+            $this->abandoned_cart->removeFinishedHooks('rnocp_check_user_plan', 'publish');
         }
-    }
-
-    /**
-     * Remove all hooks and schedule once
-     * @return bool
-     */
-    function removeFinishedHooks()
-    {
-        global $wpdb;
-        $res = true;
-        $scheduled_actions = $wpdb->get_results("SELECT ID from `" . $wpdb->prefix . "posts` where post_title like '%rnocp_check_user_plan%' AND post_status like 'publish' AND  post_type='scheduled-action'");
-        if (!empty($scheduled_actions)) {
-            foreach ($scheduled_actions as $action) {
-                if (!wp_delete_post($action->ID, true)) {
-                    $res = false;
-                }
-            }
-        }
-        return $res;
     }
 
     /**

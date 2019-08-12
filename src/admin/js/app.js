@@ -11,6 +11,13 @@
                 event.preventDefault();
             }
         });
+        $(document).on("change", "#rnoc_cart_abandoned_time", function (event) {
+            let value = $(this).val();
+            let consider_time = parseInt(value);
+            if (consider_time < 15) {
+                $(this).val(15);
+            }
+        });
     });
 
 })(jQuery);

@@ -367,7 +367,7 @@ class Settings
                 'desc' => __('In minutes. Example: You can consider a cart as abandoned 15 minutes after it was added', RNOC_TEXT_DOMAIN),
                 'attributes' => array(
                     'type' => 'number',
-                    'min' => 1,
+                    'min' => 15,
                     'class' => 'number_only_field'
                 ),
                 'default' => 60

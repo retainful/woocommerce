@@ -331,6 +331,7 @@ class AbandonedCart
     function sendAbandonedCartEmails()
     {
         global $wpdb;
+        $this->removeFinishedHooks('rnoc_abandoned_cart_send_email', 'publish');
         $current_time = current_time('timestamp');
         $to_remain_history_query = "SELECT history.*,queue.id as queue_id,template.language_code as template_language_code,queue.template_id as template_id,template.subject,template.extra ,template.body FROM `{$this->email_queue_table}` AS queue LEFT JOIN `{$this->cart_history_table}` AS history ON history.id = queue.cart_id LEFT JOIN `{$this->email_templates_table}` as template ON template.id = queue.template_id WHERE queue.is_completed = 0 AND queue.run_at < {$current_time} AND history.cart_is_recovered = 0 AND history.order_id IS NULL";
         $to_remain_histories = $wpdb->get_results($to_remain_history_query);
@@ -544,18 +545,44 @@ class AbandonedCart
             }
         }
         //Remove all hooks
-        $this->removeFinishedHooks();
+        $this->removeFinishedHooks('rnoc_abandoned_clear_abandoned_carts', 'publish');
     }
 
     /**
+     * All the available scheduled actions post name
+     * @return array
+     */
+    protected function availableScheduledActions()
+    {
+        return array('rnocp_check_user_plan', 'rnoc_abandoned_clear_abandoned_carts', 'rnoc_abandoned_cart_send_email');
+    }
+    /**
      * Remove all hooks and schedule once
+     * @param $post_title
+     * @param $status
      * @return bool
      */
-    function removeFinishedHooks()
+    function removeFinishedHooks($post_title, $status = "")
     {
+        $available_action_names = $this->availableScheduledActions();
+        if (!empty($post_title) && !in_array($post_title, $available_action_names)) {
+            return false;
+        }
         global $wpdb;
-        $wpdb->query("delete from `" . $wpdb->prefix . "posts` where (post_title like '%rnoc_abandoned_cart_send_email%' OR post_title like '%rnoc_abandoned_clear_abandoned_carts%') AND post_status like 'publish' AND post_type='scheduled-action'");
-        return true;
+        $res = true;
+        $where = "";
+        if (!empty($status)) {
+            $where = "AND post_status = '" . $status . "'";
+        }
+        $scheduled_actions = $wpdb->get_results("SELECT ID from `" . $wpdb->prefix . "posts` where post_title ='" . $post_title . "' {$where} AND  post_type='scheduled-action'");
+        if (!empty($scheduled_actions)) {
+            foreach ($scheduled_actions as $action) {
+                if (!wp_delete_post($action->ID, true)) {
+                    $res = false;
+                }
+            }
+        }
+        return $res;
     }
 
     /**
