@@ -436,6 +436,8 @@ class OrderCoupon
                 wp_update_post($my_post);
             }
         }
+        //Create new coupon if coupon not found for order while sending the email
+        $this->createNewCoupon($order_id, array());
         $this->scheduleSync($order_id);
         return true;
     }
