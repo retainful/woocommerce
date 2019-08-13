@@ -12,7 +12,7 @@
  * Plugin URI: https://www.retainful.com
  * Requires at least: 4.6.1
  * WC requires at least: 2.5
- * WC tested up to: 3.5
+ * WC tested up to: 3.7
  */
 if (!defined('ABSPATH')) exit;
 /**
