@@ -221,7 +221,9 @@ class OrderCoupon
                     }
                 }
             }
+            $message = apply_filters('rnoc_before_displaying_next_order_coupon', $message);
             echo $message;
+            do_action('rnoc_after_displaying_next_order_coupon');
         }
     }
 

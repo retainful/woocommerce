@@ -106,6 +106,8 @@ class Main
             $hook = $this->admin->couponMessageHook();
             if (!empty($hook))
                 add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
+            //add action for filter
+            add_action('rnoc_show_order_coupon', array($this->rnoc, 'attachOrderCoupon'), 10, 4);
             //Sync the coupon details with retainful
             add_action('retainful_cron_sync_coupon_details', array($this->rnoc, 'cronSendCouponDetails'), 1);
             //Remove coupon code after placing order

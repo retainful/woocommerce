@@ -14,7 +14,7 @@
 ----------------------------------------------------------------------
 
 add_action('wcdn_after_addresses',function($order){
-	do_action('woocommerce_email_customer_details',$order,true,'','');
+	do_action('rnoc_show_order_coupon',$order,true,'','');
 });
 
 -----------------------------------------------------------------------
