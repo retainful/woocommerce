@@ -124,6 +124,17 @@ class CMB2_Field_Edit_Email_Template
                 </div>
                 <div class="cmb-row table-layout">
                     <div class="cmb-th">
+                        <label><?php echo __('Is Email template active?', RNOC_TEXT_DOMAIN); ?></label>
+                    </div>
+                    <div class="cmb-td">
+                        <select name="active" id="field_is_active">
+                            <option value="1" <?php echo isset($template->is_active) ? ($template->is_active == "1") ? "selected" : "" : '' ?>><?php echo __('Yes', RNOC_TEXT_DOMAIN) ?></option>
+                            <option value="0" <?php echo isset($template->is_active) ? ($template->is_active == "0") ? "selected" : "" : '' ?>><?php echo __('No', RNOC_TEXT_DOMAIN) ?></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="cmb-row table-layout">
+                    <div class="cmb-th">
                         <label><?php echo __('Email Body', RNOC_TEXT_DOMAIN); ?></label>
                     </div>
                     <div class="cmb-td">
@@ -184,7 +195,7 @@ class CMB2_Field_Edit_Email_Template
                 </div>
                 <div class="cmb-row table-layout">
                     <div class="cmb-th">
-                        <label><?php echo __('Send this email in'); ?></label>
+                        <label><?php echo __('Send this email in', RNOC_TEXT_DOMAIN); ?></label>
                     </div>
                     <div class="cmb-td">
                         <input type="text" class="number_only_field" name="frequency"
@@ -199,7 +210,7 @@ class CMB2_Field_Edit_Email_Template
                 </div>
                 <div class="cmb-row table-layout">
                     <div class="cmb-th">
-                        <label><?php echo __('Send a test email to'); ?></label>
+                        <label><?php echo __('Send a test email to', RNOC_TEXT_DOMAIN); ?></label>
                     </div>
                     <div class="cmb-td">
                         <input type="text" class="regular-text" id="test_mail_to">
