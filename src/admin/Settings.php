@@ -665,8 +665,10 @@ class Settings
             $api_key = $this->getApiKey();
             if (!empty($api_key)) {
                 $this->isApiEnabled($api_key);
-                $plan_details = get_option('rnoc_plan_details', array());
+            } else {
+                $this->updateUserAsFreeUser();
             }
+            $plan_details = get_option('rnoc_plan_details', array());
         }
         if (empty($plan_details)) {
             $plan_details = array(
@@ -710,15 +712,35 @@ class Settings
         }
         if (!empty($api_key)) {
             if ($details = $this->api->validateApi($api_key)) {
-                update_option('rnoc_plan_details', $details);
-                update_option('rnoc_last_plan_checked', current_time('timestamp'));
+                $this->updatePlanDetails($details);
                 return true;
             } else {
+                $this->updateUserAsFreeUser();
                 return false;
             }
         } else {
+            $this->updateUserAsFreeUser();
             return false;
         }
+    }
+
+    /**
+     * update user as Free user
+     */
+    function updateUserAsFreeUser()
+    {
+        $details = $this->api->getPlanDetails();
+        $this->updatePlanDetails($details);
+    }
+
+    /**
+     * update the plan details
+     * @param array $details
+     */
+    function updatePlanDetails($details = array())
+    {
+        update_option('rnoc_plan_details', $details);
+        update_option('rnoc_last_plan_checked', current_time('timestamp'));
     }
 
     /**

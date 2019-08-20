@@ -315,8 +315,10 @@ class Main
         $api_key = $this->admin->getApiKey();
         if (!empty($api_key)) {
             $this->admin->isApiEnabled($api_key);
-            $this->abandoned_cart->removeFinishedHooks('rnocp_check_user_plan', 'publish');
+        } else {
+            $this->admin->updateUserAsFreeUser();
         }
+        $this->abandoned_cart->removeFinishedHooks('rnocp_check_user_plan', 'publish');
     }
 
     /**

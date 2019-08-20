@@ -124,13 +124,11 @@ class CMB2_Field_Edit_Email_Template
                 </div>
                 <div class="cmb-row table-layout">
                     <div class="cmb-th">
-                        <label><?php echo __('Is Email template active?', RNOC_TEXT_DOMAIN); ?></label>
+                        <label><?php echo __('Enabled?', RNOC_TEXT_DOMAIN); ?></label>
                     </div>
                     <div class="cmb-td">
-                        <select name="active" id="field_is_active">
-                            <option value="1" <?php echo isset($template->is_active) ? ($template->is_active == "1") ? "selected" : "" : '' ?>><?php echo __('Yes', RNOC_TEXT_DOMAIN) ?></option>
-                            <option value="0" <?php echo isset($template->is_active) ? ($template->is_active == "0") ? "selected" : "" : '' ?>><?php echo __('No', RNOC_TEXT_DOMAIN) ?></option>
-                        </select>
+                        <label><input type="radio" name="active" value="1" <?php echo isset($template->is_active) ? ($template->is_active == "1") ? "checked" : "" : '' ?>><?php echo __('Yes', RNOC_TEXT_DOMAIN) ?></label>
+                        <label><input type="radio" name="active" value="0" <?php echo isset($template->is_active) ? ($template->is_active == "0") ? "checked" : "" : '' ?>><?php echo __('No', RNOC_TEXT_DOMAIN) ?></label>
                     </div>
                 </div>
                 <div class="cmb-row table-layout">
@@ -277,7 +275,7 @@ class CMB2_Field_Edit_Email_Template
                     font-weight: 500;
                     margin: 20px 0 10px;
                     text-transform: capitalize;
-                    white-space: nowrap;
+                    white-space: pre-wrap;
                     border-radius: 4px;
                     box-sizing: border-box;
                     transition: .2s;

@@ -23,13 +23,24 @@ class OrderCoupon
     function validateAppKey()
     {
         $app_id = isset($_REQUEST['app_id']) ? $_REQUEST['app_id'] : '';
+        $options_data = array(
+            RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => '0',
+            RNOC_PLUGIN_PREFIX . 'retainful_app_id' => $app_id
+        );
+        $slug = $this->admin->slug;
+        //Save app id before validate key
+        update_option($slug . '_license', $options_data);
         $response = array();
+        $this->admin->updateUserAsFreeUser();
         if (empty($app_id)) {
             $response['error'] = __('Please enter App-Id', RNOC_TEXT_DOMAIN);
         }
         if (empty($response)) {
             $is_api_enabled = $this->admin->isApiEnabled($app_id);
             if ($is_api_enabled) {
+                //Change app id status
+                $options_data[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 1;
+                update_option($slug . '_license', $options_data);
                 $response['success'] = __('Successfully connected to Retainful', RNOC_TEXT_DOMAIN);
             } else {
                 $response['error'] = __('Please enter Valid App-Id', RNOC_TEXT_DOMAIN);

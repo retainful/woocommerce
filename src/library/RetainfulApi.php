@@ -32,14 +32,26 @@ class RetainfulApi
             $plan = isset($response->plan) ? strtolower($response->plan) : 'free';
             $status = isset($response->status) ? strtolower($response->status) : 'active';
             $period_end = isset($response->period_end) ? strtolower($response->period_end) : 'never';
-            return array(
-                'plan' => $plan,
-                'status' => $status,
-                'expired_on' => $period_end
-            );
+            return $this->getPlanDetails($plan, $status, $period_end);
         } else {
             return false;
         }
+    }
+
+    /**
+     *  plan details
+     * @param null $plan
+     * @param null $status
+     * @param null $period_end
+     * @return array
+     */
+    function getPlanDetails($plan = NULL, $status = NULL, $period_end = NULL)
+    {
+        return array(
+            'plan' => (empty($plan)) ? 'free' : $plan,
+            'status' => (empty($status)) ? 'active' : $status,
+            'expired_on' => (empty($period_end)) ? 'never' : $period_end
+        );
     }
 
     /**

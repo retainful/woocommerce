@@ -22,11 +22,12 @@
         var path = $("#retainful_ajax_path").val();
         var app_id = $("#retainful_app_id");
         var message = $(".retainful_app_validation_message");
+        var submit_btn =  $("#submit-cmb");
         $("#connect-to-retainful-loader").show();
         message.html('<p>&nbsp;</p>');
         $("#is_retainful_app_connected").val(0);
         if (app_id.val() !== "") {
-            $("#submit-cmb").attr('disabled', 'disabled');
+            submit_btn.attr('disabled', 'disabled');
         }
         $.ajax({
             url: path,
@@ -35,25 +36,24 @@
             data: {action: 'validate_app_key', app_id: app_id.val()},
             success: function (response) {
                 if (response.error && app_id.val() !== "") {
-                    app_id.val("");
                     app_id.focus();
-                    $("#submit-cmb").removeAttr('disabled');
+                    submit_btn.removeAttr('disabled');
                     $("#connect-to-retainful-loader").hide();
                     message.html('<p style="color:red;">' + response.error + '</p>');
                 }
                 if (response.error && app_id.val() === "") {
                     app_id.focus();
-                    $("#submit-cmb").removeAttr('disabled');
+                    submit_btn.removeAttr('disabled');
                     $("#connect-to-retainful-loader").hide();
                     message.html('<p style="color:red;">' + response.error + '</p>');
                 }
                 if (response.success) {
                     $("#is_retainful_app_connected").val(1);
                     message.html('<p style="color:green;">' + response.success + '</p>');
-                    $("#submit-cmb").removeAttr('disabled');
-                    $("#submit-cmb").trigger("click");
+                    submit_btn.removeAttr('disabled');
                     $("#connect-to-retainful-loader").hide();
                 }
+                submit_btn.trigger("click");
             }
         });
     }
