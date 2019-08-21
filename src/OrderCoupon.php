@@ -188,7 +188,7 @@ class OrderCoupon
     function attachOrderCoupon($order, $sent_to_admin, $plain_text, $email)
     {
         $order_id = $this->wc_functions->getOrderId($order);
-        if (!$this->hasValidOrderStatus($order_id)) {
+        if (!$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id)) {
             return false;
         }
         $coupon_code = '';
@@ -556,6 +556,46 @@ class OrderCoupon
     }
 
     /**
+     * Check for order user has valid user roles to generate coupon
+     * @param $order_id
+     * @return bool
+     */
+    function hasValidUserRoles($order_id)
+    {
+        $valid_user_roles = $this->admin->getCouponValidUserRoles();
+        if (!empty($valid_user_roles)) {
+            if (!in_array('all', $valid_user_roles)) {
+                $order = $this->wc_functions->getOrder($order_id);
+                $order_roles = $this->getUserRoleFromOrder($order);
+                if (count(array_intersect($order_roles, $valid_user_roles)) == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * get the user role from order object
+     * @param $order
+     * @return array
+     */
+    function getUserRoleFromOrder($order)
+    {
+        $user = '';
+        $this->wc_functions->getOrderUser($order);
+        if (empty($user)) {
+            $user_email = $this->wc_functions->getOrderEmail($order);
+            $user = $this->wc_functions->getUserByEmail($user_email);
+        }
+        if (!empty($user)) {
+            $user_roles = isset($user->roles) ? $user->roles : array();
+            return $user_roles;
+        }
+        return array();
+    }
+
+    /**
      * Create new coupon
      * @param $order_id
      * @param $data
@@ -566,7 +606,7 @@ class OrderCoupon
         $order_id = sanitize_key($order_id);
         if (empty($order_id)) return false;
         $coupon = $this->isCouponFound($order_id);
-        if (!$this->hasValidOrderStatus($order_id)) {
+        if (!$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id)) {
             return NULL;
         }
         $order = $this->wc_functions->getOrder($order_id);

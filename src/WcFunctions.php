@@ -106,6 +106,22 @@ class WcFunctions
     }
 
     /**
+     * get the user by email
+     * @param $email
+     * @return bool|\WP_User|null
+     */
+    function getUserByEmail($email)
+    {
+        if (empty($email)) {
+            return NULL;
+        }
+        if (function_exists('get_user_by')) {
+            return get_user_by('email', $email);
+        }
+        return NULL;
+    }
+
+    /**
      * Get used coupons of order
      * @param $order
      * @return null
@@ -241,6 +257,19 @@ class WcFunctions
             return $order->get_user_id();
         } elseif (isset($order->user_id)) {
             return $order->user_id;
+        }
+        return NULL;
+    }
+
+    /**
+     * get Order User
+     * @param $order
+     * @return null
+     */
+    function getOrderUser($order)
+    {
+        if (method_exists($order, 'get_user')) {
+            return $order->get_user();
         }
         return NULL;
     }

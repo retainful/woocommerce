@@ -27,60 +27,65 @@ class CMB2_Field_Unlock_Features
     public function render_unlock_features($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
     {
         $for = isset($field->args['for']) ? $field->args['for'] : 'pro-coupon-usage-restriction';
+        $link_only_field = isset($field->args['link_only_field']) ? $field->args['link_only_field'] : 1;
         $admin = new \Rnoc\Retainful\Admin\Settings();
-        $redirect_url = isset($field->args['redirect_url']) ? $field->args['redirect_url'] : admin_url('admin.php?page=' . $admin->slug . '_license');
-        ?>
-        <style>
-            .overlay-container {
-                position: relative;
-            }
+        if ($link_only_field == 1) {
+            echo $admin->unlockPremiumLink();
+        } else {
+            $redirect_url = isset($field->args['redirect_url']) ? $field->args['redirect_url'] : admin_url('admin.php?page=' . $admin->slug . '_license');
+            ?>
+            <style>
+                .overlay-container {
+                    position: relative;
+                }
 
-            .overlay-image {
-                opacity: 1;
-                display: block;
-                width: 100%;
-                height: auto;
-                transition: .5s ease;
-                backface-visibility: hidden;
-            }
+                .overlay-image {
+                    opacity: 1;
+                    display: block;
+                    width: 100%;
+                    height: auto;
+                    transition: .5s ease;
+                    backface-visibility: hidden;
+                }
 
-            .container-middle {
-                transition: .5s ease;
-                opacity: 0;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                -ms-transform: translate(-50%, -50%);
-                text-align: center;
-            }
+                .container-middle {
+                    transition: .5s ease;
+                    opacity: 0;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    -ms-transform: translate(-50%, -50%);
+                    text-align: center;
+                }
 
-            .overlay-container:hover .overlay-image {
-                opacity: 0.3;
-            }
+                .overlay-container:hover .overlay-image {
+                    opacity: 0.3;
+                }
 
-            .overlay-container:hover .container-middle {
-                opacity: 1;
-            }
+                .overlay-container:hover .container-middle {
+                    opacity: 1;
+                }
 
-            .overlay-text {
-                font-size: 16px;
-                padding: 16px 32px;
-            }
-        </style>
-        <div class="overlay-container">
-            <img src="<?php echo RNOC_PLUGIN_URL ?>src/assets/images/<?php echo $for; ?>.png" width="100%"
-                 class="overlay-image">
-            <div class="container-middle">
-                <div class="overlay-text"><span
-                            class="dashicons-lock dashicons"></span><?php echo __('Unlock this features!', RNOC_TEXT_DOMAIN) ?>
-                    <br><br>
-                    <a href="<?php echo $redirect_url; ?>"
-                       target="_blank"><?php echo __('Click Here!', RNOC_TEXT_DOMAIN); ?></a>
+                .overlay-text {
+                    font-size: 16px;
+                    padding: 16px 32px;
+                }
+            </style>
+            <div class="overlay-container">
+                <img src="<?php echo RNOC_PLUGIN_URL ?>src/assets/images/<?php echo $for; ?>.png" width="100%"
+                     class="overlay-image">
+                <div class="container-middle">
+                    <div class="overlay-text"><span
+                                class="dashicons-lock dashicons"></span><?php echo __('Unlock this features!', RNOC_TEXT_DOMAIN) ?>
+                        <br><br>
+                        <a href="<?php echo $redirect_url; ?>"
+                           target="_blank"><?php echo __('Click Here!', RNOC_TEXT_DOMAIN); ?></a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <?php
+            <?php
+        }
     }
 }
 

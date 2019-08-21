@@ -163,6 +163,26 @@ class Settings
                 'default' => array('all'),
                 'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN)
             ));
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
+                    'type' => 'pw_multiselect',
+                    'options' => $this->getUserRoles(),
+                    'attributes' => array(
+                        'placeholder' => __('Select User Roles', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => array('all'),
+                    'desc' => __('Please select the user roles to restrict', RNOC_TEXT_DOMAIN)
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_user_role_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1
+                ));
+            }
             $next_order_coupon->add_field(array(
                 'name' => __('Coupon type', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
@@ -655,6 +675,24 @@ class Settings
     }
 
     /**
+     *
+     * Get all user roles
+     * @return array - list of all user roles
+     */
+    function getUserRoles()
+    {
+        global $wp_roles;
+        $all_roles = $wp_roles->roles;
+        $user_roles = array('all' => __('All', RNOC_TEXT_DOMAIN));
+        if (!empty($all_roles)) {
+            foreach ($all_roles as $role_name => $role) {
+                $user_roles[$role_name] = isset($role['name']) ? $role['name'] : '';
+            }
+        }
+        return $user_roles;
+    }
+
+    /**
      * get the plan details of the API
      * @return array|mixed
      */
@@ -824,6 +862,22 @@ class Settings
             return isset($settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status'] : $statuses;
         }
         return $statuses;
+    }
+
+    /**
+     * get coupon settings from admin
+     * @return array
+     */
+    function getCouponValidUserRoles()
+    {
+        $roles = array('all');
+        if ($this->isProPlan()) {
+            $usage_restrictions = get_option($this->slug, array());
+            if (!empty($usage_restrictions)) {
+                return isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'preferred_user_roles']) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'preferred_user_roles'] : $roles;
+            }
+        }
+        return $roles;
     }
 
     /**
