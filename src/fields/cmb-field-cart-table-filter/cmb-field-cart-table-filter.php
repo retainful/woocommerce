@@ -62,8 +62,8 @@ class CMB2_Field_Cart_Table_Filter
                 <select name="cart_type" class="custom-select" id="cart-type-selection">
                     <option value="all" <?php echo ($cart_type == "all") ? 'selected' : ''; ?>><?php echo __('All Carts', RNOC_TEXT_DOMAIN); ?></option>
                     <option value="abandoned" <?php echo ($cart_type == "abandoned") ? 'selected' : ''; ?>><?php echo __('All abandoned Carts', RNOC_TEXT_DOMAIN); ?></option>
-                    <option value="recovered" <?php echo ($cart_type == "recovered") ? 'selected' : ''; ?>><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></option>
                     <option value="recoverable" <?php echo ($cart_type == "recoverable") ? 'selected' : ''; ?>><?php echo __('Recoverable Carts', RNOC_TEXT_DOMAIN); ?></option>
+                    <option value="recovered" <?php echo ($cart_type == "recovered") ? 'selected' : ''; ?>><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></option>
                     <?php
                     $abandoned_cart_settings = $abandoned_cart->admin->getAdminSettings();
                     $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
