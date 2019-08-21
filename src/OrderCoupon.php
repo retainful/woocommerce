@@ -582,8 +582,7 @@ class OrderCoupon
      */
     function getUserRoleFromOrder($order)
     {
-        $user = '';
-        $this->wc_functions->getOrderUser($order);
+        $user = $this->wc_functions->getOrderUser($order);
         if (empty($user)) {
             $user_email = $this->wc_functions->getOrderEmail($order);
             $user = $this->wc_functions->getUserByEmail($user_email);

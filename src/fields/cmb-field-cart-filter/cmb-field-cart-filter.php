@@ -25,13 +25,13 @@ class CMB2_Field_Date_Range_Picker
         $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
         $start_end_dates = $abandoned_cart->start_end_dates;
         $start_end_dates_select = $abandoned_cart->start_end_dates_label;
-        $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_seven';
+        $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_thirty';
         if ($duration != "custom") {
             $selected_dates = $start_end_dates[$duration]['start_date'] . ' - ' . $start_end_dates[$duration]['end_date'];
         } else if (isset($_GET['start']) && isset($_GET['end'])) {
             $selected_dates = $_GET['start'] . ' - ' . $_GET['start'];
         } else {
-            $selected_dates = $start_end_dates['last_seven']['start_date'] . ' - ' . $start_end_dates['last_seven']['end_date'];
+            $selected_dates = $start_end_dates['last_thirty']['start_date'] . ' - ' . $start_end_dates['last_thirty']['end_date'];
         }
         ?>
         <script>

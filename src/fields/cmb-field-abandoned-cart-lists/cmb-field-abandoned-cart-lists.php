@@ -27,7 +27,7 @@ class CMB2_Field_Abandoned_Cart_Lists
         $settings = new \Rnoc\Retainful\Admin\Settings();
         $start_end_dates = $abandoned_cart_obj->start_end_dates;
         $limit = 20;
-        $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_seven';
+        $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_thirty';
         if ($duration != "custom") {
             $start_date = $start_end_dates[$duration]['start_date'];
             $end_date = $start_end_dates[$duration]['end_date'];
@@ -35,8 +35,8 @@ class CMB2_Field_Abandoned_Cart_Lists
             $start_date = $_GET['start'];
             $end_date = $_GET['start'];
         } else {
-            $start_date = $start_end_dates['last_seven']['start_date'];
-            $end_date = $start_end_dates['last_seven']['end_date'];
+            $start_date = $start_end_dates['last_thirty']['start_date'];
+            $end_date = $start_end_dates['last_thirty']['end_date'];
         }
         $show_only = isset($_GET['show_only']) ? $_GET['show_only'] : 'all';
         $cart_type = isset($_GET['cart_type']) ? $_GET['cart_type'] : 'all';
@@ -180,7 +180,7 @@ class CMB2_Field_Abandoned_Cart_Lists
                             } elseif (!empty($guest_email)) {
                                 echo '<a href="mailto:' . $guest_email . '">' . $guest_email . '</a>';
                             } else { ?>
-                                <span style="color:#888888"><?php echo __('This is guest cart', RNOC_TEXT_DOMAIN); ?></span>
+                                <span style="color:#888888"><?php echo __('This is a guest cart. No email left by customer', RNOC_TEXT_DOMAIN); ?></span>
                                 <?php
                             }
                             ?>

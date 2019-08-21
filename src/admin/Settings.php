@@ -978,4 +978,10 @@ class Settings
         }
         return $this->api->emailTrack($url, $params);
     }
+
+    function setupSurveyForm()
+    {
+        $survey = new Survey();
+        $survey->init(RNOC_PLUGIN_SLUG, 'Retainful - next order coupon for woocommerce', RNOC_TEXT_DOMAIN);
+    }
 }

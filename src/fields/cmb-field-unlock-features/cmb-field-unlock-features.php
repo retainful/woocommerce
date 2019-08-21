@@ -27,7 +27,7 @@ class CMB2_Field_Unlock_Features
     public function render_unlock_features($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
     {
         $for = isset($field->args['for']) ? $field->args['for'] : 'pro-coupon-usage-restriction';
-        $link_only_field = isset($field->args['link_only_field']) ? $field->args['link_only_field'] : 1;
+        $link_only_field = isset($field->args['link_only_field']) ? $field->args['link_only_field'] : 0;
         $admin = new \Rnoc\Retainful\Admin\Settings();
         if ($link_only_field == 1) {
             echo $admin->unlockPremiumLink();

@@ -20,6 +20,12 @@ if (!defined('ABSPATH')) exit;
  */
 if (!defined('RNOC_TEXT_DOMAIN'))
     define('RNOC_TEXT_DOMAIN', 'retainful-next-order-coupon-for-woocommerce');
+
+/**
+ * Define the plugin slug
+ */
+if (!defined('RNOC_PLUGIN_SLUG'))
+    define('RNOC_PLUGIN_SLUG', 'retainful-next-order-coupon-for-woocommerce');
 /**
  * Current version of our app
  */

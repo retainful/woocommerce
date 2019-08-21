@@ -25,7 +25,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
         $abandoned_cart_obj = new \Rnoc\Retainful\AbandonedCart();
         $admin = new \Rnoc\Retainful\Admin\Settings();
         $start_end_dates = $abandoned_cart_obj->start_end_dates;
-        $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_seven';
+        $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_thirty';
         if ($duration != "custom") {
             $start_date = $start_end_dates[$duration]['start_date'];
             $end_date = $start_end_dates[$duration]['end_date'];
@@ -33,8 +33,8 @@ class CMB2_Field_Abandoned_Cart_Dashboard
             $start_date = $_GET['start'];
             $end_date = $_GET['start'];
         } else {
-            $start_date = $start_end_dates['last_seven']['start_date'];
-            $end_date = $start_end_dates['last_seven']['end_date'];
+            $start_date = $start_end_dates['last_thirty']['start_date'];
+            $end_date = $start_end_dates['last_thirty']['end_date'];
         }
         $cart_details = $abandoned_cart_obj->getStaticsForDashboard($start_date, $end_date);
         $width_class = 'rnoc_width_23';
@@ -48,7 +48,7 @@ class CMB2_Field_Abandoned_Cart_Dashboard
             <div class="rnoc_counter_widget widget_violet card_main_box <?php echo $width_class; ?>">
                 <div class="rnoc_counter_container">
                     <div class="rnoc_widget_title_container">
-                        <span class="rnoc_counter_title card-box-name "><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></span>
+                        <span class="rnoc_counter_title card-box-name "><?php echo __('All abandoned Carts', RNOC_TEXT_DOMAIN); ?></span>
                     </div>
 					<div class="avatar-lg avatar-lg-1">
 						<img src="<?php echo RNOC_PLUGIN_URL; ?>src/assets/images/icon-1.png" class="img_icon" alt="Abandoned Carts">

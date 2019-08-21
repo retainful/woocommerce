@@ -24,7 +24,7 @@ class CMB2_Field_Cart_Table_Filter
         $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
         $cart_type = isset($_GET['cart_type']) ? $_GET['cart_type'] : 'all';
         $start_end_dates = $abandoned_cart->start_end_dates;
-        $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_seven';
+        $duration = (isset($_GET['duration'])) ? $_GET['duration'] : 'last_thirty';
         if ($duration != "custom") {
             $start_date = $start_end_dates[$duration]['start_date'];
             $end_date = $start_end_dates[$duration]['end_date'];
@@ -32,8 +32,8 @@ class CMB2_Field_Cart_Table_Filter
             $start_date = $_GET['start'];
             $end_date = $_GET['start'];
         } else {
-            $start_date = $start_end_dates['last_seven']['start_date'];
-            $end_date = $start_end_dates['last_seven']['end_date'];
+            $start_date = $start_end_dates['last_thirty']['start_date'];
+            $end_date = $start_end_dates['last_thirty']['end_date'];
         }
         $date_arr = array(
             'start' => $start_date,
@@ -61,8 +61,9 @@ class CMB2_Field_Cart_Table_Filter
             <label class="filter_by"><?php echo __('Filter by', RNOC_TEXT_DOMAIN) ?>
                 <select name="cart_type" class="custom-select" id="cart-type-selection">
                     <option value="all" <?php echo ($cart_type == "all") ? 'selected' : ''; ?>><?php echo __('All Carts', RNOC_TEXT_DOMAIN); ?></option>
-                    <option value="abandoned" <?php echo ($cart_type == "abandoned") ? 'selected' : ''; ?>><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></option>
+                    <option value="abandoned" <?php echo ($cart_type == "abandoned") ? 'selected' : ''; ?>><?php echo __('All abandoned Carts', RNOC_TEXT_DOMAIN); ?></option>
                     <option value="recovered" <?php echo ($cart_type == "recovered") ? 'selected' : ''; ?>><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></option>
+                    <option value="recoverable" <?php echo ($cart_type == "recoverable") ? 'selected' : ''; ?>><?php echo __('Recoverable Carts', RNOC_TEXT_DOMAIN); ?></option>
                     <?php
                     $abandoned_cart_settings = $abandoned_cart->admin->getAdminSettings();
                     $is_tracking_enabled = (isset($abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'])) ? $abandoned_cart_settings[RNOC_PLUGIN_PREFIX . 'track_real_time_cart'] : 1;
@@ -81,7 +82,7 @@ class CMB2_Field_Cart_Table_Filter
             <a href="<?php echo $url . '&cart_type=all&' . http_build_query($date_arr) ?>"
                class="wp-ui-filters <?php echo ($cart_type == "all") ? 'active' : ''; ?>"><?php echo __('All Carts', RNOC_TEXT_DOMAIN); ?></a>
             <a href="<?php echo $url . '&cart_type=abandoned&' . http_build_query($date_arr) ?>"
-               class="wp-ui-filters <?php echo ($cart_type == "abandoned") ? 'active' : ''; ?>"><?php echo __('Abandoned Carts', RNOC_TEXT_DOMAIN); ?></a>
+               class="wp-ui-filters <?php echo ($cart_type == "abandoned") ? 'active' : ''; ?>"><?php echo __('All abandoned Carts', RNOC_TEXT_DOMAIN); ?></a>
             <a href="<?php echo $url . '&cart_type=recovered&' . http_build_query($date_arr) ?>"
                class="wp-ui-filters <?php echo ($cart_type == "recovered") ? 'active' : ''; ?>"><?php echo __('Recovered Carts', RNOC_TEXT_DOMAIN); ?></a>
             <?php
