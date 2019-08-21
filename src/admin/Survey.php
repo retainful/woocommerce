@@ -80,6 +80,9 @@ class Survey
                                 id: '<?php echo mailchimp_get_store_id()?>',
                                 url: '<?php echo esc_url(home_url()); ?>',
                                 data: {
+                                    subject:"",
+                                    message:"",
+                                    token:"",
                                     code: $form.find('.selected input[type=radio]').val(),
                                     reason: $form.find('.selected .<?php echo $this->plugin; ?>-deactivate-survey-option-reason').val(),
                                     details: $form.find('.selected input[type=text]').val(),

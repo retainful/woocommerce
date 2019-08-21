@@ -893,7 +893,7 @@ class AbandonedCart
         } elseif ($cart_type == 'recovered') {
             $get_only = ' AND cart_is_recovered=1 ';
         } elseif ($cart_type == 'recoverable') {
-            $get_only = ' AND (Length(customer_key) < 32 OR (SELECT id FROM `' . $this->guest_cart_history_table . '` WHERE session_id = `' . $this->cart_history_table . '`.customer_key AND email_id is NOT NULL)) ';
+            $get_only = 'AND cart_is_recovered =0  AND (Length(customer_key) < 32 OR (SELECT id FROM `' . $this->guest_cart_history_table . '` WHERE session_id = `' . $this->cart_history_table . '`.customer_key AND email_id is NOT NULL)) ';
             if($is_tracking_enabled) {
                 $get_only .= ' AND cart_expiry <' . $current_time . ' ';
             }
