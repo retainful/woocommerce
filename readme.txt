@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.2.1
 WC tested up to: 3.7
 Requires PHP: 5.6
-Stable tag: 1.2.7
+Stable tag: 1.2.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -249,21 +249,29 @@ No. There is no charges for support.
 * Fix: session issue
 
 = 1.2.2 =
-*Improvement: UI/UX improved
-*Improvement: Option added to disable Next order coupon
+* Improvement: UI/UX improved
+* Improvement: Option added to disable Next order coupon
 
 = 1.2.3 =
-*Improvement: Support for Multilingual added
+* Improvement: Support for Multilingual added
 
 = 1.2.4 =
-*Fix: Auto login to recover user cart issue fix
+* Fix: Auto login to recover user cart issue fix
 
 = 1.2.5 =
-*New Feature: New page added to view sent recovery E-mails
-*Fix: Issue fix for Queueing the abandoned cart recovery E-mails
+* New Feature: New page added to view sent recovery E-mails
+* Fix: Issue fix for Queueing the abandoned cart recovery E-mails
 
 = 1.2.6 =
-*Fix: IP Filter for abandoned carts not working
+* Fix: IP Filter for abandoned carts not working
 
 = 1.2.7 =
-*Improvement: Multi-site compatibility added
+* Improvement: Multi-site compatibility added
+
+= 1.2.8 =
+* Improvement: support for a business plan as well
+* Fix: Next order coupon not created with email customizer
+* Fix: MIME-Version issue fixed
+* Improvement: Support for "WooCommerce Print Invoice & Delivery Note" added
+* New Feature: Restrict coupon code based on user role
+* New Feature: Recoverable carts filter added to the abandoned carts filter section

@@ -173,7 +173,7 @@ class Settings
                         'placeholder' => __('Select User Roles', RNOC_TEXT_DOMAIN)
                     ),
                     'default' => array('all'),
-                    'desc' => __('Please select the user roles to restrict', RNOC_TEXT_DOMAIN)
+                    'desc' => __('Coupon codes will generate only for the selected user roles. By default coupon code will generate for all user roles.', RNOC_TEXT_DOMAIN)
                 ));
             } else {
                 $next_order_coupon->add_field(array(

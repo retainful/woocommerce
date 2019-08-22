@@ -423,7 +423,6 @@ class AbandonedCart
                                     "From: \"$from_name\" <$from_address>",
                                     "Return-Path: <" . $from_address . ">",
                                     "Reply-To: \"" . $from_name . "\" <" . $replay_address . ">",
-                                    "MIME-Version: 1.0",
                                     "X-Mailer: PHP" . phpversion(),
                                     "Content-Type: text/html; charset=\"" . $charset . "\""
                                 );
@@ -764,7 +763,6 @@ class AbandonedCart
                         "From: \"Admin\" <$admin_email>",
                         "Return-Path: <" . $admin_email . ">",
                         "Reply-To: \"Admin\" <" . $admin_email . ">",
-                        "MIME-Version: 1.0",
                         "X-Mailer: PHP" . phpversion(),
                         "Content-Type: text/html; charset=\"" . $charset . "\""
                     );
@@ -1170,7 +1168,6 @@ class AbandonedCart
                 "From: \"$from_name\" <$from_address>",
                 "Return-Path: <" . $from_address . ">",
                 "Reply-To: \"" . $from_name . "\" <" . $replay_address . ">",
-                "MIME-Version: 1.0",
                 "X-Mailer: PHP" . phpversion(),
                 "Content-Type: text/html; charset=\"" . $charset . "\""
             );

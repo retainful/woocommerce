@@ -5,14 +5,14 @@
  * Description: Recover abandoned carts and drive repeat purchases by sending single-use, unique coupon codes to customers for their next purchase
  * Author: Retainful
  * Author URI: https://www.retainful.com
- * Version: 1.2.7
+ * Version: 1.2.8
  * Slug: retainful-next-order-coupon-for-woocommerce
  * Text Domain: retainful-next-order-coupon-for-woocommerce
  * Domain Path: /i18n/languages/
  * Plugin URI: https://www.retainful.com
  * Requires at least: 4.6.1
  * WC requires at least: 2.5
- * WC tested up to: 3.7
+ * WC tested up to: 3.7.0
  */
 if (!defined('ABSPATH')) exit;
 /**
@@ -30,7 +30,7 @@ if (!defined('RNOC_PLUGIN_SLUG'))
  * Current version of our app
  */
 if (!defined('RNOC_VERSION'))
-    define('RNOC_VERSION', '1.2.7');
+    define('RNOC_VERSION', '1.2.8');
 /**
  * Set base file URL
  */
