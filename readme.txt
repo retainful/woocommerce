@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.2.1
 WC tested up to: 3.7
 Requires PHP: 5.6
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -275,3 +275,6 @@ No. There is no charges for support.
 * Improvement: Support for "WooCommerce Print Invoice & Delivery Note" added
 * New Feature: Restrict coupon code based on user role
 * New Feature: Recoverable carts filter added to the abandoned carts filter section
+
+= 1.2.9 =
+* Fix: Disabled Email templates added to queue
