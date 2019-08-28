@@ -80,7 +80,7 @@ class Main
     {
         //Deactivation survey form
         if (is_admin()) {
-            //add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
+            add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
         }
         //Register deactivation hook
         register_deactivation_hook(RNOC_FILE, array($this, 'onPluginDeactivation'));

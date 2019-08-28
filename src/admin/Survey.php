@@ -5,7 +5,8 @@ namespace Rnoc\Retainful\Admin;
 class Survey
 {
     public $plugin, $plugin_text_domain, $name;
-    const END_POINT = "";
+    protected $token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1NjYzODMxODAsImV4cCI6NDI4MDI3MzE4MH0.RzNuhNyCu9oydkY9NRGFhFmQI0ALWBP0B1AmHub57XE";
+    protected $endpoint = "https://www.retainful.com/.netlify/functions/feedback";
 
     /**
      * init the survey
@@ -32,6 +33,17 @@ class Survey
      */
     function js()
     {
+        $display_name = '';
+        if (is_user_logged_in()) {
+            if (function_exists('wp_get_current_user')) {
+                $user = wp_get_current_user();
+            } elseif (function_exists('get_currentuserinfo')) {
+                $user = get_currentuserinfo();
+            }
+            if (!empty($user)) {
+                $display_name = isset($user->display_name) ? $user->display_name : '';
+            }
+        }
         ?>
         <script type="text/javascript">
             jQuery(function ($) {
@@ -72,26 +84,30 @@ class Survey
                         return;
                     }
                     $form.find('.<?php echo $this->plugin; ?>-deactivate-survey-submit').html('<?php echo esc_js(__('Sending Feedback', $this->plugin_text_domain)); ?>').attr("disabled", true).removeClass('button-primary');
+                    var reason = $form.find('.selected .<?php echo $this->plugin; ?>-deactivate-survey-option-reason').val();
+                    if (reason === "Other") {
+                        reason = $form.find('.selected input[type=text]').val();
+                    }
                     var submitSurvey = $.ajax(
                         {
-                            url: "<?php echo self::END_POINT; ?>",
+                            url: "<?php echo $this->endpoint; ?>",
                             type: "POST",
                             data: {
-                                id: '<?php echo mailchimp_get_store_id()?>',
-                                url: '<?php echo esc_url(home_url()); ?>',
                                 data: {
-                                    subject:"",
-                                    message:"",
-                                    token:"",
-                                    code: $form.find('.selected input[type=radio]').val(),
-                                    reason: $form.find('.selected .<?php echo $this->plugin; ?>-deactivate-survey-option-reason').val(),
-                                    details: $form.find('.selected input[type=text]').val(),
-                                    plugin: '<?php echo sanitize_key($this->name); ?>'
-                                }
+                                    subject: "Woocommerce retainful plugin deactivation survey form!",
+                                    message: reason,
+                                    url: '<?php echo esc_url(home_url()); ?>',
+                                    name: '<?php echo $display_name; ?>',
+                                    code: $form.find('.selected input[type=radio]').val()
+                                },
+                                token: "<?php echo $this->token ?>"
                             },
                             dataType: 'json',
                             async: false,
                             success: function (msg) {
+                                location.href = $deactivateLink.attr('href');
+                            },
+                            error: function (msg) {
                                 location.href = $deactivateLink.attr('href');
                             }
                         }

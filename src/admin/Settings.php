@@ -516,6 +516,10 @@ class Settings
         }
     }
 
+    /**
+     * get all available order statuses
+     * @return array
+     */
     function availableOrderStatuses()
     {
         $default = array('all' => __('All', RNOC_TEXT_DOMAIN));
@@ -979,6 +983,9 @@ class Settings
         return $this->api->emailTrack($url, $params);
     }
 
+    /**
+     * Show up the survey form
+     */
     function setupSurveyForm()
     {
         $survey = new Survey();
