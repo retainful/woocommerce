@@ -435,6 +435,7 @@ class AbandonedCart
                             }
                         } else {
                             $this->scheduleEmailTemplate($history->id, $history->cart_expiry);
+                            $this->deleteQueue($history->queue_id);
                         }
                     }
                 }
