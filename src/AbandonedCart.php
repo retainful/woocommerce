@@ -333,7 +333,7 @@ class AbandonedCart
         global $wpdb;
         $this->removeFinishedHooks('rnoc_abandoned_cart_send_email', 'publish');
         $current_time = current_time('timestamp');
-        $to_remain_history_query = "SELECT history.*,queue.id as queue_id,template.language_code as template_language_code,queue.template_id as template_id,template.subject,template.extra ,template.body FROM `{$this->email_queue_table}` AS queue LEFT JOIN `{$this->cart_history_table}` AS history ON history.id = queue.cart_id LEFT JOIN `{$this->email_templates_table}` as template ON template.id = queue.template_id WHERE queue.is_completed = 0 AND queue.run_at < {$current_time} AND history.cart_is_recovered = 0 AND history.order_id IS NULL";
+        $to_remain_history_query = "SELECT history.*,template.is_active as is_template_active,queue.id as queue_id,template.language_code as template_language_code,queue.template_id as template_id,template.subject,template.extra ,template.body FROM `{$this->email_queue_table}` AS queue LEFT JOIN `{$this->cart_history_table}` AS history ON history.id = queue.cart_id LEFT JOIN `{$this->email_templates_table}` as template ON template.id = queue.template_id WHERE queue.is_completed = 0 AND queue.run_at < {$current_time} AND history.cart_is_recovered = 0 AND history.order_id IS NULL";
         $to_remain_histories = $wpdb->get_results($to_remain_history_query);
         if (!empty($to_remain_histories)) {
             $email_templates_settings = $this->admin->getEmailTemplatesSettings();
@@ -342,94 +342,99 @@ class AbandonedCart
                     $cart_details = json_decode($history->cart_contents);
                     if (!empty($cart_details)) {
                         $history_id = $history->id;
-                        //Check each email template is sent or not
-                        $email_sent_history_query = "SELECT * FROM `" . $this->email_history_table . "` WHERE  template_id = %d AND abandoned_order_id = %d";
-                        $email_sent_history = $wpdb->get_results($wpdb->prepare($email_sent_history_query, $history->template_id, $history_id));
-                        if (empty($email_sent_history)) {
-                            $user_email = $user_first_name = $user_last_name = '';
-                            $customer_key = $history->customer_key;
-                            if (!is_numeric($customer_key)) {
-                                $query_guest = "SELECT billing_first_name, billing_last_name, email_id FROM `" . $this->guest_cart_history_table . "` WHERE session_id = %s";
-                                $results_guest = $wpdb->get_row($wpdb->prepare($query_guest, $customer_key), OBJECT);
-                                if (!empty($results_guest) && isset($results_guest->email_id)) {
-                                    $user_email = $results_guest->email_id;
-                                    $user_first_name = $results_guest->billing_first_name;
-                                    $user_last_name = $results_guest->billing_last_name;
-                                }
-                            } else if (is_numeric($customer_key)) {
-                                $user_email = get_user_meta($customer_key, 'billing_email', true);
-                                $user_first_name = get_user_meta($customer_key, 'billing_first_name', true);
-                                $user_last_name = get_user_meta($customer_key, 'billing_last_name', true);
-                                $user_data = get_userdata($customer_key);
-                                if (isset($user_first_name) && $user_first_name == "") {
-                                    if (isset($user_data->display_name)) {
-                                        $user_first_name = $user_data->display_name;
+                        //if template is active then proceed withe template,and then schedule next template.else schedule the next template
+                        if ($history->is_template_active == "1") {
+                            //Check each email template is sent or not
+                            $email_sent_history_query = "SELECT * FROM `" . $this->email_history_table . "` WHERE  template_id = %d AND abandoned_order_id = %d";
+                            $email_sent_history = $wpdb->get_results($wpdb->prepare($email_sent_history_query, $history->template_id, $history_id));
+                            if (empty($email_sent_history)) {
+                                $user_email = $user_first_name = $user_last_name = '';
+                                $customer_key = $history->customer_key;
+                                if (!is_numeric($customer_key)) {
+                                    $query_guest = "SELECT billing_first_name, billing_last_name, email_id FROM `" . $this->guest_cart_history_table . "` WHERE session_id = %s";
+                                    $results_guest = $wpdb->get_row($wpdb->prepare($query_guest, $customer_key), OBJECT);
+                                    if (!empty($results_guest) && isset($results_guest->email_id)) {
+                                        $user_email = $results_guest->email_id;
+                                        $user_first_name = $results_guest->billing_first_name;
+                                        $user_last_name = $results_guest->billing_last_name;
+                                    }
+                                } else if (is_numeric($customer_key)) {
+                                    $user_email = get_user_meta($customer_key, 'billing_email', true);
+                                    $user_first_name = get_user_meta($customer_key, 'billing_first_name', true);
+                                    $user_last_name = get_user_meta($customer_key, 'billing_last_name', true);
+                                    $user_data = get_userdata($customer_key);
+                                    if (isset($user_first_name) && $user_first_name == "") {
+                                        if (isset($user_data->display_name)) {
+                                            $user_first_name = $user_data->display_name;
+                                        }
+                                    }
+                                    if (isset($user_email) && $user_email == "") {
+                                        if (isset($user_data->user_email)) {
+                                            $user_email = $user_data->user_email;
+                                        }
                                     }
                                 }
-                                if (isset($user_email) && $user_email == "") {
-                                    if (isset($user_data->user_email)) {
-                                        $user_email = $user_data->user_email;
+                                //Process only if user email found
+                                if (!empty($user_email)) {
+                                    $customer_name = $user_first_name . ' ' . $user_last_name;
+                                    $email_subject = $history->subject;
+                                    if (empty($email_subject)) {
+                                        $email_subject = 'Hey {{customer_name}} You left something in your cart';
                                     }
+                                    $email_subject = str_replace('{{customer_name}}', $customer_name, $email_subject);
+                                    $email_body = stripslashes($history->body);
+                                    $cart_html = $this->getCartTable($cart_details, $history->currency_code);
+                                    //Log about emil sent
+                                    $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id,subject ) VALUES ( %s, %s, %s, %s, %s )";
+                                    $wpdb->query($wpdb->prepare($email_sent_query, $history->template_id, $history_id, current_time('mysql'), $user_email, $email_subject));
+                                    $this->scheduleEmailTemplate($history->id, $history->cart_expiry);
+                                    $this->deleteQueue($history->queue_id);
+                                    $site_url = site_url();
+                                    $cart_page_link = $this->wc_functions->getCartUrl();
+                                    $need_to_encode = array(
+                                        'url' => $cart_page_link,
+                                        'email_sent' => $wpdb->insert_id,
+                                        'abandoned_cart_id' => $history_id,
+                                        'session_id' => $customer_key
+                                    );
+                                    $encoding_cart = http_build_query($need_to_encode);
+                                    $validate_cart = $this->encryptValidate($encoding_cart);
+                                    $cart_recovery_link = $site_url . '/?retainful_cart_action=recover&validate=' . $validate_cart . '&lang=' . $history->language_code;
+                                    $extra_fields = (isset($history->extra)) ? $history->extra : '{}';
+                                    $extra_data = json_decode($extra_fields, true);
+                                    $selected_coupon = isset($extra_data['coupon_code']) ? $extra_data['coupon_code'] : '';
+                                    $replace = array(
+                                        'customer_name' => $customer_name,
+                                        'site_url' => $site_url,
+                                        'cart_recovery_link' => $cart_recovery_link,
+                                        'user_cart' => $cart_html,
+                                        'recovery_coupon' => $selected_coupon,
+                                        'site_footer' => '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . __(' All rights reserved.', RNOC_TEXT_DOMAIN)
+                                    );
+                                    foreach ($replace as $short_code => $short_code_value) {
+                                        $email_body = str_replace('{{' . $short_code . '}}', $short_code_value, $email_body);
+                                    }
+                                    $from_name = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'] : 'Admin';
+                                    $admin_email = get_option('admin_email');
+                                    $from_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'] : $admin_email;
+                                    $replay_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'] : $admin_email;
+                                    //Prepare for sending emails
+                                    $charset = (function_exists('get_bloginfo')) ? get_bloginfo('charset') : 'UTF-8';
+                                    //Prepare for sending emails
+                                    $headers = array(
+                                        "From: \"$from_name\" <$from_address>",
+                                        "Return-Path: <" . $from_address . ">",
+                                        "Reply-To: \"" . $from_name . "\" <" . $replay_address . ">",
+                                        "X-Mailer: PHP" . phpversion(),
+                                        "Content-Type: text/html; charset=\"" . $charset . "\""
+                                    );
+                                    $header = implode("\n", $headers);
+                                    //Send mail
+                                    wc_mail($user_email, $email_subject, $email_body, $header);
                                 }
                             }
-                            //Process only if user email found
-                            if (!empty($user_email)) {
-                                $customer_name = $user_first_name . ' ' . $user_last_name;
-                                $email_subject = $history->subject;
-                                if (empty($email_subject)) {
-                                    $email_subject = 'Hey {{customer_name}} You left something in your cart';
-                                }
-                                $email_subject = str_replace('{{customer_name}}', $customer_name, $email_subject);
-                                $email_body = stripslashes($history->body);
-                                $cart_html = $this->getCartTable($cart_details, $history->currency_code);
-                                //Log about emil sent
-                                $email_sent_query = "INSERT INTO `" . $this->email_history_table . "` ( template_id, abandoned_order_id, sent_time, sent_email_id,subject ) VALUES ( %s, %s, %s, %s, %s )";
-                                $wpdb->query($wpdb->prepare($email_sent_query, $history->template_id, $history_id, current_time('mysql'), $user_email, $email_subject));
-                                $this->scheduleEmailTemplate($history->id, $history->cart_expiry);
-                                $this->deleteQueue($history->queue_id);
-                                $site_url = site_url();
-                                $cart_page_link = $this->wc_functions->getCartUrl();
-                                $need_to_encode = array(
-                                    'url' => $cart_page_link,
-                                    'email_sent' => $wpdb->insert_id,
-                                    'abandoned_cart_id' => $history_id,
-                                    'session_id' => $customer_key
-                                );
-                                $encoding_cart = http_build_query($need_to_encode);
-                                $validate_cart = $this->encryptValidate($encoding_cart);
-                                $cart_recovery_link = $site_url . '/?retainful_cart_action=recover&validate=' . $validate_cart . '&lang=' . $history->language_code;
-                                $extra_fields = (isset($history->extra)) ? $history->extra : '{}';
-                                $extra_data = json_decode($extra_fields, true);
-                                $selected_coupon = isset($extra_data['coupon_code']) ? $extra_data['coupon_code'] : '';
-                                $replace = array(
-                                    'customer_name' => $customer_name,
-                                    'site_url' => $site_url,
-                                    'cart_recovery_link' => $cart_recovery_link,
-                                    'user_cart' => $cart_html,
-                                    'recovery_coupon' => $selected_coupon,
-                                    'site_footer' => '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . __(' All rights reserved.', RNOC_TEXT_DOMAIN)
-                                );
-                                foreach ($replace as $short_code => $short_code_value) {
-                                    $email_body = str_replace('{{' . $short_code . '}}', $short_code_value, $email_body);
-                                }
-                                $from_name = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_name'] : 'Admin';
-                                $admin_email = get_option('admin_email');
-                                $from_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_from_address'] : $admin_email;
-                                $replay_address = (isset($email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'])) ? $email_templates_settings[RNOC_PLUGIN_PREFIX . 'email_reply_address'] : $admin_email;
-                                //Prepare for sending emails
-                                $charset = (function_exists('get_bloginfo')) ? get_bloginfo('charset') : 'UTF-8';
-                                //Prepare for sending emails
-                                $headers = array(
-                                    "From: \"$from_name\" <$from_address>",
-                                    "Return-Path: <" . $from_address . ">",
-                                    "Reply-To: \"" . $from_name . "\" <" . $replay_address . ">",
-                                    "X-Mailer: PHP" . phpversion(),
-                                    "Content-Type: text/html; charset=\"" . $charset . "\""
-                                );
-                                $header = implode("\n", $headers);
-                                //Send mail
-                                wc_mail($user_email, $email_subject, $email_body, $header);
-                            }
+                        } else {
+                            $this->scheduleEmailTemplate($history->id, $history->cart_expiry);
                         }
                     }
                 }
