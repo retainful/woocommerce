@@ -814,7 +814,7 @@ class AbandonedCart
     function getStaticsForDashboard($start_date, $end_date)
     {
         $cart_histories = $this->getAbandonedCartsOfDate($start_date, $end_date);
-        $recovered_carts = $recovered_total = $abandoned_cart = $abandoned_total = 0;
+        $recovered_carts = $recovered_total = $abandoned_cart = $abandoned_total = $recoverable_carts = 0;
         if (!empty($cart_histories)) {
             $base_currency = $this->getBaseCurrency();
             $current_time = current_time('timestamp');
@@ -835,6 +835,18 @@ class AbandonedCart
                     $recovered_total += $line_total;
                 } else if ($value->cart_expiry > $current_time) {
                 } else {
+                    if (strlen($value->customer_key) < 32) {
+                        $recoverable_carts += 1;
+                    } else {
+                        global $wpdb;
+                        $query = "SELECT email_id FROM {$this->guest_cart_history_table} WHERE session_id= '{$value->customer_key}'";
+                        $row = $wpdb->get_row($query);
+                        if (!empty($row)) {
+                            if (isset($row->email_id) && !empty($row->email_id)) {
+                                $recoverable_carts += 1;
+                            }
+                        }
+                    }
                     $abandoned_cart += 1;
                     $abandoned_total += $line_total;
                 }
@@ -849,6 +861,7 @@ class AbandonedCart
             'recovered_carts' => $recovered_carts,
             'recovered_total' => $this->wc_functions->formatPrice($recovered_total),
             'abandoned_carts' => $abandoned_cart,
+            'recoverable_carts' => $recoverable_carts,
             'abandoned_total' => $this->wc_functions->formatPrice($abandoned_total)
         );
     }
@@ -1287,7 +1300,7 @@ class AbandonedCart
     function sentEmailsHistory($start, $limit, $order_by = "sent_time", $order_by_value = "DESC")
     {
         global $wpdb;
-        $email_sent_history_query = "SELECT history.sent_time,history.sent_email_id,(CASE WHEN history.subject IS NULL THEN template.subject ELSE history.subject END) as subject FROM `{$this->email_history_table}` as history LEFT JOIN `{$this->email_templates_table}` as template ON history.template_id = template.id ORDER BY {$order_by} {$order_by_value} LIMIT {$limit} OFFSET {$start}";
+        $email_sent_history_query = "SELECT history.sent_time,history.abandoned_order_id,history.sent_email_id,(CASE WHEN history.subject IS NULL THEN template.subject ELSE history.subject END) as subject FROM `{$this->email_history_table}` as history LEFT JOIN `{$this->email_templates_table}` as template ON history.template_id = template.id ORDER BY {$order_by} {$order_by_value} LIMIT {$limit} OFFSET {$start}";
         return $wpdb->get_results($email_sent_history_query);
     }
 

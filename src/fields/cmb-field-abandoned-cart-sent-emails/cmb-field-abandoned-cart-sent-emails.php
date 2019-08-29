@@ -45,6 +45,7 @@ class CMB2_Field_Abandoned_Cart_Sent_Emails
         <table class="retainful_abandoned_table">
             <thead class="bg-light">
             <tr class="border-0">
+                <th class="border-0"><?php echo __('Abandoned cart ID', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Date', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Email', RNOC_TEXT_DOMAIN); ?></th>
                 <th class="border-0"><?php echo __('Subject', RNOC_TEXT_DOMAIN); ?></th>
@@ -56,6 +57,9 @@ class CMB2_Field_Abandoned_Cart_Sent_Emails
                 foreach ($sent_emails as $email) {
                     ?>
                     <tr>
+                        <td>
+                            <?php echo $email->abandoned_order_id; ?>
+                        </td>
                         <td>
                             <?php echo date('Y-m-d H:i A', strtotime($email->sent_time)); ?>
                         </td>

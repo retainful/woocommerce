@@ -552,6 +552,45 @@ class WcFunctions
     }
 
     /**
+     * Get Item sku from Item object
+     * @param $item
+     * @return null
+     */
+    function getItemSku($item)
+    {
+        if (method_exists($item, 'get_sku')) {
+            return $item->get_sku();
+        }
+        return NULL;
+    }
+
+    /**
+     * Get Item title from Item object
+     * @param $item
+     * @return null
+     */
+    function getItemTitle($item)
+    {
+        if (method_exists($item, 'get_title')) {
+            return $item->get_title();
+        }
+        return NULL;
+    }
+
+    /**
+     * Get Item price from Item object
+     * @param $item
+     * @return null
+     */
+    function getItemPrice($item)
+    {
+        if (method_exists($item, 'get_price')) {
+            return $item->get_price();
+        }
+        return NULL;
+    }
+
+    /**
      * Get category Id of product
      * @param $item
      * @return null
