@@ -683,10 +683,15 @@ class AbandonedCart
      */
     function autoLoadUserCart($cart_info, $abandoned_cart_id, $session_id)
     {
+        global $wpdb;
         $saved_cart = json_decode($cart_info, true);
         if (!empty($saved_cart)) {
-            $this->setSessionToken($session_id);
-            //global $wpdb;
+            $current_customer_key = $this->getUserSessionKey();
+            if ($current_customer_key != $session_id) {
+                $wpdb->query('DELETE FROM ' . $this->cart_history_table . ' WHERE customer_key = "' . $current_customer_key . '"');
+                //Make the abandoned cart token as session key
+                $this->setSessionToken($session_id);
+            }
             $this->wc_functions->emptyUserCart();
             $this->wc_functions->clearWooNotices();
             foreach ($saved_cart as $cart_item) {
@@ -699,9 +704,6 @@ class AbandonedCart
                 $cart_item_data = array();
                 $this->wc_functions->addToCart($id, $cart_item['variation_id'], $qty, array(), $cart_item_data);
             }
-            //$current_customer_key = $this->getUserSessionKey();
-            //Make the current cart token as session key
-            //$wpdb->query('DELETE FROM ' . $this->cart_history_table . ' WHERE cart_key = "' . $current_customer_key . '"');
         }
         return;
     }
