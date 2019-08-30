@@ -109,9 +109,18 @@ class AbandonedCart
         $session_key = $this->wc_functions->getPHPSession(RNOC_PLUGIN_PREFIX . 'user_session_key');
         if (empty($session_key)) {
             $session_key = $this->generateToken();
-            $this->wc_functions->setPHPSession(RNOC_PLUGIN_PREFIX . 'user_session_key', $session_key);
+            $this->setSessionToken($session_key);
         }
         return $session_key;
+    }
+
+    /**
+     * Set the session token
+     * @param $session_key
+     */
+    function setSessionToken($session_key)
+    {
+        $this->wc_functions->setPHPSession(RNOC_PLUGIN_PREFIX . 'user_session_key', $session_key);
     }
 
     /**
@@ -632,22 +641,22 @@ class AbandonedCart
                 global $wpdb;
                 $this->wc_functions->startPHPSession();
                 $cart_link = $this->decryptValidate($_GET['validate']);
-                parse_str($cart_link);
-                if (isset($url) && isset($abandoned_cart_id) && isset($session_id) && isset($email_sent)) {
+                parse_str($cart_link, $data);
+                if (isset($data['url']) && isset($data['abandoned_cart_id']) && isset($data['session_id']) && isset($data['email_sent'])) {
                     $abandoned_cart_history_query = "SELECT cart_contents,customer_key,currency_code FROM `" . $this->cart_history_table . "` WHERE id = %d AND cart_is_recovered=0";
-                    $abandoned_cart_history_results = $wpdb->get_row($wpdb->prepare($abandoned_cart_history_query, $abandoned_cart_id), OBJECT);
+                    $abandoned_cart_history_results = $wpdb->get_row($wpdb->prepare($abandoned_cart_history_query, $data['abandoned_cart_id']), OBJECT);
                     $user_id = 0;
                     if (!empty($abandoned_cart_history_results)) {
                         $user_id = $abandoned_cart_history_results->customer_key;
-                        $this->wc_functions->setPHPSession(RNOC_PLUGIN_PREFIX . 'recovered_cart_id', $abandoned_cart_id);
-                        $this->autoLoadUserCart($abandoned_cart_history_results->cart_contents, $abandoned_cart_id, $session_id);
+                        $this->wc_functions->setPHPSession(RNOC_PLUGIN_PREFIX . 'recovered_cart_id', $data['abandoned_cart_id']);
+                        $this->autoLoadUserCart($abandoned_cart_history_results->cart_contents, $data['abandoned_cart_id'], $data['session_id']);
                         apply_filters('rnoc_set_current_currency_code', $abandoned_cart_history_results->currency_code);
                     }
                     if (empty($user_id)) {
                         wc_add_notice(__('It seems, your cart has expired!'),'error');
                     }
-                    if ($email_sent > 0 && is_numeric($email_sent)) {
-                        wp_redirect($url);
+                    if ($data['email_sent'] > 0 && is_numeric($data['email_sent'])) {
+                        wp_redirect($data['url']);
                     }
                 }
             }
@@ -674,43 +683,27 @@ class AbandonedCart
      */
     function autoLoadUserCart($cart_info, $abandoned_cart_id, $session_id)
     {
-        global $wpdb;
-        $cart_items = $this->wc_functions->getCart();
-        $products_in_cart = array();
-        if (!empty($cart_items)) {
-            foreach ($cart_items as $cart_key => $cart_item) {
-                $product_id = (isset($cart_item['variation_id']) && !empty($cart_item['variation_id'])) ? $cart_item['variation_id'] : $cart_item['product_id'];
-                $products_in_cart[$product_id] = array('quantity' => $cart_item['quantity'], 'key' => $cart_key);
-            }
-        }
         $saved_cart = json_decode($cart_info, true);
         if (!empty($saved_cart)) {
-            foreach ($saved_cart as $a => $b) {
-                $product_id = (isset($b['variation_id']) && !empty($b['variation_id'])) ? $b['variation_id'] : $b['product_id'];
-                if (array_key_exists($product_id, $products_in_cart)) {
-                    $quantity = $b['quantity'] + $products_in_cart[$product_id]['quantity'];
-                    $this->wc_functions->setQuantity($products_in_cart[$product_id]['key'], $quantity);
-                } else {
-                    $this->wc_functions->addToCart($b['product_id'], $b['variation_id'], $b['quantity'], $b['variation']);
+            $this->setSessionToken($session_id);
+            //global $wpdb;
+            $this->wc_functions->emptyUserCart();
+            $this->wc_functions->clearWooNotices();
+            foreach ($saved_cart as $cart_item) {
+                // Skip bundled products when added main product.
+                if (isset($cart_item['bundled_by'])) {
+                    continue;
                 }
+                $id = $cart_item['product_id'];
+                $qty = $cart_item['quantity'];
+                $cart_item_data = array();
+                $this->wc_functions->addToCart($id, $cart_item['variation_id'], $qty, array(), $cart_item_data);
             }
+            //$current_customer_key = $this->getUserSessionKey();
+            //Make the current cart token as session key
+            //$wpdb->query('DELETE FROM ' . $this->cart_history_table . ' WHERE cart_key = "' . $current_customer_key . '"');
         }
-        $current_customer_key = $this->getUserSessionKey();
-        $wpdb->update($this->cart_history_table, array('customer_key' => $current_customer_key, 'cart_expiry' => current_time('timestamp'), 'cart_contents' => json_encode($this->wc_functions->getCart())), array('customer_key' => $current_customer_key), array('%s', '%s', '%d'));
-        $abandoned_cart_history_query = "SELECT id FROM `" . $this->cart_history_table . "` WHERE id= %d";
-        $abandoned_cart_history_results = $wpdb->get_row($wpdb->prepare($abandoned_cart_history_query, $abandoned_cart_id), OBJECT);
-        if (!empty($abandoned_cart_history_results)) {
-            $wpdb->query('DELETE FROM ' . $this->cart_history_table . ' WHERE id = ' . $abandoned_cart_history_results->id);
-        }
-        $row = $wpdb->get_row("SELECT id FROM `" . $this->guest_cart_history_table . "` WHERE session_id = '" . $current_customer_key . "'", OBJECT);
-        if (empty($row)) {
-            $insert_guest = "INSERT INTO `" . $this->guest_cart_history_table . "`(billing_first_name, billing_last_name, billing_company_name, billing_address_1, billing_address_2, billing_city, billing_county, billing_zipcode, email_id, phone, ship_to_billing, order_notes, shipping_first_name, shipping_last_name, shipping_company_name, shipping_address_1, shipping_address_2, shipping_city, shipping_county, shipping_zipcode, shipping_charges)
-            SELECT billing_first_name, billing_last_name, billing_company_name, billing_address_1, billing_address_2, billing_city, billing_county, billing_zipcode, email_id, phone, ship_to_billing, order_notes, shipping_first_name, shipping_last_name, shipping_company_name, shipping_address_1, shipping_address_2, shipping_city, shipping_county, shipping_zipcode, shipping_charges FROM `" . $this->guest_cart_history_table . "` WHERE session_id = '" . $session_id . "'";
-            $insert = $wpdb->query($insert_guest);
-            if ($insert) {
-                $wpdb->update($this->guest_cart_history_table, array('session_id' => $current_customer_key), array('id' => $wpdb->insert_id), array('%s'));
-            }
-        }
+        return;
     }
 
     /**

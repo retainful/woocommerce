@@ -620,6 +620,29 @@ class WcFunctions
     }
 
     /**
+     * Empty the user cart
+     * @return bool
+     */
+    function emptyUserCart()
+    {
+        global $woocommerce;
+        if (method_exists($woocommerce->cart, 'empty_cart')) {
+            $woocommerce->cart->empty_cart();
+        }
+        return true;
+    }
+
+    /**
+     * Clear all notices
+     */
+    function clearWooNotices()
+    {
+        if (function_exists('wc_clear_notices')) {
+            wc_clear_notices();
+        }
+    }
+
+    /**
      * Check the item is in sale
      * @param $item
      * @return bool
