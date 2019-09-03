@@ -439,6 +439,9 @@ class AbandonedCart
                                     );
                                     $header = implode("\n", $headers);
                                     //Send mail
+                                    if (function_exists('wpautop')) {
+                                        $email_body = wpautop($email_body);
+                                    }
                                     wc_mail($user_email, $email_subject, $email_body, $header);
                                 }
                             }
@@ -1186,6 +1189,9 @@ class AbandonedCart
                 "Content-Type: text/html; charset=\"" . $charset . "\""
             );
             $header = implode("\n", $headers);
+            if (function_exists('wpautop')) {
+                $template = wpautop($template);
+            }
             //Send mail
             wc_mail($send_to, $email_subject, $template, $header);
         } else {
