@@ -185,7 +185,7 @@ class OrderCoupon
      * @param $email
      * @return bool
      */
-    function attachOrderCoupon($order, $sent_to_admin, $plain_text, $email)
+    function attachOrderCoupon($order, $sent_to_admin, $plain_text = "", $email = "")
     {
         $order_id = $this->wc_functions->getOrderId($order);
         if (!$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id)) {
