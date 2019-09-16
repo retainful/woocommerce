@@ -660,6 +660,7 @@ class AbandonedCart
                     }
                     if ($data['email_sent'] > 0 && is_numeric($data['email_sent'])) {
                         wp_redirect($data['url']);
+                        exit;
                     }
                 }
             }
