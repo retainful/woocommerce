@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: retainful\n"
-"POT-Creation-Date: 2019-08-22 10:30+0530\n"
-"PO-Revision-Date: 2019-08-22 10:30+0530\n"
+"POT-Creation-Date: 2019-09-17 11:45+0530\n"
+"PO-Revision-Date: 2019-09-17 11:45+0530\n"
 "Last-Translator: \n"
 "Language-Team: retainful\n"
 "Language: en\n"
@@ -47,40 +47,40 @@ msgstr ""
 msgid "Custom"
 msgstr ""
 
-#: AbandonedCart.php:410 AbandonedCart.php:1156
+#: AbandonedCart.php:421 AbandonedCart.php:1174
 msgid " All rights reserved."
 msgstr ""
 
-#: AbandonedCart.php:641
+#: AbandonedCart.php:659
 msgid "It seems, your cart has expired!"
 msgstr ""
 
-#: AbandonedCart.php:758 AbandonedCart.php:759
+#: AbandonedCart.php:763 AbandonedCart.php:764
 msgid "New Customer Order - Recovered"
 msgstr ""
 
-#: AbandonedCart.php:1066
+#: AbandonedCart.php:1084
 msgid "Template saved successfully!"
 msgstr ""
 
-#: AbandonedCart.php:1083
+#: AbandonedCart.php:1101
 msgid "Template activated successfully!"
 msgstr ""
 
-#: AbandonedCart.php:1085
+#: AbandonedCart.php:1103
 msgid "Template de-activated successfully!"
 msgstr ""
 
-#: AbandonedCart.php:1089 AbandonedCart.php:1093 AbandonedCart.php:1112
-#: AbandonedCart.php:1116
+#: AbandonedCart.php:1107 AbandonedCart.php:1111 AbandonedCart.php:1130
+#: AbandonedCart.php:1134
 msgid "Invalid Request"
 msgstr ""
 
-#: AbandonedCart.php:1179
+#: AbandonedCart.php:1200
 msgid "Email address and Email body required"
 msgstr ""
 
-#: AbandonedCart.php:1201 AbandonedCart.php:1209
+#: AbandonedCart.php:1222 AbandonedCart.php:1230
 msgid "Sorry, Template not found"
 msgstr ""
 
@@ -232,7 +232,9 @@ msgid "Select User Roles"
 msgstr ""
 
 #: admin/Settings.php:176
-msgid "Coupon codes will generate only for the selected user roles. By default coupon code will generate for all user roles."
+msgid ""
+"Coupon codes will generate only for the selected user roles. By default "
+"coupon code will generate for all user roles."
 msgstr ""
 
 #: admin/Settings.php:187
@@ -497,15 +499,15 @@ msgstr ""
 msgid "You can get your App-id from https://www.app.retainful.com"
 msgstr ""
 
-#: admin/Settings.php:521 admin/Settings.php:686
+#: admin/Settings.php:525 admin/Settings.php:690
 msgid "All"
 msgstr ""
 
-#: admin/Settings.php:738
+#: admin/Settings.php:742
 msgid "Unlock this feature by upgrading to Premium"
 msgstr ""
 
-#: admin/Settings.php:820
+#: admin/Settings.php:824
 msgid ""
 "<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 style="
 "\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"
@@ -522,77 +524,77 @@ msgid ""
 "decoration: none;\" href=\"{{coupon_url}}\">Go! </a></p></div></div>"
 msgstr ""
 
-#: admin/Survey.php:71
+#: admin/Survey.php:83
 msgid "Please select an option"
 msgstr ""
 
-#: admin/Survey.php:74
+#: admin/Survey.php:86
 msgid "Sending Feedback"
 msgstr ""
 
-#: admin/Survey.php:224
+#: admin/Survey.php:240
 msgid "I want to change the audience associated with this integration."
 msgstr ""
 
-#: admin/Survey.php:228
+#: admin/Survey.php:244
 msgid "I want to change the site or store connected through this integration."
 msgstr ""
 
-#: admin/Survey.php:232
+#: admin/Survey.php:248
 msgid "The order data isn't syncing."
 msgstr ""
 
-#: admin/Survey.php:236
+#: admin/Survey.php:252
 msgid "The promo codes aren't showing up."
 msgstr ""
 
-#: admin/Survey.php:240
+#: admin/Survey.php:256
 msgid "I'm trying to troubleshoot the integration."
 msgstr ""
 
-#: admin/Survey.php:244
+#: admin/Survey.php:260
 msgid "I was instructed to disconnect by Mailchimp Support."
 msgstr ""
 
-#: admin/Survey.php:248
+#: admin/Survey.php:264
 msgid "I no longer use this integration."
 msgstr ""
 
-#: admin/Survey.php:252
+#: admin/Survey.php:268
 msgid "It's a temporary deactivation."
 msgstr ""
 
-#: admin/Survey.php:256
+#: admin/Survey.php:272
 msgid "Other"
 msgstr ""
 
-#: admin/Survey.php:258
+#: admin/Survey.php:274
 msgid "Please share the reason"
 msgstr ""
 
-#: admin/Survey.php:268
+#: admin/Survey.php:284
 msgid "Quick Feedback"
 msgstr ""
 
-#: admin/Survey.php:269
+#: admin/Survey.php:285
 #: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:234
 msgid "Close"
 msgstr ""
 
-#: admin/Survey.php:277
+#: admin/Survey.php:293
 #, php-format
 msgid "If you have a moment, please share why you are deactivating %s:"
 msgstr ""
 
-#: admin/Survey.php:278
+#: admin/Survey.php:294
 msgid "Mailchimp for Woocommerce"
 msgstr ""
 
-#: admin/Survey.php:306
+#: admin/Survey.php:322
 msgid "Submit & Deactivate"
 msgstr ""
 
-#: admin/Survey.php:308
+#: admin/Survey.php:324
 msgid "Skip & Deactivate"
 msgstr ""
 
@@ -617,34 +619,43 @@ msgid "Cart Total"
 msgstr ""
 
 #: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:51
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:64
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:85
-msgid "All abandoned Carts"
+msgid "Recovered Revenue"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:64
-msgid "Abandoned Amount"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:77
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:65
 #: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:66
 #: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:87
 msgid "Recovered Carts"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:90
-msgid "Recovered Amount"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:107
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:83
 msgid ""
 "Get more features like Email collection popup, Countdown timer & coupons"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:112
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:88
 #: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:100
 #: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:93
 msgid "Upgrade to Premium"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:101
+msgid "Abandoned Revenue"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:115
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:64
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:85
+msgid "All abandoned Carts"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:130
+#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:65
+msgid "Recoverable Carts"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:130
+msgid "Carts with known email"
 msgstr ""
 
 #: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:70
@@ -656,7 +667,7 @@ msgid "Cart Status"
 msgstr ""
 
 #: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:72
-#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:48
+#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:49
 msgid "Date"
 msgstr ""
 
@@ -665,7 +676,7 @@ msgid "Customer / IP"
 msgstr ""
 
 #: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:74
-#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:49
+#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:50
 msgid "Email"
 msgstr ""
 
@@ -705,11 +716,15 @@ msgstr ""
 msgid "No carts found!"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:50
+#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:48
+msgid "Abandoned cart ID"
+msgstr ""
+
+#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:51
 msgid "Subject"
 msgstr ""
 
-#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:75
+#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:79
 msgid "No E-Mails sent!"
 msgstr ""
 
@@ -748,10 +763,6 @@ msgstr ""
 #: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:63
 #: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:83
 msgid "All Carts"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:65
-msgid "Recoverable Carts"
 msgstr ""
 
 #: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:72
