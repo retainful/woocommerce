@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.2.1
 WC tested up to: 3.7
 Requires PHP: 5.6
-Stable tag: 1.2.9
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -278,3 +278,9 @@ No. There is no charges for support.
 
 = 1.2.9 =
 * Fix: Disabled Email templates added to queue
+
+= 1.3.0 =
+* Fix: Remove disabled email template queue and the schedule the next active email template
+* Fix: Recoverable carts card added
+* Fix: AttachOrderCoupon invalid parameter error fixed
+* Fix: Missing "exit" while redirecting
