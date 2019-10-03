@@ -95,7 +95,6 @@ class Main
         //Activate CMB2 functions
         $this->rnoc->init();
         new Currency();
-        do_action('rnoc_initiated');
         if ($this->admin->isNextOrderCouponEnabled()) {
             //Get events
             add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
@@ -104,7 +103,7 @@ class Main
             add_action('woocommerce_order_status_processing', array($this->rnoc, 'onAfterPayment'), 10, 1);
             add_action('woocommerce_order_status_on-hold', array($this->rnoc, 'onAfterPayment'), 10, 1);
             add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
-            add_action('woocommerce_init', array($this->rnoc, 'setCouponToSession'));
+            add_action('rnoc_initiated', array($this->rnoc, 'setCouponToSession'));
             add_action('woocommerce_cart_loaded_from_session', array($this->rnoc, 'addCouponToCheckout'), 10);
             //Attach coupon to email
             $hook = $this->admin->couponMessageHook();
@@ -199,6 +198,7 @@ class Main
         //Premium check
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
         $this->checkApi();
+        do_action('rnoc_initiated');
     }
 
     function onPluginDeactivation()
