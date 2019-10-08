@@ -75,7 +75,12 @@ class CMB2_Field_Premium_Addon_List
                 array(
                     'title' => __('IP Filter (Premium)', RNOC_TEXT_DOMAIN),
                     'description' => __('Exclude capturing carts from selected IPs or a range of IPs.', RNOC_TEXT_DOMAIN),
-                    'icon' => 'dashicons-clock'
+                    'icon' => 'dashicons-admin-site-alt'
+                ),
+                array(
+                    'title' => __('Exit Intent Popup (Premium)', RNOC_TEXT_DOMAIN),
+                    'description' => __('Convert or collect email when your customers tries to leave your site with items in their cart. This add-on can detect the exit and trigger a popup with a coupon and/or an email form', RNOC_TEXT_DOMAIN),
+                    'icon' => 'dashicons-external'
                 )
             );
             ?>
