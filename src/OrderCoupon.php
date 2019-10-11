@@ -466,7 +466,7 @@ class OrderCoupon
             //Handle API Requests
             $api_key = $this->admin->getApiKey();
             if (!empty($api_key)) {
-                as_schedule_single_action(time() + 60, 'retainful_cron_sync_coupon_details', array($order_id));
+                $this->admin->scheduleEvents('retainful_cron_sync_coupon_details', current_time('timestamp'), array($order_id));
             }
         }
     }

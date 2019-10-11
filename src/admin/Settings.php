@@ -991,4 +991,74 @@ class Settings
         $survey = new Survey();
         $survey->init(RNOC_PLUGIN_SLUG, 'Retainful - next order coupon for woocommerce', RNOC_TEXT_DOMAIN);
     }
+
+    /**
+     * Schedule events
+     * @param $hook
+     * @param $timestamp
+     * @param array $args
+     * @param string $type
+     * @param null $interval_in_seconds
+     * @param string $group
+     */
+    function scheduleEvents($hook, $timestamp, $args = array(), $type = "single", $interval_in_seconds = NULL, $group = '')
+    {
+        if (class_exists('ActionScheduler')) {
+            switch ($type) {
+                case "recurring":
+                    if (!$this->nextScheduledAction($hook)) {
+                        \ActionScheduler::factory()->recurring($hook, $args, $timestamp, $interval_in_seconds, $group);
+                    }
+                    break;
+                case 'single':
+                default:
+                    \ActionScheduler::factory()->single($hook, $args, $timestamp);
+                    break;
+            }
+        } else {
+            switch ($type) {
+                case "recurring":
+                    if (function_exists('as_schedule_recurring_action') && function_exists('as_next_scheduled_action')) {
+                        if (!as_next_scheduled_action($hook)) {
+                            as_schedule_recurring_action($timestamp, $interval_in_seconds, $hook, $args, $group);
+                        }
+                    }
+                    break;
+                case 'single':
+                default:
+                    if (function_exists('as_schedule_single_action')) {
+                        as_schedule_single_action($timestamp, $hook, $args);
+                    }
+                    break;
+            }
+        }
+    }
+
+    /**
+     * @param string $hook
+     * @param array $args
+     * @param string $group
+     *
+     * @return int|bool The timestamp for the next occurrence, or false if nothing was found
+     */
+    function nextScheduledAction($hook, $args = NULL, $group = '')
+    {
+        $params = array();
+        if (is_array($args)) {
+            $params['args'] = $args;
+        }
+        if (!empty($group)) {
+            $params['group'] = $group;
+        }
+        $job_id = \ActionScheduler::store()->find_action($hook, $params);
+        if (empty($job_id)) {
+            return false;
+        }
+        $job = \ActionScheduler::store()->fetch_action($job_id);
+        $next = $job->get_schedule()->next();
+        if ($next) {
+            return (int)($next->format('U'));
+        }
+        return false;
+    }
 }

@@ -298,17 +298,9 @@ class Main
      */
     function actionSchedulerHooks()
     {
-        if (function_exists('as_next_scheduled_action')) {
-            if (!as_next_scheduled_action('rnoc_abandoned_clear_abandoned_carts')) {
-                as_schedule_recurring_action(time(), 86400, 'rnoc_abandoned_clear_abandoned_carts');
-            }
-            if (!as_next_scheduled_action('rnocp_check_user_plan')) {
-                as_schedule_recurring_action(time(), 604800, 'rnocp_check_user_plan');
-            }
-            if (!as_next_scheduled_action('rnoc_abandoned_cart_send_email')) {
-                as_schedule_recurring_action(time(), 900, 'rnoc_abandoned_cart_send_email');
-            }
-        }
+        $this->admin->scheduleEvents('rnoc_abandoned_clear_abandoned_carts', current_time('timestamp'), array(), 'recurring', 86400);
+        $this->admin->scheduleEvents('rnocp_check_user_plan', current_time('timestamp'), array(), 'recurring', 604800);
+        $this->admin->scheduleEvents('rnoc_abandoned_cart_send_email', current_time('timestamp'), array(), 'recurring', 900);
     }
 
     /**

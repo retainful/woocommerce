@@ -4,8 +4,7 @@
   "require": {
     "cmb2/cmb2": "^2.5.1",
     "mashape/unirest-php": "3.*",
-    "jaybizzle/laravel-crawler-detect": "1.*",
-    "prospress/action-scheduler": "^1"
+    "jaybizzle/laravel-crawler-detect": "1.*"
   },
   "minimum-stability": "stable",
   "autoload": {
@@ -19,7 +18,6 @@
     "files": [
       "vendor/cmb2/cmb2/init.php",
       "src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php",
-      "vendor/prospress/action-scheduler/action-scheduler.php",
       "src/fields/cmb-field-post-search-ajax/cmb-field-post-search-ajax.php",
       "src/fields/cmb-field-select2/cmb-field-select2.php",
       "src/fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php",
