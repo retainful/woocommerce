@@ -98,10 +98,7 @@ class Main
         if ($this->admin->isNextOrderCouponEnabled()) {
             //Get events
             add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
-            add_action('woocommerce_payment_complete', array($this->rnoc, 'onAfterPayment'), 10, 1);
-            add_action('woocommerce_order_status_completed', array($this->rnoc, 'onAfterPayment'), 10, 1);
-            add_action('woocommerce_order_status_processing', array($this->rnoc, 'onAfterPayment'), 10, 1);
-            add_action('woocommerce_order_status_on-hold', array($this->rnoc, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_order_status_changed', array($this->rnoc, 'onAfterPayment'), 10, 1);
             add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
             add_action('rnoc_initiated', array($this->rnoc, 'setCouponToSession'));
             add_action('woocommerce_cart_loaded_from_session', array($this->rnoc, 'addCouponToCheckout'), 10);
