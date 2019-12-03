@@ -158,7 +158,9 @@ class RestApi
      */
     function getClientIp()
     {
-        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+        if (isset($_SERVER['HTTP_X_REAL_IP'])) {
+            $client_ip = $_SERVER['HTTP_X_REAL_IP'];
+        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $client_ip = $_SERVER['HTTP_CLIENT_IP'];
         } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
@@ -184,10 +186,24 @@ class RestApi
     function retrieveUserIp($user_id = NULL)
     {
         if ($user_id) {
-            return get_user_meta($user_id, $this->user_ip_key_for_db);
+            $ip = get_user_meta($user_id, $this->user_ip_key_for_db);
         } else {
-            return self::$woocommerce->getPHPSession($this->user_ip_key);
+            $ip = self::$woocommerce->getPHPSession($this->user_ip_key);
         }
+        return $this->formatUserIP($ip);
+    }
+
+    /**
+     * Sometimes the IP address returne is not formatted quite well.
+     * So it requires a basic formating.
+     * @param $ip
+     * @return String
+     */
+    function formatUserIP($ip)
+    {
+        //check for commas in the IP
+        $ip = trim(current(preg_split('/,/', sanitize_text_field(wp_unslash($ip)))));
+        return (string)$ip;
     }
 
     /**

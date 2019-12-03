@@ -1,5 +1,5 @@
 === Retainful - WooCommerce Cart Abandonment Recovery and Next Order Coupons ===
-Contributors: retainful
+Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
 Requires at least: 4.0
 Tested up to: 5.2.4

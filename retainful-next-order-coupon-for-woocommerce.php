@@ -14,7 +14,6 @@
  * WC requires at least: 2.5
  * WC tested up to: 3.8.0
  */
-
 if (!defined('ABSPATH')) exit;
 /**
  * Define the text domain

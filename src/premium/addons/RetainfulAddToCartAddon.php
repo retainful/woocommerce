@@ -128,6 +128,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     if (!$this->isValidPagesToDisplay($modal_display_pages)) {
                         return false;
                     }
+                    add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
                     $is_popup_closed_by_user = $this->wc_functions->getPHPSession('rnoc_popup_closed_by_user');
                     if (!empty($is_popup_closed_by_user)) {
                         return false;
@@ -159,7 +160,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     }
                     if ($show_popup) {
                         add_action('wp_footer', array($this, 'addToCartPopup'), 10);
-                        add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
                     }
                 }
             }
@@ -184,10 +184,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function popupClosed()
         {
-            $popup_action = isset($_POST['popup_action'])?sanitize_key($_POST['popup_action']):1;
+            $popup_action = isset($_POST['popup_action']) ? sanitize_key($_POST['popup_action']) : 1;
             $this->wc_functions->setPHPSession('rnoc_popup_closed_by_user', $popup_action);
             wp_send_json_success();
         }
+
         /**
          * set session email and create coupon if available
          */
@@ -206,7 +207,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             }
             $this->wc_functions->setPHPSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             $this->wc_functions->setPHPSession('rnoc_user_billing_email_php_session', $email);
-            $this->admin->logMessage($email,'Add to cart email collection popup email entered');
+            $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
             if (!$run_cart_externally) {
                 $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
@@ -221,7 +222,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     if (empty($results)) {
                         $insert_guest = "INSERT INTO `" . $abandoned_cart->guest_cart_history_table . "`(email_id, session_id) VALUES ( %s,%s)";
                         $wpdb->query($wpdb->prepare($insert_guest, $email, $user_session_id));
-                        $this->sendEmail($email);
                     } else {
                         $guest_details_id = $results->id;
                         $query_update = "UPDATE `" . $abandoned_cart->guest_cart_history_table . "` SET email_id=%s, shipping_county=%s, shipping_zipcode=%s, shipping_charges=%s, session_id=%s WHERE id=%d";
@@ -238,37 +238,92 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             } else {
                 $error = false;
             }
-            wp_send_json(array('error' => $error, 'message' => $message));
+            $coupon_details = "";
+            $show_coupon_popup = false;
+            $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
+            if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'need_coupon', 0) == 1) {
+                $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
+                if (!empty($coupon_code)) {
+                    $show_woo_coupon = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'show_woo_coupon', 'send_via_email');
+                    switch ($show_woo_coupon) {
+                        case "instantly":
+                            $show_coupon_popup = true;
+                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
+                            break;
+                        case "both":
+                            $show_coupon_popup = true;
+                            $this->sendEmail($email, $coupon_settings);
+                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
+                            break;
+                        default:
+                        case "send_via_email":
+                            $this->sendEmail($email, $coupon_settings);
+                            break;
+                    }
+                }
+            }
+            wp_send_json(array('error' => $error, 'message' => $message, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
         }
 
         /**
          * send coupon details via mail
          * @param $email
+         * @param $coupon_settings
          * @return string
          */
-        function sendEmail($email)
+        function sendEmail($email, $coupon_settings)
         {
-            $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
             $message = __('Thanks for providing Email.', RNOC_TEXT_DOMAIN);
-            if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'need_coupon', 0) == 1) {
-                $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
-                if (!empty($coupon_code)) {
-                    $headers = $this->getMailHeaders();
-                    $mail_content = $this->getMailContent();
-                    $cart_page_link = $this->wc_functions->getCartUrl();
-                    $string_to_replace = array(
-                        '{{coupon_code}}' => $coupon_code,
-                        '{{coupon_url}}' => $cart_page_link . '?retainful_email_coupon_code=' . $coupon_code
-                    );
-                    foreach ($string_to_replace as $find => $replace) {
-                        $mail_content = str_replace($find, $replace, $mail_content);
-                    }
-                    $mail_subject = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject', __('You got a new coupon code, Grab it now!', RNOC_TEXT_DOMAIN));
-                    wc_mail($email, $mail_subject, $mail_content, $headers);
-                    $message = __('We have sent the coupon code to your email.', RNOC_TEXT_DOMAIN);
-                }
+            $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
+            if (!empty($coupon_code)) {
+                $headers = $this->getMailHeaders();
+                $mail_content = $this->getMailCouponContent($coupon_settings);
+                $mail_subject = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject', __('You got a new coupon code, Grab it now!', RNOC_TEXT_DOMAIN));
+                wc_mail($email, $mail_subject, $mail_content, $headers);
+                $message = __('We have sent the coupon code to your email.', RNOC_TEXT_DOMAIN);
             }
             return $message;
+        }
+
+        /**
+         * @param $coupon_settings
+         * @return mixed|null
+         */
+        function getCouponPopupContent($coupon_settings)
+        {
+            $final_settings = array(
+                "show_for_admin" => current_user_can('administrator'),
+                "template" => $this->getMailCouponContent($coupon_settings, "popup"),
+                "custom_style" => '',
+                "add_on_slug" => 'rnoc-add-to-cart-add-on-instant-coupon',
+                "no_thanks_action" => 1,
+                "is_email_mandatory" => 1
+            );
+            return $this->getTemplateContent(RNOCPREMIUM_PLUGIN_PATH . 'templates/popup_display.php', $final_settings, $this->slug);
+        }
+
+        /**
+         * get the content to
+         * @param $coupon_settings
+         * @param $template
+         * @return mixed|string
+         */
+        function getMailCouponContent($coupon_settings, $template = "mail")
+        {
+            $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
+            $mail_content = "";
+            if (!empty($coupon_code)) {
+                $mail_content = ($template == "mail") ? $this->getMailContent() : $this->getPopupContent();
+                $cart_page_link = $this->wc_functions->getCartUrl();
+                $string_to_replace = array(
+                    '{{coupon_code}}' => $coupon_code,
+                    '{{coupon_url}}' => $cart_page_link . '?retainful_email_coupon_code=' . $coupon_code
+                );
+                foreach ($string_to_replace as $find => $replace) {
+                    $mail_content = str_replace($find, $replace, $mail_content);
+                }
+            }
+            return $mail_content;
         }
 
         /**
@@ -284,6 +339,21 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 $mail_content = $this->getDefaultEmailTemplate();
             }
             return $mail_content;
+        }
+
+        /**
+         * content for showing popup
+         * @return string
+         */
+        function getPopupContent()
+        {
+            $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
+            if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template')) {
+                $content = __($coupon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'], RNOC_TEXT_DOMAIN);
+            } else {
+                $content = $this->getDefaultPopupTemplate();
+            }
+            return $content;
         }
 
         /**
@@ -324,7 +394,12 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             wp_enqueue_style('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
             $modal_show_popup_until = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1);
             $modal_show = array(
-                'hide_modal_after_show' => $modal_show_popup_until
+                'hide_modal_after_show' => $modal_show_popup_until,
+                'jquery_url' => includes_url('js/jquery/jquery.js'),
+                "enable_add_to_cart_popup" => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_modal', 0) == 0) ? "no" : "yes",
+                "is_email_mandatory" => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1) == 1) ? "yes" : "no",
+                "no_thanks_action" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
+                "show_popup_until" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
             );
             wp_localize_script('rnoc-add-to-cart', 'retainful_premium_add_to_cart_collection_popup_condition', $modal_show);
             $modal_popup_extra_classes = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class', null);
@@ -352,6 +427,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 echo $this->getTemplateContent(RNOCPREMIUM_PLUGIN_PATH . 'templates/popup_display.php', $final_settings, $this->slug);
             }
         }
+
         /**
          * Default email template
          * @return string
@@ -360,6 +436,16 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         {
             return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">You have new Discount code</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">We want to offer you an exclusive voucher for your order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; width: fit-content; padding: 10px; border: 1px solid #8D71DB; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>', RNOC_TEXT_DOMAIN);
         }
+
+        /**
+         * Default popup template
+         * @return string
+         */
+        function getDefaultPopupTemplate()
+        {
+            return __('<div class="popup" style="padding: 20px;background: #F9F9F9;border-radius: 0;transition: all 3s ease-in-out;font-family: inherit;"> <div class="popup-head" style="display: block;padding: 20px;text-align: center;"> <div class="lw-title" style="padding: 0px 12px;margin-bottom: 0;font-size: 32px;color: #1f1e1f;font-weight: 600;line-height: 45px;text-transform: uppercase;"> You have a new discount code! </div><p style="font-size: 25px;padding: 0px 15px;line-height: 20px;margin-bottom: 34px;">We want to offer you an exclusive voucher for your order!</p><div class="lw-wrap" style="display: block;padding: 0px;color: #2f2e35;border: 1px dashed #0dd7a5;"> <div class="lw-center" style="text-align: center;padding: 20px 30px;"> <div style="margin: 10px 0 17px;line-height: 25px;font-size: 22px;display: inline-block;">Your Code </div><a class="lw-btn" href="{{coupon_url}}" style="text-decoration:none;color: #0dd7a5;"> <div style="width: 100%;display: inline-block;padding: 12px 0;color: #0dd7a5;border: 2px dashed #0dd7a5;border-radius: 4px;font-size: 16px;font-weight: 600;text-align: center;line-height: 1.33333;transition: background .2s, opacity .2s;margin-top: 0px;margin-bottom: 15px;">{{coupon_code}}</div></a> <a class="lw-btn" href="{{coupon_url}}" style="text-decoration:none; color:#fff;"> <div style="width: 100%;display: inline-block;padding: 12px 0;background: #0dd7a5;border: none;border-radius: 4px;font-size: 16px;font-weight: 600;color: white;text-align: center;line-height: 1.33333;transition: background .2s, opacity .2s;margin-top: 0px;margin-bottom: 15px;"> Use discount </div></a> <div> <a href="#" class="lw-content" style="text-decoration: none;font-size: 16px;line-height: 24px;color: #6c6b70 !important;font-weight: 500!important;">* Not valid with other discount codes</a> </div></div></div></div></div>', RNOC_TEXT_DOMAIN);
+        }
+
         /**
          * add the settings tabs
          * @param $settings
@@ -388,16 +474,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 ),
             );
             return $settings;
-        }
-
-        /**
-         * select coupon
-         * @return array
-         */
-        function getWooCouponCodes()
-        {
-            $posts = get_posts(array('post_type' => 'shop_coupon', 'post_status' => 'publish'));
-            return wp_list_pluck($posts, 'post_title', 'post_title');
         }
 
         /**
@@ -535,18 +611,52 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'desc' => __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_group_field($popup_coupon_settings, array(
+                'name' => __('Show coupon code', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
+                'type' => 'radio_inline',
+                'options' => array(
+                    "instantly" => __("Instantly", RNOC_TEXT_DOMAIN),
+                    "send_via_email" => __("Send an email", RNOC_TEXT_DOMAIN),
+                    "both" => __("Show instantly and also send an email", RNOC_TEXT_DOMAIN),
+                ),
+                'attributes' => array(
+                    'placeholder' => __('Choose coupon settings', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => "send_via_email",
+                'desc' => __('How to show the coupon to customers', RNOC_TEXT_DOMAIN)
+            ));
+            $general_settings->add_group_field($popup_coupon_settings, array(
+                'name' => __('Popup template', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template',
+                'type' => 'wysiwyg',
+                'default' => $this->getDefaultPopupTemplate(),
+                'desc' => __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN),
+                'attributes' => array(
+                    'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
+                    'data-conditional-value' => wp_json_encode(array('both', 'instantly')),
+                )
+            ));
+            $general_settings->add_group_field($popup_coupon_settings, array(
                 'name' => __('Email subject', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject',
                 'type' => 'text',
                 'default' => __('You got a new coupon code, Grab it now!', RNOC_TEXT_DOMAIN),
-                'desc' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN)
+                'desc' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN),
+                'attributes' => array(
+                    'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
+                    'data-conditional-value' => wp_json_encode(array('both', 'send_via_email')),
+                ),
             ));
             $general_settings->add_group_field($popup_coupon_settings, array(
                 'name' => __('Email template (Used for the email that is sent when customer enters his email in the Add to Cart Popup)', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'coupon_mail_template',
                 'type' => 'wysiwyg',
                 'default' => $this->getDefaultEmailTemplate(),
-                'desc' => __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN)
+                'desc' => __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN),
+                'attributes' => array(
+                    'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
+                    'data-conditional-value' => wp_json_encode(array('both', 'send_via_email')),
+                )
             ));
             //Modal design
             $popup_design_settings = $general_settings->add_field(array(

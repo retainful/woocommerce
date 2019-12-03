@@ -141,7 +141,7 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
          */
         function getWooCouponCodes()
         {
-            $posts = get_posts(array('post_type' => 'shop_coupon', 'post_status' => 'publish'));
+            $posts = get_posts(array('post_type' => 'shop_coupon', 'posts_per_page' => -1, 'post_status' => 'publish'));
             return wp_list_pluck($posts, 'post_title', 'post_title');
         }
 

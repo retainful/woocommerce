@@ -3,8 +3,8 @@
   "description": "Simple plugin to give coupons for users next order",
   "require": {
     "cmb2/cmb2": "^2.5.1",
-    "mashape/unirest-php": "3.*",
-    "jaybizzle/laravel-crawler-detect": "1.*"
+    "jaybizzle/laravel-crawler-detect": "1.*",
+    "ext-openssl": "*"
   },
   "minimum-stability": "stable",
   "autoload": {
@@ -12,6 +12,7 @@
       "Rnoc\\": "",
       "Rnoc\\Retainful\\": "src/",
       "Rnoc\\Retainful\\Admin\\": "src/admin/",
+      "Rnoc\\Retainful\\Premium\\": "src/premium/",
       "Rnoc\\Retainful\\Integrations\\": "src/integrations/",
       "Rnoc\\Retainful\\Library\\": "src/library/"
     },
@@ -29,6 +30,7 @@
       "src/fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php",
       "src/fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php",
       "src/fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php",
+      "src/fields/cmb-field-conditional-fields/cmb-field-conditional-fields.php",
       "src/fields/cmb-field-tabs/cmb-field-tabs.php"
     ]
   }
