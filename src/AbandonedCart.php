@@ -222,7 +222,7 @@ class AbandonedCart
                 return;
             }
             $wpdb->insert($this->cart_history_table,
-                array('language_code' => $language_code, 'currency_code' => $currency_code, 'customer_key' => $customer_id, 'cart_contents' => json_encode($this->wc_functions->getCart()), 'cart_expiry' => $current_time + $cart_cut_off_time, 'cart_is_recovered' => 0, 'show_on_funnel_report' => 1, 'ip_address' => $_SERVER['REMOTE_ADDR'], 'item_count' => $cart->cart_contents_count, 'cart_total' => $cart->cart_contents_total),
+                array('language_code' => $language_code, 'currency_code' => $currency_code, 'customer_key' => $customer_id, 'cart_contents' => json_encode($this->wc_functions->getCart()), 'cart_expiry' => $current_time + $cart_cut_off_time, 'cart_is_recovered' => 0, 'show_on_funnel_report' => 1, 'ip_address' => $this->getClientIp(), 'item_count' => $cart->cart_contents_count, 'cart_total' => $cart->cart_contents_total),
                 array('%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%d')
             );
             $this->scheduleEmailTemplate($wpdb->insert_id, $current_time + $cart_cut_off_time);
@@ -231,7 +231,7 @@ class AbandonedCart
             if (is_checkout() || $current_time - $cart_cut_off_time > $row->cart_expiry) {
                 $update_values = array(
                     'cart_contents' => json_encode($this->wc_functions->getCart()),
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
+                    'ip_address' => $this->getClientIp(),
                     'item_count' => $cart->cart_contents_count,
                     'cart_total' => $cart->cart_contents_total,
                     'viewed_checkout' => true,
@@ -242,7 +242,7 @@ class AbandonedCart
                 $update_values = array(
                     'cart_contents' => json_encode($this->wc_functions->getCart()),
                     /*'cart_expiry' => $current_time,*/
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
+                    'ip_address' => $this->getClientIp(),
                     'item_count' => $cart->cart_contents_count,
                     'cart_total' => $cart->cart_contents_total,
                     'currency_code' => $currency_code,
@@ -258,7 +258,46 @@ class AbandonedCart
             );
         }
     }
-
+    /**
+     * Get the client IP address
+     * @return mixed|string
+     */
+    function getClientIp()
+    {
+        if (class_exists('WC_Geolocation')) {
+            return \WC_Geolocation::get_ip_address();
+        }
+        if (isset($_SERVER['HTTP_X_REAL_IP'])) {
+            $client_ip = $_SERVER['HTTP_X_REAL_IP'];
+        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $client_ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $client_ip = $_SERVER['HTTP_X_FORWARDED'];
+        } elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $client_ip = $_SERVER['HTTP_FORWARDED_FOR'];
+        } elseif (isset($_SERVER['HTTP_FORWARDED'])) {
+            $client_ip = $_SERVER['HTTP_FORWARDED'];
+        } elseif (isset($_SERVER['REMOTE_ADDR'])) {
+            $client_ip = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $client_ip = '';
+        }
+        return $this->formatUserIP($client_ip);
+    }
+    /**
+     * Sometimes the IP address returne is not formatted quite well.
+     * So it requires a basic formating.
+     * @param $ip
+     * @return String
+     */
+    function formatUserIP($ip)
+    {
+        //check for commas in the IP
+        $ip = trim(current(preg_split('/,/', sanitize_text_field(wp_unslash($ip)))));
+        return (string)$ip;
+    }
     /**
      * User logged in the store
      * @param $user_name
