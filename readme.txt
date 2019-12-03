@@ -1,45 +1,78 @@
-=== Retainful - WooCommerce Abandoned Cart Recovery Emails and Next Order Coupons ===
+=== Retainful - WooCommerce Cart Abandonment Recovery and Next Order Coupons ===
 Contributors: retainful
 Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
 Requires at least: 4.0
-Tested up to: 5.2.1
-WC tested up to: 3.7
+Tested up to: 5.2.4
+WC tested up to: 3.8.0
 Requires PHP: 5.6
-Stable tag: 1.3.0
+Stable tag: 2.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Recover abandoned carts in WooCommerce with a single click using Retainful. Drive repeat purchases by sending Next Order Coupons and increase the revenue.
+Stop cart abandonment in WooCommerce and recover lost revenue with Retainful. Drive repeat purchases by sending Next Order Coupons and increase the sales.
 
 == Description ==
 
-[Retainful](https://www.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=visit_site) helps you recover WooCommerce abandoned carts with a single click. It can automatically send a series of email reminders when customers abandon their carts in your shop.
+[Retainful](https://www.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=visit_site) helps you recover abandoned carts and drive repeat purchases in your WooCommerce store. It can capture the email address and automatically send a series of email reminders when customers abandon their carts in your shop.
 
 == Abandoned Cart Recovery in WooCommerce ==
 
-7 out of 10 potential shoppers leave your store without buying. But you can reduce the cart abandonment rate and recover the lost sales by sending a well timed, sequence of email reminders.
-It is a proven fact that abandoned cart recovery emails can recover at least 30% of the lost sales.
+Research shows that about 70 to 80% of customers abandon their carts and leave your store without buying. At least 40 to 60% of these abandoned carts can be recovered by sending well-timed, series of email reminders. 
 
-Retainful automates your abandoned cart recovery. You can schedule a series of timed email reminders that can be sent to the customers to recover your WooCommerce abandoned carts.
+Retainful helps you **automatically send recovery emails** when customers abandon their carts. You can schedule a series of timed email reminders that can be sent to the customers to recover their carts and complete the purchase.
 
 **Here is an example:**
 
-* Send the first email remainder 30 minutes after the customer abandoned the cart
-* Trigger another email reminder after 6 hours of abandonment automatically.
-* Remind the customer again a day after. This time, include a coupon code in the email.
-* Not recovered in 3 days? Send another abandoned cart reminder 3 days after
+* **First email** is sent **30 minutes after** the customer abandoned the cart
+* **Second email** is sent **6 hours after** the abandonment automatically.
+* **Third email** can be sent **a day after**. This time, include a coupon code in the email.
+* **Fourth** abandoned cart reminder goes **3 days after** (if the cart still remains un-recovered)
 
-All these abandoned cart email reminders can be scheduled and automatically sent. No need to manually send these emails.
-Retainful can automatically send these abandoned cart reminders in the background.
+All these abandoned cart email reminders can be scheduled and sent automatically. No need to manually send these emails.
+
+Retainful can automatically send these abandoned cart reminders and it stops the moment customer completes the purchase.
+
+**How does Retainful work?**
+
+- The plugin captures the email address as soon as customer enters it at the checkout step. 
+- If the customer has not completed the purchase within 30 minutes, ifirst email reminder is sent automatically with a unique recovery link
+- Customer clicks the link to recover his cart. 
+- Completes the purchase
+
+With Retainful Premium plans, you can also [capture the customer's email when they add an item to cart](https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) or when they try to leave your site without buying, i.e, [Exit Intent Popup](https://www.retainful.com/docs/woocommerce/exit-intent-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) 
+
+**How to get started with Retainful?**
+
+1. Install and activate the plugin
+2. [Sign up for a free account](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) and get your API Keys
+3. Connect to Retainful
+
+[Get Retainful](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) | [Demo](https://demo.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=demo) | [Documentation](https://www.retainful.com/docs?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
+
+Retainful can do more than recovering your lost sales. It can drive repeat purchases in your store. Say hello to [Next Order Coupons for WooCommerce](https://www.retainful.com/blog/how-to-provide-next-order-coupon-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=next-order-coupon)
 
 == Next Order Coupons ==
 
-In addition to abandoned cart recovery emails, Retainful also helps you drive repeat purchases by sending single-use, unique coupon codes for the next purchase.
+Retainful can help you drive repeat purchases by sending single-use, unique coupon codes for the next purchase.
+
 The customer can redeem this coupon code during their next purchase. This helps you retain your existing customers, get repeated orders and earn more dollars per customer.
 
-[Demo](https://demo.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=demo) | [Documentation](https://www.retainful.com/docs?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
+> Since Retainful 2.0, creating, scheduling and sending the email is available in the Retainful app in the cloud itself. This change was introduced after huge demand from customers to ensure better performance, speed of the shop and email deliverability. Existing users can easily switch with a single click.
 
-==Features (Free Version) ==
+== Customize emails with Drag and Drop Visual Email Editor ==
+
+> Available from Retainful 2.0
+
+Create beautiful, mobile-friendly emails in minutes using the Retainful's powerful drag and drop email editor. Use our ready-to-use email templates and customize them in minutes to reflect your brand. Add a logo, custom text, images, social icons and links, shop address, coupon and more using the drag and drop editor.
+
+== Better Performance and Site Speed ==
+
+With Retainful 2.0, you can now track and recover abandoned carts without adding any additional load to your site performance. When storing tons of abandoned carts and running constant cron jobs in your site for scheduling and sending emails, it consumes quite a lot of your server resources, affecting the site performance. (For example, you have set an email to be sent 15 minutes after a cart is abandoned. That means, a cron job should be running repeatedly at least every 5 minutes and the site had to constantly run checks after checks whether the time has come to send the email. If not, the email won't go at the right time. These constant checks will have a huge impact on the site).
+
+Instead, you can let Retainful handle abandoned cart recovery campaigns for you. This will ensure that you can track any number of abandoned carts, run the recovery campaigns and monitor the revenue generated from your campaigns, without adding any additional loads to your site.
+
+
+== Features ==
 
 === Abandoned Cart Recovery Features: ===
 
@@ -48,16 +81,15 @@ The customer can redeem this coupon code during their next purchase. This helps 
 * Customers can **recover their carts** with a single click. A unique recovery link is sent in the abandoned cart email.
 * Schedule a sequence of emails (at timed intervals) till customer recovers the cart.
 * **Unlimited abandoned cart recovery email templates** and email reminders.
-* Include the cart items and summary in the emails- Customers can see abandoned cart products in the email
+* Include the cart items and summary in the emails - Customers can see abandoned cart products in the email
 * Short codes for including customer's first name, last name. So you can make the cart recovery email more personalised.
-* Plugin **automatically stops sending the emails once the cart is recovered**
-* Extensive reporting - See abandoned carts, recovered, in-progress carts.
+* Retainful **automatically stops sending the emails once the cart is recovered**
+* Drag and Drop Visual Email Editor. (Retainful 2.0)
+* Create beautiful, mobile-friendly emails easily with drag and drop email editor. (Retainful 2.0)
+* Extensive reporting - See abandoned carts, recovered, live carts.
 * See **real-time carts**, i.e, carts of the customers who are purchasing in your site at the very moment
-* Compare **Abandoned Order value* and the *Recovered order** values
-* Notify store administrators when a cart is recovered (So you can thank your customer for coming back)
-* 3 abandoned cart email template designs
-
-NOTE: We are working very hard to improve the features and bring in more tools that help you recover carts smartly. If you have any features in your mind, please suggest us.
+* Compare **Abandoned order value* and the *Recovered order** values
+* Mailchimp integration (Retainful 2.0)
 
 === Next Order Coupon features: ===
 
@@ -92,17 +124,20 @@ Whether you are using the default transactional emails of WooCommerce or use an 
 The Retainful Dashboard shows you the conversions in real-time and know how much money you made through repeat purchases using Retainful coupons. See who have opened the cart recovery emails and the total revenue recovered from lost your carts.
 
 
-== Retainful Premium ==
+== Retainful Premium Add-ons ==
 
-[Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade) and get more awesome features to recover your abandoned carts.
+Retainful comes with **premium add-ons** to recover the sales effectively.
 
-Retainful comes with **three premium add-ons** and **premium email templates** to recover the sales effectively.
+=== Premium Add-ons: ===
 
-=== Premium Features (Add-ons): ===
+**Exit-Intent Popup**
 
-**Email Collection Popup**
+[Convert your visitors into customers](https://www.retainful.com/docs/woocommerce/exit-intent-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) when they try to leave your shop with items in their cart. Track the mouse behaviour of your customers and trigger a popup with coupon or collect email when the customer tries to exit.
+With the exit popups, you can encourage the visitors to complete their purchase ot leave their email.
 
-[Collect the email address] (https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) before the customer adds an item to cart.
+**Add-to-cart Email Collection Popup**
+
+[Collect the email address](https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) before the customer adds an item to cart.
 Trigger a popup when the customer clicks add to cart and get their email address. The popup is fully customisable. Change the colour, background, text and the labels.
 This enables you to follow-up the customer even if he abandons the cart.
 If an existing customer logs in, automatically associate their cart with their email.
@@ -116,18 +151,16 @@ The feature implements the two proven psychological motivators - Urgency and FOM
 
 Not every visitor will be ready to input their email address at the time of adding an item to cart. Instead of plainly asking for the email, you can say "get a 10% discount code in your email. Please enter your email".
 This will encourage the customer to enter their email ID to get the coupon code. Retainful allows you to collect the Email ID and send an email with the coupon code.
-[Learn more about incentivizing your visitors](https://www.retainful.com/docs/woocommerce/coupon-for-email-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=docs)
+[Learn more about incentivizing your visitors](https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce/#motivating-customers-with-an-offer-in-email-collection-popup)
 
-**Auto apply coupon**
+You can try the Premium add-ons free for 14 days. We offer a 14-day trial period for you to test drive the features.
 
-The coupon code, which is emailed to the customer upon providing email, can be auto applied when customer clicks the link to return to your shop. No need for the customer to manually copy paste the coupon code.
+== Free Trial, Free Plan & Pricing ==
 
-**Premium abandoned cart email templates**
+[Retainful](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) is a Software-As-A-Service (SAAS) platform that provides both free and subscription-based services, depending on features you need for your WooCommerce store.
 
-Get more beautiful, responsive abandoned cart email templates by upgrading to Premium version of Retainful. Impress your customers by giving a premium and professional look and feel to your abandoned cart recovery emails.
-
-[Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade) by creating an account.
-
+- Forever-free plan features have unlimited access, update, and support.
+- Paid features like Premium add-ons have a 14-day free trial. Our paid plans start at just $9 / month. Check out our [pricing page](https://www.retainful.com/pricing?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=pricing) for more informtion
 
 ==Support and Documentation ==
 
@@ -148,36 +181,32 @@ We are working hard to bring in more features to recover abandoned carts and cus
 == Installation ==
 
 1. Download & Activate the plugin on WordPress Admin Dashboard.
-2. Sign up for a free account at https://app.retainful.com (required only if you want to use certain advanced features and analytics or premium features)
-3. Get the API Key and Connect the store
+2. Sign up for a free account at https://app.retainful.com
+3. Get the App ID and App Secret to connect the store
 
 == Frequently Asked Questions ==
 
-= 1. Do I need a Retainful account to use Abandoned Cart Recovery Emails? =
+= 1. I have downloaded the plugin, but don't have a Retainful account. How can I get one? =
 
-No. Abandoned Cart recovery emails can be sent out-of-the-box using the plugin itself. You dont need a Retainful account.
+You can sign up for a Retainful account by [visiting our sign up page](https://app.retainful.com?utm_source=wp_directory&utm_medium=faq&utm_campaign=marketplace&utm_content=signup). You can create an account free of cost.
 
-= 2. Do I need a Retainful account to use Next Order Coupon? =
+= 2. What is a Cart Abandonment? =
+When a customer leaves your shop without completing a purchase, it is called Cart Abandonment. So the customer added items to cart, but has not checked out or paid or has not shown any activity for a certain period of time.
 
-The basic features like a percentage or fixed discount can be used without connecting the plugin to Retainful.
+= 3. How to capture customer's email address ? =
+Retainful can capture the email address as soon as customer enters it at the checkout step. Besides, you can also capture the email early-on by using the Add-to-cart Email Collection popup and Exit Intent Popup. 
 
-However, if you would like to track the coupon usage metrics, then you will need the Retainful account.
-Retainful is partly a Software-as-a-Service platform, built on the cloud. While the plugin handles the interface with WooCommerce, the email opens, conversion tracking and reporting, follow-ups are performed by the Retainful in the cloud.
-The Insights and Analytics are recorded and provided via the Platform's Dashboard.
+= 4. How customers can recover the abandoned cart ? =
+Retainful includes a unique cart recovery link in the email reminders sent to the customers. So customers can recover their carts (and items in it) with a single click and complete the purchase.
 
-= 3. Do you collect any data for conversion metrics? =
+= 5. Can I include a coupon in the cart recovery emails ? =
+Yes. You can include a coupon code to encourage the customers to complete the purchase. When the customer clicks the cart recovery link, you can also set the coupon to auto apply in their cart as well. This will increase the conversion and grow your revenue.
 
-Retainful records the Next Order Coupon conversions by using only the customer's email, OrderID and the order total. No other data is collected.
+= 6. When Next Order Coupons will be sent =
 
-= 4. Is sending abandoned cart emails still allowed under GDPR? =
-Yes, according to the European Commission's definition of legal grounds for processing data you're compliant as long as you have explicit consent from the visitor to receive those emails.
-You can also use the Email Collection popup to collect the email with the visitor's consent.
+When a customer makes a purchase in your store, he will get a unique, single use coupon for his next purchase. This coupon is included right inside the order notification email itself. This is because the transactional emails like order notifications have the higher open and conversion rates.
 
-= 5. What is the Pricing for Retainful =
-Retainful is free. Yes. There are no charges for using the services of the Retainful - Next Order Coupon for WooCommerce and Abandoned Carts
-You can upgrade to premium for a price if you would like to use the premium features.
-
-= 6. Do I have to pay for support? =
+= 7. Do I have to pay for support? =
 No. There is no charges for support.
 
 == Screenshots ==
@@ -284,3 +313,27 @@ No. There is no charges for support.
 * Fix: Recoverable carts card added
 * Fix: AttachOrderCoupon invalid parameter error fixed
 * Fix: Missing "exit" while redirecting
+
+= 2.0.0 =
+* New feature: Manage abandoned carts in cloud
+
+= 2.0.1 =
+* Improvement: Adding crawler detector to reduce spam carts
+
+= 2.0.2 =
+* New feature: Implementing JavaScript cart tracking Engine to improve the User experience
+
+= 2.0.3 =
+* Improvement: Cart Tracking JavaScript Loaded externally
+* Fix: Coupon timer will never initlize when coupon is not chosen
+* Fix: Changing class name unique
+
+= 2.1.0 =
+* Fix: getting line item price issue
+* Fix: Recovered at time was empty
+* Fix: empty the cart when user logged out
+* Fix: Different cart consider when user registered or login
+* Fix: Duplicate cart created when online payment failed
+
+= 2.1.1 =
+* Fix: Duplicate cart created when online payment failed
