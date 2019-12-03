@@ -1,0 +1,75 @@
+.rnoc-popup-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.7);
+}
+.rnoc-popup-modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    border: 1px solid #888;
+    width: 50%;
+    position: relative;
+    text-align: center;
+}
+.rnoc-popup-modal .close-rnoc-popup {
+    color: #fff;
+    font-size: 26px;
+    margin: 20px;
+    font-weight: bold;
+    position: absolute;
+    right: -35px;
+    top: -35px;
+    width: 30px;
+    background: #333;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 50%;
+    box-shadow: 0 0 0px 2px #fff;
+}
+.rnoc-popup-modal .close-rnoc-popup:hover,
+.rnoc-popup-modal .close-rnoc-popup:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+@media(max-width: 992px){
+    .rnoc-popup-modal-content {
+        width: 90%;
+        max-height: 400px;
+        overflow: auto;
+    }
+    .rnoc-popup-modal .close-rnoc-popup {
+        right: -20px;
+        top: -20px;
+    }
+    .rnoc-popup-form-block input{
+        flex: 0 0 100%;
+    }
+    .rnoc-popup-form-block button{
+        flex: 0 0 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .rnoc-popup-modal .rnoc-popup-modal-content {
+        line-height: 1.3;
+    }
+
+    .rnoc-popup-modal .rnoc-popup-modal-content .rnoc-popup-holder .rnoc-header div {
+        font-size: 27px !important;
+        line-height: 1.3;
+    }
+
+    .rnoc-popup-modal .rnoc-popup-modal-content .rnoc-popup-holder .rnoc-content #rnoc_popup_form .rnoc-popup-form-block input, .rnoc-popup-modal .rnoc-popup-modal-content .rnoc-popup-holder .rnoc-content #rnoc_popup_form .rnoc-popup-form-block button {
+        flex: 0 0 100% !important;
+    }
+}

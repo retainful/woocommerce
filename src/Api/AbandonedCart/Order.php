@@ -1,0 +1,415 @@
+<?php
+
+namespace Rnoc\Retainful\Api\AbandonedCart;
+
+class Order extends RestApi
+{
+    function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Get the customer details
+     * @param $order
+     * @return array
+     */
+    function getCustomerDetails($order)
+    {
+        if ($user_id = self::$woocommerce->getOrderUserId($order)) {
+            $user_data = self::$woocommerce->getOrderUser($order);
+            $created_at = $updated_at = strtotime($user_data->user_registered);
+        } else {
+            $user_id = 0;
+            $created_at = $updated_at = current_time('timestamp', true);
+        }
+        $user_info = array(
+            'id' => $user_id,
+            'note' => NULL,
+            'tags' => '',
+            'email' => self::$woocommerce->getBillingEmail($order),
+            'phone' => self::$woocommerce->getBillingPhone($order),
+            'state' => self::$woocommerce->getBillingState($order),
+            'currency' => NULL,
+            'last_name' => self::$woocommerce->getBillingFirstName($order),
+            'created_at' => $this->formatToIso8601($created_at),
+            'first_name' => self::$woocommerce->getBillingLastName($order),
+            'tax_exempt' => false,
+            'updated_at' => $this->formatToIso8601($updated_at),
+            'total_spent' => 0,
+            'orders_count' => 0,
+            'last_order_id' => NULL,
+            'verified_email' => true,
+            'last_order_name' => NULL,
+            'accepts_marketing' => true,
+            'multipass_identifier' => NULL,
+            'marketing_opt_in_level' => NULL
+        );
+        return $user_info;
+    }
+
+    /**
+     * get the cart tax details
+     * @return array
+     */
+    function getOrderTaxDetails()
+    {
+        //$tax_details = self::$woocommerce->getCartTaxes();
+        $taxes = array();
+        /*if (!empty($tax_details)) {
+            foreach ($tax_details as $key => $tax_detail) {
+                $taxes[] = array(
+                    'rate' => 0,
+                    'price' => (isset($tax_detail->amount)) ? $tax_detail->amount : 0,
+                    'title' => (isset($tax_detail->label)) ? $tax_detail->label : 'Tax'
+                );
+            }
+        }*/
+        return $taxes;
+    }
+
+    /**
+     * Get the line items details
+     * @param $order
+     * @return array
+     */
+    function getOrderLineItemsDetails($order)
+    {
+        $items = array();
+        $cart = self::$woocommerce->getOrderItems($order);
+        if (!empty($cart)) {
+            foreach ($cart as $item_key => $item_details) {
+                //Deceleration
+                $tax_details = array();
+                $item_quantity = (isset($item_details['quantity']) && !empty($item_details['quantity'])) ? $item_details['quantity'] : NULL;
+                $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
+                $product_id = (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0;
+                $is_variable_item = false;
+                if (!empty($variant_id)) {
+                    $item = self::$woocommerce->getProduct($variant_id);
+                    $is_variable_item = true;
+                } elseif (!empty($product_id)) {
+                    $item = self::$woocommerce->getProduct($product_id);
+                } else {
+                    $item = (isset($item_details['data']) && !empty($item_details['data'])) ? $item_details['data'] : NULL;
+                }
+                $line_tax = $this->formatDecimalPrice((isset($item_details['line_tax']) && !empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0);
+                if ($line_tax > 0) {
+                    $tax_details[] = array(
+                        'rate' => 0,
+                        'zone' => 'province',
+                        'price' => $line_tax,
+                        'title' => 'tax',
+                        'source' => 'WooCommerce',
+                        'position' => 1,
+                        'compare_at' => 0,
+                    );
+                }
+                $image_url = self::$woocommerce->getProductImageSrc($item);
+                if (!empty($item) && !empty($item_quantity)) {
+                    $items[] = array(
+                        'key' => $item_key,
+                        'image_url' => $image_url,
+                        'sku' => self::$woocommerce->getItemSku($item),
+                        'grams' => 0,
+                        'price' => self::$woocommerce->getItemPrice($item),
+                        'title' => self::$woocommerce->getItemTitle($item),
+                        'vendor' => 'woocommerce',
+                        'taxable' => ($line_tax != 0),
+                        'user_id' => NULL,
+                        'quantity' => $item_quantity,
+                        'gift_card' => false,
+                        'tax_lines' => $tax_details,
+                        'line_price' => $this->formatDecimalPrice((isset($item_details['line_total']) && !empty($item_details['line_total'])) ? $item_details['line_total'] : 0),
+                        'product_id' => (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0,
+                        'properties' => array(),
+                        'variant_id' => $variant_id,
+                        'variant_price' => $this->formatDecimalPrice(($is_variable_item) ? self::$woocommerce->getItemPrice($item) : 0),
+                        'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemTitle($item) : 0,
+                        'compare_at_price' => NULL,
+                        'country_hs_codes' => array(),
+                        'applied_discounts' => array(),
+                        'requires_shipping' => true,
+                        'origin_location_id' => NULL,
+                        'fulfillment_service' => 'manual',
+                        'country_code_of_origin' => NULL,
+                        'harmonized_system_code' => NULL,
+                        'unit_price_measurement' => array(
+                            'measured_type' => NULL,
+                            'quantity_unit' => NULL,
+                            'quantity_value' => NULL,
+                            'reference_unit' => NULL,
+                            'reference_value' => NULL,
+                        ),
+                        'destination_location_id' => NULL,
+                        'province_code_of_origin' => NULL,
+                    );
+                }
+            }
+        }
+        return $items;
+    }
+
+    /**
+     * get the completed at time of the order
+     * @param $order
+     * @return mixed|void
+     */
+    function getCompletedAt($order)
+    {
+        $order_id = self::$woocommerce->getOrderId($order);
+        $order_placed_at = self::$woocommerce->getOrderMeta($order, $this->order_placed_date_key_for_db);
+        $order_status = self::$woocommerce->getStatus($order);
+        if (!$order_placed_at && $this->isOrderHasValidOrderStatus($order_status)) {
+            $order_placed_at = current_time('timestamp', true);
+            self::$woocommerce->setOrderMeta($order_id, $this->order_placed_date_key_for_db, $order_placed_at);
+            if ($this->isOrderInPendingRecovery($order_id)) {
+                $this->markOrderAsRecovered($order_id);
+            }
+        }
+        $completed_at = (!empty($order_placed_at)) ? $this->formatToIso8601($order_placed_at) : NULL;
+        return apply_filters('rnoc_order_completed_at', $completed_at, $order);
+    }
+
+    /**
+     * get order details for sync cart
+     * @param $order
+     * @return array
+     */
+    function getOrderData($order)
+    {
+        $order_id = self::$woocommerce->getOrderId($order);
+        $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+        $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
+        $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
+        $customer_details = $this->getCustomerDetails($order);
+        $current_currency_code = self::$woocommerce->getOrderCurrency($order);
+        $default_currency_code = self::$settings->getBaseCurrency();
+        $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
+        self::$settings->logMessage($cart_created_at, 'cart created time');
+        $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
+        $cart_total = $this->formatDecimalPrice(self::$woocommerce->getOrderTotal($order));
+        $excluding_tax = (self::$woocommerce->isPriceExcludingTax());
+        $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
+        $recovered_at = self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_at');
+        $order_data = array(
+            'cart_type' => 'order',
+            'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
+            'r_order_id' => $order_id,
+            'plugin_version' => RNOC_VERSION,
+            'cart_hash' => $cart_hash,
+            'ip' => $user_ip,
+            'id' => $cart_token,
+            'name' => '#' . $cart_token,
+            'note' => NULL,
+            'email' => (isset($customer_details['email'])) ? $customer_details['email'] : NULL,
+            'phone' => NULL,
+            'token' => $cart_token,
+            'source' => NULL,
+            'gateway' => NULL,
+            'user_id' => NULL,
+            'currency' => $default_currency_code,
+            'customer' => $customer_details,
+            'closed_at' => NULL,
+            'device_id' => NULL,
+            'tax_lines' => $this->getOrderTaxDetails(),
+            'total_tax' => $this->formatDecimalPrice(self::$woocommerce->getOrderTotalTax($order)),
+            'cart_token' => $cart_token,
+            'created_at' => $this->formatToIso8601($cart_created_at),
+            'line_items' => $this->getOrderLineItemsDetails($order),
+            'source_url' => NULL,
+            'updated_at' => $this->formatToIso8601(''),
+            'location_id' => NULL,
+            'source_name' => 'web',
+            'total_price' => $cart_total,
+            'completed_at' => $this->getCompletedAt($order),
+            'landing_site' => '/',
+            'total_weight' => 0,
+            'discount_codes' => $this->getAppliedDiscounts($order),
+            'referring_site' => '',
+            'order_status' => self::$woocommerce->getStatus($order),
+            'shipping_lines' => array(),
+            'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
+            'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
+            'taxes_included' => false,
+            'customer_locale' => NULL,
+            'note_attributes' => array(),
+            'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getOrderDiscount($order, $excluding_tax)),
+            'shipping_address' => $this->getCustomerShippingAddressDetails($order),
+            'billing_address' => $this->getCustomerBillingAddressDetails($order),
+            'source_identifier' => NULL,
+            'presentment_currency' => $current_currency_code,
+            'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
+            'total_line_items_price' => $this->formatDecimalPrice($this->getOrderItemsTotal($order)),
+            'buyer_accepts_marketing' => ($is_buyer_accepts_marketing == 1),
+            'woocommerce_totals' => $this->getOrderTotals($order, $excluding_tax),
+            'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
+            'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
+            'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL
+        );
+        return $order_data;
+    }
+
+    /**
+     * get the subtotal from order
+     * @param $order
+     * @return int|String|null
+     */
+    function getOrderItemsTotal($order)
+    {
+        $subtotal = 0;
+        $cart = self::$woocommerce->getOrderItems($order);
+        if (!empty($cart)) {
+            foreach ($cart as $item) {
+                $subtotal += self::$woocommerce->getItemSubTotal($item);
+                if (!self::$woocommerce->isPriceExcludingTax()) {
+                    $subtotal += self::$woocommerce->getItemTaxSubTotal($item);
+                }
+            }
+        }
+        return $subtotal;
+    }
+
+    /**
+     * get cart totals
+     * @param $order
+     * @param $excluding_tax
+     * @return array
+     */
+    function getOrderTotals($order, $excluding_tax)
+    {
+        return array(
+            'total_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderTotal($order)),
+            'subtotal_price' => $this->formatDecimalPrice($this->getOrderItemsTotal($order)),
+            'total_tax' => $this->formatDecimalPrice(self::$woocommerce->getOrderTotalTax($order)),
+            'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getOrderDiscount($order, $excluding_tax)),
+            'total_shipping' => $this->formatDecimalPrice(self::$woocommerce->getOrderShippingTotal($order)),
+            'fee_items' => $this->getOrderFeeDetails($order, $excluding_tax),
+        );
+    }
+
+    /**
+     * get cart fee details
+     * @param $order
+     * @param $excluding_tax
+     * @return array
+     */
+    function getOrderFeeDetails($order, $excluding_tax)
+    {
+        $fee_items = array();
+        if ($fees = self::$woocommerce->getOrderFees($order)) {
+            foreach ($fees as $id => $fee) {
+                $fee_items[] = array(
+                    'title' => html_entity_decode($fee['name'] ? $fee['name'] : __('Fee', RNOC_TEXT_DOMAIN)),
+                    'key' => $id,
+                    'amount' => $this->formatDecimalPrice(($excluding_tax) ? $fee['line_total'] : $fee['line_total'] + $fee['line_tax'])
+                );
+            }
+        }
+        return $fee_items;
+    }
+
+    /**
+     * Currency details for cart
+     * @param $cart_total
+     * @param $current_currency_code
+     * @param $default_currency_code
+     * @return array
+     */
+    function getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code)
+    {
+        if ($current_currency_code != $default_currency_code) {
+            $exchange_rate = apply_filters('rnoc_get_currency_rate', $cart_total, $current_currency_code);
+            $shop_cart_total = $this->convertToCurrency($cart_total, $exchange_rate);
+        } else {
+            $shop_cart_total = $cart_total;
+        }
+        $details = array(
+            'shop_money' => array(
+                'amount' => $shop_cart_total,
+                'currency_code' => $default_currency_code
+            ),
+            'presentment_money' => array(
+                'amount' => $cart_total,
+                'currency_code' => $current_currency_code
+            )
+        );
+        return $details;
+    }
+
+    /**
+     * Get all applied discount codes
+     * @param $order
+     * @return array
+     */
+    function getAppliedDiscounts($order)
+    {
+        $discounts = array();
+        $applied_discounts = self::$woocommerce->getUsedCoupons($order);
+        $i = 1;
+        if (!empty($applied_discounts)) {
+            foreach ($applied_discounts as $applied_discount) {
+                $discounts[] = array(
+                    "id" => $i,
+                    "usage_count" => self::$woocommerce->getCouponUsageCount($applied_discount),
+                    "code" => self::$woocommerce->getCouponCode($applied_discount),
+                    "created_at" => NULL,
+                    "updated_at" => NULL
+                );
+            }
+        }
+        return $discounts;
+    }
+
+    /**
+     * Get the shipping address of the customer
+     * @param $order
+     * @return array
+     */
+    function getCustomerShippingAddressDetails($order)
+    {
+        return array(
+            'zip' => self::$woocommerce->getShippingPostCode($order),
+            'city' => self::$woocommerce->getShippingCity($order),
+            'name' => self::$woocommerce->getShippingFirstName($order) . ' ' . self::$woocommerce->getShippingLastName($order),
+            'phone' => NULL,
+            'company' => NULL,
+            'country' => self::$woocommerce->getShippingCountry($order),
+            'address1' => self::$woocommerce->getShippingAddressOne($order),
+            'address2' => self::$woocommerce->getShippingAddressTwo($order),
+            'latitude' => '',
+            'province' => self::$woocommerce->getShippingState($order),
+            'last_name' => self::$woocommerce->getShippingLastName($order),
+            'longitude' => '',
+            'first_name' => self::$woocommerce->getShippingFirstName($order),
+            'country_code' => self::$woocommerce->getShippingCountry($order),
+            'province_code' => self::$woocommerce->getShippingState($order),
+        );
+    }
+
+    /**
+     * Get the billing address of the customer
+     * @param $order
+     * @return array
+     */
+    function getCustomerBillingAddressDetails($order)
+    {
+        return array(
+            'zip' => self::$woocommerce->getBillingPostCode($order),
+            'city' => self::$woocommerce->getBillingCity($order),
+            'name' => self::$woocommerce->getBillingFirstName($order) . ' ' . self::$woocommerce->getBillingLastName($order),
+            'phone' => NULL,
+            'company' => NULL,
+            'country' => self::$woocommerce->getBillingCountry($order),
+            'address1' => self::$woocommerce->getBillingAddressOne($order),
+            'address2' => self::$woocommerce->getBillingAddressTwo($order),
+            'latitude' => '',
+            'province' => self::$woocommerce->getBillingState($order),
+            'last_name' => self::$woocommerce->getBillingLastName($order),
+            'longitude' => '',
+            'first_name' => self::$woocommerce->getBillingFirstName($order),
+            'country_code' => self::$woocommerce->getBillingCountry($order),
+            'province_code' => self::$woocommerce->getBillingState($order),
+        );
+    }
+}
