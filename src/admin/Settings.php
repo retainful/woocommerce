@@ -4,12 +4,14 @@ namespace Rnoc\Retainful\Admin;
 
 if (!defined('ABSPATH')) exit;
 
+use Rnoc\Retainful\Api\AbandonedCart\RestApi;
+use Rnoc\Retainful\Integrations\MultiLingual;
 use Rnoc\Retainful\library\RetainfulApi;
 use Rnoc\Retainful\WcFunctions;
 
 class Settings
 {
-    public $slug = 'retainful', $api;
+    public $slug = 'retainful', $api, $wc_functions;
 
     /**
      * Settings constructor.
@@ -17,6 +19,50 @@ class Settings
     function __construct()
     {
         $this->api = new RetainfulApi();
+        $this->wc_functions = new WcFunctions();
+    }
+
+    /**
+     * switch to cloud notice
+     * @return string
+     */
+    function switchToCloudNotice()
+    {
+        if (!$this->isNewInstallation()) {
+            $move_to_cloud_url = admin_url('admin.php?page=' . $this->slug . '_license&move_to_cloud=yes');
+            return '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("Manage your abandoned carts effectively in Retainful Dashboard & get more features ", RNOC_TEXT_DOMAIN) . '&nbsp; <a class="button-primary align-right" href="' . $move_to_cloud_url . '">' . esc_html("Switch to cloud!") . '</a>&nbsp;<a href="https://www.retainful.com/blog/abandoned-cart-solutions-cloud-based-solutions-vs-self-hosted-plugin-based-solutions" target="_blank">' . __("Learn more", RNOC_TEXT_DOMAIN) . '</a></p>';
+        }
+        return NULL;
+    }
+
+    /**
+     * switch to cloud notice
+     * @return string
+     */
+    function deactivatePremiumPluginNotice()
+    {
+        if ($this->isPremiumPluginActive()) {
+            $deactivate_link = $this->pluginActionLink('retainful-abandoned-cart-premium/retainful-abandoned-cart-premium.php', 'deactivate');
+            return '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("Premium addons now availale in the Retainful Core plugin itself. So a separate Premium add-ons plugin is not necessary. You can de-activate the plugin.", RNOC_TEXT_DOMAIN) . '<a href="' . $deactivate_link . '" class="button button-primary">' . __('De-activate', RNOC_TEXT_DOMAIN) . '</a></p>';
+        }
+        return NULL;
+    }
+
+    /**
+     * generate plugin activate,de-activate or delete link
+     * @param $plugin
+     * @param string $action
+     * @return string
+     */
+    function pluginActionLink($plugin, $action = 'activate')
+    {
+        if (strpos($plugin, '/')) {
+            $plugin = str_replace('\/', '%2F', $plugin);
+        }
+        $url = sprintf(admin_url('plugins.php?action=' . $action . '&plugin=%s&plugin_status=all&paged=1&s'), $plugin);
+        $_REQUEST['plugin'] = $plugin;
+        $url = wp_nonce_url($url, $action . '-plugin_' . $plugin);
+        return $url;
     }
 
     /**
@@ -24,112 +70,278 @@ class Settings
      */
     function renderPage()
     {
-        add_filter('cmb2_override_meta_save', array($this, 'save_custom_data'), 10, 2);
         add_action('cmb2_admin_init', function () {
+            $page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : NULL;
+            if (is_admin() && in_array($page, array('retainful_abandoned_cart', 'retainful_abandoned_cart_email_templates', 'retainful', 'retainful_settings', 'retainful_premium', 'retainful_license', 'retainful_abandoned_cart_sent_emails'))) {
+                $this->addScript();
+            }
+            if ($page == $this->slug . '_license') {
+                $move_to_cloud = isset($_GET['move_to_cloud']) ? sanitize_text_field($_GET['move_to_cloud']) : 'no';
+                $move_to_local = isset($_GET['move_to_local']) ? sanitize_text_field($_GET['move_to_local']) : 'no';
+                if ($move_to_cloud == 'yes') {
+                    $this->setAbandonedCartToManageInCloud();
+                }
+                if ($move_to_local == 'yes') {
+                    $this->setAbandonedCartToManageLocally();
+                }
+                if ($move_to_cloud == 'yes' || $move_to_local == 'yes') {
+                    $redirect_url = admin_url('admin.php?page=' . $page);
+                    wp_safe_redirect($redirect_url);
+                    exit;
+                }
+            }
+            $notice = NULL;
             $is_app_connected = $this->isAppConnected();
-            /*
-             * Adding abandoned cart
-             */
-            //Abandoned cart
-            $abandoned_cart = new_cmb2_box(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart',
-                'title' => __('Retainful - Abandoned Carts', RNOC_TEXT_DOMAIN),
-                'parent_slug' => 'woocommerce',
-                'capability' => 'edit_shop_coupons',
-                'object_types' => array('options-page'),
-                'option_key' => $this->slug . '_abandoned_cart',
-                'tab_group' => $this->slug,
-                'tab_title' => __('Abandoned / Recovered Carts', RNOC_TEXT_DOMAIN),
-                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
-            ));
-            //Reports
-            $abandoned_cart->add_field(array(
-                'name' => __('Select date range', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
-                'type' => 'date_range_picker'
-            ));
-            $abandoned_cart->add_field(array(
-                'name' => '',
-                'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_report',
-                'type' => 'abandoned_cart_dashboard'
-            ));
-            //Cart list
-            $abandoned_cart->add_field(array(
-                'name' => '',
-                'id' => RNOC_PLUGIN_PREFIX . 'cart_table_filter',
-                'type' => 'cart_table_filter'
-            ));
-            $abandoned_cart->add_field(array(
-                'name' => '',
-                'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
-                'type' => 'abandoned_cart_lists'
-            ));
-            //Email templates
-            $abandoned_cart_email_templates = new_cmb2_box(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_email_templates',
-                'title' => __('Retainful Abandoned Cart Email Templates', RNOC_TEXT_DOMAIN),
-                'object_types' => array('options-page'),
-                'option_key' => $this->slug . '_abandoned_cart_email_templates',
-                'tab_group' => $this->slug,
-                'parent_slug' => $this->slug,
-                'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Email Templates', RNOC_TEXT_DOMAIN),
-                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
-            ));
-            if (!isset($_REQUEST['task'])) {
-                $abandoned_cart_email_templates->add_field(array(
-                    'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'email_from_name',
-                    'type' => 'text',
-                    'before_row' => '<h4>' . __("Abandoned Cart Email Templates", RNOC_TEXT_DOMAIN) . '</h4>',
-                    'desc' => __('Enter the name that should appear in the email sent.', RNOC_TEXT_DOMAIN),
-                    'default' => 'Admin'
+            $run_abandoned_cart_externally = $this->runAbandonedCartExternally();
+            if (!$run_abandoned_cart_externally) {
+                /*
+                 * Adding abandoned cart
+                 */
+                //Abandoned cart
+                $abandoned_cart = new_cmb2_box(array(
+                    'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart',
+                    'title' => __('Retainful - Abandoned Carts', RNOC_TEXT_DOMAIN),
+                    'parent_slug' => 'woocommerce',
+                    'capability' => 'edit_shop_coupons',
+                    'object_types' => array('options-page'),
+                    'option_key' => $this->slug . '_abandoned_cart',
+                    'tab_group' => $this->slug,
+                    'tab_title' => __('Abandoned / Recovered Carts', RNOC_TEXT_DOMAIN),
+                    'save_button' => __('Save', RNOC_TEXT_DOMAIN)
                 ));
-                $admin_email = get_option('admin_email');
-                $abandoned_cart_email_templates->add_field(array(
-                    'name' => __('"From" Address', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'email_from_address',
-                    'type' => 'text',
-                    'desc' => __('Email address from which the reminder emails should be sent.', RNOC_TEXT_DOMAIN),
-                    'default' => $admin_email
+                $notice = $this->switchToCloudNotice();
+                //Reports
+                $abandoned_cart->add_field(array(
+                    'name' => __('Select date range', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'date_range_picker',
+                    'type' => 'date_range_picker',
+                    'before_row' => $notice
                 ));
-                $abandoned_cart_email_templates->add_field(array(
-                    'name' => __('"Reply To " Address', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'email_reply_address',
-                    'type' => 'text',
-                    'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
-                    'default' => $admin_email
-                ));
-                $abandoned_cart_email_templates->add_field(array(
+                $abandoned_cart->add_field(array(
                     'name' => '',
-                    'id' => RNOC_PLUGIN_PREFIX . 'email_templates_list',
-                    'type' => 'email_templates',
-                    'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
-                    'default' => $admin_email
+                    'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_report',
+                    'type' => 'abandoned_cart_dashboard'
+                ));
+                //Cart list
+                $abandoned_cart->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'cart_table_filter',
+                    'type' => 'cart_table_filter'
+                ));
+                $abandoned_cart->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'abandoned_cart_dashboard',
+                    'type' => 'abandoned_cart_lists'
+                ));
+                //Email templates
+                $abandoned_cart_email_templates = new_cmb2_box(array(
+                    'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart_email_templates',
+                    'title' => __('Retainful Abandoned Cart Email Templates', RNOC_TEXT_DOMAIN),
+                    'object_types' => array('options-page'),
+                    'option_key' => $this->slug . '_abandoned_cart_email_templates',
+                    'tab_group' => $this->slug,
+                    'parent_slug' => $this->slug,
+                    'capability' => 'edit_shop_coupons',
+                    'tab_title' => __('Email Templates', RNOC_TEXT_DOMAIN),
+                    'save_button' => __('Save', RNOC_TEXT_DOMAIN)
+                ));
+                if (!isset($_REQUEST['task'])) {
+                    $abandoned_cart_email_templates->add_field(array(
+                        'name' => __('"From" Name', RNOC_TEXT_DOMAIN),
+                        'id' => RNOC_PLUGIN_PREFIX . 'email_from_name',
+                        'type' => 'text',
+                        'before_row' => $notice . '<h4>' . __("Abandoned Cart Email Templates", RNOC_TEXT_DOMAIN) . '</h4>',
+                        'desc' => __('Enter the name that should appear in the email sent.', RNOC_TEXT_DOMAIN),
+                        'default' => 'Admin'
+                    ));
+                    $admin_email = get_option('admin_email');
+                    $abandoned_cart_email_templates->add_field(array(
+                        'name' => __('"From" Address', RNOC_TEXT_DOMAIN),
+                        'id' => RNOC_PLUGIN_PREFIX . 'email_from_address',
+                        'type' => 'text',
+                        'desc' => __('Email address from which the reminder emails should be sent.', RNOC_TEXT_DOMAIN),
+                        'default' => $admin_email
+                    ));
+                    $abandoned_cart_email_templates->add_field(array(
+                        'name' => __('"Reply To " Address', RNOC_TEXT_DOMAIN),
+                        'id' => RNOC_PLUGIN_PREFIX . 'email_reply_address',
+                        'type' => 'text',
+                        'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
+                        'default' => $admin_email
+                    ));
+                    $abandoned_cart_email_templates->add_field(array(
+                        'name' => '',
+                        'id' => RNOC_PLUGIN_PREFIX . 'email_templates_list',
+                        'type' => 'email_templates',
+                        'desc' => __('When a contact receives your email and clicks reply, which email address should that reply be sent to?', RNOC_TEXT_DOMAIN),
+                        'default' => $admin_email
+                    ));
+                } else {
+                    $abandoned_cart_email_templates->add_field(array(
+                        'name' => '',
+                        'id' => 'email_template_edit',
+                        'type' => 'email_template_edit',
+                        'before_row' => $notice
+                    ));
+                }
+                //Sent Emails Tab
+                $sent_emails_list = new_cmb2_box(array(
+                    'id' => RNOC_PLUGIN_PREFIX . 'retainful_sent_emails',
+                    'title' => __('Abandoned cart sent E-mails', RNOC_TEXT_DOMAIN),
+                    'object_types' => array('options-page'),
+                    'option_key' => $this->slug . '_abandoned_cart_sent_emails',
+                    'tab_group' => $this->slug,
+                    'parent_slug' => $this->slug,
+                    'capability' => 'edit_shop_coupons',
+                    'tab_title' => __('Sent E-Mails', RNOC_TEXT_DOMAIN),
+                    'save_button' => __('Save', RNOC_TEXT_DOMAIN)
+                ));
+                $sent_emails_list->add_field(array(
+                    'name' => '',
+                    'id' => RNOC_PLUGIN_PREFIX . 'sent_emails_list',
+                    'type' => 'abandoned_cart_sent_emails',
+                    'before_row' => $notice
                 ));
             } else {
-                $abandoned_cart_email_templates->add_field(array(
-                    'name' => '',
-                    'id' => 'email_template_edit',
-                    'type' => 'email_template_edit'
-                ));
+                $this->licenseTab($run_abandoned_cart_externally);
             }
-            //Sent Emails Tab
-            $sent_emails_list = new_cmb2_box(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'retainful_sent_emails',
-                'title' => __('Abandoned cart sent E-mails', RNOC_TEXT_DOMAIN),
+            //Settings tab
+            $general_settings = new_cmb2_box(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_settings',
+                'title' => __('Settings', RNOC_TEXT_DOMAIN),
                 'object_types' => array('options-page'),
-                'option_key' => $this->slug . '_abandoned_cart_sent_emails',
+                'option_key' => $this->slug . '_settings',
                 'tab_group' => $this->slug,
+                'vertical_tabs' => true,
                 'parent_slug' => $this->slug,
                 'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Sent E-Mails', RNOC_TEXT_DOMAIN),
+                'tab_title' => __('Settings', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
-            $sent_emails_list->add_field(array(
-                'name' => '',
-                'id' => RNOC_PLUGIN_PREFIX . 'sent_emails_list',
-                'type' => 'abandoned_cart_sent_emails'
+            if (!$run_abandoned_cart_externally) {
+                $general_settings->add_field(array(
+                    'name' => __('When to consider a cart as abandoned?', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'cart_abandoned_time',
+                    'type' => 'text',
+                    'desc' => __('In minutes. Example: You can consider a cart as abandoned 15 minutes after it was added', RNOC_TEXT_DOMAIN),
+                    'attributes' => array(
+                        'type' => 'number',
+                        'min' => 15,
+                        'class' => 'number_only_field'
+                    ),
+                    'default' => 60,
+                    'before_row' => $notice
+                ));
+                $general_settings->add_field(array(
+                    'name' => __('How many days to wait before automatically deleting the cart', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days',
+                    'type' => 'text',
+                    'desc' => __('Useful when you wanted the abandoned carts be removed after certain days', RNOC_TEXT_DOMAIN),
+                    'attributes' => array(
+                        'type' => 'number',
+                        'min' => 1,
+                        'class' => 'number_only_field'
+                    ),
+                    'default' => 90
+                ));
+                $general_settings->add_field(array(
+                    'name' => __('Should the store administrator get a notification when a cart is recovered', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'email_admin_on_recovery',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        0 => __('No', RNOC_TEXT_DOMAIN),
+                        1 => __('Yes', RNOC_TEXT_DOMAIN)
+                    ),
+                    'desc' => __('Useful if you wanted to get notified when a cart is recovered.', RNOC_TEXT_DOMAIN),
+                    'default' => 0
+                ));
+                $general_settings->add_field(array(
+                    'name' => __('Track real-time carts?', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'track_real_time_cart',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        0 => __('No', RNOC_TEXT_DOMAIN),
+                        1 => __('Yes', RNOC_TEXT_DOMAIN)
+                    ),
+                    'desc' => __('If not enabled, only carts that are abandoned gets tracked (i.e, after customer leaves the site)', RNOC_TEXT_DOMAIN),
+                    'default' => 1
+                ));
+                $general_settings->add_field(array(
+                    'name' => __('Show guest cart?', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        0 => __('No', RNOC_TEXT_DOMAIN),
+                        1 => __('Yes', RNOC_TEXT_DOMAIN)
+                    ),
+                    'desc' => __('If not enabled, Guest carts will not shown in your Abandoned cart dashboard.', RNOC_TEXT_DOMAIN),
+                    'default' => 1
+                ));
+            }
+            $general_settings->add_field(array(
+                'name' => __('Cart tracking engine?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'cart_tracking_engine',
+                'type' => 'radio_inline',
+                'options' => array(
+                    'php' => __('PHP (Default)', RNOC_TEXT_DOMAIN),
+                    'js' => __('JavaScript', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 'php'
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Consider On-Hold order status as abandoned cart?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
+                'type' => 'radio_inline',
+                'options' => array(
+                    0 => __('No', RNOC_TEXT_DOMAIN),
+                    1 => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 0
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Enable GDPR Compliance?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
+                'type' => 'radio_inline',
+                'options' => array(
+                    0 => __('No', RNOC_TEXT_DOMAIN),
+                    1 => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 0
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Compliance Message', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'cart_capture_msg',
+                'type' => 'textarea',
+                'desc' => __('Under GDPR, it is mandatory to inform the users when we track their cart activity in real-time.', RNOC_TEXT_DOMAIN)
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Enable IP filter?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
+                'type' => 'radio_inline',
+                'classes' => 'retainful-coupon-group',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 0
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Exclude capturing carts from these IP\'s', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses',
+                'type' => 'textarea',
+                'default' => '',
+                'desc' => __('The plugin will not track carts from these IP\'s. Enter IP in comma seperated format.Example 192.168.1.10,192.168.1.11. Alternatively you can also use 192.168.* , 192.168.10.*, 192.168.1.1-192.168.1.255', RNOC_TEXT_DOMAIN)
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Enable debug log?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'enable_debug_log',
+                'type' => 'radio_inline',
+                'classes' => 'retainful-coupon-group',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 0
             ));
             //Next order tab
             $next_order_coupon = new_cmb2_box(array(
@@ -153,7 +365,7 @@ class Settings
                     '1' => __('Yes', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => '1',
-                'before_row' => '<p class="submit"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="' . __("Save", RNOC_TEXT_DOMAIN) . '"></p>'
+                'before_row' => '<p class="submit"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="' . __("Save", RNOC_TEXT_DOMAIN) . '"></p>' . $notice
             ));
             $next_order_coupon->add_field(array(
                 'name' => __('Order Status', RNOC_TEXT_DOMAIN),
@@ -227,6 +439,16 @@ class Settings
                 ),
                 'default' => '1',
                 'after' => '<p><b>' . __('The unique code will be generated when you try re-sending the email notification for an order in the backend', RNOC_TEXT_DOMAIN) . '</b></p>',
+            ));
+            $next_order_coupon->add_field(array(
+                'name' => __('Show next order coupon in order "Thank you" page?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page',
+                'type' => 'radio',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => '0'
             ));
             $next_order_coupon->add_field(array(
                 'name' => __('Display coupon message after', RNOC_TEXT_DOMAIN),
@@ -359,89 +581,34 @@ class Settings
                     'attributes' => array(
                         'placeholder' => __('Select categories', RNOC_TEXT_DOMAIN)
                     ),
-                    'desc' => __('Product categories that the coupon code will not applied to, or cannot be in the cart in order for the "Fixed cart discount" to be applied.', RNOC_TEXT_DOMAIN)
+                    'desc' => __('Product categories that the coupon code will not applied to, or cannot be in the cart in order for the "Fixed cart discount" to be applied.', RNOC_TEXT_DOMAIN),
+                    'after_row' => '<h3>' . __("Coupon applied response", RNOC_TEXT_DOMAIN) . '</h3>',
                 ));
             } else {
                 $next_order_coupon->add_field(array(
                     'name' => '',
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_features',
-                    'type' => 'unlock_features'
+                    'type' => 'unlock_features',
+                    'after_row' => '<h3>' . __("Coupon applied response", RNOC_TEXT_DOMAIN) . '</h3>'
                 ));
             }
-            $general_settings = new_cmb2_box(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'retainful_settings',
-                'title' => __('Settings', RNOC_TEXT_DOMAIN),
-                'object_types' => array('options-page'),
-                'option_key' => $this->slug . '_settings',
-                'tab_group' => $this->slug,
-                'vertical_tabs' => true,
-                'parent_slug' => $this->slug,
-                'capability' => 'edit_shop_coupons',
-                'tab_title' => __('Settings', RNOC_TEXT_DOMAIN),
-                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_field(array(
-                'name' => __('When to consider a cart as abandoned?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'cart_abandoned_time',
-                'type' => 'text',
-                'desc' => __('In minutes. Example: You can consider a cart as abandoned 15 minutes after it was added', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'type' => 'number',
-                    'min' => 15,
-                    'class' => 'number_only_field'
-                ),
-                'default' => 60
-            ));
-            $general_settings->add_field(array(
-                'name' => __('How many days to wait before automatically deleting the cart', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'delete_abandoned_order_days',
-                'type' => 'text',
-                'desc' => __('Useful when you wanted the abandoned carts be removed after certain days', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'type' => 'number',
-                    'min' => 1,
-                    'class' => 'number_only_field'
-                ),
-                'default' => 90
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Should the store administrator get a notification when a cart is recovered', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'email_admin_on_recovery',
+            $next_order_coupon->add_field(array(
+                'name' => __('Enable response popup', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup',
                 'type' => 'radio_inline',
+                'default' => '1',
                 'options' => array(
-                    0 => __('No', RNOC_TEXT_DOMAIN),
-                    1 => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'desc' => __('Useful if you wanted to get notified when a cart is recovered.', RNOC_TEXT_DOMAIN),
-                'default' => 0
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN),
+                )
             ));
-            $general_settings->add_field(array(
-                'name' => __('Track real-time carts?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'track_real_time_cart',
-                'type' => 'radio_inline',
-                'options' => array(
-                    0 => __('No', RNOC_TEXT_DOMAIN),
-                    1 => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'desc' => __('If not enabled, only carts that are abandoned gets tracked (i.e, after customer leaves the site)', RNOC_TEXT_DOMAIN),
-                'default' => 1
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Show guest cart?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'show_guest_cart_in_dashboard',
-                'type' => 'radio_inline',
-                'options' => array(
-                    0 => __('No', RNOC_TEXT_DOMAIN),
-                    1 => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'desc' => __('If not enabled, Guest carts will not shown in your Abandoned cart dashboard.', RNOC_TEXT_DOMAIN),
-                'default' => 1
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Compliance: Message to show when tracking real-time carts', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'cart_capture_msg',
-                'type' => 'textarea',
-                'desc' => __('Under GDPR, it is mandatory to inform the users when we track their cart activity in real-time. If you are not tracking, you can leave this empty', RNOC_TEXT_DOMAIN)
+            $popup_msg_desc = __('Please use the below short codes to show the Coupon details in the popup.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_amount}}</b> - Coupon amount<br><b>{{shop_url}}</b> - Shop URL<br><b>{{cart_url}}</b> - Cart URL<br><b>{{checkout_url}}</b> - Checkout URL', RNOC_TEXT_DOMAIN);
+            $next_order_coupon->add_field(array(
+                'name' => __('Popup contents', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design',
+                'type' => 'wysiwyg',
+                'default' => $this->appliedCouponDefaultTemplate(),
+                'desc' => $popup_msg_desc
             ));
             //Premium Addon
             $tabs_array = array(
@@ -455,8 +622,19 @@ class Settings
                 )
             );
             if ($this->isProPlan()) {
-                if (defined('RNOCP_VERSION')) {
+                if (defined('RNOC_VERSION')) {
                     $tabs_array = apply_filters('rnoc_premium_addon_tab', $tabs_array);
+                }
+            }
+            /*
+             * @since premium version 1.1.2 ip filter was removed.
+             * so for core 2.1.0 this was added to support premium 1.1.1 and below
+             */
+            if (!empty($tabs_array) and is_array($tabs_array)) {
+                foreach ($tabs_array as $key => $details) {
+                    if (isset($details['id']) && $details['id'] == "do-not-track-ip") {
+                        unset($tabs_array[$key]);
+                    }
                 }
             }
             $premium_addon = new_cmb2_box(array(
@@ -477,43 +655,333 @@ class Settings
                 'id' => RNOC_PLUGIN_PREFIX . 'premium_addon',
                 'type' => 'premium_addon_list',
                 'default' => '',
+                'before_row' => $notice
             ));
             if ($this->isProPlan()) {
-                if (defined('RNOCP_VERSION')) {
+                if (defined('RNOC_VERSION')) {
                     //Popup modal settings
                     apply_filters('rnoc_premium_addon_tab_content', $premium_addon);
                 }
             }
-            //License
-            $license = new_cmb2_box(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'license',
-                'title' => __('License', RNOC_TEXT_DOMAIN),
-                'object_types' => array('options-page'),
-                'option_key' => $this->slug . '_license',
-                'tab_group' => $this->slug,
-                'parent_slug' => $this->slug,
-                'capability' => 'edit_shop_coupons',
-                'tab_title' => __('License', RNOC_TEXT_DOMAIN),
-                'save_button' => __('Save', RNOC_TEXT_DOMAIN)
-            ));
+            if (!$run_abandoned_cart_externally) {
+                $this->licenseTab($run_abandoned_cart_externally);
+            }
+        });
+    }
+
+    /**
+     * check the premium plugin is active
+     * @return bool
+     */
+    function isPremiumPluginActive()
+    {
+        return is_plugin_active('retainful-abandoned-cart-premium/retainful-abandoned-cart-premium.php');
+    }
+
+    /**
+     * applied Coupon Default Template
+     * @return string
+     */
+    function appliedCouponDefaultTemplate()
+    {
+        return '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_code}} was successfully applied to your cart!</h3><p style="margin:10px auto; ">Enjoy your shopping :)</p><p style="text-align: center; margin: 0;"><a href="{{shop_url}}" style="text-decoration: none;line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff;">Continue shopping!</a></p></div></div>';
+    }
+
+    /**
+     * un schedule hooks
+     */
+    function unScheduleHooks()
+    {
+        $this->removeFinishedHooks('rnoc_abandoned_clear_abandoned_carts', 'pending');
+        $this->removeFinishedHooks('rnoc_abandoned_cart_send_email', 'pending');
+    }
+
+    /**
+     * Schedule the action scheduler hooks
+     */
+    function actionSchedulerHooks()
+    {
+        $this->scheduleEvents('rnoc_abandoned_clear_abandoned_carts', current_time('timestamp'), array(), 'recurring', 86400);
+        $this->scheduleEvents('rnoc_abandoned_cart_send_email', current_time('timestamp'), array(), 'recurring', 900);
+        $this->schedulePlanChecker();
+    }
+
+    /**
+     * Schedule events to check plan
+     */
+    function schedulePlanChecker()
+    {
+        $this->scheduleEvents('rnocp_check_user_plan', current_time('timestamp'), array(), 'recurring', 604800);
+    }
+
+    /**
+     * Schedule events
+     * @param $hook
+     * @param $timestamp
+     * @param array $args
+     * @param string $type
+     * @param null $interval_in_seconds
+     * @param string $group
+     */
+    function scheduleEvents($hook, $timestamp, $args = array(), $type = "single", $interval_in_seconds = NULL, $group = '')
+    {
+        if (class_exists('ActionScheduler')) {
+            switch ($type) {
+                case "recurring":
+                    if (!$this->nextScheduledAction($hook)) {
+                        \ActionScheduler::factory()->recurring($hook, $args, $timestamp, $interval_in_seconds, $group);
+                    }
+                    break;
+                case 'single':
+                default:
+                    \ActionScheduler::factory()->single($hook, $args, $timestamp);
+                    break;
+            }
+        } else {
+            switch ($type) {
+                case "recurring":
+                    if (function_exists('as_schedule_recurring_action') && function_exists('as_next_scheduled_action')) {
+                        if (!as_next_scheduled_action($hook)) {
+                            as_schedule_recurring_action($timestamp, $interval_in_seconds, $hook, $args, $group);
+                        }
+                    }
+                    break;
+                case 'single':
+                default:
+                    if (function_exists('as_schedule_single_action')) {
+                        as_schedule_single_action($timestamp, $hook, $args);
+                    }
+                    break;
+            }
+        }
+    }
+
+    /**
+     * @param string $hook
+     * @param array $args
+     * @param string $group
+     *
+     * @return int|bool The timestamp for the next occurrence, or false if nothing was found
+     */
+    function nextScheduledAction($hook, $args = NULL, $group = '')
+    {
+        $params = array();
+        if (is_array($args)) {
+            $params['args'] = $args;
+        }
+        if (!empty($group)) {
+            $params['group'] = $group;
+        }
+        $job_id = \ActionScheduler::store()->find_action($hook, $params);
+        if (empty($job_id)) {
+            return false;
+        }
+        $job = \ActionScheduler::store()->fetch_action($job_id);
+        $next = $job->get_schedule()->next();
+        if ($next) {
+            return (int)($next->format('U'));
+        }
+        return false;
+    }
+
+    /**
+     * All the available scheduled actions post name
+     * @return array
+     */
+    protected function availableScheduledActions()
+    {
+        return array('rnocp_check_user_plan', 'rnoc_abandoned_clear_abandoned_carts', 'rnoc_abandoned_cart_send_email');
+    }
+
+    /**
+     * Remove all hooks and schedule once
+     * @param $post_title
+     * @param $status
+     * @return bool
+     */
+    function removeFinishedHooks($post_title, $status = "")
+    {
+        $available_action_names = $this->availableScheduledActions();
+        if (!empty($post_title) && !in_array($post_title, $available_action_names)) {
+            return false;
+        }
+        global $wpdb;
+        $res = true;
+        $where = "";
+        if (!empty($status)) {
+            $where = "AND post_status = '" . $status . "'";
+        }
+        $scheduled_actions = $wpdb->get_results("SELECT ID from `" . $wpdb->prefix . "posts` where post_title ='" . $post_title . "' {$where} AND  post_type='scheduled-action'");
+        if (!empty($scheduled_actions)) {
+            foreach ($scheduled_actions as $action) {
+                if (!wp_delete_post($action->ID, true)) {
+                    $res = false;
+                }
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * Get license details
+     * @param $run_abandoned_cart_externally
+     * @return \CMB2
+     */
+    function licenseTab($run_abandoned_cart_externally)
+    {
+        $switch_to_plugin_notice = NULL;
+        if ($run_abandoned_cart_externally) {
+            $is_new_installation = $this->isNewInstallation();
+            //If the user is old user then ask user to run abandoned cart to
+            if ($is_new_installation == 0) {
+                $move_to_cloud_url = admin_url('admin.php?page=' . $this->slug . '_license&move_to_local=yes');
+                $switch_to_plugin_notice = '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("If you would like to switch back and manage the abandoned carts via the plugin", RNOC_TEXT_DOMAIN) . '&nbsp; <a href="' . $move_to_cloud_url . '">' . esc_html("Click Here!") . '</a></p>';
+            }
+        }
+        //License
+        $license = new_cmb2_box(array(
+            'capability' => 'edit_shop_coupons',
+            'object_types' => array('options-page'),
+            'option_key' => $this->slug . '_license',
+            'tab_group' => $this->slug,
+            'id' => RNOC_PLUGIN_PREFIX . 'license',
+            'title' => (!$run_abandoned_cart_externally) ? __('License', RNOC_TEXT_DOMAIN) : __('Retainful - Abandoned Carts'),
+            'parent_slug' => (!$run_abandoned_cart_externally) ? $this->slug : 'woocommerce',
+            'tab_title' => (!$run_abandoned_cart_externally) ? __('License', RNOC_TEXT_DOMAIN) : __('Connection'),
+            'save_button' => __('Save', RNOC_TEXT_DOMAIN)
+        ));
+        $switch_to_cloud_notice = (!$run_abandoned_cart_externally) ? $this->switchToCloudNotice() : NULL;
+        $is_production = apply_filters('rnoc_is_production_plugin', true);
+        if ($is_production) {
             $license->add_field(array(
                 'name' => __('License / App ID', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_app_id',
-                'type' => 'retainful_app',
+                'type' => 'text',
                 'default' => '',
-                'desc' => __('You can get your App-id from https://www.app.retainful.com', RNOC_TEXT_DOMAIN)
+                'before_row' => $switch_to_cloud_notice . $this->deactivatePremiumPluginNotice(),
+                'desc' => __('Get your App-id <a target="_blank" href="' . $this->api->app_url . 'settings">here</a>', RNOC_TEXT_DOMAIN)
             ));
+            //if ($run_abandoned_cart_externally) {
             $license->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'is_retainful_connected',
-                'type' => 'hidden',
-                'default' => 0,
-                'attributes' => array('id' => 'is_retainful_app_connected')
+                'name' => __('Secret Key', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'retainful_app_secret',
+                'type' => 'text',
+                'default' => '',
+                'desc' => __('Get your Secret key <a target="_blank" href="' . $this->api->app_url . 'settings">here</a>', RNOC_TEXT_DOMAIN)
             ));
-        });
-        $page = isset($_GET['page']) ? $_GET['page'] : NULL;
-        if (is_admin() && in_array($page, array('retainful_abandoned_cart', 'retainful_abandoned_cart_email_templates', 'retainful', 'retainful_settings', 'retainful_premium', 'retainful_license', 'retainful_abandoned_cart_sent_emails'))) {
-            $this->addScript();
+            //}
         }
+        $license->add_field(array(
+            'name' => '',
+            'id' => RNOC_PLUGIN_PREFIX . 'retainful_app',
+            'type' => 'retainful_app',
+            'is_app_in_production' => $is_production,
+            'default' => '',
+            'desc' => '',
+            'after_row' => $switch_to_plugin_notice
+        ));
+        $license->add_field(array(
+            'id' => RNOC_PLUGIN_PREFIX . 'is_retainful_connected',
+            'type' => 'hidden',
+            'default' => 0,
+            'attributes' => array('id' => 'is_retainful_app_connected')
+        ));
+        return $license;
+    }
+
+    /**
+     * Set the option to manage Abandoned cart to manage in cloud
+     */
+    function setAbandonedCartToManageInCloud()
+    {
+        $this->unScheduleHooks();
+        update_option('retainful_run_abandoned_cart_in_cloud', 1);
+    }
+
+    /**
+     * Set the option to manage Abandoned cart to manage in cloud
+     */
+    function setAbandonedCartToManageLocally()
+    {
+        $this->actionSchedulerHooks();
+        update_option('retainful_run_abandoned_cart_in_cloud', 0);
+    }
+
+    /**
+     * @return mixed|void
+     */
+    function isNewInstallation()
+    {
+        return get_option('retainful_is_new_installation', 1);
+    }
+
+    /**
+     * check abandoned cart need to run locally or externally
+     * @return bool|mixed|void
+     */
+    function runAbandonedCartExternally()
+    {
+        $response = false;
+        $is_new_installation = $this->isNewInstallation();
+        if ($is_new_installation) {
+            $response = true;
+        }
+        $retainful_run_abandoned_cart_in_cloud = get_option('retainful_run_abandoned_cart_in_cloud', 0);
+        if ($retainful_run_abandoned_cart_in_cloud) {
+            $response = true;
+        }
+        $retainful_check_is_new_installation = get_option('retainful_check_is_new_installation', 0);
+        if (empty($retainful_check_is_new_installation)) {
+            $is_new_installation = $this->isInstalledFresh();
+            update_option('retainful_is_new_installation', $is_new_installation);
+            update_option('retainful_check_is_new_installation', 1);
+            $response = $is_new_installation;
+        }
+        return apply_filters('retainful_manage_abandon_carts_in_cloud', $response);
+    }
+
+    /**
+     * Create log file named retainful.log
+     * @param $message
+     * @param $log_in_as
+     */
+    function logMessage($message, $log_in_as = "checkout")
+    {
+        $admin_settings = $this->getAdminSettings();
+        if (isset($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($message)) {
+            try {
+                if (is_array($message) || is_object($message)) {
+                    $message = json_encode($message);
+                }
+                $to_print = $log_in_as . ":\n";
+                $to_print .= $message;
+                $file = fopen(RNOC_LOG_FILE_PATH, 'a');
+                $content = "\n\n Time :" . current_time('mysql') . ' | ' . $to_print;
+                fwrite($file, $content);
+                fclose($file);
+            } catch (\Exception $e) {
+                $e->getMessage();
+            }
+        }
+    }
+
+    /**
+     * Check the current installation is new or not
+     * @return bool
+     */
+    function isInstalledFresh()
+    {
+        global $wpdb;
+        $tables_list = $wpdb->get_results('SHOW TABLES', ARRAY_N);
+        $required_tables = array($wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history', $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates');
+        if (!empty($tables_list)) {
+            foreach ($tables_list as $table_name) {
+                if (count(array_intersect($required_tables, $table_name)) > 0) {
+                    return 0;
+                }
+            }
+        }
+        return 1;
     }
 
     /**
@@ -542,6 +1010,16 @@ class Settings
     }
 
     /**
+     * Get the user current plan
+     * @return mixed|string
+     */
+    function getUserPlanStatus()
+    {
+        $plan_details = $this->getPlanDetails();
+        return strtolower(trim(isset($plan_details['status']) ? $plan_details['status'] : 'inactive'));
+    }
+
+    /**
      * Get the abandoned cart settings
      * @return array|mixed
      */
@@ -551,6 +1029,16 @@ class Settings
         if (empty($abandoned_cart))
             $abandoned_cart = array();
         return $abandoned_cart;
+    }
+
+    /**
+     * get the cart tracking engine
+     * @return mixed|string
+     */
+    function getCartTrackingEngine()
+    {
+        $settings = $this->getAdminSettings();
+        return (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'])) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] : 'php';
     }
 
     /**
@@ -624,8 +1112,8 @@ class Settings
     function addScript()
     {
         $asset_path = plugins_url('', __FILE__);
-        wp_enqueue_script('retainful-app-main', $asset_path . '/js/app.js');
-        wp_enqueue_style('retainful-admin-css', $asset_path . '/css/main.css');
+        wp_enqueue_script('retainful-app-main', $asset_path . '/js/app.js', array(), RNOC_VERSION);
+        wp_enqueue_style('retainful-admin-css', $asset_path . '/css/main.css', array(), RNOC_VERSION);
     }
 
     /**
@@ -672,7 +1160,9 @@ class Settings
         ));
         if (!empty($category_list)) {
             foreach ($category_list as $category) {
-                $categories[$category->term_id] = $category->name;
+                if (is_object($category) && isset($category->term_id) && isset($category->name)) {
+                    $categories[$category->term_id] = $category->name;
+                }
             }
         }
         return $categories;
@@ -705,8 +1195,9 @@ class Settings
         $plan_details = get_option('rnoc_plan_details', array());
         if (empty($plan_details)) {
             $api_key = $this->getApiKey();
+            $secret_key = $this->getSecretKey();
             if (!empty($api_key)) {
-                $this->isApiEnabled($api_key);
+                $this->isApiEnabled($api_key, $secret_key);
             } else {
                 $this->updateUserAsFreeUser();
             }
@@ -729,8 +1220,9 @@ class Settings
     function isProPlan()
     {
         $plan = $this->getUserActivePlan();
+        $status = $this->getUserPlanStatus();
         $plan = strtolower($plan);
-        return (in_array($plan, array('pro', 'business')));
+        return (in_array($plan, array('pro', 'business', 'professional')) && in_array($status, array('active')));
     }
 
     /**
@@ -745,17 +1237,30 @@ class Settings
     /**
      * Check fo entered API key is valid or not
      * @param string $api_key
-     * @return bool
+     * @param string $secret_key
+     * @param string $store_data
+     * @return bool|array
      */
-    function isApiEnabled($api_key = "")
+    function isApiEnabled($api_key = "", $secret_key = NULL, $store_data = NULL)
     {
         if (empty($api_key)) {
             $api_key = $this->getApiKey();
         }
+        if (empty($secret_key)) {
+            $secret_key = $this->getSecretKey();
+        }
+        if (empty($store_data)) {
+            $store_data = $this->storeDetails($api_key, $secret_key);
+        }
         if (!empty($api_key)) {
-            if ($details = $this->api->validateApi($api_key)) {
-                $this->updatePlanDetails($details);
-                return true;
+            if ($details = $this->api->validateApi($api_key, $store_data)) {
+                if (empty($details) || is_string($details)) {
+                    $this->updateUserAsFreeUser();
+                    return array('error' => $details);
+                } else {
+                    $this->updatePlanDetails($details);
+                    return array('success' => isset($details['message']) ? $details['message'] : NULL);
+                }
             } else {
                 $this->updateUserAsFreeUser();
                 return false;
@@ -786,12 +1291,21 @@ class Settings
     }
 
     /**
+     * License settings
+     * @return mixed|void
+     */
+    function getLicenseDetails()
+    {
+        return get_option($this->slug . '_license', array());
+    }
+
+    /**
      * Check fo entered API key is valid or not
      * @return bool
      */
     function isAppConnected()
     {
-        $settings = get_option($this->slug . '_license', array());
+        $settings = $this->getLicenseDetails();
         if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'])) {
             return true;
         }
@@ -804,11 +1318,96 @@ class Settings
      */
     function getApiKey()
     {
-        $settings = get_option($this->slug . '_license', array());
+        $settings = $this->getLicenseDetails();
         if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id'])) {
             return $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id'];
         }
         return NULL;
+    }
+
+    /**
+     * Get Admin API key
+     * @return String|null
+     */
+    function getSecretKey()
+    {
+        $settings = $this->getLicenseDetails();
+        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret'])) {
+            return $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret'];
+        }
+        return NULL;
+    }
+
+    /**
+     * Check the site has multi currency
+     * @return bool
+     */
+    function getBaseCurrency()
+    {
+        $base_currency = $this->wc_functions->getDefaultCurrency();
+        return apply_filters('rnoc_get_default_currency_code', $base_currency);
+    }
+
+    /**
+     * Check the site has multi currency
+     * @return bool
+     */
+    function getAllAvailableCurrencies()
+    {
+        $base_currency = $this->wc_functions->getDefaultCurrency();
+        $currencies = array($base_currency);
+        return apply_filters('rnoc_get_available_currencies', $currencies);
+    }
+
+    /**
+     * Get the store details
+     * @param $api_key
+     * @param $secret_key
+     * @return array
+     */
+    function storeDetails($api_key, $secret_key)
+    {
+        $scheme = wc_site_is_https() ? 'https' : 'http';
+        $country_details = get_option('woocommerce_default_country');
+        list($country_code, $state_code) = explode(':', $country_details);
+        $lang_helper = new MultiLingual();
+        $default_language = $lang_helper->getDefaultLanguage();
+        $api_obj = new RestApi();
+        $details = array(
+            'woocommerce_app_id' => $api_key,
+            'secret_key' => $api_obj->encryptData($api_key, $secret_key),
+            'id' => NULL,
+            'name' => get_option('blogname'),
+            'email' => get_option('admin_email'),
+            'domain' => get_home_url(null, null, $scheme),
+            'address1' => get_option('woocommerce_store_address', NULL),
+            'address2' => get_option('woocommerce_store_address_2', NULL),
+            'currency' => $this->getBaseCurrency(),
+            'city' => get_option('woocommerce_store_city', NULL),
+            'zip' => get_option('woocommerce_store_postcode', NULL),
+            'country' => NULL,
+            'timezone' => $this->getSiteTimeZone(),
+            'weight_unit' => get_option('woocommerce_weight_unit'),
+            'country_code' => $country_code,
+            'province_code' => $state_code,
+            'force_ssl' => (get_option('woocommerce_force_ssl_checkout', 'no') == 'yes'),
+            'enabled_presentment_currencies' => $this->getAllAvailableCurrencies(),
+            'primary_locale' => $default_language
+        );
+        return $details;
+    }
+
+    /**
+     * Get the timezone of the site
+     * @return mixed|void
+     */
+    function getSiteTimeZone()
+    {
+        $time_zone = get_option('timezone_string');
+        if (empty($time_zone)) {
+            $time_zone = get_option('gmt_offset');
+        }
+        return $time_zone;
     }
 
     /**
@@ -866,6 +1465,34 @@ class Settings
             return isset($settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status'] : $statuses;
         }
         return $statuses;
+    }
+
+    /**
+     * get coupon settings from admin
+     * @return string
+     */
+    function showCouponInThankYouPage()
+    {
+        $show_on_thankyou_page = 0;
+        $settings = get_option($this->slug, array());
+        if (!empty($settings)) {
+            return isset($settings[RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page']) ? $settings[RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page'] : $show_on_thankyou_page;
+        }
+        return $show_on_thankyou_page;
+    }
+
+    /**
+     * get coupon settings from admin
+     * @return string
+     */
+    function enableCouponResponsePopup()
+    {
+        $enable = 1;
+        $settings = get_option($this->slug, array());
+        if (!empty($settings)) {
+            return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup']) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'] : $enable;
+        }
+        return $enable;
     }
 
     /**
@@ -938,7 +1565,8 @@ class Settings
         if (!isset($params['app_id'])) {
             $params['app_id'] = $this->getApiKey();
         }
-        $response = $this->api->request($url, $params, true);
+        $url = $this->api->domain . $url;
+        $response = $this->api->request($url, $params);
         if (isset($response->success) && $response->success) {
             //Do any stuff if success
             return true;
@@ -946,21 +1574,6 @@ class Settings
             //Log messages if request get failed
             return false;
         }
-    }
-
-    /**
-     * Log the message for further usage
-     * @param $message
-     * @param $response
-     */
-    function logResponse($message, $response)
-    {
-        $plugin_directory = plugin_dir_path(__DIR__);
-        $file = $plugin_directory . "/cache/retainful.log";
-        $f = fopen($file, 'a');
-        fwrite($f, "\n\n Message: \n" . $message);
-        fwrite($f, "Data " . json_encode($response));
-        fclose($f);
     }
 
     /**
@@ -988,77 +1601,8 @@ class Settings
      */
     function setupSurveyForm()
     {
+        if (!apply_filters('rnoc_need_survey_form', true)) return false;
         $survey = new Survey();
         $survey->init(RNOC_PLUGIN_SLUG, 'Retainful - next order coupon for woocommerce', RNOC_TEXT_DOMAIN);
-    }
-
-    /**
-     * Schedule events
-     * @param $hook
-     * @param $timestamp
-     * @param array $args
-     * @param string $type
-     * @param null $interval_in_seconds
-     * @param string $group
-     */
-    function scheduleEvents($hook, $timestamp, $args = array(), $type = "single", $interval_in_seconds = NULL, $group = '')
-    {
-        if (class_exists('ActionScheduler')) {
-            switch ($type) {
-                case "recurring":
-                    if (!$this->nextScheduledAction($hook)) {
-                        \ActionScheduler::factory()->recurring($hook, $args, $timestamp, $interval_in_seconds, $group);
-                    }
-                    break;
-                case 'single':
-                default:
-                    \ActionScheduler::factory()->single($hook, $args, $timestamp);
-                    break;
-            }
-        } else {
-            switch ($type) {
-                case "recurring":
-                    if (function_exists('as_schedule_recurring_action') && function_exists('as_next_scheduled_action')) {
-                        if (!as_next_scheduled_action($hook)) {
-                            as_schedule_recurring_action($timestamp, $interval_in_seconds, $hook, $args, $group);
-                        }
-                    }
-                    break;
-                case 'single':
-                default:
-                    if (function_exists('as_schedule_single_action')) {
-                        as_schedule_single_action($timestamp, $hook, $args);
-                    }
-                    break;
-            }
-        }
-    }
-
-    /**
-     * @param string $hook
-     * @param array $args
-     * @param string $group
-     *
-     * @return int|bool The timestamp for the next occurrence, or false if nothing was found
-     */
-    function nextScheduledAction($hook, $args = NULL, $group = '')
-    {
-        $params = array();
-        if (is_array($args)) {
-            $params['args'] = $args;
-        }
-        if (!empty($group)) {
-            $params['group'] = $group;
-        }
-        $job_id = \ActionScheduler::store()->find_action($hook, $params);
-        if (empty($job_id)) {
-            return false;
-        }
-        $job = \ActionScheduler::store()->fetch_action($job_id);
-        $next = $job->get_schedule()->next();
-        if ($next) {
-            return (int)($next->format('U'));
-        }
-        return false;
     }
 }

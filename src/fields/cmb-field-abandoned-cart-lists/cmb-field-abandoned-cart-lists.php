@@ -31,7 +31,7 @@ class CMB2_Field_Abandoned_Cart_Lists
         if ($duration != "custom") {
             $start_date = $start_end_dates[$duration]['start_date'];
             $end_date = $start_end_dates[$duration]['end_date'];
-        } else if (isset($_GET['start']) && isset($_GET['end'])) {
+        } elseif (isset($_GET['start']) && isset($_GET['end'])) {
             $start_date = $_GET['start'];
             $end_date = $_GET['start'];
         } else {
@@ -105,7 +105,7 @@ class CMB2_Field_Abandoned_Cart_Lists
                                         class="status-dot rcd-bg mr-1"><?php echo __("Recovered", RNOC_TEXT_DOMAIN); ?></span>
                             </td>
                             <?php
-                        } else if ($carts->cart_expiry > $current_time) {
+                        } elseif ($carts->cart_expiry > $current_time) {
                             ?>
                             <td class="in-prs-clr"><span
                                         class="status-dot in-prs-bg mr-1"><?php echo __("In Progress", RNOC_TEXT_DOMAIN); ?></span>
@@ -129,7 +129,7 @@ class CMB2_Field_Abandoned_Cart_Lists
                             $user = get_userdata($carts->customer_key);
                             if ($user) {
                                 echo $user->first_name . ' ' . $user->last_name;
-                            } else if ($carts->order_id) {
+                            } elseif ($carts->order_id) {
                                 $meta = get_post_meta($carts->order_id);
                                 $result = '';
                                 if (isset($meta['_billing_first_name'])) {
@@ -171,7 +171,7 @@ class CMB2_Field_Abandoned_Cart_Lists
                             $user = get_userdata($carts->customer_key);
                             if ($user) {
                                 echo '<a href="mailto:' . $user->user_email . '">' . $user->user_email . '</a>';
-                            } else if ($carts->order_id) {
+                            } elseif ($carts->order_id) {
                                 $meta = get_post_meta($carts->order_id);
                                 if (isset($meta['_billing_email'])) {
                                     $email = $meta['_billing_email'];

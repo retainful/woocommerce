@@ -22,10 +22,16 @@ class OrderCoupon
      */
     function validateAppKey()
     {
-        $app_id = isset($_REQUEST['app_id']) ? $_REQUEST['app_id'] : '';
+        $is_production = apply_filters('rnoc_is_production_plugin', true);
+        if (!$is_production) {
+            wp_send_json_error('You can only change you App-Id and Secret key in production store!',500);
+        }
+        $app_id = isset($_REQUEST['app_id']) ? sanitize_text_field($_REQUEST['app_id']) : '';
+        $secret_key = isset($_REQUEST['secret_key']) ? sanitize_text_field($_REQUEST['secret_key']) : '';
         $options_data = array(
             RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => '0',
-            RNOC_PLUGIN_PREFIX . 'retainful_app_id' => $app_id
+            RNOC_PLUGIN_PREFIX . 'retainful_app_id' => $app_id,
+            RNOC_PLUGIN_PREFIX . 'retainful_app_secret' => $secret_key
         );
         $slug = $this->admin->slug;
         //Save app id before validate key
@@ -35,15 +41,20 @@ class OrderCoupon
         if (empty($app_id)) {
             $response['error'] = __('Please enter App-Id', RNOC_TEXT_DOMAIN);
         }
+        if (empty($secret_key)) {
+            $response['error'] = __('Please enter App-Secret', RNOC_TEXT_DOMAIN);
+        }
         if (empty($response)) {
-            $is_api_enabled = $this->admin->isApiEnabled($app_id);
-            if ($is_api_enabled) {
+            $api_response = $this->admin->isApiEnabled($app_id, $secret_key);
+            if (isset($api_response['success'])) {
                 //Change app id status
                 $options_data[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 1;
                 update_option($slug . '_license', $options_data);
-                $response['success'] = __('Successfully connected to Retainful', RNOC_TEXT_DOMAIN);
+                $response['success'] = $api_response['success'];
+            } elseif (isset($api_response['error'])) {
+                $response['error'] = $api_response['error'];
             } else {
-                $response['error'] = __('Please enter Valid App-Id', RNOC_TEXT_DOMAIN);
+                $response['error'] = __('Please check the entered details', RNOC_TEXT_DOMAIN);
             }
         }
         wp_send_json($response);
@@ -64,12 +75,19 @@ class OrderCoupon
      */
     function pluginActionLinks($links)
     {
-        $action_links = array(
-            'abandoned_carts' => '<a href="' . admin_url('admin.php?page=retainful_abandoned_cart') . '">' . __('Abandoned carts', RNOC_TEXT_DOMAIN) . '</a>',
-            'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', RNOC_TEXT_DOMAIN) . '</a>',
-            'settings' => '<a href="' . admin_url('admin.php?page=retainful_settings') . '">' . __('Settings', RNOC_TEXT_DOMAIN) . '</a>',
-            'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('License', RNOC_TEXT_DOMAIN) . '</a>',
-        );
+        if ($this->admin->runAbandonedCartExternally()) {
+            $action_links = array(
+                'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('Connection', RNOC_TEXT_DOMAIN) . '</a>',
+                'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', RNOC_TEXT_DOMAIN) . '</a>',
+            );
+        } else {
+            $action_links = array(
+                'abandoned_carts' => '<a href="' . admin_url('admin.php?page=retainful_abandoned_cart') . '">' . __('Abandoned carts', RNOC_TEXT_DOMAIN) . '</a>',
+                'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', RNOC_TEXT_DOMAIN) . '</a>',
+                'settings' => '<a href="' . admin_url('admin.php?page=retainful_settings') . '">' . __('Settings', RNOC_TEXT_DOMAIN) . '</a>',
+                'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('License', RNOC_TEXT_DOMAIN) . '</a>',
+            );
+        }
         return array_merge($action_links, $links);
     }
 
@@ -170,11 +188,24 @@ class OrderCoupon
         $api_key = $this->admin->getApiKey();
         if ($this->admin->isAppConnected() && !empty($api_key)) {
             $order = $this->wc_functions->getOrder($order_id);
+            $this->updateAppliedCouponDetails($order_id, $order);
             $request_params = $this->getRequestParams($order);
             $request_params['app_id'] = $api_key;
             return $this->admin->sendCouponDetails('track', $request_params);
         }
         return false;
+    }
+
+    /**
+     * Show coupon in thankyou page
+     * @param $order_id
+     */
+    function showCouponInThankYouPage($order_id)
+    {
+        if (!empty($this->admin->showCouponInThankYouPage())) {
+            $order = $this->wc_functions->getOrder($order_id);
+            $this->attachOrderCoupon($order, false);
+        }
     }
 
     /**
@@ -185,7 +216,7 @@ class OrderCoupon
      * @param $email
      * @return bool
      */
-    function attachOrderCoupon($order, $sent_to_admin, $plain_text = "", $email = "")
+    function attachOrderCoupon($order, $sent_to_admin, $plain_text = '', $email = '')
     {
         $order_id = $this->wc_functions->getOrderId($order);
         if (!$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id)) {
@@ -270,6 +301,48 @@ class OrderCoupon
             //Do not apply coupon until the coupon is valid
             if ($this->checkCouponBeforeCouponApply($coupon_code)) {
                 $this->wc_functions->addDiscount($coupon_code);
+            }
+        }
+    }
+
+    /**
+     * show applied coupon popup
+     */
+    function showAppliedCouponPopup()
+    {
+        if (isset($_GET['retainful_coupon_code']) && !empty($_GET['retainful_coupon_code'])) {
+            $coupon_code = sanitize_text_field($_GET['retainful_coupon_code']);
+            $settings = $this->admin->getUsageRestrictions();
+            $need_popup = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'] : 1;
+            $popup_content = (isset($settings[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'])) ? $settings[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] : $this->admin->appliedCouponDefaultTemplate();
+            if ($need_popup && !empty($popup_content)) {
+                $override_path = get_theme_file_path('retainful/templates/applied_coupon_popup.php');
+                $cart_template_path = RNOC_PLUGIN_PATH . 'src/admin/templates/applied_coupon_popup.php';
+                if (file_exists($override_path)) {
+                    $cart_template_path = $override_path;
+                }
+                if (file_exists($cart_template_path)) {
+                    $coupon_details = $this->getCouponDetails($coupon_code);
+                    if (!empty($coupon_details)) {
+                        $post_id = $coupon_details->ID;
+                        $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
+                        if ($coupon_amount > 0) {
+                            $coupon_type = get_post_meta($post_id, 'coupon_type', true);
+                            $coupon_array = array(
+                                'coupon_amount' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
+                                'coupon_code' => $coupon_code,
+                                'shop_url' => $this->wc_functions->getShopUrl(),
+                                'cart_url' => $this->wc_functions->getCartUrl(),
+                                'checkout_url' => $this->wc_functions->getCheckoutUrl(),
+                            );
+                            foreach ($coupon_array as $key => $val) {
+                                $popup_content = str_replace('{{' . $key . '}}', $val, $popup_content);
+                            }
+                            include $cart_template_path;
+                            $this->wc_functions->setPHPSession('rnoc_is_coupon_applied_popup_showed', 1);
+                        }
+                    }
+                }
             }
         }
     }
@@ -410,7 +483,7 @@ class OrderCoupon
                     'limit_usage_to_x_items' => '',
                     'usage_count' => '',
                     'expiry_date' => $coupon_expiry_date,
-                    'apply_before_tax' => 'yes',
+                    'apply_before_tax' => 'no',
                     'free_shipping' => false,
                     'product_categories' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'] : array(),
                     'excluded_product_categories' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'] : array(),
@@ -438,6 +511,7 @@ class OrderCoupon
         if (empty($order_id))
             return false;
         $order = $this->wc_functions->getOrder($order_id);
+        $this->updateAppliedCouponDetails($order_id, $order);
         $request_params = $this->getRequestParams($order);
         if (isset($request_params['applied_coupon']) && !empty($request_params['applied_coupon'])) {
             $coupon_details = $this->isValidCoupon($request_params['applied_coupon'], $order);
@@ -466,7 +540,13 @@ class OrderCoupon
             //Handle API Requests
             $api_key = $this->admin->getApiKey();
             if (!empty($api_key)) {
-                $this->admin->scheduleEvents('retainful_cron_sync_coupon_details', current_time('timestamp'), array($order_id));
+                $woocommerce_version = rnocGetInstalledWoocommerceVersion();
+                if (version_compare($woocommerce_version, '3.5', '>=')) {
+                    $this->admin->scheduleEvents('retainful_cron_sync_coupon_details', current_time('timestamp') + 60, array($order_id));
+                } else {
+                    //For old versions directly sync the cou[on details
+                    $this->cronSendCouponDetails($order_id);
+                }
             }
         }
     }
@@ -605,7 +685,8 @@ class OrderCoupon
         $order_id = sanitize_key($order_id);
         if (empty($order_id)) return false;
         $coupon = $this->isCouponFound($order_id);
-        if (!$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id)) {
+        $coupon_settings = $this->admin->getCouponSettings();
+        if (!$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
             return NULL;
         }
         $order = $this->wc_functions->getOrder($order_id);
@@ -631,6 +712,17 @@ class OrderCoupon
         if (empty($new_coupon_code))
             return NULL;
         update_post_meta($order_id, '_rnoc_next_order_coupon', $new_coupon_code);
+        $this->updateAppliedCouponDetails($order_id, $order);
+        return $new_coupon_code;
+    }
+
+    /**
+     * Update used coupon details of the order
+     * @param $order_id
+     * @param $order
+     */
+    function updateAppliedCouponDetails($order_id, $order)
+    {
         $used_coupons = $this->wc_functions->getUsedCoupons($order);
         if (!empty($used_coupons)) {
             foreach ($used_coupons as $used_coupon) {
@@ -643,7 +735,6 @@ class OrderCoupon
                 }
             }
         }
-        return $new_coupon_code;
     }
 
     /**
@@ -684,12 +775,12 @@ class OrderCoupon
         if (is_string($postData) && $postData != '') {
             parse_str($postData, $postDataArray);
         }
-        $postBillingEmail = isset($_REQUEST['billing_email']) ? $_REQUEST['billing_email'] : '';
+        $postBillingEmail = isset($_REQUEST['billing_email']) ? sanitize_email($_REQUEST['billing_email']) : '';
         if ($postBillingEmail != '') {
             $postDataArray['billing_email'] = $postBillingEmail;
         }
         if (!get_current_user_id()) {
-            $order_id = isset($_REQUEST['order-received']) ? $_REQUEST['order-received'] : 0;
+            $order_id = isset($_REQUEST['order-received']) ? sanitize_key($_REQUEST['order-received']) : 0;
             if ($order_id) {
                 $order = $this->wc_functions->getOrder($order_id);
                 $postDataArray['billing_email'] = $this->wc_functions->getOrderEmail($order);
@@ -698,12 +789,12 @@ class OrderCoupon
         $user_email = '';
         if (isset($postDataArray['billing_email']) && $postDataArray['billing_email'] != '') {
             $user_email = $postDataArray['billing_email'];
-        } else if (get_current_user_id()) {
-            $user_email = get_user_meta(get_current_user_id(), 'billing_email', true);
+        } else if ($user_id = get_current_user_id()) {
+            $user_email = get_user_meta($user_id, 'billing_email', true);
             if ($user_email != '' && !empty($user_email)) {
                 return $user_email;
             } else {
-                $user_details = get_userdata(get_current_user_id());
+                $user_details = get_userdata($user_id);
                 if (isset($user_details->data->user_email) && $user_details->data->user_email != '') {
                     $user_email = $user_details->data->user_email;
                     return $user_email;
