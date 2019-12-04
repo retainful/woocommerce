@@ -395,6 +395,25 @@ class Settings
                     'link_only_field' => 1
                 ));
             }
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'limit_per_user',
+                    'type' => 'text_small',
+                    'attributes' => array(
+                        'type' => 'number'
+                    ),
+                    'default' => 0,
+                    'desc' => __('Limit the next order coupon per user', RNOC_TEXT_DOMAIN)
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_limit_per_user_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1
+                ));
+            }
             $next_order_coupon->add_field(array(
                 'name' => __('Coupon type', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
@@ -1509,6 +1528,22 @@ class Settings
             }
         }
         return $roles;
+    }
+
+    /**
+     * get coupon settings from admin
+     * @return integer
+     */
+    function getCouponLimitPerUser()
+    {
+        $limit = 0;
+        if ($this->isProPlan()) {
+            $settings = get_option($this->slug, array());
+            if (!empty($settings)) {
+                return isset($settings[RNOC_PLUGIN_PREFIX . 'limit_per_user']) ? $settings[RNOC_PLUGIN_PREFIX . 'limit_per_user'] : $limit;
+            }
+        }
+        return $limit;
     }
 
     /**

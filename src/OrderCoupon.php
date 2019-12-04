@@ -24,7 +24,7 @@ class OrderCoupon
     {
         $is_production = apply_filters('rnoc_is_production_plugin', true);
         if (!$is_production) {
-            wp_send_json_error('You can only change you App-Id and Secret key in production store!',500);
+            wp_send_json_error('You can only change you App-Id and Secret key in production store!', 500);
         }
         $app_id = isset($_REQUEST['app_id']) ? sanitize_text_field($_REQUEST['app_id']) : '';
         $secret_key = isset($_REQUEST['secret_key']) ? sanitize_text_field($_REQUEST['secret_key']) : '';
@@ -675,6 +675,39 @@ class OrderCoupon
     }
 
     /**
+     * check the user has valid limit
+     * @param $order_id
+     * @return bool
+     */
+    function isValidCouponLimit($order_id)
+    {
+        if (empty($order_id)) {
+            return false;
+        }
+        $limit = $this->admin->getCouponLimitPerUser();
+        if (empty($limit)) {
+            return true;
+        }
+        $order = $this->wc_functions->getOrder($order_id);
+        if (empty($order)) {
+            return false;
+        }
+        $order_email = $this->wc_functions->getOrderEmail($order);
+        $args = array(
+            'customer' => $order_email,
+        );
+        $args = apply_filters("rnoc_coupon_limit_arguments", $args, $order, $order_id);
+        $orders = $this->wc_functions->getOrdersList($args);
+        if (empty($orders)) {
+            return true;
+        } elseif (count($orders) > $limit) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Create new coupon
      * @param $order_id
      * @param $data
@@ -686,7 +719,7 @@ class OrderCoupon
         if (empty($order_id)) return false;
         $coupon = $this->isCouponFound($order_id);
         $coupon_settings = $this->admin->getCouponSettings();
-        if (!$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
+        if (!$this->isValidCouponLimit($order_id) || !$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
             return NULL;
         }
         $order = $this->wc_functions->getOrder($order_id);
