@@ -16,7 +16,7 @@
             <div style="width: 100%"> {{email_collection_form}}</div>
                 <a class="lw-content"
                    style="text-decoration: none; font-size: 16px; line-height: 24px; color: #6c6b70; font-weight: 500"
-                   href="{{checkout_url}}">No, thanks. I'd prefer to pay full price.</a>
+                   href="{{checkout_url_without_coupon}}">No, thanks. I'd prefer to pay full price.</a>
 
         </div>
     </div>

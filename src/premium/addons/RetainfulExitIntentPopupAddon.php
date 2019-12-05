@@ -369,16 +369,18 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 $coupon_code = get_the_title($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL));
                 $checkout_url = $this->getCheckoutUrl();
                 $cart_url = $this->getCartUrl();
+                $coupon_data = "";
                 if (!empty($coupon_code)) {
-                    $checkout_url = $checkout_url . '?rnoc_on_exit_coupon_code=' . $coupon_code;
-                    $cart_url = $cart_url . '?rnoc_on_exit_coupon_code=' . $coupon_code;
+                    $coupon_data = '?rnoc_on_exit_coupon_code=' . $coupon_code;
                 }
                 $email = $this->wc_functions->getPHPSession('rnoc_user_billing_email_php_session');
                 $to_replace = array(
                     'coupon_code' => $coupon_code,
-                    'checkout_url' => $checkout_url,
+                    'checkout_url' => $checkout_url . $coupon_data,
+                    'checkout_url_without_coupon' => $checkout_url,
                     'email_collection_form' => ($this->isValidUserToShow() && empty($email)) ? $this->getEmailCollectionForm() : '',
-                    'cart_url' => $cart_url
+                    'cart_url_without_coupon' => $cart_url,
+                    'cart_url' => $cart_url . $coupon_data
                 );
                 foreach ($to_replace as $find => $replace) {
                     $content = str_replace('{{' . $find . '}}', $replace, $content);
@@ -612,7 +614,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'before' => $before_editor . '<div class="rnoc-grid"> <div class="grid-column">',
                 'after' => '<button type="button" class="insert-template" id="rnoc_exit_intent_popup_template_show_preview">' . __("Preview", RNOC_TEXT_DOMAIN) . '</button></div><div class="grid-column" id="exit-intent-popup-preview"></div></div><style id="custom-style-container"></style>',
                 'default' => $this->getDefaultPopupTemplate(),
-                'desc' => __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{cart_url}}</b> - Url to redirect to cart page<br><b>{{checkout_url}}</b> - Url to redirect user to checkout page<br><b>{{email_collection_form}}</b> - To display email collection form. Note: Email collection form will only show to Guest and Administrator.', RNOC_TEXT_DOMAIN)
+                'desc' => __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{cart_url}}</b> - Url to redirect to cart page<br><b>{{cart_url_without_coupon}}</b> - Url to redirect to cart page without auto applying coupon<br><b>{{checkout_url}}</b> - Url to redirect user to checkout page<br><b>{{checkout_url_without_coupon}}</b> - Url to redirect user to checkout page without auto apply coupon code<br><b>{{email_collection_form}}</b> - To display email collection form. Note: Email collection form will only show to Guest and Administrator.', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
                 'name' => __('Custom CSS styles', RNOC_TEXT_DOMAIN),

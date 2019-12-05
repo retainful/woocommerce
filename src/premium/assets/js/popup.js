@@ -88,7 +88,6 @@ function initJqueryRetainfulPopupJs() {
                 //Trigger event about showing popup
                 $(document).trigger('retainful_showing_add_to_cart_popup', [thisButton]);
                 thisButton.removeClass('loading');
-                console.log(thisButton);
                 thisButton.addClass('rnoc-popup-opener');
                 let modal = this.getAddToCartPopupWindow();
                 modal.css('display', 'block');
@@ -318,7 +317,7 @@ function initJqueryRetainfulPopupJs() {
             let email = $('#rnoc-add-to-cart-add-on #rnoc-popup-email-field').val();
             let error_handler = $("#rnoc-add-to-cart-add-on  #rnoc-invalid-mail-message");
             var is_buyer_accepting_marketing = $('#rnoc-add-to-cart-add-on #rnoc-popup-buyer-accepts-marketing');
-            add_to_cart_popup.syncEmail(email, is_buyer_accepting_marketing, $(this), event, error_handler);
+            add_to_cart_popup.syncEmail(email, is_buyer_accepting_marketing, $('#rnoc-add-to-cart-add-on .rnoc-popup-btn'), event, error_handler);
         });
         $(document).on('added_to_cart', (fragment, cart_hash, this_button) => {
             add_to_cart_popup.showInstantPopup();

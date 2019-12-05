@@ -694,13 +694,16 @@ class OrderCoupon
         }
         $order_email = $this->wc_functions->getOrderEmail($order);
         $args = array(
-            'customer' => $order_email,
+            'posts_per_page' => -1,
+            'post_type' => 'rnoc_order_coupon',
+            'meta_key' => 'email',
+            'meta_value' => $order_email
         );
-        $args = apply_filters("rnoc_coupon_limit_arguments", $args, $order, $order_id);
-        $orders = $this->wc_functions->getOrdersList($args);
+        $posts_query = new \WP_Query($args);
+        $count = $posts_query->post_count;
         if (empty($orders)) {
             return true;
-        } elseif (count($orders) > $limit) {
+        } elseif ($count > $limit) {
             return false;
         } else {
             return true;
