@@ -266,38 +266,6 @@ function initJqueryRetainfulPopupJs() {
                 });
                 return msg;
             }
-
-            /**
-             * Show the instant popup
-             */
-            showInstantPopup() {
-                if (this.isLocalStorageSupports()) {
-                    let is_popup_showed = sessionStorage.getItem("rnoc_instant_coupon_popup_showed");
-                    if (is_popup_showed && is_popup_showed === "no") {
-                        let popup_html = sessionStorage.getItem("rnoc_instant_coupon_popup_html");
-                        $(popup_html).appendTo("body");
-                        let instant_popup = this.getInstantPopup();
-                        instant_popup.show();
-                        sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "yes");
-                    }
-                }
-            }
-
-            /**
-             * Hide the instant popup
-             */
-            closeInstantPopup() {
-                let instant_popup = this.getInstantPopup();
-                instant_popup.hide();
-            }
-
-            /**
-             * get the instant popup
-             * @return {jQuery}
-             */
-            getInstantPopup() {
-                return $("#rnoc-add-to-cart-add-on-instant-coupon").show();
-            }
         }
 
         let add_to_cart_popup = new addToCartPopup().setOptions(retainful_premium_add_to_cart_collection_popup_condition);
@@ -318,15 +286,6 @@ function initJqueryRetainfulPopupJs() {
             let error_handler = $("#rnoc-add-to-cart-add-on  #rnoc-invalid-mail-message");
             var is_buyer_accepting_marketing = $('#rnoc-add-to-cart-add-on #rnoc-popup-buyer-accepts-marketing');
             add_to_cart_popup.syncEmail(email, is_buyer_accepting_marketing, $('#rnoc-add-to-cart-add-on .rnoc-popup-btn'), event, error_handler);
-        });
-        $(document).on('added_to_cart', (fragment, cart_hash, this_button) => {
-            add_to_cart_popup.showInstantPopup();
-        });
-        $(document).on('click', '#rnoc-add-to-cart-add-on-instant-coupon .close-rnoc-popup', () => {
-            add_to_cart_popup.closeInstantPopup();
-        });
-        $(document).ready(() => {
-            add_to_cart_popup.showInstantPopup()
         });
         $(document).on("click", ".single_add_to_cart_button,[name=add-to-cart]", function (event) {
             if (add_to_cart_popup.needPopup()) {

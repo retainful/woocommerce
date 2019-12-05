@@ -101,6 +101,7 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
         function isValidPagesToDisplay($to_display_pages)
         {
             if (!empty($to_display_pages)) {
+                global $post;
                 $page_id = get_the_ID();
                 if (!in_array($page_id, $to_display_pages)) {
                     return false;

@@ -401,7 +401,8 @@ class Settings
                     'id' => RNOC_PLUGIN_PREFIX . 'limit_per_user',
                     'type' => 'text_small',
                     'attributes' => array(
-                        'type' => 'number'
+                        'type' => 'number',
+                        'min'=>0
                     ),
                     'default' => 0,
                     'desc' => __('Limit the next order coupon per user', RNOC_TEXT_DOMAIN)
@@ -1466,8 +1467,8 @@ class Settings
         $coupon = array();
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
-            $coupon['coupon_type'] = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] : 0;
-            $coupon['coupon_amount'] = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
+            $coupon['coupon_type'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] : 0;
+            $coupon['coupon_amount'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) && ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] > 0) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
         }
         return $coupon;
     }
