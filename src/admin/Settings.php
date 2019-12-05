@@ -286,7 +286,7 @@ class Settings
                     'php' => __('PHP (Default)', RNOC_TEXT_DOMAIN),
                     'js' => __('JavaScript', RNOC_TEXT_DOMAIN)
                 ),
-                'default' => 'php'
+                'default' => 'js'
             ));
             $general_settings->add_field(array(
                 'name' => __('Consider On-Hold order status as abandoned cart?', RNOC_TEXT_DOMAIN),
@@ -1058,7 +1058,7 @@ class Settings
     function getCartTrackingEngine()
     {
         $settings = $this->getAdminSettings();
-        return (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'])) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] : 'php';
+        return (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'])) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] : 'js';
     }
 
     /**
