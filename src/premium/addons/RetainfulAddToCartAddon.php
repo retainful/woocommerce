@@ -391,7 +391,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addSiteScripts()
         {
-            wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/popup.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
+            wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
             $modal_show_popup_until = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1);
             $modal_show = array(
                 'hide_modal_after_show' => $modal_show_popup_until,
@@ -415,7 +415,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addSiteInstantCouponScripts()
         {
-            wp_enqueue_script('rnoc-add-to-cart-instant-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/add_to_cart_coupon_popup.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
+            wp_enqueue_script('rnoc-add-to-cart-instant-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/add_to_cart_coupon_popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
             wp_enqueue_style('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
         }
 
