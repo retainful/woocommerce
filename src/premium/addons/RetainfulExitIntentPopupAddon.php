@@ -322,7 +322,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             } else {
                 $url = '';
             }
-            $coupon_code = get_the_title($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL));
+            $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL);
             if (!empty($coupon_code)) {
                 $url = $url . '?rnoc_on_exit_coupon_code=' . $coupon_code;
             }
@@ -366,7 +366,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 if (empty($content)) {
                     $content = $this->getDefaultPopupTemplate();
                 }
-                $coupon_code = get_the_title($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL));
+                $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL);
                 $checkout_url = $this->getCheckoutUrl();
                 $cart_url = $this->getCartUrl();
                 $coupon_data = "";

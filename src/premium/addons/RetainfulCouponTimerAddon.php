@@ -27,7 +27,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 add_filter('rnoc_premium_addon_tab_content', array($this, 'premiumAddonTabContent'));
             }
             $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 1);
-            $coupon_code = get_the_title($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL));
+            $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
             if ($need_coupon_timer && !empty($coupon_code)) {
                 add_action('woocommerce_add_to_cart', array($this, 'productAddedToCart'));
                 add_action('wp', array($this, 'showTimer'));
@@ -61,7 +61,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         {
             if (!in_array($new_status, array('pending'))) {
                 $this->wc_functions->removePHPSession('rnoc_coupon_timer_expired_on');
-                $coupon_code = get_the_title($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL));
+                $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
                 $order = $this->wc_functions->getOrder($order_id);
                 if (!empty($order)) {
                     $used_coupon_codes = $this->wc_functions->getUsedCoupons($order);
@@ -83,7 +83,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         {
             $coupon_expire_time = $this->wc_functions->getPHPSession('rnoc_coupon_timer_expired_on');
             if (!empty($coupon_expire_time) && (current_time('timestamp') > $coupon_expire_time)) {
-                $coupon_code = get_the_title($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL));
+                $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
                 $hook_coupon_code = $this->wc_functions->getCouponCode($coupon);
                 if (strtolower($hook_coupon_code) == strtolower($coupon_code)) {
                     return false;
@@ -103,7 +103,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         {
             $coupon_expire_time = $this->wc_functions->getPHPSession('rnoc_coupon_timer_expired_on');
             if (!empty($coupon_expire_time) && (current_time('timestamp') > $coupon_expire_time)) {
-                $coupon_code = get_the_title($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL));
+                $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
                 $hook_coupon_code = $this->wc_functions->getCouponCode($coupon);
                 if ((strtolower($hook_coupon_code) == strtolower($coupon_code)) && ($error_code == 101 || $error_code == 100)) {
                     $message = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message', 'Sorry! Instant Offer has expired.');
@@ -219,7 +219,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         {
             $coupon_expire_time = $this->wc_functions->getPHPSession('rnoc_coupon_timer_expired_on');
             if (!empty($coupon_expire_time) && (current_time('timestamp') <= $coupon_expire_time)) {
-                $coupon_code = get_the_title($this->getKeyFromArray($settings_details, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'));
+                $coupon_code = $this->getKeyFromArray($settings_details, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon');
                 if (!is_null($used_code) && strtolower($used_code) != strtolower($coupon_code)) {
                     return false;
                 }
@@ -297,7 +297,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             $coupon_expire_time = $this->wc_functions->getPHPSession('rnoc_coupon_timer_expired_on');
             if (empty($coupon_expire_time)) {
                 $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 1);
-                $coupon_code = get_the_title($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL));
+                $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
                 $expired_on_min = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time', 15);
                 if (!empty($need_coupon_timer) && !empty($coupon_code) && !empty($expired_on_min)) {
                     $expiry_timestamp = current_time('timestamp') + ($expired_on_min * 60);
