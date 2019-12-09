@@ -84,9 +84,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'rnoc_modal_email_placeholder' => __('Email address', RNOC_TEXT_DOMAIN),
                 'rnoc_modal_add_cart_text' => __('Add to Cart', RNOC_TEXT_DOMAIN),
                 'rnoc_modal_add_cart_color' => '#ffffff',
-                'rnoc_modal_add_cart_bg_color' => '#a77cf4',
-                'rnoc_modal_add_cart_border_top_color' => '#a77cf4',
-                'rnoc_modal_add_cart_no_thanks_color' => '#a77cf4',
+                'rnoc_modal_add_cart_bg_color' => '#f27052',
+                'rnoc_modal_add_cart_border_top_color' => '#f27052',
+                'rnoc_modal_add_cart_no_thanks_color' => '#f27052',
                 'rnoc_modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
                 'rnoc_modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
                 'rnoc_coupon_message' => '',
@@ -443,7 +443,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function getDefaultEmailTemplate()
         {
-            return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">You have new Discount code</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">We want to offer you an exclusive voucher for your order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; width: fit-content; padding: 10px; border: 1px solid #8D71DB; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>', RNOC_TEXT_DOMAIN);
+            return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">You have new Discount code</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">We want to offer you an exclusive voucher for your order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #f27052; color: #f27052; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #f27052; width: fit-content; padding: 10px; border: 1px solid #f27052; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>', RNOC_TEXT_DOMAIN);
         }
 
         /**
@@ -452,7 +452,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function getDefaultPopupTemplate()
         {
-            return __('<div class="popup" style="padding: 20px;background: #F9F9F9;border-radius: 0;transition: all 3s ease-in-out;font-family: inherit;"> <div class="popup-head" style="display: block;padding: 20px;text-align: center;"> <div class="lw-title" style="padding: 0px 12px;margin-bottom: 0;font-size: 32px;color: #1f1e1f;font-weight: 600;line-height: 45px;text-transform: uppercase;"> You have a new discount code! </div><p style="font-size: 25px;padding: 0px 15px;line-height: 20px;margin-bottom: 34px;">We want to offer you an exclusive voucher for your order!</p><div class="lw-wrap" style="display: block;padding: 0px;color: #2f2e35;border: 1px dashed #0dd7a5;"> <div class="lw-center" style="text-align: center;padding: 20px 30px;"> <div style="margin: 10px 0 17px;line-height: 25px;font-size: 22px;display: inline-block;">Your Code </div><a class="lw-btn" href="{{coupon_url}}" style="text-decoration:none;color: #0dd7a5;"> <div style="width: 100%;display: inline-block;padding: 12px 0;color: #0dd7a5;border: 2px dashed #0dd7a5;border-radius: 4px;font-size: 16px;font-weight: 600;text-align: center;line-height: 1.33333;transition: background .2s, opacity .2s;margin-top: 0px;margin-bottom: 15px;">{{coupon_code}}</div></a> <a class="lw-btn" href="{{coupon_url}}" style="text-decoration:none; color:#fff;"> <div style="width: 100%;display: inline-block;padding: 12px 0;background: #0dd7a5;border: none;border-radius: 4px;font-size: 16px;font-weight: 600;color: white;text-align: center;line-height: 1.33333;transition: background .2s, opacity .2s;margin-top: 0px;margin-bottom: 15px;"> Use discount </div></a> <div> <a href="#" class="lw-content" style="text-decoration: none;font-size: 16px;line-height: 24px;color: #6c6b70 !important;font-weight: 500!important;">* Not valid with other discount codes</a> </div></div></div></div></div>', RNOC_TEXT_DOMAIN);
+            return __('<div style="padding: 20px; background: #F8F0F0; border-radius: 15px;"><div style="padding: 20px; text-align: center;"><div style="padding: 0px 12px; margin-bottom: 0; font-size: 35px; color: #1f1e1f; font-weight: 600; line-height: 45px;">You have new Discount code</div><p style="font-size: 20px; padding: 0px 15px; line-height: 20px; margin-bottom: 15px; margin-top: 28px;">Get 15% off on any item when you buy today</p><div style="padding: 0px; color: #2f2e35;"><div style="text-align: center; padding: 20px 30px;"><a style="width: 60%; padding: 12px 20%; background: #ffffff; border-radius: 4px; font-size: 16px; font-weight: 600; color: #2f2e35; text-align: center; line-height: 1.33333; margin-top: 0px; margin-bottom: 5px; border: 1px dashed #2f2e35; text-decoration: none;" href="{{coupon_url}}">{{coupon_code}}</a> <a style="padding: 12px 20px; background: #f27052; border: none; border-radius: 4px; font-size: 18px; font-weight: 600; color: white; text-align: center; line-height: 1.33333; text-decoration: none;" href="{{coupon_url}}">Use a coupon</a></div><a style="text-decoration: none; font-size: 16px; line-height: 24px; color: #6c6b70 !important; font-weight: 500!important; margin-bottom: -15px;" href="#">*Not valid with other discount codes</a></div></div></div>', RNOC_TEXT_DOMAIN);
         }
 
         /**
@@ -721,13 +721,13 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color',
                 'type' => 'colorpicker',
-                'default' => '#a77cf4'
+                'default' => '#f27052'
             ));
             $general_settings->add_group_field($popup_design_settings, array(
                 'name' => __('Popup top border color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
                 'type' => 'colorpicker',
-                'default' => '#a77cf4'
+                'default' => '#f27052'
             ));
             $general_settings->add_group_field($popup_design_settings, array(
                 'name' => __('Not mandatory text', RNOC_TEXT_DOMAIN),
@@ -740,7 +740,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'name' => __('No thanks link color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
                 'type' => 'colorpicker',
-                'default' => '#a77cf4'
+                'default' => '#f27052'
             ));
             $general_settings->add_group_field($popup_design_settings, array(
                 'name' => __('Terms', RNOC_TEXT_DOMAIN),

@@ -1,55 +1,57 @@
-<div class="rnoc-popup-holder" style="border-top: 5px solid <?php echo $rnoc_modal_add_cart_border_top_color; ?>;padding: 20px;background: #f5f5f5;">
-    <div class="rnoc-header">
-        <div style="color: <?php echo $rnoc_modal_heading_color; ?>;font-size: 34px;font-weight: 600;margin-top: 20px;">
+<div class="popup"
+     style="padding: 15px;background: #F8F0F0;border-radius: 15px;position: relative;transition: all 3s ease-in-out;border-top: 5px solid <?php echo $rnoc_modal_add_cart_border_top_color; ?>;">
+
+    <div class="popup-head" style="display: block;text-align: center;">
+        <div class="lw-title"
+             style="padding: 0 12px;margin: 15px 0px 4px;font-size: 31px;font-weight: 600;line-height: 43px;color: <?php echo $rnoc_modal_heading_color; ?>;">
             <?php echo $rnoc_modal_heading; ?>
         </div>
-        <div style="color: <?php echo $rnoc_modal_sub_heading_color; ?>;margin: 10px 0;line-height: 1.7;font-size: 20px;">
-            <?php echo $rnoc_modal_sub_heading; ?>
-        </div>
-    </div>
-    <div class="rnoc-content">
+        <p style="font-size: 22px;padding: 0 15px;line-height: 30px;margin: 18px 0px 10px;color: <?php echo $rnoc_modal_sub_heading_color; ?>;"><?php echo $rnoc_modal_sub_heading; ?></p>
+
         <?php echo $rnoc_popup_form_open ?>
-        <div class="rnoc-popup-form-block" style="display: flex;align-items: center;flex-wrap: wrap;justify-content: space-between;">
-            <input type="email" id="rnoc-popup-email-field" placeholder="<?php echo $rnoc_modal_email_placeholder ?>" class="rnoc-popup-input" <?php echo $rnoc_popup_email_field ?>  style="width: 100%;max-width: 100%;padding: 15px;box-shadow: 0 0 4px -3px #000000;border-radius: 5px;background: #ffffff;margin: 10px 0;font-weight: 400;font-size: 18px;border: none !important;flex: 0 0 58%;">
-            <button class="rnoc-popup-btn"
-                    style="color: <?php echo $rnoc_modal_add_cart_color ?>;background: <?php echo $rnoc_modal_add_cart_bg_color ?>;width: 100%;padding: 15px;border-radius: 5px;margin: 10px 0;font-weight: 400;font-size: 18px;border: none !important;flex: 0 0 40%;cursor: pointer;">
-                <?php echo $rnoc_modal_add_cart_text ?>
-            </button>
-        </div>
-        <div style="text-align: left;">
+        <div class="lw-center" style="text-align: center;padding: 0 10px;">
+            <div class="rnoc-popup-form-block" style="position: relative;margin-bottom: 4px;">
+                <input id="rnoc-popup-email-field"
+                       placeholder="<?php echo $rnoc_modal_email_placeholder ?>" <?php echo $rnoc_popup_email_field ?>
+                       type="email"
+                       style="display: inline-block;width: 48%;font-size: 16px;border-radius: 5px 0px 0px 5px;box-shadow: 0 3px 5px 0 rgba(37, 39, 44, 0.12);height: 47px;padding: 0 15px;border: 1px solid rgba(0, 0, 0, 0.12);margin-bottom: 7px;font-weight: 500;">
+                <button class="rnoc-popup-btn"
+                        style="color: <?php echo $rnoc_modal_add_cart_color ?>;background: <?php echo $rnoc_modal_add_cart_bg_color ?>;width: 40%;display: inline-block;padding: 14px 20px;height: 48px;border: none;border-radius: 0px 5px 5px 0px;font-size: 16px;line-height: 20px;box-shadow: 0 3px 5px 0 rgba(37, 39, 44, 0.17);font-weight: 600;margin: 15px -7px;text-align: center;cursor: pointer;">
+                    Add to Cart
+                </button>
+            </div>
+            <p style="margin: 15px 0 5px 50px;color: red;text-align: left;display: none;" id="rnoc-invalid-mail-message"><?php echo __('Please enter the valid
+            email.', RNOC_TEXT_DOMAIN) ?></p>
             <?php
             if ($rnoc_gdpr_check_box_settings != "no_need_gdpr") {
                 ?>
-                <label>
-                    <?php
-                    if (in_array($rnoc_gdpr_check_box_settings, array('show_and_check_checkbox', 'show_checkbox'))) {
-                        ?>
-                        <input type="checkbox" name="add_to_cart_buyer_accepts_marketing"
-                               id="rnoc-popup-buyer-accepts-marketing" <?php echo ($rnoc_gdpr_check_box_settings == 'show_and_check_checkbox') ? "checked" : "" ?>/>&nbsp;
+                <div class="pp-label"
+                     style="text-align: left;margin: 15px 0 15px 50px;font-size: 15px;">
+                    <label>
                         <?php
-                    }
-                    echo $rnoc_gdpr_check_box_message;
-                    ?>
-                </label>
+                        if (in_array($rnoc_gdpr_check_box_settings, array('show_and_check_checkbox', 'show_checkbox'))) {
+                            ?>
+                            <input type="checkbox" name="add_to_cart_buyer_accepts_marketing"
+                                   id="rnoc-popup-buyer-accepts-marketing" <?php echo ($rnoc_gdpr_check_box_settings == 'show_and_check_checkbox') ? "checked" : "" ?>/>&nbsp;
+                            <?php
+                        }
+                        echo $rnoc_gdpr_check_box_message;
+                        ?>
+                    </label>
+                </div>
                 <?php
             }
             ?>
+            <?php
+            if ($rnoc_no_thanks_action) {
+                ?>
+                <a class="no-thanks-close-popup" href="#"
+                   style="text-decoration: none;font-size: 16px;color: <?php echo $rnoc_modal_add_cart_no_thanks_color; ?>;line-height: 24px;margin-bottom: 20px;font-weight: 500 !important;"><?php echo $rnoc_modal_not_mandatory_text ?></a>
+                <?php
+            }
+            ?>
+            <span style="font-size: 12px;padding: 0 85px;line-height: 22px;margin-top: 8px;color: #403f3f;display: block;"><?php echo $rnoc_modal_terms_text ?></span>
         </div>
-        <p style="color: red;text-align: left;display: none;" id="rnoc-invalid-mail-message"><?php echo __('Please enter the valid
-            email.', RNOC_TEXT_DOMAIN) ?></p>
-        <p class="small-text"
-           style="color: #6d6d6d;text-align: center;font-size: 14px;"><?php echo $rnoc_coupon_message ?></p>
         <?php echo $rnoc_popup_form_close ?>
     </div>
-    <div class="footer" style="text-align: center;">
-        <?php
-        if($rnoc_no_thanks_action) {
-            ?>
-            <a href="#" class="no-thanks-close-popup"
-               style="color: <?php echo $rnoc_modal_add_cart_no_thanks_color; ?>;text-decoration: none;"><?php echo $rnoc_modal_not_mandatory_text ?></a>
-            <?php
-        }
-        ?>
-    </div>
-    <div style="margin: 20px auto;color: #5f5f5f;text-align: center;"><?php echo $rnoc_modal_terms_text ?></div>
 </div>

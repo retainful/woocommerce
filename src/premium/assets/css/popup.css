@@ -11,50 +11,58 @@
     background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.7);
 }
+
 .rnoc-popup-modal-content {
     background-color: #fefefe;
     margin: auto;
-    border: 1px solid #888;
-    width: 50%;
+    width: 40%;
     position: relative;
     text-align: center;
+    border-radius: 50px;
 }
+
 .rnoc-popup-modal .close-rnoc-popup {
     color: #fff;
     font-size: 26px;
     margin: 20px;
     font-weight: bold;
     position: absolute;
-    right: -35px;
-    top: -35px;
+    right: -27px;
+    top: -27px;
     width: 30px;
-    background: #333;
+    background: #000000;
     height: 30px;
     text-align: center;
     line-height: 30px;
     border-radius: 50%;
     box-shadow: 0 0 0px 2px #fff;
+    z-index: 9;
 }
+
 .rnoc-popup-modal .close-rnoc-popup:hover,
 .rnoc-popup-modal .close-rnoc-popup:focus {
-    color: #000;
+    color: #fff;
     text-decoration: none;
     cursor: pointer;
 }
-@media(max-width: 992px){
+
+@media (max-width: 992px) {
     .rnoc-popup-modal-content {
         width: 90%;
         max-height: 400px;
         overflow: auto;
     }
+
     .rnoc-popup-modal .close-rnoc-popup {
         right: -20px;
         top: -20px;
     }
-    .rnoc-popup-form-block input{
+
+    .rnoc-popup-form-block input {
         flex: 0 0 100%;
     }
-    .rnoc-popup-form-block button{
+
+    .rnoc-popup-form-block button {
         flex: 0 0 100%;
     }
 }

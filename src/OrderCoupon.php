@@ -701,9 +701,7 @@ class OrderCoupon
         );
         $posts_query = new \WP_Query($args);
         $count = $posts_query->post_count;
-        if (empty($orders)) {
-            return true;
-        } elseif ($count > $limit) {
+        if ($count > $limit) {
             return false;
         } else {
             return true;

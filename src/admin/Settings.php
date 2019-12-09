@@ -289,6 +289,16 @@ class Settings
                 'default' => 'js'
             ));
             $general_settings->add_field(array(
+                'name' => __('Track Zero value carts / orders', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
+                'type' => 'radio_inline',
+                'options' => array(
+                    'yes' => __('Yes', RNOC_TEXT_DOMAIN),
+                    'no' => __('No', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 'no'
+            ));
+            $general_settings->add_field(array(
                 'name' => __('Consider On-Hold order status as abandoned cart?', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
                 'type' => 'radio_inline',
@@ -402,7 +412,7 @@ class Settings
                     'type' => 'text_small',
                     'attributes' => array(
                         'type' => 'number',
-                        'min'=>0
+                        'min' => 0
                     ),
                     'default' => 0,
                     'desc' => __('Limit the next order coupon per user', RNOC_TEXT_DOMAIN)
@@ -976,7 +986,7 @@ class Settings
                 $to_print = $log_in_as . ":\n";
                 $to_print .= $message;
                 $file = fopen(RNOC_LOG_FILE_PATH, 'a');
-                $content = "\n\n Time :" . current_time('mysql') . ' | ' . $to_print;
+                $content = "\n\n Time :" . current_time('mysql',true) . ' | ' . $to_print;
                 fwrite($file, $content);
                 fclose($file);
             } catch (\Exception $e) {
@@ -1059,6 +1069,16 @@ class Settings
     {
         $settings = $this->getAdminSettings();
         return (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'])) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] : 'js';
+    }
+
+    /**
+     * get the cart tracking engine
+     * @return mixed|string
+     */
+    function trackZeroValueCarts()
+    {
+        $settings = $this->getAdminSettings();
+        return (isset($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'])) ? $settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'] : 'no';
     }
 
     /**

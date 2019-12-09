@@ -532,6 +532,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $general_settings->add_field(array(
                 'type' => 'post_search_ajax',
                 'limit' => 1,
+                'valuefield' => 'title',
                 'attributes' => array(
                     'placeholder' => __('Search and select Coupons..', RNOC_TEXT_DOMAIN)
                 ),

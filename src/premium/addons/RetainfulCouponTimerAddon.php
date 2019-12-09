@@ -170,7 +170,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 RNOC_PLUGIN_PREFIX . 'checkout_url' => $this->getCheckoutUrl(),
                 RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
                 RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
-                RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#a77cf4',
+                RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
             );
         }
 
@@ -359,6 +359,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             $general_settings->add_field(array(
                 'type' => 'post_search_ajax',
                 'limit' => 1,
+                'valuefield' => 'title',
                 'attributes' => array(
                     'placeholder' => __('Search and select Coupons..', RNOC_TEXT_DOMAIN)
                 ),
@@ -492,7 +493,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
                 'type' => 'colorpicker',
-                'default' => '#a77cf4'
+                'default' => '#f27052'
             ));
             //Above cart position settings
             $above_cart_position_settings = $general_settings->add_field(array(
@@ -580,7 +581,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
                 'type' => 'colorpicker',
-                'default' => '#a77cf4'
+                'default' => '#f27052'
             ));
             //Below applied coupon settings
             $below_discount_position_settings = $general_settings->add_field(array(

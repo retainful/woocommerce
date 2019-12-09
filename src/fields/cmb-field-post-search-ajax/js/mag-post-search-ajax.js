@@ -7,6 +7,7 @@
 			var fid 		= $(this).attr('id');
 			var query_args 	= $(this).attr('data-queryargs');
 			var object		= $(this).attr('data-object');
+			var value_field		= $(this).attr('data-valuefield');
 			$(this).devbridgeAutocomplete({
 				serviceUrl: psa.ajaxurl,
 				type: 'POST',
@@ -36,6 +37,7 @@
 					action  	: 'cmb_post_search_ajax_get_results',
 					psacheck	: psa.nonce,
 					object		: object,
+					value_field		: value_field,
 					query_args	: query_args,
 				},
 				onSearchStart: function(){
