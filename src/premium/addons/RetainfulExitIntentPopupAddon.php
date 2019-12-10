@@ -205,6 +205,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
                     $this->applyCouponAutomatically();
                     $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages', array());
+                    
                     if (!$this->isValidPagesToDisplay($modal_display_pages)) {
                         return false;
                     }
@@ -256,6 +257,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         {
             if (isset($_REQUEST['rnoc_on_exit_coupon_code'])) {
                 $coupon_code = sanitize_text_field($_REQUEST['rnoc_on_exit_coupon_code']);
+                $coupon_code = apply_filters("rnoc_exit_intent_before_applying_coupon_code", $coupon_code);
                 if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
                     $this->wc_functions->addDiscount($coupon_code);
                 }
