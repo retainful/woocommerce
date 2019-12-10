@@ -219,7 +219,7 @@ class OrderCoupon
     function attachOrderCoupon($order, $sent_to_admin, $plain_text = '', $email = '')
     {
         $order_id = $this->wc_functions->getOrderId($order);
-        if (!$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order)) {
+        if (!$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order)) {
             return false;
         }
         $coupon_code = '';
@@ -626,8 +626,8 @@ class OrderCoupon
         $valid_order_statuses = $this->admin->getCouponValidOrderStatuses();
         if (!empty($valid_order_statuses)) {
             if (!in_array('all', $valid_order_statuses)) {
-                $status = 'wc-' . $this->wc_functions->getStatus($order);
-                if (!in_array($status, $valid_order_statuses)) {
+                $order_status = 'wc-' . $this->wc_functions->getStatus($order);
+                if (!in_array($order_status, $valid_order_statuses)) {
                     $status = false;
                 }
             }
@@ -648,7 +648,7 @@ class OrderCoupon
             if (!in_array('all', $valid_user_roles)) {
                 $order_roles = $this->getUserRoleFromOrder($order);
                 if (count(array_intersect($order_roles, $valid_user_roles)) == 0) {
-                    $status =  false;
+                    $status = false;
                 }
             }
         }
@@ -681,9 +681,9 @@ class OrderCoupon
      */
     function isValidCouponLimit($order)
     {
-        $status = false;
+        $status = true;
         $limit = $this->admin->getCouponLimitPerUser();
-        if (empty($limit)) {
+        if (!empty($limit)) {
             $order_email = $this->wc_functions->getOrderEmail($order);
             $args = array(
                 'posts_per_page' => -1,
@@ -693,8 +693,8 @@ class OrderCoupon
             );
             $posts_query = new \WP_Query($args);
             $count = $posts_query->post_count;
-            if ($count <= $limit) {
-                $status = true;
+            if ($count >= $limit) {
+                $status = false;
             }
         }
         return apply_filters("rnoc_is_order_has_valid_limit", $status, $order);
@@ -707,17 +707,17 @@ class OrderCoupon
      */
     function hasValidProductsToGenerateCoupon($order)
     {
-        $status = false;
+        $status = true;
         $invalid_products = $this->admin->getInvalidProductsForCoupon();
-        if (empty($invalid_products)) {
+        if (!empty($invalid_products)) {
             $cart = $this->wc_functions->getOrderItems($order);
             if (!empty($cart)) {
                 foreach ($cart as $item_key => $item_details) {
                     $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
                     $product_id = (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0;
                     $id = (!empty($variant_id)) ? $variant_id : $product_id;
-                    if (!in_array($id, $invalid_products)) {
-                        $status = true;
+                    if (in_array($id, $invalid_products)) {
+                        $status = false;
                         break;
                     }
                 }
@@ -733,7 +733,7 @@ class OrderCoupon
      */
     function hasValidCategoriesToGenerateCoupon($order)
     {
-        $status = false;
+        $status = true;
         $invalid_categories = $this->admin->getInvalidCategoriesForCoupon();
         if (!empty($invalid_categories)) {
             $cart = $this->wc_functions->getOrderItems($order);
@@ -744,8 +744,8 @@ class OrderCoupon
                     $id = (!empty($variant_id)) ? $variant_id : $product_id;
                     $product_category_ids = $this->wc_functions->getProductCategoryIds($id);
                     if (is_array($product_category_ids) && is_array($invalid_categories)) {
-                        if (count(array_intersect($invalid_categories, $product_category_ids)) == 0) {
-                            $status = true;
+                        if (count(array_intersect($invalid_categories, $product_category_ids)) > 0) {
+                            $status = false;
                             break;
                         }
                     }
