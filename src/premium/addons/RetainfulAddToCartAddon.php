@@ -87,6 +87,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'rnoc_modal_add_cart_bg_color' => '#f27052',
                 'rnoc_modal_add_cart_border_top_color' => '#f27052',
                 'rnoc_modal_add_cart_no_thanks_color' => '#f27052',
+                'rnoc_modal_bg_color' => '#F8F0F0',
                 'rnoc_modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
                 'rnoc_modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
                 'rnoc_coupon_message' => '',
@@ -475,6 +476,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     RNOC_PLUGIN_PREFIX . 'need_modal',
                     RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class',
                     RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
+                    RNOC_PLUGIN_PREFIX . 'modal_bg_color',
                     RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
                     RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action',
                     RNOC_PLUGIN_PREFIX . 'modal_show_popup_until',
@@ -624,7 +626,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
                 'type' => 'radio_inline',
                 'options' => array(
-                    "instantly" => __("Instantly", RNOC_TEXT_DOMAIN),
+                    "instantly" => __("Instantly using a popup", RNOC_TEXT_DOMAIN),
                     "send_via_email" => __("Send an email", RNOC_TEXT_DOMAIN),
                     "both" => __("Show instantly and also send an email", RNOC_TEXT_DOMAIN),
                 ),
@@ -728,6 +730,12 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
                 'type' => 'colorpicker',
                 'default' => '#f27052'
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Add to cart popup background color', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_bg_color',
+                'type' => 'colorpicker',
+                'default' => '#F8F0F0'
             ));
             $general_settings->add_group_field($popup_design_settings, array(
                 'name' => __('Not mandatory text', RNOC_TEXT_DOMAIN),

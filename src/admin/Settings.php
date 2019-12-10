@@ -378,54 +378,6 @@ class Settings
                 'before_row' => '<p class="submit"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="' . __("Save", RNOC_TEXT_DOMAIN) . '"></p>' . $notice
             ));
             $next_order_coupon->add_field(array(
-                'name' => __('Order Status', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'preferred_order_status',
-                'type' => 'pw_multiselect',
-                'options' => $this->availableOrderStatuses(),
-                'default' => array('all'),
-                'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN)
-            ));
-            if ($this->isProPlan()) {
-                $next_order_coupon->add_field(array(
-                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
-                    'type' => 'pw_multiselect',
-                    'options' => $this->getUserRoles(),
-                    'attributes' => array(
-                        'placeholder' => __('Select User Roles', RNOC_TEXT_DOMAIN)
-                    ),
-                    'default' => array('all'),
-                    'desc' => __('Coupon codes will generate only for the selected user roles. By default coupon code will generate for all user roles.', RNOC_TEXT_DOMAIN)
-                ));
-            } else {
-                $next_order_coupon->add_field(array(
-                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_user_role_feature',
-                    'type' => 'unlock_features',
-                    'link_only_field' => 1
-                ));
-            }
-            if ($this->isProPlan()) {
-                $next_order_coupon->add_field(array(
-                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'limit_per_user',
-                    'type' => 'text_small',
-                    'attributes' => array(
-                        'type' => 'number',
-                        'min' => 0
-                    ),
-                    'default' => 0,
-                    'desc' => __('Limit the next order coupon per user', RNOC_TEXT_DOMAIN)
-                ));
-            } else {
-                $next_order_coupon->add_field(array(
-                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_limit_per_user_feature',
-                    'type' => 'unlock_features',
-                    'link_only_field' => 1
-                ));
-            }
-            $next_order_coupon->add_field(array(
                 'name' => __('Coupon type', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
                 'type' => 'radio',
@@ -504,8 +456,81 @@ class Settings
                 'classes' => 'retainful-coupon-group',
                 'default' => '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>',
                 'desc' => $coupon_msg_desc,
-                'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
+                'after_row' => '<h3>' . __('Coupon Generation Restriction', RNOC_TEXT_DOMAIN) . '&nbsp;<small>' . __("(You can control the generation of a coupon based on the these settings.)", RNOC_TEXT_DOMAIN) . '</small></h3>'
             ));
+            $next_order_coupon->add_field(array(
+                'name' => __('Order Status', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'preferred_order_status',
+                'type' => 'pw_multiselect',
+                'options' => $this->availableOrderStatuses(),
+                'default' => array('all'),
+                'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN),
+            ));
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
+                    'type' => 'pw_multiselect',
+                    'options' => $this->getUserRoles(),
+                    'attributes' => array(
+                        'placeholder' => __('Select User Roles', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => array('all'),
+                    'desc' => __('Coupon codes will generate only for the selected user roles. By default coupon code will generate for all user roles.', RNOC_TEXT_DOMAIN)
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_user_role_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1
+                ));
+            }
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'limit_per_user',
+                    'type' => 'text_small',
+                    'attributes' => array(
+                        'type' => 'number',
+                        'min' => 0
+                    ),
+                    'default' => 0,
+                    'desc' => __('Limit the next order coupon per user', RNOC_TEXT_DOMAIN)
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_limit_per_user_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1
+                ));
+            }
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Do not generate if the following products found in the order', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products',
+                    'type' => 'post_search_ajax',
+                    'limit' => 10,
+                    'desc' => __('Coupon code will not generate when selected products found in order!', RNOC_TEXT_DOMAIN),
+                    'attributes' => array(
+                        'placeholder' => __('Choose products..', RNOC_TEXT_DOMAIN)
+                    ),
+                    'query_args' => array(
+                        'post_type' => array('product', 'product_variation'),
+                        'post_status' => 'publish'
+                    ),
+                    'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Do not generate if the following products found in the order', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_exclude_generating_coupon_for_products_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1,
+                    'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
+                ));
+            }
             if ($is_app_connected) {
                 //Usage restrictions
                 $next_order_coupon->add_field(array(
@@ -685,7 +710,7 @@ class Settings
                 'id' => RNOC_PLUGIN_PREFIX . 'premium_addon',
                 'type' => 'premium_addon_list',
                 'default' => '',
-                'before_row' => $notice
+                'before_row' => $notice.'<p style="text-align: right"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="Save" style="display: none;"></p>'
             ));
             if ($this->isProPlan()) {
                 if (defined('RNOC_VERSION')) {
@@ -986,7 +1011,7 @@ class Settings
                 $to_print = $log_in_as . ":\n";
                 $to_print .= $message;
                 $file = fopen(RNOC_LOG_FILE_PATH, 'a');
-                $content = "\n\n Time :" . current_time('mysql',true) . ' | ' . $to_print;
+                $content = "\n\n Time :" . current_time('mysql', true) . ' | ' . $to_print;
                 fwrite($file, $content);
                 fclose($file);
             } catch (\Exception $e) {
@@ -1552,7 +1577,7 @@ class Settings
     }
 
     /**
-     * get coupon settings from admin
+     * get coupon Limit per email
      * @return integer
      */
     function getCouponLimitPerUser()
@@ -1565,6 +1590,22 @@ class Settings
             }
         }
         return $limit;
+    }
+
+    /**
+     * get coupon settings from admin
+     * @return array
+     */
+    function getInvalidProductsForCoupon()
+    {
+        $products = array();
+        if ($this->isProPlan()) {
+            $settings = get_option($this->slug, array());
+            if (!empty($settings)) {
+                return isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products'] : $products;
+            }
+        }
+        return $products;
     }
 
     /**

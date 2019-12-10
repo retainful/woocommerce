@@ -1,5 +1,5 @@
 <div class="popup"
-     style="padding: 15px;background: #F8F0F0;border-radius: 15px;position: relative;transition: all 3s ease-in-out;border-top: 5px solid <?php echo $rnoc_modal_add_cart_border_top_color; ?>;">
+     style="padding: 15px;background: <?php echo $rnoc_modal_bg_color; ?>;border-radius: 15px;position: relative;transition: all 3s ease-in-out;border-top: 5px solid <?php echo $rnoc_modal_add_cart_border_top_color; ?>;">
 
     <div class="popup-head" style="display: block;text-align: center;">
         <div class="lw-title"

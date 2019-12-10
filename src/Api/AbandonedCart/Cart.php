@@ -600,6 +600,7 @@ class Cart extends RestApi
         $user_ip = $this->retrieveUserIp();
         if (empty($user_ip)) {
             $user_ip = $this->getClientIp();
+            $user_ip = $this->formatUserIP($user_ip);
             $this->setUserIP($user_ip);
         }
         return $user_ip;
