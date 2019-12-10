@@ -104,8 +104,7 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
             if(!empty($to_display_pages) && is_array($to_display_pages)) {
                 $to_display_pages =  array_map('intval', $to_display_pages);
             }
-            global $post;
-            $post_slug = $post->post_name;
+
             if(is_page($to_display_pages)) {
                 return true;
             } else {
