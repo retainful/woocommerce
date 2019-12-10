@@ -1191,6 +1191,19 @@ class WcFunctions
     }
 
     /**
+     * get the default currency
+     * @param $product_id
+     * @return array
+     */
+    function getProductCategoryIds($product_id)
+    {
+        if (function_exists('wc_get_product_term_ids')) {
+            return wc_get_product_term_ids($product_id, 'product_cat');
+        }
+        return array();
+    }
+
+    /**
      * get the checkout url
      * @return string|null
      */

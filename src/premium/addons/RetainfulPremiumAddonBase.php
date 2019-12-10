@@ -101,10 +101,20 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
         function isValidPagesToDisplay($to_display_pages)
         {
             if (!empty($to_display_pages)) {
-                global $post;
-                $page_id = get_the_ID();
-                if (!in_array($page_id, $to_display_pages)) {
-                    return false;
+                global $wp;
+                $current_slug = add_query_arg(array(), $wp->request);
+                if (!empty($current_slug)) {
+                    $page = get_page_by_path($current_slug);
+                    if (!empty($page)) {
+                        $page_id = $page->ID;
+                        if (!in_array($page_id, $to_display_pages)) {
+                            return false;
+                        }
+                    }
+                } else {
+                    if (!in_array('landing_page', $to_display_pages)) {
+                        return false;
+                    }
                 }
             }
             return true;

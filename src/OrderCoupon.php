@@ -741,6 +741,43 @@ class OrderCoupon
     }
 
     /**
+     * Check the order has valid order items to generate coupon
+     * @param $order_id
+     * @return bool
+     */
+    function hasValidCategoriesToGenerateCoupon($order_id)
+    {
+        if (empty($order_id)) {
+            return false;
+        }
+        $invalid_categories = $this->admin->getInvalidCategoriesForCoupon();
+        if (empty($invalid_categories)) {
+            return true;
+        }
+        $order = $this->wc_functions->getOrder($order_id);
+        if (empty($order)) {
+            return false;
+        }
+        $cart = $this->wc_functions->getOrderItems($order);
+        if (!empty($cart)) {
+            foreach ($cart as $item_key => $item_details) {
+                $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
+                $product_id = (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0;
+                $id = (!empty($variant_id)) ? $variant_id : $product_id;
+                $product_category_ids = $this->wc_functions->getProductCategoryIds($id);
+                if (is_array($product_category_ids) && is_array($invalid_categories)) {
+                    if (count(array_intersect($invalid_categories, $product_category_ids)) > 0) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * Create new coupon
      * @param $order_id
      * @param $data
@@ -752,7 +789,7 @@ class OrderCoupon
         if (empty($order_id)) return false;
         $coupon = $this->isCouponFound($order_id);
         $coupon_settings = $this->admin->getCouponSettings();
-        if (!$this->hasValidProductsToGenerateCoupon($order_id) || !$this->isValidCouponLimit($order_id) || !$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
+        if (!$this->hasValidCategoriesToGenerateCoupon($order_id) || !$this->hasValidProductsToGenerateCoupon($order_id) || !$this->isValidCouponLimit($order_id) || !$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
             return NULL;
         }
         $order = $this->wc_functions->getOrder($order_id);

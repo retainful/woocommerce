@@ -496,7 +496,7 @@ class Settings
                         'min' => 0
                     ),
                     'default' => 0,
-                    'desc' => __('Limit the next order coupon per user', RNOC_TEXT_DOMAIN)
+                    'desc' => __('Limit the number of next order coupons per customer. Set to 0 for un-limited coupons per customer.', RNOC_TEXT_DOMAIN)
                 ));
             } else {
                 $next_order_coupon->add_field(array(
@@ -519,13 +519,32 @@ class Settings
                     'query_args' => array(
                         'post_type' => array('product', 'product_variation'),
                         'post_status' => 'publish'
-                    ),
-                    'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
+                    )
                 ));
             } else {
                 $next_order_coupon->add_field(array(
                     'name' => __('Do not generate if the following products found in the order', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_exclude_generating_coupon_for_products_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1
+                ));
+            }
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Do not generate if the following categories found in the order', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories',
+                    'type' => 'pw_multiselect',
+                    'options' => $this->getCategories(),
+                    'attributes' => array(
+                        'placeholder' => __('Select categories', RNOC_TEXT_DOMAIN)
+                    ),
+                    'desc' => __('Product categories that the coupon code will be applied to, or that need to be in the cart in order for the "Fixed cart discount" to be applied.', RNOC_TEXT_DOMAIN),
+                    'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Do not generate if the following categories found in the order', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_exclude_generating_coupon_for_categories_feature',
                     'type' => 'unlock_features',
                     'link_only_field' => 1,
                     'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
@@ -710,7 +729,7 @@ class Settings
                 'id' => RNOC_PLUGIN_PREFIX . 'premium_addon',
                 'type' => 'premium_addon_list',
                 'default' => '',
-                'before_row' => $notice.'<p style="text-align: right"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="Save" style="display: none;"></p>'
+                'before_row' => $notice . '<p style="text-align: right"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="Save" style="display: none;"></p>'
             ));
             if ($this->isProPlan()) {
                 if (defined('RNOC_VERSION')) {
@@ -1593,7 +1612,7 @@ class Settings
     }
 
     /**
-     * get coupon settings from admin
+     * get invalid products for coupon creation
      * @return array
      */
     function getInvalidProductsForCoupon()
@@ -1606,6 +1625,22 @@ class Settings
             }
         }
         return $products;
+    }
+
+    /**
+     * get invalid categories for coupon creation
+     * @return array
+     */
+    function getInvalidCategoriesForCoupon()
+    {
+        $categories = array();
+        if ($this->isProPlan()) {
+            $settings = get_option($this->slug, array());
+            if (!empty($settings)) {
+                return isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories'] : $categories;
+            }
+        }
+        return $categories;
     }
 
     /**
