@@ -160,9 +160,9 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
         {
             $posts = get_posts(array('post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1));
             $remaining_pages = wp_list_pluck($posts, 'post_title', 'ID');
-            if (is_array($remaining_pages)) {
+            /*if (is_array($remaining_pages)) {
                 $remaining_pages['landing_page'] = __('Landing page', RNOC_TEXT_DOMAIN);
-            }
+            }*/
             return $remaining_pages;
         }
 

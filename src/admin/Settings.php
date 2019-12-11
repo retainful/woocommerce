@@ -729,7 +729,7 @@ class Settings
                 'id' => RNOC_PLUGIN_PREFIX . 'premium_addon',
                 'type' => 'premium_addon_list',
                 'default' => '',
-                'before_row' => $notice . '<p style="text-align: right"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="Save" style="display: none;"></p>'
+                'before_row' => $notice . '<p style="text-align: right"><input type="submit" name="submit-cmb" id="submit-cmb-top" class="button button-primary" value="Save" style="display: none;"></p>'
             ));
             if ($this->isProPlan()) {
                 if (defined('RNOC_VERSION')) {
