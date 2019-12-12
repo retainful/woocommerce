@@ -100,14 +100,16 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
          */
         function isValidPagesToDisplay($to_display_pages)
         {
-            if(!empty($to_display_pages) && is_array($to_display_pages)) {
-                $to_display_pages =  array_map('intval', $to_display_pages);
-            }
-            if(is_page($to_display_pages)) {
+            if (empty($to_display_pages)) {
                 return true;
-            } else {
-                return false;
             }
+            if (is_array($to_display_pages)) {
+                $to_display_pages = array_map('intval', $to_display_pages);
+            }
+            if (is_page($to_display_pages)) {
+                return true;
+            }
+            return false;
         }
 
         /**

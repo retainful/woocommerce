@@ -512,7 +512,7 @@ class Settings
                     'id' => RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products',
                     'type' => 'post_search_ajax',
                     'limit' => 10,
-                    'desc' => __('Coupon code will not generate when selected products found in order!', RNOC_TEXT_DOMAIN),
+                    'desc' => __('Coupon code will not be generated when these products were found in the order!', RNOC_TEXT_DOMAIN),
                     'attributes' => array(
                         'placeholder' => __('Choose products..', RNOC_TEXT_DOMAIN)
                     ),
@@ -538,7 +538,7 @@ class Settings
                     'attributes' => array(
                         'placeholder' => __('Select categories', RNOC_TEXT_DOMAIN)
                     ),
-                    'desc' => __('Product categories that the coupon code will be applied to, or that need to be in the cart in order for the "Fixed cart discount" to be applied.', RNOC_TEXT_DOMAIN),
+                    'desc' => __('Next order coupon will NOT be generated if an order has products from the selected categories.', RNOC_TEXT_DOMAIN),
                     'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
                 ));
             } else {
