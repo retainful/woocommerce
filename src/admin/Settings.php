@@ -277,37 +277,38 @@ class Settings
                     'desc' => __('If not enabled, Guest carts will not shown in your Abandoned cart dashboard.', RNOC_TEXT_DOMAIN),
                     'default' => 1
                 ));
+            }else {
+                $general_settings->add_field(array(
+                    'name' => __('Cart tracking engine?', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'cart_tracking_engine',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        'js' => __('JavaScript (Default,Recommended)', RNOC_TEXT_DOMAIN),
+                        'php' => __('PHP', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => 'js'
+                ));
+                $general_settings->add_field(array(
+                    'name' => __('Track Zero value carts / orders', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        'yes' => __('Yes', RNOC_TEXT_DOMAIN),
+                        'no' => __('No', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => 'no'
+                ));
+                $general_settings->add_field(array(
+                    'name' => __('Consider On-Hold order status as abandoned cart?', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        0 => __('No', RNOC_TEXT_DOMAIN),
+                        1 => __('Yes', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => 0
+                ));
             }
-            $general_settings->add_field(array(
-                'name' => __('Cart tracking engine?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'cart_tracking_engine',
-                'type' => 'radio_inline',
-                'options' => array(
-                    'php' => __('PHP (Default)', RNOC_TEXT_DOMAIN),
-                    'js' => __('JavaScript', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 'js'
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Track Zero value carts / orders', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
-                'type' => 'radio_inline',
-                'options' => array(
-                    'yes' => __('Yes', RNOC_TEXT_DOMAIN),
-                    'no' => __('No', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 'no'
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Consider On-Hold order status as abandoned cart?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
-                'type' => 'radio_inline',
-                'options' => array(
-                    0 => __('No', RNOC_TEXT_DOMAIN),
-                    1 => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 0
-            ));
             $general_settings->add_field(array(
                 'name' => __('Enable GDPR Compliance?', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
