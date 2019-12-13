@@ -217,8 +217,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     if ($need_popup == 0) {
                         return false;
                     }
-                    $need_exit_intent_modal_after_coupon_applied = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 1);
-                    if ($need_exit_intent_modal_after_coupon_applied == 0) {
+                    $need_exit_intent_modal_after_coupon_applied = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 0);
+                    if ($need_exit_intent_modal_after_coupon_applied == 1) {
                         $is_coupon_applied = $this->wc_functions->getPHPSession('rnoc_exit_intent_coupon_code_applied');
                         if ($is_coupon_applied) {
                             return false;
@@ -562,14 +562,14 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'desc' => __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
-                'name' => __('Show exit intent popup once coupon applied?', RNOC_TEXT_DOMAIN),
+                'name' => __('Don\'t show exit intent popup once its coupon applied?', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
                 'type' => 'radio_inline',
                 'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                    '0' => __('No, keep showing', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes, hide', RNOC_TEXT_DOMAIN)
                 ),
-                'default' => '1'
+                'default' => '0'
             ));
             $general_settings->add_field(array(
                 'name' => __('Show exit popup', RNOC_TEXT_DOMAIN),
