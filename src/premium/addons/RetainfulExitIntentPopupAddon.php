@@ -31,8 +31,17 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             add_action('wp_ajax_nopriv_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
             //To support the logged in user
             add_action('wp_ajax_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
+            add_action('rnoc_exit_intent_after_applying_coupon_code', array($this, 'exitIntentCouponApplied'));
             add_action('wp', array($this, 'siteInit'));
             add_filter('woocommerce_checkout_fields', array($this, 'addCheckoutEmail'));
+        }
+
+        /**
+         * Set coupon code applied
+         */
+        function exitIntentCouponApplied()
+        {
+            $this->wc_functions->setPHPSession('rnoc_exit_intent_coupon_code_applied', 1);
         }
 
         /**
@@ -204,13 +213,19 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     $this->admin = new Rnoc\Retainful\Admin\Settings();
                     $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
                     $this->applyCouponAutomatically();
-                    $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages', array());
-                    
-                    if (!$this->isValidPagesToDisplay($modal_display_pages)) {
-                        return false;
-                    }
                     $need_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 0);
                     if ($need_popup == 0) {
+                        return false;
+                    }
+                    $need_exit_intent_modal_after_coupon_applied = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 1);
+                    if ($need_exit_intent_modal_after_coupon_applied == 0) {
+                        $is_coupon_applied = $this->wc_functions->getPHPSession('rnoc_exit_intent_coupon_code_applied');
+                        if ($is_coupon_applied) {
+                            return false;
+                        }
+                    }
+                    $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages', array());
+                    if (!$this->isValidPagesToDisplay($modal_display_pages)) {
                         return false;
                     }
                     $need_popup_for = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', "all");
@@ -260,6 +275,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 $coupon_code = apply_filters("rnoc_exit_intent_before_applying_coupon_code", $coupon_code);
                 if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
                     $this->wc_functions->addDiscount($coupon_code);
+                    do_action("rnoc_exit_intent_after_applying_coupon_code", $coupon_code);
                 }
             }
         }
@@ -467,6 +483,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to',
+                    RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
@@ -543,6 +560,16 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'name' => __('Choose the coupon code', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon',
                 'desc' => __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN)
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Show exit intent popup once coupon applied?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
+                'type' => 'radio_inline',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => '1'
             ));
             $general_settings->add_field(array(
                 'name' => __('Show exit popup', RNOC_TEXT_DOMAIN),
