@@ -853,8 +853,7 @@ class Cart extends RestApi
             self::$settings->logMessage($cart, 'cart');
             $data = array(
                 'cart_hash' => $this->generateCartHash(),
-                'data' => $this->encryptData($cart),
-                'cart' => $cart
+                'data' => $this->encryptData($cart)
             );
         }
         echo $this->getCartTrackingDiv($data);
