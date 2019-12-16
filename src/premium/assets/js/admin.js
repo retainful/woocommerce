@@ -30,6 +30,8 @@ jQuery(function ($) {
     });
     function viewPriview(){
         let val = editor.val();
+        let custom_css = $("#rnoc_exit_intent_modal_custom_style").val();
+        $("#custom-style-container").html(custom_css);
         $('#exit-intent-popup-preview').html(val);
     }
     viewPriview();

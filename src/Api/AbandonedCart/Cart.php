@@ -342,6 +342,21 @@ class Cart extends RestApi
     }
 
     /**
+     * Need to track zero value carts or not
+     * @param $return
+     * @return mixed
+     */
+    function isZeroValueCart($return)
+    {
+        if (self::$settings->trackZeroValueCarts() == "no") {
+            if (self::$woocommerce->getCartSubTotal() <= 0 && self::$woocommerce->getCartTotalPrice() <= 0) {
+                $return = false;
+            }
+        }
+        return $return;
+    }
+
+    /**
      * need to track user cart
      * @return bool
      */
@@ -585,6 +600,7 @@ class Cart extends RestApi
         $user_ip = $this->retrieveUserIp();
         if (empty($user_ip)) {
             $user_ip = $this->getClientIp();
+            $user_ip = $this->formatUserIP($user_ip);
             $this->setUserIP($user_ip);
         }
         return $user_ip;
@@ -593,7 +609,8 @@ class Cart extends RestApi
     /**
      * Handle duplication for cart when order is in pending and failed payment
      */
-    function handleDuplicateCart(){
+    function handleDuplicateCart()
+    {
         //Handle duplication of cart
         $previous_placed_order_id = self::$woocommerce->getPHPSession('rnoc_previously_placed_order_id');
         if (!empty($previous_placed_order_id) && $order = self::$woocommerce->getOrder($previous_placed_order_id)) {
@@ -609,6 +626,7 @@ class Cart extends RestApi
             }
         }
     }
+
     /**
      * Preprocess cart required for API call
      * @return array
@@ -663,7 +681,7 @@ class Cart extends RestApi
             'discount_codes' => $this->getAppliedDiscounts(),
             'referring_site' => NULL,
             'shipping_lines' => array(),
-            'subtotal_price' => self::$woocommerce->getCartSubTotal(),
+            'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getCartSubTotal()),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
             'taxes_included' => false,
             'customer_locale' => $current_language,
@@ -835,8 +853,7 @@ class Cart extends RestApi
             self::$settings->logMessage($cart, 'cart');
             $data = array(
                 'cart_hash' => $this->generateCartHash(),
-                'data' => $this->encryptData($cart),
-                'cart' => $cart
+                'data' => $this->encryptData($cart)
             );
         }
         echo $this->getCartTrackingDiv($data);

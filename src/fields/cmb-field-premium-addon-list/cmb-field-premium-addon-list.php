@@ -110,11 +110,14 @@ class CMB2_Field_Premium_Addon_List
             });
             jQuery('.cmb-tabs div').click(function () {
                 var save_btn = jQuery('#submit-cmb');
+                var save_btn_top = jQuery('#submit-cmb-top');
                 var id = jQuery(this).attr('id');
                 if (id === "rnoc_retainful_premium_addon-tab-general-settings") {
                     save_btn.hide();
+                    save_btn_top.hide();
                 } else {
                     save_btn.show();
+                    save_btn_top.show();
                 }
             });
         </script>

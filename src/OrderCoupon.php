@@ -24,7 +24,7 @@ class OrderCoupon
     {
         $is_production = apply_filters('rnoc_is_production_plugin', true);
         if (!$is_production) {
-            wp_send_json_error('You can only change you App-Id and Secret key in production store!',500);
+            wp_send_json_error('You can only change you App-Id and Secret key in production store!', 500);
         }
         $app_id = isset($_REQUEST['app_id']) ? sanitize_text_field($_REQUEST['app_id']) : '';
         $secret_key = isset($_REQUEST['secret_key']) ? sanitize_text_field($_REQUEST['secret_key']) : '';
@@ -219,7 +219,7 @@ class OrderCoupon
     function attachOrderCoupon($order, $sent_to_admin, $plain_text = '', $email = '')
     {
         $order_id = $this->wc_functions->getOrderId($order);
-        if (!$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id)) {
+        if (!$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order)) {
             return false;
         }
         $coupon_code = '';
@@ -617,42 +617,42 @@ class OrderCoupon
 
     /**
      * Check for order has valid order status to generate coupon
-     * @param $order_id
+     * @param $order
      * @return bool
      */
-    function hasValidOrderStatus($order_id)
+    function hasValidOrderStatus($order)
     {
+        $status = true;
         $valid_order_statuses = $this->admin->getCouponValidOrderStatuses();
         if (!empty($valid_order_statuses)) {
             if (!in_array('all', $valid_order_statuses)) {
-                $order = $this->wc_functions->getOrder($order_id);
-                $status = 'wc-' . $this->wc_functions->getStatus($order);
-                if (!in_array($status, $valid_order_statuses)) {
-                    return false;
+                $order_status = 'wc-' . $this->wc_functions->getStatus($order);
+                if (!in_array($order_status, $valid_order_statuses)) {
+                    $status = false;
                 }
             }
         }
-        return true;
+        return apply_filters("rnoc_is_order_has_valid_order_status", $status, $order);
     }
 
     /**
      * Check for order user has valid user roles to generate coupon
-     * @param $order_id
+     * @param $order
      * @return bool
      */
-    function hasValidUserRoles($order_id)
+    function hasValidUserRoles($order)
     {
+        $status = true;
         $valid_user_roles = $this->admin->getCouponValidUserRoles();
         if (!empty($valid_user_roles)) {
             if (!in_array('all', $valid_user_roles)) {
-                $order = $this->wc_functions->getOrder($order_id);
                 $order_roles = $this->getUserRoleFromOrder($order);
                 if (count(array_intersect($order_roles, $valid_user_roles)) == 0) {
-                    return false;
+                    $status = false;
                 }
             }
         }
-        return true;
+        return apply_filters("rnoc_is_order_has_valid_user_role", $status, $order);
     }
 
     /**
@@ -675,6 +675,87 @@ class OrderCoupon
     }
 
     /**
+     * check the user has valid limit
+     * @param $order
+     * @return bool
+     */
+    function isValidCouponLimit($order)
+    {
+        $status = true;
+        $limit = $this->admin->getCouponLimitPerUser();
+        if (!empty($limit)) {
+            $order_email = $this->wc_functions->getOrderEmail($order);
+            $args = array(
+                'posts_per_page' => -1,
+                'post_type' => 'rnoc_order_coupon',
+                'meta_key' => 'email',
+                'meta_value' => $order_email
+            );
+            $posts_query = new \WP_Query($args);
+            $count = $posts_query->post_count;
+            if ($count >= $limit) {
+                $status = false;
+            }
+        }
+        return apply_filters("rnoc_is_order_has_valid_limit", $status, $order);
+    }
+
+    /**
+     * Check the order has valid order items to generate coupon
+     * @param $order
+     * @return bool
+     */
+    function hasValidProductsToGenerateCoupon($order)
+    {
+        $status = true;
+        $invalid_products = $this->admin->getInvalidProductsForCoupon();
+        if (!empty($invalid_products)) {
+            $cart = $this->wc_functions->getOrderItems($order);
+            if (!empty($cart)) {
+                foreach ($cart as $item_key => $item_details) {
+                    $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
+                    $product_id = (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0;
+                    $id = (!empty($variant_id)) ? $variant_id : $product_id;
+                    if (in_array($id, $invalid_products)) {
+                        $status = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return apply_filters("rnoc_is_order_has_valid_products", $status, $order);
+    }
+
+    /**
+     * Check the order has valid order items to generate coupon
+     * @param $order
+     * @return bool
+     */
+    function hasValidCategoriesToGenerateCoupon($order)
+    {
+        $status = true;
+        $invalid_categories = $this->admin->getInvalidCategoriesForCoupon();
+        if (!empty($invalid_categories)) {
+            $cart = $this->wc_functions->getOrderItems($order);
+            if (!empty($cart)) {
+                foreach ($cart as $item_key => $item_details) {
+                    $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
+                    $product_id = (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0;
+                    $id = (!empty($variant_id)) ? $variant_id : $product_id;
+                    $product_category_ids = $this->wc_functions->getProductCategoryIds($id);
+                    if (is_array($product_category_ids) && is_array($invalid_categories)) {
+                        if (count(array_intersect($invalid_categories, $product_category_ids)) > 0) {
+                            $status = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return apply_filters("rnoc_is_order_has_valid_categories", $status, $order);
+    }
+
+    /**
      * Create new coupon
      * @param $order_id
      * @param $data
@@ -684,12 +765,15 @@ class OrderCoupon
     {
         $order_id = sanitize_key($order_id);
         if (empty($order_id)) return false;
+        $order = $this->wc_functions->getOrder($order_id);
+        if (!$order) {
+            return false;
+        }
         $coupon = $this->isCouponFound($order_id);
         $coupon_settings = $this->admin->getCouponSettings();
-        if (!$this->hasValidOrderStatus($order_id) || !$this->hasValidUserRoles($order_id) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
+        if (!$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order) || !$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
             return NULL;
         }
-        $order = $this->wc_functions->getOrder($order_id);
         $email = $this->wc_functions->getOrderEmail($order);
         //Sometime email not found in the order object when order created from backend. So, get  from the request
         if (empty($email)) {

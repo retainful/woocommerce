@@ -258,6 +258,7 @@ class AbandonedCart
             );
         }
     }
+
     /**
      * Get the client IP address
      * @return mixed|string
@@ -286,6 +287,7 @@ class AbandonedCart
         }
         return $this->formatUserIP($client_ip);
     }
+
     /**
      * Sometimes the IP address returne is not formatted quite well.
      * So it requires a basic formating.
@@ -298,6 +300,7 @@ class AbandonedCart
         $ip = trim(current(preg_split('/,/', sanitize_text_field(wp_unslash($ip)))));
         return (string)$ip;
     }
+
     /**
      * User logged in the store
      * @param $user_name

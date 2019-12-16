@@ -17,7 +17,9 @@ class IpFiltering
      */
     function getClientIp()
     {
-        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+        if (isset($_SERVER['HTTP_X_REAL_IP'])) {
+            $client_ip = $_SERVER['HTTP_X_REAL_IP'];
+        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $client_ip = $_SERVER['HTTP_CLIENT_IP'];
         } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
@@ -32,7 +34,20 @@ class IpFiltering
         } else {
             $client_ip = '';
         }
-        return $client_ip;
+        return $this->formatUserIP($client_ip);
+    }
+
+    /**
+     * Sometimes the IP address returne is not formatted quite well.
+     * So it requires a basic formating.
+     * @param $ip
+     * @return String
+     */
+    function formatUserIP($ip)
+    {
+        //check for commas in the IP
+        $ip = trim(current(preg_split('/,/', sanitize_text_field(wp_unslash($ip)))));
+        return (string)$ip;
     }
 
     /**

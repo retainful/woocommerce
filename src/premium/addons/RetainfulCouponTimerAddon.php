@@ -170,7 +170,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 RNOC_PLUGIN_PREFIX . 'checkout_url' => $this->getCheckoutUrl(),
                 RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
                 RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
-                RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#a77cf4',
+                RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
             );
         }
 
@@ -357,13 +357,15 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'default' => 1
             ));
             $general_settings->add_field(array(
+                'type' => 'post_search_ajax',
+                'limit' => 1,
+                'valuefield' => 'title',
+                'attributes' => array(
+                    'placeholder' => __('Search and select Coupons..', RNOC_TEXT_DOMAIN)
+                ),
+                'query_args' => array('post_type' => 'shop_coupon', 'post_status' => 'publish'),
                 'name' => __('Choose the coupon code', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon',
-                'type' => 'pw_select',
-                'options' => $this->getWooCouponCodes(),
-                'attributes' => array(
-                    'placeholder' => __('Select Coupon', RNOC_TEXT_DOMAIN)
-                ),
                 'desc' => __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_field(array(
@@ -491,7 +493,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
                 'type' => 'colorpicker',
-                'default' => '#a77cf4'
+                'default' => '#f27052'
             ));
             //Above cart position settings
             $above_cart_position_settings = $general_settings->add_field(array(
@@ -579,7 +581,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
                 'type' => 'colorpicker',
-                'default' => '#a77cf4'
+                'default' => '#f27052'
             ));
             //Below applied coupon settings
             $below_discount_position_settings = $general_settings->add_field(array(
@@ -641,16 +643,6 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'default' => '#000000'
             ));
             return $general_settings;
-        }
-
-        /**
-         * select coupon
-         * @return array
-         */
-        function getWooCouponCodes()
-        {
-            $posts = get_posts(array('post_type' => 'shop_coupon', 'post_status' => 'publish'));
-            return wp_list_pluck($posts, 'post_title', 'post_title');
         }
     }
 }

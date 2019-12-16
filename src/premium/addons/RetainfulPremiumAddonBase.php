@@ -100,24 +100,16 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
          */
         function isValidPagesToDisplay($to_display_pages)
         {
-            if (!empty($to_display_pages)) {
-                global $wp;
-                $current_slug = add_query_arg(array(), $wp->request);
-                if (!empty($current_slug)) {
-                    $page = get_page_by_path($current_slug);
-                    if (!empty($page)) {
-                        $page_id = $page->ID;
-                        if (!in_array($page_id, $to_display_pages)) {
-                            return false;
-                        }
-                    }
-                } else {
-                    if (!in_array('landing_page', $to_display_pages)) {
-                        return false;
-                    }
-                }
+            if (empty($to_display_pages)) {
+                return true;
             }
-            return true;
+            if (is_array($to_display_pages)) {
+                $to_display_pages = array_map('intval', $to_display_pages);
+            }
+            if (is_page($to_display_pages)) {
+                return true;
+            }
+            return false;
         }
 
         /**
@@ -141,7 +133,7 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
          */
         function getWooCouponCodes()
         {
-            $posts = get_posts(array('post_type' => 'shop_coupon', 'post_status' => 'publish'));
+            $posts = get_posts(array('post_type' => 'shop_coupon', 'posts_per_page' => -1, 'post_status' => 'publish'));
             return wp_list_pluck($posts, 'post_title', 'post_title');
         }
 
@@ -167,9 +159,9 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
         {
             $posts = get_posts(array('post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1));
             $remaining_pages = wp_list_pluck($posts, 'post_title', 'ID');
-            if (is_array($remaining_pages)) {
+            /*if (is_array($remaining_pages)) {
                 $remaining_pages['landing_page'] = __('Landing page', RNOC_TEXT_DOMAIN);
-            }
+            }*/
             return $remaining_pages;
         }
 

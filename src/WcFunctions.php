@@ -319,8 +319,6 @@ class WcFunctions
         return 0;
     }
 
-
-
     /**
      * Get Item subtotal tax
      * @param $item
@@ -634,6 +632,19 @@ class WcFunctions
         if (function_exists('wc_paying_customer')) {
             wc_paying_customer($order_id);
         }
+    }
+
+    /**
+     * Orders list
+     * @param $args
+     * @return array|\stdClass|\WC_Order[]
+     */
+    function getOrdersList($args)
+    {
+        if (function_exists('wc_get_orders')) {
+            return wc_get_orders($args);
+        }
+        return array();
     }
 
     /**
@@ -1177,6 +1188,19 @@ class WcFunctions
             return get_woocommerce_currency();
         }
         return NULL;
+    }
+
+    /**
+     * get the default currency
+     * @param $product_id
+     * @return array
+     */
+    function getProductCategoryIds($product_id)
+    {
+        if (function_exists('wc_get_product_term_ids')) {
+            return wc_get_product_term_ids($product_id, 'product_cat');
+        }
+        return array();
     }
 
     /**

@@ -277,27 +277,38 @@ class Settings
                     'desc' => __('If not enabled, Guest carts will not shown in your Abandoned cart dashboard.', RNOC_TEXT_DOMAIN),
                     'default' => 1
                 ));
+            }else {
+                $general_settings->add_field(array(
+                    'name' => __('Cart tracking engine?', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'cart_tracking_engine',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        'js' => __('JavaScript (Default,Recommended)', RNOC_TEXT_DOMAIN),
+                        'php' => __('PHP', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => 'js'
+                ));
+                $general_settings->add_field(array(
+                    'name' => __('Track Zero value carts / orders', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        'yes' => __('Yes', RNOC_TEXT_DOMAIN),
+                        'no' => __('No', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => 'no'
+                ));
+                $general_settings->add_field(array(
+                    'name' => __('Consider On-Hold order status as abandoned cart?', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        0 => __('No', RNOC_TEXT_DOMAIN),
+                        1 => __('Yes', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => 0
+                ));
             }
-            $general_settings->add_field(array(
-                'name' => __('Cart tracking engine?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'cart_tracking_engine',
-                'type' => 'radio_inline',
-                'options' => array(
-                    'php' => __('PHP (Default)', RNOC_TEXT_DOMAIN),
-                    'js' => __('JavaScript', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 'php'
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Consider On-Hold order status as abandoned cart?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
-                'type' => 'radio_inline',
-                'options' => array(
-                    0 => __('No', RNOC_TEXT_DOMAIN),
-                    1 => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 0
-            ));
             $general_settings->add_field(array(
                 'name' => __('Enable GDPR Compliance?', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
@@ -367,34 +378,6 @@ class Settings
                 'default' => '1',
                 'before_row' => '<p class="submit"><input type="submit" name="submit-cmb" id="submit-cmb" class="button button-primary" value="' . __("Save", RNOC_TEXT_DOMAIN) . '"></p>' . $notice
             ));
-            $next_order_coupon->add_field(array(
-                'name' => __('Order Status', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'preferred_order_status',
-                'type' => 'pw_multiselect',
-                'options' => $this->availableOrderStatuses(),
-                'default' => array('all'),
-                'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN)
-            ));
-            if ($this->isProPlan()) {
-                $next_order_coupon->add_field(array(
-                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
-                    'type' => 'pw_multiselect',
-                    'options' => $this->getUserRoles(),
-                    'attributes' => array(
-                        'placeholder' => __('Select User Roles', RNOC_TEXT_DOMAIN)
-                    ),
-                    'default' => array('all'),
-                    'desc' => __('Coupon codes will generate only for the selected user roles. By default coupon code will generate for all user roles.', RNOC_TEXT_DOMAIN)
-                ));
-            } else {
-                $next_order_coupon->add_field(array(
-                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_user_role_feature',
-                    'type' => 'unlock_features',
-                    'link_only_field' => 1
-                ));
-            }
             $next_order_coupon->add_field(array(
                 'name' => __('Coupon type', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
@@ -474,8 +457,100 @@ class Settings
                 'classes' => 'retainful-coupon-group',
                 'default' => '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>',
                 'desc' => $coupon_msg_desc,
-                'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
+                'after_row' => '<h3>' . __('Coupon Generation Restriction', RNOC_TEXT_DOMAIN) . '&nbsp;<small>' . __("(You can control the generation of a coupon based on the these settings.)", RNOC_TEXT_DOMAIN) . '</small></h3>'
             ));
+            $next_order_coupon->add_field(array(
+                'name' => __('Order Status', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'preferred_order_status',
+                'type' => 'pw_multiselect',
+                'options' => $this->availableOrderStatuses(),
+                'default' => array('all'),
+                'desc' => __('<b>Note</b>: Coupon code will not generate until the order meet the choosed order status.', RNOC_TEXT_DOMAIN),
+            ));
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
+                    'type' => 'pw_multiselect',
+                    'options' => $this->getUserRoles(),
+                    'attributes' => array(
+                        'placeholder' => __('Select User Roles', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => array('all'),
+                    'desc' => __('Coupon codes will generate only for the selected user roles. By default coupon code will generate for all user roles.', RNOC_TEXT_DOMAIN)
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_user_role_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1
+                ));
+            }
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'limit_per_user',
+                    'type' => 'text_small',
+                    'attributes' => array(
+                        'type' => 'number',
+                        'min' => 0
+                    ),
+                    'default' => 0,
+                    'desc' => __('Limit the number of next order coupons per customer. Set to 0 for un-limited coupons per customer.', RNOC_TEXT_DOMAIN)
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_limit_per_user_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1
+                ));
+            }
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Do not generate if the following products found in the order', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products',
+                    'type' => 'post_search_ajax',
+                    'limit' => 10,
+                    'desc' => __('Coupon code will not be generated when these products were found in the order!', RNOC_TEXT_DOMAIN),
+                    'attributes' => array(
+                        'placeholder' => __('Choose products..', RNOC_TEXT_DOMAIN)
+                    ),
+                    'query_args' => array(
+                        'post_type' => array('product', 'product_variation'),
+                        'post_status' => 'publish'
+                    )
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Do not generate if the following products found in the order', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_exclude_generating_coupon_for_products_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1
+                ));
+            }
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Do not generate if the following categories found in the order', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories',
+                    'type' => 'pw_multiselect',
+                    'options' => $this->getCategories(),
+                    'attributes' => array(
+                        'placeholder' => __('Select categories', RNOC_TEXT_DOMAIN)
+                    ),
+                    'desc' => __('Next order coupon will NOT be generated if an order has products from the selected categories.', RNOC_TEXT_DOMAIN),
+                    'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Do not generate if the following categories found in the order', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_exclude_generating_coupon_for_categories_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1,
+                    'after_row' => '<h3>' . __('Coupon Usage Restriction', RNOC_TEXT_DOMAIN) . '</h3>'
+                ));
+            }
             if ($is_app_connected) {
                 //Usage restrictions
                 $next_order_coupon->add_field(array(
@@ -655,7 +730,7 @@ class Settings
                 'id' => RNOC_PLUGIN_PREFIX . 'premium_addon',
                 'type' => 'premium_addon_list',
                 'default' => '',
-                'before_row' => $notice
+                'before_row' => $notice . '<p style="text-align: right"><input type="submit" name="submit-cmb" id="submit-cmb-top" class="button button-primary" value="Save" style="display: none;"></p>'
             ));
             if ($this->isProPlan()) {
                 if (defined('RNOC_VERSION')) {
@@ -956,7 +1031,7 @@ class Settings
                 $to_print = $log_in_as . ":\n";
                 $to_print .= $message;
                 $file = fopen(RNOC_LOG_FILE_PATH, 'a');
-                $content = "\n\n Time :" . current_time('mysql') . ' | ' . $to_print;
+                $content = "\n\n Time :" . current_time('mysql', true) . ' | ' . $to_print;
                 fwrite($file, $content);
                 fclose($file);
             } catch (\Exception $e) {
@@ -1038,7 +1113,17 @@ class Settings
     function getCartTrackingEngine()
     {
         $settings = $this->getAdminSettings();
-        return (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'])) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] : 'php';
+        return (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'])) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] : 'js';
+    }
+
+    /**
+     * get the cart tracking engine
+     * @return mixed|string
+     */
+    function trackZeroValueCarts()
+    {
+        $settings = $this->getAdminSettings();
+        return (isset($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'])) ? $settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'] : 'no';
     }
 
     /**
@@ -1447,8 +1532,8 @@ class Settings
         $coupon = array();
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
-            $coupon['coupon_type'] = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] : 0;
-            $coupon['coupon_amount'] = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
+            $coupon['coupon_type'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] : 0;
+            $coupon['coupon_amount'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) && ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] > 0) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
         }
         return $coupon;
     }
@@ -1509,6 +1594,54 @@ class Settings
             }
         }
         return $roles;
+    }
+
+    /**
+     * get coupon Limit per email
+     * @return integer
+     */
+    function getCouponLimitPerUser()
+    {
+        $limit = 0;
+        if ($this->isProPlan()) {
+            $settings = get_option($this->slug, array());
+            if (!empty($settings)) {
+                return isset($settings[RNOC_PLUGIN_PREFIX . 'limit_per_user']) ? $settings[RNOC_PLUGIN_PREFIX . 'limit_per_user'] : $limit;
+            }
+        }
+        return $limit;
+    }
+
+    /**
+     * get invalid products for coupon creation
+     * @return array
+     */
+    function getInvalidProductsForCoupon()
+    {
+        $products = array();
+        if ($this->isProPlan()) {
+            $settings = get_option($this->slug, array());
+            if (!empty($settings)) {
+                return isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products'] : $products;
+            }
+        }
+        return $products;
+    }
+
+    /**
+     * get invalid categories for coupon creation
+     * @return array
+     */
+    function getInvalidCategoriesForCoupon()
+    {
+        $categories = array();
+        if ($this->isProPlan()) {
+            $settings = get_option($this->slug, array());
+            if (!empty($settings)) {
+                return isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories'] : $categories;
+            }
+        }
+        return $categories;
     }
 
     /**
