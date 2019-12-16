@@ -337,3 +337,11 @@ No. There is no charges for support.
 
 = 2.1.1 =
 * Fix: Duplicate cart created when online payment failed
+
+= 2.1.2 =
+* Fix: IP address gathering improved
+* Fix: jQuery undefined issue fixed in premium addons
+* Fix: Premium features functionalities improved
+* Fix: Zero value cart tracking options added
+* Fix: coupon search and choosing option improved
+* Improvement: next order coupon creation restriction added
