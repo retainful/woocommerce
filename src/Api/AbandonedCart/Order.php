@@ -110,6 +110,7 @@ class Order extends RestApi
                     $items[] = array(
                         'key' => $item_key,
                         'image_url' => $image_url,
+                        'product_url' => get_permalink($product_id),
                         'sku' => self::$woocommerce->getItemSku($item),
                         'grams' => 0,
                         'price' => self::$woocommerce->getItemPrice($item),
@@ -121,7 +122,7 @@ class Order extends RestApi
                         'gift_card' => false,
                         'tax_lines' => $tax_details,
                         'line_price' => $this->formatDecimalPrice((isset($item_details['line_total']) && !empty($item_details['line_total'])) ? $item_details['line_total'] : 0),
-                        'product_id' => (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0,
+                        'product_id' => $product_id,
                         'properties' => array(),
                         'variant_id' => $variant_id,
                         'variant_price' => $this->formatDecimalPrice(($is_variable_item) ? self::$woocommerce->getItemPrice($item) : 0),
