@@ -110,7 +110,7 @@ class Order extends RestApi
                     $items[] = array(
                         'key' => $item_key,
                         'image_url' => $image_url,
-                        'product_url' => get_permalink($product_id),
+                        'product_url' => self::$woocommerce->getProductUrl($item),
                         'sku' => self::$woocommerce->getItemSku($item),
                         'grams' => 0,
                         'price' => self::$woocommerce->getItemPrice($item),

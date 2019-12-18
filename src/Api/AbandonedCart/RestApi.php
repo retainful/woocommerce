@@ -365,7 +365,7 @@ class RestApi
     {
         if (extension_loaded('openssl')) {
             if (is_array($data) || is_object($data)) {
-                $data = json_encode($data);
+                $data = wp_json_encode($data);
             }
             try {
                 if (empty($secret)) {

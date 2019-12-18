@@ -307,6 +307,20 @@ class WcFunctions
     }
 
     /**
+     * Get Product url
+     * @param $product
+     * @param $item_details
+     * @return String|null
+     */
+    function getProductUrl($product, $item_details = NULL)
+    {
+        if (method_exists($product, 'get_permalink')) {
+            return $product->get_permalink($item_details);
+        }
+        return "";
+    }
+
+    /**
      * Get Item subtotal
      * @param $item
      * @return String|null

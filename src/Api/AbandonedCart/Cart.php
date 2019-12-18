@@ -499,7 +499,7 @@ class Cart extends RestApi
                         'variant_price' => ($is_variable_item) ? self::$woocommerce->getCartItemPrice($item) : 0,
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemTitle($item) : 0,
                         'image_url' => $image_url,
-                        'product_url' => get_permalink($product_id),
+                        'product_url' => self::$woocommerce->getProductUrl($item, $item_details),
                         'grams' => 0,
                         'user_id' => NULL,
                         'properties' => array(),
@@ -953,7 +953,7 @@ class Cart extends RestApi
             self::$woocommerce->clearWooNotices();
             $remove_list = $this->mustCartItemsKeys();
             foreach ($cart_contents as $key => $cart_item) {
-                $array_cart_item = json_decode(json_encode($cart_item), true);
+                $array_cart_item = json_decode(wp_json_encode($cart_item), true);
                 $this->unsetFromArray($array_cart_item, $remove_list);
                 if (!is_array($array_cart_item)) {
                     $array_cart_item = array();
