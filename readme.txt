@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.3
 WC tested up to: 3.8.1
 Requires PHP: 5.6
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -345,3 +345,6 @@ No. There is no charges for support.
 * Fix: Zero value cart tracking options added
 * Fix: coupon search and choosing option improved
 * Improvement: next order coupon creation restriction added
+
+= 2.1.3 =
+* Fix: Variable products can not recovered properly when clicking cart recovery URL
