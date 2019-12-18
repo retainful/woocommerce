@@ -958,8 +958,11 @@ class Cart extends RestApi
                 if (!is_array($array_cart_item)) {
                     $array_cart_item = array();
                 }
-                $variant_id = isset($cart_item->variant_id) ? $cart_item->variant_id : 0;
-                $variation = isset($cart_item->variation) ? $cart_item->variation : NULL;
+                $variant_id = isset($cart_item->variation_id) ? $cart_item->variation_id : 0;
+                $variation = isset($cart_item->variation) ? $cart_item->variation : array();
+                if (is_object($variation)) {
+                    $variation = json_decode(wp_json_encode($variation), true);
+                }
                 self::$woocommerce->addToCart($cart_item->product_id, $variant_id, $cart_item->quantity, $variation, $array_cart_item);
             }
         }
