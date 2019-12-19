@@ -209,7 +209,7 @@ function initJqueryRetainfulPopupJs() {
                     error_container.show();
                     return {"error": true}
                 }
-                if (options.is_email_mandatory === "yes" && this.isEmail(email)) {
+                if (this.isEmail(email)) {
                     submit_button.addClass('loading');
                     submit_button.attr('disabled', true);
                     let popup_data = {

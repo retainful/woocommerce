@@ -1187,13 +1187,13 @@ class Cart extends RestApi
             $created_at = $updated_at = strtotime($user_data->user_registered);
             $billing_first_name = get_user_meta($user_id, 'billing_first_name', true);
             $billing_last_name = get_user_meta($user_id, 'billing_last_name', true);
-            //$billing_address_1 = get_user_meta($user_id, 'billing_address_1', true);
-            //$billing_city = get_user_meta($user_id, 'billing_city', true);
+            $billing_address_1 = get_user_meta($user_id, 'billing_address_1', true);
+            $billing_city = get_user_meta($user_id, 'billing_city', true);
             $billing_state = get_user_meta($user_id, 'billing_state', true);
-            //$billing_postcode = get_user_meta($user_id, 'billing_postcode', true);
+            $billing_postcode = get_user_meta($user_id, 'billing_postcode', true);
             $billing_phone = get_user_meta($user_id, 'billing_phone', true);
-            //$billing_country = get_user_meta($user_id, 'billing_country', true);
-            //$billing_address_2 = '';
+            $billing_country = get_user_meta($user_id, 'billing_country', true);
+            $billing_address_2 = get_user_meta($user_id, 'billing_address_2', true);
         } else {
             $user_id = 0;
             $created_at = self::$woocommerce->getPHPSession('rnoc_session_created_at');
@@ -1202,15 +1202,15 @@ class Cart extends RestApi
             if (empty($billing_details)) {
                 $billing_details = array();
             }
-            //$billing_postcode = isset($billing_details['billing_postcode']) ? $billing_details['billing_postcode'] : NULL;
-            //$billing_city = isset($billing_details['billing_city']) ? $billing_details['billing_city'] : NULL;
+            $billing_postcode = isset($billing_details['billing_postcode']) ? $billing_details['billing_postcode'] : NULL;
+            $billing_city = isset($billing_details['billing_city']) ? $billing_details['billing_city'] : NULL;
             $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
             $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
             $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
-            //$billing_country = isset($billing_details['billing_country']) ? $billing_details['billing_country'] : NULL;
+            $billing_country = isset($billing_details['billing_country']) ? $billing_details['billing_country'] : NULL;
             $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
-            //$billing_address_1 = isset($billing_details['billing_address_1']) ? $billing_details['billing_address_1'] : NULL;
-            //$billing_address_2 = isset($billing_details['billing_address_2']) ? $billing_details['billing_address_2'] : NULL;
+            $billing_address_1 = isset($billing_details['billing_address_1']) ? $billing_details['billing_address_1'] : NULL;
+            $billing_address_2 = isset($billing_details['billing_address_2']) ? $billing_details['billing_address_2'] : NULL;
         }
         $user_info = array(
             'id' => $user_id,
@@ -1219,10 +1219,15 @@ class Cart extends RestApi
             'email' => $billing_email,
             'phone' => $billing_phone,
             'state' => $billing_state,
-            'currency' => NULL,
+            'address_1' => $billing_address_1,
+            'address_2' => $billing_address_2,
+            'country' => $billing_country,
             'last_name' => $billing_last_name,
-            'created_at' => $this->formatToIso8601($created_at),
             'first_name' => $billing_first_name,
+            'city' => $billing_city,
+            'zip_code' => $billing_postcode,
+            'currency' => NULL,
+            'created_at' => $this->formatToIso8601($created_at),
             'tax_exempt' => false,
             'updated_at' => $this->formatToIso8601($updated_at),
             'total_spent' => 0,
