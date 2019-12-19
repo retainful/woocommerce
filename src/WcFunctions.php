@@ -861,6 +861,22 @@ class WcFunctions
     }
 
     /**
+     * get the client session details
+     * @return mixed|void
+     */
+    public function getClientSession()
+    {
+        $session = [
+            'applied_coupons' => $this->getSession('applied_coupons'),
+            'chosen_shipping_methods' => $this->getSession('chosen_shipping_methods'),
+            'shipping_method_counts' => $this->getSession('shipping_method_counts'),
+            'chosen_payment_method' => $this->getSession('chosen_payment_method'),
+            'previous_shipping_methods' => $this->getSession('previous_shipping_methods'),
+        ];
+        return apply_filters('rnoc_get_client_session', $session);
+    }
+
+    /**
      * Get cart items
      * @return array
      */
@@ -1078,6 +1094,19 @@ class WcFunctions
     {
         if (method_exists($item, 'get_title')) {
             return $item->get_title();
+        }
+        return NULL;
+    }
+
+    /**
+     * Get Item name from Item object
+     * @param $item
+     * @return null
+     */
+    function getItemName($item)
+    {
+        if (method_exists($item, 'get_name')) {
+            return $item->get_name();
         }
         return NULL;
     }

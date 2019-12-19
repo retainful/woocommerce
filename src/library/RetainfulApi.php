@@ -7,6 +7,8 @@ if (!defined('ABSPATH')) exit;
 class RetainfulApi
 {
     public $app_url = "https://app.retainful.com/";
+//    public $domain = "https://sokoxgf82d.execute-api.us-east-2.amazonaws.com/development/v1/";
+//    public $abandoned_cart_api_url = "https://sokoxgf82d.execute-api.us-east-2.amazonaws.com/development/v1/woocommerce/";
     public $domain = "https://api.retainful.com/v1/";
     public $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
     /**

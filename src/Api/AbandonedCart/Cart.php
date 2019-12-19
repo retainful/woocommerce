@@ -462,7 +462,7 @@ class Cart extends RestApi
                 $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
                 $product_id = (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0;
                 $is_variable_item = (!empty($variant_id));
-                $item = (isset($item_details['data']) && !empty($item_details['data'])) ? $item_details['data'] : NULL;
+                $item = apply_filters('woocommerce_cart_item_product', $item_details['data'], $item_details, $item_key);
                 if (empty($item)) {
                     if (!empty($variant_id)) {
                         $item = self::$woocommerce->getProduct($variant_id);
@@ -488,7 +488,7 @@ class Cart extends RestApi
                         'key' => $item_key,
                         'sku' => self::$woocommerce->getItemSku($item),
                         'price' => $this->formatDecimalPrice(self::$woocommerce->getCartItemPrice($item)),
-                        'title' => self::$woocommerce->getItemTitle($item),
+                        'title' => self::$woocommerce->getItemName($item),
                         'vendor' => 'woocommerce',
                         'taxable' => ($line_tax != 0),
                         'quantity' => $item_quantity,
@@ -497,7 +497,7 @@ class Cart extends RestApi
                         'product_id' => $product_id,
                         'variant_id' => $variant_id,
                         'variant_price' => ($is_variable_item) ? self::$woocommerce->getCartItemPrice($item) : 0,
-                        'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemTitle($item) : 0,
+                        'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
                         'image_url' => $image_url,
                         'product_url' => self::$woocommerce->getProductUrl($item, $item_details),
                         'grams' => 0,
@@ -697,6 +697,7 @@ class Cart extends RestApi
             'total_line_items_price' => $this->formatDecimalPrice(self::$woocommerce->getCartTotal()),
             'buyer_accepts_marketing' => $this->isBuyerAcceptsMarketing(),
             'cart_contents' => $woo_cart_data,
+            'woocommerce_client_session' => self::$woocommerce->getClientSession(),
             'woocommerce_totals' => $this->getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
             'recovered_by_retainful' => (self::$woocommerce->getPHPSession('rnoc_recovered_by_retainful')) ? true : false,
@@ -935,6 +936,32 @@ class Cart extends RestApi
     }
 
     /**
+     * Returns $coupons, with any invalid coupons removed
+     *
+     * @param array $coupons array of string coupon codes
+     * @return array $coupons with any invalid codes removed
+     * @since 2.1.4
+     */
+    private function getValidCoupons($coupons)
+    {
+        $valid_coupons = array();
+        if ($coupons) {
+            foreach ($coupons as $coupon) {
+                $coupon_code = isset($coupon->code) ? $coupon->code : NULL;
+                if (!empty($coupon_code)) {
+                    $the_coupon = new \WC_Coupon($coupon_code);
+                    if (!$the_coupon->is_valid()) {
+                        continue;
+                    }
+                    $valid_coupons[] = $coupon_code;
+                }
+            }
+        }
+        $valid_coupons = apply_filters("rnoc_recover_cart_coupons", $valid_coupons);
+        return $valid_coupons;
+    }
+
+    /**
      * Recreate user guest cart
      * @param $data
      */
@@ -947,23 +974,38 @@ class Cart extends RestApi
         self::$woocommerce->setPHPSession($this->cart_tracking_started_key, $created_at);
         //$cart = isset($data->line_items) ? $data->line_items : array();
         $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
+        $client_session = isset($data->woocommerce_client_session) ? $data->woocommerce_client_session : array();
         apply_filters('rnoc_abandoned_cart_recover_guest_cart', $cart_contents);
-        if (!empty($cart_contents)) {
-            self::$woocommerce->emptyUserCart();
-            self::$woocommerce->clearWooNotices();
-            $remove_list = $this->mustCartItemsKeys();
-            foreach ($cart_contents as $key => $cart_item) {
-                $array_cart_item = json_decode(wp_json_encode($cart_item), true);
-                $this->unsetFromArray($array_cart_item, $remove_list);
-                if (!is_array($array_cart_item)) {
-                    $array_cart_item = array();
+        if (!empty($client_session) && !empty($cart_contents)) {
+            $cart = json_decode(wp_json_encode($cart_contents), true);
+            $applied_coupons = isset($data->discount_codes) ? $data->discount_codes : array();
+            $chosen_shipping_methods = (array)$client_session->chosen_shipping_methods;
+            $shipping_method_counts = (array)$client_session->shipping_method_counts;
+            $chosen_payment_method = $client_session->chosen_payment_method;
+            // base session data
+            self::$woocommerce->setSession('cart', $cart);
+            self::$woocommerce->setSession('applied_coupons', $this->getValidCoupons($applied_coupons));
+            self::$woocommerce->setSession('chosen_shipping_methods', $chosen_shipping_methods);
+            self::$woocommerce->setSession('shipping_method_counts', $shipping_method_counts);
+            self::$woocommerce->setSession('chosen_payment_method', $chosen_payment_method);
+        } else {
+            if (!empty($cart_contents)) {
+                self::$woocommerce->emptyUserCart();
+                self::$woocommerce->clearWooNotices();
+                $remove_list = $this->mustCartItemsKeys();
+                foreach ($cart_contents as $key => $cart_item) {
+                    $array_cart_item = json_decode(wp_json_encode($cart_item), true);
+                    $this->unsetFromArray($array_cart_item, $remove_list);
+                    if (!is_array($array_cart_item)) {
+                        $array_cart_item = array();
+                    }
+                    $variant_id = isset($cart_item->variation_id) ? $cart_item->variation_id : 0;
+                    $variation = isset($cart_item->variation) ? $cart_item->variation : array();
+                    if (is_object($variation)) {
+                        $variation = json_decode(wp_json_encode($variation), true);
+                    }
+                    self::$woocommerce->addToCart($cart_item->product_id, $variant_id, $cart_item->quantity, $variation, $array_cart_item);
                 }
-                $variant_id = isset($cart_item->variation_id) ? $cart_item->variation_id : 0;
-                $variation = isset($cart_item->variation) ? $cart_item->variation : array();
-                if (is_object($variation)) {
-                    $variation = json_decode(wp_json_encode($variation), true);
-                }
-                self::$woocommerce->addToCart($cart_item->product_id, $variant_id, $cart_item->quantity, $variation, $array_cart_item);
             }
         }
         // set (or refresh, if already set) session
