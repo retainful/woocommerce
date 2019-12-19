@@ -170,10 +170,6 @@ function initJqueryRetainfulPopupJs() {
                             break;
                         case "2":/*Until No thanks button clicked */
                             return_val = (popup_closed_by !== "2");
-                            //All adding item to cart when no thanks button is clicked
-                            if (options.no_thanks_action === "1") {
-                                return_val = false;
-                            }
                             break;
                         case "3":/*Until close button clicked */
                             return_val = (popup_closed_by !== "3");
@@ -197,15 +193,11 @@ function initJqueryRetainfulPopupJs() {
                 event.preventDefault();
                 error_container.hide();
                 let options = this.getOptions();
-                if (options.is_email_mandatory !== "yes") {
-                    this.closePopup("1");
-                    return {"error": false}
-                }
                 if (options.is_email_mandatory === "yes" && email === "") {
                     error_container.show();
                     return {"error": true}
                 }
-                if (options.is_email_mandatory === "yes" && !this.isEmail(email)) {
+                if (!this.isEmail(email)) {
                     error_container.show();
                     return {"error": true}
                 }

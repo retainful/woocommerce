@@ -867,6 +867,7 @@ class WcFunctions
     public function getClientSession()
     {
         $session = [
+            'cart' => $this->getSession('cart'),
             'applied_coupons' => $this->getSession('applied_coupons'),
             'chosen_shipping_methods' => $this->getSession('chosen_shipping_methods'),
             'shipping_method_counts' => $this->getSession('shipping_method_counts'),

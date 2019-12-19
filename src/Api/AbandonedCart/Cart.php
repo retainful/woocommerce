@@ -697,7 +697,7 @@ class Cart extends RestApi
             'total_line_items_price' => $this->formatDecimalPrice(self::$woocommerce->getCartTotal()),
             'buyer_accepts_marketing' => $this->isBuyerAcceptsMarketing(),
             'cart_contents' => $woo_cart_data,
-            'woocommerce_client_session' => self::$woocommerce->getClientSession(),
+            'client_session' => self::$woocommerce->getClientSession(),
             'woocommerce_totals' => $this->getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
             'recovered_by_retainful' => (self::$woocommerce->getPHPSession('rnoc_recovered_by_retainful')) ? true : false,
@@ -913,12 +913,18 @@ class Cart extends RestApi
         $customer_email = isset($data->email) ? $data->email : '';
         //Setting the email
         self::$woocommerce->setPHPSession('rnoc_user_billing_email', $customer_email);
-        $billing_details = isset($data->customer) ? $data->customer : new stdClass();
+        $billing_details = isset($data->billing_address) ? $data->billing_address : new stdClass();
         $billing_address = array(
             'billing_first_name' => isset($billing_details->first_name) ? $billing_details->first_name : NULL,
             'billing_last_name' => isset($billing_details->last_name) ? $billing_details->last_name : NULL,
-            'billing_state' => isset($billing_details->state) ? $billing_details->state : NULL,
-            'billing_phone' => isset($billing_details->phone) ? $billing_details->phone : NULL
+            'billing_state' => isset($billing_details->province_code) ? $billing_details->province_code : NULL,
+            'billing_phone' => isset($billing_details->phone) ? $billing_details->phone : NULL,
+            'billing_postcode' => isset($billing_details->zip) ? $billing_details->zip : NULL,
+            'billing_city' => isset($billing_details->city) ? $billing_details->city : NULL,
+            'billing_country' => isset($billing_details->country) ? $billing_details->country : NULL,
+            'billing_address_1' => isset($billing_details->address1) ? $billing_details->address1 : NULL,
+            'billing_address_2' => isset($billing_details->address2) ? $billing_details->address2 : NULL,
+            'billing_company' => isset($billing_details->company) ? $billing_details->company : NULL
         );
         $this->setSessionBillingDetails($billing_address);
         $shipping_details = isset($data->shipping_address) ? $data->shipping_address : new stdClass();
@@ -973,22 +979,24 @@ class Cart extends RestApi
         $created_at = isset($data->created_at) ? strtotime($data->created_at) : current_time('mysql', true);
         self::$woocommerce->setPHPSession($this->cart_tracking_started_key, $created_at);
         //$cart = isset($data->line_items) ? $data->line_items : array();
-        $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
-        $client_session = isset($data->woocommerce_client_session) ? $data->woocommerce_client_session : array();
-        apply_filters('rnoc_abandoned_cart_recover_guest_cart', $cart_contents);
-        if (!empty($client_session) && !empty($cart_contents)) {
-            $cart = json_decode(wp_json_encode($cart_contents), true);
-            $applied_coupons = isset($data->discount_codes) ? $data->discount_codes : array();
-            $chosen_shipping_methods = (array)$client_session->chosen_shipping_methods;
-            $shipping_method_counts = (array)$client_session->shipping_method_counts;
-            $chosen_payment_method = $client_session->chosen_payment_method;
-            // base session data
-            self::$woocommerce->setSession('cart', $cart);
-            self::$woocommerce->setSession('applied_coupons', $this->getValidCoupons($applied_coupons));
-            self::$woocommerce->setSession('chosen_shipping_methods', $chosen_shipping_methods);
-            self::$woocommerce->setSession('shipping_method_counts', $shipping_method_counts);
-            self::$woocommerce->setSession('chosen_payment_method', $chosen_payment_method);
+        $data = apply_filters('rnoc_abandoned_cart_recover_guest_cart', $data);
+        $client_session = isset($data->client_session) ? $data->client_session : array();
+        if (!empty($client_session)) {
+            $cart = json_decode(wp_json_encode($data->cart), true);
+            if(!empty($cart)) {
+                $applied_coupons = isset($data->discount_codes) ? $data->discount_codes : array();
+                $chosen_shipping_methods = (array)$client_session->chosen_shipping_methods;
+                $shipping_method_counts = (array)$client_session->shipping_method_counts;
+                $chosen_payment_method = $client_session->chosen_payment_method;
+                // base session data
+                self::$woocommerce->setSession('cart', $cart);
+                self::$woocommerce->setSession('applied_coupons', $this->getValidCoupons($applied_coupons));
+                self::$woocommerce->setSession('chosen_shipping_methods', $chosen_shipping_methods);
+                self::$woocommerce->setSession('shipping_method_counts', $shipping_method_counts);
+                self::$woocommerce->setSession('chosen_payment_method', $chosen_payment_method);
+            }
         } else {
+            $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
             if (!empty($cart_contents)) {
                 self::$woocommerce->emptyUserCart();
                 self::$woocommerce->clearWooNotices();
@@ -1187,13 +1195,8 @@ class Cart extends RestApi
             $created_at = $updated_at = strtotime($user_data->user_registered);
             $billing_first_name = get_user_meta($user_id, 'billing_first_name', true);
             $billing_last_name = get_user_meta($user_id, 'billing_last_name', true);
-            $billing_address_1 = get_user_meta($user_id, 'billing_address_1', true);
-            $billing_city = get_user_meta($user_id, 'billing_city', true);
             $billing_state = get_user_meta($user_id, 'billing_state', true);
-            $billing_postcode = get_user_meta($user_id, 'billing_postcode', true);
             $billing_phone = get_user_meta($user_id, 'billing_phone', true);
-            $billing_country = get_user_meta($user_id, 'billing_country', true);
-            $billing_address_2 = get_user_meta($user_id, 'billing_address_2', true);
         } else {
             $user_id = 0;
             $created_at = self::$woocommerce->getPHPSession('rnoc_session_created_at');
@@ -1202,15 +1205,10 @@ class Cart extends RestApi
             if (empty($billing_details)) {
                 $billing_details = array();
             }
-            $billing_postcode = isset($billing_details['billing_postcode']) ? $billing_details['billing_postcode'] : NULL;
-            $billing_city = isset($billing_details['billing_city']) ? $billing_details['billing_city'] : NULL;
             $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
             $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
             $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
-            $billing_country = isset($billing_details['billing_country']) ? $billing_details['billing_country'] : NULL;
             $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
-            $billing_address_1 = isset($billing_details['billing_address_1']) ? $billing_details['billing_address_1'] : NULL;
-            $billing_address_2 = isset($billing_details['billing_address_2']) ? $billing_details['billing_address_2'] : NULL;
         }
         $user_info = array(
             'id' => $user_id,
@@ -1219,13 +1217,8 @@ class Cart extends RestApi
             'email' => $billing_email,
             'phone' => $billing_phone,
             'state' => $billing_state,
-            'address_1' => $billing_address_1,
-            'address_2' => $billing_address_2,
-            'country' => $billing_country,
             'last_name' => $billing_last_name,
             'first_name' => $billing_first_name,
-            'city' => $billing_city,
-            'zip_code' => $billing_postcode,
             'currency' => NULL,
             'created_at' => $this->formatToIso8601($created_at),
             'tax_exempt' => false,
@@ -1304,7 +1297,9 @@ class Cart extends RestApi
             $billing_state = get_user_meta($user_id, 'billing_state', true);
             $billing_postcode = get_user_meta($user_id, 'billing_postcode', true);
             $billing_country = get_user_meta($user_id, 'billing_country', true);
+            $billing_phone = get_user_meta($user_id, 'billing_phone', true);
             $billing_address_2 = '';
+            $billing_company = '';
         } else {
             $billing_details = self::$woocommerce->getPHPSession('rnoc_billing_address');
             if (empty($billing_details)) {
@@ -1318,13 +1313,15 @@ class Cart extends RestApi
             $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
             $billing_address_1 = isset($billing_details['billing_address_1']) ? $billing_details['billing_address_1'] : NULL;
             $billing_address_2 = isset($billing_details['billing_address_2']) ? $billing_details['billing_address_2'] : NULL;
+            $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
+            $billing_company = isset($billing_details['billing_company']) ? $billing_details['billing_company'] : NULL;
         }
         return array(
             'zip' => $billing_postcode,
             'city' => $billing_city,
             'name' => $billing_first_name . ' ' . $billing_last_name,
-            'phone' => NULL,
-            'company' => NULL,
+            'phone' => $billing_phone,
+            'company' => $billing_company,
             'country' => $billing_country,
             'address1' => $billing_address_1,
             'address2' => $billing_address_2,
