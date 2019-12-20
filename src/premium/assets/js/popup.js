@@ -200,63 +200,21 @@ function initJqueryRetainfulPopupJs() {
                 if (!this.isEmail(email)) {
                     error_container.show();
                     return {"error": true}
-                }
-                if (this.isEmail(email)) {
-                    submit_button.addClass('loading');
-                    submit_button.attr('disabled', true);
+                } else {
                     let popup_data = {
                         email: email,
                         is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
                         action: 'set_rnoc_guest_session'
                     };
-                    let response = this.request(rnoc_ajax_url, popup_data);
-                    if (!response.error) {
-                        if (response.message !== '') {
-                            //return {"error": true}
-                        }
-                        //instant popup support
-                        if (response.show_coupon_instant_popup) {
-                            sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
-                            sessionStorage.setItem("rnoc_instant_coupon_popup_html", response.coupon_instant_popup_content);
-                        }
-                        this.closePopup("1");
-                    } else {
-                        if (response.message !== '') {
-                            //return err
-                        }
+                    let data_to_encrypt = JSON.stringify(popup_data);
+                    sessionStorage.setItem("rnoc_add_to_cart_popup_data", data_to_encrypt);
+                    if (rnoc_add_to_cart_coupon_popup.show_coupon_instant_popup) {
+                        sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
+                        sessionStorage.setItem("rnoc_instant_coupon_popup_html", rnoc_add_to_cart_coupon_popup.coupon_instant_popup_content);
                     }
-                    submit_button.removeClass('loading');
-                    submit_button.attr('disabled', false);
+                    this.closePopup("1");
                     return {"error": false};
                 }
-            }
-
-            /**
-             * request js
-             * @param url
-             * @param body
-             * @param headers
-             * @param data_type
-             * @param method
-             * @param async
-             */
-            request(url, body = {}, headers = {}, data_type = "json", method = "POST", async = false) {
-                let msg = null;
-                $.ajax({
-                    url: url,
-                    headers: headers,
-                    method: method,
-                    dataType: data_type,
-                    data: body,
-                    async: async,
-                    success: function (response) {
-                        msg = response;
-                    },
-                    error: function (response) {
-                        msg = response;
-                    }
-                });
-                return msg;
             }
         }
 
@@ -287,16 +245,6 @@ function initJqueryRetainfulPopupJs() {
         });
         if (typeof retainful_premium_add_to_cart_collection !== "undefined" && typeof retainful_premium_add_to_cart_collection.add_to_cart_button_classes !== 'undefined') {
             var retainful_email_collection_support_class = retainful_premium_add_to_cart_collection.add_to_cart_button_classes;
-            /*$(document).on('retainful_closing_add_to_cart_popup', function () {
-            var button = $('.rnoc-popup-opener');
-            var link = button.attr('href');
-            if (typeof link !== "undefined") {
-                window.location.href = link;
-            } else {
-                button.trigger('click');
-                button.removeClass('rnoc-popup-opener');
-            }
-            });*/
             $(document).on('click', retainful_email_collection_support_class, function (event) {
                 let this_button = $(this);
                 let url = this_button.attr('href');

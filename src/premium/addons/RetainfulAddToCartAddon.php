@@ -125,11 +125,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     if ($need_popup == 0) {
                         return false;
                     }
+                    add_action('wp_enqueue_scripts', array($this, 'addSiteInstantCouponScripts'));
                     $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_display_pages', array());
                     if (!$this->isValidPagesToDisplay($modal_display_pages)) {
                         return false;
                     }
-                    add_action('wp_enqueue_scripts', array($this, 'addSiteInstantCouponScripts'));
                     $is_popup_closed_by_user = $this->wc_functions->getPHPSession('rnoc_popup_closed_by_user');
                     if (!empty($is_popup_closed_by_user)) {
                         return false;
@@ -240,22 +240,14 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             } else {
                 $error = false;
             }
-            $coupon_details = "";
-            $show_coupon_popup = false;
             $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
             if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'need_coupon', 0) == 1) {
                 $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
                 if (!empty($coupon_code)) {
                     $show_woo_coupon = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'show_woo_coupon', 'send_via_email');
                     switch ($show_woo_coupon) {
-                        case "instantly":
-                            $show_coupon_popup = true;
-                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
-                            break;
                         case "both":
-                            $show_coupon_popup = true;
                             $this->sendEmail($email, $coupon_settings);
-                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
                             break;
                         default:
                         case "send_via_email":
@@ -264,7 +256,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     }
                 }
             }
-            wp_send_json(array('error' => $error, 'message' => $message, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
+            wp_send_json(array('error' => $error, 'message' => $message));
         }
 
         /**
@@ -392,7 +384,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addSiteScripts()
         {
-            wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
+            wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/popup.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
             $modal_show_popup_until = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1);
             $modal_show = array(
                 'hide_modal_after_show' => $modal_show_popup_until,
@@ -416,8 +408,40 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addSiteInstantCouponScripts()
         {
-            wp_enqueue_script('rnoc-add-to-cart-instant-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/add_to_cart_coupon_popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
+            wp_enqueue_script('rnoc-add-to-cart-instant-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/add_to_cart_coupon_popup.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
             wp_enqueue_style('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
+        }
+
+        /**
+         * show coupon popup
+         * @return string
+         */
+        function getAddToCartCouponPopup()
+        {
+            $coupon_details = "";
+            $show_coupon_popup = false;
+            $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
+            if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'need_coupon', 0) == 1) {
+                $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
+                if (!empty($coupon_code)) {
+                    $show_woo_coupon = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'show_woo_coupon', 'send_via_email');
+                    switch ($show_woo_coupon) {
+                        case "instantly":
+                            $show_coupon_popup = true;
+                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
+                            break;
+                        case "both":
+                            $show_coupon_popup = true;
+                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
+                            break;
+                        default:
+                        case "send_via_email":
+                            break;
+                    }
+                }
+            }
+            $encoded = wp_json_encode(array("coupon_instant_popup_content" => $coupon_details, "show_coupon_instant_popup" => $show_coupon_popup));
+            return "<script>var rnoc_add_to_cart_coupon_popup={$encoded}</script>";
         }
 
         /**
@@ -425,9 +449,10 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addToCartPopup()
         {
+            $template = $this->getPopupTemplate();
             $final_settings = array(
                 "show_for_admin" => current_user_can('administrator'),
-                "template" => $this->getPopupTemplate(),
+                "template" => $template . $this->getAddToCartCouponPopup(),
                 "custom_style" => '',
                 "add_on_slug" => 'rnoc-add-to-cart-add-on',
                 "no_thanks_action" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),

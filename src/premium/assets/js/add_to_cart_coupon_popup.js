@@ -56,6 +56,9 @@ function initJqueryRetainfulAddToCartCouponPopupJs() {
              */
             showInstantPopup() {
                 if (this.isLocalStorageSupports()) {
+                    let popup_data_encoded = sessionStorage.getItem("rnoc_add_to_cart_popup_data");
+                    let popup_data = JSON.parse(popup_data_encoded);
+                    this.request(rnoc_ajax_url, popup_data);
                     let is_popup_showed = sessionStorage.getItem("rnoc_instant_coupon_popup_showed");
                     if (is_popup_showed && is_popup_showed === "no") {
                         let popup_html = sessionStorage.getItem("rnoc_instant_coupon_popup_html");
@@ -81,6 +84,34 @@ function initJqueryRetainfulAddToCartCouponPopupJs() {
              */
             getInstantPopup() {
                 return $("#rnoc-add-to-cart-add-on-instant-coupon").show();
+            }
+
+            /**
+             * request js
+             * @param url
+             * @param body
+             * @param headers
+             * @param data_type
+             * @param method
+             * @param async
+             */
+            request(url, body = {}, headers = {}, data_type = "json", method = "POST", async = false) {
+                let msg = null;
+                $.ajax({
+                    url: url,
+                    headers: headers,
+                    method: method,
+                    dataType: data_type,
+                    data: body,
+                    async: async,
+                    success: function (response) {
+                        msg = response;
+                    },
+                    error: function (response) {
+                        msg = response;
+                    }
+                });
+                return msg;
             }
         }
 
