@@ -232,7 +232,7 @@ class Order extends RestApi
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
-            'taxes_included' => false,
+            'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
             'customer_locale' => NULL,
             'note_attributes' => array(),
             'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getOrderDiscount($order, $excluding_tax)),

@@ -33,10 +33,10 @@ class Checkout extends RestApi
             $cart_created_at = $this->userCartCreatedAt();
             $user_ip = $this->retrieveUserIp();
             $is_buyer_accepts_marketing = ($this->isBuyerAcceptsMarketing()) ? 1 : 0;
-            $cart_hash = self::$woocommerce->getPHPSession('rnoc_current_cart_hash');
-            $recovered_at = self::$woocommerce->getPHPSession('rnoc_recovered_at');
-            $recovered_by = self::$woocommerce->getPHPSession('rnoc_recovered_by_retainful');
-            $recovered_cart_token = self::$woocommerce->getPHPSession('rnoc_recovered_cart_token');
+            $cart_hash = self::$woocommerce->getSession('rnoc_current_cart_hash');
+            $recovered_at = self::$woocommerce->getSession('rnoc_recovered_at');
+            $recovered_by = self::$woocommerce->getSession('rnoc_recovered_by_retainful');
+            $recovered_cart_token = self::$woocommerce->getSession('rnoc_recovered_cart_token');
             self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_hash_key_for_db, $cart_hash);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
@@ -149,8 +149,7 @@ class Checkout extends RestApi
             $cart_token = $this->retrieveCartToken();
             if (!empty($cart_token)) {
                 $order = self::$woocommerce->getOrder($order_id);
-                self::$woocommerce->setPHPSession('rnoc_previously_placed_order_id', $order_id);
-                $this->purchaseComplete($order_id);
+               $this->purchaseComplete($order_id);
                 $order_obj = new Order();
                 $cart = $order_obj->getOrderData($order);
                 self::$settings->logMessage($cart);
@@ -221,16 +220,15 @@ class Checkout extends RestApi
      */
     function unsetOrderTempData($user_id = NULL)
     {
-        self::$woocommerce->removePHPSession($this->cart_token_key);
-        self::$woocommerce->removePHPSession($this->pending_recovery_key);
-        self::$woocommerce->removePHPSession($this->cart_tracking_started_key);
-        self::$woocommerce->removePHPSession($this->previous_cart_hash_key);
-        self::$woocommerce->removePHPSession($this->user_ip_key);
+        self::$woocommerce->removeSession($this->cart_token_key);
+        self::$woocommerce->removeSession($this->pending_recovery_key);
+        self::$woocommerce->removeSession($this->cart_tracking_started_key);
+        self::$woocommerce->removeSession($this->previous_cart_hash_key);
+        self::$woocommerce->removeSession($this->user_ip_key);
         //This was set in plugin since 2.0.4
-        self::$woocommerce->removePHPSession('rnoc_recovered_at');
-        self::$woocommerce->removePHPSession('rnoc_recovered_by_retainful');
-        self::$woocommerce->removePHPSession('rnoc_recovered_cart_token');
-        self::$woocommerce->removePHPSession('rnoc_previously_placed_order_id');
+        self::$woocommerce->removeSession('rnoc_recovered_at');
+        self::$woocommerce->removeSession('rnoc_recovered_by_retainful');
+        self::$woocommerce->removeSession('rnoc_recovered_cart_token');
         if ($user_id || ($user_id = get_current_user_id())) {
             $this->removeTempDataForUser($user_id);
         }
@@ -268,9 +266,9 @@ class Checkout extends RestApi
      */
     function setCheckoutFieldsDefaultValues($fields)
     {
-        $fields['billing']['billing_email']['default'] = self::$woocommerce->getPHPSession('rnoc_user_billing_email');
+        $fields['billing']['billing_email']['default'] = self::$woocommerce->getSession('rnoc_user_billing_email');
         //Set the billing details for checkout fields
-        $billing_address = self::$woocommerce->getPHPSession('rnoc_billing_address');
+        $billing_address = self::$woocommerce->getSession('rnoc_billing_address');
         if (!empty($billing_address) && is_array($billing_address)) {
             foreach ($billing_address as $billing_key => $billing_value) {
                 if (isset($fields['billing'][$billing_key])) {
@@ -279,7 +277,7 @@ class Checkout extends RestApi
             }
         }
         //Set the shipping details for checkout fields
-        $shipping_address = self::$woocommerce->getPHPSession('rnoc_shipping_address');
+        $shipping_address = self::$woocommerce->getSession('rnoc_shipping_address');
         if (!empty($shipping_address) && is_array($shipping_address)) {
             foreach ($shipping_address as $shipping_key => $shipping_value) {
                 if (isset($fields['shipping'][$shipping_key])) {

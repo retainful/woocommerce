@@ -42,10 +42,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addCheckoutEmail($fields)
         {
-            $user_email = $this->wc_functions->getPHPSession('rnoc_user_billing_email');
-            if (empty($user_email)) {
-                $user_email = $this->wc_functions->getPHPSession('rnocp_popup_email');
-            }
+            $user_email = $this->wc_functions->getSession('rnoc_user_billing_email');
             $fields['billing']['billing_email']['default'] = $user_email;
             return $fields;
         }
@@ -130,20 +127,15 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     if (!$this->isValidPagesToDisplay($modal_display_pages)) {
                         return false;
                     }
-                    $is_popup_closed_by_user = $this->wc_functions->getPHPSession('rnoc_popup_closed_by_user');
+                    $is_popup_closed_by_user = $this->wc_functions->getSession('rnoc_popup_closed_by_user');
                     if (!empty($is_popup_closed_by_user)) {
                         return false;
                     }
                     $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
                     $show_popup = false;
                     if ($run_cart_externally) {
-                        $email = $this->wc_functions->getPHPSession('rnoc_user_billing_email_php_session');
-                        $woo_session_email = $this->wc_functions->getPHPSession('rnoc_user_billing_email');
+                        $email = $this->wc_functions->getSession('rnoc_user_billing_email');
                         if (!empty($email)) {
-                            if (empty($woo_session_email)) {
-                                //If cart is empty..then WooCommerce session was not initialized, so set the email in normal session and then assign back to WooCommerce session
-                                $this->wc_functions->setPHPSession('rnoc_user_billing_email', $email);
-                            }
                             return false;
                         }
                         $show_popup = true;
@@ -187,7 +179,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         function popupClosed()
         {
             $popup_action = isset($_POST['popup_action']) ? sanitize_key($_POST['popup_action']) : 1;
-            $this->wc_functions->setPHPSession('rnoc_popup_closed_by_user', $popup_action);
+            $this->wc_functions->setSession('rnoc_popup_closed_by_user', $popup_action);
             wp_send_json_success();
         }
 
@@ -207,8 +199,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             } else {
                 $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
             }
-            $this->wc_functions->setPHPSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
-            $this->wc_functions->setPHPSession('rnoc_user_billing_email_php_session', $email);
+            $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
+            $this->wc_functions->setSession('rnoc_user_billing_email', $email);
+            $this->wc_functions->setPHPSession('rnoc_php_user_billing_email', $email);
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
             if (!$run_cart_externally) {
@@ -218,7 +211,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 $customer->set_email($email);
                 if (!empty($user_session_id) && !empty($_REQUEST['email'])) {
                     global $wpdb;
-                    $this->wc_functions->setPHPSession('rnocp_popup_email', $email);
                     $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
                     $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
                     if (empty($results)) {

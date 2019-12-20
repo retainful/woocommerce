@@ -41,7 +41,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function exitIntentCouponApplied()
         {
-            $this->wc_functions->setPHPSession('rnoc_exit_intent_coupon_code_applied', 1);
+            $this->wc_functions->setSession('rnoc_exit_intent_coupon_code_applied', 1);
         }
 
         /**
@@ -171,10 +171,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function addCheckoutEmail($fields)
         {
-            $user_email = $this->wc_functions->getPHPSession('rnoc_user_billing_email');
-            if (empty($user_email)) {
-                $user_email = $this->wc_functions->getPHPSession('rnocp_popup_email');
-            }
+            $user_email = $this->wc_functions->getSession('rnoc_user_billing_email');
             $fields['billing']['billing_email']['default'] = $user_email;
             return $fields;
         }
@@ -219,7 +216,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     }
                     $need_exit_intent_modal_after_coupon_applied = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 0);
                     if ($need_exit_intent_modal_after_coupon_applied == 1) {
-                        $is_coupon_applied = $this->wc_functions->getPHPSession('rnoc_exit_intent_coupon_code_applied');
+                        $is_coupon_applied = $this->wc_functions->getSession('rnoc_exit_intent_coupon_code_applied');
                         if ($is_coupon_applied) {
                             return false;
                         }
@@ -235,14 +232,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
                     $show_popup = false;
                     if ($run_cart_externally) {
-                        $email = $this->wc_functions->getPHPSession('rnoc_user_billing_email_php_session');
-                        $woo_session_email = $this->wc_functions->getPHPSession('rnoc_user_billing_email');
-                        if (!empty($email)) {
-                            if (empty($woo_session_email)) {
-                                //If cart is empty..then WooCommerce session was not initialized, so set the email in normal session and then assign back to WooCommerce session
-                                $this->wc_functions->setPHPSession('rnoc_user_billing_email', $email);
-                            }
-                        }
                         $show_popup = true;
                     } else {
                         $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
@@ -289,7 +278,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $message = '';
             $error = true;
             $email = sanitize_email($_REQUEST['email']);
-            $this->wc_functions->setPHPSession('rnoc_user_billing_email_php_session', $email);
+            $this->wc_functions->setSession('rnoc_user_billing_email', $email);
+            $this->wc_functions->setPHPSession('rnoc_php_user_billing_email', $email);
             $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
             $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
             if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
@@ -297,7 +287,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             } else {
                 $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
             }
-            $this->wc_functions->setPHPSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
+            $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
             if (!$run_cart_externally) {
                 $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
@@ -306,7 +296,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 $customer->set_email($email);
                 if (!empty($user_session_id) && !empty($_REQUEST['email'])) {
                     global $wpdb;
-                    $this->wc_functions->setPHPSession('rnocp_popup_email', $email);
                     $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
                     $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
                     if (empty($results)) {
@@ -391,7 +380,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 if (!empty($coupon_code)) {
                     $coupon_data = '?rnoc_on_exit_coupon_code=' . $coupon_code;
                 }
-                $email = $this->wc_functions->getPHPSession('rnoc_user_billing_email_php_session');
+                $email = $this->wc_functions->getSession('rnoc_user_billing_email');
                 $to_replace = array(
                     'coupon_code' => $coupon_code,
                     'checkout_url' => $checkout_url . $coupon_data,

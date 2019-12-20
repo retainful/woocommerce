@@ -48,7 +48,16 @@ class RestApi
      */
     function setSessionShippingDetails($shipping_address)
     {
-        self::$woocommerce->setPHPSession('rnoc_shipping_address', $shipping_address);
+        self::$woocommerce->setSession('rnoc_shipping_address', $shipping_address);
+    }
+
+
+    /**
+     * Remove the session shipping details
+     */
+    function removeSessionShippingDetails()
+    {
+        self::$woocommerce->removeSession('rnoc_shipping_address');
     }
 
     /**
@@ -74,7 +83,15 @@ class RestApi
      */
     function setSessionBillingDetails($billing_address)
     {
-        self::$woocommerce->setPHPSession('rnoc_billing_address', $billing_address);
+        self::$woocommerce->setSession('rnoc_billing_address', $billing_address);
+    }
+
+    /**
+     * Remove the session billing details
+     */
+    function removeSessionBillingDetails()
+    {
+        self::$woocommerce->removeSession('rnoc_billing_address');
     }
 
     /**
@@ -86,8 +103,8 @@ class RestApi
     {
         if ($user_id || ($user_id = get_current_user_id())) {
             return (bool)get_user_meta($user_id, $this->pending_recovery_key_for_db, true);
-        } elseif (self::$woocommerce->getPHPSession($this->pending_recovery_key)) {
-            return (bool)self::$woocommerce->getPHPSession($this->pending_recovery_key);
+        } elseif (self::$woocommerce->getSession($this->pending_recovery_key)) {
+            return (bool)self::$woocommerce->getSession($this->pending_recovery_key);
         }
         return false;
     }
@@ -102,7 +119,7 @@ class RestApi
         if (!empty($user_id) || $user_id = get_current_user_id()) {
             return get_user_meta($user_id, $this->cart_token_key_for_db, true);
         } else {
-            return self::$woocommerce->getPHPSession($this->cart_token_key);
+            return self::$woocommerce->getSession($this->cart_token_key);
         }
     }
 
@@ -188,7 +205,7 @@ class RestApi
         if ($user_id) {
             $ip = get_user_meta($user_id, $this->user_ip_key_for_db);
         } else {
-            $ip = self::$woocommerce->getPHPSession($this->user_ip_key);
+            $ip = self::$woocommerce->getSession($this->user_ip_key);
         }
         return $this->formatUserIP($ip);
     }
@@ -422,7 +439,7 @@ class RestApi
         if ($user_id || $user_id = get_current_user_id()) {
             $cart_created_at = get_user_meta($user_id, $this->cart_tracking_started_key_for_db, true);
         } else {
-            $cart_created_at = self::$woocommerce->getPHPSession($this->cart_tracking_started_key);
+            $cart_created_at = self::$woocommerce->getSession($this->cart_tracking_started_key);
         }
         return $cart_created_at;
     }
@@ -451,7 +468,7 @@ class RestApi
         if (is_user_logged_in()) {
             return true;
         } else {
-            $is_buyer_accepts_marketing = self::$woocommerce->getPHPSession('is_buyer_accepting_marketing');
+            $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
             if ($is_buyer_accepts_marketing == 1) {
                 return true;
             }

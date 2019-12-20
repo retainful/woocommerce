@@ -38,8 +38,10 @@ class Cart extends RestApi
      */
     function userLoggedOut()
     {
-        self::$woocommerce->removePHPSession($this->cart_token_key);
-        self::$woocommerce->removePHPSession($this->cart_tracking_started_key);
+        self::$woocommerce->removeSession($this->cart_token_key);
+        self::$woocommerce->removeSession($this->cart_tracking_started_key);
+        $this->removeSessionBillingDetails();
+        $this->removeSessionShippingDetails();
     }
 
     /**
@@ -48,11 +50,11 @@ class Cart extends RestApi
      */
     function userSignedUp($user_id)
     {
-        $cart_token = self::$woocommerce->getPHPSession($this->cart_token_key);
+        $cart_token = self::$woocommerce->getSession($this->cart_token_key);
         if (!empty($cart_token)) {
             update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
         }
-        $cart_created_at = self::$woocommerce->getPHPSession($this->cart_tracking_started_key);
+        $cart_created_at = self::$woocommerce->getSession($this->cart_tracking_started_key);
         if (!empty($cart_created_at)) {
             update_user_meta($user_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
         }
@@ -133,7 +135,7 @@ class Cart extends RestApi
                 'billing_name' => $billing_first_name . ' ' . $billing_last_name,
                 'billing_company' => $billing_company
             );
-            self::$woocommerce->setPHPSession('is_buyer_accepting_marketing', 1);
+            self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
             $this->setSessionBillingDetails($billing_address);
             //Shipping to same billing address
             if (!empty($ship_to_billing)) {
@@ -165,14 +167,14 @@ class Cart extends RestApi
             }
             $this->setSessionShippingDetails($shipping_address);
             //Billing email
-            self::$woocommerce->setPHPSession('rnoc_user_billing_email', $billing_email);
+            self::$woocommerce->setSession('rnoc_user_billing_email', $billing_email);
             //Set update and created date
-            $session_created_at = self::$woocommerce->getPHPSession('rnoc_session_created_at');
+            $session_created_at = self::$woocommerce->getSession('rnoc_session_created_at');
             $current_time = current_time('timestamp', true);
             if (empty($session_created_at)) {
-                self::$woocommerce->setPHPSession('rnoc_session_created_at', $current_time);
+                self::$woocommerce->setSession('rnoc_session_created_at', $current_time);
             }
-            self::$woocommerce->setPHPSession('rnoc_session_updated_at', $current_time);
+            self::$woocommerce->setSession('rnoc_session_updated_at', $current_time);
         }
         $this->syncCartData(true);
         wp_send_json_success('');
@@ -224,14 +226,14 @@ class Cart extends RestApi
     {
         if (isset($_REQUEST['retainful_ac_coupon']) && !empty($_REQUEST['retainful_ac_coupon'])) {
             $coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
-            self::$woocommerce->setPHPSession('rnoc_ac_coupon', $coupon_code);
+            self::$woocommerce->setSession('rnoc_ac_coupon', $coupon_code);
         }
-        $session_coupon = self::$woocommerce->getPHPSession('rnoc_ac_coupon');
+        $session_coupon = self::$woocommerce->getSession('rnoc_ac_coupon');
         if (!empty($session_coupon)) {
             $cart = self::$woocommerce->getCart();
             if (!empty($cart) && !self::$woocommerce->hasDiscount($session_coupon)) {
                 if (self::$woocommerce->addDiscount($session_coupon)) {
-                    self::$woocommerce->removePHPSession('rnoc_ac_coupon');
+                    self::$woocommerce->removeSession('rnoc_ac_coupon');
                 }
             }
         }
@@ -295,12 +297,12 @@ class Cart extends RestApi
      */
     function comparePreviousCartHash($current_cart_hash)
     {
-        $old_cart_hash = self::$woocommerce->getPHPSession($this->previous_cart_hash_key);
+        $old_cart_hash = self::$woocommerce->getSession($this->previous_cart_hash_key);
         $is_not_similar = ($old_cart_hash != $current_cart_hash);
         if ($is_not_similar) {
-            self::$woocommerce->setPHPSession($this->previous_cart_hash_key, $current_cart_hash);
+            self::$woocommerce->setSession($this->previous_cart_hash_key, $current_cart_hash);
         }
-        self::$woocommerce->setPHPSession('rnoc_current_cart_hash', $current_cart_hash);
+        self::$woocommerce->setSession('rnoc_current_cart_hash', $current_cart_hash);
         return $is_not_similar;
     }
 
@@ -315,7 +317,7 @@ class Cart extends RestApi
         if ($user_id || $user_id = get_current_user_id()) {
             $cart_created_at = update_user_meta($user_id, $this->cart_tracking_started_key_for_db, $time);
         } else {
-            $cart_created_at = self::$woocommerce->setPHPSession($this->cart_tracking_started_key, $time);
+            $cart_created_at = self::$woocommerce->setSession($this->cart_tracking_started_key, $time);
         }
         return $cart_created_at;
     }
@@ -414,8 +416,8 @@ class Cart extends RestApi
     function setCartToken($cart_token)
     {
         $current_time = current_time('timestamp', true);
-        self::$woocommerce->setPHPSession($this->cart_token_key, $cart_token);
-        self::$woocommerce->setPHPSession($this->cart_tracking_started_key, $current_time);
+        self::$woocommerce->setSession($this->cart_token_key, $cart_token);
+        self::$woocommerce->setSession($this->cart_tracking_started_key, $current_time);
         if ($user_id = get_current_user_id()) {
             update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
             update_user_meta($user_id, $this->cart_tracking_started_key_for_db, $current_time);
@@ -428,7 +430,7 @@ class Cart extends RestApi
      */
     function setUserIP($ip_address)
     {
-        self::$woocommerce->setPHPSession($this->user_ip_key, $ip_address);
+        self::$woocommerce->setSession($this->user_ip_key, $ip_address);
         if ($user_id = get_current_user_id()) {
             update_user_meta($user_id, $this->user_ip_key_for_db, $ip_address);
         }
@@ -608,33 +610,11 @@ class Cart extends RestApi
     }
 
     /**
-     * Handle duplication for cart when order is in pending and failed payment
-     */
-    function handleDuplicateCart()
-    {
-        //Handle duplication of cart
-        $previous_placed_order_id = self::$woocommerce->getPHPSession('rnoc_previously_placed_order_id');
-        if (!empty($previous_placed_order_id) && $order = self::$woocommerce->getOrder($previous_placed_order_id)) {
-            $order_status = self::$woocommerce->getStatus($order);
-            if ($this->isValidOrderStatusToResetCartToken($order_status)) {
-                $order_cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
-                $current_cart_hash = $this->generateCartHash();
-                if ($current_cart_hash != $order_cart_hash) {
-                    $cart_token = $this->generateCartToken();
-                    $this->setCartToken($cart_token);
-                    self::$woocommerce->removePHPSession('rnoc_previously_placed_order_id');
-                }
-            }
-        }
-    }
-
-    /**
      * Preprocess cart required for API call
      * @return array
      */
     function getUserCart()
     {
-        $this->handleDuplicateCart();
         $language_helper = new MultiLingual();
         $current_language = $language_helper->getCurrentLanguage();
         $customer_details = $this->getCustomerDetails();
@@ -646,7 +626,7 @@ class Cart extends RestApi
         $cart_hash = $this->generateCartHash();
         $woo_cart_data = self::$woocommerce->getCart();
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
-        $recovered_at = self::$woocommerce->getPHPSession('rnoc_recovered_at');
+        $recovered_at = self::$woocommerce->getSession('rnoc_recovered_at');
         $cart = array(
             'cart_type' => 'cart',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
@@ -684,7 +664,7 @@ class Cart extends RestApi
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getCartSubTotal()),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
-            'taxes_included' => false,
+            'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
             'customer_locale' => $current_language,
             'note_attributes' => NULL,
             'order_status' => NULL,
@@ -700,8 +680,8 @@ class Cart extends RestApi
             'client_session' => self::$woocommerce->getClientSession(),
             'woocommerce_totals' => $this->getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
-            'recovered_by_retainful' => (self::$woocommerce->getPHPSession('rnoc_recovered_by_retainful')) ? true : false,
-            'recovered_cart_token' => self::$woocommerce->getPHPSession('rnoc_recovered_cart_token')
+            'recovered_by_retainful' => (self::$woocommerce->getSession('rnoc_recovered_by_retainful')) ? true : false,
+            'recovered_cart_token' => self::$woocommerce->getSession('rnoc_recovered_cart_token')
         );
         return $cart;
     }
@@ -809,19 +789,19 @@ class Cart extends RestApi
                         self::$woocommerce->setOrderNote($order, $note);
                     }
                     $redirect = self::$woocommerce->isOrderNeedPayment($order) ? self::$woocommerce->getOrderPaymentURL($order) : self::$woocommerce->getOrderReceivedURL($order);
-                    self::$woocommerce->setPHPSession($this->pending_recovery_key, true);
+                    self::$woocommerce->setSession($this->pending_recovery_key, true);
                     // set (or refresh, if already set) session
                     self::$woocommerce->setSessionCookie(true);
                     wp_safe_redirect($redirect);
                     exit;
                 }
                 $is_buyer_accept_marketing = (isset($data->buyer_accepts_marketing) && $data->buyer_accepts_marketing) ? 1 : 0;
-                self::$woocommerce->setPHPSession('is_buyer_accepting_marketing', $is_buyer_accept_marketing);
+                self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accept_marketing);
                 $user_currency = isset($data->presentment_currency) ? $data->presentment_currency : self::$woocommerce->getDefaultCurrency();
                 apply_filters('rnoc_set_current_currency_code', $user_currency);
-                self::$woocommerce->setPHPSession('rnoc_recovered_at', current_time('timestamp', true));
-                self::$woocommerce->setPHPSession('rnoc_recovered_by_retainful', 1);
-                self::$woocommerce->setPHPSession('rnoc_recovered_cart_token', $cart_token);
+                self::$woocommerce->setSession('rnoc_recovered_at', current_time('timestamp', true));
+                self::$woocommerce->setSession('rnoc_recovered_by_retainful', 1);
+                self::$woocommerce->setSession('rnoc_recovered_cart_token', $cart_token);
                 // check if cart is associated with a registered user / persistent cart
                 $user_id = $this->getUserIdFromCartToken($cart_token);
                 $cart_recreated = false;
@@ -833,7 +813,7 @@ class Cart extends RestApi
                 }
                 if (!$cart_recreated) {
                     // set customer note in session, if present
-                    self::$woocommerce->setPHPSession($this->order_note_key, $note);
+                    self::$woocommerce->setSession($this->order_note_key, $note);
                     // guest user
                     $this->reCreateCartForGuestUsers($data);
                 }
@@ -912,7 +892,7 @@ class Cart extends RestApi
     {
         $customer_email = isset($data->email) ? $data->email : '';
         //Setting the email
-        self::$woocommerce->setPHPSession('rnoc_user_billing_email', $customer_email);
+        self::$woocommerce->setSession('rnoc_user_billing_email', $customer_email);
         $billing_details = isset($data->billing_address) ? $data->billing_address : new stdClass();
         $billing_address = array(
             'billing_first_name' => isset($billing_details->first_name) ? $billing_details->first_name : NULL,
@@ -974,16 +954,16 @@ class Cart extends RestApi
     function reCreateCartForGuestUsers($data)
     {
         // set Retainful data in session
-        self::$woocommerce->setPHPSession($this->cart_token_key, $data->cart_token);
-        self::$woocommerce->setPHPSession($this->pending_recovery_key, true);
+        self::$woocommerce->setSession($this->cart_token_key, $data->cart_token);
+        self::$woocommerce->setSession($this->pending_recovery_key, true);
         $created_at = isset($data->created_at) ? strtotime($data->created_at) : current_time('mysql', true);
-        self::$woocommerce->setPHPSession($this->cart_tracking_started_key, $created_at);
+        self::$woocommerce->setSession($this->cart_tracking_started_key, $created_at);
         //$cart = isset($data->line_items) ? $data->line_items : array();
         $data = apply_filters('rnoc_abandoned_cart_recover_guest_cart', $data);
         $client_session = isset($data->client_session) ? $data->client_session : array();
         if (!empty($client_session)) {
-            $cart = json_decode(wp_json_encode($data->cart), true);
-            if(!empty($cart)) {
+            $cart = json_decode(wp_json_encode($client_session->cart), true);
+            if (!empty($cart)) {
                 $applied_coupons = isset($data->discount_codes) ? $data->discount_codes : array();
                 $chosen_shipping_methods = (array)$client_session->chosen_shipping_methods;
                 $shipping_method_counts = (array)$client_session->shipping_method_counts;
@@ -1186,7 +1166,10 @@ class Cart extends RestApi
      */
     function getCustomerDetails()
     {
-        $billing_email = self::$woocommerce->getPHPSession('rnoc_user_billing_email');
+        $billing_email = self::$woocommerce->getSession('rnoc_user_billing_email');
+        if(empty($billing_email)){
+            $billing_email = self::$woocommerce->getPHPSession('rnoc_php_user_billing_email');
+        }
         if ($user_id = get_current_user_id()) {
             $user_data = wp_get_current_user();
             if (empty($billing_email)) {
@@ -1199,9 +1182,9 @@ class Cart extends RestApi
             $billing_phone = get_user_meta($user_id, 'billing_phone', true);
         } else {
             $user_id = 0;
-            $created_at = self::$woocommerce->getPHPSession('rnoc_session_created_at');
-            $updated_at = self::$woocommerce->getPHPSession('rnoc_session_updated_at');
-            $billing_details = self::$woocommerce->getPHPSession('rnoc_billing_address');
+            $created_at = self::$woocommerce->getSession('rnoc_session_created_at');
+            $updated_at = self::$woocommerce->getSession('rnoc_session_updated_at');
+            $billing_details = self::$woocommerce->getSession('rnoc_billing_address');
             if (empty($billing_details)) {
                 $billing_details = array();
             }
@@ -1251,7 +1234,7 @@ class Cart extends RestApi
             $shipping_country = get_user_meta($user_id, 'shipping_country', true);
             $shipping_address_2 = '';
         } else {
-            $shipping_details = self::$woocommerce->getPHPSession('rnoc_shipping_address');
+            $shipping_details = self::$woocommerce->getSession('rnoc_shipping_address');
             if (empty($shipping_details)) {
                 $shipping_details = array();
             }
@@ -1301,7 +1284,7 @@ class Cart extends RestApi
             $billing_address_2 = '';
             $billing_company = '';
         } else {
-            $billing_details = self::$woocommerce->getPHPSession('rnoc_billing_address');
+            $billing_details = self::$woocommerce->getSession('rnoc_billing_address');
             if (empty($billing_details)) {
                 $billing_details = array();
             }

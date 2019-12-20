@@ -593,6 +593,7 @@ class WcFunctions
      */
     function setSession($key, $value)
     {
+        apply_filters('rnoc_session_maintained_by','woocommerce');
         if (empty($key) || empty($value))
             return false;
         if (method_exists(WC()->session, 'set')) {

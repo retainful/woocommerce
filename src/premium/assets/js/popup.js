@@ -181,6 +181,34 @@ function initJqueryRetainfulPopupJs() {
             }
 
             /**
+             * request js
+             * @param url
+             * @param body
+             * @param headers
+             * @param data_type
+             * @param method
+             * @param async
+             */
+            request(url, body = {}, headers = {}, data_type = "json", method = "POST", async = false) {
+                let msg = null;
+                $.ajax({
+                    url: url,
+                    headers: headers,
+                    method: method,
+                    dataType: data_type,
+                    data: body,
+                    async: async,
+                    success: function (response) {
+                        msg = response;
+                    },
+                    error: function (response) {
+                        msg = response;
+                    }
+                });
+                return msg;
+            }
+
+            /**
              * validate and sync the email
              * @param email
              * @param marketing_data
@@ -202,12 +230,14 @@ function initJqueryRetainfulPopupJs() {
                     return {"error": true}
                 } else {
                     let popup_data = {
+                        local_storage: true,
                         email: email,
                         is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
                         action: 'set_rnoc_guest_session'
                     };
-                    let data_to_encrypt = JSON.stringify(popup_data);
-                    sessionStorage.setItem("rnoc_add_to_cart_popup_data", data_to_encrypt);
+                    this.request(rnoc_ajax_url, popup_data);
+                    /*let data_to_encrypt = JSON.stringify(popup_data);
+                    sessionStorage.setItem("rnoc_add_to_cart_popup_data", data_to_encrypt);*/
                     if (rnoc_add_to_cart_coupon_popup.show_coupon_instant_popup) {
                         sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
                         sessionStorage.setItem("rnoc_instant_coupon_popup_html", rnoc_add_to_cart_coupon_popup.coupon_instant_popup_content);
