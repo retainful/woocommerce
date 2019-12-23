@@ -603,14 +603,18 @@ class WcFunctions
      */
     function setSession($key, $value)
     {
-//        apply_filters('rnoc_session_maintained_by', 'woocommerce');
         if (empty($key) || empty($value))
             return false;
-        $this->initWoocommerceSession();
-        if (method_exists(WC()->session, 'set')) {
-            WC()->session->set($key, $value);
+        $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
+        if ($session_handled_by == "woocommerce") {
+            $this->initWoocommerceSession();
+            if (method_exists(WC()->session, 'set')) {
+                WC()->session->set($key, $value);
+            }
+            return true;
+        } else {
+            return $this->setPHPSession($key, $value);
         }
-        return true;
     }
 
     /**
@@ -751,10 +755,15 @@ class WcFunctions
     {
         if (empty($key))
             return NULL;
-        if (method_exists(WC()->session, 'get')) {
-            return WC()->session->get($key);
+        $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
+        if ($session_handled_by == "woocommerce") {
+            if (method_exists(WC()->session, 'get')) {
+                return WC()->session->get($key);
+            }
+            return NULL;
+        } else {
+            return $this->getPHPSession($key);
         }
-        return NULL;
     }
 
     /**
@@ -849,10 +858,15 @@ class WcFunctions
     {
         if (empty($key))
             return false;
-        if (method_exists(WC()->session, '__unset')) {
-            WC()->session->__unset($key);
+        $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
+        if ($session_handled_by == "woocommerce") {
+            if (method_exists(WC()->session, '__unset')) {
+                WC()->session->__unset($key);
+            }
+            return true;
+        } else {
+            return $this->removePHPSession($key);
         }
-        return true;
     }
 
     /**
