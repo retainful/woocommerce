@@ -40,7 +40,17 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         public function renderPopupPreview($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
         {
+            $this->setupAdminScripts();
             echo $this->getPopupTemplate();
+        }
+
+        /**
+         * Enqueue scripts and styles
+         */
+        function setupAdminScripts()
+        {
+            wp_register_style('rnoc-add-to-cart-popup', RNOCPREMIUM_PLUGIN_URL . '/assets/css/popup.css', array(), RNOC_VERSION);
+            wp_enqueue_style('rnoc-add-to-cart-popup');
         }
 
         /**

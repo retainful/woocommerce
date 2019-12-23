@@ -663,8 +663,8 @@ class WcFunctions
     {
         $email = $this->getCustomerBillingEmail();
         if (empty($email)) {
-            if (method_exists(WC()->customer, 'get_billing_email')) {
-                return WC()->customer->get_billing_email();
+            if (method_exists(WC()->customer, 'get_email')) {
+                return WC()->customer->get_email();
             } else {
                 return false;
             }
