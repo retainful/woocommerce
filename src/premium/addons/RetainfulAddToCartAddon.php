@@ -61,7 +61,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 }
             }
             $default_settings = array(
-                'rnoc_popup_form_open' => (is_admin()) ? '' : '<form id="rnoc_popup_form">',
+                'rnoc_popup_form_open' => (is_admin()) ? '' : '<form id="rnoc_popup_form" class="rnoc-lw-wrap">',
                 'rnoc_modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
                 'rnoc_modal_heading_color' => '#000000',
                 'rnoc_modal_sub_heading' => $coupon_message,

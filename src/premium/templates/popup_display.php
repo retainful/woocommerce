@@ -1,6 +1,6 @@
 <div id="<?php echo $add_on_slug; ?>" class="rnoc-popup-modal">
+    <span class="close-rnoc-popup">&times;</span>
     <div class="rnoc-popup-modal-content">
-        <span class="close-rnoc-popup">&times;</span>
         <?php
         echo $template;
         ?>

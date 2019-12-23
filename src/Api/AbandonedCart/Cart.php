@@ -227,11 +227,15 @@ class Cart extends RestApi
         }
         $session_coupon = self::$woocommerce->getSession('rnoc_ac_coupon');
         if (!empty($session_coupon)) {
-            $cart = self::$woocommerce->getCart();
-            if (!empty($cart) && !self::$woocommerce->hasDiscount($session_coupon)) {
-                if (self::$woocommerce->addDiscount($session_coupon)) {
-                    self::$woocommerce->removeSession('rnoc_ac_coupon');
+            if(self::$woocommerce->isValidCoupon($session_coupon)) {
+                $cart = self::$woocommerce->getCart();
+                if (!empty($cart) && !self::$woocommerce->hasDiscount($session_coupon)) {
+                    if (self::$woocommerce->addDiscount($session_coupon)) {
+                        self::$woocommerce->removeSession('rnoc_ac_coupon');
+                    }
                 }
+            }else{
+                self::$woocommerce->removeSession('rnoc_ac_coupon');
             }
         }
     }
@@ -931,11 +935,7 @@ class Cart extends RestApi
         if ($coupons) {
             foreach ($coupons as $coupon) {
                 $coupon_code = isset($coupon->code) ? $coupon->code : NULL;
-                if (!empty($coupon_code)) {
-                    $the_coupon = new \WC_Coupon($coupon_code);
-                    if (!$the_coupon->is_valid()) {
-                        continue;
-                    }
+                if (!empty($coupon_code) && self::$woocommerce->isValidCoupon($coupon_code)) {
                     $valid_coupons[] = $coupon_code;
                 }
             }

@@ -18,17 +18,16 @@
     width: 40%;
     position: relative;
     text-align: center;
-    border-radius: 50px;
 }
 
 .rnoc-popup-modal .close-rnoc-popup {
     color: #fff;
     font-size: 26px;
-    margin: 20px;
+    margin: 7px;
     font-weight: bold;
     position: absolute;
-    right: -27px;
-    top: -27px;
+    right: 29%;
+    top: 86px;
     width: 30px;
     background: #000000;
     height: 30px;
@@ -49,13 +48,14 @@
 @media (max-width: 992px) {
     .rnoc-popup-modal-content {
         width: 90%;
-        max-height: 400px;
+        max-height: 100%;
         overflow: auto;
     }
 
     .rnoc-popup-modal .close-rnoc-popup {
-        right: -20px;
-        top: -20px;
+        right: 4%;
+
+        top: 86px;
     }
 
     .rnoc-popup-form-block input {
@@ -79,5 +79,214 @@
 
     .rnoc-popup-modal .rnoc-popup-modal-content .rnoc-popup-holder .rnoc-content #rnoc_popup_form .rnoc-popup-form-block input, .rnoc-popup-modal .rnoc-popup-modal-content .rnoc-popup-holder .rnoc-content #rnoc_popup_form .rnoc-popup-form-block button {
         flex: 0 0 100% !important;
+    }
+    .rnoc-popup-modal .close-rnoc-popup {
+        right: 1%;
+
+        top: 86px;
+    }
+}
+
+/*Add to cart popup */
+
+.rnoc-popup a {
+    text-decoration: none;
+}
+
+.rnoc-popup {
+    padding: 15px;
+    position: relative;
+    /* transition: all 3s ease-in-out;*/
+}
+
+.rnoc-popup .rnoc-popup-head {
+    display: block;
+    padding: 2%;
+    text-align: center;
+    /* border: 1px dashed #f27052; */
+}
+
+.rnoc-popup .rnoc-lw-title {
+    padding: 0 2%;
+    margin-bottom: 0;
+    font-size: 2em;
+    color: #1f1e1f;
+    font-weight: 600;
+    line-height: 1.4em;
+}
+
+.rn-popup.rnoc-lw-wrap {
+    display: block;
+    padding: 0;
+    color: #2f2e35;
+}
+
+.rnoc-popup .rnoc-lw-center {
+    text-align: center;
+}
+
+.rnoc-popup .rnoc-lw-field {
+    position: relative;
+}
+
+.rnoc-popup .lw-content {
+    font-size: 1em;
+    color: #1f1e1f;
+    font-weight: 500 !important;
+    line-height: 1em;
+    margin-bottom: 5%;
+}
+
+.rnoc-popup .rnoc-lw-input {
+    display: inline-block;
+    width: 52%;
+    font-size: 1em;
+    border-radius: 5px 0px 0px 5px;
+    box-shadow: 0 3px 5px 0 rgba(37, 39, 44, 0.12);
+    height: 47px;
+    max-height: 47px;
+    padding: 0 15px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    margin-bottom: 2%;
+    font-weight: 500;
+}
+
+.rnoc-popup .rnoc-lw-btn {
+    width: 45%;
+    display: inline-block;
+    padding: 14px 20px;
+    height: 48px;
+    max-height: 48px;
+    border: none;
+    border-radius: 0px 5px 5px 0px;
+    font-size: 1em;
+    line-height: 1em;
+    box-shadow: 0 3px 5px 0 rgba(37, 39, 44, 0.17);
+    font-weight: 600;
+    color: white;
+    margin: 15px -7px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.rnoc-popup .rnoc-popup-head p {
+    font-size: 1.4em;
+    padding: 0 4%;
+    line-height: 1em;
+    margin-bottom: 3%;
+    color: #1f1e1f;
+}
+
+.rnoc-popup .rnoc-popup-head a {
+    color: #403f3f;
+    font-weight: 600;
+}
+
+.rnoc-popup .rnoc-pp-label {
+    text-align: left;
+    margin-left: 4%;
+    margin-bottom: 3%;
+    font-size: 1em;
+    margin-top: 3%;
+}
+
+.rnoc-popup .rnoc-pp-label a {
+    color: #f27052;
+}
+
+.rnoc-popup .rnoc-popup-head span {
+    font-size: 0.8em;
+    padding: 0 12%;
+    line-height: 2em;
+    margin-top: 2%;
+    color: #403f3f;
+    display: block;
+}
+
+.rnoc-popup .close {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    transition: all 200ms;
+    font-size: 28px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    background: #f27052;
+    padding: 0px 9px;
+    z-index: 0;
+    border-radius: 0px 12px 0px 0px;
+}
+.rnoc-popup .no-thanks-close-popup
+{
+    display: block;
+    margin-bottom: 3%
+
+}
+
+@media (max-width: 992px) {
+    .rnoc-popup {
+        width: 100%;
+    }
+
+    .rnoc-popup .rnoc-popup-head span {
+        font-size: 0.7em;
+        padding: 0 5%;
+        line-height: 1.6em;
+        margin-top: 3%;
+    }
+
+    .rnoc-popup .rnoc-lw-input {
+        border-radius: 5px;
+        margin-top: 3%;
+    }
+
+    .rnoc-popup .rnoc-popup-head p {
+        font-size: 1.2em;
+        margin-bottom: 1%;
+    }
+}
+
+@media (max-width: 768px) {
+    .rnoc-popup {
+        width: 100%;
+    }
+
+    .rnoc-popup .rnoc-lw-title {
+        font-size: 1.5em;
+        line-height: 1.4em;
+        margin-top: 5%;
+    }
+
+    .rnoc-popup .rnoc-popup-head {
+        padding: 0px;
+    }
+
+    .rnoc-popup .rnoc-popup-head p {
+        font-size: 1em;
+        margin-bottom: 1%;
+    }
+
+    .rnoc-popup .rnoc-popup-head span {
+        font-size: 0.7em;
+        padding: 0 1%;
+    }
+
+    .rnoc-popup .rnoc-lw-input {
+        width: 100%;
+        border-radius: 5px;
+        margin-top: 4%;
+    }
+
+    .rnoc-popup .rnoc-lw-btn {
+        width: 98%;
+        border-radius: 5px;
+    }
+
+    .rnoc-popup .rnoc-pp-label {
+        margin-left: 0px;
+        margin-bottom: 5%;
+        font-size: 0.9em;
+        margin-top: 4%;
     }
 }

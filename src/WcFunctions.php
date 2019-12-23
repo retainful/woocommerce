@@ -643,12 +643,30 @@ class WcFunctions
      * get customer Email
      * @return bool
      */
-    function getCustomerEmail()
+    function getCustomerBillingEmail()
     {
         if (method_exists(WC()->customer, 'get_billing_email')) {
             return WC()->customer->get_billing_email();
         }
         return false;
+    }
+
+    /**
+     * get customer billing Email
+     * @return bool
+     */
+    function getCustomerEmail()
+    {
+        $email = $this->getCustomerBillingEmail();
+        if (empty($email)) {
+            if (method_exists(WC()->customer, 'get_billing_email')) {
+                return WC()->customer->get_billing_email();
+            } else {
+                return false;
+            }
+        } else {
+            return $email;
+        }
     }
 
     /**
@@ -1777,5 +1795,16 @@ class WcFunctions
     function isPriceExcludingTax()
     {
         return ('excl' == get_option('woocommerce_tax_display_cart'));
+    }
+
+    function isValidCoupon($coupon_code)
+    {
+        if (class_exists('WC_Coupon')) {
+            $the_coupon = new \WC_Coupon($coupon_code);
+            if ($the_coupon->is_valid()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
