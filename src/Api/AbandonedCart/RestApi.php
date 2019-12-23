@@ -48,9 +48,15 @@ class RestApi
      */
     function setSessionShippingDetails($shipping_address)
     {
-        self::$woocommerce->setSession('rnoc_shipping_address', $shipping_address);
+        if (!empty($shipping_address)) {
+            foreach ($shipping_address as $key => $value) {
+                $method = 'set_' . $key;
+                if (is_callable(array(WC()->customer, $method))) {
+                    WC()->customer->$method($value);
+                }
+            }
+        }
     }
-
 
     /**
      * Remove the session shipping details
@@ -78,12 +84,60 @@ class RestApi
     }
 
     /**
-     * Set the session billing details
+     * Set the customer billing details
      * @param $billing_address
      */
-    function setSessionBillingDetails($billing_address)
+    function setCustomerBillingDetails($billing_address)
     {
-        self::$woocommerce->setSession('rnoc_billing_address', $billing_address);
+        if (!empty($billing_address)) {
+            foreach ($billing_address as $key => $value) {
+                $method = 'set_' . $key;
+                if (is_callable(array(WC()->customer, $method))) {
+                    WC()->customer->$method($value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Customer address mapping fields
+     * @return array
+     */
+    function getAddressMapFields()
+    {
+        $fields = array(
+            'first_name',
+            'last_name',
+            'state',
+            'phone',
+            'postcode',
+            'city',
+            'country',
+            'address_1',
+            'address_2',
+            'company'
+        );
+        return apply_filters('rnoc_get_checkout_mapping_fields', $fields);
+    }
+
+    /**
+     * Get the customer billing details
+     * @param $type
+     * @return array
+     */
+    function getCustomerCheckoutDetails($type = "billing")
+    {
+        $fields = $this->getAddressMapFields();
+        $checkout_field_values = array();
+        if (!empty($fields)) {
+            foreach ($fields as $key) {
+                $method = 'get_' . $type . '_' . $key;
+                if (is_callable(array(WC()->customer, $method))) {
+                    $checkout_field_values[$type . '_' . $key] = WC()->customer->$method();
+                }
+            }
+        }
+        return $checkout_field_values;
     }
 
     /**

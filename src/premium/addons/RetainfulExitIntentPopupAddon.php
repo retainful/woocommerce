@@ -33,7 +33,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             add_action('wp_ajax_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
             add_action('rnoc_exit_intent_after_applying_coupon_code', array($this, 'exitIntentCouponApplied'));
             add_action('wp', array($this, 'siteInit'));
-            add_filter('woocommerce_checkout_fields', array($this, 'addCheckoutEmail'));
         }
 
         /**
@@ -166,17 +165,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         }
 
         /**
-         * @param $fields
-         * @return mixed
-         */
-        function addCheckoutEmail($fields)
-        {
-            $user_email = $this->wc_functions->getSession('rnoc_user_billing_email');
-            $fields['billing']['billing_email']['default'] = $user_email;
-            return $fields;
-        }
-
-        /**
          * popup template
          * @return string
          */
@@ -278,8 +266,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $message = '';
             $error = true;
             $email = sanitize_email($_REQUEST['email']);
-            $this->wc_functions->setSession('rnoc_user_billing_email', $email);
-            $this->wc_functions->setPHPSession('rnoc_php_user_billing_email', $email);
+            $this->wc_functions->setCustomerEmail($email);
             $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
             $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
             if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
@@ -380,7 +367,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 if (!empty($coupon_code)) {
                     $coupon_data = '?rnoc_on_exit_coupon_code=' . $coupon_code;
                 }
-                $email = $this->wc_functions->getSession('rnoc_user_billing_email');
+                $email = $this->wc_functions->getCustomerEmail();
                 $to_replace = array(
                     'coupon_code' => $coupon_code,
                     'checkout_url' => $checkout_url . $coupon_data,

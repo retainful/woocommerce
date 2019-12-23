@@ -40,8 +40,8 @@ class Cart extends RestApi
     {
         self::$woocommerce->removeSession($this->cart_token_key);
         self::$woocommerce->removeSession($this->cart_tracking_started_key);
-        $this->removeSessionBillingDetails();
-        $this->removeSessionShippingDetails();
+        //$this->removeSessionBillingDetails();
+        //$this->removeSessionShippingDetails();
     }
 
     /**
@@ -123,51 +123,48 @@ class Cart extends RestApi
             $shipping_country = (isset($_POST['shipping_country'])) ? sanitize_text_field($_POST['shipping_country']) : '';
             //Billing details
             $billing_address = array(
-                'billing_postcode' => $billing_zipcode,
-                'billing_city' => $billing_city,
                 'billing_first_name' => $billing_first_name,
                 'billing_last_name' => $billing_last_name,
-                'billing_country' => $billing_country,
-                'billing_state' => $billing_state,
+                'billing_company' => $billing_company,
                 'billing_address_1' => $billing_address_1,
-                'billing_phone' => $billing_phone,
                 'billing_address_2' => $billing_address_2,
-                'billing_name' => $billing_first_name . ' ' . $billing_last_name,
-                'billing_company' => $billing_company
+                'billing_city' => $billing_city,
+                'billing_state' => $billing_state,
+                'billing_postcode' => $billing_zipcode,
+                'billing_country' => $billing_country,
+                'billing_phone' => $billing_phone
             );
             self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
-            $this->setSessionBillingDetails($billing_address);
+            $this->setCustomerBillingDetails($billing_address);
             //Shipping to same billing address
             if (!empty($ship_to_billing)) {
                 $shipping_address = array(
-                    'shipping_postcode' => $shipping_zipcode,
-                    'shipping_city' => $shipping_city,
                     'shipping_first_name' => $shipping_first_name,
                     'shipping_last_name' => $shipping_last_name,
-                    'shipping_country' => $shipping_country,
-                    'shipping_state' => $shipping_state,
+                    'shipping_company' => $shipping_company,
                     'shipping_address_1' => $shipping_address_1,
                     'shipping_address_2' => $shipping_address_2,
-                    'shipping_name' => $shipping_first_name . ' ' . $shipping_last_name,
-                    'shipping_company' => $shipping_company
+                    'shipping_city' => $shipping_city,
+                    'shipping_state' => $shipping_state,
+                    'shipping_postcode' => $shipping_zipcode,
+                    'shipping_country' => $shipping_country,
                 );
             } else {
                 $shipping_address = array(
-                    'shipping_postcode' => $billing_address['billing_postcode'],
-                    'shipping_city' => $billing_address['billing_city'],
                     'shipping_first_name' => $billing_address['billing_first_name'],
                     'shipping_last_name' => $billing_address['billing_last_name'],
-                    'shipping_country' => $billing_address['billing_country'],
-                    'shipping_state' => $billing_address['billing_state'],
+                    'shipping_company' => $billing_address['billing_company'],
                     'shipping_address_1' => $billing_address['billing_address_1'],
                     'shipping_address_2' => $billing_address['billing_address_2'],
-                    'shipping_name' => $billing_address['billing_first_name'] . ' ' . $billing_address['billing_last_name'],
-                    'shipping_company' => $billing_address['billing_company']
+                    'shipping_city' => $billing_address['billing_city'],
+                    'shipping_state' => $billing_address['billing_state'],
+                    'shipping_postcode' => $billing_address['billing_postcode'],
+                    'shipping_country' => $billing_address['billing_country'],
                 );
             }
             $this->setSessionShippingDetails($shipping_address);
             //Billing email
-            self::$woocommerce->setSession('rnoc_user_billing_email', $billing_email);
+            self::$woocommerce->setCustomerEmail($billing_email);
             //Set update and created date
             $session_created_at = self::$woocommerce->getSession('rnoc_session_created_at');
             $current_time = current_time('timestamp', true);
@@ -892,7 +889,7 @@ class Cart extends RestApi
     {
         $customer_email = isset($data->email) ? $data->email : '';
         //Setting the email
-        self::$woocommerce->setSession('rnoc_user_billing_email', $customer_email);
+        self::$woocommerce->setCustomerEmail($customer_email);
         $billing_details = isset($data->billing_address) ? $data->billing_address : new stdClass();
         $billing_address = array(
             'billing_first_name' => isset($billing_details->first_name) ? $billing_details->first_name : NULL,
@@ -906,7 +903,7 @@ class Cart extends RestApi
             'billing_address_2' => isset($billing_details->address2) ? $billing_details->address2 : NULL,
             'billing_company' => isset($billing_details->company) ? $billing_details->company : NULL
         );
-        $this->setSessionBillingDetails($billing_address);
+        $this->setCustomerBillingDetails($billing_address);
         $shipping_details = isset($data->shipping_address) ? $data->shipping_address : new stdClass();
         $shipping_address = array(
             'shipping_first_name' => isset($shipping_details->first_name) ? $shipping_details->first_name : NULL,
@@ -1161,15 +1158,22 @@ class Cart extends RestApi
     }
 
     /**
+     * Init the woocommerce session when it was not initlized
+     */
+    function initWoocommerceSession()
+    {
+        if (!self::$woocommerce->hasSession()) {
+            self::$woocommerce->setSessionCookie(true);
+        }
+    }
+
+    /**
      * Get the customer details
      * @return array
      */
     function getCustomerDetails()
     {
-        $billing_email = self::$woocommerce->getSession('rnoc_user_billing_email');
-        if(empty($billing_email)){
-            $billing_email = self::$woocommerce->getPHPSession('rnoc_php_user_billing_email');
-        }
+        $billing_email = self::$woocommerce->getCustomerEmail();
         if ($user_id = get_current_user_id()) {
             $user_data = wp_get_current_user();
             if (empty($billing_email)) {
@@ -1184,7 +1188,7 @@ class Cart extends RestApi
             $user_id = 0;
             $created_at = self::$woocommerce->getSession('rnoc_session_created_at');
             $updated_at = self::$woocommerce->getSession('rnoc_session_updated_at');
-            $billing_details = self::$woocommerce->getSession('rnoc_billing_address');
+            $billing_details = $this->getCustomerCheckoutDetails('billing');
             if (empty($billing_details)) {
                 $billing_details = array();
             }
@@ -1234,7 +1238,7 @@ class Cart extends RestApi
             $shipping_country = get_user_meta($user_id, 'shipping_country', true);
             $shipping_address_2 = '';
         } else {
-            $shipping_details = self::$woocommerce->getSession('rnoc_shipping_address');
+            $shipping_details = $this->getCustomerCheckoutDetails('shipping');
             if (empty($shipping_details)) {
                 $shipping_details = array();
             }
@@ -1284,7 +1288,7 @@ class Cart extends RestApi
             $billing_address_2 = '';
             $billing_company = '';
         } else {
-            $billing_details = self::$woocommerce->getSession('rnoc_billing_address');
+            $billing_details = $this->getCustomerCheckoutDetails('billing');
             if (empty($billing_details)) {
                 $billing_details = array();
             }

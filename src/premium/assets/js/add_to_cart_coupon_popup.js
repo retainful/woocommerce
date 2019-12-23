@@ -64,14 +64,6 @@ function initJqueryRetainfulAddToCartCouponPopupJs() {
                         instant_popup.show();
                         sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "yes");
                     }
-                    /*let popup_data_encoded = sessionStorage.getItem("rnoc_add_to_cart_popup_data");
-                    if(popup_data_encoded) {
-                        let popup_data = JSON.parse(popup_data_encoded);
-                        let response = this.request(rnoc_ajax_url, popup_data);
-                        if(!response.error){
-                            sessionStorage.removeItem("rnoc_add_to_cart_popup_data");
-                        }
-                    }*/
                 }
             }
 

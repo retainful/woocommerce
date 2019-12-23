@@ -258,33 +258,4 @@ class Checkout extends RestApi
         }*/
         self::$woocommerce->setOrderMeta($order_id, $this->pending_recovery_key_for_db, true);
     }
-
-    /**
-     * retrieve data from session and populate fields
-     * @param $fields
-     * @return mixed
-     */
-    function setCheckoutFieldsDefaultValues($fields)
-    {
-        $fields['billing']['billing_email']['default'] = self::$woocommerce->getSession('rnoc_user_billing_email');
-        //Set the billing details for checkout fields
-        $billing_address = self::$woocommerce->getSession('rnoc_billing_address');
-        if (!empty($billing_address) && is_array($billing_address)) {
-            foreach ($billing_address as $billing_key => $billing_value) {
-                if (isset($fields['billing'][$billing_key])) {
-                    $fields['billing'][$billing_key]['default'] = $billing_value;
-                }
-            }
-        }
-        //Set the shipping details for checkout fields
-        $shipping_address = self::$woocommerce->getSession('rnoc_shipping_address');
-        if (!empty($shipping_address) && is_array($shipping_address)) {
-            foreach ($shipping_address as $shipping_key => $shipping_value) {
-                if (isset($fields['shipping'][$shipping_key])) {
-                    $fields['shipping'][$shipping_key]['default'] = $shipping_value;
-                }
-            }
-        }
-        return $fields;
-    }
 }

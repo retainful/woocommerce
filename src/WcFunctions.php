@@ -587,15 +587,26 @@ class WcFunctions
     }
 
     /**
+     * Init the woocommerce session when it was not initlized
+     */
+    function initWoocommerceSession()
+    {
+        if (!$this->hasSession()) {
+            $this->setSessionCookie(true);
+        }
+    }
+
+    /**
      * @param $key
      * @param $value
      * @return bool
      */
     function setSession($key, $value)
     {
-        apply_filters('rnoc_session_maintained_by','woocommerce');
+//        apply_filters('rnoc_session_maintained_by', 'woocommerce');
         if (empty($key) || empty($value))
             return false;
+        $this->initWoocommerceSession();
         if (method_exists(WC()->session, 'set')) {
             WC()->session->set($key, $value);
         }
@@ -613,6 +624,43 @@ class WcFunctions
             WC()->session->set_customer_session_cookie($value);
         }
         return true;
+    }
+
+    /**
+     * set customer Email
+     * @param $value
+     * @return bool
+     */
+    function setCustomerEmail($value)
+    {
+        if (method_exists(WC()->customer, 'set_billing_email')) {
+            return WC()->customer->set_billing_email($value);
+        }
+        return false;
+    }
+
+    /**
+     * get customer Email
+     * @return bool
+     */
+    function getCustomerEmail()
+    {
+        if (method_exists(WC()->customer, 'get_billing_email')) {
+            return WC()->customer->get_billing_email();
+        }
+        return false;
+    }
+
+    /**
+     * check woocommerce session has started
+     * @return bool
+     */
+    function hasSession()
+    {
+        if (method_exists(WC()->session, 'has_session')) {
+            return WC()->session->has_session();
+        }
+        return false;
     }
 
     /**

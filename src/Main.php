@@ -174,13 +174,13 @@ class Main
                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
+                add_action('woocommerce_init', array($cart, 'initWoocommerceSession'));
                 add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
                 add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
                 add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
                 //add_action('wp_login', array($cart, 'userLoggedIn'));
                 add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
                 add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
-                add_filter('woocommerce_checkout_fields', array($checkout, 'setCheckoutFieldsDefaultValues'));
                 //Add tracking message
                 if (is_user_logged_in()) {
                     add_action('woocommerce_after_add_to_cart_button', array($cart, 'userGdprMessage'), 10);

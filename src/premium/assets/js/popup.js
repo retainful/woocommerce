@@ -229,20 +229,33 @@ function initJqueryRetainfulPopupJs() {
                     error_container.show();
                     return {"error": true}
                 } else {
+                    submit_button.addClass('loading');
+                    submit_button.attr('disabled', true);
                     let popup_data = {
                         local_storage: true,
                         email: email,
                         is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
                         action: 'set_rnoc_guest_session'
                     };
-                    this.request(rnoc_ajax_url, popup_data);
-                    /*let data_to_encrypt = JSON.stringify(popup_data);
-                    sessionStorage.setItem("rnoc_add_to_cart_popup_data", data_to_encrypt);*/
-                    if (rnoc_add_to_cart_coupon_popup.show_coupon_instant_popup) {
-                        sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
-                        sessionStorage.setItem("rnoc_instant_coupon_popup_html", rnoc_add_to_cart_coupon_popup.coupon_instant_popup_content);
+                    let response = this.request(rnoc_ajax_url, popup_data);
+                    if (response.error) {
+                        if (response.message !== '') {
+                            //return {"error": true}
+                        }
+                    } else {
+                        if (response.message !== '') {
+                            //return err
+                        }
+                        //instant popup support
+                        if (rnoc_add_to_cart_coupon_popup.show_coupon_instant_popup) {
+                            sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
+                            sessionStorage.setItem("rnoc_instant_coupon_popup_html", rnoc_add_to_cart_coupon_popup.coupon_instant_popup_content);
+                        }
+                        sessionStorage.setItem('rnocp_is_add_to_cart_popup_email_entered', '1');
+                        this.closePopup("1");
                     }
-                    this.closePopup("1");
+                    submit_button.removeClass('loading');
+                    submit_button.attr('disabled', false);
                     return {"error": false};
                 }
             }

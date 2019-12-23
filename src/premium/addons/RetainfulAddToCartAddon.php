@@ -33,18 +33,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             add_action('wp_ajax_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
             add_action('wp_ajax_rnoc_popup_closed', array($this, 'popupClosed'));
             add_action('wp', array($this, 'siteInit'));
-            add_filter('woocommerce_checkout_fields', array($this, 'addCheckoutEmail'));
-        }
-
-        /**
-         * @param $fields
-         * @return mixed
-         */
-        function addCheckoutEmail($fields)
-        {
-            $user_email = $this->wc_functions->getSession('rnoc_user_billing_email');
-            $fields['billing']['billing_email']['default'] = $user_email;
-            return $fields;
         }
 
         /**
@@ -134,7 +122,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
                     $show_popup = false;
                     if ($run_cart_externally) {
-                        $email = $this->wc_functions->getSession('rnoc_user_billing_email');
+                        $email = $this->wc_functions->getCustomerEmail();
                         if (!empty($email)) {
                             return false;
                         }
@@ -200,8 +188,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
             }
             $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
-            $this->wc_functions->setSession('rnoc_user_billing_email', $email);
-            $this->wc_functions->setPHPSession('rnoc_php_user_billing_email', $email);
+            $this->wc_functions->initWoocommerceSession();
+            $this->wc_functions->setCustomerEmail($email);
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
             if (!$run_cart_externally) {
@@ -376,7 +364,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addSiteScripts()
         {
-            wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/popup.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
+            wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
             $modal_show_popup_until = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1);
             $modal_show = array(
                 'hide_modal_after_show' => $modal_show_popup_until,
@@ -400,7 +388,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addSiteInstantCouponScripts()
         {
-            wp_enqueue_script('rnoc-add-to-cart-instant-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/add_to_cart_coupon_popup.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
+            wp_enqueue_script('rnoc-add-to-cart-instant-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/add_to_cart_coupon_popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
             wp_enqueue_style('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
         }
 
