@@ -91,7 +91,7 @@ function initJqueryRetainfulPopupJs() {
                 thisButton.addClass('rnoc-popup-opener');
                 let modal = this.getAddToCartPopupWindow();
                 modal.css('display', 'block');
-                localStorage.setItem('retainful_add_to_cart_opened', 'yes');
+                sessionStorage.setItem('retainful_add_to_cart_opened', 'yes');
                 $(document).trigger('retainful_showed_add_to_cart_popup', [modal, thisButton]);
             }
 
@@ -100,16 +100,13 @@ function initJqueryRetainfulPopupJs() {
              */
             closePopup(event = "1") {
                 if (this.isLocalStorageSupports()) {
-                    localStorage.setItem('retainful_add_to_cart_popup_closed_by', event);
+                    sessionStorage.setItem('retainful_add_to_cart_popup_closed_by', event);
                     let modal = this.getAddToCartPopupWindow();
                     //Trigger event about hiding popup
                     $(document).trigger('retainful_closing_add_to_cart_popup', [modal]);
                     let popup_btn = $('.rnoc-popup-opener');
                     if (event !== "3") {
-                        if (event === "2") {
-                            localStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
-                        }
-                        //Allow only when no thanks button clicked
+                        sessionStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
                         popup_btn.click();
                     }
                     popup_btn.removeClass('rnoc-popup-opener');
@@ -154,11 +151,11 @@ function initJqueryRetainfulPopupJs() {
                 let options = this.getOptions();
                 //Popup will not shown to non local storage supported browsers
                 if (this.isLocalStorageSupports() && this.isPopupEnabled()) {
-                    if (localStorage.getItem('retainful_add_to_cart_popup_temporary_silent') === "1") {
-                        localStorage.removeItem('retainful_add_to_cart_popup_temporary_silent');
+                    if (sessionStorage.getItem('retainful_add_to_cart_popup_temporary_silent') === "1") {
+                        sessionStorage.removeItem('retainful_add_to_cart_popup_temporary_silent');
                         return false;
                     }
-                    let popup_closed_by = localStorage.getItem("retainful_add_to_cart_popup_closed_by");
+                    let popup_closed_by = sessionStorage.getItem("retainful_add_to_cart_popup_closed_by");
                     if (popup_closed_by === null) {
                         return true;
                     }
@@ -238,21 +235,21 @@ function initJqueryRetainfulPopupJs() {
                         action: 'set_rnoc_guest_session'
                     };
                     let response = this.request(rnoc_ajax_url, popup_data);
-                    if (response.error) {
+                    if (!response.error) {
                         if (response.message !== '') {
                             //return {"error": true}
                         }
+                        //instant popup support
+                        if (response.show_coupon_instant_popup) {
+                            sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
+                            sessionStorage.setItem("rnoc_instant_coupon_popup_html", response.coupon_instant_popup_content);
+                        }
+                        sessionStorage.setItem('rnocp_is_add_to_cart_popup_email_entered', '1');
+                        this.closePopup("1");
                     } else {
                         if (response.message !== '') {
                             //return err
                         }
-                        //instant popup support
-                        if (rnoc_add_to_cart_coupon_popup.show_coupon_instant_popup) {
-                            sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
-                            sessionStorage.setItem("rnoc_instant_coupon_popup_html", rnoc_add_to_cart_coupon_popup.coupon_instant_popup_content);
-                        }
-                        sessionStorage.setItem('rnocp_is_add_to_cart_popup_email_entered', '1');
-                        this.closePopup("1");
                     }
                     submit_button.removeClass('loading');
                     submit_button.attr('disabled', false);
