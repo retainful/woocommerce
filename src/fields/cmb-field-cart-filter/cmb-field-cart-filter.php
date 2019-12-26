@@ -29,7 +29,7 @@ class CMB2_Field_Date_Range_Picker
         if ($duration != "custom") {
             $selected_dates = $start_end_dates[$duration]['start_date'] . ' - ' . $start_end_dates[$duration]['end_date'];
         } elseif (isset($_GET['start']) && isset($_GET['end'])) {
-            $selected_dates = $_GET['start'] . ' - ' . $_GET['start'];
+            $selected_dates = $_GET['start'] . ' - ' . $_GET['end'];
         } else {
             $selected_dates = $start_end_dates['last_thirty']['start_date'] . ' - ' . $start_end_dates['last_thirty']['end_date'];
         }

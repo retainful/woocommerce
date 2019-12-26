@@ -11,6 +11,7 @@
  * Domain Path: /i18n/languages/
  * Plugin URI: https://www.retainful.com
  * Requires at least: 4.6.1
+ * Contributers: Sathyaseelan
  * WC requires at least: 2.5
  * WC tested up to: 3.8.1
  */
