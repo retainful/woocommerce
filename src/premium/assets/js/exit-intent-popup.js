@@ -74,6 +74,10 @@ function initJqueryRetainfulExitIntentPopupJs() {
         function showRetainfulExitIntentPopup() {
             let cart_hash_key = wc_cart_fragments_params.cart_hash_key;
             let cart_hash = sessionStorage.getItem(cart_hash_key);
+            let checkout_form = $('form.checkout');
+            if (checkout_form.is('.processing')) {
+                return false;
+            }
             if (cart_hash !== "" && cart_hash !== undefined) {
                 let number_of_times_showed = (typeof window.rnocp_exit_intent_popup_showed_count !== "undefined") ? window.rnocp_exit_intent_popup_showed_count : 0;
                 let show_popup = true;
