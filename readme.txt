@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.3
 WC tested up to: 3.8.1
 Requires PHP: 5.6
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -348,3 +348,6 @@ No. There is no charges for support.
 
 = 2.1.3 =
 * Fix: Variable products can not recovered properly when clicking cart recovery URL
+
+= 2.1.4 =
+* Improvement: Saving session data improved
