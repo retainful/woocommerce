@@ -245,7 +245,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         case "both":
                             $show_coupon_popup = true;
                             $this->sendEmail($email, $coupon_settings);
-                            $this->sendEmail($email, $coupon_settings);
                             $coupon_details = $this->getCouponPopupContent($coupon_settings);
                             break;
                         default:
