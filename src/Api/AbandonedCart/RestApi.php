@@ -430,7 +430,7 @@ class RestApi
      * Encrypt the cart
      * @param $data
      * @param $secret
-     * @return array
+     * @return string
      */
     function encryptData($data, $secret = NULL)
     {
@@ -446,9 +446,7 @@ class RestApi
                 $iv = openssl_random_pseudo_bytes($iv_len);
                 $cipher_text_raw = openssl_encrypt($data, self::CIPHER_METHOD, $secret, OPENSSL_RAW_DATA, $iv);
                 $hmac = hash_hmac(self::HMAC_ALGORITHM, $cipher_text_raw, $secret, true);
-                $encrypt = base64_encode(bin2hex($iv) . ':retainful:' . bin2hex($hmac) . ':retainful:' . bin2hex($cipher_text_raw));
-                #$this->decryptCart($encrypt);
-                return $encrypt;
+                return base64_encode(bin2hex($iv) . ':retainful:' . bin2hex($hmac) . ':retainful:' . bin2hex($cipher_text_raw));
             } catch (Exception $e) {
                 return NULL;
             }

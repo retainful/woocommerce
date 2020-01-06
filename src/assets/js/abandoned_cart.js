@@ -61,7 +61,6 @@
             return this;
         }
 
-
         /**
          * cart tracking element ID
          * @return {string}
@@ -69,7 +68,6 @@
         getCartTrackingElementId() {
             return this.cart_tracking_element_id;
         }
-
 
         /**
          * Set the abandoned cart data
@@ -125,10 +123,12 @@
         /**
          * sync cart to api
          */
-        syncCart() {
-            let cart_data = this.getAbandonedCartData();
+        syncCart(cart_data = null, force_sync = false) {
+            if (cart_data === null) {
+                cart_data = this.getAbandonedCartData();
+            }
             let cart_hash = this.getCartHash();
-            if (cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) {
+            if ((cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) || (force_sync)) {
                 this.previous_cart_hash = cart_hash;
                 let headers = {"app_id": this.getPublicKey(), "Content-Type": "application/json"};
                 let body = {"data": cart_data};
@@ -169,8 +169,7 @@
     if (retainful_cart_data.cart_tracking_engine === "js") {
         retainful.initCartTracking();
     }
-
-    $('input#billing_email,input#billing_last_name,input#billing_first_name,input#billing_postcode,select#billing_country,select#billing_state').on('change', function () {
+    $('input#billing_email,input#billing_last_name,input#billing_first_name,input#billing_postcode,select#billing_country,select#billing_state').on('blur', function () {
         /*$('input#billing_email').on('change', function () {*/
         if ($('#billing_email').val() !== "") {
             var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
@@ -199,9 +198,10 @@
                 shipping_country: $('#shipping_country').val(),
                 action: 'rnoc_track_user_data'
             };
-            retainful.request(retainful_cart_data.ajax_url, guest_data, {}, "json", "POST", true);
+            let response = retainful.request(retainful_cart_data.ajax_url, guest_data, {}, "json", "POST", false);
+            if (response.success && response.data) {
+                retainful.syncCart(response.data, true);
+            }
         }
     });
-
-
 })(jQuery);

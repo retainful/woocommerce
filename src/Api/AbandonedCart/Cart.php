@@ -173,8 +173,9 @@ class Cart extends RestApi
             }
             self::$woocommerce->setSession('rnoc_session_updated_at', $current_time);
         }
-        $this->syncCartData(true);
-        wp_send_json_success('');
+        $cart = $this->getUserCart();
+        $encrypted_cart = $this->encryptData($cart);
+        wp_send_json_success($encrypted_cart);
     }
 
     /**
@@ -227,14 +228,14 @@ class Cart extends RestApi
         }
         $session_coupon = self::$woocommerce->getSession('rnoc_ac_coupon');
         if (!empty($session_coupon)) {
-            if(self::$woocommerce->isValidCoupon($session_coupon)) {
+            if (self::$woocommerce->isValidCoupon($session_coupon)) {
                 $cart = self::$woocommerce->getCart();
                 if (!empty($cart) && !self::$woocommerce->hasDiscount($session_coupon)) {
                     if (self::$woocommerce->addDiscount($session_coupon)) {
                         self::$woocommerce->removeSession('rnoc_ac_coupon');
                     }
                 }
-            }else{
+            } else {
                 self::$woocommerce->removeSession('rnoc_ac_coupon');
             }
         }
@@ -503,32 +504,13 @@ class Cart extends RestApi
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
                         'image_url' => $image_url,
                         'product_url' => self::$woocommerce->getProductUrl($item, $item_details),
-                        'grams' => 0,
                         'user_id' => NULL,
-                        'properties' => array(),
-                        'gift_card' => NULL,
-                        'compare_at_price' => NULL,
-                        'country_hs_codes' => array(),
-                        'applied_discounts' => array(),
-                        'requires_shipping' => NULL,
-                        'origin_location_id' => NULL,
-                        'fulfillment_service' => NULL,
-                        'country_code_of_origin' => NULL,
-                        'harmonized_system_code' => NULL,
-                        'unit_price_measurement' => array(
-                            'measured_type' => NULL,
-                            'quantity_unit' => NULL,
-                            'quantity_value' => NULL,
-                            'reference_unit' => NULL,
-                            'reference_value' => NULL,
-                        ),
-                        'destination_location_id' => NULL,
-                        'province_code_of_origin' => NULL,
+                        'properties' => array()
                     );
                 }
             }
         }
-        return $items;
+        return apply_filters("rnoc_get_abandoned_cart_line_items", $items);
     }
 
     /**
@@ -635,43 +617,28 @@ class Cart extends RestApi
             'ip' => $this->getUserIPDetails(),
             'id' => $cart_token,
             'name' => '#' . $cart_token,
-            'note' => NULL,
             'email' => (isset($customer_details['email'])) ? $customer_details['email'] : NULL,
-            'phone' => NULL,
             'token' => $cart_token,
-            'source' => NULL,
-            'gateway' => NULL,
-            'user_id' => NULL,
             'currency' => $default_currency_code,
             'customer' => $customer_details,
-            'closed_at' => NULL,
-            'device_id' => NULL,
             'tax_lines' => $this->getCartTaxDetails(),
             'total_tax' => self::$woocommerce->getCartTotalTax(),
             'cart_token' => $cart_token,
             'created_at' => $this->formatToIso8601($cart_created_at),
             'line_items' => $this->getCartLineItemsDetails(),
-            'source_url' => NULL,
             'updated_at' => $this->formatToIso8601(''),
-            'location_id' => NULL,
-            'source_name' => NUll,
             'total_price' => $cart_total,
             'completed_at' => NULL,
-            'landing_site' => NULL,
-            'total_weight' => NULL,
             'discount_codes' => $this->getAppliedDiscounts(),
-            'referring_site' => NULL,
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getCartSubTotal()),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
             'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
             'customer_locale' => $current_language,
-            'note_attributes' => NULL,
             'order_status' => NULL,
             'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getCartTotalDiscount()),
             'shipping_address' => $this->getCustomerShippingAddressDetails(),
             'billing_address' => $this->getCustomerBillingAddressDetails(),
-            'source_identifier' => NULL,
             'presentment_currency' => $current_currency_code,
             'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
             'total_line_items_price' => $this->formatDecimalPrice(self::$woocommerce->getCartTotal()),
@@ -1195,10 +1162,8 @@ class Cart extends RestApi
             $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
             $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
         }
-        $user_info = array(
+        return array(
             'id' => $user_id,
-            'note' => NULL,
-            'tags' => '',
             'email' => $billing_email,
             'phone' => $billing_phone,
             'state' => $billing_state,
@@ -1206,7 +1171,6 @@ class Cart extends RestApi
             'first_name' => $billing_first_name,
             'currency' => NULL,
             'created_at' => $this->formatToIso8601($created_at),
-            'tax_exempt' => false,
             'updated_at' => $this->formatToIso8601($updated_at),
             'total_spent' => 0,
             'orders_count' => 0,
@@ -1214,10 +1178,7 @@ class Cart extends RestApi
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,
-            'multipass_identifier' => NULL,
-            'marketing_opt_in_level' => NULL
         );
-        return $user_info;
     }
 
     /**
