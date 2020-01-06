@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful;
-
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Settings;
@@ -190,6 +189,7 @@ class OrderCoupon
             $order = $this->wc_functions->getOrder($order_id);
             $this->updateAppliedCouponDetails($order_id, $order);
             $request_params = $this->getRequestParams($order);
+            $this->admin->logMessage($request_params, 'next order coupon');
             $request_params['app_id'] = $api_key;
             return $this->admin->sendCouponDetails('track', $request_params);
         }

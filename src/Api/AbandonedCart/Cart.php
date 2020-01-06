@@ -625,7 +625,6 @@ class Cart extends RestApi
         $cart_created_at = $this->userCartCreatedAt();
         $cart_total = $this->formatDecimalPrice(self::$woocommerce->getCartTotalPrice());
         $cart_hash = $this->generateCartHash();
-        $woo_cart_data = self::$woocommerce->getCart();
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
         $recovered_at = self::$woocommerce->getSession('rnoc_recovered_at');
         $cart = array(
@@ -677,7 +676,6 @@ class Cart extends RestApi
             'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
             'total_line_items_price' => $this->formatDecimalPrice(self::$woocommerce->getCartTotal()),
             'buyer_accepts_marketing' => $this->isBuyerAcceptsMarketing(),
-            'cart_contents' => $woo_cart_data,
             'client_session' => self::$woocommerce->getClientSession(),
             'woocommerce_totals' => $this->getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
