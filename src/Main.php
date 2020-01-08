@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful;
-
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Settings;
@@ -174,6 +173,8 @@ class Main
                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
+                //Sync the order by the scheduled events
+                add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
                 add_action('woocommerce_init', array($cart, 'initWoocommerceSession'));
                 add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
                 add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));

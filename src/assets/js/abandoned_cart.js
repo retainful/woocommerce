@@ -169,7 +169,7 @@
     if (retainful_cart_data.cart_tracking_engine === "js") {
         retainful.initCartTracking();
     }
-    $('input#billing_email,input#billing_last_name,input#billing_first_name,input#billing_postcode,select#billing_country,select#billing_state').on('blur', function () {
+    $('input#billing_email,input#billing_last_name,input#billing_first_name,input#billing_postcode,select#billing_country,select#billing_state').on('change', function () {
         /*$('input#billing_email').on('change', function () {*/
         if ($('#billing_email').val() !== "") {
             var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;

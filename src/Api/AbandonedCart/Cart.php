@@ -745,6 +745,10 @@ class Cart extends RestApi
                 }
                 $app_id = self::$settings->getApiKey();
                 $data = self::$api->retrieveCartDetails($app_id, $cart_token);
+                //When the cart details from API was empty, then we no need to proceed further
+                if (empty($data)) {
+                    return false;
+                }
                 $order_id = $this->getOrderIdFromCartToken($cart_token);
                 $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
                 if ($order_id && $order = self::$woocommerce->getOrder($order_id)) {

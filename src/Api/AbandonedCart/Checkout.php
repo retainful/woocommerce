@@ -58,6 +58,20 @@ class Checkout extends RestApi
      */
     function orderUpdated($order_id)
     {
+        if ($this->needInstantOrderSync()) {
+            $this->syncOrder($order_id);
+        } else {
+            $this->scheduleCartSync($order_id);
+        }
+    }
+
+    /**
+     * Sync the order with API
+     * @param $order_id
+     * @return void|null
+     */
+    function syncOrder($order_id)
+    {
         if (empty($order_id)) {
             return null;
         }
@@ -82,6 +96,28 @@ class Checkout extends RestApi
         $cart_hash = $this->encryptData($order_data);
         if (!empty($cart_hash)) {
             $this->syncCart($cart_hash);
+        }
+    }
+
+    /**
+     * Sync the order
+     * @param $order_id
+     */
+    function syncOrderByScheduler($order_id)
+    {
+        $this->syncOrder($order_id);
+    }
+
+    /**
+     * schedule the sync of the cart
+     * @param $order_id
+     */
+    function scheduleCartSync($order_id)
+    {
+        $hook = 'retainful_sync_abandoned_cart_order';
+        $meta_key = '_rnoc_order_id';
+        if (self::$settings->hasAnyActiveScheduleExists($hook, $order_id, $meta_key) == false) {
+            self::$settings->scheduleEvents($hook, current_time('timestamp') + 60, array($meta_key => $order_id));
         }
     }
 
@@ -149,18 +185,32 @@ class Checkout extends RestApi
             $cart_token = $this->retrieveCartToken();
             if (!empty($cart_token)) {
                 $order = self::$woocommerce->getOrder($order_id);
-               $this->purchaseComplete($order_id);
-                $order_obj = new Order();
-                $cart = $order_obj->getOrderData($order);
-                self::$settings->logMessage($cart);
-                $cart_hash = $this->encryptData($cart);
-                if (!empty($cart_hash)) {
-                    $this->syncCart($cart_hash);
+                $this->purchaseComplete($order_id);
+                if ($this->needInstantOrderSync()) {
+                    $order_obj = new Order();
+                    $cart = $order_obj->getOrderData($order);
+                    self::$settings->logMessage($cart);
+                    $cart_hash = $this->encryptData($cart);
+                    //Reduce the loading speed
+                    if (!empty($cart_hash)) {
+                        $this->syncCart($cart_hash);
+                    }
+                } else {
+                    $this->scheduleCartSync($order_id);
                 }
                 //$this->unsetOrderTempData();
             }
         } catch (Exception $e) {
         }
+    }
+
+    /**
+     * need the instant sync or not
+     * @return mixed|void
+     */
+    function needInstantOrderSync()
+    {
+        return apply_filters('rnoc_sync_order_data_instantly_to_api', true);
     }
 
     /**
@@ -188,12 +238,16 @@ class Checkout extends RestApi
         if (!$cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db)) {
             return $result;
         }
-        $order_obj = new Order();
-        $cart = $order_obj->getOrderData($order);
-        self::$settings->logMessage($cart);
-        $cart_hash = $this->encryptData($cart);
-        if (!empty($cart_hash)) {
-            $this->syncCart($cart_hash);
+        if ($this->needInstantOrderSync()) {
+            $order_obj = new Order();
+            $cart = $order_obj->getOrderData($order);
+            self::$settings->logMessage($cart);
+            $cart_hash = $this->encryptData($cart);
+            if (!empty($cart_hash)) {
+                $this->syncCart($cart_hash);
+            }
+        } else {
+            $this->scheduleCartSync($order_id);
         }
         //$this->unsetOrderTempData();
         return $result;

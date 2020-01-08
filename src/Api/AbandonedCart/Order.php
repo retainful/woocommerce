@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful\Api\AbandonedCart;
-
 class Order extends RestApi
 {
     function __construct()
@@ -208,6 +207,7 @@ class Order extends RestApi
             'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
             'total_line_items_price' => $this->formatDecimalPrice($this->getOrderItemsTotal($order)),
             'buyer_accepts_marketing' => ($is_buyer_accepts_marketing == 1),
+            'cancelled_at' => self::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db),
             'woocommerce_totals' => $this->getOrderTotals($order, $excluding_tax),
             'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),

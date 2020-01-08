@@ -542,7 +542,9 @@ class OrderCoupon
             if (!empty($api_key)) {
                 $woocommerce_version = rnocGetInstalledWoocommerceVersion();
                 if (version_compare($woocommerce_version, '3.5', '>=')) {
-                    $this->admin->scheduleEvents('retainful_cron_sync_coupon_details', current_time('timestamp') + 60, array($order_id));
+                    $hook = 'retainful_cron_sync_coupon_details';
+                    $meta_key = '_rnoc_order_id';
+                    $this->admin->scheduleEvents($hook, current_time('timestamp') + 60, array($meta_key => $order_id));
                 } else {
                     //For old versions directly sync the cou[on details
                     $this->cronSendCouponDetails($order_id);
