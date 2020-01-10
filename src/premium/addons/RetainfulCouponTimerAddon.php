@@ -116,7 +116,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         function showTimer()
         {
             $coupon_expire_time = $this->wc_functions->getSession('rnoc_coupon_timer_expired_on_gmt');
-            if (!empty($coupon_expire_time)) {
+            if (!empty($coupon_expire_time) && $coupon_expire_time >= current_time("timestamp",true)) {
                 $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages', array());
                 if ($this->isValidPagesToDisplay($modal_display_pages)) {
                     $top_position = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings');
