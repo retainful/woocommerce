@@ -2,11 +2,11 @@
 /**
  * CMB2 Conditionals.
  */
-if (!class_exists('CMB2_Conditionals', false)) {
+if (!class_exists('CMB2_RNOC_Conditionals', false)) {
     /**
      * CMB2_Conditionals Plugin.
      */
-    class CMB2_Conditionals
+    class CMB2_RNOC_Conditionals
     {
         /**
          * Constructor - Set up the actions for the plugin.
@@ -26,4 +26,4 @@ if (!class_exists('CMB2_Conditionals', false)) {
         }
     }
 } /* End of class-exists wrapper. */
-new CMB2_Conditionals();
+new CMB2_RNOC_Conditionals();

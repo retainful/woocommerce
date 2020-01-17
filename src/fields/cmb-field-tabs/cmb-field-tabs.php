@@ -1,10 +1,10 @@
 <?php
 if (!defined('ABSPATH')) exit;
-if (!class_exists('CMB2_Tabs')) {
+if (!class_exists('CMB2_RNOC_Tabs')) {
     /**
      * Class CMB2_Tabs
      */
-    class CMB2_Tabs
+    class CMB2_RNOC_Tabs
     {
         /**
          * Current version number
@@ -97,5 +97,5 @@ if (!class_exists('CMB2_Tabs')) {
         }
     }
 
-    $cmb2_tabs = new CMB2_Tabs();
+    $cmb2_tabs = new CMB2_RNOC_Tabs();
 }
