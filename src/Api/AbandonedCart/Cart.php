@@ -202,6 +202,7 @@ class Cart extends RestApi
                 'tracking_element_selector' => $this->getTrackingElementId(),
                 'cart_tracking_engine' => self::$settings->getCartTrackingEngine()
             );
+            $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
             wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
         }
     }
@@ -794,9 +795,10 @@ class Cart extends RestApi
     }
 
     /**
-     * render the tracking div
+     * get the tracking data
+     * @return array
      */
-    function renderAbandonedCartTrackingDiv()
+    function getTrackingCartData()
     {
         $data = array();
         $cart_created_at = $this->userCartCreatedAt();
@@ -808,20 +810,30 @@ class Cart extends RestApi
                 'data' => $this->encryptData($cart)
             );
         }
+        return $data;
+    }
+
+    /**
+     * render the tracking div
+     */
+    function renderAbandonedCartTrackingDiv()
+    {
+        $data = $this->getTrackingCartData();
         echo $this->getCartTrackingDiv($data);
     }
 
     /**
      * get the abandoned cart tracking div element
-     * @param string $cart_data
+     * @param array $cart_data
      * @return string
      */
-    function getCartTrackingDiv($cart_data = '')
+    function getCartTrackingDiv($cart_data = array())
     {
-        return sprintf(
+        $tracking_div = sprintf(
             '<div id="%1$s" style="display: none !important;">%2$s</div>',
             esc_attr($this->getTrackingElementId()),
             esc_html(wp_json_encode($cart_data)));
+        return apply_filters('rnoc_get_cart_tracking_div', $tracking_div, $cart_data);
     }
 
     /**
@@ -832,15 +844,7 @@ class Cart extends RestApi
     function addToCartFragments($fragments)
     {
         $selector = 'div#' . $this->getTrackingElementId();
-        $data = array();
-        if ($this->isValidCartToTrack() && $this->needToTrackCart()) {
-            $cart = $this->getUserCart();
-            self::$settings->logMessage($cart, 'cart');
-            $data = array(
-                'cart_hash' => $this->generateCartHash(),
-                'data' => $this->encryptData($cart)
-            );
-        }
+        $data = $this->getTrackingCartData();
         $fragments[$selector] = $this->getCartTrackingDiv($data);
         return $fragments;
     }
