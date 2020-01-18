@@ -79,29 +79,100 @@ if (!defined('RNOC_LOG_FILE_PATH')) {
     $path = ABSPATH . 'wp-content/retainful.log';
     define('RNOC_LOG_FILE_PATH', $path);
 }
+/**
+ * Setup plugin compatable versions
+ */
+if (!defined('RNOC_MINIMUM_WC_VERSION')) {
+    define('RNOC_MINIMUM_WC_VERSION', '3.0.9');
+}
+if (!defined('RNOC_MINIMUM_WP_VERSION')) {
+    define('RNOC_MINIMUM_WP_VERSION', '4.4');
+}
+if (!defined('RNOC_MINIMUM_PHP_VERSION')) {
+    define('RNOC_MINIMUM_PHP_VERSION', '5.6.0');
+}
 //Create and alter the tables for abandoned carts and also check for woocommerce installed
-register_activation_hook(RNOC_FILE, 'RnocValidatePluginActivation');
-if (!function_exists('RnocValidatePluginActivation')) {
-    function RnocValidatePluginActivation()
+register_activation_hook(RNOC_FILE, 'rnocPluginActivation');
+if (!function_exists('rnocPluginActivation')) {
+    /**
+     * Run on plugin activation
+     */
+    function rnocPluginActivation()
     {
-        if (version_compare(phpversion(), '5.6', '<')) {
-            exit(__('Retainful-woocommerce requires minimum PHP version of 5.6', RNOC_TEXT_DOMAIN));
+        if (!rnocIsEnvironmentCompatible()) {
+            wp_die(sprintf(__('This plugin can not be activated because it requires minimum PHP version of %1$s.', RNOC_TEXT_DOMAIN), RNOC_MINIMUM_PHP_VERSION));
         }
-        global $wp_version;
-        if (version_compare($wp_version, '4.5', '<')) {
-            exit(__('Retainful-woocommerce requires minimum Wordpress version of 4.5', RNOC_TEXT_DOMAIN));
+        if (!rnocIsWordPressCompatible()) {
+            exit(__('Woocommerce Email Customizer + requires at least Wordpress', RNOC_TEXT_DOMAIN) . ' ' . RNOC_MINIMUM_WC_VERSION);
         }
-        $path = 'woocommerce/woocommerce.php';
-        if (!in_array($path, apply_filters('active_plugins', get_option('active_plugins')))) {
-            exit(__('Woocommerce must installed and activated in-order to use Retainful-Woocommerce!', RNOC_TEXT_DOMAIN));
-        } else {
-            $wc_installed_version = rnocGetInstalledWoocommerceVersion();
-            $wc_required_version = '2.5';
-            if (version_compare($wc_required_version, $wc_installed_version, '>=')) {
-                exit(__('Retainful-woocommerce requires minimum Woocommerce version of ', RNOC_TEXT_DOMAIN) . ' ' . $wc_required_version . '. ' . __('But your Woocommerce version is ', RNOC_TEXT_DOMAIN) . ' ' . $wc_installed_version);
-            }
+        if (!rnocIsWoocommerceActive()) {
+            exit(__('Woocommerce must installed and activated in-order to use WooCommerce Email Customizer Plus!', RNOC_TEXT_DOMAIN));
+        }
+        if (!rnocIsWooCompatible()) {
+            exit(__('Woocommerce Email Customizer + requires at least Woocommerce', RNOC_TEXT_DOMAIN) . ' ' . RNOC_MINIMUM_WC_VERSION);
         }
         do_action('retainful_plugin_activated');
+        return true;
+    }
+}
+/**
+ * Check the woocommerce is active or not
+ * @return bool
+ */
+if (!function_exists('rnocIsWoocommerceActive')) {
+    function rnocIsWoocommerceActive()
+    {
+        $active_plugins = apply_filters('active_plugins', get_option('active_plugins', array()));
+        if (is_multisite()) {
+            $active_plugins = array_merge($active_plugins, get_site_option('active_sitewide_plugins', array()));
+        }
+        return in_array('woocommerce/woocommerce.php', $active_plugins, false) || array_key_exists('woocommerce/woocommerce.php', $active_plugins);
+    }
+}
+/**
+ * Check woocommerce version is compatibility
+ * @return bool
+ */
+if (!function_exists('rnocIsWooCompatible')) {
+    function rnocIsWooCompatible()
+    {
+        if (!RNOC_MINIMUM_WC_VERSION) {
+            $is_compatible = true;
+        } else {
+            $is_compatible = defined('WC_VERSION') && version_compare(WC_VERSION, RNOC_MINIMUM_WC_VERSION, '>=');
+        }
+        return $is_compatible;
+    }
+}
+/**
+ * Determines if the WordPress compatible.
+ *
+ * @return bool
+ * @since 1.0.0
+ *
+ */
+if (!function_exists('rnocIsWordPressCompatible')) {
+    function rnocIsWordPressCompatible()
+    {
+        if (!RNOC_MINIMUM_WP_VERSION) {
+            $is_compatible = true;
+        } else {
+            $is_compatible = version_compare(get_bloginfo('version'), RNOC_MINIMUM_WP_VERSION, '>=');
+        }
+        return $is_compatible;
+    }
+}
+/**
+ * Determines if the server environment is compatible with this plugin.
+ *
+ * @return bool
+ * @since 1.0.0
+ *
+ */
+if (!function_exists('rnocIsEnvironmentCompatible')) {
+    function rnocIsEnvironmentCompatible()
+    {
+        return version_compare(PHP_VERSION, RNOC_MINIMUM_PHP_VERSION, '>=');
     }
 }
 if (!function_exists('rnocGetInstalledWoocommerceVersion')) {
