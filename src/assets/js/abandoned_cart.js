@@ -169,6 +169,10 @@
     if (retainful_cart_data.cart_tracking_engine === "js") {
         retainful.initCartTracking();
     }
+    if(retainful_cart_data.cart !== undefined) {
+        let tracking_content = '<div id="' + retainful_cart_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retainful_cart_data.cart) + '</div>';
+        $(tracking_content).appendTo('body');
+    }
     $('input#billing_email,input#billing_last_name,input#billing_first_name,input#billing_postcode,select#billing_country,select#billing_state').on('change', function () {
         /*$('input#billing_email').on('change', function () {*/
         if ($('#billing_email').val() !== "") {

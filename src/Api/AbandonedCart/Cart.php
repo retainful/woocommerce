@@ -800,17 +800,13 @@ class Cart extends RestApi
      */
     function getTrackingCartData()
     {
-        $data = array();
-        $cart_created_at = $this->userCartCreatedAt();
-        if ($this->isValidCartToTrack() && !empty($cart_created_at)) {
-            $cart = $this->getUserCart();
-            self::$settings->logMessage($cart, 'cart');
-            $data = array(
-                'cart_hash' => $this->generateCartHash(),
-                'data' => $this->encryptData($cart)
-            );
-        }
-        return $data;
+        $cart = $this->getUserCart();
+        self::$settings->logMessage($cart, 'cart');
+        $data = array(
+            'cart_hash' => $this->generateCartHash(),
+            'data' => $this->encryptData($cart)
+        );
+        return apply_filters('rnoc_get_tracking_data', $data);
     }
 
     /**
@@ -818,7 +814,11 @@ class Cart extends RestApi
      */
     function renderAbandonedCartTrackingDiv()
     {
-        $data = $this->getTrackingCartData();
+        $data = array();
+        $cart_created_at = $this->userCartCreatedAt();
+        if ($this->isValidCartToTrack() && !empty($cart_created_at)) {
+            $data = $this->getTrackingCartData();
+        }
         echo $this->getCartTrackingDiv($data);
     }
 
@@ -844,7 +844,15 @@ class Cart extends RestApi
     function addToCartFragments($fragments)
     {
         $selector = 'div#' . $this->getTrackingElementId();
-        $data = $this->getTrackingCartData();
+        $data = array();
+        $cart_created_at = $this->userCartCreatedAt();
+        if (empty($cart_created_at)) {
+            $this->needToTrackCart();
+            $cart_created_at = $this->userCartCreatedAt();
+        }
+        if ($this->isValidCartToTrack() && !empty($cart_created_at)) {
+            $data = $this->getTrackingCartData();
+        }
         $fragments[$selector] = $this->getCartTrackingDiv($data);
         return $fragments;
     }
