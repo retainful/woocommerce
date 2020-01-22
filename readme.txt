@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.3
 WC tested up to: 3.8.1
 Requires PHP: 5.6
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -354,3 +354,7 @@ No. There is no charges for support.
 
 = 2.1.5 =
 * Improvement: Removing unwanted variables
+
+= 2.1.6 =
+* Improvement: Removing NULL variables
+* Improvement: Code clean up
