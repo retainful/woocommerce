@@ -13,7 +13,7 @@
  * Requires at least: 4.6.1
  * Contributers: Sathyaseelan
  * WC requires at least: 2.5
- * WC tested up to: 3.8.1
+ * WC tested up to: 3.9
  */
 if (!defined('ABSPATH')) exit;
 /**
