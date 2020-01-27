@@ -9,12 +9,6 @@ class RetainfulApi
     public $domain = "https://api.retainful.com/v1/";
     public $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
 
-    function __construct()
-    {
-        $this->domain = apply_filters("rnoc_api_domain_url", $this->domain);
-        $this->abandoned_cart_api_url = apply_filters("rnoc_ac_api_url", $this->abandoned_cart_api_url);
-    }
-
     /**
      * Upgrade premium URL
      * @return string

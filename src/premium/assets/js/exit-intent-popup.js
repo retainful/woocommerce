@@ -78,7 +78,7 @@ function initJqueryRetainfulExitIntentPopupJs() {
             if (checkout_form.is('.processing')) {
                 return false;
             }
-            if (cart_hash !== "" && cart_hash !== undefined) {
+            if (cart_hash !== "" && cart_hash !== undefined && cart_hash !== null) {
                 let number_of_times_showed = (typeof window.rnocp_exit_intent_popup_showed_count !== "undefined") ? window.rnocp_exit_intent_popup_showed_count : 0;
                 let show_popup = true;
                 if (retainful_premium_exit_intent_popup.show_option === "once_per_session") {

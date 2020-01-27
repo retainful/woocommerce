@@ -803,6 +803,7 @@ class Cart extends RestApi
         $cart = $this->getUserCart();
         self::$settings->logMessage($cart, 'cart');
         $data = array(
+            'cart_token' => $this->getCartToken(),
             'cart_hash' => $this->generateCartHash(),
             'data' => $this->encryptData($cart)
         );
@@ -932,7 +933,7 @@ class Cart extends RestApi
     function reCreateCartForGuestUsers($data)
     {
         // set Retainful data in session
-        self::$woocommerce->setSession($this->cart_token_key, $data->cart_token);
+        $this->setCartToken($data->cart_token);
         self::$woocommerce->setSession($this->pending_recovery_key, true);
         $created_at = isset($data->created_at) ? strtotime($data->created_at) : current_time('mysql', true);
         self::$woocommerce->setSession($this->cart_tracking_started_key, $created_at);

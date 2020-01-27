@@ -9,6 +9,7 @@
             this.end_point = end_point;
             this.public_key = public_key;
             this.abandoned_cart_data = null;
+            this.cart_token = null;
             this.cart_hash = null;
             this.cart_tracking_element_id = "retainful-abandoned-cart-data";
             this.async_request = true;
@@ -81,8 +82,26 @@
                 let element_id = this.getCartTrackingElementId();
                 let data = $("#" + element_id).html();
                 let cart_details = JSON.parse(data);
-                this.abandoned_cart_data = cart_details.data;
-                this.cart_hash = cart_details.cart_hash;
+                this.abandoned_cart_data = (cart_details.data !== undefined) ? cart_details.data : null;
+                this.cart_hash = (cart_details.cart_hash !== undefined) ? cart_details.cart_hash : null;
+                this.cart_token = (cart_details.cart_token !== undefined) ? cart_details.cart_token : null;
+                if (this.isLocalStorageSupports() && this.cart_token !== null) {
+                    let old_cart_token_history = localStorage.getItem('retainful_ac_cart_token_history');
+                    let old_cart_token = localStorage.getItem('retainful_ac_cart_token');
+                    let timestamp_in_ms = window.performance && window.performance.now && window.performance.timing && window.performance.timing.navigationStart ? window.performance.now() + window.performance.timing.navigationStart : Date.now();
+                    if (old_cart_token_history === null) {
+                        let cart_token_history = [];
+                        cart_token_history.push({"time": timestamp_in_ms, "token": this.cart_token});
+                        localStorage.setItem('retainful_ac_cart_token_history', JSON.stringify(cart_token_history));
+                    } else {
+                        let cart_token_history = JSON.parse(old_cart_token_history);
+                        if (old_cart_token !== this.cart_token) {
+                            cart_token_history.push({"time": timestamp_in_ms, "token": this.cart_token});
+                        }
+                        localStorage.setItem('retainful_ac_cart_token_history', JSON.stringify(cart_token_history));
+                    }
+                    localStorage.setItem('retainful_ac_cart_token', this.cart_token);
+                }
             }
             return this;
         }
@@ -118,6 +137,22 @@
                 retainful.syncCart();
             });
             return this;
+        }
+
+        /**
+         * Check the browser supports local storage or not
+         * @return {boolean}
+         */
+        isLocalStorageSupports() {
+            try {
+                sessionStorage.setItem('retainful', 'test');
+                sessionStorage.removeItem('retainful');
+                localStorage.setItem('retainful', 'test');
+                localStorage.removeItem('retainful');
+                return true;
+            } catch (err) {
+                return false;
+            }
         }
 
         /**
@@ -169,7 +204,7 @@
     if (retainful_cart_data.cart_tracking_engine === "js") {
         retainful.initCartTracking();
     }
-    if(retainful_cart_data.cart !== undefined) {
+    if (retainful_cart_data.cart !== undefined) {
         let tracking_content = '<div id="' + retainful_cart_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retainful_cart_data.cart) + '</div>';
         $(tracking_content).appendTo('body');
     }
