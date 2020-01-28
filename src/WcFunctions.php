@@ -633,7 +633,7 @@ class WcFunctions
     /**
      * set customer Email
      * @param $value
-     * @return bool
+     * @return bool|mixed
      */
     function setCustomerEmail($value)
     {

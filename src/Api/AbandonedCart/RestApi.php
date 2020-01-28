@@ -170,7 +170,10 @@ class RestApi
      */
     function retrieveCartToken($user_id = null)
     {
-        if (!empty($user_id) || $user_id = get_current_user_id()) {
+        if ($user_id == null) {
+            $user_id = get_current_user_id();
+        }
+        if (!empty($user_id)) {
             return get_user_meta($user_id, $this->cart_token_key_for_db, true);
         } else {
             return self::$woocommerce->getSession($this->cart_token_key);
