@@ -106,7 +106,7 @@ if (!function_exists('rnocPluginActivation')) {
             exit(__('Woocommerce Email Customizer + requires at least Wordpress', RNOC_TEXT_DOMAIN) . ' ' . RNOC_MINIMUM_WC_VERSION);
         }
         if (!rnocIsWoocommerceActive()) {
-            exit(__('Woocommerce must installed and activated in-order to use WooCommerce Email Customizer Plus!', RNOC_TEXT_DOMAIN));
+            exit(__('Woocommerce must be installed and activated in-order to use Retainful!', RNOC_TEXT_DOMAIN));
         }
         if (!rnocIsWooCompatible()) {
             exit(__('Woocommerce Email Customizer + requires at least Woocommerce', RNOC_TEXT_DOMAIN) . ' ' . RNOC_MINIMUM_WC_VERSION);
