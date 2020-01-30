@@ -190,6 +190,13 @@ if (!function_exists('rnocGetInstalledWoocommerceVersion')) {
         return $wc_installed_version;
     }
 }
+
+
+// ensure WooCommerce is active
+if (! rnocIsWoocommerceActive() ) {
+	return;
+}
+
 require __DIR__ . '/vendor/autoload.php';
 
 use Rnoc\Retainful\Main;
