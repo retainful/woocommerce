@@ -1,246 +1,290 @@
-(function ($) {
-    class Retainful {
-        /**
-         * Constructor
-         * @param end_point
-         * @param public_key
-         */
-        constructor(end_point = null, public_key = null) {
-            this.end_point = end_point;
-            this.public_key = public_key;
-            this.abandoned_cart_data = null;
-            this.cart_token = null;
-            this.cart_hash = null;
-            this.cart_tracking_element_id = "retainful-abandoned-cart-data";
-            this.async_request = true;
-            this.previous_cart_hash = null;
-        }
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof jQuery == "undefined") {
+        // alert("jquery undefined");
 
-        /**
-         * Set endpoint for tracking
-         * @param end_point
-         * @returns {Retainful}
-         */
-        setEndPoint(end_point) {
-            this.end_point = end_point;
-            return this;
-        }
-
-        /**
-         * Get endpoint for tracking
-         * @return string
-         */
-        getEndPoint() {
-            return this.end_point
-        }
-
-        /**
-         * Set public key for the api
-         * @param public_key
-         * @returns {Retainful}
-         */
-        setPublicKey(public_key) {
-            this.public_key = public_key;
-            return this;
-        }
-
-        /**
-         * Get public key for tracking
-         * @returns string
-         */
-        getPublicKey() {
-            return this.public_key
-        }
-
-        /**
-         * set cart tracking element ID
-         * @param element_id
-         * @return {Retainful}
-         */
-        setCartTrackingElementId(element_id) {
-            this.cart_tracking_element_id = element_id;
-            return this;
-        }
-
-        /**
-         * cart tracking element ID
-         * @return {string}
-         */
-        getCartTrackingElementId() {
-            return this.cart_tracking_element_id;
-        }
-
-        /**
-         * Set the abandoned cart data
-         * @param cart_data
-         * @return {Retainful}
-         */
-        setAbandonedCartData(cart_data = null) {
-            if (cart_data !== null) {
-                this.abandoned_cart_data = cart_data;
-            } else {
-                let element_id = this.getCartTrackingElementId();
-                let data = $("#" + element_id).html();
-                let cart_details = JSON.parse(data);
-                this.abandoned_cart_data = (cart_details.data !== undefined) ? cart_details.data : null;
-                this.cart_hash = (cart_details.cart_hash !== undefined) ? cart_details.cart_hash : null;
-                this.cart_token = (cart_details.cart_token !== undefined) ? cart_details.cart_token : null;
-                if (this.isLocalStorageSupports() && this.cart_token !== null) {
-                    let old_cart_token_history = localStorage.getItem('retainful_ac_cart_token_history');
-                    let old_cart_token = localStorage.getItem('retainful_ac_cart_token');
-                    let timestamp_in_ms = window.performance && window.performance.now && window.performance.timing && window.performance.timing.navigationStart ? window.performance.now() + window.performance.timing.navigationStart : Date.now();
-                    if (old_cart_token_history === null) {
-                        let cart_token_history = [];
-                        cart_token_history.push({"time": timestamp_in_ms, "token": this.cart_token});
-                        localStorage.setItem('retainful_ac_cart_token_history', JSON.stringify(cart_token_history));
-                    } else {
-                        let cart_token_history = JSON.parse(old_cart_token_history);
-                        if (old_cart_token !== this.cart_token) {
-                            cart_token_history.push({"time": timestamp_in_ms, "token": this.cart_token});
-                        }
-                        localStorage.setItem('retainful_ac_cart_token_history', JSON.stringify(cart_token_history));
-                    }
-                    localStorage.setItem('retainful_ac_cart_token', this.cart_token);
+        function getScript(url, success) {
+            let script = document.createElement('script');
+            script.src = url;
+            let head = document.getElementsByTagName('head')[0],
+                done = false;
+            // Attach handlers for all browsers
+            script.onload = script.onreadystatechange = function () {
+                if (!done && (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete')) {
+                    done = true;
+                    // callback function provided as param
+                    success();
+                    script.onload = script.onreadystatechange = null;
+                    head.removeChild(script);
                 }
-            }
-            return this;
-        }
-
-        /**
-         * get abandoned cart data
-         * @return {null}
-         */
-        getAbandonedCartData() {
-            this.setAbandonedCartData();
-            return this.abandoned_cart_data;
-        }
-
-        /**
-         * get abandoned cart hash data
-         * @return {null}
-         */
-        getCartHash() {
-            return this.cart_hash;
-        }
-
-        /**
-         * Init cart tracking the hooks
-         * @return {Retainful}
-         */
-        initCartTracking() {
-            let retainful = this;
-            $(document.body).on("added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout", function () {
-                retainful.syncCart();
-            }).on("wc_fragments_refreshed", function () {
-                retainful.syncCart();
-            }).on("wc_fragments_loaded", function () {
-                retainful.syncCart();
-            });
-            return this;
-        }
-
-        /**
-         * Check the browser supports local storage or not
-         * @return {boolean}
-         */
-        isLocalStorageSupports() {
-            try {
-                sessionStorage.setItem('retainful', 'test');
-                sessionStorage.removeItem('retainful');
-                localStorage.setItem('retainful', 'test');
-                localStorage.removeItem('retainful');
-                return true;
-            } catch (err) {
-                return false;
-            }
-        }
-
-        /**
-         * sync cart to api
-         */
-        syncCart(cart_data = null, force_sync = false) {
-            if (cart_data === null) {
-                cart_data = this.getAbandonedCartData();
-            }
-            let cart_hash = this.getCartHash();
-            if ((cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) || (force_sync)) {
-                this.previous_cart_hash = cart_hash;
-                let headers = {"app_id": this.getPublicKey(), "Content-Type": "application/json"};
-                let body = {"data": cart_data};
-                this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
-            }
-        }
-
-        /**
-         * request api
-         * @param url
-         * @param body
-         * @param headers
-         * @param data_type
-         * @param method
-         * @param async
-         */
-        request(url, body = {}, headers = {}, data_type = "json", method = "POST", async = false) {
-            let msg = null;
-            $.ajax({
-                url: url,
-                headers: headers,
-                method: method,
-                dataType: data_type,
-                data: body,
-                async: async,
-                success: function (response) {
-                    msg = response;
-                },
-                error: function (response) {
-                    msg = response;
-                }
-            });
-            return msg;
-        }
-    }
-
-    let retainful = new Retainful(retainful_cart_data.api_url, retainful_cart_data.public_key).setCartTrackingElementId(retainful_cart_data.tracking_element_selector);
-    if (retainful_cart_data.cart_tracking_engine === "js") {
-        retainful.initCartTracking();
-    }
-    if (retainful_cart_data.cart !== undefined) {
-        let tracking_content = '<div id="' + retainful_cart_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retainful_cart_data.cart) + '</div>';
-        $(tracking_content).appendTo('body');
-    }
-    $('input#billing_email,input#billing_last_name,input#billing_first_name,input#billing_postcode,select#billing_country,select#billing_state').on('change', function () {
-        /*$('input#billing_email').on('change', function () {*/
-        if ($('#billing_email').val() !== "") {
-            var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
-            var guest_data = {
-                billing_first_name: $('#billing_first_name').val(),
-                billing_last_name: $('#billing_last_name').val(),
-                billing_company: $('#billing_company').val(),
-                billing_address_1: $('#billing_address_1').val(),
-                billing_address_2: $('#billing_address_2').val(),
-                billing_city: $('#billing_city').val(),
-                billing_state: $('#billing_state').val(),
-                billing_postcode: $('#billing_postcode').val(),
-                billing_country: $('#billing_country').val(),
-                billing_phone: $('#billing_phone').val(),
-                billing_email: $('#billing_email').val(),
-                ship_to_billing: ship_to_bill,
-                order_notes: $('#order_comments').val(),
-                shipping_first_name: $('#shipping_first_name').val(),
-                shipping_last_name: $('#shipping_last_name').val(),
-                shipping_company: $('#shipping_company').val(),
-                shipping_address_1: $('#shipping_address_1').val(),
-                shipping_address_2: $('#shipping_address_2').val(),
-                shipping_city: $('#shipping_city').val(),
-                shipping_state: $('#shipping_state').val(),
-                shipping_postcode: $('#shipping_postcode').val(),
-                shipping_country: $('#shipping_country').val(),
-                action: 'rnoc_track_user_data'
             };
-            let response = retainful.request(retainful_cart_data.ajax_url, guest_data, {}, "json", "POST", false);
-            if (response.success && response.data) {
-                retainful.syncCart(response.data, true);
+            head.appendChild(script);
+        }
+
+        let jquery_url = "https://code.jquery.com/jquery-3.2.1.min.js";
+        if (retainful_cart_data.jquery_url !== undefined) {
+            jquery_url = retainful_cart_data.jquery_url;
+        }
+        getScript(jquery_url, function () {
+            if (typeof jQuery == "undefined") {
+                console.log("retainful unable to include jQuery");
+            } else {
+                jQuery.noConflict();
+                initJqueryRetainfulAbandonedCartsTracking();
+            }
+        });
+
+    } else {
+        // alert('defined');
+        initJqueryRetainfulAbandonedCartsTracking();
+    }
+});
+
+function initJqueryRetainfulAbandonedCartsTracking() {
+    jQuery(function ($) {
+        class Retainful {
+            /**
+             * Constructor
+             * @param end_point
+             * @param public_key
+             */
+            constructor(end_point = null, public_key = null) {
+                this.end_point = end_point;
+                this.public_key = public_key;
+                this.abandoned_cart_data = null;
+                this.cart_token = null;
+                this.cart_hash = null;
+                this.cart_tracking_element_id = "retainful-abandoned-cart-data";
+                this.async_request = true;
+                this.previous_cart_hash = null;
+            }
+
+            /**
+             * Set endpoint for tracking
+             * @param end_point
+             * @returns {Retainful}
+             */
+            setEndPoint(end_point) {
+                this.end_point = end_point;
+                return this;
+            }
+
+            /**
+             * Get endpoint for tracking
+             * @return string
+             */
+            getEndPoint() {
+                return this.end_point
+            }
+
+            /**
+             * Set public key for the api
+             * @param public_key
+             * @returns {Retainful}
+             */
+            setPublicKey(public_key) {
+                this.public_key = public_key;
+                return this;
+            }
+
+            /**
+             * Get public key for tracking
+             * @returns string
+             */
+            getPublicKey() {
+                return this.public_key
+            }
+
+            /**
+             * set cart tracking element ID
+             * @param element_id
+             * @return {Retainful}
+             */
+            setCartTrackingElementId(element_id) {
+                this.cart_tracking_element_id = element_id;
+                return this;
+            }
+
+            /**
+             * cart tracking element ID
+             * @return {string}
+             */
+            getCartTrackingElementId() {
+                return this.cart_tracking_element_id;
+            }
+
+            /**
+             * Set the abandoned cart data
+             * @param cart_data
+             * @return {Retainful}
+             */
+            setAbandonedCartData(cart_data = null) {
+                if (cart_data !== null) {
+                    this.abandoned_cart_data = cart_data;
+                } else {
+                    let element_id = this.getCartTrackingElementId();
+                    let data = $("#" + element_id).html();
+                    let cart_details = JSON.parse(data);
+                    this.abandoned_cart_data = (cart_details.data !== undefined) ? cart_details.data : null;
+                    this.cart_hash = (cart_details.cart_hash !== undefined) ? cart_details.cart_hash : null;
+                    this.cart_token = (cart_details.cart_token !== undefined) ? cart_details.cart_token : null;
+                    if (this.isLocalStorageSupports() && this.cart_token !== null) {
+                        let old_cart_token_history = localStorage.getItem('retainful_ac_cart_token_history');
+                        let old_cart_token = localStorage.getItem('retainful_ac_cart_token');
+                        let timestamp_in_ms = window.performance && window.performance.now && window.performance.timing && window.performance.timing.navigationStart ? window.performance.now() + window.performance.timing.navigationStart : Date.now();
+                        if (old_cart_token_history === null) {
+                            let cart_token_history = [];
+                            cart_token_history.push({"time": timestamp_in_ms, "token": this.cart_token});
+                            localStorage.setItem('retainful_ac_cart_token_history', JSON.stringify(cart_token_history));
+                        } else {
+                            let cart_token_history = JSON.parse(old_cart_token_history);
+                            if (old_cart_token !== this.cart_token) {
+                                cart_token_history.push({"time": timestamp_in_ms, "token": this.cart_token});
+                            }
+                            localStorage.setItem('retainful_ac_cart_token_history', JSON.stringify(cart_token_history));
+                        }
+                        localStorage.setItem('retainful_ac_cart_token', this.cart_token);
+                    }
+                }
+                return this;
+            }
+
+            /**
+             * get abandoned cart data
+             * @return {null}
+             */
+            getAbandonedCartData() {
+                this.setAbandonedCartData();
+                return this.abandoned_cart_data;
+            }
+
+            /**
+             * get abandoned cart hash data
+             * @return {null}
+             */
+            getCartHash() {
+                return this.cart_hash;
+            }
+
+            /**
+             * Init cart tracking the hooks
+             * @return {Retainful}
+             */
+            initCartTracking() {
+                let retainful = this;
+                $(document.body).on("added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout", function () {
+                    alert();
+                    retainful.syncCart();
+                }).on("wc_fragments_refreshed", function () {
+                    retainful.syncCart();
+                }).on("wc_fragments_loaded", function () {
+                    retainful.syncCart();
+                });
+                return this;
+            }
+
+            /**
+             * Check the browser supports local storage or not
+             * @return {boolean}
+             */
+            isLocalStorageSupports() {
+                try {
+                    sessionStorage.setItem('retainful', 'test');
+                    sessionStorage.removeItem('retainful');
+                    localStorage.setItem('retainful', 'test');
+                    localStorage.removeItem('retainful');
+                    return true;
+                } catch (err) {
+                    return false;
+                }
+            }
+
+            /**
+             * sync cart to api
+             */
+            syncCart(cart_data = null, force_sync = false) {
+                if (cart_data === null) {
+                    cart_data = this.getAbandonedCartData();
+                }
+                let cart_hash = this.getCartHash();
+                if ((cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) || (force_sync)) {
+                    this.previous_cart_hash = cart_hash;
+                    let headers = {"app_id": this.getPublicKey(), "Content-Type": "application/json"};
+                    let body = {"data": cart_data};
+                    this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
+                }
+            }
+
+            /**
+             * request api
+             * @param url
+             * @param body
+             * @param headers
+             * @param data_type
+             * @param method
+             * @param async
+             */
+            request(url, body = {}, headers = {}, data_type = "json", method = "POST", async = false) {
+                let msg = null;
+                $.ajax({
+                    url: url,
+                    headers: headers,
+                    method: method,
+                    dataType: data_type,
+                    data: body,
+                    async: async,
+                    success: function (response) {
+                        msg = response;
+                    },
+                    error: function (response) {
+                        msg = response;
+                    }
+                });
+                return msg;
             }
         }
+
+        let retainful = new Retainful(retainful_cart_data.api_url, retainful_cart_data.public_key).setCartTrackingElementId(retainful_cart_data.tracking_element_selector);
+        if (retainful_cart_data.cart_tracking_engine === "js") {
+            retainful.initCartTracking();
+        }
+        if (retainful_cart_data.cart !== undefined) {
+            let tracking_content = '<div id="' + retainful_cart_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retainful_cart_data.cart) + '</div>';
+            $(tracking_content).appendTo('body');
+        }
+        $('input#billing_email,input#billing_last_name,input#billing_first_name,input#billing_postcode,select#billing_country,select#billing_state').on('change', function () {
+            /*$('input#billing_email').on('change', function () {*/
+            if ($('#billing_email').val() !== "") {
+                var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
+                var guest_data = {
+                    billing_first_name: $('#billing_first_name').val(),
+                    billing_last_name: $('#billing_last_name').val(),
+                    billing_company: $('#billing_company').val(),
+                    billing_address_1: $('#billing_address_1').val(),
+                    billing_address_2: $('#billing_address_2').val(),
+                    billing_city: $('#billing_city').val(),
+                    billing_state: $('#billing_state').val(),
+                    billing_postcode: $('#billing_postcode').val(),
+                    billing_country: $('#billing_country').val(),
+                    billing_phone: $('#billing_phone').val(),
+                    billing_email: $('#billing_email').val(),
+                    ship_to_billing: ship_to_bill,
+                    order_notes: $('#order_comments').val(),
+                    shipping_first_name: $('#shipping_first_name').val(),
+                    shipping_last_name: $('#shipping_last_name').val(),
+                    shipping_company: $('#shipping_company').val(),
+                    shipping_address_1: $('#shipping_address_1').val(),
+                    shipping_address_2: $('#shipping_address_2').val(),
+                    shipping_city: $('#shipping_city').val(),
+                    shipping_state: $('#shipping_state').val(),
+                    shipping_postcode: $('#shipping_postcode').val(),
+                    shipping_country: $('#shipping_country').val(),
+                    action: 'rnoc_track_user_data'
+                };
+                let response = retainful.request(retainful_cart_data.ajax_url, guest_data, {}, "json", "POST", false);
+                if (response.success && response.data) {
+                    retainful.syncCart(response.data, true);
+                }
+            }
+        });
     });
-})(jQuery);
+}

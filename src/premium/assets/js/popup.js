@@ -156,6 +156,9 @@ function initJqueryRetainfulPopupJs() {
                         return false;
                     }
                     let popup_closed_by = sessionStorage.getItem("retainful_add_to_cart_popup_closed_by");
+                    if (popup_closed_by === "1") {
+                        return false;
+                    }
                     if (popup_closed_by === null) {
                         return true;
                     }
