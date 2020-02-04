@@ -211,9 +211,24 @@ class Order extends RestApi
             'woocommerce_totals' => $this->getOrderTotals($order, $excluding_tax),
             'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
-            'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL
+            'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
+            'next_order_coupon' => $this->getNextOrderCouponDetails($order)
         );
         return $order_data;
+    }
+
+    function getNextOrderCouponDetails($order)
+    {
+        return array(
+            'order_id' => self::$woocommerce->getOrderId($order),
+            'email' => self::$woocommerce->getOrderEmail($order),
+            'firstname' => self::$woocommerce->getOrderFirstName($order),
+            'lastname' => self::$woocommerce->getOrderLastName($order),
+            'total' => self::$woocommerce->getOrderTotal($order),
+            'new_coupon' => self::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon'),
+            'applied_coupon' => self::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon_applied'),
+            'order_date' => strtotime(self::$woocommerce->getOrderDate($order))
+        );
     }
 
     /**

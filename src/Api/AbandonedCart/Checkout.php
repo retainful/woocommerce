@@ -33,10 +33,10 @@ class Checkout extends RestApi
             $cart_created_at = $this->userCartCreatedAt();
             $user_ip = $this->retrieveUserIp();
             $is_buyer_accepts_marketing = ($this->isBuyerAcceptsMarketing()) ? 1 : 0;
-            $cart_hash = self::$woocommerce->getSession('rnoc_current_cart_hash');
-            $recovered_at = self::$woocommerce->getSession('rnoc_recovered_at');
-            $recovered_by = self::$woocommerce->getSession('rnoc_recovered_by_retainful');
-            $recovered_cart_token = self::$woocommerce->getSession('rnoc_recovered_cart_token');
+            $cart_hash = $this->getSessionForCustomer('cart_hash', 'rnoc_current_cart_hash');
+            $recovered_at = $this->getSessionForCustomer('recovered_at', 'rnoc_recovered_at');
+            $recovered_by = $this->getSessionForCustomer('recovered_by_retainful', 'rnoc_recovered_by_retainful');
+            $recovered_cart_token = $this->getSessionForCustomer('recovered_cart_token', 'rnoc_recovered_cart_token');
             self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_hash_key_for_db, $cart_hash);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
@@ -274,15 +274,15 @@ class Checkout extends RestApi
      */
     function unsetOrderTempData($user_id = NULL)
     {
-        self::$woocommerce->removeSession($this->cart_token_key);
-        self::$woocommerce->removeSession($this->pending_recovery_key);
-        self::$woocommerce->removeSession($this->cart_tracking_started_key);
-        self::$woocommerce->removeSession($this->previous_cart_hash_key);
-        self::$woocommerce->removeSession($this->user_ip_key);
+        $this->setSessionForCustomer('cart_token', '', $this->cart_token_key);
+        $this->setSessionForCustomer('pending_recovery', '', $this->pending_recovery_key);
+        $this->setSessionForCustomer('cart_created_date', '', $this->cart_tracking_started_key);
+        $this->setSessionForCustomer('previous_cart_hash', '', $this->previous_cart_hash_key);
+        $this->setSessionForCustomer('user_ip', '', $this->user_ip_key);
         //This was set in plugin since 2.0.4
-        self::$woocommerce->removeSession('rnoc_recovered_at');
-        self::$woocommerce->removeSession('rnoc_recovered_by_retainful');
-        self::$woocommerce->removeSession('rnoc_recovered_cart_token');
+        $this->setSessionForCustomer('recovered_at', '', 'rnoc_recovered_at');
+        $this->setSessionForCustomer('recovered_by_retainful', '', 'rnoc_recovered_by_retainful');
+        $this->setSessionForCustomer('recovered_cart_token', '', 'rnoc_recovered_cart_token');
         if ($user_id || ($user_id = get_current_user_id())) {
             $this->removeTempDataForUser($user_id);
         }

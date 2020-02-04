@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
             head.appendChild(script);
         }
 
-        let jquery_url = "https://code.jquery.com/jquery-3.2.1.min.js";
+        let jquery_url = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js";
         if (retainful_cart_data.jquery_url !== undefined) {
             jquery_url = retainful_cart_data.jquery_url;
         }
@@ -172,7 +172,6 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             initCartTracking() {
                 let retainful = this;
                 $(document.body).on("added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout", function () {
-                    alert();
                     retainful.syncCart();
                 }).on("wc_fragments_refreshed", function () {
                     retainful.syncCart();

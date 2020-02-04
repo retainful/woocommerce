@@ -157,10 +157,9 @@ class RestApi
     {
         if ($user_id || ($user_id = get_current_user_id())) {
             return (bool)get_user_meta($user_id, $this->pending_recovery_key_for_db, true);
-        } elseif (self::$woocommerce->getSession($this->pending_recovery_key)) {
-            return (bool)self::$woocommerce->getSession($this->pending_recovery_key);
+        } else {
+            return (bool)$this->getSessionForCustomer('pending_recovery', $this->pending_recovery_key);
         }
-        return false;
     }
 
     /**
@@ -176,7 +175,7 @@ class RestApi
         if (!empty($user_id)) {
             return get_user_meta($user_id, $this->cart_token_key_for_db, true);
         } else {
-            return self::$woocommerce->getSession($this->cart_token_key);
+            return $this->getSessionForCustomer('cart_token', $this->cart_token_key);
         }
     }
 
@@ -262,9 +261,61 @@ class RestApi
         if ($user_id) {
             $ip = get_user_meta($user_id, $this->user_ip_key_for_db);
         } else {
-            $ip = self::$woocommerce->getSession($this->user_ip_key);
+            $ip = $this->getSessionForCustomer('user_ip', $this->user_ip_key);
         }
         return $this->formatUserIP($ip);
+    }
+
+    /**
+     * Set the session values
+     * @param $prop
+     * @param $value
+     * @param $default_session_prop
+     * @return bool|int
+     */
+    function setSessionForCustomer($prop, $value, $default_session_prop)
+    {
+        try {
+            if ($user_id = get_current_user_id()) {
+                $customer = new \Retainful_Customer($user_id, false);
+            } else {
+                $customer = new \Retainful_Customer(0, true);
+            }
+            $function = 'set_' . $prop;
+            if (is_callable(array($customer, $function))) {
+                $customer->{$function}($value);
+                return $customer->save();
+            } else {
+                return self::$woocommerce->setSession($default_session_prop, $value);
+            }
+        } catch (Exception $exception) {
+            return self::$woocommerce->setSession($default_session_prop, $value);
+        }
+    }
+
+    /**
+     * get the session for the customer
+     * @param $prop
+     * @param $default_session_prop
+     * @return array|string|null
+     */
+    function getSessionForCustomer($prop, $default_session_prop)
+    {
+        try {
+            if ($user_id = get_current_user_id()) {
+                $customer = new \Retainful_Customer($user_id, false);
+            } else {
+                $customer = new \Retainful_Customer(0, true);
+            }
+            $function = 'get_' . $prop;
+            if (is_callable(array($customer, $function))) {
+                return $customer->{$function}();
+            } else {
+                return self::$woocommerce->getSession($default_session_prop);
+            }
+        } catch (Exception $exception) {
+            return self::$woocommerce->getSession($default_session_prop);
+        }
     }
 
     /**
@@ -494,9 +545,26 @@ class RestApi
         if ($user_id || $user_id = get_current_user_id()) {
             $cart_created_at = get_user_meta($user_id, $this->cart_tracking_started_key_for_db, true);
         } else {
-            $cart_created_at = self::$woocommerce->getSession($this->cart_tracking_started_key);
+            $cart_created_at = $this->getSessionForCustomer('cart_created_date', $this->cart_tracking_started_key);
         }
         return $cart_created_at;
+    }
+
+    /**
+     * When user start adding to cart
+     * @param null $user_id
+     * @param null $time
+     * @return array|mixed|string|null
+     */
+    function setCartCreatedDate($user_id = NULL, $time = NULL)
+    {
+        if (empty($time)) {
+            $time = current_time('timestamp', true);
+        }
+        if (!empty($user_id) || $user_id = get_current_user_id()) {
+            update_user_meta($user_id, $this->cart_tracking_started_key_for_db, $time);
+        }
+        return $time;
     }
 
     /**
@@ -523,7 +591,7 @@ class RestApi
         if (is_user_logged_in()) {
             return true;
         } else {
-            $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
+            $is_buyer_accepts_marketing = $this->getSessionForCustomer('buyer_accepts_marketing', 'is_buyer_accepting_marketing');//self::$woocommerce->getSession('is_buyer_accepting_marketing');
             if ($is_buyer_accepts_marketing == 1) {
                 return true;
             }

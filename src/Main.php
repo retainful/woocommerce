@@ -24,12 +24,27 @@ class Main
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         $this->abandoned_cart = ($this->abandoned_cart == NULL) ? new AbandonedCart() : $this->abandoned_cart;
         $this->abandoned_cart_api = ($this->abandoned_cart_api == NULL) ? new RestApi() : $this->abandoned_cart_api;
-        //$this->activateEvents();
         add_action('init', array($this, 'activateEvents'));
+        add_action('woocommerce_init', array($this, 'includePluginFiles'));
+        add_filter('woocommerce_data_stores', array($this, 'addDataStores'));
         if (!$this->admin->isPremiumPluginActive()) {
             //init the retainful premium
             new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
         }
+    }
+
+    function includePluginFiles()
+    {
+        require RNOC_PLUGIN_PATH . 'src/includes/retainful-customer.php';
+        require RNOC_PLUGIN_PATH . 'src/includes/retainful-customer-data-store.php';
+    }
+
+    function addDataStores($stores)
+    {
+        if (!isset($stores['customer-retainful-abandoned-carts'])) {
+            $stores['customer-retainful-abandoned-carts'] = 'WC_Customer_Data_Retainful_Store_Session';
+        }
+        return $stores;
     }
 
     /**
@@ -173,9 +188,10 @@ class Main
                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
+                add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
+                add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
                 //Sync the order by the scheduled events
                 add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
-                add_action('woocommerce_init', array($cart, 'initWoocommerceSession'));
                 add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
                 add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
                 add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
