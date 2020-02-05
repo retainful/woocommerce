@@ -3,9 +3,9 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
 Requires at least: 4.0
 Tested up to: 5.3
-WC tested up to: 3.8.1
+WC tested up to: 3.9
 Requires PHP: 5.6
-Stable tag: 2.1.2
+Stable tag: 2.1.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,7 +47,7 @@ With Retainful Premium plans, you can also [capture the customer's email when th
 2. [Sign up for a free account](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) and get your API Keys
 3. Connect to Retainful
 
-[Get Retainful](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) | [Demo](https://demo.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=demo) | [Documentation](https://www.retainful.com/docs?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
+[Get Retainful](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) | [Documentation](https://www.retainful.com/docs?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
 
 Retainful can do more than recovering your lost sales. It can drive repeat purchases in your store. Say hello to [Next Order Coupons for WooCommerce](https://www.retainful.com/blog/how-to-provide-next-order-coupon-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=next-order-coupon)
 
@@ -345,3 +345,19 @@ No. There is no charges for support.
 * Fix: Zero value cart tracking options added
 * Fix: coupon search and choosing option improved
 * Improvement: next order coupon creation restriction added
+
+= 2.1.3 =
+* Fix: Variable products can not recovered properly when clicking cart recovery URL
+
+= 2.1.4 =
+* Improvement: Saving session data improved
+
+= 2.1.5 =
+* Improvement: Removing unwanted variables
+
+= 2.1.6 =
+* Improvement: Removing NULL variables
+* Improvement: Code clean up
+
+= 2.1.7 =
+* Fix: Fatal error on de-activating WooCommerce

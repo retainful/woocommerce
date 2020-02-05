@@ -48,7 +48,22 @@ class RestApi
      */
     function setSessionShippingDetails($shipping_address)
     {
-        self::$woocommerce->setPHPSession('rnoc_shipping_address', $shipping_address);
+        if (!empty($shipping_address)) {
+            foreach ($shipping_address as $key => $value) {
+                $method = 'set_' . $key;
+                if (is_callable(array(WC()->customer, $method))) {
+                    WC()->customer->$method($value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove the session shipping details
+     */
+    function removeSessionShippingDetails()
+    {
+        self::$woocommerce->removeSession('rnoc_shipping_address');
     }
 
     /**
@@ -69,12 +84,68 @@ class RestApi
     }
 
     /**
-     * Set the session billing details
+     * Set the customer billing details
      * @param $billing_address
      */
-    function setSessionBillingDetails($billing_address)
+    function setCustomerBillingDetails($billing_address)
     {
-        self::$woocommerce->setPHPSession('rnoc_billing_address', $billing_address);
+        if (!empty($billing_address)) {
+            foreach ($billing_address as $key => $value) {
+                $method = 'set_' . $key;
+                if (is_callable(array(WC()->customer, $method))) {
+                    WC()->customer->$method($value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Customer address mapping fields
+     * @return array
+     */
+    function getAddressMapFields()
+    {
+        $fields = array(
+            'first_name',
+            'last_name',
+            'state',
+            'phone',
+            'postcode',
+            'city',
+            'country',
+            'address_1',
+            'address_2',
+            'company'
+        );
+        return apply_filters('rnoc_get_checkout_mapping_fields', $fields);
+    }
+
+    /**
+     * Get the customer billing details
+     * @param $type
+     * @return array
+     */
+    function getCustomerCheckoutDetails($type = "billing")
+    {
+        $fields = $this->getAddressMapFields();
+        $checkout_field_values = array();
+        if (!empty($fields)) {
+            foreach ($fields as $key) {
+                $method = 'get_' . $type . '_' . $key;
+                if (is_callable(array(WC()->customer, $method))) {
+                    $checkout_field_values[$type . '_' . $key] = WC()->customer->$method();
+                }
+            }
+        }
+        return $checkout_field_values;
+    }
+
+    /**
+     * Remove the session billing details
+     */
+    function removeSessionBillingDetails()
+    {
+        self::$woocommerce->removeSession('rnoc_billing_address');
     }
 
     /**
@@ -86,10 +157,9 @@ class RestApi
     {
         if ($user_id || ($user_id = get_current_user_id())) {
             return (bool)get_user_meta($user_id, $this->pending_recovery_key_for_db, true);
-        } elseif (self::$woocommerce->getPHPSession($this->pending_recovery_key)) {
-            return (bool)self::$woocommerce->getPHPSession($this->pending_recovery_key);
+        } else {
+            return (bool)$this->getSessionForCustomer('pending_recovery', $this->pending_recovery_key);
         }
-        return false;
     }
 
     /**
@@ -99,10 +169,13 @@ class RestApi
      */
     function retrieveCartToken($user_id = null)
     {
-        if (!empty($user_id) || $user_id = get_current_user_id()) {
+        if ($user_id == null) {
+            $user_id = get_current_user_id();
+        }
+        if (!empty($user_id)) {
             return get_user_meta($user_id, $this->cart_token_key_for_db, true);
         } else {
-            return self::$woocommerce->getPHPSession($this->cart_token_key);
+            return $this->getSessionForCustomer('cart_token', $this->cart_token_key);
         }
     }
 
@@ -188,9 +261,61 @@ class RestApi
         if ($user_id) {
             $ip = get_user_meta($user_id, $this->user_ip_key_for_db);
         } else {
-            $ip = self::$woocommerce->getPHPSession($this->user_ip_key);
+            $ip = $this->getSessionForCustomer('user_ip', $this->user_ip_key);
         }
         return $this->formatUserIP($ip);
+    }
+
+    /**
+     * Set the session values
+     * @param $prop
+     * @param $value
+     * @param $default_session_prop
+     * @return bool|int
+     */
+    function setSessionForCustomer($prop, $value, $default_session_prop)
+    {
+        try {
+            if ($user_id = get_current_user_id()) {
+                $customer = new \Retainful_Customer($user_id, false);
+            } else {
+                $customer = new \Retainful_Customer(0, true);
+            }
+            $function = 'set_' . $prop;
+            if (is_callable(array($customer, $function))) {
+                $customer->{$function}($value);
+                return $customer->save();
+            } else {
+                return self::$woocommerce->setSession($default_session_prop, $value);
+            }
+        } catch (Exception $exception) {
+            return self::$woocommerce->setSession($default_session_prop, $value);
+        }
+    }
+
+    /**
+     * get the session for the customer
+     * @param $prop
+     * @param $default_session_prop
+     * @return array|string|null
+     */
+    function getSessionForCustomer($prop, $default_session_prop)
+    {
+        try {
+            if ($user_id = get_current_user_id()) {
+                $customer = new \Retainful_Customer($user_id, false);
+            } else {
+                $customer = new \Retainful_Customer(0, true);
+            }
+            $function = 'get_' . $prop;
+            if (is_callable(array($customer, $function))) {
+                return $customer->{$function}();
+            } else {
+                return self::$woocommerce->getSession($default_session_prop);
+            }
+        } catch (Exception $exception) {
+            return self::$woocommerce->getSession($default_session_prop);
+        }
     }
 
     /**
@@ -359,13 +484,13 @@ class RestApi
      * Encrypt the cart
      * @param $data
      * @param $secret
-     * @return array
+     * @return string
      */
     function encryptData($data, $secret = NULL)
     {
         if (extension_loaded('openssl')) {
             if (is_array($data) || is_object($data)) {
-                $data = json_encode($data);
+                $data = wp_json_encode($data);
             }
             try {
                 if (empty($secret)) {
@@ -375,9 +500,7 @@ class RestApi
                 $iv = openssl_random_pseudo_bytes($iv_len);
                 $cipher_text_raw = openssl_encrypt($data, self::CIPHER_METHOD, $secret, OPENSSL_RAW_DATA, $iv);
                 $hmac = hash_hmac(self::HMAC_ALGORITHM, $cipher_text_raw, $secret, true);
-                $encrypt = base64_encode(bin2hex($iv) . ':retainful:' . bin2hex($hmac) . ':retainful:' . bin2hex($cipher_text_raw));
-                #$this->decryptCart($encrypt);
-                return $encrypt;
+                return base64_encode(bin2hex($iv) . ':retainful:' . bin2hex($hmac) . ':retainful:' . bin2hex($cipher_text_raw));
             } catch (Exception $e) {
                 return NULL;
             }
@@ -422,9 +545,26 @@ class RestApi
         if ($user_id || $user_id = get_current_user_id()) {
             $cart_created_at = get_user_meta($user_id, $this->cart_tracking_started_key_for_db, true);
         } else {
-            $cart_created_at = self::$woocommerce->getPHPSession($this->cart_tracking_started_key);
+            $cart_created_at = $this->getSessionForCustomer('cart_created_date', $this->cart_tracking_started_key);
         }
         return $cart_created_at;
+    }
+
+    /**
+     * When user start adding to cart
+     * @param null $user_id
+     * @param null $time
+     * @return array|mixed|string|null
+     */
+    function setCartCreatedDate($user_id = NULL, $time = NULL)
+    {
+        if (empty($time)) {
+            $time = current_time('timestamp', true);
+        }
+        if (!empty($user_id) || $user_id = get_current_user_id()) {
+            update_user_meta($user_id, $this->cart_tracking_started_key_for_db, $time);
+        }
+        return $time;
     }
 
     /**
@@ -451,7 +591,7 @@ class RestApi
         if (is_user_logged_in()) {
             return true;
         } else {
-            $is_buyer_accepts_marketing = self::$woocommerce->getPHPSession('is_buyer_accepting_marketing');
+            $is_buyer_accepts_marketing = $this->getSessionForCustomer('buyer_accepts_marketing', 'is_buyer_accepting_marketing');//self::$woocommerce->getSession('is_buyer_accepting_marketing');
             if ($is_buyer_accepts_marketing == 1) {
                 return true;
             }

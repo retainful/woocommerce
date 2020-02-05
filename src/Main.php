@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful;
-
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Settings;
@@ -25,12 +24,29 @@ class Main
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         $this->abandoned_cart = ($this->abandoned_cart == NULL) ? new AbandonedCart() : $this->abandoned_cart;
         $this->abandoned_cart_api = ($this->abandoned_cart_api == NULL) ? new RestApi() : $this->abandoned_cart_api;
-        //$this->activateEvents();
         add_action('init', array($this, 'activateEvents'));
+        add_action('woocommerce_init', array($this, 'includePluginFiles'));
+        add_filter('woocommerce_data_stores', array($this, 'addDataStores'));
         if (!$this->admin->isPremiumPluginActive()) {
             //init the retainful premium
             new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
         }
+    }
+
+    function includePluginFiles()
+    {
+        $woocommerce_functions = new WcFunctions();
+        $woocommerce_functions->initWoocommerceSession();
+        require RNOC_PLUGIN_PATH . 'src/includes/retainful-customer.php';
+        require RNOC_PLUGIN_PATH . 'src/includes/retainful-customer-data-store.php';
+    }
+
+    function addDataStores($stores)
+    {
+        if (!isset($stores['customer-retainful-abandoned-carts'])) {
+            $stores['customer-retainful-abandoned-carts'] = 'WC_Customer_Data_Retainful_Store_Session';
+        }
+        return $stores;
     }
 
     /**
@@ -174,13 +190,16 @@ class Main
                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
+                add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
+                add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
+                //Sync the order by the scheduled events
+                add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
                 add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
                 add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
                 add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
                 //add_action('wp_login', array($cart, 'userLoggedIn'));
                 add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
                 add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
-                add_filter('woocommerce_checkout_fields', array($checkout, 'setCheckoutFieldsDefaultValues'));
                 //Add tracking message
                 if (is_user_logged_in()) {
                     add_action('woocommerce_after_add_to_cart_button', array($cart, 'userGdprMessage'), 10);

@@ -91,7 +91,7 @@ function initJqueryRetainfulPopupJs() {
                 thisButton.addClass('rnoc-popup-opener');
                 let modal = this.getAddToCartPopupWindow();
                 modal.css('display', 'block');
-                localStorage.setItem('retainful_add_to_cart_opened', 'yes');
+                sessionStorage.setItem('retainful_add_to_cart_opened', 'yes');
                 $(document).trigger('retainful_showed_add_to_cart_popup', [modal, thisButton]);
             }
 
@@ -100,16 +100,13 @@ function initJqueryRetainfulPopupJs() {
              */
             closePopup(event = "1") {
                 if (this.isLocalStorageSupports()) {
-                    localStorage.setItem('retainful_add_to_cart_popup_closed_by', event);
+                    sessionStorage.setItem('retainful_add_to_cart_popup_closed_by', event);
                     let modal = this.getAddToCartPopupWindow();
                     //Trigger event about hiding popup
                     $(document).trigger('retainful_closing_add_to_cart_popup', [modal]);
                     let popup_btn = $('.rnoc-popup-opener');
                     if (event !== "3") {
-                        if (event === "2") {
-                            localStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
-                        }
-                        //Allow only when no thanks button clicked
+                        sessionStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
                         popup_btn.click();
                     }
                     popup_btn.removeClass('rnoc-popup-opener');
@@ -154,11 +151,14 @@ function initJqueryRetainfulPopupJs() {
                 let options = this.getOptions();
                 //Popup will not shown to non local storage supported browsers
                 if (this.isLocalStorageSupports() && this.isPopupEnabled()) {
-                    if (localStorage.getItem('retainful_add_to_cart_popup_temporary_silent') === "1") {
-                        localStorage.removeItem('retainful_add_to_cart_popup_temporary_silent');
+                    if (sessionStorage.getItem('retainful_add_to_cart_popup_temporary_silent') === "1") {
+                        sessionStorage.removeItem('retainful_add_to_cart_popup_temporary_silent');
                         return false;
                     }
-                    let popup_closed_by = localStorage.getItem("retainful_add_to_cart_popup_closed_by");
+                    let popup_closed_by = sessionStorage.getItem("retainful_add_to_cart_popup_closed_by");
+                    if (popup_closed_by === "1") {
+                        return false;
+                    }
                     if (popup_closed_by === null) {
                         return true;
                     }
@@ -170,10 +170,6 @@ function initJqueryRetainfulPopupJs() {
                             break;
                         case "2":/*Until No thanks button clicked */
                             return_val = (popup_closed_by !== "2");
-                            //All adding item to cart when no thanks button is clicked
-                            if (options.no_thanks_action === "1") {
-                                return_val = false;
-                            }
                             break;
                         case "3":/*Until close button clicked */
                             return_val = (popup_closed_by !== "3");
@@ -182,61 +178,6 @@ function initJqueryRetainfulPopupJs() {
                     return return_val;
                 }
                 return false;
-            }
-
-            /**
-             * validate and sync the email
-             * @param email
-             * @param marketing_data
-             * @param submit_button
-             * @param event
-             * @param error_container
-             * @return {{error: boolean}}
-             */
-            syncEmail(email, marketing_data, submit_button, event, error_container) {
-                event.preventDefault();
-                error_container.hide();
-                let options = this.getOptions();
-                if (options.is_email_mandatory !== "yes") {
-                    this.closePopup("1");
-                    return {"error": false}
-                }
-                if (options.is_email_mandatory === "yes" && email === "") {
-                    error_container.show();
-                    return {"error": true}
-                }
-                if (options.is_email_mandatory === "yes" && !this.isEmail(email)) {
-                    error_container.show();
-                    return {"error": true}
-                }
-                if (options.is_email_mandatory === "yes" && this.isEmail(email)) {
-                    submit_button.addClass('loading');
-                    submit_button.attr('disabled', true);
-                    let popup_data = {
-                        email: email,
-                        is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
-                        action: 'set_rnoc_guest_session'
-                    };
-                    let response = this.request(rnoc_ajax_url, popup_data);
-                    if (!response.error) {
-                        if (response.message !== '') {
-                            //return {"error": true}
-                        }
-                        //instant popup support
-                        if (response.show_coupon_instant_popup) {
-                            sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
-                            sessionStorage.setItem("rnoc_instant_coupon_popup_html", response.coupon_instant_popup_content);
-                        }
-                        this.closePopup("1");
-                    } else {
-                        if (response.message !== '') {
-                            //return err
-                        }
-                    }
-                    submit_button.removeClass('loading');
-                    submit_button.attr('disabled', false);
-                    return {"error": false};
-                }
             }
 
             /**
@@ -265,6 +206,58 @@ function initJqueryRetainfulPopupJs() {
                     }
                 });
                 return msg;
+            }
+
+            /**
+             * validate and sync the email
+             * @param email
+             * @param marketing_data
+             * @param submit_button
+             * @param event
+             * @param error_container
+             * @return {{error: boolean}}
+             */
+            syncEmail(email, marketing_data, submit_button, event, error_container) {
+                event.preventDefault();
+                error_container.hide();
+                let options = this.getOptions();
+                if (options.is_email_mandatory === "yes" && email === "") {
+                    error_container.show();
+                    return {"error": true}
+                }
+                if (!this.isEmail(email)) {
+                    error_container.show();
+                    return {"error": true}
+                } else {
+                    submit_button.addClass('loading');
+                    submit_button.attr('disabled', true);
+                    let popup_data = {
+                        local_storage: true,
+                        email: email,
+                        is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
+                        action: 'set_rnoc_guest_session'
+                    };
+                    let response = this.request(rnoc_ajax_url, popup_data);
+                    if (!response.error) {
+                        if (response.message !== '') {
+                            //return {"error": true}
+                        }
+                        //instant popup support
+                        if (response.show_coupon_instant_popup) {
+                            sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
+                            sessionStorage.setItem("rnoc_instant_coupon_popup_html", response.coupon_instant_popup_content);
+                        }
+                        sessionStorage.setItem('rnocp_is_add_to_cart_popup_email_entered', '1');
+                        this.closePopup("1");
+                    } else {
+                        if (response.message !== '') {
+                            //return err
+                        }
+                    }
+                    submit_button.removeClass('loading');
+                    submit_button.attr('disabled', false);
+                    return {"error": false};
+                }
             }
         }
 
@@ -295,16 +288,6 @@ function initJqueryRetainfulPopupJs() {
         });
         if (typeof retainful_premium_add_to_cart_collection !== "undefined" && typeof retainful_premium_add_to_cart_collection.add_to_cart_button_classes !== 'undefined') {
             var retainful_email_collection_support_class = retainful_premium_add_to_cart_collection.add_to_cart_button_classes;
-            /*$(document).on('retainful_closing_add_to_cart_popup', function () {
-            var button = $('.rnoc-popup-opener');
-            var link = button.attr('href');
-            if (typeof link !== "undefined") {
-                window.location.href = link;
-            } else {
-                button.trigger('click');
-                button.removeClass('rnoc-popup-opener');
-            }
-            });*/
             $(document).on('click', retainful_email_collection_support_class, function (event) {
                 let this_button = $(this);
                 let url = this_button.attr('href');

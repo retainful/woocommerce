@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful;
-
 if (!defined('ABSPATH')) exit;
 
 class WcFunctions
@@ -307,6 +306,20 @@ class WcFunctions
     }
 
     /**
+     * Get Product url
+     * @param $product
+     * @param $item_details
+     * @return String|null
+     */
+    function getProductUrl($product, $item_details = NULL)
+    {
+        if (method_exists($product, 'get_permalink')) {
+            return $product->get_permalink($item_details);
+        }
+        return "";
+    }
+
+    /**
      * Get Item subtotal
      * @param $item
      * @return String|null
@@ -573,18 +586,35 @@ class WcFunctions
     }
 
     /**
+     * Init the woocommerce session when it was not initlized
+     */
+    function initWoocommerceSession()
+    {
+        if (!$this->hasSession()) {
+            $this->setSessionCookie(true);
+        }
+    }
+
+    /**
      * @param $key
      * @param $value
+     * @param $force_woocommerce_session
      * @return bool
      */
-    function setSession($key, $value)
+    function setSession($key, $value, $force_woocommerce_session = false)
     {
         if (empty($key) || empty($value))
             return false;
-        if (method_exists(WC()->session, 'set')) {
-            WC()->session->set($key, $value);
+        $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
+        if ($session_handled_by == "woocommerce" || $force_woocommerce_session) {
+            $this->initWoocommerceSession();
+            if (method_exists(WC()->session, 'set')) {
+                WC()->session->set($key, $value);
+            }
+            return true;
+        } else {
+            return $this->setPHPSession($key, $value);
         }
-        return true;
     }
 
     /**
@@ -598,6 +628,65 @@ class WcFunctions
             WC()->session->set_customer_session_cookie($value);
         }
         return true;
+    }
+
+    /**
+     * set customer Email
+     * @param $value
+     * @return bool|mixed
+     */
+    function setCustomerEmail($value)
+    {
+        if (method_exists(WC()->customer, 'set_billing_email')) {
+            return WC()->customer->set_billing_email($value);
+        }
+        return false;
+    }
+
+    /**
+     * get customer Email
+     * @return bool
+     */
+    function getCustomerBillingEmail()
+    {
+        if (method_exists(WC()->customer, 'get_billing_email')) {
+            return WC()->customer->get_billing_email();
+        }
+        return false;
+    }
+
+    /**
+     * get customer billing Email
+     * @return bool
+     */
+    function getCustomerEmail()
+    {
+        $email = $this->getCustomerBillingEmail();
+        if (empty($email)) {
+            if (method_exists(WC()->customer, 'get_email')) {
+                return WC()->customer->get_email();
+            } else {
+                return false;
+            }
+        } else {
+            return $email;
+        }
+    }
+
+    /**
+     * check woocommerce session has started
+     * @return bool
+     */
+    function hasSession()
+    {
+        if (!isset(\WC()->session) && class_exists('WC_Session_Handler')) {
+            \WC()->session = new \WC_Session_Handler();
+            \WC()->session->init();
+        }
+        if (method_exists(WC()->session, 'has_session')) {
+            return WC()->session->has_session();
+        }
+        return false;
     }
 
     /**
@@ -664,16 +753,22 @@ class WcFunctions
     /**
      * Get data from session
      * @param $key
+     * @param $force_woocommerce_session
      * @return array|string|null
      */
-    function getSession($key)
+    function getSession($key, $force_woocommerce_session = false)
     {
         if (empty($key))
             return NULL;
-        if (method_exists(WC()->session, 'get')) {
-            return WC()->session->get($key);
+        $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
+        if ($session_handled_by == "woocommerce" || $force_woocommerce_session) {
+            if (method_exists(WC()->session, 'get')) {
+                return WC()->session->get($key);
+            }
+            return NULL;
+        } else {
+            return $this->getPHPSession($key);
         }
-        return NULL;
     }
 
     /**
@@ -762,16 +857,22 @@ class WcFunctions
     /**
      * Remove data from session
      * @param $key
+     * @param $force_woocommerce_session
      * @return bool
      */
-    function removeSession($key)
+    function removeSession($key, $force_woocommerce_session)
     {
         if (empty($key))
             return false;
-        if (method_exists(WC()->session, '__unset')) {
-            WC()->session->__unset($key);
+        $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
+        if ($session_handled_by == "woocommerce" || $force_woocommerce_session) {
+            if (method_exists(WC()->session, '__unset')) {
+                WC()->session->__unset($key);
+            }
+            return true;
+        } else {
+            return $this->removePHPSession($key);
         }
-        return true;
     }
 
     /**
@@ -844,6 +945,23 @@ class WcFunctions
         if (method_exists(WC()->cart, 'get_applied_coupons'))
             return WC()->cart->get_applied_coupons();
         return false;
+    }
+
+    /**
+     * get the client session details
+     * @return mixed|void
+     */
+    public function getClientSession()
+    {
+        $session = array(
+            'cart' => $this->getSession('cart', true),
+            'applied_coupons' => $this->getSession('applied_coupons', true),
+            'chosen_shipping_methods' => $this->getSession('chosen_shipping_methods', true),
+            'shipping_method_counts' => $this->getSession('shipping_method_counts', true),
+            'chosen_payment_method' => $this->getSession('chosen_payment_method', true),
+            'previous_shipping_methods' => $this->getSession('previous_shipping_methods', true),
+        );
+        return apply_filters('rnoc_get_client_session', $session);
     }
 
     /**
@@ -1064,6 +1182,19 @@ class WcFunctions
     {
         if (method_exists($item, 'get_title')) {
             return $item->get_title();
+        }
+        return NULL;
+    }
+
+    /**
+     * Get Item name from Item object
+     * @param $item
+     * @return null
+     */
+    function getItemName($item)
+    {
+        if (method_exists($item, 'get_name')) {
+            return $item->get_name();
         }
         return NULL;
     }
@@ -1684,5 +1815,16 @@ class WcFunctions
     function isPriceExcludingTax()
     {
         return ('excl' == get_option('woocommerce_tax_display_cart'));
+    }
+
+    function isValidCoupon($coupon_code)
+    {
+        if (class_exists('WC_Coupon')) {
+            $the_coupon = new \WC_Coupon($coupon_code);
+            if ($the_coupon->is_valid()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

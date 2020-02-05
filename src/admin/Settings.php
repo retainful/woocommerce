@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful\Admin;
-
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
@@ -277,7 +276,7 @@ class Settings
                     'desc' => __('If not enabled, Guest carts will not shown in your Abandoned cart dashboard.', RNOC_TEXT_DOMAIN),
                     'default' => 1
                 ));
-            }else {
+            } else {
                 $general_settings->add_field(array(
                     'name' => __('Cart tracking engine?', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'cart_tracking_engine',
@@ -763,6 +762,31 @@ class Settings
     }
 
     /**
+     * Check any pending hooks already exists
+     * @param $meta_value
+     * @param $hook
+     * @param $meta_key
+     * @return bool|mixed
+     */
+    function hasAnyActiveScheduleExists($hook, $meta_value, $meta_key)
+    {
+        $actions = new \WP_Query(array(
+            'post_title' => $hook,
+            'post_status' => 'pending',
+            'post_type' => 'scheduled-action',
+            'meta_query' => array(
+                array(
+                    'key' => $meta_key,
+                    'value' => $meta_value,
+                    'compare' => '='
+                )
+            ),
+            'posts_per_page' => 1
+        ));
+        return $actions->have_posts();
+    }
+
+    /**
      * un schedule hooks
      */
     function unScheduleHooks()
@@ -790,6 +814,23 @@ class Settings
     }
 
     /**
+     * Add post meta
+     * @param $post_id
+     * @param $args
+     * @return false|int
+     */
+    function addPostMeta($post_id, $args)
+    {
+        if (!empty($args)) {
+            foreach ($args as $meta_key => $meta_value) {
+                add_post_meta($post_id, $meta_key, $meta_value);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Schedule events
      * @param $hook
      * @param $timestamp
@@ -809,7 +850,8 @@ class Settings
                     break;
                 case 'single':
                 default:
-                    \ActionScheduler::factory()->single($hook, $args, $timestamp);
+                    $action_id = \ActionScheduler::factory()->single($hook, $args, $timestamp);
+                    $this->addPostMeta($action_id, $args);
                     break;
             }
         } else {
@@ -824,7 +866,8 @@ class Settings
                 case 'single':
                 default:
                     if (function_exists('as_schedule_single_action')) {
-                        as_schedule_single_action($timestamp, $hook, $args);
+                        $action_id = as_schedule_single_action($timestamp, $hook, $args);
+                        $this->addPostMeta($action_id, $args);
                     }
                     break;
             }

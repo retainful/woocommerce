@@ -2,8 +2,8 @@
 /**
  * Class MAG_CMB2_Field_Post_Search_Ajax
  */
-if (!class_exists('MAG_CMB2_Field_Post_Search_Ajax')) {
-    class MAG_CMB2_Field_Post_Search_Ajax
+if (!class_exists('CMB2_RNOC_Field_Post_Search_Ajax')) {
+    class CMB2_RNOC_Field_Post_Search_Ajax
     {
         /**
          * Current version number
@@ -189,4 +189,4 @@ if (!class_exists('MAG_CMB2_Field_Post_Search_Ajax')) {
         }
     }
 }
-$mag_cmb2_field_post_search_ajax = new MAG_CMB2_Field_Post_Search_Ajax();
+$mag_cmb2_field_post_search_ajax = new CMB2_RNOC_Field_Post_Search_Ajax();

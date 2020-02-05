@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful\library;
-
 if (!defined('ABSPATH')) exit;
 
 class RetainfulApi
@@ -9,6 +8,7 @@ class RetainfulApi
     public $app_url = "https://app.retainful.com/";
     public $domain = "https://api.retainful.com/v1/";
     public $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
+
     /**
      * Upgrade premium URL
      * @return string

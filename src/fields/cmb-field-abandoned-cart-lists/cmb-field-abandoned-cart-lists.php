@@ -33,7 +33,7 @@ class CMB2_Field_Abandoned_Cart_Lists
             $end_date = $start_end_dates[$duration]['end_date'];
         } elseif (isset($_GET['start']) && isset($_GET['end'])) {
             $start_date = $_GET['start'];
-            $end_date = $_GET['start'];
+            $end_date = $_GET['end'];
         } else {
             $start_date = $start_end_dates['last_thirty']['start_date'];
             $end_date = $start_end_dates['last_thirty']['end_date'];

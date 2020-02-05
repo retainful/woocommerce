@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful\Api\AbandonedCart;
-
 class Order extends RestApi
 {
     function __construct()
@@ -25,8 +24,6 @@ class Order extends RestApi
         }
         $user_info = array(
             'id' => $user_id,
-            'note' => NULL,
-            'tags' => '',
             'email' => self::$woocommerce->getBillingEmail($order),
             'phone' => self::$woocommerce->getBillingPhone($order),
             'state' => self::$woocommerce->getBillingState($order),
@@ -34,7 +31,6 @@ class Order extends RestApi
             'last_name' => self::$woocommerce->getBillingFirstName($order),
             'created_at' => $this->formatToIso8601($created_at),
             'first_name' => self::$woocommerce->getBillingLastName($order),
-            'tax_exempt' => false,
             'updated_at' => $this->formatToIso8601($updated_at),
             'total_spent' => 0,
             'orders_count' => 0,
@@ -42,8 +38,6 @@ class Order extends RestApi
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,
-            'multipass_identifier' => NULL,
-            'marketing_opt_in_level' => NULL
         );
         return $user_info;
     }
@@ -110,39 +104,22 @@ class Order extends RestApi
                     $items[] = array(
                         'key' => $item_key,
                         'image_url' => $image_url,
+                        'product_url' => self::$woocommerce->getProductUrl($item),
                         'sku' => self::$woocommerce->getItemSku($item),
-                        'grams' => 0,
                         'price' => self::$woocommerce->getItemPrice($item),
-                        'title' => self::$woocommerce->getItemTitle($item),
+                        'title' => self::$woocommerce->getItemName($item),
                         'vendor' => 'woocommerce',
                         'taxable' => ($line_tax != 0),
                         'user_id' => NULL,
                         'quantity' => $item_quantity,
-                        'gift_card' => false,
                         'tax_lines' => $tax_details,
                         'line_price' => $this->formatDecimalPrice((isset($item_details['line_total']) && !empty($item_details['line_total'])) ? $item_details['line_total'] : 0),
-                        'product_id' => (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0,
+                        'product_id' => $product_id,
                         'properties' => array(),
                         'variant_id' => $variant_id,
                         'variant_price' => $this->formatDecimalPrice(($is_variable_item) ? self::$woocommerce->getItemPrice($item) : 0),
-                        'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemTitle($item) : 0,
-                        'compare_at_price' => NULL,
-                        'country_hs_codes' => array(),
-                        'applied_discounts' => array(),
-                        'requires_shipping' => true,
-                        'origin_location_id' => NULL,
-                        'fulfillment_service' => 'manual',
-                        'country_code_of_origin' => NULL,
-                        'harmonized_system_code' => NULL,
-                        'unit_price_measurement' => array(
-                            'measured_type' => NULL,
-                            'quantity_unit' => NULL,
-                            'quantity_value' => NULL,
-                            'reference_unit' => NULL,
-                            'reference_value' => NULL,
-                        ),
-                        'destination_location_id' => NULL,
-                        'province_code_of_origin' => NULL,
+                        'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
+                        'requires_shipping' => true
                     );
                 }
             }
@@ -201,53 +178,57 @@ class Order extends RestApi
             'ip' => $user_ip,
             'id' => $cart_token,
             'name' => '#' . $cart_token,
-            'note' => NULL,
             'email' => (isset($customer_details['email'])) ? $customer_details['email'] : NULL,
-            'phone' => NULL,
             'token' => $cart_token,
-            'source' => NULL,
-            'gateway' => NULL,
             'user_id' => NULL,
             'currency' => $default_currency_code,
             'customer' => $customer_details,
-            'closed_at' => NULL,
-            'device_id' => NULL,
             'tax_lines' => $this->getOrderTaxDetails(),
             'total_tax' => $this->formatDecimalPrice(self::$woocommerce->getOrderTotalTax($order)),
             'cart_token' => $cart_token,
             'created_at' => $this->formatToIso8601($cart_created_at),
             'line_items' => $this->getOrderLineItemsDetails($order),
-            'source_url' => NULL,
             'updated_at' => $this->formatToIso8601(''),
-            'location_id' => NULL,
             'source_name' => 'web',
             'total_price' => $cart_total,
             'completed_at' => $this->getCompletedAt($order),
-            'landing_site' => '/',
             'total_weight' => 0,
             'discount_codes' => $this->getAppliedDiscounts($order),
-            'referring_site' => '',
             'order_status' => self::$woocommerce->getStatus($order),
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
-            'taxes_included' => false,
+            'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
             'customer_locale' => NULL,
-            'note_attributes' => array(),
             'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getOrderDiscount($order, $excluding_tax)),
             'shipping_address' => $this->getCustomerShippingAddressDetails($order),
             'billing_address' => $this->getCustomerBillingAddressDetails($order),
-            'source_identifier' => NULL,
             'presentment_currency' => $current_currency_code,
             'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
             'total_line_items_price' => $this->formatDecimalPrice($this->getOrderItemsTotal($order)),
             'buyer_accepts_marketing' => ($is_buyer_accepts_marketing == 1),
+            'cancelled_at' => self::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db),
             'woocommerce_totals' => $this->getOrderTotals($order, $excluding_tax),
             'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
-            'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL
+            'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
+            'next_order_coupon' => $this->getNextOrderCouponDetails($order)
         );
         return $order_data;
+    }
+
+    function getNextOrderCouponDetails($order)
+    {
+        return array(
+            'order_id' => self::$woocommerce->getOrderId($order),
+            'email' => self::$woocommerce->getOrderEmail($order),
+            'firstname' => self::$woocommerce->getOrderFirstName($order),
+            'lastname' => self::$woocommerce->getOrderLastName($order),
+            'total' => self::$woocommerce->getOrderTotal($order),
+            'new_coupon' => self::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon'),
+            'applied_coupon' => self::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon_applied'),
+            'order_date' => strtotime(self::$woocommerce->getOrderDate($order))
+        );
     }
 
     /**

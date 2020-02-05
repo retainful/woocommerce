@@ -4,7 +4,8 @@
   "require": {
     "cmb2/cmb2": "^2.5.1",
     "jaybizzle/laravel-crawler-detect": "1.*",
-    "ext-openssl": "*"
+    "ext-openssl": "*",
+    "ext-json": "*"
   },
   "minimum-stability": "stable",
   "autoload": {

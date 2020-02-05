@@ -33,10 +33,10 @@ class Checkout extends RestApi
             $cart_created_at = $this->userCartCreatedAt();
             $user_ip = $this->retrieveUserIp();
             $is_buyer_accepts_marketing = ($this->isBuyerAcceptsMarketing()) ? 1 : 0;
-            $cart_hash = self::$woocommerce->getPHPSession('rnoc_current_cart_hash');
-            $recovered_at = self::$woocommerce->getPHPSession('rnoc_recovered_at');
-            $recovered_by = self::$woocommerce->getPHPSession('rnoc_recovered_by_retainful');
-            $recovered_cart_token = self::$woocommerce->getPHPSession('rnoc_recovered_cart_token');
+            $cart_hash = $this->getSessionForCustomer('cart_hash', 'rnoc_current_cart_hash');
+            $recovered_at = $this->getSessionForCustomer('recovered_at', 'rnoc_recovered_at');
+            $recovered_by = $this->getSessionForCustomer('recovered_by_retainful', 'rnoc_recovered_by_retainful');
+            $recovered_cart_token = $this->getSessionForCustomer('recovered_cart_token', 'rnoc_recovered_cart_token');
             self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_hash_key_for_db, $cart_hash);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
@@ -57,6 +57,20 @@ class Checkout extends RestApi
      * @return void|null
      */
     function orderUpdated($order_id)
+    {
+        if ($this->needInstantOrderSync()) {
+            $this->syncOrder($order_id);
+        } else {
+            $this->scheduleCartSync($order_id);
+        }
+    }
+
+    /**
+     * Sync the order with API
+     * @param $order_id
+     * @return void|null
+     */
+    function syncOrder($order_id)
     {
         if (empty($order_id)) {
             return null;
@@ -82,6 +96,28 @@ class Checkout extends RestApi
         $cart_hash = $this->encryptData($order_data);
         if (!empty($cart_hash)) {
             $this->syncCart($cart_hash);
+        }
+    }
+
+    /**
+     * Sync the order
+     * @param $order_id
+     */
+    function syncOrderByScheduler($order_id)
+    {
+        $this->syncOrder($order_id);
+    }
+
+    /**
+     * schedule the sync of the cart
+     * @param $order_id
+     */
+    function scheduleCartSync($order_id)
+    {
+        $hook = 'retainful_sync_abandoned_cart_order';
+        $meta_key = '_rnoc_order_id';
+        if (self::$settings->hasAnyActiveScheduleExists($hook, $order_id, $meta_key) == false) {
+            self::$settings->scheduleEvents($hook, current_time('timestamp') + 60, array($meta_key => $order_id));
         }
     }
 
@@ -149,19 +185,32 @@ class Checkout extends RestApi
             $cart_token = $this->retrieveCartToken();
             if (!empty($cart_token)) {
                 $order = self::$woocommerce->getOrder($order_id);
-                self::$woocommerce->setPHPSession('rnoc_previously_placed_order_id', $order_id);
                 $this->purchaseComplete($order_id);
-                $order_obj = new Order();
-                $cart = $order_obj->getOrderData($order);
-                self::$settings->logMessage($cart);
-                $cart_hash = $this->encryptData($cart);
-                if (!empty($cart_hash)) {
-                    $this->syncCart($cart_hash);
+                if ($this->needInstantOrderSync()) {
+                    $order_obj = new Order();
+                    $cart = $order_obj->getOrderData($order);
+                    self::$settings->logMessage($cart);
+                    $cart_hash = $this->encryptData($cart);
+                    //Reduce the loading speed
+                    if (!empty($cart_hash)) {
+                        $this->syncCart($cart_hash);
+                    }
+                } else {
+                    $this->scheduleCartSync($order_id);
                 }
                 //$this->unsetOrderTempData();
             }
         } catch (Exception $e) {
         }
+    }
+
+    /**
+     * need the instant sync or not
+     * @return mixed|void
+     */
+    function needInstantOrderSync()
+    {
+        return apply_filters('rnoc_sync_order_data_instantly_to_api', true);
     }
 
     /**
@@ -189,12 +238,16 @@ class Checkout extends RestApi
         if (!$cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db)) {
             return $result;
         }
-        $order_obj = new Order();
-        $cart = $order_obj->getOrderData($order);
-        self::$settings->logMessage($cart);
-        $cart_hash = $this->encryptData($cart);
-        if (!empty($cart_hash)) {
-            $this->syncCart($cart_hash);
+        if ($this->needInstantOrderSync()) {
+            $order_obj = new Order();
+            $cart = $order_obj->getOrderData($order);
+            self::$settings->logMessage($cart);
+            $cart_hash = $this->encryptData($cart);
+            if (!empty($cart_hash)) {
+                $this->syncCart($cart_hash);
+            }
+        } else {
+            $this->scheduleCartSync($order_id);
         }
         //$this->unsetOrderTempData();
         return $result;
@@ -221,16 +274,15 @@ class Checkout extends RestApi
      */
     function unsetOrderTempData($user_id = NULL)
     {
-        self::$woocommerce->removePHPSession($this->cart_token_key);
-        self::$woocommerce->removePHPSession($this->pending_recovery_key);
-        self::$woocommerce->removePHPSession($this->cart_tracking_started_key);
-        self::$woocommerce->removePHPSession($this->previous_cart_hash_key);
-        self::$woocommerce->removePHPSession($this->user_ip_key);
+        $this->setSessionForCustomer('cart_token', '', $this->cart_token_key);
+        $this->setSessionForCustomer('pending_recovery', '', $this->pending_recovery_key);
+        $this->setSessionForCustomer('cart_created_date', '', $this->cart_tracking_started_key);
+        $this->setSessionForCustomer('previous_cart_hash', '', $this->previous_cart_hash_key);
+        $this->setSessionForCustomer('user_ip', '', $this->user_ip_key);
         //This was set in plugin since 2.0.4
-        self::$woocommerce->removePHPSession('rnoc_recovered_at');
-        self::$woocommerce->removePHPSession('rnoc_recovered_by_retainful');
-        self::$woocommerce->removePHPSession('rnoc_recovered_cart_token');
-        self::$woocommerce->removePHPSession('rnoc_previously_placed_order_id');
+        $this->setSessionForCustomer('recovered_at', '', 'rnoc_recovered_at');
+        $this->setSessionForCustomer('recovered_by_retainful', '', 'rnoc_recovered_by_retainful');
+        $this->setSessionForCustomer('recovered_cart_token', '', 'rnoc_recovered_cart_token');
         if ($user_id || ($user_id = get_current_user_id())) {
             $this->removeTempDataForUser($user_id);
         }
@@ -259,34 +311,5 @@ class Checkout extends RestApi
             return;
         }*/
         self::$woocommerce->setOrderMeta($order_id, $this->pending_recovery_key_for_db, true);
-    }
-
-    /**
-     * retrieve data from session and populate fields
-     * @param $fields
-     * @return mixed
-     */
-    function setCheckoutFieldsDefaultValues($fields)
-    {
-        $fields['billing']['billing_email']['default'] = self::$woocommerce->getPHPSession('rnoc_user_billing_email');
-        //Set the billing details for checkout fields
-        $billing_address = self::$woocommerce->getPHPSession('rnoc_billing_address');
-        if (!empty($billing_address) && is_array($billing_address)) {
-            foreach ($billing_address as $billing_key => $billing_value) {
-                if (isset($fields['billing'][$billing_key])) {
-                    $fields['billing'][$billing_key]['default'] = $billing_value;
-                }
-            }
-        }
-        //Set the shipping details for checkout fields
-        $shipping_address = self::$woocommerce->getPHPSession('rnoc_shipping_address');
-        if (!empty($shipping_address) && is_array($shipping_address)) {
-            foreach ($shipping_address as $shipping_key => $shipping_value) {
-                if (isset($fields['shipping'][$shipping_key])) {
-                    $fields['shipping'][$shipping_key]['default'] = $shipping_value;
-                }
-            }
-        }
-        return $fields;
     }
 }
