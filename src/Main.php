@@ -35,6 +35,8 @@ class Main
 
     function includePluginFiles()
     {
+        $woocommerce_functions = new WcFunctions();
+        $woocommerce_functions->initWoocommerceSession();
         require RNOC_PLUGIN_PATH . 'src/includes/retainful-customer.php';
         require RNOC_PLUGIN_PATH . 'src/includes/retainful-customer-data-store.php';
     }

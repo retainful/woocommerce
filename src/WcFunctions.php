@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful;
-
 if (!defined('ABSPATH')) exit;
 
 class WcFunctions
@@ -680,6 +679,10 @@ class WcFunctions
      */
     function hasSession()
     {
+        if (!isset(\WC()->session) && class_exists('WC_Session_Handler')) {
+            \WC()->session = new \WC_Session_Handler();
+            \WC()->session->init();
+        }
         if (method_exists(WC()->session, 'has_session')) {
             return WC()->session->has_session();
         }

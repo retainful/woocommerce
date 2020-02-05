@@ -1165,16 +1165,6 @@ class Cart extends RestApi
     }
 
     /**
-     * Init the woocommerce session when it was not initlized
-     */
-    function initWoocommerceSession()
-    {
-        if (!self::$woocommerce->hasSession()) {
-            self::$woocommerce->setSessionCookie(true);
-        }
-    }
-
-    /**
      * Get the customer details
      * @return array
      */
