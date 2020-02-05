@@ -245,6 +245,9 @@ function initJqueryRetainfulAbandonedCartsTracking() {
         let retainful = new Retainful(retainful_cart_data.api_url, retainful_cart_data.public_key).setCartTrackingElementId(retainful_cart_data.tracking_element_selector);
         if (retainful_cart_data.cart_tracking_engine === "js") {
             retainful.initCartTracking();
+            $(document).ready(function () {
+                retainful.syncCart();
+            });
         }
         if (retainful_cart_data.cart !== undefined) {
             let tracking_content = '<div id="' + retainful_cart_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retainful_cart_data.cart) + '</div>';

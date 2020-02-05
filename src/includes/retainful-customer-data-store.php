@@ -68,6 +68,7 @@ class WC_Customer_Data_Retainful_Store_Session extends WC_Data_Store_WP implemen
      */
     public function read(&$customer)
     {
+        $this->initSession();
         $session = WC()->session;
         if (is_object($session) && $session instanceof WC_Session) {
             $data = (array)WC()->session->get('retainful_customer');
@@ -79,6 +80,18 @@ class WC_Customer_Data_Retainful_Store_Session extends WC_Data_Store_WP implemen
         }
         $this->set_defaults($customer);
         $customer->set_object_read(true);
+    }
+
+    /**
+     * Init the session
+     */
+    function initSession()
+    {
+        if (!isset(\WC()->session) || empty(\WC()->session)) {
+            \WC()->session = new \WC_Session_Handler();
+            \WC()->session->init();
+            \WC()->session->set_customer_session_cookie(true);
+        }
     }
 
     /**

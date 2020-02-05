@@ -599,14 +599,15 @@ class WcFunctions
     /**
      * @param $key
      * @param $value
+     * @param $force_woocommerce_session
      * @return bool
      */
-    function setSession($key, $value)
+    function setSession($key, $value, $force_woocommerce_session = false)
     {
         if (empty($key) || empty($value))
             return false;
         $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
-        if ($session_handled_by == "woocommerce") {
+        if ($session_handled_by == "woocommerce" || $force_woocommerce_session) {
             $this->initWoocommerceSession();
             if (method_exists(WC()->session, 'set')) {
                 WC()->session->set($key, $value);
@@ -749,14 +750,15 @@ class WcFunctions
     /**
      * Get data from session
      * @param $key
+     * @param $force_woocommerce_session
      * @return array|string|null
      */
-    function getSession($key)
+    function getSession($key, $force_woocommerce_session = false)
     {
         if (empty($key))
             return NULL;
         $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
-        if ($session_handled_by == "woocommerce") {
+        if ($session_handled_by == "woocommerce" || $force_woocommerce_session) {
             if (method_exists(WC()->session, 'get')) {
                 return WC()->session->get($key);
             }
@@ -852,14 +854,15 @@ class WcFunctions
     /**
      * Remove data from session
      * @param $key
+     * @param $force_woocommerce_session
      * @return bool
      */
-    function removeSession($key)
+    function removeSession($key, $force_woocommerce_session)
     {
         if (empty($key))
             return false;
         $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
-        if ($session_handled_by == "woocommerce") {
+        if ($session_handled_by == "woocommerce" || $force_woocommerce_session) {
             if (method_exists(WC()->session, '__unset')) {
                 WC()->session->__unset($key);
             }
@@ -947,14 +950,14 @@ class WcFunctions
      */
     public function getClientSession()
     {
-        $session = [
-            'cart' => $this->getSession('cart'),
-            'applied_coupons' => $this->getSession('applied_coupons'),
-            'chosen_shipping_methods' => $this->getSession('chosen_shipping_methods'),
-            'shipping_method_counts' => $this->getSession('shipping_method_counts'),
-            'chosen_payment_method' => $this->getSession('chosen_payment_method'),
-            'previous_shipping_methods' => $this->getSession('previous_shipping_methods'),
-        ];
+        $session = array(
+            'cart' => $this->getSession('cart', true),
+            'applied_coupons' => $this->getSession('applied_coupons', true),
+            'chosen_shipping_methods' => $this->getSession('chosen_shipping_methods', true),
+            'shipping_method_counts' => $this->getSession('shipping_method_counts', true),
+            'chosen_payment_method' => $this->getSession('chosen_payment_method', true),
+            'previous_shipping_methods' => $this->getSession('previous_shipping_methods', true),
+        );
         return apply_filters('rnoc_get_client_session', $session);
     }
 

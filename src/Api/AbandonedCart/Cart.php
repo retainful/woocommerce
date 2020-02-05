@@ -192,7 +192,7 @@ class Cart extends RestApi
     function addCartTrackingScripts()
     {
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
-            //wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
+            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
             $data = array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
@@ -202,8 +202,7 @@ class Cart extends RestApi
                 'cart_tracking_engine' => self::$settings->getCartTrackingEngine()
             );
             $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
-            //wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
-            wp_localize_script('abandonedcart', 'retainful_cart_data', $data);
+            wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
         }
     }
 
@@ -439,13 +438,16 @@ class Cart extends RestApi
      */
     function setCartToken($cart_token, $user_id = null)
     {
-        $current_time = current_time('timestamp', true);
-        $this->setSessionForCustomer('cart_token', $cart_token, $this->cart_token_key);
-        if (!empty($user_id) || $user_id = get_current_user_id()) {
-            update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
-            $this->setCartCreatedDate($user_id, $current_time);
-        } else {
-            $this->setSessionForCustomer('cart_created_date', $current_time, $this->cart_tracking_started_key);
+        $old_cart_token = $this->getSessionForCustomer('cart_token', $this->cart_token_key);
+        if(empty($old_cart_token)) {
+            $current_time = current_time('timestamp', true);
+            $this->setSessionForCustomer('cart_token', $cart_token, $this->cart_token_key);
+            if (!empty($user_id) || $user_id = get_current_user_id()) {
+                update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
+                $this->setCartCreatedDate($user_id, $current_time);
+            } else {
+                $this->setSessionForCustomer('cart_created_date', $current_time, $this->cart_tracking_started_key);
+            }
         }
     }
 
@@ -669,8 +671,8 @@ class Cart extends RestApi
             'client_session' => self::$woocommerce->getClientSession(),
             'woocommerce_totals' => $this->getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
-            'recovered_by_retainful' => (self::$woocommerce->getSession('rnoc_recovered_by_retainful')) ? true : false,
-            'recovered_cart_token' => self::$woocommerce->getSession('rnoc_recovered_cart_token')
+            'recovered_by_retainful' => ($this->getSessionForCustomer('recovered_by_retainful', 'rnoc_recovered_by_retainful')) ? true : false,
+            'recovered_cart_token' => $this->getSessionForCustomer('recovered_cart_token', 'rnoc_recovered_cart_token')
         );
         return apply_filters('rnoc_get_user_cart', $cart);
     }
@@ -970,14 +972,12 @@ class Cart extends RestApi
                 $chosen_shipping_methods = (array)$client_session->chosen_shipping_methods;
                 $shipping_method_counts = (array)$client_session->shipping_method_counts;
                 $chosen_payment_method = $client_session->chosen_payment_method;
-                $retainful_customer = (array)$client_session->retainful_customer;
                 // base session data
-                self::$woocommerce->setSession('cart', $cart);
-                self::$woocommerce->setSession('applied_coupons', $this->getValidCoupons($applied_coupons));
-                self::$woocommerce->setSession('chosen_shipping_methods', $chosen_shipping_methods);
-                self::$woocommerce->setSession('shipping_method_counts', $shipping_method_counts);
-                self::$woocommerce->setSession('chosen_payment_method', $chosen_payment_method);
-                self::$woocommerce->setSession('retainful_customer', $retainful_customer);
+                self::$woocommerce->setSession('cart', $cart,true);
+                self::$woocommerce->setSession('applied_coupons', $this->getValidCoupons($applied_coupons),true);
+                self::$woocommerce->setSession('chosen_shipping_methods', $chosen_shipping_methods,true);
+                self::$woocommerce->setSession('shipping_method_counts', $shipping_method_counts,true);
+                self::$woocommerce->setSession('chosen_payment_method', $chosen_payment_method,true);
             }
         } else {
             $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
