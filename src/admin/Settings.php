@@ -336,6 +336,18 @@ class Settings
                 'default' => 0
             ));
             $general_settings->add_field(array(
+                'name' => __('Handle storage using ', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'handle_storage_using',
+                'type' => 'radio_inline',
+                'classes' => 'retainful-coupon-group',
+                'options' => array(
+                    'woocommerce' => __('WooCommerce Session', RNOC_TEXT_DOMAIN),
+                    'php' => __('PHP Session', RNOC_TEXT_DOMAIN),
+                    'cookie' => __('Cookie', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 'woocommerce'
+            ));
+            $general_settings->add_field(array(
                 'name' => __('Exclude capturing carts from these IP\'s', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses',
                 'type' => 'textarea',
@@ -1080,6 +1092,20 @@ class Settings
             } catch (\Exception $e) {
                 $e->getMessage();
             }
+        }
+    }
+
+    /**
+     * get where to save the temp data
+     * @return mixed|string
+     */
+    function getStorageHandler()
+    {
+        $admin_settings = $this->getAdminSettings();
+        if (isset($admin_settings[RNOC_PLUGIN_PREFIX . 'handle_storage_using']) && !empty($admin_settings[RNOC_PLUGIN_PREFIX . 'handle_storage_using'])) {
+            return $admin_settings[RNOC_PLUGIN_PREFIX . 'handle_storage_using'];
+        } else {
+            return "woocommerce";
         }
     }
 

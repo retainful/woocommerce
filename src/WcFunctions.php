@@ -598,23 +598,17 @@ class WcFunctions
     /**
      * @param $key
      * @param $value
-     * @param $force_woocommerce_session
      * @return bool
      */
-    function setSession($key, $value, $force_woocommerce_session = false)
+    function setSession($key, $value)
     {
         if (empty($key) || empty($value))
             return false;
-        $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
-        if ($session_handled_by == "woocommerce" || $force_woocommerce_session) {
-            $this->initWoocommerceSession();
-            if (method_exists(WC()->session, 'set')) {
-                WC()->session->set($key, $value);
-            }
-            return true;
-        } else {
-            return $this->setPHPSession($key, $value);
+        $this->initWoocommerceSession();
+        if (method_exists(WC()->session, 'set')) {
+            WC()->session->set($key, $value);
         }
+        return true;
     }
 
     /**
@@ -753,22 +747,16 @@ class WcFunctions
     /**
      * Get data from session
      * @param $key
-     * @param $force_woocommerce_session
      * @return array|string|null
      */
-    function getSession($key, $force_woocommerce_session = false)
+    function getSession($key)
     {
         if (empty($key))
             return NULL;
-        $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
-        if ($session_handled_by == "woocommerce" || $force_woocommerce_session) {
-            if (method_exists(WC()->session, 'get')) {
-                return WC()->session->get($key);
-            }
-            return NULL;
-        } else {
-            return $this->getPHPSession($key);
+        if (method_exists(WC()->session, 'get')) {
+            return WC()->session->get($key);
         }
+        return NULL;
     }
 
     /**
@@ -857,22 +845,16 @@ class WcFunctions
     /**
      * Remove data from session
      * @param $key
-     * @param $force_woocommerce_session
      * @return bool
      */
-    function removeSession($key, $force_woocommerce_session)
+    function removeSession($key)
     {
         if (empty($key))
             return false;
-        $session_handled_by = apply_filters('rnoc_session_maintained_by', 'woocommerce');
-        if ($session_handled_by == "woocommerce" || $force_woocommerce_session) {
-            if (method_exists(WC()->session, '__unset')) {
-                WC()->session->__unset($key);
-            }
-            return true;
-        } else {
-            return $this->removePHPSession($key);
+        if (method_exists(WC()->session, '__unset')) {
+            WC()->session->__unset($key);
         }
+        return true;
     }
 
     /**

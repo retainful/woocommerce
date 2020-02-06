@@ -23,10 +23,9 @@ class Main
         $this->rnoc = ($this->rnoc == NULL) ? new OrderCoupon() : $this->rnoc;
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         $this->abandoned_cart = ($this->abandoned_cart == NULL) ? new AbandonedCart() : $this->abandoned_cart;
-        $this->abandoned_cart_api = ($this->abandoned_cart_api == NULL) ? new RestApi() : $this->abandoned_cart_api;
+        //$this->abandoned_cart_api = ($this->abandoned_cart_api == NULL) ? new RestApi() : $this->abandoned_cart_api;
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
-        add_filter('woocommerce_data_stores', array($this, 'addDataStores'));
         if (!$this->admin->isPremiumPluginActive()) {
             //init the retainful premium
             new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
@@ -37,8 +36,6 @@ class Main
     {
         $woocommerce_functions = new WcFunctions();
         $woocommerce_functions->initWoocommerceSession();
-        require RNOC_PLUGIN_PATH . 'src/includes/retainful-customer.php';
-        require RNOC_PLUGIN_PATH . 'src/includes/retainful-customer-data-store.php';
     }
 
     function addDataStores($stores)
