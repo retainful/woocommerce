@@ -27,6 +27,16 @@ class WooSession extends Base
     }
 
     /**
+     * check the wc session has the value
+     * @param $key
+     * @return bool
+     */
+    function hasKey($key)
+    {
+        return true;
+    }
+
+    /**
      * Set the value for the PHP session
      * @param $key
      * @param $value

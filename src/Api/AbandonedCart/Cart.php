@@ -431,26 +431,6 @@ class Cart extends RestApi
     }
 
     /**
-     * Set the cart token for the session
-     * @param $cart_token
-     * @param $user_id
-     */
-    function setCartToken($cart_token, $user_id = null)
-    {
-        $old_cart_token = self::$storage->getValue($this->cart_token_key);
-        if (empty($old_cart_token)) {
-            $current_time = current_time('timestamp', true);
-            self::$storage->setValue($this->cart_token_key, $cart_token);
-            if (!empty($user_id) || $user_id = get_current_user_id()) {
-                update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
-                $this->setCartCreatedDate($user_id, $current_time);
-            } else {
-                self::$storage->setValue($this->cart_tracking_started_key, $current_time);
-            }
-        }
-    }
-
-    /**
      * Set the user IP for the session
      * @param $ip_address
      */
@@ -877,6 +857,12 @@ class Cart extends RestApi
         //var_dump($this->isValidCartToTrack() && !empty($cart_created_at));
         if ($this->isValidCartToTrack() && !empty($cart_created_at)) {
             $data = $this->getTrackingCartData();
+        } else {
+            $force_refresh = self::$storage->getValue('rnoc_force_refresh_cart');
+            if (empty($force_refresh) && !empty(self::$woocommerce->getCart())) {
+                self::$storage->setValue('rnoc_force_refresh_cart', 1);
+                $data = array('force_refresh_carts' => 1);
+            }
         }
         $fragments[$selector] = $this->getCartTrackingDiv($data);
         return $fragments;

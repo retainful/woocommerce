@@ -11,6 +11,16 @@ class PhpSession extends Base
     }
 
     /**
+     * check the cookie has the value
+     * @param $key
+     * @return bool
+     */
+    function hasKey($key)
+    {
+        return (isset($_SESSION[$key]));
+    }
+
+    /**
      * Set the value for the PHP session
      * @param $key
      * @param $value

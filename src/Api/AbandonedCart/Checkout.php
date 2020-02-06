@@ -280,6 +280,7 @@ class Checkout extends RestApi
         self::$storage->removeValue($this->previous_cart_hash_key);
         self::$storage->removeValue($this->user_ip_key);
         //This was set in plugin since 2.0.4
+        self::$storage->removeValue('rnoc_force_refresh_cart');
         self::$storage->removeValue('rnoc_recovered_at');
         self::$storage->removeValue('rnoc_recovered_by_retainful');
         self::$storage->removeValue('rnoc_recovered_cart_token');

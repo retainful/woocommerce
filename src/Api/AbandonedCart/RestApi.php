@@ -58,6 +58,25 @@ class RestApi
     }
 
     /**
+     * Set the cart token for the session
+     * @param $cart_token
+     * @param $user_id
+     */
+    function setCartToken($cart_token, $user_id = null)
+    {
+        $old_cart_token = self::$storage->getValue($this->cart_token_key);
+        if (empty($old_cart_token)) {
+            $current_time = current_time('timestamp', true);
+            self::$storage->setValue($this->cart_token_key, $cart_token);
+            self::$storage->setValue($this->cart_tracking_started_key, $current_time);
+            if (!empty($user_id) || $user_id = get_current_user_id()) {
+                update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
+                $this->setCartCreatedDate($user_id, $current_time);
+            }
+        }
+    }
+
+    /**
      * @param $price
      * @return string
      */

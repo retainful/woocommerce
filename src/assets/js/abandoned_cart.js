@@ -48,11 +48,14 @@ function initJqueryRetainfulAbandonedCartsTracking() {
              * @param public_key
              */
             constructor(end_point = null, public_key = null) {
+                this.ajax_url = null;
+                this.is_force_synced = false;
                 this.end_point = end_point;
                 this.public_key = public_key;
                 this.abandoned_cart_data = null;
                 this.cart_token = null;
                 this.cart_hash = null;
+                this.force_refresh_carts = null;
                 this.cart_tracking_element_id = "retainful-abandoned-cart-data";
                 this.async_request = true;
                 this.previous_cart_hash = null;
@@ -105,6 +108,16 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             }
 
             /**
+             * set the ajax url
+             * @param url
+             * @returns {Retainful}
+             */
+            setAjaxUrl(url) {
+                this.ajax_url = url;
+                return this;
+            }
+
+            /**
              * cart tracking element ID
              * @return {string}
              */
@@ -127,6 +140,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                     this.abandoned_cart_data = (cart_details.data !== undefined) ? cart_details.data : null;
                     this.cart_hash = (cart_details.cart_hash !== undefined) ? cart_details.cart_hash : null;
                     this.cart_token = (cart_details.cart_token !== undefined) ? cart_details.cart_token : null;
+                    this.force_refresh_carts = (cart_details.force_refresh_carts !== undefined) ? cart_details.force_refresh_carts : null;
                     if (this.isLocalStorageSupports() && this.cart_token !== null) {
                         let old_cart_token_history = localStorage.getItem('retainful_ac_cart_token_history');
                         let old_cart_token = localStorage.getItem('retainful_ac_cart_token');
@@ -211,6 +225,13 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                     let body = {"data": cart_data};
                     this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
                 }
+                if (this.force_refresh_carts !== null && !this.is_force_synced) {
+                    this.is_force_synced = true;
+                    let response = retainful.request(this.ajax_url, {action: 'rnoc_track_user_data'}, {}, "json", "POST", false);
+                    if (response.success && response.data) {
+                        retainful.syncCart(response.data, true);
+                    }
+                }
             }
 
             /**
@@ -244,6 +265,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
 
         let retainful = new Retainful(retainful_cart_data.api_url, retainful_cart_data.public_key).setCartTrackingElementId(retainful_cart_data.tracking_element_selector);
         if (retainful_cart_data.cart_tracking_engine === "js") {
+            retainful.setAjaxUrl(retainful_cart_data.ajax_url);
             retainful.initCartTracking();
             $(document).ready(function () {
                 retainful.syncCart();
