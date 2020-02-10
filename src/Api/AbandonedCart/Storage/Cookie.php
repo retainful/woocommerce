@@ -24,7 +24,18 @@ class Cookie extends Base
         if (empty($key)) {
             return NULL;
         }
-        setcookie($key, $value, time() + (86400 * 15), '/');
+        if (function_exists('wc_setcookie')) {
+            wc_setcookie($key, $value);
+        } else {
+            setcookie($key, $value, array(
+                'expires' => 0,
+                'path' => COOKIEPATH ? COOKIEPATH : '/',
+                'domain' => COOKIE_DOMAIN,
+                'samesite' => 'None',
+                'secure' => false,
+                'httponly' => false,
+            ));
+        }
         return true;
     }
 
@@ -56,7 +67,18 @@ class Cookie extends Base
         }
         if (isset($_COOKIE[$key])) {
             unset($_COOKIE[$key]);
-            setcookie($key, null, -1, '/');
+            if (function_exists('wc_setcookie')) {
+                wc_setcookie($key, null, -1);
+            } else {
+                setcookie($key, null, array(
+                    'expires' => -1,
+                    'path' => COOKIEPATH ? COOKIEPATH : '/',
+                    'domain' => COOKIE_DOMAIN,
+                    'samesite' => 'None',
+                    'secure' => false,
+                    'httponly' => false,
+                ));
+            }
             return true;
         } else {
             return false;

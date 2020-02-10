@@ -18,7 +18,7 @@ class RestApi
     protected $user_ip_key = "rnoc_user_ip_address", $user_ip_key_for_db = "_rnoc_user_ip_address";
     protected $order_placed_date_key_for_db = "_rnoc_order_placed_at", $order_cancelled_date_key_for_db = "_rnoc_order_cancelled_at";
     protected $pending_recovery_key = "rnoc_is_pending_recovery", $pending_recovery_key_for_db = "_rnoc_is_pending_recovery";
-    protected $cart_tracking_started_key = "rnoc_cart_tracking_started_at", $cart_tracking_started_key_for_db = "_rnoc_cart_tracking_started_at";
+    protected $cart_tracking_started_key = "rnoc_cart_created_at", $cart_tracking_started_key_for_db = "_rnoc_cart_tracking_started_at";
     protected $order_note_key = "rnoc_order_note", $order_note_key_for_db = "_rnoc_order_note";
     protected $order_recovered_key = "rnoc_order_recovered", $order_recovered_key_for_db = "_rnoc_order_recovered";
     protected $accepts_marketing_key_for_db = "_rnoc_is_buyer_accepts_marketing";
@@ -304,7 +304,7 @@ class RestApi
         if ($user_id) {
             $ip = get_user_meta($user_id, $this->user_ip_key_for_db);
         } else {
-            $ip = self::$storage->getValue($this->user_ip_key);
+            $ip = $this->getClientIp();
         }
         return $this->formatUserIP($ip);
     }
@@ -582,7 +582,7 @@ class RestApi
         if (is_user_logged_in()) {
             return true;
         } else {
-            $is_buyer_accepts_marketing = self::$storage->getValue('is_buyer_accepting_marketing');
+            $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
             if ($is_buyer_accepts_marketing == 1) {
                 return true;
             }

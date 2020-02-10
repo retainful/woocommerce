@@ -134,7 +134,7 @@ class Cart extends RestApi
                 'billing_country' => $billing_country,
                 'billing_phone' => $billing_phone
             );
-            self::$storage->setValue('is_buyer_accepting_marketing', 1);
+            self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
             $this->setCustomerBillingDetails($billing_address);
             //Shipping to same billing address
             if (!empty($ship_to_billing)) {
@@ -431,18 +431,6 @@ class Cart extends RestApi
     }
 
     /**
-     * Set the user IP for the session
-     * @param $ip_address
-     */
-    function setUserIP($ip_address)
-    {
-        self::$storage->setValue($this->user_ip_key, $ip_address);
-        if ($user_id = get_current_user_id()) {
-            update_user_meta($user_id, $this->user_ip_key_for_db, $ip_address);
-        }
-    }
-
-    /**
      * @param null $user_id
      */
     function removeCartToken($user_id = NULL)
@@ -591,7 +579,6 @@ class Cart extends RestApi
         if (empty($user_ip)) {
             $user_ip = $this->getClientIp();
             $user_ip = $this->formatUserIP($user_ip);
-            $this->setUserIP($user_ip);
         }
         return $user_ip;
     }
@@ -770,7 +757,7 @@ class Cart extends RestApi
                     exit;
                 }
                 $is_buyer_accept_marketing = (isset($data->buyer_accepts_marketing) && $data->buyer_accepts_marketing) ? 1 : 0;
-                self::$storage->setValue('is_buyer_accepting_marketing', $is_buyer_accept_marketing);
+                self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accept_marketing);
                 $user_currency = isset($data->presentment_currency) ? $data->presentment_currency : self::$woocommerce->getDefaultCurrency();
                 apply_filters('rnoc_set_current_currency_code', $user_currency);
                 self::$storage->setValue('rnoc_recovered_at', current_time('timestamp', true));

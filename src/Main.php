@@ -38,14 +38,6 @@ class Main
         $woocommerce_functions->initWoocommerceSession();
     }
 
-    function addDataStores($stores)
-    {
-        if (!isset($stores['customer-retainful-abandoned-carts'])) {
-            $stores['customer-retainful-abandoned-carts'] = 'WC_Customer_Data_Retainful_Store_Session';
-        }
-        return $stores;
-    }
-
     /**
      * Register all the required end points
      */
