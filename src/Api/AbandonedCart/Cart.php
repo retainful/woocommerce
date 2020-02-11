@@ -767,11 +767,17 @@ class Cart extends RestApi
                 $user_id = $this->getUserIdFromCartToken($cart_token);
                 $cart_recreated = false;
                 // order id is associated with a registered user
+                $current_cart = array();
                 if ($user_id && $this->loginUser($user_id)) {
                     // save order note to be applied after redirect
                     update_user_meta($user_id, $this->order_note_key_for_db, $note);
+                    $current_cart = self::$woocommerce->getCart();
                     $cart_recreated = true;
                 }
+                if (is_user_logged_in() && empty($current_cart)) {
+                    $cart_recreated = false;
+                }
+                $cart_recreated = apply_filters('rnoc_cart_re_created', $cart_recreated, $data);
                 if (!$cart_recreated) {
                     // set customer note in session, if present
                     self::$storage->setValue($this->order_note_key, $note);

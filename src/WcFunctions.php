@@ -936,12 +936,12 @@ class WcFunctions
     public function getClientSession()
     {
         $session = array(
-            'cart' => $this->getSession('cart', true),
-            'applied_coupons' => $this->getSession('applied_coupons', true),
-            'chosen_shipping_methods' => $this->getSession('chosen_shipping_methods', true),
-            'shipping_method_counts' => $this->getSession('shipping_method_counts', true),
-            'chosen_payment_method' => $this->getSession('chosen_payment_method', true),
-            'previous_shipping_methods' => $this->getSession('previous_shipping_methods', true),
+            'cart' => $this->getSession('cart'),
+            'applied_coupons' => $this->getSession('applied_coupons'),
+            'chosen_shipping_methods' => $this->getSession('chosen_shipping_methods'),
+            'shipping_method_counts' => $this->getSession('shipping_method_counts'),
+            'chosen_payment_method' => $this->getSession('chosen_payment_method'),
+            'previous_shipping_methods' => $this->getSession('previous_shipping_methods'),
         );
         return apply_filters('rnoc_get_client_session', $session);
     }
