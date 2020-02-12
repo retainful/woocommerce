@@ -605,6 +605,18 @@ class OrderCoupon
     function getRequestParams($order)
     {
         if (empty($order)) return array();
+        $new_coupon = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+        $coupon_details = $this->getCouponByCouponCode($new_coupon);
+        $expire_date = $apply_url = '';
+        if (!empty($coupon_details)) {
+            if (isset($coupon_details->ID) && !empty($coupon_details->ID)) {
+                $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
+                if (!empty($coupon_expiry_date)) {
+                    $expire_date = strtotime($coupon_expiry_date);
+                }
+                $apply_url = add_query_arg('retainful_coupon_code', $new_coupon, site_url());
+            }
+        }
         return array(
             'order_id' => $this->wc_functions->getOrderId($order),
             'email' => $this->wc_functions->getOrderEmail($order),
@@ -614,7 +626,9 @@ class OrderCoupon
             'new_coupon' => $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon'),
             'applied_coupon' => $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon_applied'),
             'order_date' => strtotime($this->wc_functions->getOrderDate($order)),
-            'expired_at' => ''
+            'expired_at' => $expire_date,
+            'apply_url' => $apply_url,
+            'minimum_spent' => ''
         );
     }
 
