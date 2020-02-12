@@ -37,6 +37,8 @@ class Checkout extends RestApi
             $recovered_at = self::$storage->getValue('rnoc_recovered_at');
             $recovered_by = self::$storage->getValue('rnoc_recovered_by_retainful');
             $recovered_cart_token = self::$storage->getValue('rnoc_recovered_cart_token');
+            $user_agent = $this->getUserAgent();
+            $user_accept_language = $this->getUserAcceptLanguage();
             self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_hash_key_for_db, $cart_hash);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
@@ -45,6 +47,8 @@ class Checkout extends RestApi
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_at', $recovered_at);
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_by', $recovered_by);
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_cart_token', $recovered_cart_token);
+            self::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_user_agent', $user_agent);
+            self::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_accept_language', $user_accept_language);
             $this->markOrderAsPendingRecovery($order_id);
             //$this->unsetOrderTempData();
         }

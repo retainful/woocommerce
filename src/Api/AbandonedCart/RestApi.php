@@ -602,4 +602,53 @@ class RestApi
         }
         return true;
     }
+
+    /**
+     * get the client details
+     * @param null $order
+     * @return mixed|void
+     */
+    function getClientDetails($order = null)
+    {
+        $client_details = array(
+            'user_agent' => $this->getUserAgent($order),
+            'accept_language' => $this->getUserAcceptLanguage($order),
+        );
+        return apply_filters('rnoc_get_client_details', $client_details, $order);
+    }
+
+    /**
+     * get the user agent of client
+     * @param null $order
+     * @return mixed|string|null
+     */
+    function getUserAgent($order = null)
+    {
+        if (!empty($order)) {
+            return self::$woocommerce->getOrderMeta($order, '_rnoc_get_http_user_agent');
+        } else {
+            if (isset($_SERVER['HTTP_USER_AGENT']) && !empty($_SERVER['HTTP_USER_AGENT'])) {
+                return $_SERVER['HTTP_USER_AGENT'];
+            }
+        }
+        return '';
+    }
+
+    /**
+     * get the user accept language
+     * @param null $order
+     * @return mixed|string|null
+     */
+    function getUserAcceptLanguage($order = null)
+    {
+        if (!empty($order)) {
+            return self::$woocommerce->getOrderMeta($order, '_rnoc_get_http_accept_language');
+        } else {
+            if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && !empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+                $lang = trim($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                return substr($lang, 0, 2);
+            }
+        }
+        return '';
+    }
 }

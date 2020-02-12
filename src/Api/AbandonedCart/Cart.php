@@ -180,7 +180,8 @@ class Cart extends RestApi
     /**
      * send the ajax encrypted cart
      */
-    function ajaxGetEncryptedCart(){
+    function ajaxGetEncryptedCart()
+    {
         $cart = $this->getUserCart();
         $encrypted_cart = $this->encryptData($cart);
         wp_send_json_success($encrypted_cart);
@@ -647,7 +648,8 @@ class Cart extends RestApi
             'woocommerce_totals' => $this->getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
             'recovered_by_retainful' => (self::$storage->getValue('rnoc_recovered_by_retainful')) ? true : false,
-            'recovered_cart_token' => self::$storage->getValue('rnoc_recovered_cart_token')
+            'recovered_cart_token' => self::$storage->getValue('rnoc_recovered_cart_token'),
+            'client_details' => $this->getClientDetails()
         );
         return apply_filters('rnoc_get_user_cart', $cart);
     }
@@ -780,9 +782,9 @@ class Cart extends RestApi
                     // save order note to be applied after redirect
                     update_user_meta($user_id, $this->order_note_key_for_db, $note);
                     $current_cart = self::$woocommerce->getCart();
-                    if(empty($current_cart)){
+                    if (empty($current_cart)) {
                         $cart_recreated = false;
-                    }else{
+                    } else {
                         $cart_recreated = true;
                     }
                 }
