@@ -613,7 +613,8 @@ class OrderCoupon
             'total' => $this->wc_functions->getOrderTotal($order),
             'new_coupon' => $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon'),
             'applied_coupon' => $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon_applied'),
-            'order_date' => strtotime($this->wc_functions->getOrderDate($order))
+            'order_date' => strtotime($this->wc_functions->getOrderDate($order)),
+            'expired_at' => ''
         );
     }
 

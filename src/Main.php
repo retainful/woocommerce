@@ -185,6 +185,8 @@ class Main
                 add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
                 add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
                 add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
+                add_action('wp_ajax_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
+                add_action('wp_ajax_nopriv_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
                 add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
                 //add_action('wp_login', array($cart, 'userLoggedIn'));
                 add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
