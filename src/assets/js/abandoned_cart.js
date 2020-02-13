@@ -227,7 +227,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                 }
                 if (this.force_refresh_carts !== null && !this.is_force_synced) {
                     this.is_force_synced = true;
-                    let response = retainful.request(this.ajax_url, {action: 'rnoc_ajax_get_encrypted_cart'}, {}, "json", "POST", false);
+                    let response = retainful.request(this.ajax_url, {action: 'rnoc_track_user_data'}, {}, "json", "POST", false);
                     if (response.success && response.data) {
                         retainful.syncCart(response.data, true);
                     }
@@ -270,7 +270,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             $(document).ready(function () {
                 let has_items_in_cart = getRetainfulCookie('woocommerce_items_in_cart', '0');
                 if (parseInt(has_items_in_cart) === 1) {
-                    let response = retainful.request(retainful_cart_data.ajax_url, {action: 'rnoc_ajax_get_encrypted_cart'}, {}, "json", "POST", false);
+                    let response = retainful.request(retainful_cart_data.ajax_url, {action: 'rnoc_track_user_data'}, {}, "json", "POST", false);
                     if (response.success && response.data) {
                         retainful.syncCart(response.data, true);
                     }
