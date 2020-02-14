@@ -932,7 +932,8 @@ class OrderCoupon
             $settings = $this->admin->getCouponSettings();
             add_post_meta($id, 'order_id', $order_id);
             add_post_meta($id, 'email', $email);
-            $user_id = get_current_user_id();
+            $order = $this->wc_functions->getOrder($order_id);
+            $user_id = $this->wc_functions->getOrderUserId($order);
             add_post_meta($id, 'user_id', $user_id);
             add_post_meta($id, 'coupon_type', isset($settings['coupon_type']) ? sanitize_text_field($settings['coupon_type']) : '0');
             add_post_meta($id, 'coupon_value', isset($settings['coupon_amount']) ? sanitize_text_field($settings['coupon_amount']) : '0');

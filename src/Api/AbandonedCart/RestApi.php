@@ -66,6 +66,7 @@ class RestApi
     {
         $old_cart_token = self::$storage->getValue($this->cart_token_key);
         if (empty($old_cart_token)) {
+            self::$settings->logMessage($cart_token,'setting cart token');
             $current_time = current_time('timestamp', true);
             self::$storage->setValue($this->cart_token_key, $cart_token);
             self::$storage->setValue($this->cart_tracking_started_key, $current_time);
@@ -568,6 +569,7 @@ class RestApi
         $app_id = self::$settings->getApiKey();
         $response = false;
         if (!empty($cart_details)) {
+            self::$settings->logMessage('cart synced with PHP','synced by');
             $response = self::$api->syncCartDetails($app_id, $cart_details);
         }
         return $response;

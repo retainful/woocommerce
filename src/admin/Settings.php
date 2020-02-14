@@ -360,8 +360,8 @@ class Settings
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
                     'woocommerce' => __('WooCommerce session (Default)', RNOC_TEXT_DOMAIN),
-                    'php' => __('PHP Session', RNOC_TEXT_DOMAIN),
-                    'cookie' => __('Cookie', RNOC_TEXT_DOMAIN)
+                    'cookie' => __('Cookie', RNOC_TEXT_DOMAIN),
+                    'php' => __('PHP Session', RNOC_TEXT_DOMAIN)
                 ),
                 'desc' => __('DO NOT change this setting unless you are instructed by the Retainful Support team. WooCommerce session will work for 99% of the shops.', RNOC_TEXT_DOMAIN),
                 'default' => 'woocommerce'
