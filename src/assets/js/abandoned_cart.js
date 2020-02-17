@@ -268,15 +268,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             retainful.setAjaxUrl(retainful_cart_data.ajax_url);
             retainful.initCartTracking();
             $(document).ready(function () {
-                let has_items_in_cart = getRetainfulCookie('woocommerce_items_in_cart', '0');
-                if (parseInt(has_items_in_cart) === 1) {
-                    let response = retainful.request(retainful_cart_data.ajax_url, {action: 'rnoc_track_user_data'}, {}, "json", "POST", false);
-                    if (response.success && response.data) {
-                        retainful.syncCart(response.data, true);
-                    }
-                } else {
-                    retainful.syncCart();
-                }
+                retainful.syncCart();
             });
         }
         if (retainful_cart_data.cart !== undefined) {
@@ -319,14 +311,4 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             }
         });
     });
-}
-
-function getRetainfulCookie(name, default_val = null) {
-    var value = "; " + document.cookie;
-    var parts = value.split("; " + name + "=");
-    if (parts.length === 2) {
-        return parts.pop().split(";").shift();
-    } else {
-        return default_val;
-    }
 }

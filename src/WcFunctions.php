@@ -62,7 +62,7 @@ class WcFunctions
         $image_id = $this->getProductImageId($product);
         $image = wp_get_attachment_image_src($image_id);
         list($src) = $image;
-        return $src;
+        return apply_filters('rnoc_get_product_image_src', $src, $product);
     }
 
     function getProductImage($product)
