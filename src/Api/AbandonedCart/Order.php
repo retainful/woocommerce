@@ -212,12 +212,17 @@ class Order extends RestApi
             'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
-            'next_order_coupon' => $this->getNextOrderCouponDetails($order),
+            //'next_order_coupon' => $this->getNextOrderCouponDetails($order),
             'client_details' => $this->getClientDetails($order)
         );
         return $order_data;
     }
 
+    /**
+     * next order coupon details
+     * @param $order
+     * @return array
+     */
     function getNextOrderCouponDetails($order)
     {
         return array(

@@ -3,7 +3,7 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
 Requires at least: 4.0
 Tested up to: 5.3
-WC tested up to: 3.9
+WC tested up to: 3.9.2
 Requires PHP: 5.6
 Stable tag: 2.1.7
 License: GPLv2 or later

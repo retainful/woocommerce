@@ -354,7 +354,7 @@ class Settings
                 'default' => 0
             ));
             $general_settings->add_field(array(
-                'name' => __('Handle storage using ', RNOC_TEXT_DOMAIN),
+                'name' => __('Session handler', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'handle_storage_using',
                 'type' => 'radio_inline',
                 'classes' => 'retainful-coupon-group',

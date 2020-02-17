@@ -627,8 +627,7 @@ class OrderCoupon
             'applied_coupon' => $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon_applied'),
             'order_date' => strtotime($this->wc_functions->getOrderDate($order)),
             'expired_at' => $expire_date,
-            'apply_url' => $apply_url,
-            'minimum_spent' => ''
+            'apply_url' => $apply_url
         );
     }
 
