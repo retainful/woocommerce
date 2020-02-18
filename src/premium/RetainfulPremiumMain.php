@@ -29,7 +29,7 @@ class RetainfulPremiumMain
         if (is_admin()) {
             wp_enqueue_style('rnocp-admin-css', RNOCPREMIUM_PLUGIN_URL . 'assets/css/admin.css', array(), RNOC_VERSION);
             wp_enqueue_script('rnocp-admin-js', RNOCPREMIUM_PLUGIN_URL . 'assets/js/admin.js', array(), RNOC_VERSION);
-            wp_localize_script('rnocp-admin-js', 'rnocp_admin_params', array('ajax_url' => admin_url('admin-ajax.php')));
+            wp_localize_script('rnocp-admin-js', 'rnocp_admin_params', array('ajax_url' => admin_url('admin-ajax.php'), 'jquery_url' => includes_url('js/jquery/jquery.js')));
         }
         return true;
     }
