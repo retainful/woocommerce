@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.3
 WC tested up to: 3.9.2
 Requires PHP: 5.6
-Stable tag: 2.1.7
+Stable tag: 2.1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -361,3 +361,7 @@ No. There is no charges for support.
 
 = 2.1.7 =
 * Fix: Fatal error on de-activating WooCommerce
+
+= 2.1.8 =
+* Improvement: Session handling storage added
+* Fix: Cart tracking js issue fixed
