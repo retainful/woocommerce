@@ -591,7 +591,7 @@ class WcFunctions
      */
     function initWoocommerceSession()
     {
-        if (!$this->hasSession()) {
+        if (!$this->hasSession() && !defined('DOING_CRON')) {
             $this->setSessionCookie(true);
         }
     }

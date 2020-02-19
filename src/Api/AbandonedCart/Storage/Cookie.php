@@ -24,19 +24,32 @@ class Cookie extends Base
         if (empty($key)) {
             return NULL;
         }
-        if (function_exists('wc_setcookie')) {
-            wc_setcookie($key, $value);
-        } else {
-            setcookie($key, $value, array(
-                'expires' => 0,
-                'path' => COOKIEPATH ? COOKIEPATH : '/',
-                'domain' => COOKIE_DOMAIN,
-                'samesite' => 'None',
-                'secure' => false,
-                'httponly' => false,
-            ));
-        }
+        $this->setCookieValue($key, $value, 0);
         return true;
+    }
+
+    /**
+     * set the cookie value
+     * @param $key
+     * @param $value
+     * @param $expires
+     */
+    function setCookieValue($key, $value, $expires)
+    {
+        if (function_exists('wc_setcookie')) {
+            wc_setcookie($key, $value, $expires);
+        } else {
+            if (!headers_sent()) {
+                setcookie($key, $value, array(
+                    'expires' => $expires,
+                    'path' => COOKIEPATH ? COOKIEPATH : '/',
+                    'domain' => COOKIE_DOMAIN,
+                    'samesite' => 'None',
+                    'secure' => false,
+                    'httponly' => false,
+                ));
+            }
+        }
     }
 
     /**
@@ -67,18 +80,7 @@ class Cookie extends Base
         }
         if (isset($_COOKIE[$key])) {
             unset($_COOKIE[$key]);
-            if (function_exists('wc_setcookie')) {
-                wc_setcookie($key, null, -1);
-            } else {
-                setcookie($key, null, array(
-                    'expires' => -1,
-                    'path' => COOKIEPATH ? COOKIEPATH : '/',
-                    'domain' => COOKIE_DOMAIN,
-                    'samesite' => 'None',
-                    'secure' => false,
-                    'httponly' => false,
-                ));
-            }
+            $this->setCookieValue($key, null, -1);
             return true;
         } else {
             return false;
