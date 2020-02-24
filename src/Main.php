@@ -165,14 +165,9 @@ class Main
         /**
          * Ip filtering
          */
-        $settings = $this->admin->getAdminSettings();
-        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && isset($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])) {
-            $ip = $settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'];
-            if (!empty($ip)) {
-                $ip_filter = new IpFiltering($ip);
-                add_filter('rnoc_is_cart_has_valid_ip', array($ip_filter, 'trackAbandonedCart'), 10, 2);
-            }
-        }
+
+         $this->canActivateIPFilter();
+        
         //Validate key
         add_action('wp_ajax_validate_app_key', array($this->rnoc, 'validateAppKey'));
         //Settings link
@@ -313,6 +308,18 @@ class Main
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
         do_action('rnoc_initiated');
         $this->checkApi();
+    }
+
+    function canActivateIPFilter() {
+        $settings = $this->admin->getAdminSettings();
+        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && isset($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])) {
+            $ip = $settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'];
+            if (!empty($ip)) {
+                $ip_filter = new IpFiltering($ip);
+                add_filter('rnoc_is_cart_has_valid_ip', array($ip_filter, 'trackAbandonedCart'), 10, 2);
+            }
+        }
+
     }
 
     /**

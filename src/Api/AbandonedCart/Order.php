@@ -166,70 +166,68 @@ class Order extends RestApi
     function getOrderData($order)
     {
         $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
-        if ($this->canTrackAbandonedCarts($user_ip)) {
-            $order_id = self::$woocommerce->getOrderId($order);
-            $cart_token = $this->getOrderCartToken($order);
-            $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
-            $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
-            $customer_details = $this->getCustomerDetails($order);
-            $current_currency_code = self::$woocommerce->getOrderCurrency($order);
-            $default_currency_code = self::$settings->getBaseCurrency();
-            $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
-            self::$settings->logMessage($cart_created_at, 'cart created time');
-            $cart_total = $this->formatDecimalPrice(self::$woocommerce->getOrderTotal($order));
-            $excluding_tax = (self::$woocommerce->isPriceExcludingTax());
-            $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
-            $recovered_at = self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_at');
-            $order_data = array(
-                'cart_type' => 'order',
-                'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
-                'r_order_id' => $order_id,
-                'plugin_version' => RNOC_VERSION,
-                'cart_hash' => $cart_hash,
-                'ip' => $user_ip,
-                'id' => $cart_token,
-                'name' => '#' . $cart_token,
-                'email' => (isset($customer_details['email'])) ? $customer_details['email'] : NULL,
-                'token' => $cart_token,
-                'user_id' => NULL,
-                'currency' => $default_currency_code,
-                'customer' => $customer_details,
-                'tax_lines' => $this->getOrderTaxDetails(),
-                'total_tax' => $this->formatDecimalPrice(self::$woocommerce->getOrderTotalTax($order)),
-                'cart_token' => $cart_token,
-                'created_at' => $this->formatToIso8601($cart_created_at),
-                'line_items' => $this->getOrderLineItemsDetails($order),
-                'updated_at' => $this->formatToIso8601(''),
-                'source_name' => 'web',
-                'total_price' => $cart_total,
-                'completed_at' => $this->getCompletedAt($order),
-                'total_weight' => 0,
-                'discount_codes' => $this->getAppliedDiscounts($order),
-                'order_status' => self::$woocommerce->getStatus($order),
-                'shipping_lines' => array(),
-                'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
-                'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
-                'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
-                'customer_locale' => NULL,
-                'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getOrderDiscount($order, $excluding_tax)),
-                'shipping_address' => $this->getCustomerShippingAddressDetails($order),
-                'billing_address' => $this->getCustomerBillingAddressDetails($order),
-                'presentment_currency' => $current_currency_code,
-                'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
-                'total_line_items_price' => $this->formatDecimalPrice($this->getOrderItemsTotal($order)),
-                'buyer_accepts_marketing' => ($is_buyer_accepts_marketing == 1),
-                'cancelled_at' => self::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db),
-                'woocommerce_totals' => $this->getOrderTotals($order, $excluding_tax),
-                'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
-                'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
-                'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
-                //'next_order_coupon' => $this->getNextOrderCouponDetails($order),
-                'client_details' => $this->getClientDetails($order)
-            );
-            return $order_data;
-        } else {
-            return array();
-        }
+        if (!$this->canTrackAbandonedCarts($user_ip)) return false;
+
+        $order_id = self::$woocommerce->getOrderId($order);
+        $cart_token = $this->getOrderCartToken($order);
+        $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
+        $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
+        $customer_details = $this->getCustomerDetails($order);
+        $current_currency_code = self::$woocommerce->getOrderCurrency($order);
+        $default_currency_code = self::$settings->getBaseCurrency();
+        $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
+        self::$settings->logMessage($cart_created_at, 'cart created time');
+        $cart_total = $this->formatDecimalPrice(self::$woocommerce->getOrderTotal($order));
+        $excluding_tax = (self::$woocommerce->isPriceExcludingTax());
+        $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
+        $recovered_at = self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_at');
+        $order_data = array(
+            'cart_type' => 'order',
+            'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
+            'r_order_id' => $order_id,
+            'plugin_version' => RNOC_VERSION,
+            'cart_hash' => $cart_hash,
+            'ip' => $user_ip,
+            'id' => $cart_token,
+            'name' => '#' . $cart_token,
+            'email' => (isset($customer_details['email'])) ? $customer_details['email'] : NULL,
+            'token' => $cart_token,
+            'user_id' => NULL,
+            'currency' => $default_currency_code,
+            'customer' => $customer_details,
+            'tax_lines' => $this->getOrderTaxDetails(),
+            'total_tax' => $this->formatDecimalPrice(self::$woocommerce->getOrderTotalTax($order)),
+            'cart_token' => $cart_token,
+            'created_at' => $this->formatToIso8601($cart_created_at),
+            'line_items' => $this->getOrderLineItemsDetails($order),
+            'updated_at' => $this->formatToIso8601(''),
+            'source_name' => 'web',
+            'total_price' => $cart_total,
+            'completed_at' => $this->getCompletedAt($order),
+            'total_weight' => 0,
+            'discount_codes' => $this->getAppliedDiscounts($order),
+            'order_status' => self::$woocommerce->getStatus($order),
+            'shipping_lines' => array(),
+            'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
+            'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
+            'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
+            'customer_locale' => NULL,
+            'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getOrderDiscount($order, $excluding_tax)),
+            'shipping_address' => $this->getCustomerShippingAddressDetails($order),
+            'billing_address' => $this->getCustomerBillingAddressDetails($order),
+            'presentment_currency' => $current_currency_code,
+            'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
+            'total_line_items_price' => $this->formatDecimalPrice($this->getOrderItemsTotal($order)),
+            'buyer_accepts_marketing' => ($is_buyer_accepts_marketing == 1),
+            'cancelled_at' => self::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db),
+            'woocommerce_totals' => $this->getOrderTotals($order, $excluding_tax),
+            'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
+            'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
+            'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
+            //'next_order_coupon' => $this->getNextOrderCouponDetails($order),
+            'client_details' => $this->getClientDetails($order)
+        );
+        return $order_data;
     }
 
     /**

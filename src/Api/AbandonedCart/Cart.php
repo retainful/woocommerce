@@ -178,7 +178,8 @@ class Cart extends RestApi
             $encrypted_cart = $this->encryptData($cart);
             wp_send_json_success(array('cart' => $encrypted_cart, 'token' => $cart_token));
         } else {
-            wp_send_json_error('Invalid!', RNOC_TEXT_DOMAIN);
+            //dont send anything
+            wp_send_json_success();
         }
     }
 
