@@ -95,6 +95,9 @@ class Checkout extends RestApi
         }
         $order_obj = new Order();
         $order_data = $order_obj->getOrderData($order);
+        if (empty($order_data)) {
+            return null;
+        }
         $order_data['cancelled_at'] = (!empty($order_cancelled_at)) ? $this->formatToIso8601($order_cancelled_at) : NULL;
         self::$settings->logMessage($order_data);
         $cart_hash = $this->encryptData($order_data);
@@ -190,21 +193,33 @@ class Checkout extends RestApi
             if (!empty($cart_token)) {
                 $order = self::$woocommerce->getOrder($order_id);
                 $this->purchaseComplete($order_id);
-                if ($this->needInstantOrderSync()) {
-                    $order_obj = new Order();
-                    $cart = $order_obj->getOrderData($order);
-                    self::$settings->logMessage($cart);
-                    $cart_hash = $this->encryptData($cart);
-                    //Reduce the loading speed
-                    if (!empty($cart_hash)) {
-                        $this->syncCart($cart_hash);
-                    }
-                } else {
-                    $this->scheduleCartSync($order_id);
-                }
+                $this->syncOrderToAPI($order, $order_id);
                 //$this->unsetOrderTempData();
             }
         } catch (Exception $e) {
+        }
+    }
+
+    /**
+     * sync order to api
+     * @param $order
+     * @param $order_id
+     */
+    function syncOrderToAPI($order, $order_id)
+    {
+        if ($this->needInstantOrderSync()) {
+            $order_obj = new Order();
+            $cart = $order_obj->getOrderData($order);
+            if (!empty($cart)) {
+                self::$settings->logMessage($cart);
+                $cart_hash = $this->encryptData($cart);
+                //Reduce the loading speed
+                if (!empty($cart_hash)) {
+                    $this->syncCart($cart_hash);
+                }
+            }
+        } else {
+            $this->scheduleCartSync($order_id);
         }
     }
 
@@ -242,17 +257,7 @@ class Checkout extends RestApi
         if (!$cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db)) {
             return $result;
         }
-        if ($this->needInstantOrderSync()) {
-            $order_obj = new Order();
-            $cart = $order_obj->getOrderData($order);
-            self::$settings->logMessage($cart);
-            $cart_hash = $this->encryptData($cart);
-            if (!empty($cart_hash)) {
-                $this->syncCart($cart_hash);
-            }
-        } else {
-            $this->scheduleCartSync($order_id);
-        }
+        $this->syncOrderToAPI($order, $order_id);
         //$this->unsetOrderTempData();
         return $result;
     }

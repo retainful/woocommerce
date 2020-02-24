@@ -214,14 +214,10 @@ class OrderCoupon
      * @param $sent_to_admin
      * @param $plain_text
      * @param $email
-     * @return bool
      */
     function attachOrderCoupon($order, $sent_to_admin, $plain_text = '', $email = '')
     {
         $order_id = $this->wc_functions->getOrderId($order);
-        if (!$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order)) {
-            return false;
-        }
         $coupon_code = '';
         if ($this->admin->autoGenerateCouponsForOldOrders()) {
             //Create new coupon if coupon not found for order while sending the email
@@ -233,7 +229,7 @@ class OrderCoupon
         }
         if (!empty($coupon_code)) {
             $message = "";
-            $coupon_details = $this->getCouponDetails($coupon_code);
+            $coupon_details = $this->getCouponByCouponCode($coupon_code);
             if (!empty($coupon_details)) {
                 $post_id = $coupon_details->ID;
                 $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
@@ -785,7 +781,6 @@ class OrderCoupon
         if (!$order) {
             return false;
         }
-        $coupon = $this->isCouponFound($order_id);
         $coupon_settings = $this->admin->getCouponSettings();
         if (!$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order) || !$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
             return NULL;
@@ -795,6 +790,7 @@ class OrderCoupon
         if (empty($email)) {
             $email = (isset($_REQUEST['_billing_email']) && !empty($_REQUEST['_billing_email'])) ? $_REQUEST['_billing_email'] : '';
         }
+        $coupon = $this->isCouponFound($order_id);
         $order_date = $this->wc_functions->getOrderDate($order);
         if (empty($coupon)) {
             $new_coupon_code = strtoupper(uniqid());

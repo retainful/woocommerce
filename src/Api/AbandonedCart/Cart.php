@@ -172,9 +172,13 @@ class Cart extends RestApi
                 self::$storage->setValue('rnoc_session_created_at', $current_time);
             }
         }
-        $cart = $this->getUserCart();
-        $encrypted_cart = $this->encryptData($cart);
-        wp_send_json_success($encrypted_cart);
+        if ($this->isValidCartToTrack()) {
+            $cart = $this->getUserCart();
+            $encrypted_cart = $this->encryptData($cart);
+            wp_send_json_success($encrypted_cart);
+        } else {
+            wp_send_json_error('Invalid!', RNOC_TEXT_DOMAIN);
+        }
     }
 
     /**
@@ -858,7 +862,6 @@ class Cart extends RestApi
             $this->needToTrackCart();
             $cart_created_at = $this->userCartCreatedAt();
         }
-        //var_dump($this->isValidCartToTrack() && !empty($cart_created_at));
         if ($this->isValidCartToTrack() && !empty($cart_created_at)) {
             $data = $this->getTrackingCartData();
         } else {

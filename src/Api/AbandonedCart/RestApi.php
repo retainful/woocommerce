@@ -66,7 +66,7 @@ class RestApi
     {
         $old_cart_token = self::$storage->getValue($this->cart_token_key);
         if (empty($old_cart_token)) {
-            self::$settings->logMessage($cart_token,'setting cart token');
+            self::$settings->logMessage($cart_token, 'setting cart token');
             $current_time = current_time('timestamp', true);
             self::$storage->setValue($this->cart_token_key, $cart_token);
             self::$storage->setValue($this->cart_tracking_started_key, $current_time);
@@ -569,7 +569,7 @@ class RestApi
         $app_id = self::$settings->getApiKey();
         $response = false;
         if (!empty($cart_details)) {
-            self::$settings->logMessage('cart synced with PHP','synced by');
+            self::$settings->logMessage('cart synced with PHP', 'synced by');
             $response = self::$api->syncCartDetails($app_id, $cart_details);
         }
         return $response;
@@ -599,10 +599,10 @@ class RestApi
      */
     function canTrackAbandonedCarts($ip_address = NULL)
     {
-        if (!apply_filters('rnoc_can_track_abandoned_carts', true, $ip_address)) {
-            return false;
+        if (apply_filters('rnoc_is_cart_has_valid_ip', true, $ip_address) && apply_filters('rnoc_can_track_abandoned_carts', true)) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**

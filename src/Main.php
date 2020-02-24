@@ -162,6 +162,17 @@ class Main
             add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
             add_filter('wp_footer', array($this->rnoc, 'showAppliedCouponPopup'));
         }
+        /**
+         * Ip filtering
+         */
+        $settings = $this->admin->getAdminSettings();
+        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && isset($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])) {
+            $ip = $settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'];
+            if (!empty($ip)) {
+                $ip_filter = new IpFiltering($ip);
+                add_filter('rnoc_is_cart_has_valid_ip', array($ip_filter, 'trackAbandonedCart'), 10, 2);
+            }
+        }
         //Validate key
         add_action('wp_ajax_validate_app_key', array($this->rnoc, 'validateAppKey'));
         //Settings link
@@ -300,15 +311,6 @@ class Main
         }
         //Premium check
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
-        /**
-         * Ip filtering
-         */
-        $settings = $this->admin->getAdminSettings();
-        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && isset($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])) {
-            $ip = $settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'];
-            $ip_filter = new IpFiltering($ip);
-            add_filter('rnoc_can_track_abandoned_carts', array($ip_filter, 'trackAbandonedCart'), 10, 2);
-        }
         do_action('rnoc_initiated');
         $this->checkApi();
     }

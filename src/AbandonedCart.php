@@ -1331,9 +1331,9 @@ class AbandonedCart
      */
     function canTrackAbandonedCarts()
     {
-        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
-            return false;
+        if (apply_filters('rnoc_is_cart_has_valid_ip', true, null)) {
+            return true;
         }
-        return true;
+        return false;
     }
 }
