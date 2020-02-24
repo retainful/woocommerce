@@ -174,8 +174,9 @@ class Cart extends RestApi
         }
         if ($this->isValidCartToTrack()) {
             $cart = $this->getUserCart();
+            $cart_token = $this->getCartToken();
             $encrypted_cart = $this->encryptData($cart);
-            wp_send_json_success($encrypted_cart);
+            wp_send_json_success(array('cart' => $encrypted_cart, 'token' => $cart_token));
         } else {
             wp_send_json_error('Invalid!', RNOC_TEXT_DOMAIN);
         }
@@ -372,7 +373,7 @@ class Cart extends RestApi
                 self::$settings->logMessage($cart, 'cart');
                 $cart_hash = $this->encryptData($cart);
                 if (!empty($cart_hash)) {
-                    $this->syncCart($cart_hash);
+                    $this->syncCart($cart_hash, array('cart_token' => $this->getCartToken()));
                 }
             }
         }

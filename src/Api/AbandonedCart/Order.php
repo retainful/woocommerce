@@ -149,6 +149,16 @@ class Order extends RestApi
     }
 
     /**
+     * get the cart token from the order object
+     * @param $order
+     * @return string|null
+     */
+    function getOrderCartToken($order)
+    {
+        return self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+    }
+
+    /**
      * get order details for sync cart
      * @param $order
      * @return array
@@ -158,7 +168,7 @@ class Order extends RestApi
         $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
         if ($this->canTrackAbandonedCarts($user_ip)) {
             $order_id = self::$woocommerce->getOrderId($order);
-            $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+            $cart_token = $this->getOrderCartToken($order);
             $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
             $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
             $customer_details = $this->getCustomerDetails($order);

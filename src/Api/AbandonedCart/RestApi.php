@@ -562,15 +562,16 @@ class RestApi
     /**
      * Synchronize cart with SaaS
      * @param $cart_details
+     * @param $headers
      * @return array|bool|mixed|object|string
      */
-    function syncCart($cart_details)
+    function syncCart($cart_details, $headers = array())
     {
         $app_id = self::$settings->getApiKey();
         $response = false;
         if (!empty($cart_details)) {
             self::$settings->logMessage('cart synced with PHP', 'synced by');
-            $response = self::$api->syncCartDetails($app_id, $cart_details);
+            $response = self::$api->syncCartDetails($app_id, $cart_details, $headers);
         }
         return $response;
     }

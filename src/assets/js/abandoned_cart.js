@@ -180,6 +180,14 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             }
 
             /**
+             * get cart token
+             * @return {null}
+             */
+            getCartToken() {
+                return this.cart_token;
+            }
+
+            /**
              * Init cart tracking the hooks
              * @return {Retainful}
              */
@@ -219,17 +227,23 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                     cart_data = this.getAbandonedCartData();
                 }
                 let cart_hash = this.getCartHash();
-                if ((cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) || (force_sync)) {
+                let cart_token = this.getCartToken();
+                if ((cart_token !== undefined && cart_token !== null && cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) || (force_sync)) {
                     this.previous_cart_hash = cart_hash;
-                    let headers = {"app_id": this.getPublicKey(), "Content-Type": "application/json"};
+                    let headers = {
+                        "app_id": this.getPublicKey(),
+                        "Content-Type": "application/json",
+                        "cart_token": cart_token
+                    };
                     let body = {"data": cart_data};
                     this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
                 }
                 if (this.force_refresh_carts !== null && !this.is_force_synced) {
                     this.is_force_synced = true;
                     let response = retainful.request(this.ajax_url, {action: 'rnoc_track_user_data'}, {}, "json", "POST", false);
-                    if (response.success && response.data) {
-                        retainful.syncCart(response.data, true);
+                    if (response.success && response.data.cart) {
+                        this.cart_token = response.data.token;
+                        retainful.syncCart(response.data.cart, true);
                     }
                 }
             }
