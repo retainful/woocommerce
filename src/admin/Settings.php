@@ -501,7 +501,7 @@ class Settings
             }
             if ($this->isProPlan()) {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
+                    'name' => __('Maximum number of orders a customer can get next order coupons?', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'limit_per_user',
                     'type' => 'text_small',
                     'attributes' => array(
@@ -509,7 +509,7 @@ class Settings
                         'min' => 0
                     ),
                     'default' => 0,
-                    'desc' => __('Limit the number of next order coupons per customer. Set to 0 for un-limited coupons per customer.', RNOC_TEXT_DOMAIN)
+                    'desc' => __('You can send ONE unique coupon for every order the customer places or limit the maximum number of orders for which the customer receives the next order coupon. Leave as 0 for unlimited orders', RNOC_TEXT_DOMAIN)
                 ));
             } else {
                 $next_order_coupon->add_field(array(
