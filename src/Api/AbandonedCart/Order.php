@@ -161,13 +161,13 @@ class Order extends RestApi
     /**
      * get order details for sync cart
      * @param $order
-     * @return array|bool
+     * @return array
      */
     function getOrderData($order)
     {
         $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
         if (!$this->canTrackAbandonedCarts($user_ip)) {
-            return false;
+            return array();
         }
         $order_id = self::$woocommerce->getOrderId($order);
         $cart_token = $this->getOrderCartToken($order);
