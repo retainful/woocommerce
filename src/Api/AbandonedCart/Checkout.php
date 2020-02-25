@@ -102,7 +102,7 @@ class Checkout extends RestApi
         self::$settings->logMessage($order_data);
         $cart_hash = $this->encryptData($order_data);
         if (!empty($cart_hash)) {
-            $this->syncCart($cart_hash, array('cart_token' => $order_obj->getOrderCartToken($order)));
+            $this->syncCart($cart_hash);
         }
     }
 
@@ -215,7 +215,7 @@ class Checkout extends RestApi
                 $cart_hash = $this->encryptData($cart);
                 //Reduce the loading speed
                 if (!empty($cart_hash)) {
-                    $this->syncCart($cart_hash, array('cart_token' => $order_obj->getOrderCartToken($order)));
+                    $this->syncCart($cart_hash);
                 }
             }
         } else {

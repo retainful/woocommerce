@@ -174,12 +174,11 @@ class Cart extends RestApi
         }
         if ($this->isValidCartToTrack()) {
             $cart = $this->getUserCart();
-            $cart_token = $this->getCartToken();
             $encrypted_cart = $this->encryptData($cart);
-            wp_send_json_success(array('cart' => $encrypted_cart, 'token' => $cart_token));
+            wp_send_json_success($encrypted_cart);
         } else {
             //dont send anything
-            wp_send_json_success();
+            wp_send_json(array('success' => false));
         }
     }
 
@@ -374,7 +373,7 @@ class Cart extends RestApi
                 self::$settings->logMessage($cart, 'cart');
                 $cart_hash = $this->encryptData($cart);
                 if (!empty($cart_hash)) {
-                    $this->syncCart($cart_hash, array('cart_token' => $this->getCartToken()));
+                    $this->syncCart($cart_hash);
                 }
             }
         }
@@ -864,13 +863,15 @@ class Cart extends RestApi
             $this->needToTrackCart();
             $cart_created_at = $this->userCartCreatedAt();
         }
-        if ($this->isValidCartToTrack() && !empty($cart_created_at)) {
-            $data = $this->getTrackingCartData();
-        } else {
-            $force_refresh = self::$storage->getValue('rnoc_force_refresh_cart');
-            if (empty($force_refresh) && !empty(self::$woocommerce->getCart())) {
-                self::$storage->setValue('rnoc_force_refresh_cart', 1);
-                $data = array('force_refresh_carts' => 1);
+        if ($this->isValidCartToTrack()) {
+            if (!empty($cart_created_at)) {
+                $data = $this->getTrackingCartData();
+            } else {
+                $force_refresh = self::$storage->getValue('rnoc_force_refresh_cart');
+                if (empty($force_refresh) && !empty(self::$woocommerce->getCart())) {
+                    self::$storage->setValue('rnoc_force_refresh_cart', 1);
+                    $data = array('force_refresh_carts' => 1);
+                }
             }
         }
         $fragments[$selector] = $this->getCartTrackingDiv($data);
