@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.3
 WC tested up to: 3.9.2
 Requires PHP: 5.6
-Stable tag: 2.1.8
+Stable tag: 2.1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -365,3 +365,7 @@ No. There is no charges for support.
 = 2.1.8 =
 * Improvement: Session handling storage added
 * Fix: Cart tracking js issue fixed
+
+= 2.1.9 =
+* Fix: Blacklist IP from tracking carts
+* Fix: Next order coupon not attaching to email when order status is different
