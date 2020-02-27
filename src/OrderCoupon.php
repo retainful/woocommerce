@@ -99,7 +99,8 @@ class OrderCoupon
      */
     function wooEmailCustomizerRetainfulCouponContent($order_coupon_data, $order, $sending_email)
     {
-        $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+        $order_id = $this->wc_functions->getOrderId($order);
+        $coupon_code = $this->wc_functions->getPostMeta($order_id, '_rnoc_next_order_coupon');
         if (!empty($coupon_code)) {
             $coupon_details = $this->getCouponDetails($coupon_code);
             if (!empty($coupon_details)) {

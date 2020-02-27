@@ -133,6 +133,7 @@ class Main
             add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
             add_action('woocommerce_order_status_changed', array($this->rnoc, 'onAfterPayment'), 10, 1);
             add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
+            add_action('rnoc_create_new_next_order_coupon', array($this->rnoc, 'createNewCoupon'), 10, 2);
             add_action('rnoc_initiated', array($this->rnoc, 'setCouponToSession'));
             add_action('wp_loaded', array($this->rnoc, 'addCouponToCheckout'), 10);
             //Attach coupon to email
@@ -165,9 +166,7 @@ class Main
         /**
          * Ip filtering
          */
-
-         $this->canActivateIPFilter();
-        
+        $this->canActivateIPFilter();
         //Validate key
         add_action('wp_ajax_validate_app_key', array($this->rnoc, 'validateAppKey'));
         //Settings link
@@ -310,7 +309,8 @@ class Main
         $this->checkApi();
     }
 
-    function canActivateIPFilter() {
+    function canActivateIPFilter()
+    {
         $settings = $this->admin->getAdminSettings();
         if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && isset($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])) {
             $ip = $settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'];
@@ -319,7 +319,6 @@ class Main
                 add_filter('rnoc_is_cart_has_valid_ip', array($ip_filter, 'trackAbandonedCart'), 10, 2);
             }
         }
-
     }
 
     /**
