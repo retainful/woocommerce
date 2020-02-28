@@ -332,8 +332,9 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function addSiteScripts()
         {
-            wp_enqueue_script('rnoc-exit-intent-bounce-back', RNOCPREMIUM_PLUGIN_URL . 'assets/js/bounce-back.min.js', array('wc-cart-fragments'), RNOC_VERSION);
-            wp_enqueue_script('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/exit-intent-popup.js', array('wc-cart-fragments'), RNOC_VERSION);
+            $load_exit_intent_popup_scripts_after = apply_filters('rnoc_load_exit_intent_popup_scripts_after', array('wc-cart-fragments'));
+            wp_enqueue_script('rnoc-exit-intent-bounce-back', RNOCPREMIUM_PLUGIN_URL . 'assets/js/bounce-back.min.js', $load_exit_intent_popup_scripts_after, RNOC_VERSION);
+            wp_enqueue_script('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/exit-intent-popup.js', $load_exit_intent_popup_scripts_after, RNOC_VERSION);
             wp_enqueue_style('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
             $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', 1);
             $show_option = isset($show_settings['show_option']) ? $show_settings['show_option'] : 'once_per_page';
@@ -345,8 +346,10 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'distance' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', 100),
                 'cookieLife' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 1),
                 'storeName' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup',
+                'consider_cart_created_as_hash' => 'no',
                 'jquery_url' => includes_url('js/jquery/jquery.js')
             );
+            $settings = apply_filters('rnoc_load_exit_intent_popup_settings', $settings);
             wp_localize_script('rnoc-exit-intent-popup', 'retainful_premium_exit_intent_popup', $settings);
         }
 
