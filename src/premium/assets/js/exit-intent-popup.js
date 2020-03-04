@@ -75,11 +75,13 @@ function initJqueryRetainfulExitIntentPopupJs() {
 
         function showRetainfulExitIntentPopup() {
             let cart_hash;
-            if(retainful_premium_exit_intent_popup.consider_cart_created_as_hash === "yes"){
-                cart_hash = sessionStorage.getItem('wc_cart_created');
-            }else {
-                let cart_hash_key = wc_cart_fragments_params.cart_hash_key;
-                cart_hash = sessionStorage.getItem(cart_hash_key);
+            for (let key in sessionStorage) {
+                if (sessionStorage.hasOwnProperty(key)) {
+                    if (key.indexOf("wc_cart_hash_") === 0) {
+                        cart_hash = sessionStorage.getItem(key);
+                        break;
+                    }
+                }
             }
             let checkout_form = $('form.checkout');
             if (checkout_form.is('.processing')) {

@@ -223,7 +223,7 @@ class OrderCoupon
         if ($this->admin->autoGenerateCouponsForOldOrders()) {
             //Create new coupon if coupon not found for order while sending the email
             $coupon_code = $this->createNewCoupon($order_id, array());
-            $this->scheduleSync($order_id);
+            //$this->scheduleSync($order_id);
         }
         if (empty($coupon_code)) {
             $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
@@ -522,7 +522,7 @@ class OrderCoupon
         }
         //Create new coupon if coupon not found for order while sending the email
         $this->createNewCoupon($order_id, array());
-        $this->scheduleSync($order_id);
+        //$this->scheduleSync($order_id);
         return true;
     }
 
