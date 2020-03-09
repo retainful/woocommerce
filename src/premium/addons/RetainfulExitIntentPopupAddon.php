@@ -332,7 +332,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function addSiteScripts()
         {
-            $load_exit_intent_popup_scripts_after = apply_filters('rnoc_load_exit_intent_popup_scripts_after', array('wc-cart-fragments'));
+            $load_exit_intent_popup_scripts_after = apply_filters('rnoc_load_exit_intent_popup_scripts_after', array());
             wp_enqueue_script('rnoc-exit-intent-bounce-back', RNOCPREMIUM_PLUGIN_URL . 'assets/js/bounce-back.min.js', $load_exit_intent_popup_scripts_after, RNOC_VERSION);
             wp_enqueue_script('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/exit-intent-popup.js', $load_exit_intent_popup_scripts_after, RNOC_VERSION);
             wp_enqueue_style('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
