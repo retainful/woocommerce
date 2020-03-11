@@ -210,7 +210,7 @@ class Order extends RestApi
             'completed_at' => $this->getCompletedAt($order),
             'total_weight' => 0,
             'discount_codes' => $this->getAppliedDiscounts($order),
-            'order_status' => self::$woocommerce->getStatus($order),
+            'order_status' => apply_filters('rnoc_abandoned_cart_order_status', self::$woocommerce->getStatus($order), $order),
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
