@@ -903,16 +903,37 @@ class Settings
         if (!empty($group)) {
             $params['group'] = $group;
         }
-        $job_id = \ActionScheduler::store()->find_action($hook, $params);
-        if (empty($job_id)) {
+        if (defined('WC_VERSION') && version_compare(WC_VERSION, '4.0', '>=')) {
+            $params['status'] = \ActionScheduler_Store::STATUS_RUNNING;
+            $job_id = \ActionScheduler::store()->find_action($hook, $params);
+            if (!empty($job_id)) {
+                return true;
+            }
+            $params['status'] = \ActionScheduler_Store::STATUS_PENDING;
+            $job_id = \ActionScheduler::store()->find_action($hook, $params);
+            if (empty($job_id)) {
+                return false;
+            }
+            $job = \ActionScheduler::store()->fetch_action($job_id);
+            $scheduled_date = $job->get_schedule()->get_date();
+            if ($scheduled_date) {
+                return (int)$scheduled_date->format('U');
+            } elseif (NULL === $scheduled_date) { // pending async action with NullSchedule
+                return true;
+            }
+            return false;
+        } else {
+            $job_id = \ActionScheduler::store()->find_action($hook, $params);
+            if (empty($job_id)) {
+                return false;
+            }
+            $job = \ActionScheduler::store()->fetch_action($job_id);
+            $next = $job->get_schedule()->next();
+            if ($next) {
+                return (int)($next->format('U'));
+            }
             return false;
         }
-        $job = \ActionScheduler::store()->fetch_action($job_id);
-        $next = $job->get_schedule()->next();
-        if ($next) {
-            return (int)($next->format('U'));
-        }
-        return false;
     }
 
     /**
