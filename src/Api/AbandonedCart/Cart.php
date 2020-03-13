@@ -635,7 +635,7 @@ class Cart extends RestApi
             'updated_at' => $this->formatToIso8601(''),
             'total_price' => $cart_total,
             'completed_at' => NULL,
-            'discount_codes' => $this->getAppliedDiscounts(),
+            'discount_codes' => self::$woocommerce->getAppliedDiscounts(),
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getCartSubTotal()),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
@@ -694,29 +694,7 @@ class Cart extends RestApi
         return $fee_items;
     }
 
-    /**
-     * Get all applied discount codes
-     * @return array
-     */
-    function getAppliedDiscounts()
-    {
-        $discounts = array();
-        $applied_discounts = self::$woocommerce->getAppliedCartCoupons();
-        $i = 1;
-        if (!empty($applied_discounts)) {
-            foreach ($applied_discounts as $applied_discount) {
-                $discounts[] = array(
-                    "id" => $i,
-                    "usage_count" => self::$woocommerce->getCouponUsageCount($applied_discount),
-                    "code" => self::$woocommerce->getCouponCode($applied_discount),
-                    "created_at" => NULL,
-                    "updated_at" => NULL
-                );
-            }
-        }
-        return $discounts;
-    }
-
+  
     /**
      * Recover the user cart
      */

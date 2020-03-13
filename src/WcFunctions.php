@@ -1014,6 +1014,36 @@ class WcFunctions
         return $subtotal;
     }
 
+
+    function getAppliedDiscounts($order = null) {
+
+        $discounts = array();
+        if(!is_null($order)) {
+            $applied_discounts = $this->getUsedCoupons($order);
+        } else {
+            $applied_discounts = $this->getAppliedCartCoupons();
+        }
+        
+        $i = 1;
+        if (!empty($applied_discounts)) {
+            foreach ($applied_discounts as $applied_discount) {
+                if(!$applied_discount instanceof \WC_Coupon){
+                    $applied_discount = new \WC_Coupon($applied_discount);
+                }
+                $discounts[] = array(
+                    "id" => $i,
+                    "usage_count" => $this->getCouponUsageCount($applied_discount),
+                    "code" => $this->getCouponCode($applied_discount),
+                    "date_expires" => $this->getCouponDateExpires($applied_discount),
+                    "discount_type" => $this->getCouponDiscountType($applied_discount),
+                    "created_at" => NULL,
+                    "updated_at" => NULL
+                );
+            }
+        }
+        return $discounts;
+    }
+
     /**
      * Get Applied coupons
      * @return array
@@ -1035,6 +1065,22 @@ class WcFunctions
     {
         if (method_exists($coupon, 'get_usage_count')) {
             return $coupon->get_usage_count();
+        }
+        return 0;
+    }
+
+    function getCouponDateExpires($coupon)
+    {
+        if (method_exists($coupon, 'get_date_expires')) {
+            return $coupon->get_date_expires();
+        }
+        return 0;
+    }
+
+    function getCouponDiscountType($coupon)
+    {
+        if (method_exists($coupon, 'get_discount_type')) {
+            return $coupon->get_discount_type();
         }
         return 0;
     }

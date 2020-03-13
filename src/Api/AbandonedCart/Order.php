@@ -209,7 +209,7 @@ class Order extends RestApi
             'total_price' => $cart_total,
             'completed_at' => $this->getCompletedAt($order),
             'total_weight' => 0,
-            'discount_codes' => $this->getAppliedDiscounts($order),
+            'discount_codes' => self::$woocommerce->getAppliedDiscounts($order),
             'order_status' => apply_filters('rnoc_abandoned_cart_order_status', self::$woocommerce->getStatus($order), $order),
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
@@ -349,33 +349,6 @@ class Order extends RestApi
             )
         );
         return $details;
-    }
-
-    /**
-     * Get all applied discount codes
-     * @param $order
-     * @return array
-     */
-    function getAppliedDiscounts($order)
-    {
-        $discounts = array();
-        $applied_discounts = self::$woocommerce->getUsedCoupons($order);
-        $i = 1;
-        if (!empty($applied_discounts)) {
-            foreach ($applied_discounts as $applied_discount) {
-                if(!$applied_discount instanceof \WC_Coupon){
-                    $applied_discount = new \WC_Coupon($applied_discount);
-                }
-                $discounts[] = array(
-                    "id" => $i,
-                    "usage_count" => self::$woocommerce->getCouponUsageCount($applied_discount),
-                    "code" => self::$woocommerce->getCouponCode($applied_discount),
-                    "created_at" => NULL,
-                    "updated_at" => NULL
-                );
-            }
-        }
-        return $discounts;
     }
 
     /**
