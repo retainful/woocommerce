@@ -1665,28 +1665,6 @@ class WcFunctions
         return array();
     }
 
-    /**
-     * Get all applied discount codes
-     * @return array
-     */
-    function getAppliedDiscounts()
-    {
-        $discounts = array();
-        $applied_discounts = self::$woocommerce->getAppliedCartCoupons();
-        $i = 1;
-        if (!empty($applied_discounts)) {
-            foreach ($applied_discounts as $applied_discount) {
-                $discounts[] = array(
-                    "id" => $i,
-                    "code" => $applied_discount->code,
-                    "usage_count" => $applied_discount->usage_count,
-                    "created_at" => NULL,
-                    "updated_at" => NULL
-                );
-            }
-        }
-        return $discounts;
-    }
 
     /**
      * Get cart items total tax

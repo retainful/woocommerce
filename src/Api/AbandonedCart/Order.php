@@ -363,6 +363,9 @@ class Order extends RestApi
         $i = 1;
         if (!empty($applied_discounts)) {
             foreach ($applied_discounts as $applied_discount) {
+                if(!$applied_discount instanceof \WC_Coupon){
+                    $applied_discount = new \WC_Coupon($applied_discount);
+                }
                 $discounts[] = array(
                     "id" => $i,
                     "usage_count" => self::$woocommerce->getCouponUsageCount($applied_discount),
