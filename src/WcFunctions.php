@@ -1074,7 +1074,7 @@ class WcFunctions
         if (method_exists($coupon, 'get_date_expires')) {
             return $coupon->get_date_expires();
         }
-        return 0;
+        return '';
     }
 
     function getCouponDiscountType($coupon)
@@ -1082,7 +1082,7 @@ class WcFunctions
         if (method_exists($coupon, 'get_discount_type')) {
             return $coupon->get_discount_type();
         }
-        return 0;
+        return '';
     }
 
     /**
