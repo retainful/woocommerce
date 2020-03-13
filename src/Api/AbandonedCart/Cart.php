@@ -727,6 +727,13 @@ class Cart extends RestApi
             $this->reCreateCart();
         } catch (Exception $exception) {
         }
+        if (!empty($_GET)) {
+            foreach ($_GET as $key => $value) {
+                if ($key != "token" && $key != "hash") {
+                    $checkout_url = add_query_arg($key, $value, $checkout_url);
+                }
+            }
+        }
         $checkout_url = apply_filters('retainful_recovery_redirect_url', $checkout_url);
         wp_safe_redirect($checkout_url);
         exit;
