@@ -457,8 +457,8 @@ class OrderCoupon
         $coupon_details = $this->isValidCoupon($coupon_code);
         if (!empty($coupon_details)) {
             $is_coupon_already_applied = false;
-            if (!empty(self::$applied_coupons) && self::$applied_coupons != $coupon_code)
-                $is_coupon_already_applied = true;
+            /*if (!empty(self::$applied_coupons) && self::$applied_coupons != $coupon_code)
+                $is_coupon_already_applied = true;*/
             if (isset($coupon_details->ID) && !empty($coupon_details->ID) && !$is_coupon_already_applied) {
                 self::$applied_coupons = $coupon_code;
                 $discount_type = 'fixed_cart';
