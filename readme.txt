@@ -369,3 +369,8 @@ No. There is no charges for support.
 = 2.1.9 =
 * Fix: Blacklist IP from tracking carts
 * Fix: Next order coupon not attaching to email when order status is different
+
+= 2.2.0 =
+* Fix: Issue with email customizer plus retainful block
+* Fix: Deprecation warning with woocommerce 4.0(Action scheduler)
+* Fix: Getting applied discounts issue
