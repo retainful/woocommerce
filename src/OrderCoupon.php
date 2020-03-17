@@ -435,11 +435,18 @@ class OrderCoupon
      */
     function setCouponToSession()
     {
+        $request_coupon_code = null;
         if (isset($_REQUEST['retainful_coupon_code'])) {
-            $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
-            if (empty($coupon_code)) {
-                $coupon_code = sanitize_text_field($_REQUEST['retainful_coupon_code']);
-                $this->wc_functions->setPHPSession('retainful_coupon_code', $coupon_code); // Set the coupon code in session
+            $request_coupon_code = sanitize_text_field($_REQUEST['retainful_coupon_code']);
+        }
+        if (isset($_REQUEST['retainful_ac_coupon'])) {
+            $request_coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
+        }
+        $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
+        if (!empty($request_coupon_code) && empty($coupon_code)) {
+            $coupon_details = $this->getCouponByCouponCode($request_coupon_code);
+            if (!empty($coupon_details)) {
+                $this->wc_functions->setPHPSession('retainful_coupon_code', $request_coupon_code); // Set the coupon code in session
             }
         }
     }
