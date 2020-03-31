@@ -377,7 +377,12 @@ class Cart extends RestApi
                 self::$settings->logMessage($cart, 'cart');
                 $cart_hash = $this->encryptData($cart);
                 if (!empty($cart_hash)) {
-                    $this->syncCart($cart_hash);
+                    $extra_headers = array(
+                        "Retainful-Client-IP" => $this->formatUserIP($this->getClientIp()),
+                        "version" => RNOC_VERSION,
+                        "cart_token" => $this->getCartToken()
+                    );
+                    $this->syncCart($cart_hash, $extra_headers);
                 }
             }
         }
