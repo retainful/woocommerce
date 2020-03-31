@@ -33,7 +33,8 @@ class CMB2_Field_Premium_Addon_List
                 <?php
                 foreach ($available_addon_list as $addon) {
                     $title = $addon->title();
-                    if (!empty($title)) {
+                    $slug = $addon->slug();
+                    if (!empty($title) && $slug != "do-not-track-ip") {
                         ?>
                         <div class="rnoc-grid-cell retainful_premium_grid">
                             <div class="avatar-lg-bg">
@@ -46,7 +47,7 @@ class CMB2_Field_Premium_Addon_List
                             </div>
                             <div class="footer">
                                 <button type="button" class="view-addon-btn button button-premium"
-                                        data-slug="<?php echo $addon->slug(); ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
+                                        data-slug="<?php echo $slug; ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
                             </div>
                         </div>
                         <?php
@@ -58,28 +59,18 @@ class CMB2_Field_Premium_Addon_List
         } else {
             $available_addon_list = array(
                 array(
-                    'title' => __('Add to Cart Popup for Email collection (Premium)', RNOC_TEXT_DOMAIN),
+                    'title' => __('Add-to-Cart Email Collection Popup (Premium)', RNOC_TEXT_DOMAIN),
                     'description' => __('Collect customer email at the time of adding to cart. This will help you recover the cart even if they abandon before checkout.', RNOC_TEXT_DOMAIN),
                     'icon' => 'dashicons-cart'
                 ),
                 array(
-                    'title' => __('Coupon For Email Collection (Premium)', RNOC_TEXT_DOMAIN),
-                    'description' => __('Encourage customers to enter the email to get a coupon code. This way you will come to know the customer email and can recover cart even if they abandon before checkout', RNOC_TEXT_DOMAIN),
-                    'icon' => 'dashicons-tag'
-                ),
-                array(
                     'title' => __('Countdown Timer (Premium)', RNOC_TEXT_DOMAIN),
-                    'description' => __('Give a clear deadline to grab the offer and add urgency using Countdown timer', RNOC_TEXT_DOMAIN),
+                    'description' => __('Give a clear deadline to grab the offer and create a sense of urgency using Countdown Timer', RNOC_TEXT_DOMAIN),
                     'icon' => 'dashicons-clock'
                 ),
                 array(
-                    'title' => __('IP Filter (Premium)', RNOC_TEXT_DOMAIN),
-                    'description' => __('Exclude capturing carts from selected IPs or a range of IPs.', RNOC_TEXT_DOMAIN),
-                    'icon' => 'dashicons-admin-site-alt'
-                ),
-                array(
                     'title' => __('Exit Intent Popup (Premium)', RNOC_TEXT_DOMAIN),
-                    'description' => __('Convert or collect email when your customers tries to leave your site with items in their cart. This add-on can detect the exit and trigger a popup with a coupon and/or an email form', RNOC_TEXT_DOMAIN),
+                    'description' => __('When customers try to leave your store, stop them by showing a coupon code or just collect their email and catch them later.', RNOC_TEXT_DOMAIN),
                     'icon' => 'dashicons-external'
                 )
             );
@@ -102,7 +93,7 @@ class CMB2_Field_Premium_Addon_List
                         <div class="footer">
                             <a href="<?php echo $premium_url; ?>"
                                target="_blank"
-                               class="button button-premium"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN); ?></a>
+                               class="button button-premium"><?php echo __('Upgrade to a Paid Plan', RNOC_TEXT_DOMAIN); ?></a>
                         </div>
                     </div>
                     <?php
@@ -119,12 +110,14 @@ class CMB2_Field_Premium_Addon_List
             });
             jQuery('.cmb-tabs div').click(function () {
                 var save_btn = jQuery('#submit-cmb');
+                var save_btn_top = jQuery('#submit-cmb-top');
                 var id = jQuery(this).attr('id');
-                console.log(save_btn);
                 if (id === "rnoc_retainful_premium_addon-tab-general-settings") {
                     save_btn.hide();
+                    save_btn_top.hide();
                 } else {
                     save_btn.show();
+                    save_btn_top.show();
                 }
             });
         </script>

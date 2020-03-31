@@ -6,7 +6,7 @@ class Survey
 {
     public $plugin, $plugin_text_domain, $name;
     protected $token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1NjYzODMxODAsImV4cCI6NDI4MDI3MzE4MH0.RzNuhNyCu9oydkY9NRGFhFmQI0ALWBP0B1AmHub57XE";
-    protected $endpoint = "https://www.retainful.com/.netlify/functions/feedback";
+    protected $endpoint = "https://feedback.retainful.com/.netlify/functions/feedback";
 
     /**
      * init the survey
@@ -88,20 +88,19 @@ class Survey
                     if (reason === "Other") {
                         reason = $form.find('.selected input[type=text]').val();
                     }
+                    var post_data = {
+                        "subject": "Woocommerce retainful plugin deactivation survey form!",
+                        "message": reason,
+                        "url": "<?php echo esc_url(home_url()); ?>",
+                        "name": "<?php echo $display_name; ?>",
+                        "code": $form.find('.selected input[type=radio]').val(),
+                        "token": "<?php echo $this->token ?>"
+                    };
                     var submitSurvey = $.ajax(
                         {
                             url: "<?php echo $this->endpoint; ?>",
                             type: "POST",
-                            data: {
-                                data: {
-                                    subject: "Woocommerce retainful plugin deactivation survey form!",
-                                    message: reason,
-                                    url: '<?php echo esc_url(home_url()); ?>',
-                                    name: '<?php echo $display_name; ?>',
-                                    code: $form.find('.selected input[type=radio]').val()
-                                },
-                                token: "<?php echo $this->token ?>"
-                            },
+                            data: JSON.stringify(post_data),
                             dataType: 'json',
                             async: false,
                             success: function (msg) {
@@ -237,38 +236,42 @@ class Survey
     {
         $options = array(
             1 => array(
-                'title' => esc_html__('I want to change the audience associated with this integration.', $this->plugin_text_domain),
-                'reason' => 'I want to change the audience associated with this integration.'
+                'title' => esc_html__('I could not connect to Retainful', $this->plugin_text_domain),
+                'reason' => 'I could not connect to Retainful'
             ),
             2 => array(
-                'title' => esc_html__('I want to change the site or store connected through this integration.', $this->plugin_text_domain),
-                'reason' => 'I want to change the site or store connected through this integration.'
+                'title' => esc_html__('The carts are not synchronizing to Retainful', $this->plugin_text_domain),
+                'reason' => 'The carts are not synchronizing to Retainful'
             ),
             3 => array(
-                'title' => esc_html__('The order data isn\'t syncing.', $this->plugin_text_domain),
-                'reason' => 'The order data isn\'t syncing.'
+                'title' => esc_html__('Abandoned Cart mails are not sending', $this->plugin_text_domain),
+                'reason' => 'Abandoned Cart mails are not sending'
             ),
             4 => array(
-                'title' => esc_html__('The promo codes aren\'t showing up.', $this->plugin_text_domain),
-                'reason' => 'The promo codes aren\'t showing up.'
+                'title' => esc_html__('Next order coupons are not working', $this->plugin_text_domain),
+                'reason' => 'Next order coupons are not working'
             ),
             5 => array(
-                'title' => esc_html__('I\'m trying to troubleshoot the integration.', $this->plugin_text_domain),
-                'reason' => 'I\'m trying to troubleshoot the integration.'
+                'title' => esc_html__('Plugin conflicts with another', $this->plugin_text_domain),
+                'reason' => 'Plugin conflicts with another'
             ),
             6 => array(
-                'title' => esc_html__('I was instructed to disconnect by Mailchimp Support.', $this->plugin_text_domain),
-                'reason' => 'I was instructed to disconnect by Mailchimp Support.'
+                'title' => esc_html__('I find too complex to configure', $this->plugin_text_domain),
+                'reason' => 'I find too complex to configure'
             ),
             7 => array(
-                'title' => esc_html__('I no longer use this integration.', $this->plugin_text_domain),
-                'reason' => 'I no longer use this integration.'
+                'title' => esc_html__('I am looking for more features', $this->plugin_text_domain),
+                'reason' => 'I am looking for more features'
             ),
             8 => array(
-                'title' => esc_html__('It\'s a temporary deactivation.', $this->plugin_text_domain),
-                'reason' => 'It\'s a temporary deactivation.'
+                'title' => esc_html__('Its a temporary deactivation', $this->plugin_text_domain),
+                'reason' => 'Its a temporary deactivation'
             ),
             9 => array(
+                'title' => esc_html__('Retainful Support has asked to deactivate the plugin', $this->plugin_text_domain),
+                'reason' => 'Retainful Support has asked to deactivate the plugin'
+            ),
+            10 => array(
                 'title' => esc_html__('Other', $this->plugin_text_domain),
                 'reason' => 'Other',
                 'details' => esc_html__('Please share the reason', $this->plugin_text_domain),
@@ -281,8 +284,8 @@ class Survey
                 <form class="<?php echo $this->plugin; ?>-deactivate-survey" method="post">
 						<span class="<?php echo $this->plugin; ?>-deactivate-survey-header">
 							<span class="dashicons dashicons-testimonial"></span>
-							<?php echo ' ' . esc_html__('Quick Feedback', 'mailchimp-woocommerce'); ?>
-							<span title="<?php esc_attr_e('Close', 'mailchimp-woocommerce'); ?> "
+							<?php echo ' ' . esc_html__('Quick Feedback', $this->plugin_text_domain); ?>
+							<span title="<?php esc_attr_e('Close', $this->plugin_text_domain); ?> "
                                   class="<?php echo $this->plugin; ?>-deactivate-survey-close">✕</span>
 						</span>
 
@@ -290,8 +293,8 @@ class Survey
 							<?php
                             printf(
                             /* translators: %s - plugin name. */
-                                esc_html__('If you have a moment, please share why you are deactivating %s:', 'mailchimp-woocommerce'),
-                                esc_html__('Mailchimp for Woocommerce', 'mc-woocommerce')
+                                esc_html__('If you have a moment, please share why you are deactivating %s:', $this->plugin_text_domain),
+                                esc_html__('Retainful - Next order coupon for Woocommerce', $this->plugin_text_domain)
                             );
                             ?>
 						</span>
@@ -319,9 +322,9 @@ class Survey
                     </div>
                     <div class="<?php echo $this->plugin; ?>-deactivate-survey-footer">
                         <button type="submit"
-                                class="<?php echo $this->plugin; ?>-deactivate-survey-submit button button-primary button-large"><?php echo esc_html__('Submit & Deactivate', 'mailchimp-woocommerce'); ?></button>
+                                class="<?php echo $this->plugin; ?>-deactivate-survey-submit button button-primary button-large"><?php echo esc_html__('Submit & Deactivate', $this->plugin_text_domain); ?></button>
                         <a href="#"
-                           class="<?php echo $this->plugin; ?>-deactivate-survey-deactivate"><?php echo esc_html__('Skip & Deactivate', 'mailchimp-woocommerce'); ?></a>
+                           class="<?php echo $this->plugin; ?>-deactivate-survey-deactivate"><?php echo esc_html__('Skip & Deactivate', $this->plugin_text_domain); ?></a>
                     </div>
                 </form>
             </div>
@@ -367,7 +370,7 @@ class Survey
                 if (!filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
                     $is_local_url = true;
                 }
-            } else if ('localhost' === $host) {
+            } elseif ('localhost' === $host) {
                 $is_local_url = true;
             }
             $tlds_to_check = array('.dev', '.local', ':8888');

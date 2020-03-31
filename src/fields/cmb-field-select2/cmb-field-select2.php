@@ -12,8 +12,8 @@ License: GPLv2+
 /**
  * Class PW_CMB2_Field_Select2
  */
-if (!class_exists('PW_CMB2_Field_Select2')) {
-    class PW_CMB2_Field_Select2
+if (!class_exists('CMB2_RNOC_Field_Select2')) {
+    class CMB2_RNOC_Field_Select2
     {
         /**
          * Current version number
@@ -172,4 +172,4 @@ if (!class_exists('PW_CMB2_Field_Select2')) {
         }
     }
 }
-$pw_cmb2_field_select2 = new PW_CMB2_Field_Select2();
+$pw_cmb2_field_select2 = new CMB2_RNOC_Field_Select2();

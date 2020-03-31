@@ -22,7 +22,7 @@ class CMB2_Field_Edit_Email_Template
     public function setupAdminScripts()
     {
         $asset_path = apply_filters('cmb2_field_email_template_preview', plugins_url('', __FILE__));
-        wp_enqueue_script('abandoned-cart-email-preview', $asset_path . '/js/main.js');
+        wp_enqueue_script('abandoned-cart-email-preview', $asset_path . '/js/main.js',array(),RNOC_VERSION);
         wp_localize_script('abandoned-cart-email-preview', 'email_template', array('email_field_empty' => __('Please enter email Id!', RNOC_TEXT_DOMAIN), 'sure_msg' => __('Are you sure?', RNOC_TEXT_DOMAIN), 'path' => admin_url('admin-ajax.php')));
     }
 

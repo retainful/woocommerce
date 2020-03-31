@@ -2,8 +2,8 @@
 /**
  * Class MAG_CMB2_Field_Post_Search_Ajax
  */
-if (!class_exists('MAG_CMB2_Field_Post_Search_Ajax')) {
-    class MAG_CMB2_Field_Post_Search_Ajax
+if (!class_exists('CMB2_RNOC_Field_Post_Search_Ajax')) {
+    class CMB2_RNOC_Field_Post_Search_Ajax
     {
         /**
          * Current version number
@@ -31,6 +31,7 @@ if (!class_exists('MAG_CMB2_Field_Post_Search_Ajax')) {
         {
             $this->setup_admin_scripts();
             $field_name = $field->_name();
+            $value_field_type = $field->args('valuefield') ? $field->args('valuefield') : 'id';
             if ($field->args('limit') > 1) {
                 echo '<ul class="cmb-post-search-ajax-results" id="' . $field_name . '_results">';
                 if (isset($value) && !empty($value)) {
@@ -59,7 +60,11 @@ if (!class_exists('MAG_CMB2_Field_Post_Search_Ajax')) {
                 if ($field->args('object_type') == 'user') {
                     $field_value = ($value ? get_userdata($value)->display_name : '');
                 } else {
-                    $field_value = ($value ? get_the_title($value) : '');
+                    if ($value_field_type == "title") {
+                        $field_value = $value;
+                    } else {
+                        $field_value = ($value ? get_the_title($value) : '');
+                    }
                 }
                 echo $field_type->input(array(
                     'type' => 'hidden',
@@ -76,6 +81,7 @@ if (!class_exists('MAG_CMB2_Field_Post_Search_Ajax')) {
                 'value' => $field_value,
                 'desc' => false,
                 'data-limit' => $field->args('limit') ? $field->args('limit') : '1',
+                'data-valuefield' => $value_field_type,
                 'data-sortable' => $field->args('sortable') ? $field->args('sortable') : '0',
                 'data-object' => $field->args('object_type') ? $field->args('object_type') : 'post',
                 'data-queryargs' => $field->args('query_args') ? htmlspecialchars(json_encode($field->args('query_args')), ENT_QUOTES, 'UTF-8') : ''
@@ -171,7 +177,7 @@ if (!class_exists('MAG_CMB2_Field_Post_Search_Ajax')) {
                             // Define filter "mag_cmb_post_search_ajax_result" to allow customize ajax results.
                             $datas[] = apply_filters('mag_cmb_post_search_ajax_result', array(
                                 'value' => get_the_title(),
-                                'data' => get_the_ID(),
+                                'data' => (isset($_POST['value_field']) && $_POST['value_field'] == "title") ? get_the_title() : get_the_ID(),
                                 'guid' => get_edit_post_link()
                             ));
                         endwhile;
@@ -183,4 +189,4 @@ if (!class_exists('MAG_CMB2_Field_Post_Search_Ajax')) {
         }
     }
 }
-$mag_cmb2_field_post_search_ajax = new MAG_CMB2_Field_Post_Search_Ajax();
+$mag_cmb2_field_post_search_ajax = new CMB2_RNOC_Field_Post_Search_Ajax();

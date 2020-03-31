@@ -222,7 +222,7 @@ class AbandonedCart
                 return;
             }
             $wpdb->insert($this->cart_history_table,
-                array('language_code' => $language_code, 'currency_code' => $currency_code, 'customer_key' => $customer_id, 'cart_contents' => json_encode($this->wc_functions->getCart()), 'cart_expiry' => $current_time + $cart_cut_off_time, 'cart_is_recovered' => 0, 'show_on_funnel_report' => 1, 'ip_address' => $_SERVER['REMOTE_ADDR'], 'item_count' => $cart->cart_contents_count, 'cart_total' => $cart->cart_contents_total),
+                array('language_code' => $language_code, 'currency_code' => $currency_code, 'customer_key' => $customer_id, 'cart_contents' => json_encode($this->wc_functions->getCart()), 'cart_expiry' => $current_time + $cart_cut_off_time, 'cart_is_recovered' => 0, 'show_on_funnel_report' => 1, 'ip_address' => $this->getClientIp(), 'item_count' => $cart->cart_contents_count, 'cart_total' => $cart->cart_contents_total),
                 array('%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%d')
             );
             $this->scheduleEmailTemplate($wpdb->insert_id, $current_time + $cart_cut_off_time);
@@ -231,7 +231,7 @@ class AbandonedCart
             if (is_checkout() || $current_time - $cart_cut_off_time > $row->cart_expiry) {
                 $update_values = array(
                     'cart_contents' => json_encode($this->wc_functions->getCart()),
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
+                    'ip_address' => $this->getClientIp(),
                     'item_count' => $cart->cart_contents_count,
                     'cart_total' => $cart->cart_contents_total,
                     'viewed_checkout' => true,
@@ -242,7 +242,7 @@ class AbandonedCart
                 $update_values = array(
                     'cart_contents' => json_encode($this->wc_functions->getCart()),
                     /*'cart_expiry' => $current_time,*/
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
+                    'ip_address' => $this->getClientIp(),
                     'item_count' => $cart->cart_contents_count,
                     'cart_total' => $cart->cart_contents_total,
                     'currency_code' => $currency_code,
@@ -257,6 +257,48 @@ class AbandonedCart
                 )
             );
         }
+    }
+
+    /**
+     * Get the client IP address
+     * @return mixed|string
+     */
+    function getClientIp()
+    {
+        if (class_exists('WC_Geolocation')) {
+            return \WC_Geolocation::get_ip_address();
+        }
+        if (isset($_SERVER['HTTP_X_REAL_IP'])) {
+            $client_ip = $_SERVER['HTTP_X_REAL_IP'];
+        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $client_ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $client_ip = $_SERVER['HTTP_X_FORWARDED'];
+        } elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $client_ip = $_SERVER['HTTP_FORWARDED_FOR'];
+        } elseif (isset($_SERVER['HTTP_FORWARDED'])) {
+            $client_ip = $_SERVER['HTTP_FORWARDED'];
+        } elseif (isset($_SERVER['REMOTE_ADDR'])) {
+            $client_ip = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $client_ip = '';
+        }
+        return $this->formatUserIP($client_ip);
+    }
+
+    /**
+     * Sometimes the IP address returne is not formatted quite well.
+     * So it requires a basic formating.
+     * @param $ip
+     * @return String
+     */
+    function formatUserIP($ip)
+    {
+        //check for commas in the IP
+        $ip = trim(current(preg_split('/,/', sanitize_text_field(wp_unslash($ip)))));
+        return (string)$ip;
     }
 
     /**
@@ -340,7 +382,7 @@ class AbandonedCart
     function sendAbandonedCartEmails()
     {
         global $wpdb;
-        $this->removeFinishedHooks('rnoc_abandoned_cart_send_email', 'publish');
+        $this->admin->removeFinishedHooks('rnoc_abandoned_cart_send_email', 'publish');
         $current_time = current_time('timestamp');
         $to_remain_history_query = "SELECT history.*,template.is_active as is_template_active,queue.id as queue_id,template.language_code as template_language_code,queue.template_id as template_id,template.subject,template.extra ,template.body FROM `{$this->email_queue_table}` AS queue LEFT JOIN `{$this->cart_history_table}` AS history ON history.id = queue.cart_id LEFT JOIN `{$this->email_templates_table}` as template ON template.id = queue.template_id WHERE queue.is_completed = 0 AND queue.run_at < {$current_time} AND history.cart_is_recovered = 0 AND history.order_id IS NULL";
         $to_remain_histories = $wpdb->get_results($to_remain_history_query);
@@ -477,11 +519,13 @@ class AbandonedCart
                 $sub_line_prod_name = $product_name;
             }
             // Item subtotal is calculated as product total including taxes
-            if ($cart->line_tax != 0 && $cart->line_tax > 0) {
-                $item_subtotal = $item_subtotal + $cart->line_total + $cart->line_tax;
+            $line_total = (isset($cart->line_total) && !empty($cart->line_total)) ? $cart->line_total : 0;
+            if (!$this->wc_functions->isPriceExcludingTax()) {
+                $line_total_tax = (isset($cart->line_tax) && !empty($cart->line_tax)) ? $cart->line_tax : 0;
             } else {
-                $item_subtotal = $item_subtotal + $cart->line_total;
+                $line_total_tax = 0;
             }
+            $item_subtotal = $line_total + $line_total_tax;
             //  Line total
             $item_total = $item_subtotal;
             $item_subtotal = $item_subtotal / $quantity_total;
@@ -529,6 +573,7 @@ class AbandonedCart
         }
         return NULL;
     }
+
     /**
      * Encrypt the key
      * @param $key
@@ -562,44 +607,7 @@ class AbandonedCart
             }
         }
         //Remove all hooks
-        $this->removeFinishedHooks('rnoc_abandoned_clear_abandoned_carts', 'publish');
-    }
-
-    /**
-     * All the available scheduled actions post name
-     * @return array
-     */
-    protected function availableScheduledActions()
-    {
-        return array('rnocp_check_user_plan', 'rnoc_abandoned_clear_abandoned_carts', 'rnoc_abandoned_cart_send_email');
-    }
-    /**
-     * Remove all hooks and schedule once
-     * @param $post_title
-     * @param $status
-     * @return bool
-     */
-    function removeFinishedHooks($post_title, $status = "")
-    {
-        $available_action_names = $this->availableScheduledActions();
-        if (!empty($post_title) && !in_array($post_title, $available_action_names)) {
-            return false;
-        }
-        global $wpdb;
-        $res = true;
-        $where = "";
-        if (!empty($status)) {
-            $where = "AND post_status = '" . $status . "'";
-        }
-        $scheduled_actions = $wpdb->get_results("SELECT ID from `" . $wpdb->prefix . "posts` where post_title ='" . $post_title . "' {$where} AND  post_type='scheduled-action'");
-        if (!empty($scheduled_actions)) {
-            foreach ($scheduled_actions as $action) {
-                if (!wp_delete_post($action->ID, true)) {
-                    $res = false;
-                }
-            }
-        }
-        return $res;
+        $this->admin->removeFinishedHooks('rnoc_abandoned_clear_abandoned_carts', 'publish');
     }
 
     /**
@@ -656,7 +664,7 @@ class AbandonedCart
                         apply_filters('rnoc_set_current_currency_code', $abandoned_cart_history_results->currency_code);
                     }
                     if (empty($user_id)) {
-                        wc_add_notice(__('It seems, your cart has expired!'),'error');
+                        wc_add_notice(__('It seems, your cart has expired!'), 'error');
                     }
                     if ($data['email_sent'] > 0 && is_numeric($data['email_sent'])) {
                         wp_redirect($data['url']);
@@ -800,7 +808,7 @@ class AbandonedCart
             return;
         }
         $asset_path = plugins_url('', __FILE__);
-        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'capture_guest_details', $asset_path . '/assets/js/track_guest.js', '', '', true);
+        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'capture_guest_details', $asset_path . '/assets/js/track_guest.js', '', RNOC_VERSION, true);
         wp_localize_script(RNOC_PLUGIN_PREFIX . 'capture_guest_details', 'retainful_guest_capture_params', array('ajax_url' => admin_url('admin-ajax.php')));
     }
 
@@ -910,7 +918,7 @@ class AbandonedCart
             $get_only = ' AND cart_is_recovered=1 ';
         } elseif ($cart_type == 'recoverable') {
             $get_only = 'AND cart_is_recovered =0  AND (Length(customer_key) < 32 OR (SELECT id FROM `' . $this->guest_cart_history_table . '` WHERE session_id = `' . $this->cart_history_table . '`.customer_key AND email_id is NOT NULL)) ';
-            if($is_tracking_enabled) {
+            if ($is_tracking_enabled) {
                 $get_only .= ' AND cart_expiry <' . $current_time . ' ';
             }
         } else {
@@ -1323,9 +1331,9 @@ class AbandonedCart
      */
     function canTrackAbandonedCarts()
     {
-        if (!apply_filters('rnoc_can_track_abandoned_carts', true)) {
-            return false;
+        if (apply_filters('rnoc_is_cart_has_valid_ip', true, null)) {
+            return true;
         }
-        return true;
+        return false;
     }
 }

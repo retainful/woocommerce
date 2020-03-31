@@ -27,6 +27,7 @@ class CMB2_Field_Unlock_Features
     public function render_unlock_features($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
     {
         $for = isset($field->args['for']) ? $field->args['for'] : 'pro-coupon-usage-restriction';
+        $unlock_message = isset($field->args['unlock_message']) ? $field->args['unlock_message'] : __('Sign up to unlock coupon rules for FREE!', RNOC_TEXT_DOMAIN);
         $link_only_field = isset($field->args['link_only_field']) ? $field->args['link_only_field'] : 0;
         $admin = new \Rnoc\Retainful\Admin\Settings();
         if ($link_only_field == 1) {
@@ -77,7 +78,7 @@ class CMB2_Field_Unlock_Features
                      class="overlay-image">
                 <div class="container-middle">
                     <div class="overlay-text"><span
-                                class="dashicons-lock dashicons"></span><?php echo __('Unlock this features!', RNOC_TEXT_DOMAIN) ?>
+                                class="dashicons-lock dashicons"></span><?php echo $unlock_message ?>
                         <br><br>
                         <a href="<?php echo $redirect_url; ?>"
                            target="_blank"><?php echo __('Click Here!', RNOC_TEXT_DOMAIN); ?></a>
