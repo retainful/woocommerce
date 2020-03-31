@@ -208,9 +208,13 @@ class Cart extends RestApi
     {
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
+            $user_ip = $this->getClientIp();
+            $user_ip = $this->formatUserIP($user_ip);
             $data = array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
+                'ip' => $user_ip,
+                'version' => RNOC_VERSION,
                 'public_key' => self::$settings->getApiKey(),
                 'api_url' => self::$api->getAbandonedCartEndPoint(),
                 'tracking_element_selector' => $this->getTrackingElementId(),
@@ -694,7 +698,6 @@ class Cart extends RestApi
         return $fee_items;
     }
 
-  
     /**
      * Recover the user cart
      */
