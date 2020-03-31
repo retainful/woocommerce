@@ -99,7 +99,8 @@ class OrderCoupon
      */
     function wooEmailCustomizerRetainfulCouponContent($order_coupon_data, $order, $sending_email)
     {
-        $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+        $order_id = $this->wc_functions->getOrderId($order);
+        $coupon_code = $this->wc_functions->getPostMeta($order_id, '_rnoc_next_order_coupon');
         if (!empty($coupon_code)) {
             $coupon_details = $this->getCouponDetails($coupon_code);
             if (!empty($coupon_details)) {
@@ -214,26 +215,22 @@ class OrderCoupon
      * @param $sent_to_admin
      * @param $plain_text
      * @param $email
-     * @return bool
      */
     function attachOrderCoupon($order, $sent_to_admin, $plain_text = '', $email = '')
     {
         $order_id = $this->wc_functions->getOrderId($order);
-        if (!$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order)) {
-            return false;
-        }
         $coupon_code = '';
         if ($this->admin->autoGenerateCouponsForOldOrders()) {
             //Create new coupon if coupon not found for order while sending the email
             $coupon_code = $this->createNewCoupon($order_id, array());
-            $this->scheduleSync($order_id);
+            //$this->scheduleSync($order_id);
         }
         if (empty($coupon_code)) {
             $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
         }
         if (!empty($coupon_code)) {
             $message = "";
-            $coupon_details = $this->getCouponDetails($coupon_code);
+            $coupon_details = $this->getCouponByCouponCode($coupon_code);
             if (!empty($coupon_details)) {
                 $post_id = $coupon_details->ID;
                 $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
@@ -263,7 +260,7 @@ class OrderCoupon
                     }
                 }
             }
-            $message = apply_filters('rnoc_before_displaying_next_order_coupon', $message);
+            $message = apply_filters('rnoc_before_displaying_next_order_coupon', $message, $order);
             echo $message;
             do_action('rnoc_after_displaying_next_order_coupon');
         }
@@ -438,11 +435,18 @@ class OrderCoupon
      */
     function setCouponToSession()
     {
+        $request_coupon_code = null;
         if (isset($_REQUEST['retainful_coupon_code'])) {
-            $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
-            if (empty($coupon_code)) {
-                $coupon_code = sanitize_text_field($_REQUEST['retainful_coupon_code']);
-                $this->wc_functions->setPHPSession('retainful_coupon_code', $coupon_code); // Set the coupon code in session
+            $request_coupon_code = sanitize_text_field($_REQUEST['retainful_coupon_code']);
+        }
+        if (isset($_REQUEST['retainful_ac_coupon'])) {
+            $request_coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
+        }
+        $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
+        if (!empty($request_coupon_code) && empty($coupon_code)) {
+            $coupon_details = $this->getCouponByCouponCode($request_coupon_code);
+            if (!empty($coupon_details)) {
+                $this->wc_functions->setPHPSession('retainful_coupon_code', $request_coupon_code); // Set the coupon code in session
             }
         }
     }
@@ -460,8 +464,8 @@ class OrderCoupon
         $coupon_details = $this->isValidCoupon($coupon_code);
         if (!empty($coupon_details)) {
             $is_coupon_already_applied = false;
-            if (!empty(self::$applied_coupons) && self::$applied_coupons != $coupon_code)
-                $is_coupon_already_applied = true;
+            /*if (!empty(self::$applied_coupons) && self::$applied_coupons != $coupon_code)
+                $is_coupon_already_applied = true;*/
             if (isset($coupon_details->ID) && !empty($coupon_details->ID) && !$is_coupon_already_applied) {
                 self::$applied_coupons = $coupon_code;
                 $discount_type = 'fixed_cart';
@@ -525,7 +529,7 @@ class OrderCoupon
         }
         //Create new coupon if coupon not found for order while sending the email
         $this->createNewCoupon($order_id, array());
-        $this->scheduleSync($order_id);
+        //$this->scheduleSync($order_id);
         return true;
     }
 
@@ -605,6 +609,18 @@ class OrderCoupon
     function getRequestParams($order)
     {
         if (empty($order)) return array();
+        $new_coupon = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+        $coupon_details = $this->getCouponByCouponCode($new_coupon);
+        $expire_date = $apply_url = '';
+        if (!empty($coupon_details)) {
+            if (isset($coupon_details->ID) && !empty($coupon_details->ID)) {
+                $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
+                if (!empty($coupon_expiry_date)) {
+                    $expire_date = strtotime($coupon_expiry_date);
+                }
+                $apply_url = add_query_arg('retainful_coupon_code', $new_coupon, site_url());
+            }
+        }
         return array(
             'order_id' => $this->wc_functions->getOrderId($order),
             'email' => $this->wc_functions->getOrderEmail($order),
@@ -613,7 +629,9 @@ class OrderCoupon
             'total' => $this->wc_functions->getOrderTotal($order),
             'new_coupon' => $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon'),
             'applied_coupon' => $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon_applied'),
-            'order_date' => strtotime($this->wc_functions->getOrderDate($order))
+            'order_date' => strtotime($this->wc_functions->getOrderDate($order)),
+            'expired_at' => $expire_date,
+            'apply_url' => $apply_url
         );
     }
 
@@ -771,7 +789,6 @@ class OrderCoupon
         if (!$order) {
             return false;
         }
-        $coupon = $this->isCouponFound($order_id);
         $coupon_settings = $this->admin->getCouponSettings();
         if (!$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order) || !$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
             return NULL;
@@ -781,6 +798,7 @@ class OrderCoupon
         if (empty($email)) {
             $email = (isset($_REQUEST['_billing_email']) && !empty($_REQUEST['_billing_email'])) ? $_REQUEST['_billing_email'] : '';
         }
+        $coupon = $this->isCouponFound($order_id);
         $order_date = $this->wc_functions->getOrderDate($order);
         if (empty($coupon)) {
             $new_coupon_code = strtoupper(uniqid());
@@ -917,7 +935,8 @@ class OrderCoupon
             $settings = $this->admin->getCouponSettings();
             add_post_meta($id, 'order_id', $order_id);
             add_post_meta($id, 'email', $email);
-            $user_id = get_current_user_id();
+            $order = $this->wc_functions->getOrder($order_id);
+            $user_id = $this->wc_functions->getOrderUserId($order);
             add_post_meta($id, 'user_id', $user_id);
             add_post_meta($id, 'coupon_type', isset($settings['coupon_type']) ? sanitize_text_field($settings['coupon_type']) : '0');
             add_post_meta($id, 'coupon_value', isset($settings['coupon_amount']) ? sanitize_text_field($settings['coupon_amount']) : '0');

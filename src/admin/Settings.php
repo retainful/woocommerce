@@ -354,14 +354,14 @@ class Settings
                 'default' => 0
             ));
             $general_settings->add_field(array(
-                'name' => __('Handle storage using ', RNOC_TEXT_DOMAIN),
+                'name' => __('Session handler', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'handle_storage_using',
                 'type' => 'radio_inline',
                 'classes' => 'retainful-coupon-group',
                 'options' => array(
                     'woocommerce' => __('WooCommerce session (Default)', RNOC_TEXT_DOMAIN),
-                    'php' => __('PHP Session', RNOC_TEXT_DOMAIN),
-                    'cookie' => __('Cookie', RNOC_TEXT_DOMAIN)
+                    'cookie' => __('Cookie', RNOC_TEXT_DOMAIN),
+                    'php' => __('PHP Session', RNOC_TEXT_DOMAIN)
                 ),
                 'desc' => __('DO NOT change this setting unless you are instructed by the Retainful Support team. WooCommerce session will work for 99% of the shops.', RNOC_TEXT_DOMAIN),
                 'default' => 'woocommerce'
@@ -501,7 +501,7 @@ class Settings
             }
             if ($this->isProPlan()) {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
+                    'name' => __('Maximum number of orders a customer can get next order coupons?', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'limit_per_user',
                     'type' => 'text_small',
                     'attributes' => array(
@@ -509,7 +509,7 @@ class Settings
                         'min' => 0
                     ),
                     'default' => 0,
-                    'desc' => __('Limit the number of next order coupons per customer. Set to 0 for un-limited coupons per customer.', RNOC_TEXT_DOMAIN)
+                    'desc' => __('You can send ONE unique coupon for every order the customer places or limit the maximum number of orders for which the customer receives the next order coupon. Leave as 0 for unlimited orders', RNOC_TEXT_DOMAIN)
                 ));
             } else {
                 $next_order_coupon->add_field(array(
@@ -903,16 +903,37 @@ class Settings
         if (!empty($group)) {
             $params['group'] = $group;
         }
-        $job_id = \ActionScheduler::store()->find_action($hook, $params);
-        if (empty($job_id)) {
+        if (defined('WC_VERSION') && version_compare(WC_VERSION, '4.0', '>=')) {
+            $params['status'] = \ActionScheduler_Store::STATUS_RUNNING;
+            $job_id = \ActionScheduler::store()->find_action($hook, $params);
+            if (!empty($job_id)) {
+                return true;
+            }
+            $params['status'] = \ActionScheduler_Store::STATUS_PENDING;
+            $job_id = \ActionScheduler::store()->find_action($hook, $params);
+            if (empty($job_id)) {
+                return false;
+            }
+            $job = \ActionScheduler::store()->fetch_action($job_id);
+            $scheduled_date = $job->get_schedule()->get_date();
+            if ($scheduled_date) {
+                return (int)$scheduled_date->format('U');
+            } elseif (NULL === $scheduled_date) { // pending async action with NullSchedule
+                return true;
+            }
+            return false;
+        } else {
+            $job_id = \ActionScheduler::store()->find_action($hook, $params);
+            if (empty($job_id)) {
+                return false;
+            }
+            $job = \ActionScheduler::store()->fetch_action($job_id);
+            $next = $job->get_schedule()->next();
+            if ($next) {
+                return (int)($next->format('U'));
+            }
             return false;
         }
-        $job = \ActionScheduler::store()->fetch_action($job_id);
-        $next = $job->get_schedule()->next();
-        if ($next) {
-            return (int)($next->format('U'));
-        }
-        return false;
     }
 
     /**

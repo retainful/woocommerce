@@ -37,6 +37,8 @@ class Checkout extends RestApi
             $recovered_at = self::$storage->getValue('rnoc_recovered_at');
             $recovered_by = self::$storage->getValue('rnoc_recovered_by_retainful');
             $recovered_cart_token = self::$storage->getValue('rnoc_recovered_cart_token');
+            $user_agent = $this->getUserAgent();
+            $user_accept_language = $this->getUserAcceptLanguage();
             self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_hash_key_for_db, $cart_hash);
             self::$woocommerce->setOrderMeta($order_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
@@ -45,6 +47,8 @@ class Checkout extends RestApi
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_at', $recovered_at);
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_by', $recovered_by);
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_cart_token', $recovered_cart_token);
+            self::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_user_agent', $user_agent);
+            self::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_accept_language', $user_accept_language);
             $this->markOrderAsPendingRecovery($order_id);
             //$this->unsetOrderTempData();
         }
@@ -91,6 +95,9 @@ class Checkout extends RestApi
         }
         $order_obj = new Order();
         $order_data = $order_obj->getOrderData($order);
+        if (empty($order_data)) {
+            return null;
+        }
         $order_data['cancelled_at'] = (!empty($order_cancelled_at)) ? $this->formatToIso8601($order_cancelled_at) : NULL;
         self::$settings->logMessage($order_data);
         $cart_hash = $this->encryptData($order_data);
@@ -186,21 +193,33 @@ class Checkout extends RestApi
             if (!empty($cart_token)) {
                 $order = self::$woocommerce->getOrder($order_id);
                 $this->purchaseComplete($order_id);
-                if ($this->needInstantOrderSync()) {
-                    $order_obj = new Order();
-                    $cart = $order_obj->getOrderData($order);
-                    self::$settings->logMessage($cart);
-                    $cart_hash = $this->encryptData($cart);
-                    //Reduce the loading speed
-                    if (!empty($cart_hash)) {
-                        $this->syncCart($cart_hash);
-                    }
-                } else {
-                    $this->scheduleCartSync($order_id);
-                }
+                $this->syncOrderToAPI($order, $order_id);
                 //$this->unsetOrderTempData();
             }
         } catch (Exception $e) {
+        }
+    }
+
+    /**
+     * sync order to api
+     * @param $order
+     * @param $order_id
+     */
+    function syncOrderToAPI($order, $order_id)
+    {
+        if ($this->needInstantOrderSync()) {
+            $order_obj = new Order();
+            $cart = $order_obj->getOrderData($order);
+            if (!empty($cart)) {
+                self::$settings->logMessage($cart);
+                $cart_hash = $this->encryptData($cart);
+                //Reduce the loading speed
+                if (!empty($cart_hash)) {
+                    $this->syncCart($cart_hash);
+                }
+            }
+        } else {
+            $this->scheduleCartSync($order_id);
         }
     }
 
@@ -238,17 +257,7 @@ class Checkout extends RestApi
         if (!$cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db)) {
             return $result;
         }
-        if ($this->needInstantOrderSync()) {
-            $order_obj = new Order();
-            $cart = $order_obj->getOrderData($order);
-            self::$settings->logMessage($cart);
-            $cart_hash = $this->encryptData($cart);
-            if (!empty($cart_hash)) {
-                $this->syncCart($cart_hash);
-            }
-        } else {
-            $this->scheduleCartSync($order_id);
-        }
+        $this->syncOrderToAPI($order, $order_id);
         //$this->unsetOrderTempData();
         return $result;
     }

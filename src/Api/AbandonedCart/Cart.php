@@ -172,6 +172,21 @@ class Cart extends RestApi
                 self::$storage->setValue('rnoc_session_created_at', $current_time);
             }
         }
+        if ($this->isValidCartToTrack()) {
+            $cart = $this->getUserCart();
+            $encrypted_cart = $this->encryptData($cart);
+            wp_send_json_success($encrypted_cart);
+        } else {
+            //dont send anything
+            wp_send_json(array('success' => false));
+        }
+    }
+
+    /**
+     * send the ajax encrypted cart
+     */
+    function ajaxGetEncryptedCart()
+    {
         $cart = $this->getUserCart();
         $encrypted_cart = $this->encryptData($cart);
         wp_send_json_success($encrypted_cart);
@@ -183,7 +198,7 @@ class Cart extends RestApi
      */
     function getAbandonedCartJsEngineUrl()
     {
-        return apply_filters('rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v1/retainful.js');
+        return apply_filters('rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION);
     }
 
     /**
@@ -620,7 +635,7 @@ class Cart extends RestApi
             'updated_at' => $this->formatToIso8601(''),
             'total_price' => $cart_total,
             'completed_at' => NULL,
-            'discount_codes' => $this->getAppliedDiscounts(),
+            'discount_codes' => self::$woocommerce->getAppliedDiscounts(),
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getCartSubTotal()),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
@@ -638,7 +653,8 @@ class Cart extends RestApi
             'woocommerce_totals' => $this->getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
             'recovered_by_retainful' => (self::$storage->getValue('rnoc_recovered_by_retainful')) ? true : false,
-            'recovered_cart_token' => self::$storage->getValue('rnoc_recovered_cart_token')
+            'recovered_cart_token' => self::$storage->getValue('rnoc_recovered_cart_token'),
+            'client_details' => $this->getClientDetails()
         );
         return apply_filters('rnoc_get_user_cart', $cart);
     }
@@ -678,29 +694,7 @@ class Cart extends RestApi
         return $fee_items;
     }
 
-    /**
-     * Get all applied discount codes
-     * @return array
-     */
-    function getAppliedDiscounts()
-    {
-        $discounts = array();
-        $applied_discounts = self::$woocommerce->getAppliedCartCoupons();
-        $i = 1;
-        if (!empty($applied_discounts)) {
-            foreach ($applied_discounts as $applied_discount) {
-                $discounts[] = array(
-                    "id" => $i,
-                    "usage_count" => self::$woocommerce->getCouponUsageCount($applied_discount),
-                    "code" => self::$woocommerce->getCouponCode($applied_discount),
-                    "created_at" => NULL,
-                    "updated_at" => NULL
-                );
-            }
-        }
-        return $discounts;
-    }
-
+  
     /**
      * Recover the user cart
      */
@@ -710,6 +704,13 @@ class Cart extends RestApi
         try {
             $this->reCreateCart();
         } catch (Exception $exception) {
+        }
+        if (!empty($_GET)) {
+            foreach ($_GET as $key => $value) {
+                if ($key != "token" && $key != "hash") {
+                    $checkout_url = add_query_arg($key, $value, $checkout_url);
+                }
+            }
         }
         $checkout_url = apply_filters('retainful_recovery_redirect_url', $checkout_url);
         wp_safe_redirect($checkout_url);
@@ -767,15 +768,15 @@ class Cart extends RestApi
                 $user_id = $this->getUserIdFromCartToken($cart_token);
                 $cart_recreated = false;
                 // order id is associated with a registered user
-                $current_cart = array();
                 if ($user_id && $this->loginUser($user_id)) {
                     // save order note to be applied after redirect
                     update_user_meta($user_id, $this->order_note_key_for_db, $note);
                     $current_cart = self::$woocommerce->getCart();
-                    $cart_recreated = true;
-                }
-                if (is_user_logged_in() && empty($current_cart)) {
-                    $cart_recreated = false;
+                    if (empty($current_cart)) {
+                        $cart_recreated = false;
+                    } else {
+                        $cart_recreated = true;
+                    }
                 }
                 $cart_recreated = apply_filters('rnoc_cart_re_created', $cart_recreated, $data);
                 if (!$cart_recreated) {
@@ -847,14 +848,15 @@ class Cart extends RestApi
             $this->needToTrackCart();
             $cart_created_at = $this->userCartCreatedAt();
         }
-        //var_dump($this->isValidCartToTrack() && !empty($cart_created_at));
-        if ($this->isValidCartToTrack() && !empty($cart_created_at)) {
-            $data = $this->getTrackingCartData();
-        } else {
-            $force_refresh = self::$storage->getValue('rnoc_force_refresh_cart');
-            if (empty($force_refresh) && !empty(self::$woocommerce->getCart())) {
-                self::$storage->setValue('rnoc_force_refresh_cart', 1);
-                $data = array('force_refresh_carts' => 1);
+        if ($this->isValidCartToTrack()) {
+            if (!empty($cart_created_at)) {
+                $data = $this->getTrackingCartData();
+            } else {
+                $force_refresh = self::$storage->getValue('rnoc_force_refresh_cart');
+                if (empty($force_refresh) && !empty(self::$woocommerce->getCart())) {
+                    self::$storage->setValue('rnoc_force_refresh_cart', 1);
+                    $data = array('force_refresh_carts' => 1);
+                }
             }
         }
         $fragments[$selector] = $this->getCartTrackingDiv($data);

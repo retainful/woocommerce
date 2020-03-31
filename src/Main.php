@@ -133,6 +133,7 @@ class Main
             add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
             add_action('woocommerce_order_status_changed', array($this->rnoc, 'onAfterPayment'), 10, 1);
             add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
+            add_action('rnoc_create_new_next_order_coupon', array($this->rnoc, 'createNewCoupon'), 10, 2);
             add_action('rnoc_initiated', array($this->rnoc, 'setCouponToSession'));
             add_action('wp_loaded', array($this->rnoc, 'addCouponToCheckout'), 10);
             //Attach coupon to email
@@ -162,6 +163,10 @@ class Main
             add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
             add_filter('wp_footer', array($this->rnoc, 'showAppliedCouponPopup'));
         }
+        /**
+         * Ip filtering
+         */
+        $this->canActivateIPFilter();
         //Validate key
         add_action('wp_ajax_validate_app_key', array($this->rnoc, 'validateAppKey'));
         //Settings link
@@ -185,6 +190,8 @@ class Main
                 add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
                 add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
                 add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
+                add_action('wp_ajax_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
+                add_action('wp_ajax_nopriv_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
                 add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
                 //add_action('wp_login', array($cart, 'userLoggedIn'));
                 add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
@@ -298,17 +305,20 @@ class Main
         }
         //Premium check
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
-        /**
-         * Ip filtering
-         */
+        do_action('rnoc_initiated');
+        $this->checkApi();
+    }
+
+    function canActivateIPFilter()
+    {
         $settings = $this->admin->getAdminSettings();
         if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && isset($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])) {
             $ip = $settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'];
-            $ip_filter = new IpFiltering($ip);
-            add_filter('rnoc_can_track_abandoned_carts', array($ip_filter, 'trackAbandonedCart'), 10, 2);
+            if (!empty($ip)) {
+                $ip_filter = new IpFiltering($ip);
+                add_filter('rnoc_is_cart_has_valid_ip', array($ip_filter, 'trackAbandonedCart'), 10, 2);
+            }
         }
-        do_action('rnoc_initiated');
-        $this->checkApi();
     }
 
     /**

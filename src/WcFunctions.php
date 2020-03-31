@@ -62,7 +62,8 @@ class WcFunctions
         $image_id = $this->getProductImageId($product);
         $image = wp_get_attachment_image_src($image_id);
         list($src) = $image;
-        return $src;
+        $src = !empty($src) ? $src : wc_placeholder_img_src();
+        return apply_filters('rnoc_get_product_image_src', $src, $product);
     }
 
     function getProductImage($product)
@@ -590,7 +591,7 @@ class WcFunctions
      */
     function initWoocommerceSession()
     {
-        if (!$this->hasSession()) {
+        if (!$this->hasSession() && !defined('DOING_CRON')) {
             $this->setSessionCookie(true);
         }
     }
@@ -1013,6 +1014,36 @@ class WcFunctions
         return $subtotal;
     }
 
+
+    function getAppliedDiscounts($order = null) {
+
+        $discounts = array();
+        if(!is_null($order)) {
+            $applied_discounts = $this->getUsedCoupons($order);
+        } else {
+            $applied_discounts = $this->getAppliedCartCoupons();
+        }
+        
+        $i = 1;
+        if (!empty($applied_discounts)) {
+            foreach ($applied_discounts as $applied_discount) {
+                if(!$applied_discount instanceof \WC_Coupon){
+                    $applied_discount = new \WC_Coupon($applied_discount);
+                }
+                $discounts[] = array(
+                    "id" => $i,
+                    "usage_count" => $this->getCouponUsageCount($applied_discount),
+                    "code" => $this->getCouponCode($applied_discount),
+                    "date_expires" => $this->getCouponDateExpires($applied_discount),
+                    "discount_type" => $this->getCouponDiscountType($applied_discount),
+                    "created_at" => NULL,
+                    "updated_at" => NULL
+                );
+            }
+        }
+        return $discounts;
+    }
+
     /**
      * Get Applied coupons
      * @return array
@@ -1036,6 +1067,22 @@ class WcFunctions
             return $coupon->get_usage_count();
         }
         return 0;
+    }
+
+    function getCouponDateExpires($coupon)
+    {
+        if (method_exists($coupon, 'get_date_expires')) {
+            return $coupon->get_date_expires();
+        }
+        return '';
+    }
+
+    function getCouponDiscountType($coupon)
+    {
+        if (method_exists($coupon, 'get_discount_type')) {
+            return $coupon->get_discount_type();
+        }
+        return '';
     }
 
     /**
@@ -1664,28 +1711,6 @@ class WcFunctions
         return array();
     }
 
-    /**
-     * Get all applied discount codes
-     * @return array
-     */
-    function getAppliedDiscounts()
-    {
-        $discounts = array();
-        $applied_discounts = self::$woocommerce->getAppliedCartCoupons();
-        $i = 1;
-        if (!empty($applied_discounts)) {
-            foreach ($applied_discounts as $applied_discount) {
-                $discounts[] = array(
-                    "id" => $i,
-                    "code" => $applied_discount->code,
-                    "usage_count" => $applied_discount->usage_count,
-                    "created_at" => NULL,
-                    "updated_at" => NULL
-                );
-            }
-        }
-        return $discounts;
-    }
 
     /**
      * Get cart items total tax

@@ -1,6 +1,9 @@
 <?php
 
 namespace Rnoc\Retainful\Api\AbandonedCart;
+
+use Rnoc\Retainful\OrderCoupon;
+
 class Order extends RestApi
 {
     function __construct()
@@ -149,14 +152,28 @@ class Order extends RestApi
     }
 
     /**
+     * get the cart token from the order object
+     * @param $order
+     * @return string|null
+     */
+    function getOrderCartToken($order)
+    {
+        return self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+    }
+
+    /**
      * get order details for sync cart
      * @param $order
      * @return array
      */
     function getOrderData($order)
     {
+        $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
+        if (!$this->canTrackAbandonedCarts($user_ip)) {
+            return array();
+        }
         $order_id = self::$woocommerce->getOrderId($order);
-        $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+        $cart_token = $this->getOrderCartToken($order);
         $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
         $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
         $customer_details = $this->getCustomerDetails($order);
@@ -164,7 +181,6 @@ class Order extends RestApi
         $default_currency_code = self::$settings->getBaseCurrency();
         $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
         self::$settings->logMessage($cart_created_at, 'cart created time');
-        $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
         $cart_total = $this->formatDecimalPrice(self::$woocommerce->getOrderTotal($order));
         $excluding_tax = (self::$woocommerce->isPriceExcludingTax());
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
@@ -193,8 +209,8 @@ class Order extends RestApi
             'total_price' => $cart_total,
             'completed_at' => $this->getCompletedAt($order),
             'total_weight' => 0,
-            'discount_codes' => $this->getAppliedDiscounts($order),
-            'order_status' => self::$woocommerce->getStatus($order),
+            'discount_codes' => self::$woocommerce->getAppliedDiscounts($order),
+            'order_status' => apply_filters('rnoc_abandoned_cart_order_status', self::$woocommerce->getStatus($order), $order),
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
@@ -212,23 +228,40 @@ class Order extends RestApi
             'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
-            'next_order_coupon' => $this->getNextOrderCouponDetails($order)
+            'noc_discount_codes' => $this->getNextOrderCouponDetails($order),
+            'client_details' => $this->getClientDetails($order)
         );
         return $order_data;
     }
 
+    /**
+     * next order coupon details
+     * @param $order
+     * @return array
+     */
     function getNextOrderCouponDetails($order)
     {
-        return array(
-            'order_id' => self::$woocommerce->getOrderId($order),
-            'email' => self::$woocommerce->getOrderEmail($order),
-            'firstname' => self::$woocommerce->getOrderFirstName($order),
-            'lastname' => self::$woocommerce->getOrderLastName($order),
-            'total' => self::$woocommerce->getOrderTotal($order),
-            'new_coupon' => self::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon'),
-            'applied_coupon' => self::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon_applied'),
-            'order_date' => strtotime(self::$woocommerce->getOrderDate($order))
-        );
+        $order_id = self::$woocommerce->getOrderId($order);
+        $data = array();
+        $next_order_coupon = self::$woocommerce->getPostMeta($order_id, '_rnoc_next_order_coupon');
+        if (!empty($next_order_coupon)) {
+            $order_coupon_obj = new OrderCoupon();
+            $coupon_details = $order_coupon_obj->getCouponByCouponCode($next_order_coupon);
+            if (!empty($coupon_details)) {
+                $coupon_id = $coupon_details->ID;
+                $coupon_expiry_date = get_post_meta($coupon_id, 'coupon_expired_on', true);
+                $expiry_date = get_gmt_from_date($coupon_expiry_date);
+                $data[] = array(
+                    'id' => $coupon_id,
+                    'code' => $next_order_coupon,
+                    'ends_at' => strtotime($expiry_date),
+                    'created_at' => strtotime($coupon_details->post_date_gmt),
+                    'updated_at' => strtotime($coupon_details->post_modified_gmt),
+                    'usage_count' => 1
+                );
+            }
+        }
+        return $data;
     }
 
     /**
@@ -316,30 +349,6 @@ class Order extends RestApi
             )
         );
         return $details;
-    }
-
-    /**
-     * Get all applied discount codes
-     * @param $order
-     * @return array
-     */
-    function getAppliedDiscounts($order)
-    {
-        $discounts = array();
-        $applied_discounts = self::$woocommerce->getUsedCoupons($order);
-        $i = 1;
-        if (!empty($applied_discounts)) {
-            foreach ($applied_discounts as $applied_discount) {
-                $discounts[] = array(
-                    "id" => $i,
-                    "usage_count" => self::$woocommerce->getCouponUsageCount($applied_discount),
-                    "code" => self::$woocommerce->getCouponCode($applied_discount),
-                    "created_at" => NULL,
-                    "updated_at" => NULL
-                );
-            }
-        }
-        return $discounts;
     }
 
     /**

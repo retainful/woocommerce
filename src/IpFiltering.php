@@ -56,7 +56,7 @@ class IpFiltering
      * @param $black_list_ip
      * @return bool
      */
-    function isValidIp($client_ip, $black_list_ip)
+    function isBlockedIp($client_ip, $black_list_ip)
     {
         $blocked = false;
         if (!empty($black_list_ip)) {
@@ -112,9 +112,9 @@ class IpFiltering
         } else {
             $client_ip = $ip_address;
         }
-        if (!$this->isValidIp($client_ip, $black_list_ip)) {
-            return true;
+        if ($this->isBlockedIp($client_ip, $black_list_ip)) {
+            return false;
         }
-        return false;
+        return true;
     }
 }

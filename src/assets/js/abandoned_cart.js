@@ -180,6 +180,26 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             }
 
             /**
+             * get cart token
+             * @return {null}
+             */
+            getCartToken() {
+                let cart_token = localStorage.getItem('retainful_ac_cart_token');
+                if (cart_token !== null || cart_token !== '') {
+                    this.setCartToken(cart_token);
+                }
+                return this.cart_token;
+            }
+
+            /**
+             * set the cart token
+             * @param cart_token
+             */
+            setCartToken(cart_token) {
+                this.cart_token = cart_token;
+            }
+
+            /**
              * Init cart tracking the hooks
              * @return {Retainful}
              */
@@ -221,7 +241,10 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                 let cart_hash = this.getCartHash();
                 if ((cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) || (force_sync)) {
                     this.previous_cart_hash = cart_hash;
-                    let headers = {"app_id": this.getPublicKey(), "Content-Type": "application/json"};
+                    let headers = {
+                        "app_id": this.getPublicKey(),
+                        "Content-Type": "application/json"
+                    };
                     let body = {"data": cart_data};
                     this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
                 }

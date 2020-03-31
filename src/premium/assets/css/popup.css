@@ -12,6 +12,35 @@
     background-color: rgba(0, 0, 0, 0.7);
 }
 
+.rnoc-popup-modal button:disabled, .rnoc-popup-modal button.loading {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+.rnoc-popup-modal button.loading:after {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border: 3px solid #ec9a88;
+    border-top: 3px solid #ffffff;
+    border-radius: 50%;
+    margin-left: 10px;
+    -webkit-animation: rnocRotate360 1.1s infinite linear;
+    animation: rnocRotate360 1s infinite linear;
+}
+
+@keyframes rnocRotate360 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
 .rnoc-popup-modal-content {
     background-color: #fefefe;
     margin: auto;
@@ -80,6 +109,7 @@
     .rnoc-popup-modal .rnoc-popup-modal-content .rnoc-popup-holder .rnoc-content #rnoc_popup_form .rnoc-popup-form-block input, .rnoc-popup-modal .rnoc-popup-modal-content .rnoc-popup-holder .rnoc-content #rnoc_popup_form .rnoc-popup-form-block button {
         flex: 0 0 100% !important;
     }
+
     .rnoc-popup-modal .close-rnoc-popup {
         right: 1%;
 
@@ -217,8 +247,8 @@
     z-index: 0;
     border-radius: 0px 12px 0px 0px;
 }
-.rnoc-popup .no-thanks-close-popup
-{
+
+.rnoc-popup .no-thanks-close-popup {
     display: block;
     margin-bottom: 3%
 

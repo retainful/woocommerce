@@ -66,6 +66,7 @@ class RestApi
     {
         $old_cart_token = self::$storage->getValue($this->cart_token_key);
         if (empty($old_cart_token)) {
+            self::$settings->logMessage($cart_token, 'setting cart token');
             $current_time = current_time('timestamp', true);
             self::$storage->setValue($this->cart_token_key, $cart_token);
             self::$storage->setValue($this->cart_tracking_started_key, $current_time);
@@ -568,6 +569,7 @@ class RestApi
         $app_id = self::$settings->getApiKey();
         $response = false;
         if (!empty($cart_details)) {
+            self::$settings->logMessage('cart synced with PHP', 'synced by');
             $response = self::$api->syncCartDetails($app_id, $cart_details);
         }
         return $response;
@@ -597,9 +599,58 @@ class RestApi
      */
     function canTrackAbandonedCarts($ip_address = NULL)
     {
-        if (!apply_filters('rnoc_can_track_abandoned_carts', true, $ip_address)) {
-            return false;
+        if (apply_filters('rnoc_is_cart_has_valid_ip', true, $ip_address) && apply_filters('rnoc_can_track_abandoned_carts', true)) {
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    /**
+     * get the client details
+     * @param null $order
+     * @return mixed|void
+     */
+    function getClientDetails($order = null)
+    {
+        $client_details = array(
+            'user_agent' => $this->getUserAgent($order),
+            'accept_language' => $this->getUserAcceptLanguage($order),
+        );
+        return apply_filters('rnoc_get_client_details', $client_details, $order);
+    }
+
+    /**
+     * get the user agent of client
+     * @param null $order
+     * @return mixed|string|null
+     */
+    function getUserAgent($order = null)
+    {
+        if (!empty($order)) {
+            return self::$woocommerce->getOrderMeta($order, '_rnoc_get_http_user_agent');
+        } else {
+            if (isset($_SERVER['HTTP_USER_AGENT']) && !empty($_SERVER['HTTP_USER_AGENT'])) {
+                return $_SERVER['HTTP_USER_AGENT'];
+            }
+        }
+        return '';
+    }
+
+    /**
+     * get the user accept language
+     * @param null $order
+     * @return mixed|string|null
+     */
+    function getUserAcceptLanguage($order = null)
+    {
+        if (!empty($order)) {
+            return self::$woocommerce->getOrderMeta($order, '_rnoc_get_http_accept_language');
+        } else {
+            if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && !empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+                $lang = trim($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                return substr($lang, 0, 2);
+            }
+        }
+        return '';
     }
 }
