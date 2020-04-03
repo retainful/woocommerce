@@ -1393,7 +1393,11 @@ class WcFunctions
     function startPHPSession()
     {
         if (!session_id() && !headers_sent()) {
-            session_start(array('read_and_close' => true));
+            if(version_compare(PHP_VERSION, '7.0', '>=')) {
+                session_start(array('read_and_close' => true));
+            }else{
+                session_start();
+            }
         }
     }
 
