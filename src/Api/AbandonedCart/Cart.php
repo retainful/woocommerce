@@ -504,7 +504,7 @@ class Cart extends RestApi
                 }
                 $image_url = self::$woocommerce->getProductImageSrc($item);
                 if (!empty($item) && !empty($item_quantity)) {
-                    $items[] = array(
+                    $item_array = array(
                         'key' => $item_key,
                         'sku' => self::$woocommerce->getItemSku($item),
                         'price' => $this->formatDecimalPrice(self::$woocommerce->getCartItemPrice($item)),
@@ -523,10 +523,11 @@ class Cart extends RestApi
                         'user_id' => NULL,
                         'properties' => array()
                     );
+                    $items[] = apply_filters('rnoc_get_cart_item_details', $item_array, $cart, $item_key, $item);
                 }
             }
         }
-        return apply_filters("rnoc_get_abandoned_cart_line_items", $items);
+        return apply_filters("rnoc_get_abandoned_cart_line_items", $items, $cart);
     }
 
     /**

@@ -1014,20 +1014,18 @@ class WcFunctions
         return $subtotal;
     }
 
-
-    function getAppliedDiscounts($order = null) {
-
+    function getAppliedDiscounts($order = null)
+    {
         $discounts = array();
-        if(!is_null($order)) {
+        if (!is_null($order)) {
             $applied_discounts = $this->getUsedCoupons($order);
         } else {
             $applied_discounts = $this->getAppliedCartCoupons();
         }
-        
         $i = 1;
         if (!empty($applied_discounts)) {
             foreach ($applied_discounts as $applied_discount) {
-                if(!$applied_discount instanceof \WC_Coupon){
+                if (!$applied_discount instanceof \WC_Coupon) {
                     $applied_discount = new \WC_Coupon($applied_discount);
                 }
                 $discounts[] = array(
@@ -1223,7 +1221,7 @@ class WcFunctions
     function getItemName($item)
     {
         if (method_exists($item, 'get_name')) {
-            return $item->get_name();
+            return apply_filters('rnoc_get_item_name', $item->get_name(), $item);
         }
         return NULL;
     }
@@ -1393,9 +1391,9 @@ class WcFunctions
     function startPHPSession()
     {
         if (!session_id() && !headers_sent()) {
-            if(version_compare(PHP_VERSION, '7.0', '>=')) {
+            if (version_compare(PHP_VERSION, '7.0', '>=')) {
                 session_start(array('read_and_close' => true));
-            }else{
+            } else {
                 session_start();
             }
         }
@@ -1714,7 +1712,6 @@ class WcFunctions
         }
         return array();
     }
-
 
     /**
      * Get cart items total tax
