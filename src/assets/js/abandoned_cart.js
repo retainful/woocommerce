@@ -130,11 +130,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
              * @returns string
              */
             getIp() {
-                if (this.ip !== null) {
-                    return btoa(this.ip);
-                } else {
-                    return this.ip;
-                }
+                return this.ip;
             }
 
             /**
@@ -292,11 +288,11 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                     let headers = {
                         "app_id": this.getPublicKey(),
                         "Content-Type": "application/json",
-                        "Client-Nonce": this.getIp(),
-                        "version": this.getVersion(),
-                        "cart_token": this.getCartToken()
+                        "X-Client-Referrer-IP": this.getIp(),
+                        "X-Retainful-Version": this.getVersion(),
+                        "X-Cart-Token": this.getCartToken(),
+                        "Cart-Token": this.getCartToken()
                     };
-                    console.log(headers);
                     let body = {"data": cart_data};
                     this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
                 }

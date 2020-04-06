@@ -375,12 +375,15 @@ class Cart extends RestApi
             $cart = $this->getUserCart();
             if (!empty($cart)) {
                 self::$settings->logMessage($cart, 'cart');
+                $client_ip = $this->formatUserIP($this->getClientIp());
                 $cart_hash = $this->encryptData($cart);
                 if (!empty($cart_hash)) {
+                    $token = $this->getCartToken();
                     $extra_headers = array(
-                        "Client-Nonce" => base64_encode($this->formatUserIP($this->getClientIp())),
-                        "version" => RNOC_VERSION,
-                        "cart_token" => $this->getCartToken()
+                        "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
+                        "X-Retainful-Version" => RNOC_VERSION,
+                        "X-Cart-Token" => $token,
+                        "Cart-Token" => $token,
                     );
                     $this->syncCart($cart_hash, $extra_headers);
                 }
