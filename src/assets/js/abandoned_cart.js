@@ -124,7 +124,11 @@ function initJqueryRetainfulAbandonedCartsTracking() {
              * @returns string
              */
             getIp() {
-                return this.ip;
+                if (this.ip !== null) {
+                    return btoa(this.ip);
+                } else {
+                    return this.ip;
+                }
             }
 
             /**
@@ -282,7 +286,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                     let headers = {
                         "app_id": this.getPublicKey(),
                         "Content-Type": "application/json",
-                        "Retainful-Client-IP": this.getIp(),
+                        "Client-Nonce": this.getIp(),
                         "version": this.getVersion(),
                         "cart_token": this.getCartToken()
                     };
