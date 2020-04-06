@@ -523,7 +523,7 @@ class Cart extends RestApi
                         'user_id' => NULL,
                         'properties' => array()
                     );
-                    $items[] = apply_filters('rnoc_get_cart_item_details', $item_array, $cart, $item_key, $item);
+                    $items[] = apply_filters('rnoc_get_cart_line_item_details', $item_array, $cart, $item_key, $item);
                 }
             }
         }

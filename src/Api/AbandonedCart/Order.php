@@ -124,7 +124,7 @@ class Order extends RestApi
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
                         'requires_shipping' => true
                     );
-                    $items[] = apply_filters('rnoc_get_cart_item_details', $item_array, $cart, $item_key, $item);
+                    $items[] = apply_filters('rnoc_get_order_line_item_details', $item_array, $cart, $item_key, $item);
                 }
             }
         }
