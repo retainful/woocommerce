@@ -103,7 +103,7 @@ class Checkout extends RestApi
         $cart_hash = $this->encryptData($order_data);
         if (!empty($cart_hash)) {
             $extra_headers = array(
-                "Retainful-Client-IP" => self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db),
+                "Client-Nonce" => base64_encode(self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db)),
                 "version" => RNOC_VERSION,
                 "cart_token" => self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db)
             );
@@ -221,7 +221,7 @@ class Checkout extends RestApi
                 //Reduce the loading speed
                 if (!empty($cart_hash)) {
                     $extra_headers = array(
-                        "Retainful-Client-IP" => self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db),
+                        "Client-Nonce" => base64_encode(self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db)),
                         "version" => RNOC_VERSION,
                         "cart_token" => self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db)
                     );

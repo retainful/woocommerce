@@ -378,7 +378,7 @@ class Cart extends RestApi
                 $cart_hash = $this->encryptData($cart);
                 if (!empty($cart_hash)) {
                     $extra_headers = array(
-                        "Retainful-Client-IP" => $this->formatUserIP($this->getClientIp()),
+                        "Client-Nonce" => base64_encode($this->formatUserIP($this->getClientIp())),
                         "version" => RNOC_VERSION,
                         "cart_token" => $this->getCartToken()
                     );
