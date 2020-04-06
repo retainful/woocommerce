@@ -69,6 +69,9 @@ function initJqueryRetainfulAbandonedCartsTracking() {
              * @returns {Retainful}
              */
             setIp(ip) {
+                if (ip === undefined) {
+                    ip = null;
+                }
                 this.ip = ip;
                 return this;
             }
@@ -79,6 +82,9 @@ function initJqueryRetainfulAbandonedCartsTracking() {
              * @returns {Retainful}
              */
             setVersion(version) {
+                if (version === undefined) {
+                    version = null;
+                }
                 this.version = version;
                 return this;
             }
