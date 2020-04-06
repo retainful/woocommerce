@@ -104,7 +104,7 @@ class Order extends RestApi
                 }
                 $image_url = self::$woocommerce->getProductImageSrc($item);
                 if (!empty($item) && !empty($item_quantity)) {
-                    $items[] = array(
+                    $item_array = array(
                         'key' => $item_key,
                         'image_url' => $image_url,
                         'product_url' => self::$woocommerce->getProductUrl($item),
@@ -124,6 +124,7 @@ class Order extends RestApi
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
                         'requires_shipping' => true
                     );
+                    $items[] = apply_filters('rnoc_get_cart_item_details', $item_array, $cart, $item_key, $item);
                 }
             }
         }
