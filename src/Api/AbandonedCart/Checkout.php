@@ -101,8 +101,16 @@ class Checkout extends RestApi
         $order_data['cancelled_at'] = (!empty($order_cancelled_at)) ? $this->formatToIso8601($order_cancelled_at) : NULL;
         self::$settings->logMessage($order_data);
         $cart_hash = $this->encryptData($order_data);
+        $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
         if (!empty($cart_hash)) {
-            $this->syncCart($cart_hash);
+            $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+            $extra_headers = array(
+                "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
+                "X-Retainful-Version" => RNOC_VERSION,
+                "X-Cart-Token" => $token,
+                "Cart-Token" => $token
+            );
+            $this->syncCart($cart_hash, $extra_headers);
         }
     }
 
@@ -214,8 +222,16 @@ class Checkout extends RestApi
                 self::$settings->logMessage($cart);
                 $cart_hash = $this->encryptData($cart);
                 //Reduce the loading speed
+                $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
                 if (!empty($cart_hash)) {
-                    $this->syncCart($cart_hash);
+                    $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+                    $extra_headers = array(
+                        "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
+                        "X-Retainful-Version" => RNOC_VERSION,
+                        "X-Cart-Token" => $token,
+                        "Cart-Token" => $token
+                    );
+                    $this->syncCart($cart_hash, $extra_headers);
                 }
             }
         } else {

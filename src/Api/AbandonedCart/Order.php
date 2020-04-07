@@ -104,7 +104,7 @@ class Order extends RestApi
                 }
                 $image_url = self::$woocommerce->getProductImageSrc($item);
                 if (!empty($item) && !empty($item_quantity)) {
-                    $items[] = array(
+                    $item_array = array(
                         'key' => $item_key,
                         'image_url' => $image_url,
                         'product_url' => self::$woocommerce->getProductUrl($item),
@@ -124,6 +124,7 @@ class Order extends RestApi
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
                         'requires_shipping' => true
                     );
+                    $items[] = apply_filters('rnoc_get_order_line_item_details', $item_array, $cart, $item_key, $item);
                 }
             }
         }
@@ -250,11 +251,15 @@ class Order extends RestApi
             if (!empty($coupon_details)) {
                 $coupon_id = $coupon_details->ID;
                 $coupon_expiry_date = get_post_meta($coupon_id, 'coupon_expired_on', true);
-                $expiry_date = get_gmt_from_date($coupon_expiry_date);
+                $ends_at = null;
+                if (!empty($coupon_expiry_date)) {
+                    $expiry_date = get_gmt_from_date($coupon_expiry_date);
+                    $ends_at = strtotime($expiry_date);
+                }
                 $data[] = array(
                     'id' => $coupon_id,
                     'code' => $next_order_coupon,
-                    'ends_at' => strtotime($expiry_date),
+                    'ends_at' => $ends_at,
                     'created_at' => strtotime($coupon_details->post_date_gmt),
                     'updated_at' => strtotime($coupon_details->post_modified_gmt),
                     'usage_count' => 1

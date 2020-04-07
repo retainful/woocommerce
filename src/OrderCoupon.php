@@ -293,7 +293,7 @@ class OrderCoupon
      */
     public function addCouponToCheckout()
     {
-        $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
+        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
         if (!empty($coupon_code) && !empty($this->wc_functions->getCart()) && !$this->wc_functions->hasDiscount($coupon_code)) {
             //Do not apply coupon until the coupon is valid
             if ($this->checkCouponBeforeCouponApply($coupon_code)) {
@@ -336,7 +336,7 @@ class OrderCoupon
                                 $popup_content = str_replace('{{' . $key . '}}', $val, $popup_content);
                             }
                             include $cart_template_path;
-                            $this->wc_functions->setPHPSession('rnoc_is_coupon_applied_popup_showed', 1);
+                            $this->wc_functions->setSession('rnoc_is_coupon_applied_popup_showed', 1);
                         }
                     }
                 }
@@ -350,7 +350,7 @@ class OrderCoupon
      */
     function removeCouponFromCart($remove_coupon)
     {
-        $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
+        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
         if (strtoupper($remove_coupon) == strtoupper($coupon_code) && $this->checkCouponBeforeCouponApply($remove_coupon)) {
             $this->removeCouponFromSession();
         }
@@ -361,9 +361,9 @@ class OrderCoupon
      */
     function removeCouponFromSession()
     {
-        $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
+        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
         if (!empty($coupon_code)) {
-            $this->wc_functions->removePHPSession('retainful_coupon_code');
+            $this->wc_functions->removeSession('retainful_coupon_code');
         }
     }
 
@@ -442,11 +442,11 @@ class OrderCoupon
         if (isset($_REQUEST['retainful_ac_coupon'])) {
             $request_coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
         }
-        $coupon_code = $this->wc_functions->getPHPSession('retainful_coupon_code');
+        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
         if (!empty($request_coupon_code) && empty($coupon_code)) {
             $coupon_details = $this->getCouponByCouponCode($request_coupon_code);
             if (!empty($coupon_details)) {
-                $this->wc_functions->setPHPSession('retainful_coupon_code', $request_coupon_code); // Set the coupon code in session
+                $this->wc_functions->setSession('retainful_coupon_code', $request_coupon_code); // Set the coupon code in session
             }
         }
     }

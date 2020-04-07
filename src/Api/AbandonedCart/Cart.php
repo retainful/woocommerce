@@ -208,9 +208,13 @@ class Cart extends RestApi
     {
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
+            $user_ip = $this->getClientIp();
+            $user_ip = $this->formatUserIP($user_ip);
             $data = array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
+                'ip' => $user_ip,
+                'version' => RNOC_VERSION,
                 'public_key' => self::$settings->getApiKey(),
                 'api_url' => self::$api->getAbandonedCartEndPoint(),
                 'tracking_element_selector' => $this->getTrackingElementId(),
@@ -371,9 +375,17 @@ class Cart extends RestApi
             $cart = $this->getUserCart();
             if (!empty($cart)) {
                 self::$settings->logMessage($cart, 'cart');
+                $client_ip = $this->formatUserIP($this->getClientIp());
                 $cart_hash = $this->encryptData($cart);
                 if (!empty($cart_hash)) {
-                    $this->syncCart($cart_hash);
+                    $token = $this->getCartToken();
+                    $extra_headers = array(
+                        "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
+                        "X-Retainful-Version" => RNOC_VERSION,
+                        "X-Cart-Token" => $token,
+                        "Cart-Token" => $token,
+                    );
+                    $this->syncCart($cart_hash, $extra_headers);
                 }
             }
         }
@@ -495,7 +507,7 @@ class Cart extends RestApi
                 }
                 $image_url = self::$woocommerce->getProductImageSrc($item);
                 if (!empty($item) && !empty($item_quantity)) {
-                    $items[] = array(
+                    $item_array = array(
                         'key' => $item_key,
                         'sku' => self::$woocommerce->getItemSku($item),
                         'price' => $this->formatDecimalPrice(self::$woocommerce->getCartItemPrice($item)),
@@ -514,10 +526,11 @@ class Cart extends RestApi
                         'user_id' => NULL,
                         'properties' => array()
                     );
+                    $items[] = apply_filters('rnoc_get_cart_line_item_details', $item_array, $cart, $item_key, $item, $item_details);
                 }
             }
         }
-        return apply_filters("rnoc_get_abandoned_cart_line_items", $items);
+        return apply_filters("rnoc_get_abandoned_cart_line_items", $items, $cart);
     }
 
     /**
@@ -694,7 +707,6 @@ class Cart extends RestApi
         return $fee_items;
     }
 
-  
     /**
      * Recover the user cart
      */
