@@ -251,11 +251,15 @@ class Order extends RestApi
             if (!empty($coupon_details)) {
                 $coupon_id = $coupon_details->ID;
                 $coupon_expiry_date = get_post_meta($coupon_id, 'coupon_expired_on', true);
-                $expiry_date = get_gmt_from_date($coupon_expiry_date);
+                $ends_at = null;
+                if (!empty($coupon_expiry_date)) {
+                    $expiry_date = get_gmt_from_date($coupon_expiry_date);
+                    $ends_at = strtotime($expiry_date);
+                }
                 $data[] = array(
                     'id' => $coupon_id,
                     'code' => $next_order_coupon,
-                    'ends_at' => strtotime($expiry_date),
+                    'ends_at' => $ends_at,
                     'created_at' => strtotime($coupon_details->post_date_gmt),
                     'updated_at' => strtotime($coupon_details->post_modified_gmt),
                     'usage_count' => 1
