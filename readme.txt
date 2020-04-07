@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.3
 WC tested up to: 4.0.0
 Requires PHP: 5.6
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -374,3 +374,7 @@ No. There is no charges for support.
 * Fix: Issue with email customizer plus retainful block
 * Fix: Deprecation warning with woocommerce 4.0(Action scheduler)
 * Fix: Getting applied discounts issue
+
+= 2.2.1 =
+* Fix: Extra headers added for requests
+* Fix: Next order coupon expiry date issue fixed
