@@ -236,10 +236,13 @@ class OrderCoupon
                 $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
                 if ($coupon_amount > 0) {
                     $coupon_type = get_post_meta($post_id, 'coupon_type', true);
+                    $coupon_url = add_query_arg('retainful_coupon_code', $coupon_code, site_url());
                     $string_to_replace = array(
                         '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
                         '{{coupon_code}}' => $coupon_code,
-                        '{{coupon_url}}' => site_url() . '?retainful_coupon_code=' . $coupon_code
+                        'http://{{coupon_url}}' => $coupon_url,
+                        'https://{{coupon_url}}' => $coupon_url,
+                        '{{coupon_url}}' => $coupon_url
                     );
                     $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
                     if (!empty($coupon_expiry_date)) {
