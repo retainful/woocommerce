@@ -3,6 +3,7 @@
 namespace Rnoc\Retainful\Api\AbandonedCart;
 
 use Exception;
+use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
 
 class Checkout extends RestApi
 {
@@ -37,6 +38,8 @@ class Checkout extends RestApi
             $recovered_at = self::$storage->getValue('rnoc_recovered_at');
             $recovered_by = self::$storage->getValue('rnoc_recovered_by_retainful');
             $recovered_cart_token = self::$storage->getValue('rnoc_recovered_cart_token');
+            $cookie = new Cookie();
+            $user_identifier = $cookie->getValue($this->user_unique_identifier_key);
             $user_agent = $this->getUserAgent();
             $user_accept_language = $this->getUserAcceptLanguage();
             self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
@@ -44,6 +47,7 @@ class Checkout extends RestApi
             self::$woocommerce->setOrderMeta($order_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
             self::$woocommerce->setOrderMeta($order_id, $this->user_ip_key_for_db, $user_ip);
             self::$woocommerce->setOrderMeta($order_id, $this->accepts_marketing_key_for_db, $is_buyer_accepts_marketing);
+            self::$woocommerce->setOrderMeta($order_id, $this->user_unique_identifier_key_for_db, $user_identifier);
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_at', $recovered_at);
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_by', $recovered_by);
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_cart_token', $recovered_cart_token);
@@ -104,10 +108,12 @@ class Checkout extends RestApi
         $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
         if (!empty($cart_hash)) {
             $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+            $user_identifier = self::$woocommerce->getOrderMeta($order, $this->user_unique_identifier_key_for_db);
             $extra_headers = array(
                 "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
                 "X-Retainful-Version" => RNOC_VERSION,
                 "X-Cart-Token" => $token,
+                "X-User-Identifier" => $user_identifier,
                 "Cart-Token" => $token
             );
             $this->syncCart($cart_hash, $extra_headers);
@@ -225,10 +231,12 @@ class Checkout extends RestApi
                 $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
                 if (!empty($cart_hash)) {
                     $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+                    $user_identifier = self::$woocommerce->getOrderMeta($order, $this->user_unique_identifier_key_for_db);
                     $extra_headers = array(
                         "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
                         "X-Retainful-Version" => RNOC_VERSION,
                         "X-Cart-Token" => $token,
+                        "X-User-Identifier" => $user_identifier,
                         "Cart-Token" => $token
                     );
                     $this->syncCart($cart_hash, $extra_headers);

@@ -3,6 +3,7 @@
 namespace Rnoc\Retainful\Api\AbandonedCart;
 
 use Exception;
+use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
 use Rnoc\Retainful\Integrations\MultiLingual;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use stdClass;
@@ -12,6 +13,18 @@ class Cart extends RestApi
     function __construct()
     {
         parent::__construct();
+    }
+
+    function setUserIdentifier()
+    {
+        $cookie = new Cookie();
+        $old_identifier = $cookie->getValue($this->user_unique_identifier_key);
+        if (empty($old_identifier)) {
+            $new_id = $this->generateUniqueID();
+            $new_id .= uniqid();
+            $time = time() + (10 * 365 * 24 * 60 * 60);//10 years
+            $cookie->setCookieValue($this->user_unique_identifier_key, $new_id, $time);
+        }
     }
 
     /**
@@ -379,10 +392,13 @@ class Cart extends RestApi
                 $cart_hash = $this->encryptData($cart);
                 if (!empty($cart_hash)) {
                     $token = $this->getCartToken();
+                    $cookie = new Cookie();
+                    $user_identifier = $cookie->getValue($this->user_unique_identifier_key);
                     $extra_headers = array(
                         "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
                         "X-Retainful-Version" => RNOC_VERSION,
                         "X-Cart-Token" => $token,
+                        "X-User-Identifier" => $user_identifier,
                         "Cart-Token" => $token,
                     );
                     $this->syncCart($cart_hash, $extra_headers);

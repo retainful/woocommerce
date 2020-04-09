@@ -224,6 +224,18 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             }
 
             /**
+             * get the user identifier
+             * @returns {string|null}
+             */
+            getUserIdentifier() {
+                let user_identifier = retainful.getCookie('rnoc_user_unique_identifier');
+                if (user_identifier === undefined) {
+                    return null;
+                }
+                return user_identifier;
+            }
+
+            /**
              * get cart token
              * @return {null}
              */
@@ -276,6 +288,17 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             }
 
             /**
+             * get cookie value
+             * @param name
+             * @returns {string}
+             */
+            getCookie(name) {
+                let value = "; " + document.cookie;
+                let parts = value.split("; " + name + "=");
+                if (parts.length === 2) return parts.pop().split(";").shift();
+            }
+
+            /**
              * sync cart to api
              */
             syncCart(cart_data = null, force_sync = false) {
@@ -291,7 +314,8 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                         "X-Client-Referrer-IP": this.getIp(),
                         "X-Retainful-Version": this.getVersion(),
                         "X-Cart-Token": this.getCartToken(),
-                        "Cart-Token": this.getCartToken()
+                        "Cart-Token": this.getCartToken(),
+                        "X-User-Identifier": this.getUserIdentifier()
                     };
                     let body = {"data": cart_data};
                     this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
