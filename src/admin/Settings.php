@@ -402,12 +402,12 @@ class Settings
                 'default' => '0'
             ));
             $next_order_coupon->add_field(array(
-                'name' => __('Coupon value', RNOC_TEXT_DOMAIN),
+                'name' => __('Enter the coupon amount (percentage or flat)', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount',
                 'type' => 'text',
                 'classes' => 'retainful-coupon-group',
                 'default' => '',
-                'after' => '<p><b>' . __('Note: If this field is empty, No coupon codes will generate!', RNOC_TEXT_DOMAIN) . '</b></p><p id="coupon_amount_error" style="color: red;;"></p>',
+                'after' => '<p><b>' . __('Enter the percenage or flat value of the coupon. Example: 10 (for 10 percentage). Note: If this field is empty, No coupon codes will generate!', RNOC_TEXT_DOMAIN) . '</b></p><p id="coupon_amount_error" style="color: red;;"></p>',
                 'attributes' => array(
                     'id' => 'app_coupon_value'
                 )
@@ -463,7 +463,7 @@ class Settings
                 $coupon_msg_desc .= $pro_feature_coupon_msg_desc;
             }
             $next_order_coupon->add_field(array(
-                'name' => __('Custom coupon message', RNOC_TEXT_DOMAIN),
+                'name' => __('Coupon message to be included in the order confirmation emails to the customer', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_message',
                 'type' => 'wysiwyg',
                 'classes' => 'retainful-coupon-group',
@@ -501,7 +501,7 @@ class Settings
             }
             if ($this->isProPlan()) {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Maximum number of orders a customer can get next order coupons?', RNOC_TEXT_DOMAIN),
+                    'name' => __('How many coupons a customer can get in his lifetime?', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'limit_per_user',
                     'type' => 'text_small',
                     'attributes' => array(
@@ -509,7 +509,7 @@ class Settings
                         'min' => 0
                     ),
                     'default' => 0,
-                    'desc' => __('You can send ONE unique coupon for every order the customer places or limit the maximum number of orders for which the customer receives the next order coupon. Leave as 0 for unlimited orders', RNOC_TEXT_DOMAIN)
+                    'desc' => __('Recommended setting: 0 (unlimited). In order to maximize repeat purchases, you should send one unique coupon with every purchase for the next order. However, if you only want the customer to get next order coupons for 5 times in his life, you can set it to 5. In this case, the customer will receive the coupon only for 5 of his orders. starting 6th order, he will not receive the coupon', RNOC_TEXT_DOMAIN)
                 ));
             } else {
                 $next_order_coupon->add_field(array(
@@ -593,7 +593,7 @@ class Settings
                     'name' => __('Coupon expires in ', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
                     'type' => 'text_small',
-                    'after' => '<p id="coupon_expire_error" style="color: red;"></p>' . __('After the entered number of days coupon will automatically expired.<br><b>Note: Please leave empty or put 0 to never expire.</b>', RNOC_TEXT_DOMAIN),
+                    'after' => '<p id="coupon_expire_error" style="color: red;"></p>' . __('How many days the coupon is valid? After the entered number of days coupon will automatically expire.<br><b>Note: Please leave empty or put 0 to never expire.</b> <br /> <a href="https://app.retainful.com" target="_blank">Send automatic email follow-ups to the customers before the coupon expires.</a>', RNOC_TEXT_DOMAIN),
                     'desc' => __(' Day(s)', RNOC_TEXT_DOMAIN),
                     'classes' => 'retainful-coupon-group',
                     'default' => '',
@@ -604,7 +604,7 @@ class Settings
                     )
                 ));
                 $next_order_coupon->add_field(array(
-                    'name' => __('Coupon expire date format ', RNOC_TEXT_DOMAIN),
+                    'name' => __('Coupon expiry date format ', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'expire_date_format',
                     'type' => 'select',
                     'default' => 'F j, Y, g:i a',
