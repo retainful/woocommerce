@@ -244,7 +244,10 @@ function initJqueryRetainfulPopupJs() {
                         if (response.message !== '') {
                             //return {"error": true}
                         }
-                        //instant popup support
+                        if (response.redirect !== null) {
+                            sessionStorage.setItem("rnoc_instant_coupon_popup_redirect", response.redirect);
+                            sessionStorage.setItem("rnoc_instant_coupon_is_redirected", "no");
+                        }
                         if (response.show_coupon_instant_popup) {
                             sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
                             sessionStorage.setItem("rnoc_instant_coupon_popup_html", response.coupon_instant_popup_content);

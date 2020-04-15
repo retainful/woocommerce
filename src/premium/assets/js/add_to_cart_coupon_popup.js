@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
         initJqueryRetainfulAddToCartCouponPopupJs();
     }
 });
+
 function initJqueryRetainfulAddToCartCouponPopupJs() {
     jQuery(function ($) {
         class addToCartCouponPopup {
@@ -57,6 +58,13 @@ function initJqueryRetainfulAddToCartCouponPopupJs() {
              */
             showInstantPopup() {
                 if (this.isLocalStorageSupports()) {
+                    let is_once_redirected = sessionStorage.getItem("rnoc_instant_coupon_is_redirected");
+                    if (is_once_redirected && is_once_redirected === "no") {
+                        let redirect_url = sessionStorage.getItem("rnoc_instant_coupon_popup_redirect");
+                        sessionStorage.setItem("rnoc_instant_coupon_is_redirected", "yes");
+                        window.location.href = redirect_url;
+                    }
+
                     let is_popup_showed = sessionStorage.getItem("rnoc_instant_coupon_popup_showed");
                     if (is_popup_showed && is_popup_showed === "no") {
                         let popup_html = sessionStorage.getItem("rnoc_instant_coupon_popup_html");

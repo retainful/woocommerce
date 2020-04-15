@@ -32,7 +32,36 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             //To support the logged in user
             add_action('wp_ajax_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
             add_action('wp_ajax_rnoc_popup_closed', array($this, 'popupClosed'));
+            add_action('wp_footer', array($this, 'enqueue_script'));
             add_action('wp', array($this, 'siteInit'));
+        }
+
+        function enqueue_script()
+        {
+            ?>
+            <script>
+                jQuery(document).ready(function ($) {
+                    $(document).on('added_to_cart', function (fragment, cart_hash, this_button) {
+                        rnoc_redirect_coupon_popup();
+                    });
+
+                    function rnoc_redirect_coupon_popup() {
+                        try {
+                            let is_once_redirected = sessionStorage.getItem("rnoc_instant_coupon_is_redirected");
+                            if (is_once_redirected && is_once_redirected === "no") {
+                                let redirect_url = sessionStorage.getItem("rnoc_instant_coupon_popup_redirect");
+                                sessionStorage.setItem("rnoc_instant_coupon_is_redirected", "yes");
+                                window.location.href = redirect_url;
+                            }
+                        } catch (err) {
+                            return false;
+                        }
+                    }
+
+                    rnoc_redirect_coupon_popup();
+                });
+            </script>
+            <?php
         }
 
         /**
@@ -233,11 +262,21 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $coupon_details = "";
             $show_coupon_popup = false;
             $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
+            $redirect_url = null;
             if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'need_coupon', 0) == 1) {
                 $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
                 if (!empty($coupon_code)) {
                     $show_woo_coupon = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'show_woo_coupon', 'send_via_email');
                     switch ($show_woo_coupon) {
+                        case "auto_apply_and_redirect":
+                            $this->wc_functions->addDiscount($coupon_code);
+                            $redirect_url = wc_get_checkout_url();
+                            break;
+                        case "send_mail_auto_apply_and_redirect":
+                            $this->sendEmail($email, $coupon_settings);
+                            $this->wc_functions->addDiscount($coupon_code);
+                            $redirect_url = wc_get_checkout_url();
+                            break;
                         case "instantly":
                             $show_coupon_popup = true;
                             $coupon_details = $this->getCouponPopupContent($coupon_settings);
@@ -254,7 +293,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     }
                 }
             }
-            wp_send_json(array('error' => $error, 'message' => $message, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
+            wp_send_json(array('error' => $error, 'message' => $message, 'redirect' => $redirect_url, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
         }
 
         /**
@@ -614,11 +653,13 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $general_settings->add_group_field($popup_coupon_settings, array(
                 'name' => __('Show coupon code', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
-                'type' => 'radio_inline',
+                'type' => 'select',
                 'options' => array(
                     "instantly" => __("Instantly using a popup", RNOC_TEXT_DOMAIN),
                     "send_via_email" => __("Send an email", RNOC_TEXT_DOMAIN),
                     "both" => __("Show instantly and also send an email", RNOC_TEXT_DOMAIN),
+                    "auto_apply_and_redirect" => __("Auto apply coupon and redirect to checkout", RNOC_TEXT_DOMAIN),
+                    "send_mail_auto_apply_and_redirect" => __("Send email, auto apply and redirect to checkout", RNOC_TEXT_DOMAIN),
                 ),
                 'attributes' => array(
                     'placeholder' => __('Choose coupon settings', RNOC_TEXT_DOMAIN)
