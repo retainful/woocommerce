@@ -276,6 +276,28 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             }
 
             /**
+             * set previous cart hash
+             * @param cart_hash
+             */
+            setPreviousCartHash(cart_hash) {
+                if (this.isLocalStorageSupports()) {
+                    localStorage.setItem('rnoc_previous_cart_hash', cart_hash)
+                }
+                this.previous_cart_hash = cart_hash;
+            }
+
+            /**
+             * get the previous cart hash
+             * @returns {string|null}
+             */
+            getPreviousCartHash() {
+                if (this.isLocalStorageSupports()) {
+                    return localStorage.getItem('rnoc_previous_cart_hash')
+                }
+                return this.previous_cart_hash;
+            }
+
+            /**
              * sync cart to api
              */
             syncCart(cart_data = null, force_sync = false) {
@@ -283,8 +305,9 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                     cart_data = this.getAbandonedCartData();
                 }
                 let cart_hash = this.getCartHash();
-                if ((cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) || (force_sync)) {
-                    this.previous_cart_hash = cart_hash;
+                let previous_cart_hash = this.getPreviousCartHash();
+                if ((cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== previous_cart_hash) || (force_sync)) {
+                    this.setPreviousCartHash(cart_hash);
                     let headers = {
                         "app_id": this.getPublicKey(),
                         "Content-Type": "application/json",
