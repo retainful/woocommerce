@@ -281,7 +281,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
              */
             setPreviousCartHash(cart_hash) {
                 if (this.isLocalStorageSupports()) {
-                    localStorage.setItem('rnoc_previous_cart_hash', cart_hash)
+                    sessionStorage.setItem('rnoc_previous_cart_hash', cart_hash)
                 }
                 this.previous_cart_hash = cart_hash;
             }
@@ -292,7 +292,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
              */
             getPreviousCartHash() {
                 if (this.isLocalStorageSupports()) {
-                    return localStorage.getItem('rnoc_previous_cart_hash')
+                    return sessionStorage.getItem('rnoc_previous_cart_hash')
                 }
                 return this.previous_cart_hash;
             }
