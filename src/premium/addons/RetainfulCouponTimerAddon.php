@@ -116,7 +116,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         function showTimer()
         {
             $coupon_expire_time = $this->wc_functions->getSession('rnoc_coupon_timer_expired_on_gmt');
-            if (!empty($coupon_expire_time) && $coupon_expire_time >= current_time("timestamp",true)) {
+            if (!empty($coupon_expire_time) && $coupon_expire_time >= current_time("timestamp", true)) {
                 $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages', array());
                 if ($this->isValidPagesToDisplay($modal_display_pages)) {
                     $top_position = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings');
@@ -145,6 +145,8 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
          */
         function defaultTimerDesign()
         {
+            $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
+            $checkout_url = $this->getCheckoutUrl();
             return array(
                 RNOC_PLUGIN_PREFIX . 'enable_position' => 0,
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __('Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}', RNOC_TEXT_DOMAIN),
@@ -154,7 +156,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
-                RNOC_PLUGIN_PREFIX . 'checkout_url' => $this->getCheckoutUrl(),
+                RNOC_PLUGIN_PREFIX . 'checkout_url' => add_query_arg('retainful_ac_coupon', $coupon_code, $checkout_url),
                 RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
                 RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
@@ -461,20 +463,20 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'default' => 1
             ));
             $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Add to cart button text', RNOC_TEXT_DOMAIN),
+                'name' => __('Call to action button text', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_text',
                 'type' => 'text',
                 'default' => __('Checkout Now', RNOC_TEXT_DOMAIN),
                 'desc' => ''
             ));
             $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Add to cart button color', RNOC_TEXT_DOMAIN),
+                'name' => __('Call to action button color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_color',
                 'type' => 'colorpicker',
                 'default' => '#ffffff'
             ));
             $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
+                'name' => __('Call to action button background color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
                 'type' => 'colorpicker',
                 'default' => '#f27052'
@@ -549,20 +551,20 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'default' => 1
             ));
             $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Add to cart button text', RNOC_TEXT_DOMAIN),
+                'name' => __('Call to action button text', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_text',
                 'type' => 'text',
                 'default' => __('Checkout Now', RNOC_TEXT_DOMAIN),
                 'desc' => ''
             ));
             $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Add to cart button color', RNOC_TEXT_DOMAIN),
+                'name' => __('Call to action button color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_color',
                 'type' => 'colorpicker',
                 'default' => '#ffffff'
             ));
             $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
+                'name' => __('Call to action button background color', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
                 'type' => 'colorpicker',
                 'default' => '#f27052'
