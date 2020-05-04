@@ -30,6 +30,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
             if ($need_coupon_timer && !empty($coupon_code)) {
                 add_action('woocommerce_add_to_cart', array($this, 'productAddedToCart'));
+                add_action('woocommerce_after_calculate_totals', array($this, 'autoApplyCouponCode'));
                 add_action('wp', array($this, 'showTimer'));
                 add_action('woocommerce_init', array($this, 'showTimer'));
                 add_action('woocommerce_coupon_is_valid', array($this, 'ValidateCoupon'), 10, 2);
@@ -291,10 +292,19 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     $expiry_timestamp_gmt = current_time('timestamp', true) + ($expired_on_min * 60);
                     $this->wc_functions->setSession('rnoc_coupon_timer_expired_on_gmt', $expiry_timestamp_gmt);
                     $coupon_timer_apply_coupon = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon', 'automatically');
-                    if ($coupon_timer_apply_coupon == "automatically" && $this->wc_functions->isValidCoupon($coupon_code)) {
-                        $this->wc_functions->addDiscount($coupon_code);
+                    if ($coupon_timer_apply_coupon == "automatically") {
+                        $this->wc_functions->setSession('rnoc_coupon_timer_coupon_code', $coupon_code);
                     }
                 }
+            }
+        }
+
+        function autoApplyCouponCode()
+        {
+            $coupon_code = $this->wc_functions->getSession('rnoc_coupon_timer_coupon_code');
+            if (!empty($coupon_code) && $this->wc_functions->isValidCoupon($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
+                $this->wc_functions->addDiscount($coupon_code);
+                $this->wc_functions->removeSession('rnoc_coupon_timer_coupon_code');
             }
         }
 
