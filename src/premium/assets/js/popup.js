@@ -67,6 +67,7 @@ function initJqueryRetainfulPopupJs() {
                     "enable_add_to_cart_popup": "no",
                     "is_email_mandatory": "yes",
                     "no_thanks_action": "1",
+                    "close_btn_behavior": "just_close",
                     "show_popup_until": "1",
                     "add_to_cart_popup_base_id": "#rnoc-add-to-cart-add-on"
                 };
@@ -107,9 +108,14 @@ function initJqueryRetainfulPopupJs() {
                     //Trigger event about hiding popup
                     $(document).trigger('retainful_closing_add_to_cart_popup', [modal]);
                     let popup_btn = $('.rnoc-popup-opener');
-                    if (event !== "3") {
+                    if (event === "1" || event === "2") {
                         sessionStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
                         popup_btn.click();
+                    } else {
+                        if (this.getCloseButtonBehaviour() !== "just_close") {
+                            sessionStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
+                            popup_btn.click();
+                        }
                     }
                     popup_btn.removeClass('rnoc-popup-opener');
                     modal.css('display', 'none');
@@ -124,6 +130,15 @@ function initJqueryRetainfulPopupJs() {
             getAddToCartPopupWindow() {
                 let options = this.getOptions();
                 return $(options.add_to_cart_popup_base_id);
+            }
+
+            /**
+             * getting popup object window
+             * @return {*|jQuery|HTMLElement}
+             */
+            getCloseButtonBehaviour() {
+                let options = this.getOptions();
+                return options.close_btn_behavior;
             }
 
             /**

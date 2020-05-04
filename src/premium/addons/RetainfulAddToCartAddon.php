@@ -112,6 +112,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'rnoc_modal_add_cart_border_top_color' => '#f27052',
                 'rnoc_modal_add_cart_no_thanks_color' => '#f27052',
                 'rnoc_modal_bg_color' => '#F8F0F0',
+                'rnoc_close_btn_behavior' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close'),
                 'rnoc_modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
                 'rnoc_modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
                 'rnoc_coupon_message' => '',
@@ -423,8 +424,10 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         {
             wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
             $modal_show_popup_until = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1);
+            $close_btn_behavior = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close');
             $modal_show = array(
                 'hide_modal_after_show' => $modal_show_popup_until,
+                'close_btn_behavior' => $close_btn_behavior,
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
                 "enable_add_to_cart_popup" => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_modal', 0) == 0) ? "no" : "yes",
                 "is_email_mandatory" => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1) == 1) ? "yes" : "no",
@@ -499,6 +502,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'fields' => array(
                     RNOC_PLUGIN_PREFIX . 'popup_preview',
                     RNOC_PLUGIN_PREFIX . 'modal_design_settings',
+                    RNOC_PLUGIN_PREFIX . 'close_btn_behavior',
                     RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory',
                     RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance',
                     RNOC_PLUGIN_PREFIX . 'modal_coupon_settings',
@@ -553,6 +557,16 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     '1' => __('Allow adding item to cart (Show "No thanks" link)', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => 1
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Close button behavior', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'close_btn_behavior',
+                'type' => 'radio_inline',
+                'options' => array(
+                    'add_and_close' => __('Add item to cart and close', RNOC_TEXT_DOMAIN),
+                    'just_close' => __('Just close the popup', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 'just_close'
             ));
             $general_settings->add_field(array(
                 'name' => __('Show E-mail collection popup', RNOC_TEXT_DOMAIN),
