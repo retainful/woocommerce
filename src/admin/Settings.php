@@ -420,7 +420,7 @@ class Settings
                 'options' => array(
                     'all' => __('Allow any one to apply coupon', RNOC_TEXT_DOMAIN),
                     'validate_on_checkout' => __('Allow the customer to apply coupon, but validate at checkout', RNOC_TEXT_DOMAIN),
-                    'login_users' => __('Allow customer to apply coupon only after login', RNOC_TEXT_DOMAIN)
+                    'login_users' => __('Allow customer to apply coupon only after login (Not Recommended)', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => 'all'
             ));
@@ -508,8 +508,8 @@ class Settings
                         'type' => 'number',
                         'min' => 0
                     ),
-                    'default' => 0,
-                    'desc' => __('Recommended setting: 0 (unlimited). In order to maximize repeat purchases, you should send one unique coupon with every purchase for the next order. However, if you only want the customer to get next order coupons for 5 times in his life, you can set it to 5. In this case, the customer will receive the coupon only for 5 of his orders. starting 6th order, he will not receive the coupon', RNOC_TEXT_DOMAIN)
+                    'default' => 99,
+                    'desc' => __('In order to maximize repeat purchases, you should send one unique coupon with every purchase for the next order. However, if you only want the customer to get next order coupons for 5 times in his life, you can set it to 5. In this case, the customer will receive the coupon only for 5 of his orders. starting 6th order, he will not receive the coupon', RNOC_TEXT_DOMAIN)
                 ));
             } else {
                 $next_order_coupon->add_field(array(
@@ -596,7 +596,7 @@ class Settings
                     'after' => '<p id="coupon_expire_error" style="color: red;"></p>' . __('How many days the coupon is valid? After the entered number of days coupon will automatically expire.<br><b>Note: Please leave empty or put 0 to never expire.</b> <br /> <a href="https://app.retainful.com" target="_blank">Send automatic email follow-ups to the customers before the coupon expires.</a>', RNOC_TEXT_DOMAIN),
                     'desc' => __(' Day(s)', RNOC_TEXT_DOMAIN),
                     'classes' => 'retainful-coupon-group',
-                    'default' => '',
+                    'default' => 60,
                     'attributes' => array(
                         'type' => 'number',
                         'min' => 0,
@@ -1270,10 +1270,11 @@ class Settings
         if (empty($ordered_date))
             return NULL;
         $settings = get_option($this->slug, array());
-        if (!empty($settings) && $this->isAppConnected() && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days'])) {
+        $expire_days = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days'] : 60;
+        if (!empty($settings) && $this->isAppConnected() && !empty($expire_days)) {
             try {
                 $expiry_date = new \DateTime($ordered_date);
-                $expiry_date->add(new \DateInterval('P' . $settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days'] . 'D'));
+                $expiry_date->add(new \DateInterval('P' . $expire_days . 'D'));
                 return $expiry_date->format(\DateTime::ATOM);
             } catch (\Exception $e) {
                 return NULL;
@@ -1693,7 +1694,7 @@ class Settings
      */
     function getCouponLimitPerUser()
     {
-        $limit = 0;
+        $limit = 99;
         if ($this->isProPlan()) {
             $settings = get_option($this->slug, array());
             if (!empty($settings)) {
