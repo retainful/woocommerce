@@ -4,7 +4,7 @@
             var is_noc_explained = $('[name="rnoc_enable_next_order_coupon"]:checked').val();
             var noc_coupon_val = $('[name="rnoc_retainful_coupon_amount"]').val();
             if (parseInt(is_noc_explained) === 1 && (parseInt(noc_coupon_val) <= 0 || noc_coupon_val === "")) {
-                alert("Coupon value must not empty and greater than 0!");
+                alert("Please enter a coupon value. Example: 10 (to provide a 10% coupon for next order.)");
                 return false;
             }
         })
