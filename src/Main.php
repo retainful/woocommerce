@@ -236,6 +236,7 @@ class Main
                 $this->showAdminNotice($notice);
             }
         } else {
+            add_action('admin_notices', array($this, 'showDeprecationNotice'));
             /*
             * Retainful abandoned cart
             */
@@ -307,6 +308,29 @@ class Main
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
         do_action('rnoc_initiated');
         $this->checkApi();
+    }
+
+    function showDeprecationNotice()
+    {
+        ?>
+        <div class="notice notice-warning is-dismissible">
+            <p>We will be deprecating and removing the Abandoned cart management via the Plugin interface by July 1,
+                2020. Please consider switching to Retainful Cloud to manage abandoned carts. It's easy. Just click the
+                switch button and connect your store to the Retainful dashboard</p>
+            <p><strong>Why we are making this change?</strong></p>
+            <p>The Retainful plugin interface depends on the WP Cron for scheduling emails. However, WP Cron is quite
+                unreliable. Chris Lema has a wonderful share about <a
+                        href="https://chrislema.com/understanding-wp-cron/">what is WP Cron and why he doesn't use
+                    it</a>.
+                With Retainful cloud dashboard, we track carts using Javascript and manage abandoned cart recovery,
+                without bloating your database. Your previous server resources should only be used to sell your products
+                instead of running heavy background jobs. We also wrote a <a
+                        href="https://www.retainful.com/blog/abandoned-cart-recovery-solutions-saas-vs-plugin"> detailed
+                    article</a></p>
+            <p>If you have any questions or need help, please <a href="https://www.retainful.com/support"> contact
+                    us</a></p>
+        </div>
+        <?php
     }
 
     function canActivateIPFilter()
