@@ -337,6 +337,8 @@ function initJqueryRetainfulAbandonedCartsTracking() {
         let retainful = new Retainful(retainful_cart_data.api_url, retainful_cart_data.public_key).setCartTrackingElementId(retainful_cart_data.tracking_element_selector);
         if (retainful_cart_data.cart_tracking_engine === "js") {
             retainful.setAjaxUrl(retainful_cart_data.ajax_url);
+            retainful.setIp(retainful_cart_data.ip);
+            retainful.setVersion(retainful_cart_data.version);
             retainful.initCartTracking();
             $(document).ready(function () {
                 retainful.syncCart();
