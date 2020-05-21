@@ -935,6 +935,7 @@ class Cart extends RestApi
         if ($coupons) {
             foreach ($coupons as $coupon) {
                 $coupon_code = isset($coupon->code) ? $coupon->code : NULL;
+                $coupon_code = apply_filters('rnoc_recover_cart_before_validate_coupon', $coupon_code, $coupon);
                 if (!empty($coupon_code) && self::$woocommerce->isValidCoupon($coupon_code)) {
                     $valid_coupons[] = $coupon_code;
                 }
