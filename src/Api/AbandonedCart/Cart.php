@@ -546,7 +546,8 @@ class Cart extends RestApi
         } else {
             $line_total_tax = 0;
         }
-        return $line_total + $line_total_tax;
+        $total = $line_total + $line_total_tax;
+        return apply_filters('retainful_get_line_item_total', $total, $line_total, $line_total_tax, $item_details, $this);
     }
 
     /**
