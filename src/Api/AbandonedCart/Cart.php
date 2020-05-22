@@ -799,6 +799,19 @@ class Cart extends RestApi
                     $this->reCreateCartForGuestUsers($data);
                 }
                 $this->populateSessionDetails($data);
+                $cart_session = self::$woocommerce->getSession('cart');
+                if (empty($cart_session)) {
+                    $client_session = isset($data->client_session) ? $data->client_session : array();
+                    if (!empty($client_session)) {
+                        $cart = json_decode(wp_json_encode($client_session->cart), true);
+                        if (!empty($cart)) {
+                            self::$woocommerce->setSession('cart', $cart);
+                        }
+                    } else {
+                        $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
+                        $this->recreateCartFromCartContents($cart_contents);
+                    }
+                }
             }
         }
         return false;
@@ -975,27 +988,35 @@ class Cart extends RestApi
             }
         } else {
             $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
-            if (!empty($cart_contents)) {
-                self::$woocommerce->emptyUserCart();
-                self::$woocommerce->clearWooNotices();
-                $remove_list = $this->mustCartItemsKeys();
-                foreach ($cart_contents as $key => $cart_item) {
-                    $array_cart_item = json_decode(wp_json_encode($cart_item), true);
-                    $this->unsetFromArray($array_cart_item, $remove_list);
-                    if (!is_array($array_cart_item)) {
-                        $array_cart_item = array();
-                    }
-                    $variant_id = isset($cart_item->variation_id) ? $cart_item->variation_id : 0;
-                    $variation = isset($cart_item->variation) ? $cart_item->variation : array();
-                    if (is_object($variation)) {
-                        $variation = json_decode(wp_json_encode($variation), true);
-                    }
-                    self::$woocommerce->addToCart($cart_item->product_id, $variant_id, $cart_item->quantity, $variation, $array_cart_item);
-                }
-            }
+            $this->recreateCartFromCartContents($cart_contents);
         }
         // set (or refresh, if already set) session
         self::$woocommerce->setSessionCookie(true);
+    }
+
+    /**
+     * @param $cart_contents
+     */
+    function recreateCartFromCartContents($cart_contents)
+    {
+        if (!empty($cart_contents)) {
+            self::$woocommerce->emptyUserCart();
+            self::$woocommerce->clearWooNotices();
+            $remove_list = $this->mustCartItemsKeys();
+            foreach ($cart_contents as $key => $cart_item) {
+                $array_cart_item = json_decode(wp_json_encode($cart_item), true);
+                $this->unsetFromArray($array_cart_item, $remove_list);
+                if (!is_array($array_cart_item)) {
+                    $array_cart_item = array();
+                }
+                $variant_id = isset($cart_item->variation_id) ? $cart_item->variation_id : 0;
+                $variation = isset($cart_item->variation) ? $cart_item->variation : array();
+                if (is_object($variation)) {
+                    $variation = json_decode(wp_json_encode($variation), true);
+                }
+                self::$woocommerce->addToCart($cart_item->product_id, $variant_id, $cart_item->quantity, $variation, $array_cart_item);
+            }
+        }
     }
 
     /**
