@@ -1831,19 +1831,4 @@ class WcFunctions
         }
         return false;
     }
-
-    function extraOrderStatuses()
-    {
-        $default_order_statuses = array('wc-pending', 'wc-processing', 'wc-on-hold', 'wc-completed', 'wc-cancelled', 'wc-refunded', 'wc-failed');
-        $all_order_status = $this->getAvailableOrderStatuses();
-        $extra_status = array();
-        if (!empty($all_order_status)) {
-            foreach ($all_order_status as $order_status => $label) {
-                if (!in_array($order_status, $default_order_statuses)) {
-                    $extra_status[$order_status] = $label;
-                }
-            }
-        }
-        return $extra_status;
-    }
 }

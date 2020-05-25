@@ -440,29 +440,6 @@ class RestApi
     }
 
     /**
-     * extra order status
-     * @param $order_status
-     * @return string
-     */
-    function considerExtraOrderStatus($order_status)
-    {
-        $settings = self::$settings->getAdminSettings();
-        $abandoned_extra = isset($settings[RNOC_PLUGIN_PREFIX . 'extra_abandoned_order_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'extra_abandoned_order_status'] : array();
-        if (!empty($abandoned_extra)) {
-            if (in_array($order_status, $abandoned_extra)) {
-                return "pending";
-            }
-        }
-        $recovered_extra = isset($settings[RNOC_PLUGIN_PREFIX . 'extra_recovered_order_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'extra_recovered_order_status'] : array();
-        if (!empty($recovered_extra)) {
-            if (in_array($order_status, $recovered_extra)) {
-                return "completed";
-            }
-        }
-        return $order_status;
-    }
-
-    /**
      * Format the date to ISO8601
      * @param $timestamp
      * @return string|null

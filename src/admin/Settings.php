@@ -307,29 +307,6 @@ class Settings
                     ),
                     'default' => 0
                 ));
-                /*$extra_status = $this->wc_functions->extraOrderStatuses();
-                if (!empty($extra_status)) {
-                    $general_settings->add_field(array(
-                        'name' => __('You have following additional order statuses. If you would like to consider any of these order statuses as abandoned, please choose them here (Optional)', RNOC_TEXT_DOMAIN),
-                        'id' => RNOC_PLUGIN_PREFIX . 'extra_abandoned_order_status',
-                        'type' => 'pw_multiselect',
-                        'options' => $extra_status,
-                        'attributes' => array(
-                            'placeholder' => __('Select order statuses', RNOC_TEXT_DOMAIN)
-                        ),
-                        'default' => ''
-                    ));
-                    $general_settings->add_field(array(
-                        'name' => __('Would you like to consider any of these additional statuses found in your store to be treated as successful completion / recovery of order  (Optional)', RNOC_TEXT_DOMAIN),
-                        'id' => RNOC_PLUGIN_PREFIX . 'extra_recovered_order_status',
-                        'type' => 'pw_multiselect',
-                        'options' => $extra_status,
-                        'attributes' => array(
-                            'placeholder' => __('Select order statuses', RNOC_TEXT_DOMAIN)
-                        ),
-                        'default' => ''
-                    ));
-                }*/
             }
             $general_settings->add_field(array(
                 'name' => __('Enable GDPR Compliance?', RNOC_TEXT_DOMAIN),

@@ -141,7 +141,6 @@ class Order extends RestApi
         $order_id = self::$woocommerce->getOrderId($order);
         $order_placed_at = self::$woocommerce->getOrderMeta($order, $this->order_placed_date_key_for_db);
         $order_status = self::$woocommerce->getStatus($order);
-        $order_status = $this->considerExtraOrderStatus($order_status);
         if (!$order_placed_at && $this->isOrderHasValidOrderStatus($order_status)) {
             $order_placed_at = current_time('timestamp', true);
             self::$woocommerce->setOrderMeta($order_id, $this->order_placed_date_key_for_db, $order_placed_at);
@@ -188,8 +187,6 @@ class Order extends RestApi
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
         $recovered_at = self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_at');
         $order_status = self::$woocommerce->getStatus($order);
-        //$this->considerExtraOrderStatus($order_status);
-        $order_status = apply_filters('rnoc_abandoned_cart_order_status', $order_status, $order);
         $order_data = array(
             'cart_type' => 'order',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
@@ -215,7 +212,7 @@ class Order extends RestApi
             'completed_at' => $this->getCompletedAt($order),
             'total_weight' => 0,
             'discount_codes' => self::$woocommerce->getAppliedDiscounts($order),
-            'order_status' => $order_status,
+            'order_status' => apply_filters('rnoc_abandoned_cart_order_status', $order_status, $order),
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
