@@ -323,7 +323,7 @@ class Main
                         href="https://chrislema.com/understanding-wp-cron/">what is WP Cron and why he doesn't use
                     it</a>.
                 With Retainful cloud dashboard, we track carts using Javascript and manage abandoned cart recovery,
-                without bloating your database. Your previous server resources should only be used to sell your products
+                without bloating your database. Your precious server resources should only be used to sell your products
                 instead of running heavy background jobs. We also wrote a <a
                         href="https://www.retainful.com/blog/abandoned-cart-recovery-solutions-saas-vs-plugin"> detailed
                     article</a></p>
