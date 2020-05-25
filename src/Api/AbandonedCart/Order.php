@@ -188,6 +188,7 @@ class Order extends RestApi
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
         $recovered_at = self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_at');
         $order_status = self::$woocommerce->getStatus($order);
+        $order_status = apply_filters('rnoc_abandoned_cart_order_status', $this->considerExtraOrderStatus($order_status), $order);
         $order_data = array(
             'cart_type' => 'order',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
@@ -213,7 +214,7 @@ class Order extends RestApi
             'completed_at' => $this->getCompletedAt($order),
             'total_weight' => 0,
             'discount_codes' => self::$woocommerce->getAppliedDiscounts($order),
-            'order_status' => apply_filters('rnoc_abandoned_cart_order_status', $this->considerExtraOrderStatus($order_status), $order),
+            'order_status' => $order_status,
             'shipping_lines' => array(),
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
@@ -234,7 +235,7 @@ class Order extends RestApi
             'noc_discount_codes' => $this->getNextOrderCouponDetails($order),
             'client_details' => $this->getClientDetails($order)
         );
-        return $order_data;
+        return apply_filters('rnoc_api_get_order_data', $order_data, $order);
     }
 
     /**
