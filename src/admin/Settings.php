@@ -310,7 +310,7 @@ class Settings
                 $extra_status = $this->wc_functions->extraOrderStatuses();
                 if (!empty($extra_status)) {
                     $general_settings->add_field(array(
-                        'name' => __('Consider chosen order status as abandoned order?', RNOC_TEXT_DOMAIN),
+                        'name' => __('You have following additional order statuses. If you would like to consider any of these order statuses as abandoned, please choose them here (Optional)', RNOC_TEXT_DOMAIN),
                         'id' => RNOC_PLUGIN_PREFIX . 'extra_abandoned_order_status',
                         'type' => 'pw_multiselect',
                         'options' => $extra_status,
@@ -320,7 +320,7 @@ class Settings
                         'default' => ''
                     ));
                     $general_settings->add_field(array(
-                        'name' => __('Consider chosen order status as recovered order?', RNOC_TEXT_DOMAIN),
+                        'name' => __('Would you like to consider any of these additional statuses found in your store to be treated as successful completion / recovery of order  (Optional)', RNOC_TEXT_DOMAIN),
                         'id' => RNOC_PLUGIN_PREFIX . 'extra_recovered_order_status',
                         'type' => 'pw_multiselect',
                         'options' => $extra_status,
