@@ -39,7 +39,7 @@ Retainful can automatically send these abandoned cart reminders and it stops the
 - Customer clicks the link to recover his cart. 
 - Completes the purchase
 
-With Retainful Premium plans, you can also [capture the customer's email when they add an item to cart](https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) or when they try to leave your site without buying, i.e, [Exit Intent Popup](https://www.retainful.com/docs/woocommerce/exit-intent-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) 
+With Retainful Premium plans, you can also [capture customer's email when they add an item to cart](https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) or when they try to leave your site without buying, i.e, [Exit Intent Popup](https://www.retainful.com/docs/woocommerce/exit-intent-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) 
 
 **How to get started with Retainful?**
 
@@ -57,11 +57,7 @@ Retainful can help you drive repeat purchases by sending single-use, unique coup
 
 The customer can redeem this coupon code during their next purchase. This helps you retain your existing customers, get repeated orders and earn more dollars per customer.
 
-> Since Retainful 2.0, creating, scheduling and sending the email is available in the Retainful app in the cloud itself. This change was introduced after huge demand from customers to ensure better performance, speed of the shop and email deliverability. Existing users can easily switch with a single click.
-
 == Customize emails with Drag and Drop Visual Email Editor ==
-
-> Available from Retainful 2.0
 
 Create beautiful, mobile-friendly emails in minutes using the Retainful's powerful drag and drop email editor. Use our ready-to-use email templates and customize them in minutes to reflect your brand. Add a logo, custom text, images, social icons and links, shop address, coupon and more using the drag and drop editor.
 
@@ -88,7 +84,7 @@ Instead, you can let Retainful handle abandoned cart recovery campaigns for you.
 * Create beautiful, mobile-friendly emails easily with drag and drop email editor. (Retainful 2.0)
 * Extensive reporting - See abandoned carts, recovered, live carts.
 * See **real-time carts**, i.e, carts of the customers who are purchasing in your site at the very moment
-* Compare **Abandoned order value* and the *Recovered order** values
+* Compare **Abandoned order value** and the **Recovered order** values
 * Mailchimp integration (Retainful 2.0)
 
 === Next Order Coupon features: ===
@@ -135,7 +131,7 @@ Retainful comes with **premium add-ons** to recover the sales effectively.
 [Convert your visitors into customers](https://www.retainful.com/docs/woocommerce/exit-intent-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) when they try to leave your shop with items in their cart. Track the mouse behaviour of your customers and trigger a popup with coupon or collect email when the customer tries to exit.
 With the exit popups, you can encourage the visitors to complete their purchase ot leave their email.
 
-**Add-to-cart Email Collection Popup**
+**Add-to-cart Email Capture Popup**
 
 [Collect the email address](https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) before the customer adds an item to cart.
 Trigger a popup when the customer clicks add to cart and get their email address. The popup is fully customisable. Change the colour, background, text and the labels.
@@ -157,10 +153,11 @@ You can try the Premium add-ons free for 14 days. We offer a 14-day trial period
 
 == Free Trial, Free Plan & Pricing ==
 
+**Get Started today with a 14-day free trial that gives you unlimited access to all features, then upgrade to keep using all Premium features, or switch to our free plan if you are just getting started.** 
+
 [Retainful](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) is a Software-As-A-Service (SAAS) platform that provides both free and subscription-based services, depending on features you need for your WooCommerce store.
 
-- Forever-free plan features have unlimited access, update, and support.
-- Paid features like Premium add-ons have a 14-day free trial. Our paid plans start at just $9 / month. Check out our [pricing page](https://www.retainful.com/pricing?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=pricing) for more informtion
+Check out our [pricing page](https://www.retainful.com/pricing?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=pricing) for more informtion
 
 ==Support and Documentation ==
 

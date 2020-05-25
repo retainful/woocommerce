@@ -236,7 +236,7 @@ class Main
                 $this->showAdminNotice($notice);
             }
         } else {
-            add_action('admin_notices', array($this, 'showDeprecationNotice'));
+            //add_action('admin_notices', array($this, 'showDeprecationNotice'));
             /*
             * Retainful abandoned cart
             */
