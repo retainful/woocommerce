@@ -83,7 +83,16 @@ class RestApi
      */
     function formatDecimalPrice($price)
     {
-        return round($price, self::$woocommerce->priceDecimals());
+        $decimals = self::$woocommerce->priceDecimals();
+        $rounded_price = round($price, $decimals);
+        $price_array = explode('.', $rounded_price);
+        if (isset($price_array[0]) && isset($price_array[1])) {
+            if (strlen($price_array[1]) < $decimals) {
+                $price_array[1] = str_pad($price_array[1], $decimals, '0');
+            }
+            $rounded_price = implode('.', $price_array);
+        }
+        return $rounded_price;
     }
 
     /**
