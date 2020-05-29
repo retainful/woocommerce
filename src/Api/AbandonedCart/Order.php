@@ -90,7 +90,7 @@ class Order extends RestApi
                 } else {
                     $item = (isset($item_details['data']) && !empty($item_details['data'])) ? $item_details['data'] : NULL;
                 }
-                $line_tax = $this->formatDecimalPrice((isset($item_details['line_tax']) && !empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0);
+                $line_tax = $this->formatDecimalPriceRemoveTrailingZeros((isset($item_details['line_tax']) && !empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0);
                 if ($line_tax > 0) {
                     $tax_details[] = array(
                         'rate' => 0,
@@ -109,18 +109,18 @@ class Order extends RestApi
                         'image_url' => $image_url,
                         'product_url' => self::$woocommerce->getProductUrl($item),
                         'sku' => self::$woocommerce->getItemSku($item),
-                        'price' => self::$woocommerce->getItemPrice($item),
+                        'price' => $this->formatDecimalPriceRemoveTrailingZeros(self::$woocommerce->getItemPrice($item)),
                         'title' => self::$woocommerce->getItemName($item),
                         'vendor' => 'woocommerce',
                         'taxable' => ($line_tax != 0),
                         'user_id' => NULL,
                         'quantity' => $item_quantity,
                         'tax_lines' => $tax_details,
-                        'line_price' => $this->formatDecimalPrice((isset($item_details['line_total']) && !empty($item_details['line_total'])) ? $item_details['line_total'] : 0),
+                        'line_price' => $this->formatDecimalPriceRemoveTrailingZeros((isset($item_details['line_total']) && !empty($item_details['line_total'])) ? $item_details['line_total'] : 0),
                         'product_id' => $product_id,
                         'properties' => array(),
                         'variant_id' => $variant_id,
-                        'variant_price' => $this->formatDecimalPrice(($is_variable_item) ? self::$woocommerce->getItemPrice($item) : 0),
+                        'variant_price' => $this->formatDecimalPriceRemoveTrailingZeros(($is_variable_item) ? self::$woocommerce->getItemPrice($item) : 0),
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
                         'requires_shipping' => true
                     );

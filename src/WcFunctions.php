@@ -569,7 +569,7 @@ class WcFunctions
         if (function_exists('wc_get_price_decimals')) {
             return wc_get_price_decimals();
         }
-        return NULL;
+        return 2;
     }
 
     /**
