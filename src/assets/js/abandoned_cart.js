@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 initJqueryRetainfulAbandonedCartsTracking();
             }
         });
-m
     } else {
         // alert('defined');
         initJqueryRetainfulAbandonedCartsTracking();
