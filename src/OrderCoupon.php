@@ -724,6 +724,22 @@ class OrderCoupon
     }
 
     /**
+     * check the user has valid limit
+     * @param $order
+     * @return bool
+     */
+    function isMinimumOrderTotalReached($order)
+    {
+        $status = true;
+        $minimum_total = $this->admin->getMinimumOrderTotalForCouponGeneration();
+        if (!empty($minimum_total)) {
+            $order_total = $this->wc_functions->getOrderTotal($order);
+            $status = ($order_total >= $minimum_total);
+        }
+        return apply_filters("rnoc_is_minimum_sub_total_reached", $status, $order);
+    }
+
+    /**
      * Check the order has valid order items to generate coupon
      * @param $order
      * @return bool
@@ -793,7 +809,7 @@ class OrderCoupon
             return false;
         }
         $coupon_settings = $this->admin->getCouponSettings();
-        if (!$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order) || !$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
+        if (!$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order) || !$this->isMinimumOrderTotalReached($order) || !$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
             return NULL;
         }
         $email = $this->wc_functions->getOrderEmail($order);

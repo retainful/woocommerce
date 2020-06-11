@@ -513,8 +513,28 @@ class Settings
                 ));
             } else {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Limit', RNOC_TEXT_DOMAIN),
+                    'name' => __('How many coupons a customer can get in his lifetime?', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_limit_per_user_feature',
+                    'type' => 'unlock_features',
+                    'link_only_field' => 1
+                ));
+            }
+            if ($this->isProPlan()) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Minimum order total', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'minimum_sub_total',
+                    'type' => 'text_small',
+                    'attributes' => array(
+                        'type' => 'number',
+                        'min' => 0
+                    ),
+                    'default' => '',
+                    'desc' => __('Coupon will generate only if the order total greater then or equal to the given value. Leave empty or put 0 for no restriction.', RNOC_TEXT_DOMAIN)
+                ));
+            } else {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Minimum order total', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'unlock_minimum_sub_total_feature',
                     'type' => 'unlock_features',
                     'link_only_field' => 1
                 ));
@@ -1702,6 +1722,21 @@ class Settings
             }
         }
         return $limit;
+    }
+    /**
+     * get coupon Limit per email
+     * @return integer
+     */
+    function getMinimumOrderTotalForCouponGeneration()
+    {
+        $minimum_sub_total = 0;
+        if ($this->isProPlan()) {
+            $settings = get_option($this->slug, array());
+            if (!empty($settings)) {
+                return isset($settings[RNOC_PLUGIN_PREFIX . 'minimum_sub_total']) ? $settings[RNOC_PLUGIN_PREFIX . 'minimum_sub_total'] : $minimum_sub_total;
+            }
+        }
+        return $minimum_sub_total;
     }
 
     /**

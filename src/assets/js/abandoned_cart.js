@@ -410,7 +410,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                         shipping_country: $('#shipping_country').val(),
                         action: 'rnoc_track_user_data'
                     };
-                    if(retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 1) {
+                    if(retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
                         let result = $.ajax({
                             url: retainful_cart_data.ajax_url,
                             headers: {},
@@ -428,11 +428,11 @@ function initJqueryRetainfulAbandonedCartsTracking() {
                             }
                         });
                     }else{
-                    console.log('Email validation failed');
+                    //console.log('Email validation failed');
                     }
                     
                 }else{
-                    console.log('Not a valid email yet');
+                    //console.log('Not a valid email yet');
                 }
         });
     });
