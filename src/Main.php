@@ -114,6 +114,10 @@ class Main
         if (is_admin()) {
             add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
         }
+        //Setup nonce for non logged in customers
+        if (!is_user_logged_in()) {
+            add_filter('nonce_user_logged_out', array($this, 'nonceUserLoggedOut'), 20);
+        }
         //Register deactivation hook
         register_deactivation_hook(RNOC_FILE, array($this, 'onPluginDeactivation'));
         add_action('retainful_plugin_activated', array($this, 'createRequiredTables'));
@@ -374,6 +378,72 @@ class Main
         $this->admin->removeFinishedHooks('rnoc_abandoned_clear_abandoned_carts');
         $this->admin->removeFinishedHooks('rnoc_abandoned_cart_send_email');
         $this->admin->removeFinishedHooks('rnocp_check_user_plan');
+    }
+
+    /**
+     * maintain our own nonce to solve conflicts with booking plugin
+     * @param $uid
+     * @return mixed|string
+     * @since 2.2.5
+     */
+    function nonceUserLoggedOut($uid)
+    {
+        $plugin_uid = $this->getPluginUID();
+        if (!empty($plugin_uid)) {
+            return $plugin_uid;
+        }
+        return $uid;
+    }
+
+    /**
+     * set plugin UID in cookie
+     * @param $uid
+     */
+    function setPluginUID($uid)
+    {
+        if (!headers_sent()) {
+            setcookie('rnoc_plugin_uuid', $uid, array(
+                'expires' => current_time('timestamp') + 86400,
+                'path' => COOKIEPATH ? COOKIEPATH : '/',
+                'domain' => COOKIE_DOMAIN,
+                'samesite' => 'None',
+                'secure' => false,
+                'httponly' => false,
+            ));
+        }
+    }
+
+    /**
+     * get plugin UID in cookie
+     * @return mixed|string
+     */
+    function getPluginUID()
+    {
+        if (isset($_COOKIE['rnoc_plugin_uuid'])) {
+            return $_COOKIE['rnoc_plugin_uuid'];
+        } else {
+            $new_uid = $this->generateUID();
+            $this->setPluginUID($new_uid);
+            return $new_uid;
+        }
+    }
+
+    /**
+     * generate UID similarly like WooCommerce
+     * @return string
+     */
+    function generateUID()
+    {
+        $customer_id = '';
+        if (is_user_logged_in()) {
+            $customer_id = strval(get_current_user_id());
+        }
+        if (empty($customer_id)) {
+            require_once ABSPATH . 'wp-includes/class-phpass.php';
+            $hasher = new \PasswordHash(8, false);
+            $customer_id = md5($hasher->get_random_bytes(32));
+        }
+        return $customer_id;
     }
 
     /**
