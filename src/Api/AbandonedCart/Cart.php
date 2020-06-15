@@ -754,6 +754,9 @@ class Cart extends RestApi
                 if (empty($data)) {
                     return false;
                 }
+                self::$storage->setValue('rnoc_recovered_at', current_time('timestamp', true));
+                self::$storage->setValue('rnoc_recovered_by_retainful', 1);
+                self::$storage->setValue('rnoc_recovered_cart_token', $cart_token);
                 $order_id = $this->getOrderIdFromCartToken($cart_token);
                 $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
                 if ($order_id && $order = self::$woocommerce->getOrder($order_id)) {
@@ -774,9 +777,6 @@ class Cart extends RestApi
                 self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accept_marketing);
                 $user_currency = isset($data->presentment_currency) ? $data->presentment_currency : self::$woocommerce->getDefaultCurrency();
                 apply_filters('rnoc_set_current_currency_code', $user_currency);
-                self::$storage->setValue('rnoc_recovered_at', current_time('timestamp', true));
-                self::$storage->setValue('rnoc_recovered_by_retainful', 1);
-                self::$storage->setValue('rnoc_recovered_cart_token', $cart_token);
                 // check if cart is associated with a registered user / persistent cart
                 $user_id = $this->getUserIdFromCartToken($cart_token);
                 $cart_recreated = false;
