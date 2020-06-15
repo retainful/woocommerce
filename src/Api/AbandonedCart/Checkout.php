@@ -34,9 +34,6 @@ class Checkout extends RestApi
             $user_ip = $this->retrieveUserIp();
             $is_buyer_accepts_marketing = ($this->isBuyerAcceptsMarketing()) ? 1 : 0;
             $cart_hash = self::$storage->getValue('rnoc_current_cart_hash');
-            $recovered_at = self::$storage->getValue('rnoc_recovered_at');
-            $recovered_by = self::$storage->getValue('rnoc_recovered_by_retainful');
-            $recovered_cart_token = self::$storage->getValue('rnoc_recovered_cart_token');
             $user_agent = $this->getUserAgent();
             $user_accept_language = $this->getUserAcceptLanguage();
             self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
@@ -44,15 +41,29 @@ class Checkout extends RestApi
             self::$woocommerce->setOrderMeta($order_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
             self::$woocommerce->setOrderMeta($order_id, $this->user_ip_key_for_db, $user_ip);
             self::$woocommerce->setOrderMeta($order_id, $this->accepts_marketing_key_for_db, $is_buyer_accepts_marketing);
-            self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_at', $recovered_at);
-            self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_by', $recovered_by);
-            self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_cart_token', $recovered_cart_token);
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_user_agent', $user_agent);
             self::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_accept_language', $user_accept_language);
+            $this->setOrderMetaDetails($order_id);
             $this->markOrderAsPendingRecovery($order_id);
             //$this->unsetOrderTempData();
         }
         return NULL;
+    }
+
+    /**
+     * set order meta details
+     * @param $order_id
+     */
+    function setOrderMetaDetails($order_id)
+    {
+        $recovered_at = self::$storage->getValue('rnoc_recovered_at');
+        $recovered_by = self::$storage->getValue('rnoc_recovered_by_retainful');
+        $recovered_cart_token = self::$storage->getValue('rnoc_recovered_cart_token');
+        if (!empty($recovered_at) && !empty($recovered_cart_token)) {
+            self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_at', $recovered_at);
+            self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_by', $recovered_by);
+            self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_cart_token', $recovered_cart_token);
+        }
     }
 
     /**
