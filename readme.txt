@@ -3,11 +3,11 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
 Requires at least: 4.0
 Tested up to: 5.4.1
-WC tested up to: 4.1.1
+WC tested up to: 4.2.0
 Requires PHP: 5.6
-Stable tag: 2.2.4
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Stable tag: 2.2.5
+License: GPLv3 or later
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Stop cart abandonment in WooCommerce and recover lost revenue with Retainful. Drive repeat purchases by sending Next Order Coupons and increase the sales.
 
@@ -384,3 +384,6 @@ No. There is no charges for support.
 
 = 2.2.4 =
 * Fix: Cart recovery fallback added
+
+= 2.2.5 =
+* New feature: cart total based next order coupon added
