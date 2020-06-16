@@ -239,7 +239,8 @@ class WcFunctions
     function getOrderMeta($order, $meta_key)
     {
         if (method_exists($order, 'get_meta')) {
-            return $order->get_meta($meta_key);
+            $order_id = $this->getOrderId($order);
+            return get_post_meta($order_id,$meta_key,true);
         }
         return NULL;
     }

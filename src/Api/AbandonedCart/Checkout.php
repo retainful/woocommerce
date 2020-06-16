@@ -78,6 +78,7 @@ class Checkout extends RestApi
         } else {
             $this->scheduleCartSync($order_id);
         }
+        $this->setOrderMetaDetails($order_id);
     }
 
     /**
