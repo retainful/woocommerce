@@ -235,13 +235,12 @@ class WcFunctions
      * @param $order
      * @param $meta_key
      * @return null
+     * @since 2.2.5
      */
     function getOrderMeta($order, $meta_key)
     {
-        if (method_exists($order, 'get_meta')) {
-            return $order->get_meta($meta_key);
-        }
-        return NULL;
+        $order_id = $this->getOrderId($order);
+        return get_post_meta($order_id, $meta_key, true);
     }
 
     /**
