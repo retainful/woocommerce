@@ -1,4 +1,4 @@
-<div class="popup"
+<div class="rnoc-inner-popup"
      style="padding: 20px; background: #F9F9F9; border-radius: 0;transition: all 3s ease-in-out;font-family: inherit;">
     <div class="popup-head"
          style="display: block; padding: 20px; text-align: center; border: 1px dashed #f20561;">
