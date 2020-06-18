@@ -597,12 +597,20 @@ class RestApi
         if (is_user_logged_in()) {
             return true;
         } else {
-            $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
-            if ($is_buyer_accepts_marketing == 1) {
+            $settings = self::$settings->getAdminSettings();
+            $gdpr_compliance_settings = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 'dont_show_checkbox';
+            if ($gdpr_compliance_settings == 0) {
                 return true;
+            } else {
+                $gdpr_compliance_settings_checkout = (isset($settings[RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings_in_checkout_page'])) ? $settings[RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings_in_checkout_page'] : 'dont_show_checkbox';
+                if (in_array($gdpr_compliance_settings_checkout, array("show_checkbox", "show_and_check_checkbox"))) {
+                    $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
+                    return ($is_buyer_accepts_marketing == 1);
+                } else {
+                    return true;
+                }
             }
         }
-        return false;
     }
 
     /**

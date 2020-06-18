@@ -240,7 +240,7 @@ class WcFunctions
     {
         if (method_exists($order, 'get_meta')) {
             $order_id = $this->getOrderId($order);
-            return get_post_meta($order_id,$meta_key,true);
+            return get_post_meta($order_id, $meta_key, true);
         }
         return NULL;
     }
@@ -265,6 +265,20 @@ class WcFunctions
     function getPostMeta($post_id, $meta_key)
     {
         return get_post_meta($post_id, $meta_key, true);
+    }
+
+    /**
+     * compliance message options
+     * @return array
+     */
+    function complianceMessageOptions()
+    {
+        return array(
+            'no_need_gdpr' => __('Disabled', RNOC_TEXT_DOMAIN),
+            'dont_show_checkbox' => __('Don\'t show checkbox, but show GDPR compliance message', RNOC_TEXT_DOMAIN),
+            'show_checkbox' => __('Show checkbox - default un checked', RNOC_TEXT_DOMAIN),
+            'show_and_check_checkbox' => __('Show checkbox - default checked', RNOC_TEXT_DOMAIN),
+        );
     }
 
     /**

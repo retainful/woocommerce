@@ -319,6 +319,13 @@ class Settings
                 'default' => 0
             ));
             $general_settings->add_field(array(
+                'name' => __('GDPR Compliance in checkout page ', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings_in_checkout_page',
+                'type' => 'select',
+                'default' => 'dont_show_checkbox',
+                'options' => $this->wc_functions->complianceMessageOptions()
+            ));
+            $general_settings->add_field(array(
                 'name' => __('Compliance Message', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'cart_capture_msg',
                 'type' => 'textarea',
@@ -1723,6 +1730,7 @@ class Settings
         }
         return $limit;
     }
+
     /**
      * get coupon Limit per email
      * @return integer

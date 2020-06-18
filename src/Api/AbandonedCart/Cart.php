@@ -68,11 +68,23 @@ class Cart extends RestApi
     function guestGdprMessage($fields)
     {
         $settings = self::$settings->getAdminSettings();
-        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
-        if ($enable_gdpr_compliance) {
+        $gdpr_compliance_enabled = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 'dont_show_checkbox';
+        if ($gdpr_compliance_enabled == 0) {
+            return $fields;
+        }
+        $gdpr_compliance_settings = (isset($settings[RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings_in_checkout_page'])) ? $settings[RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings_in_checkout_page'] : 'dont_show_checkbox';
+        if ($gdpr_compliance_settings != "no_need_gdpr") {
             if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
-                $existing_label = $fields['billing']['billing_email']['label'];
-                $fields['billing']['billing_email']['label'] = $existing_label . "<br><small>" . $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] . "</small>";
+                $checkbox = "";
+                if (in_array($gdpr_compliance_settings, array('show_and_check_checkbox', 'show_checkbox'))) {
+                    $fields['billing']['rnoc_is_marketting_accepted'] = array(
+                        'type' => 'checkbox',
+                        'default' => ($gdpr_compliance_settings == 'show_and_check_checkbox') ? 1 : 0,
+                        'label' => $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']
+                    );
+                } else {
+                    $fields['billing']['billing_email']['description'] = $checkbox . $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'];
+                }
             }
         }
         return $fields;
@@ -121,6 +133,8 @@ class Cart extends RestApi
             $shipping_state = (isset($_POST['shipping_state'])) ? sanitize_text_field($_POST['shipping_state']) : '';
             $shipping_zipcode = (isset($_POST['shipping_postcode'])) ? sanitize_text_field($_POST['shipping_postcode']) : '';
             $shipping_country = (isset($_POST['shipping_country'])) ? sanitize_text_field($_POST['shipping_country']) : '';
+            $is_buyer_accepting_marketing = (isset($_POST['is_marketting_accepted'])) ? sanitize_key($_POST['is_marketting_accepted']) : 0;
+            self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             //Billing details
             $billing_address = array(
                 'billing_first_name' => $billing_first_name,
