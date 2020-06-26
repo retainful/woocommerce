@@ -105,6 +105,20 @@ class Cart extends RestApi
     }
 
     /**
+     * Show GDPR message to logged in users
+     */
+    function guestUserGdprMessage()
+    {
+        $settings = self::$settings->getAdminSettings();
+        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance_in_product_page'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance_in_product_page'] : 1;
+        if ($enable_gdpr_compliance) {
+            if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
+                echo "<p><small>" . __($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'], RNOC_TEXT_DOMAIN) . "</small></p>";
+            }
+        }
+    }
+
+    /**
      * Track the customer, and set details to session
      */
     function setCustomerData()
@@ -148,7 +162,6 @@ class Cart extends RestApi
                 'billing_country' => $billing_country,
                 'billing_phone' => $billing_phone
             );
-            self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
             $this->setCustomerBillingDetails($billing_address);
             //Shipping to same billing address
             if (!empty($ship_to_billing)) {

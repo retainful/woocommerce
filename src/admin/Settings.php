@@ -326,6 +326,16 @@ class Settings
                 'options' => $this->wc_functions->complianceMessageOptions()
             ));
             $general_settings->add_field(array(
+                'name' => __('Enable GDPR Compliance in product page?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance_in_product_page',
+                'type' => 'radio_inline',
+                'options' => array(
+                    0 => __('No', RNOC_TEXT_DOMAIN),
+                    1 => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 1
+            ));
+            $general_settings->add_field(array(
                 'name' => __('Compliance Message', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'cart_capture_msg',
                 'type' => 'textarea',
