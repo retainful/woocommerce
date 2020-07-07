@@ -55,8 +55,8 @@ if (!class_exists('RetainfulFbCheckboxAddon')) {
                 var rnoc_fbcb_user_status;
                 var checkbox_holder = document.getElementById("rnoc-fb-messanger-checkbox-holder");
                 if (checkbox_holder) {
-                    var rnoc_fbcb_messenger_app_id = checkbox_holder.getAttribute("rnoc_fbcb_messenger_app_id");
-                    var rnoc_fbcb_user_ref = checkbox_holder.getAttribute("rnoc_fbcb_user_ref");
+                    var rnoc_fbcb_messenger_app_id = checkbox_holder.getAttribute("messenger_app_id");
+                    var rnoc_fbcb_user_ref = checkbox_holder.getAttribute("user_ref");
                     var rnoc_fbcb_page_id = checkbox_holder.getAttribute("page_id");
                     window.fbAsyncInit = function () {
                         FB.init({
@@ -64,8 +64,8 @@ if (!class_exists('RetainfulFbCheckboxAddon')) {
                             xfbml: true,
                             version: 'v2.6'
                         });
-
                         FB.Event.subscribe('messenger_checkbox', function (e) {
+                            console.log("event", e)
                             if (e.event === 'rendered') {
                                 console.log("Plugin was rendered");
                             } else if (e.event === 'checkbox') {
@@ -78,32 +78,32 @@ if (!class_exists('RetainfulFbCheckboxAddon')) {
                             }
                         });
                     };
-                }
-                jQuery(document).ready(function ($) {
-                    $(document).on("click", "button.single_add_to_cart_button", function () {
-                        console.log("opt-in button clicked with state " + rnoc_fbcb_state);
-                        FB.AppEvents.logEvent('MessengerCheckboxUserConfirmation', null, {
-                            'app_id': rnoc_fbcb_messenger_app_id,
-                            'page_id': rnoc_fbcb_page_id,
-                            'ref': 'rnoc_callback_ref',
-                            'user_ref': rnoc_fbcb_user_ref
-                        });
-                        if (rnoc_fbcb_state === "checked") {
-                            console.log("setting user reference via ajax " + rnoc_fbcb_user_ref);
-                            $.ajax({
-                                url: '<?php echo admin_url('admin-ajax.php') ?>',
-                                method: 'POST',
-                                dataType: 'json',
-                                data: {action: 'rnoc_fbcb_set_user_ref', user_ref: rnoc_fbcb_user_ref},
-                                async: true,
-                                success: function (response) {
-                                },
-                                error: function (response) {
-                                }
+                    jQuery(document).ready(function ($) {
+                        $(document).on("click", "button.single_add_to_cart_button", function () {
+                            console.log("opt-in button clicked with state " + rnoc_fbcb_state);
+                            FB.AppEvents.logEvent('MessengerCheckboxUserConfirmation', null, {
+                                'app_id': rnoc_fbcb_messenger_app_id,
+                                'page_id': rnoc_fbcb_page_id,
+                                'ref': 'rnoc_callback_ref',
+                                'user_ref': rnoc_fbcb_user_ref
                             });
-                        }
+                            if (rnoc_fbcb_state === "checked") {
+                                console.log("setting user reference via ajax " + rnoc_fbcb_user_ref);
+                                $.ajax({
+                                    url: '<?php echo admin_url('admin-ajax.php') ?>',
+                                    method: 'POST',
+                                    dataType: 'json',
+                                    data: {action: 'rnoc_fbcb_set_user_ref', user_ref: rnoc_fbcb_user_ref},
+                                    async: true,
+                                    success: function (response) {
+                                    },
+                                    error: function (response) {
+                                    }
+                                });
+                            }
+                        });
                     });
-                });
+                }
             </script>
             <?php
         }
@@ -131,7 +131,6 @@ if (!class_exists('RetainfulFbCheckboxAddon')) {
                  skin="light"
                  center_align="true">
             </div>
-            <input type="button" onclick="rnocConfirmOptIn()" value="Confirm Opt-in"/>
             <?php
         }
 
