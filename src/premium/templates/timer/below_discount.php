@@ -12,7 +12,13 @@
         if (distance < 0) {
             clearInterval(x);
             document.getElementById("rnoc-coupon-timer-<?php echo $coupon_timer_position ?>").innerHTML = "<?php echo __('EXPIRED',RNOC_TEXT_DOMAIN) ?>";
+            <?php
+            if(apply_filters('rnoc_coupon_timer_below_discount_position_reload', true)){
+            ?>
             window.location.reload();
+            <?php
+            }
+            ?>
         }
     }, 1000);
 </script>
