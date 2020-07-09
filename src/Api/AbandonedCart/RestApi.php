@@ -441,6 +441,16 @@ class RestApi
         do_action('rnoc_abandoned_order_recovered', $order);
     }
 
+    function cancelledOrderStatus($order_status)
+    {
+        if ($this->considerCancelledAsAbandoned() == 1) {
+            if (in_array($order_status, array("cancelled"))) {
+                $order_status = "pending";
+            }
+        }
+        return $order_status;
+    }
+
     /**
      * Consider on hold payment as abandoned
      * @return int

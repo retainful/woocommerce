@@ -17,16 +17,6 @@ class Checkout extends RestApi
         return ($recover_held_orders == "no");
     }
 
-    function cancelledOrderStatus($order_status, $order)
-    {
-        if ($this->considerCancelledAsAbandoned() == 1) {
-            if (in_array($order_status, array("cancelled"))) {
-                $order_status = "pending";
-            }
-        }
-        return $order_status;
-    }
-
     /**
      * purchase complete
      * @param $order_id

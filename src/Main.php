@@ -184,7 +184,6 @@ class Main
                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
-                add_filter('rnoc_abandoned_cart_order_status', array($checkout, 'cancelledOrderStatus'), 10, 2);
                 add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
                 add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
                 //Sync the order by the scheduled events
