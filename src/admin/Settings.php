@@ -307,6 +307,16 @@ class Settings
                     ),
                     'default' => 0
                 ));
+                $general_settings->add_field(array(
+                    'name' => __('Consider Canceled order status as abandoned cart?', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
+                    'type' => 'radio_inline',
+                    'options' => array(
+                        0 => __('No', RNOC_TEXT_DOMAIN),
+                        1 => __('Yes', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => 0
+                ));
             }
             $general_settings->add_field(array(
                 'name' => __('Enable GDPR Compliance?', RNOC_TEXT_DOMAIN),

@@ -452,6 +452,16 @@ class RestApi
     }
 
     /**
+     * Consider cancelled order as abandoned
+     * @return int
+     */
+    function considerCancelledAsAbandoned()
+    {
+        $settings = self::$settings->getAdminSettings();
+        return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'] : 0;
+    }
+
+    /**
      * Format the date to ISO8601
      * @param $timestamp
      * @return string|null
