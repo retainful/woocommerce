@@ -531,7 +531,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'options' => array(
                     'guest' => __('Only for guest', RNOC_TEXT_DOMAIN),
                     'all' => __('Everyone', RNOC_TEXT_DOMAIN),
-                    'non_email_users' => __('when a customer does\'t had an email address', RNOC_TEXT_DOMAIN)
+                    'non_email_users' => __('When a customer has not yet provided an email address', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => 'all'
             ));
