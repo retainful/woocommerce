@@ -214,7 +214,12 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         return false;
                     }
                     $need_popup_for = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', "all");
-                    if ($need_popup_for == "guest" && is_user_logged_in()) {
+                    if ($need_popup_for == "non_email_users") {
+                        $customer_email = $this->wc_functions->getCustomerEmail();
+                        if (!empty($customer_email)) {
+                            return false;
+                        }
+                    } elseif ($need_popup_for == "guest" && is_user_logged_in()) {
                         return false;
                     }
                     $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
@@ -347,6 +352,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'cookieLife' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 1),
                 'storeName' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup',
                 'consider_cart_created_as_hash' => 'no',
+                'show_only_for' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', "all"),
                 'jquery_url' => includes_url('js/jquery/jquery.js')
             );
             $settings = apply_filters('rnoc_load_exit_intent_popup_settings', $settings);
@@ -524,7 +530,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'type' => 'radio_inline',
                 'options' => array(
                     'guest' => __('Only for guest', RNOC_TEXT_DOMAIN),
-                    'all' => __('Everyone', RNOC_TEXT_DOMAIN)
+                    'all' => __('Everyone', RNOC_TEXT_DOMAIN),
+                    'non_email_users' => __('when a customer does\'t had an email address', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => 'all'
             ));

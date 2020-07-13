@@ -90,6 +90,12 @@ function initJqueryRetainfulExitIntentPopupJs() {
             if (cart_hash !== "" && cart_hash !== undefined && cart_hash !== null) {
                 let number_of_times_showed = (typeof window.rnocp_exit_intent_popup_showed_count !== "undefined") ? window.rnocp_exit_intent_popup_showed_count : 0;
                 let show_popup = true;
+                if (retainful_premium_exit_intent_popup.show_only_for === "non_email_users") {
+                    let atcp_email_entered = sessionStorage.getItem('rnocp_is_add_to_cart_popup_email_entered');
+                    if (atcp_email_entered && parseInt(atcp_email_entered) === 1) {
+                        return false;
+                    }
+                }
                 if (retainful_premium_exit_intent_popup.show_option === "once_per_session") {
                     let current_time = Date.now();
                     let last_showed_time = getPopupLastShowedTime();
@@ -161,6 +167,13 @@ function initJqueryRetainfulExitIntentPopupJs() {
                 popup_submit_btn.removeClass('loading');
                 popup_submit_btn.attr('disabled', false);
             });
+        });
+
+        $(document).on("change", "#billing_email", function () {
+            let email = $(this).val();
+            if (isEmail(email)) {
+                sessionStorage.setItem('rnocp_is_add_to_cart_popup_email_entered', '1');
+            }
         });
 
         function isEmail(email) {
