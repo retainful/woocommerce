@@ -288,7 +288,7 @@ function initJqueryRetainfulPopupJs() {
                 throw new Error('Retainful intercepts to show popup!');
             }
         });
-        $(document).on('click', '#rnoc-add-to-cart-add-on .close-rnoc-popup', () => {
+        $(document).on('click', '#rnoc-add-to-cart-add-on .close-rnoc-popup', (event) => {
             event.preventDefault();
             add_to_cart_popup.closePopup("3");
         });
