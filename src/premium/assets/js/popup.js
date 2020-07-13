@@ -289,9 +289,11 @@ function initJqueryRetainfulPopupJs() {
             }
         });
         $(document).on('click', '#rnoc-add-to-cart-add-on .close-rnoc-popup', () => {
+            event.preventDefault();
             add_to_cart_popup.closePopup("3");
         });
-        $(document).on('click', '#rnoc-add-to-cart-add-on .no-thanks-close-popup', () => {
+        $(document).on('click', '#rnoc-add-to-cart-add-on .no-thanks-close-popup', (event) => {
+            event.preventDefault();
             add_to_cart_popup.closePopup("2");
         });
         $(document).on('click', '#rnoc-add-to-cart-add-on .rnoc-popup-btn', (event) => {
