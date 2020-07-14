@@ -720,7 +720,7 @@ class Cart extends RestApi
         }
         if (!empty($_GET)) {
             foreach ($_GET as $key => $value) {
-                if ($key != "token" && $key != "hash") {
+                if (!in_array($key, array("token", "hash", "wc-api"))) {
                     $checkout_url = add_query_arg($key, $value, $checkout_url);
                 }
             }
