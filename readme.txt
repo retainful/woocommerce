@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.4.1
 WC tested up to: 4.3.0
 Requires PHP: 5.6
-Stable tag: 2.2.6
+Stable tag: 2.2.7
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -390,3 +390,7 @@ No. There is no charges for support.
 
 = 2.2.6 =
 * New feature: consider canceled order as abandoned order
+
+= 2.2.7 =
+* Fix: Add to cart popup "no thanks" link issue fixed
+* New feature: exit intent popup new option added to show popup only for customers who not provided their email address
