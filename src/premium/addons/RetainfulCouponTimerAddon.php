@@ -150,6 +150,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             $checkout_url = $this->getCheckoutUrl();
             return array(
                 RNOC_PLUGIN_PREFIX . 'enable_position' => 0,
+                RNOC_PLUGIN_PREFIX . 'top_bottom_position' => "top",
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __('Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}', RNOC_TEXT_DOMAIN),
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => ' {{minutes}}M {{seconds}}S',
@@ -409,12 +410,12 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'type' => 'group',
                 'repeatable' => false,
                 'options' => array(
-                    'group_title' => __('Top position display settings', RNOC_TEXT_DOMAIN),
+                    'group_title' => __('Top / bottom position display settings', RNOC_TEXT_DOMAIN),
                     'sortable' => true
                 ),
             ));
             $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Enable "Top" position', RNOC_TEXT_DOMAIN),
+                'name' => __('Enable Top / bottom position', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'enable_position',
                 'type' => 'radio_inline',
                 'classes' => 'retainful-coupon-group',
@@ -423,6 +424,16 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     '1' => __('Yes', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => 1
+            ));
+            $general_settings->add_group_field($top_position_settings, array(
+                'name' => __('Position', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'top_bottom_position',
+                'type' => 'radio_inline',
+                'options' => array(
+                    'top' => __('Top', RNOC_TEXT_DOMAIN),
+                    'bottom' => __('Bottom', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => "top"
             ));
             $general_settings->add_group_field($top_position_settings, array(
                 'name' => __('Message', RNOC_TEXT_DOMAIN),

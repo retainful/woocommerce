@@ -32,7 +32,7 @@
     jQuery(document).ready(function () {
         (function ($) {
             var container = $(".rnoc-coupon-timer-container-<?php echo $coupon_timer_position ?>")[0];
-            $("body").css("margin-top", container.offsetHeight);
+            $("body").css("margin-<?php echo $rnoc_top_bottom_position ?>", container.offsetHeight);
         })(jQuery);
     })
 </script>
@@ -42,7 +42,7 @@
         background: <?php echo $rnoc_coupon_timer_background; ?> !important;;
         width: 100%;
         right: 0;
-        top: 0;
+        <?php echo $rnoc_top_bottom_position ?>: 0;
         color: <?php echo $rnoc_coupon_timer_color ?>;
         position: fixed;
         z-index: 999;
