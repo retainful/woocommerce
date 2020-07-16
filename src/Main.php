@@ -24,7 +24,7 @@ class Main
         $this->rnoc = ($this->rnoc == NULL) ? new OrderCoupon() : $this->rnoc;
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         $this->abandoned_cart = ($this->abandoned_cart == NULL) ? new AbandonedCart() : $this->abandoned_cart;
-        $this->referral = ($this->referral == NULL) ? new Referral() : $this->referral;
+        //$this->referral = ($this->referral == NULL) ? new Referral() : $this->referral;
         //$this->abandoned_cart_api = ($this->abandoned_cart_api == NULL) ? new RestApi() : $this->abandoned_cart_api;
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
@@ -49,11 +49,6 @@ class Main
         register_rest_route('retainful-api/v1', '/verify', array(
             'methods' => 'POST',
             'callback' => array($this, 'verifyAppId')
-        ));
-        //Create coupon endpoint
-        register_rest_route('retainful-api/v1', '/create-coupon', array(
-            'methods' => 'POST',
-            'callback' => array($this->referral, 'createCoupon')
         ));
     }
 
