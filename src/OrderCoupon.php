@@ -331,9 +331,9 @@ class OrderCoupon
                             $coupon_array = array(
                                 'coupon_amount' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
                                 'coupon_code' => $coupon_code,
-                                'shop_url' => $this->wc_functions->getShopUrl(),
-                                'cart_url' => $this->wc_functions->getCartUrl(),
-                                'checkout_url' => $this->wc_functions->getCheckoutUrl(),
+                                'shop_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getShopUrl()),
+                                'cart_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getCartUrl()),
+                                'checkout_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getCheckoutUrl()),
                             );
                             foreach ($coupon_array as $key => $val) {
                                 $popup_content = str_replace('{{' . $key . '}}', $val, $popup_content);
@@ -388,7 +388,7 @@ class OrderCoupon
                 return true;
             //Check for coupon expired or not
             $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
-            if (!empty($coupon_expiry_date) && strtotime('Y-m-d H:i:s') > strtotime($coupon_expiry_date)) {
+            if (!empty($coupon_expiry_date) && current_time('timestamp', true) > strtotime($coupon_expiry_date)) {
                 array_push($return, false);
             }
             $cart_total = $this->wc_functions->getCartTotal();
