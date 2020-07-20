@@ -337,10 +337,11 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function addSiteScripts()
         {
-            $load_exit_intent_popup_scripts_after = apply_filters('rnoc_load_exit_intent_popup_scripts_after', array());
-            wp_enqueue_script('rnoc-exit-intent-bounce-back', RNOCPREMIUM_PLUGIN_URL . 'assets/js/bounce-back.min.js', $load_exit_intent_popup_scripts_after, RNOC_VERSION);
+            $load_exit_intent_popup_scripts_after = apply_filters('rnoc_load_exit_intent_popup_scripts_after', array('jquery'));
             wp_enqueue_script('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/exit-intent-popup.js', $load_exit_intent_popup_scripts_after, RNOC_VERSION);
-            wp_enqueue_style('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
+            if (!wp_style_is('rnoc-popup')) {
+                wp_enqueue_style('rnoc-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
+            }
             $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', 1);
             $show_option = isset($show_settings['show_option']) ? $show_settings['show_option'] : 'once_per_page';
             $show_count = isset($show_settings['show_count']) ? $show_settings['show_count'] : 1;
