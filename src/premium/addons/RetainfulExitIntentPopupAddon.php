@@ -31,7 +31,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             add_action('wp_ajax_nopriv_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
             //To support the logged in user
             add_action('wp_ajax_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
-            add_action('rnoc_exit_intent_after_applying_coupon_code', array($this, 'exitIntentCouponApplied'));
+            //add_action('rnoc_exit_intent_after_applying_coupon_code', array($this, 'exitIntentCouponApplied'));
+            add_action('woocommerce_applied_coupon', array($this, 'couponApplied'));
             add_action('wp', array($this, 'siteInit'));
         }
 
@@ -41,6 +42,14 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         function exitIntentCouponApplied()
         {
             $this->wc_functions->setSession('rnoc_exit_intent_coupon_code_applied', 1);
+        }
+
+        function couponApplied($coupon_code)
+        {
+            $eip_coupon = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '');
+            if (strtolower($eip_coupon) == strtolower($coupon_code)) {
+                $this->wc_functions->setSession('rnoc_exit_intent_coupon_code_applied', 1);
+            }
         }
 
         /**
@@ -202,7 +211,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     if ($need_popup == 0) {
                         return false;
                     }
-                    $need_exit_intent_modal_after_coupon_applied = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 0);
+                    $need_exit_intent_modal_after_coupon_applied = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 1);
                     if ($need_exit_intent_modal_after_coupon_applied == 1) {
                         $is_coupon_applied = $this->wc_functions->getSession('rnoc_exit_intent_coupon_code_applied');
                         if ($is_coupon_applied) {
@@ -354,7 +363,9 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'storeName' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup',
                 'consider_cart_created_as_hash' => 'no',
                 'show_only_for' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', "all"),
-                'jquery_url' => includes_url('js/jquery/jquery.js')
+                'jquery_url' => includes_url('js/jquery/jquery.js'),
+                'show_when_its_coupon_applied' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 1),
+                'coupon_code' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '')
             );
             $settings = apply_filters('rnoc_load_exit_intent_popup_settings', $settings);
             wp_localize_script('rnoc-exit-intent-popup', 'retainful_premium_exit_intent_popup', $settings);
