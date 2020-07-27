@@ -236,6 +236,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 $position_settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'] = $timer_display_format;
                 $position_settings['coupon_expire_time'] = $coupon_expire_time;
                 $position_settings['coupon_timer_position'] = $position;
+                $position_settings['auto_fix_page_reload'] = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload', 0);
                 $override_path = get_theme_file_path('retainful/premium/templates/timer/' . $position . '.php');
                 $template_path = RNOCPREMIUM_PLUGIN_PATH . 'templates/timer/' . $position . '.php';
                 if (file_exists($override_path)) {
@@ -325,6 +326,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages',
                     RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon',
                     RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message',
+                    RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload',
                     RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon',
                     RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time',
                     RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings',
@@ -403,6 +405,17 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'type' => 'text',
                 'desc' => __('Display this text when coupon expires.', RNOC_TEXT_DOMAIN),
                 'default' => __('Sorry! Instant Offer has expired.', RNOC_TEXT_DOMAIN)
+            ));
+            $general_settings->add_field(array(
+                'name' => __('Fix repeat reloading of page when coupon expires?', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload',
+                'type' => 'radio_inline',
+                'classes' => 'retainful-coupon-group',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => 0
             ));
             //Top position settings
             $top_position_settings = $general_settings->add_field(array(

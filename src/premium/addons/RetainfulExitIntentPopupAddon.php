@@ -358,7 +358,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'show_option' => $show_option,
                 'cookie_life' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 100),
                 'maxDisplay' => (int)$show_count,
-                'distance' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', 100),
+                'distance' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', 0),
+                'delay' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec', 0),
                 'cookieLife' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 1),
                 'storeName' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup',
                 'consider_cart_created_as_hash' => 'no',
@@ -484,6 +485,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success',
@@ -580,11 +582,21 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 )
             ));
             $general_settings->add_field(array(
+                'name' => __('Delay seconds', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
+                'type' => 'text',
+                'default' => 0,
+                'desc' => __('The minimum delay in seconds to consider triggering for.', RNOC_TEXT_DOMAIN),
+                'attributes' => array(
+                    'type' => 'number'
+                )
+            ));
+            $general_settings->add_field(array(
                 'name' => __('Distance', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
                 'type' => 'text',
-                'default' => 100,
-                'desc' => __('The minimum distance in pixels from the top of the page to consider triggering for.', RNOC_TEXT_DOMAIN),
+                'default' => 0,
+                'desc' => __('The minimum distance in % from the top of the document to consider triggering for.', RNOC_TEXT_DOMAIN),
                 'attributes' => array(
                     'type' => 'number'
                 )
