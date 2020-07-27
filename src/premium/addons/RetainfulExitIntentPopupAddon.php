@@ -354,12 +354,13 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', 1);
             $show_option = isset($show_settings['show_option']) ? $show_settings['show_option'] : 'once_per_page';
             $show_count = isset($show_settings['show_count']) ? $show_settings['show_count'] : 1;
+            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0] : array();
             $settings = array(
                 'show_option' => $show_option,
                 'cookie_life' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 100),
                 'maxDisplay' => (int)$show_count,
-                'distance' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', 0),
-                'delay' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec', 0),
+                'distance' => (int)$this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', 0),
+                'delay' => (int)$this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec', 0),
                 'cookieLife' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 1),
                 'storeName' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup',
                 'consider_cart_created_as_hash' => 'no',
@@ -427,7 +428,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             }
             $form_designs = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design', array());
             $form_designs = isset($form_designs[0]) ? $form_designs[0] : array();
-            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
+            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
             $final_settings = array(
                 'place_holder' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder', __('Enter E-mail address', RNOC_TEXT_DOMAIN)),
                 'button_color' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color', '#ffffff'),
@@ -484,8 +485,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style',
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success',
@@ -582,26 +582,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 )
             ));
             $general_settings->add_field(array(
-                'name' => __('Delay seconds', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
-                'type' => 'text',
-                'default' => 0,
-                'desc' => __('The minimum delay in seconds to consider triggering for.', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'type' => 'number'
-                )
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Distance', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
-                'type' => 'text',
-                'default' => 0,
-                'desc' => __('The minimum distance in % from the top of the document to consider triggering for.', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'type' => 'number'
-                )
-            ));
-            $general_settings->add_field(array(
                 'name' => __('Cookie expiry days', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
                 'type' => 'text',
@@ -622,6 +602,35 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 ),
                 'default' => 'checkout',
                 'desc' => __('This controls whether or not the bounce dialog should be shown on every page view or only on the user\'s first.', RNOC_TEXT_DOMAIN),
+            ));
+            $mobile_settings = $general_settings->add_field(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings',
+                'type' => 'group',
+                'repeatable' => false,
+                'options' => array(
+                    'group_title' => __('Mobile popup settings', RNOC_TEXT_DOMAIN),
+                    'sortable' => false
+                )
+            ));
+            $general_settings->add_group_field($mobile_settings, array(
+                'name' => __('Delay seconds', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
+                'type' => 'text',
+                'default' => 0,
+                'desc' => __('The minimum delay in seconds to consider triggering for.', RNOC_TEXT_DOMAIN),
+                'attributes' => array(
+                    'type' => 'number'
+                )
+            ));
+            $general_settings->add_group_field($mobile_settings, array(
+                'name' => __('Distance', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
+                'type' => 'text',
+                'default' => 0,
+                'desc' => __('The minimum distance in % from the top of the document to consider triggering for.', RNOC_TEXT_DOMAIN),
+                'attributes' => array(
+                    'type' => 'number'
+                )
             ));
             //GDPR settings
             $gdpr_compliance_settings = $general_settings->add_field(array(
