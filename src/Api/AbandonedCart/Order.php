@@ -175,6 +175,9 @@ class Order extends RestApi
         }
         $order_id = self::$woocommerce->getOrderId($order);
         $cart_token = $this->getOrderCartToken($order);
+        if(empty($cart_token)){
+            return  array();
+        }
         $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
         $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
         $customer_details = $this->getCustomerDetails($order);

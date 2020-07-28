@@ -64,6 +64,7 @@ class RestApi
      */
     function setCartToken($cart_token, $user_id = null)
     {
+        $cart_token = apply_filters('rnoc_before_set_cart_token', $cart_token, $user_id, $this);
         $old_cart_token = self::$storage->getValue($this->cart_token_key);
         if (empty($old_cart_token)) {
             self::$settings->logMessage($cart_token, 'setting cart token');
@@ -229,10 +230,11 @@ class RestApi
             $user_id = get_current_user_id();
         }
         if (!empty($user_id)) {
-            return get_user_meta($user_id, $this->cart_token_key_for_db, true);
+            $token = get_user_meta($user_id, $this->cart_token_key_for_db, true);
         } else {
-            return self::$storage->getValue($this->cart_token_key);
+            $token = self::$storage->getValue($this->cart_token_key);
         }
+        return apply_filters('rnoc_retrieve_cart_token', $token, $user_id, $this);
     }
 
     /**

@@ -454,7 +454,7 @@ class Cart extends RestApi
             $cart_token = $this->generateCartToken();
             $this->setCartToken($cart_token);
         }
-        return $cart_token;
+        return apply_filters('rnoc_get_cart_token', $cart_token, $this);
     }
 
     /**
