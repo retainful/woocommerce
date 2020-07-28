@@ -237,6 +237,8 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 $position_settings['coupon_expire_time'] = $coupon_expire_time;
                 $position_settings['coupon_timer_position'] = $position;
                 $position_settings['auto_fix_page_reload'] = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload', 0);
+                $position_settings['coupon_timer_expire_message'] = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message', 'Sorry! Instant Offer has expired.');
+                $position_settings['coupon_code'] = $coupon_code;
                 $override_path = get_theme_file_path('retainful/premium/templates/timer/' . $position . '.php');
                 $template_path = RNOCPREMIUM_PLUGIN_PATH . 'templates/timer/' . $position . '.php';
                 if (file_exists($override_path)) {

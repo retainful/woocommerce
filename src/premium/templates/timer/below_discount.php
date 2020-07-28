@@ -11,12 +11,22 @@
         document.getElementById("rnoc-coupon-timer-<?php echo $coupon_timer_position ?>").innerHTML = <?php echo $rnoc_coupon_timer_display_format ?>;
         if (distance < 0) {
             clearInterval(x);
-            document.getElementById("rnoc-coupon-timer-<?php echo $coupon_timer_position ?>").innerHTML = "<?php echo __('EXPIRED',RNOC_TEXT_DOMAIN) ?>";
+            document.getElementById("rnoc-coupon-timer-<?php echo $coupon_timer_position ?>").innerHTML = "<?php echo __('EXPIRED', RNOC_TEXT_DOMAIN) ?>";
             <?php
             if(apply_filters('rnoc_coupon_timer_below_discount_position_reload', true)){
             if($auto_fix_page_reload == 0){
             ?>
             window.location.reload();
+            <?php
+            }else {
+            ?>
+            (function ($) {
+                var coupon_det = $('.coupon-<?php echo strtolower($coupon_code); ?>');
+                coupon_det.remove();
+                var wrapper = $(".woocommerce-notices-wrapper");
+                var html = '<ul class="woocommerce-error" role="alert"><li><?php echo $coupon_timer_expire_message; ?></li></ul>';
+                wrapper.append(html);
+            })(jQuery);
             <?php
             }
             }

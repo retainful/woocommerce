@@ -26,6 +26,16 @@
             ?>
             window.location.reload();
             <?php
+            }else {
+            ?>
+            (function ($) {
+                var coupon_det = $('.coupon-<?php echo strtolower($coupon_code); ?>');
+                coupon_det.remove();
+                var wrapper = $(".woocommerce-notices-wrapper");
+                var html = '<ul class="woocommerce-error" role="alert"><li><?php echo $coupon_timer_expire_message; ?></li></ul>';
+                wrapper.append(html);
+            })(jQuery);
+            <?php
             }
             }
             ?>
@@ -44,7 +54,7 @@
         background: <?php echo $rnoc_coupon_timer_background; ?> !important;;
         width: 100%;
         right: 0;
-        <?php echo $rnoc_top_bottom_position ?>: 0;
+    <?php echo $rnoc_top_bottom_position ?>: 0;
         color: <?php echo $rnoc_coupon_timer_color ?>;
         position: fixed;
         z-index: 999;

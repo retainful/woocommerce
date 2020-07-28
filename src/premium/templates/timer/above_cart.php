@@ -26,6 +26,16 @@
             ?>
             window.location.reload();
             <?php
+            }else {
+            ?>
+            (function ($) {
+                var coupon_det = $('.coupon-<?php echo strtolower($coupon_code); ?>');
+                coupon_det.remove();
+                var wrapper = $(".woocommerce-notices-wrapper");
+                var html = '<ul class="woocommerce-error" role="alert"><li><?php echo $coupon_timer_expire_message; ?></li></ul>';
+                wrapper.append(html);
+            })(jQuery);
+            <?php
             }
             }
             ?>
