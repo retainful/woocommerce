@@ -754,6 +754,7 @@ class Cart extends RestApi
                 if (empty($data)) {
                     return false;
                 }
+                do_action('rnoc_before_recreate_cart',$data);
                 $order_id = $this->getOrderIdFromCartToken($cart_token);
                 $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
                 if ($order_id && $order = self::$woocommerce->getOrder($order_id)) {
