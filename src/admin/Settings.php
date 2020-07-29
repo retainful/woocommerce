@@ -491,7 +491,7 @@ class Settings
             ));
             if ($this->isProPlan()) {
                 $next_order_coupon->add_field(array(
-                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
+                    'name' => __('User Role', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
                     'type' => 'pw_multiselect',
                     'options' => $this->getUserRoles(),
@@ -503,7 +503,7 @@ class Settings
                 ));
             } else {
                 $next_order_coupon->add_field(array(
-                    'name' => __('User Role', RNOC_TEXT_DOMAIN),
+                    'name' => __('User Role', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_user_role_feature',
                     'type' => 'unlock_features',
                     'link_only_field' => 1
@@ -511,7 +511,7 @@ class Settings
             }
             if ($this->isProPlan()) {
                 $next_order_coupon->add_field(array(
-                    'name' => __('How many coupons a customer can get in his lifetime?', RNOC_TEXT_DOMAIN),
+                    'name' => __('How many coupons a customer can get in his lifetime?', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'limit_per_user',
                     'type' => 'text_small',
                     'attributes' => array(
@@ -523,7 +523,7 @@ class Settings
                 ));
             } else {
                 $next_order_coupon->add_field(array(
-                    'name' => __('How many coupons a customer can get in his lifetime?', RNOC_TEXT_DOMAIN),
+                    'name' => __('How many coupons a customer can get in his lifetime?', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_limit_per_user_feature',
                     'type' => 'unlock_features',
                     'link_only_field' => 1
@@ -531,7 +531,7 @@ class Settings
             }
             if ($this->isProPlan()) {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Minimum order total', RNOC_TEXT_DOMAIN),
+                    'name' => __('Minimum order total', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'minimum_sub_total',
                     'type' => 'text_small',
                     'attributes' => array(
@@ -543,7 +543,7 @@ class Settings
                 ));
             } else {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Minimum order total', RNOC_TEXT_DOMAIN),
+                    'name' => __('Minimum order total', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_minimum_sub_total_feature',
                     'type' => 'unlock_features',
                     'link_only_field' => 1
@@ -551,7 +551,7 @@ class Settings
             }
             if ($this->isProPlan()) {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Do not generate if the following products found in the order', RNOC_TEXT_DOMAIN),
+                    'name' => __('Do not generate if the following products found in the order', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products',
                     'type' => 'post_search_ajax',
                     'limit' => 10,
@@ -566,7 +566,7 @@ class Settings
                 ));
             } else {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Do not generate if the following products found in the order', RNOC_TEXT_DOMAIN),
+                    'name' => __('Do not generate if the following products found in the order', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_exclude_generating_coupon_for_products_feature',
                     'type' => 'unlock_features',
                     'link_only_field' => 1
@@ -574,7 +574,7 @@ class Settings
             }
             if ($this->isProPlan()) {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Do not generate if the following categories found in the order', RNOC_TEXT_DOMAIN),
+                    'name' => __('Do not generate if the following categories found in the order', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories',
                     'type' => 'pw_multiselect',
                     'options' => $this->getCategories(),
@@ -586,7 +586,7 @@ class Settings
                 ));
             } else {
                 $next_order_coupon->add_field(array(
-                    'name' => __('Do not generate if the following categories found in the order', RNOC_TEXT_DOMAIN),
+                    'name' => __('Do not generate if the following categories found in the order', RNOC_TEXT_DOMAIN).'<span class="premium-label">Premium</span>',
                     'id' => RNOC_PLUGIN_PREFIX . 'unlock_exclude_generating_coupon_for_categories_feature',
                     'type' => 'unlock_features',
                     'link_only_field' => 1,
