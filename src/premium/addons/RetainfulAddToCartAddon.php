@@ -275,10 +275,19 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             $this->wc_functions->addDiscount($coupon_code);
                             $redirect_url = wc_get_checkout_url();
                             break;
+                        case "auto_apply_and_redirect_cart":
+                            $this->wc_functions->addDiscount($coupon_code);
+                            $redirect_url = wc_get_cart_url();
+                            break;
                         case "send_mail_auto_apply_and_redirect":
                             $this->sendEmail($email, $coupon_settings);
                             $this->wc_functions->addDiscount($coupon_code);
                             $redirect_url = wc_get_checkout_url();
+                            break;
+                        case "send_mail_auto_apply_and_redirect_cart":
+                            $this->sendEmail($email, $coupon_settings);
+                            $this->wc_functions->addDiscount($coupon_code);
+                            $redirect_url = wc_get_cart_url();
                             break;
                         case "instantly":
                             $show_coupon_popup = true;
@@ -685,7 +694,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     "send_via_email" => __("Send an email", RNOC_TEXT_DOMAIN),
                     "both" => __("Show instantly and also send an email", RNOC_TEXT_DOMAIN),
                     "auto_apply_and_redirect" => __("Auto apply coupon and redirect to checkout", RNOC_TEXT_DOMAIN),
+                    "auto_apply_and_redirect_cart" => __("Auto apply coupon and redirect to cart", RNOC_TEXT_DOMAIN),
                     "send_mail_auto_apply_and_redirect" => __("Send email, auto apply and redirect to checkout", RNOC_TEXT_DOMAIN),
+                    "send_mail_auto_apply_and_redirect_cart" => __("Send email, auto apply and redirect to cart", RNOC_TEXT_DOMAIN),
                 ),
                 'attributes' => array(
                     'placeholder' => __('Choose coupon settings', RNOC_TEXT_DOMAIN)
