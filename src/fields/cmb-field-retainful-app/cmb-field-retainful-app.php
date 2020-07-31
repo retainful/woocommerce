@@ -69,7 +69,7 @@ class CMB2_Field_Retainful_App
             <!--this is to secure to do not save data-->
             <div class="cmb-row cmb-type-text cmb2-id-rnoc-retainful-app-id table-layout" data-fieldtype="text">
                 <div class="cmb-th">
-                    <label for="rnoc_retainful_app_id"><?php _e('License / App ID', RNOC_TEXT_DOMAIN); ?></label>
+                    <label for="rnoc_retainful_app_id"><?php _e('App ID', RNOC_TEXT_DOMAIN); ?></label>
                 </div>
                 <div class="cmb-td">
                     <p>************************************</p>

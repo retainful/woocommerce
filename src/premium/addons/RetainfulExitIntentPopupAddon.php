@@ -629,6 +629,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     '0' => __('No', RNOC_TEXT_DOMAIN),
                     '1' => __('Yes', RNOC_TEXT_DOMAIN)
                 ),
+                'description' => 'The following settings are used to trigger Exit Popup in mobile devices. Since there are a number of ways a visitor can exit in a mobile (Example: Swipe up), you can consider showing the popup either based on time delay (time spent by the customer in the site) or  scrolling (the distance the customer scrolled a page)',
                 'default' => '0'
             ));
             $general_settings->add_group_field($mobile_settings, array(
@@ -646,7 +647,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
                 'type' => 'text',
                 'default' => 0,
-                'desc' => __('The minimum delay in seconds to consider triggering for.', RNOC_TEXT_DOMAIN),
+                'desc' => __('rigger the popup after these many seconds a visitor spent time', RNOC_TEXT_DOMAIN),
                 'attributes' => array(
                     'type' => 'number'
                 )
@@ -666,7 +667,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
                 'type' => 'text',
                 'default' => 0,
-                'desc' => __('The minimum distance in % from the top of the document to consider triggering for.', RNOC_TEXT_DOMAIN),
+                'desc' => __('Trigger the popup after a visitor scrolled the page to the set distance. Its a percentage value. The distance is the % from the top of the page.', RNOC_TEXT_DOMAIN),
                 'attributes' => array(
                     'type' => 'number'
                 )

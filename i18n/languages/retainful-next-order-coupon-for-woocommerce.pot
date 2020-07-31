@@ -684,7 +684,7 @@ msgstr ""
 
 #: admin/Settings.php:932
 #: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:72
-msgid "License / App ID"
+msgid "App ID"
 msgstr ""
 
 #: admin/Settings.php:937
