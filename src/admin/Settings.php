@@ -422,6 +422,29 @@ class Settings
                     'id' => 'app_coupon_value'
                 )
             ));
+            if ($is_app_connected) {
+                $next_order_coupon->add_field(array(
+                    'name' => __('Coupon expires in ', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
+                    'type' => 'text_small',
+                    'after' => '<p id="coupon_expire_error" style="color: red;"></p>' . __('How many days the coupon is valid? After the entered number of days coupon will automatically expire.<br><b>Note: Please leave empty or put 0 to never expire.</b> <br /> <a href="https://app.retainful.com" target="_blank">Send automatic email follow-ups to the customers before the coupon expires.</a>', RNOC_TEXT_DOMAIN),
+                    'desc' => __(' Day(s)', RNOC_TEXT_DOMAIN),
+                    'classes' => 'retainful-coupon-group',
+                    'default' => 60,
+                    'attributes' => array(
+                        'type' => 'number',
+                        'min' => 0,
+                        'id' => 'app_coupon_expire_days'
+                    )
+                ));
+                $next_order_coupon->add_field(array(
+                    'name' => __('Coupon expiry date format ', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'expire_date_format',
+                    'type' => 'select',
+                    'default' => 'F j, Y, g:i a',
+                    'options' => $this->getDateFormatOptions()
+                ));
+            }
             $next_order_coupon->add_field(array(
                 'name' => __('Apply coupon to', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to',
@@ -618,27 +641,6 @@ class Settings
                         'min' => 0
                     ),
                     'default' => ''
-                ));
-                $next_order_coupon->add_field(array(
-                    'name' => __('Coupon expires in ', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
-                    'type' => 'text_small',
-                    'after' => '<p id="coupon_expire_error" style="color: red;"></p>' . __('How many days the coupon is valid? After the entered number of days coupon will automatically expire.<br><b>Note: Please leave empty or put 0 to never expire.</b> <br /> <a href="https://app.retainful.com" target="_blank">Send automatic email follow-ups to the customers before the coupon expires.</a>', RNOC_TEXT_DOMAIN),
-                    'desc' => __(' Day(s)', RNOC_TEXT_DOMAIN),
-                    'classes' => 'retainful-coupon-group',
-                    'default' => 60,
-                    'attributes' => array(
-                        'type' => 'number',
-                        'min' => 0,
-                        'id' => 'app_coupon_expire_days'
-                    )
-                ));
-                $next_order_coupon->add_field(array(
-                    'name' => __('Coupon expiry date format ', RNOC_TEXT_DOMAIN),
-                    'id' => RNOC_PLUGIN_PREFIX . 'expire_date_format',
-                    'type' => 'select',
-                    'default' => 'F j, Y, g:i a',
-                    'options' => $this->getDateFormatOptions()
                 ));
                 $next_order_coupon->add_field(array(
                     'name' => __('Individual use only', RNOC_TEXT_DOMAIN),

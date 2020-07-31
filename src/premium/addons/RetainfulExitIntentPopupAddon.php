@@ -354,13 +354,22 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', 1);
             $show_option = isset($show_settings['show_option']) ? $show_settings['show_option'] : 'once_per_page';
             $show_count = isset($show_settings['show_count']) ? $show_settings['show_count'] : 1;
-            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0] : array();
+            $mobile_popup_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0] : array();
+            $delay = $scroll_distance = 0;
+            if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_mobile_support', 0) == 1) {
+                if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_delay_trigger', 0) == 1) {
+                    $delay = (int)$this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec', 0);
+                }
+                if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger', 0) == 1) {
+                    $scroll_distance = (int)$this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', 0);
+                }
+            }
             $settings = array(
                 'show_option' => $show_option,
                 'cookie_life' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 100),
                 'maxDisplay' => (int)$show_count,
-                'distance' => (int)$this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', 0),
-                'delay' => (int)$this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec', 0),
+                'distance' => $scroll_distance,
+                'delay' => $delay,
                 'cookieLife' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 1),
                 'storeName' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup',
                 'consider_cart_created_as_hash' => 'no',
@@ -613,6 +622,26 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 )
             ));
             $general_settings->add_group_field($mobile_settings, array(
+                'name' => __('Enable mobile device support', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'enable_mobile_support',
+                'type' => 'radio_inline',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => '0'
+            ));
+            $general_settings->add_group_field($mobile_settings, array(
+                'name' => __('Enable time delay based trigger', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'enable_delay_trigger',
+                'type' => 'radio_inline',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => '0'
+            ));
+            $general_settings->add_group_field($mobile_settings, array(
                 'name' => __('Delay seconds', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
                 'type' => 'text',
@@ -623,7 +652,17 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 )
             ));
             $general_settings->add_group_field($mobile_settings, array(
-                'name' => __('Distance', RNOC_TEXT_DOMAIN),
+                'name' => __('Enable Scroll based trigger', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger',
+                'type' => 'radio_inline',
+                'options' => array(
+                    '0' => __('No', RNOC_TEXT_DOMAIN),
+                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
+                ),
+                'default' => '0'
+            ));
+            $general_settings->add_group_field($mobile_settings, array(
+                'name' => __('Scroll distance', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
                 'type' => 'text',
                 'default' => 0,
