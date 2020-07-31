@@ -64,6 +64,17 @@ class CMB2_Field_Retainful_App
                 <p style="color: red"><?= (!$is_app_connected && !empty($field_escaped_value)) ? __('You have disconnected from Retainful!') : ''; ?></p>
             </div>
             <?php
+            if ($is_app_connected) {
+                ?>
+                <div>
+                    <a href="<?php echo $api->app_url ?>" target="_blank"
+                       style="display: inline-block;font-size: 16px;padding: 10px 20px;text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;line-height:1.6;"><?php echo __('Visit Your Dashboard', RNOC_TEXT_DOMAIN); ?></a>
+                    <br><br>
+                </div>
+                <?php
+            }
+            ?>
+            <?php
         } else {
             ?>
             <!--this is to secure to do not save data-->
@@ -73,10 +84,10 @@ class CMB2_Field_Retainful_App
                 </div>
                 <div class="cmb-td">
                     <p>************************************</p>
-                    <p class="cmb2-metabox-description"><?php _e('Get your App-id ', RNOC_TEXT_DOMAIN); ?> <a target="_blank"
-                                                                           href="https://app.retainful.com/settings"><?php _e('here.', RNOC_TEXT_DOMAIN); ?></a>
+                    <p class="cmb2-metabox-description"><?php _e('Get your App-id ', RNOC_TEXT_DOMAIN); ?> <a
+                                target="_blank"
+                                href="https://app.retainful.com/settings"><?php _e('here.', RNOC_TEXT_DOMAIN); ?></a>
                     </p>
-
                 </div>
             </div>
             <div class="cmb-row cmb-type-text cmb2-id-rnoc-retainful-app-secret table-layout" data-fieldtype="text">
@@ -85,10 +96,10 @@ class CMB2_Field_Retainful_App
                 </div>
                 <div class="cmb-td">
                     <p>********************************</p>
-                    <p class="cmb2-metabox-description"><?php _e('Get your Secret key ', RNOC_TEXT_DOMAIN); ?><a target="_blank"
-                                                                               href="https://app.retainful.com/settings"><?php _e('here.', RNOC_TEXT_DOMAIN); ?></a>
+                    <p class="cmb2-metabox-description"><?php _e('Get your Secret key ', RNOC_TEXT_DOMAIN); ?><a
+                                target="_blank"
+                                href="https://app.retainful.com/settings"><?php _e('here.', RNOC_TEXT_DOMAIN); ?></a>
                     </p>
-
                 </div>
             </div>
             <div>
