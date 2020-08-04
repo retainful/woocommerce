@@ -206,6 +206,9 @@ class Cart extends RestApi
      */
     function addCartTrackingScripts()
     {
+        if (wp_script_is('wc-cart-fragments', 'enqueued')) {
+            wp_enqueue_script('wc-cart-fragments');
+        }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
             $user_ip = $this->getClientIp();
@@ -730,6 +733,19 @@ class Cart extends RestApi
         exit;
     }
 
+    function printRefreshFragmentScript()
+    {
+        if ($this->refreshFragmentsOnPageLoad()) {
+            ?>
+            <script>
+                jQuery(window).load(function (e) {
+                    jQuery(document.body).trigger('wc_fragment_refresh');
+                });
+            </script>
+            <?php
+        }
+    }
+
     /**
      * Recreate cart
      * @return bool
@@ -754,7 +770,7 @@ class Cart extends RestApi
                 if (empty($data)) {
                     return false;
                 }
-                do_action('rnoc_before_recreate_cart',$data);
+                do_action('rnoc_before_recreate_cart', $data);
                 $order_id = $this->getOrderIdFromCartToken($cart_token);
                 $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
                 if ($order_id && $order = self::$woocommerce->getOrder($order_id)) {

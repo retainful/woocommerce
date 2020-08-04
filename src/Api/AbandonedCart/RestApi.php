@@ -474,6 +474,16 @@ class RestApi
     }
 
     /**
+     * refresh fragments on page load
+     * @return int
+     */
+    function refreshFragmentsOnPageLoad()
+    {
+        $settings = self::$settings->getAdminSettings();
+        return isset($settings[RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load']) ? $settings[RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'] : 0;
+    }
+
+    /**
      * Format the date to ISO8601
      * @param $timestamp
      * @return string|null

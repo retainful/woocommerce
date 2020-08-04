@@ -317,6 +317,17 @@ class Settings
                     ),
                     'default' => 0
                 ));
+                $general_settings->add_field(array(
+                    'name' => __('Fix for Cart sync not working', RNOC_TEXT_DOMAIN),
+                    'id' => RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load',
+                    'type' => 'radio_inline',
+                    'description'=>__('Enable this option only when you dont see your carts in Retainful dashboard ', RNOC_TEXT_DOMAIN),
+                    'options' => array(
+                        0 => __('No', RNOC_TEXT_DOMAIN),
+                        1 => __('Yes', RNOC_TEXT_DOMAIN)
+                    ),
+                    'default' => 0
+                ));
             }
             $general_settings->add_field(array(
                 'name' => __('Enable GDPR Compliance?', RNOC_TEXT_DOMAIN),
