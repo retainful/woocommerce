@@ -206,7 +206,7 @@ class Cart extends RestApi
      */
     function addCartTrackingScripts()
     {
-        if (wp_script_is('wc-cart-fragments', 'enqueued')) {
+        if (!wp_script_is('wc-cart-fragments', 'enqueued')) {
             wp_enqueue_script('wc-cart-fragments');
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
