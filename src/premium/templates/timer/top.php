@@ -28,6 +28,7 @@
     }
     var endedTimeInMin = parseInt("<?php echo $expired_in_min; ?>") * 60000;
     var countDownDate = startedTime + endedTimeInMin;
+    window.rnoc_timer_expired_message_shown = false;
     var x = setInterval(function () {
         var now = new Date().getTime();
         var distance = countDownDate - now;
@@ -51,20 +52,19 @@
             <?php
             }else {
             ?>
-            window.rnoc_timer_expired_message_shown = false;
             (function ($) {
-                $.post("<?php echo admin_url('admin-ajax.php?action=rnoc_coupon_timer_expired') ?>", function (data, status) {
-                    if (data.success) {
-                        if (!window.rnoc_timer_expired_message_shown) {
+                if (window.rnoc_timer_expired_message_shown === false) {
+                    $.post("<?php echo admin_url('admin-ajax.php?action=rnoc_coupon_timer_expired') ?>", function (data, status) {
+                        if (data.success) {
                             var coupon_det = $('.coupon-<?php echo strtolower($coupon_code); ?>');
                             coupon_det.remove();
                             var wrapper = $(".woocommerce-notices-wrapper");
                             var html = '<ul class="woocommerce-error" role="alert"><li><?php echo $coupon_timer_expire_message; ?></li></ul>';
                             wrapper.append(html);
-                            window.rnoc_timer_expired_message_shown = true;
                         }
-                    }
-                });
+                    });
+                    window.rnoc_timer_expired_message_shown = true;
+                }
             })(jQuery);
             <?php
             }
