@@ -117,6 +117,7 @@ function initJqueryRetainfulPopupJs() {
                             popup_btn.click();
                         }
                     }
+                    popup_btn.attr('disabled',false);
                     popup_btn.removeClass('rnoc-popup-opener');
                     modal.css('display', 'none');
                     $(document).trigger('retainful_closed_add_to_cart_popup', [modal]);
