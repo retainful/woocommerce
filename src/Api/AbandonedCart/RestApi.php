@@ -470,7 +470,7 @@ class RestApi
     function considerCancelledAsAbandoned()
     {
         $settings = self::$settings->getAdminSettings();
-        return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'] : 0;
+        return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'] : 1;
     }
 
     /**
