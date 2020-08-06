@@ -321,7 +321,7 @@ class Settings
                     'name' => __('Fix for Cart sync not working', RNOC_TEXT_DOMAIN),
                     'id' => RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load',
                     'type' => 'radio_inline',
-                    'description'=>__('Enable this option only when you dont see your carts in Retainful dashboard ', RNOC_TEXT_DOMAIN),
+                    'description' => __('Enable this option only when you dont see your carts in Retainful dashboard ', RNOC_TEXT_DOMAIN),
                     'options' => array(
                         0 => __('No', RNOC_TEXT_DOMAIN),
                         1 => __('Yes', RNOC_TEXT_DOMAIN)
@@ -1035,19 +1035,22 @@ class Settings
             }
         }
         //License
-        $license = new_cmb2_box(array(
+        $license_arr = array(
             'capability' => 'edit_shop_coupons',
             'object_types' => array('options-page'),
             'option_key' => $this->slug . '_license',
             'tab_group' => $this->slug,
             'id' => RNOC_PLUGIN_PREFIX . 'license',
-            'icon_url'=>'dashicons-controls-repeat',
-            'position'=>55.5,
-            'title' => (!$run_abandoned_cart_externally) ? __('License', RNOC_TEXT_DOMAIN) : __('Retainful'),
-            //'parent_slug' => (!$run_abandoned_cart_externally) ? $this->slug : 'woocommerce',
+            'icon_url' => 'dashicons-controls-repeat',
+            'position' => 55.5,
+            'title' => __('Retainful', RNOC_TEXT_DOMAIN),
             'tab_title' => (!$run_abandoned_cart_externally) ? __('License', RNOC_TEXT_DOMAIN) : __('Connection'),
             'save_button' => __('Save', RNOC_TEXT_DOMAIN)
-        ));
+        );
+        if ((!$run_abandoned_cart_externally)) {
+            $license_arr['parent_slug'] = 'woocommerce';
+        }
+        $license = new_cmb2_box($license_arr);
         $switch_to_cloud_notice = (!$run_abandoned_cart_externally) ? $this->switchToCloudNotice() : NULL;
         $is_production = apply_filters('rnoc_is_production_plugin', true);
         if ($is_production) {
