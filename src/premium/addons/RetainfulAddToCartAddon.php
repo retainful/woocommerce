@@ -497,7 +497,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function getDefaultEmailTemplate()
         {
-            return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">You have new Discount code</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">We want to offer you an exclusive voucher for your order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #f27052; color: #f27052; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #f27052; width: fit-content; padding: 10px; border: 1px solid #f27052; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>', RNOC_TEXT_DOMAIN);
+            return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">Your coupon code</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">Thank you for shopping with us! We want to offer you an exclusive coupon for your order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #f27052; color: #f27052; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #f27052; width: fit-content; padding: 10px; border: 1px solid #f27052; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Shop Now! </a></p></div></div>', RNOC_TEXT_DOMAIN);
         }
 
         /**
@@ -506,7 +506,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function getDefaultPopupTemplate()
         {
-            return __('<div class="rnoc-ip-container" style="padding: 20px; background: #F8F0F0; border-radius: 15px;"><div class="rnoc-ip-inner" style="padding: 20px; text-align: center;"><div class="rnoc-ip-heading" style="padding: 0px 12px; margin-bottom: 0; font-size: 35px; color: #1f1e1f; font-weight: 600; line-height: 45px;"> You have new Discount code</div><p class="rnoc-ip-sub-heading" style="font-size: 20px; padding: 0px 15px; line-height: 20px; margin-bottom: 15px; margin-top: 28px;">Get 15% off on any item when you buy today</p><div class="rnoc-ip-coupon" style="padding: 0px; color: #2f2e35;"><div class="rnoc-ip-coupon-inner" style="text-align: center; padding: 20px 30px;"><a class="rnoc-ip-coupon-code" style="width: 60%; padding: 12px 20%; background: #ffffff; border-radius: 4px; font-size: 16px; font-weight: 600; color: #2f2e35; text-align: center; line-height: 1.33333; margin-top: 0px; margin-bottom: 5px; border: 1px dashed #2f2e35; text-decoration: none;" href="{{coupon_url}}">{{coupon_code}}</a> <a class="rnoc-ip-coupon-apply-btn" style="padding: 12px 20px; background: #f27052; border: none; border-radius: 4px; font-size: 18px; font-weight: 600; color: white; text-align: center; line-height: 1.33333; text-decoration: none;" href="{{coupon_url}}">Use a coupon</a></div> <a class="rnoc-ip-coupon-description" style="text-decoration: none; font-size: 16px; line-height: 24px; color: #6c6b70 !important; font-weight: 500!important; margin-bottom: -15px;" href="#">*Not valid with other discount codes</a></div></div></div>', RNOC_TEXT_DOMAIN);
+            return __('<div class="rnoc-ip-container" style="padding: 20px; background: #F8F0F0; border-radius: 15px;"><div class="rnoc-ip-inner" style="padding: 20px; text-align: center;"><div class="rnoc-ip-heading" style="padding: 0px 12px; margin-bottom: 0; font-size: 35px; color: #1f1e1f; font-weight: 600; line-height: 45px;"> Your coupon code</div><p class="rnoc-ip-sub-heading" style="font-size: 20px; padding: 0px 15px; line-height: 20px; margin-bottom: 15px; margin-top: 28px;">Get 10% off on any item when you buy today</p><div class="rnoc-ip-coupon" style="padding: 0px; color: #2f2e35;"><div class="rnoc-ip-coupon-inner" style="text-align: center; padding: 20px 30px;"><a class="rnoc-ip-coupon-code" style="width: 60%; padding: 12px 20%; background: #ffffff; border-radius: 4px; font-size: 16px; font-weight: 600; color: #2f2e35; text-align: center; line-height: 1.33333; margin-top: 0px; margin-bottom: 5px; border: 1px dashed #2f2e35; text-decoration: none;display:inline-block;" href="{{coupon_url}}">{{coupon_code}}</a> <a class="rnoc-ip-coupon-apply-btn" style="padding: 12px 20px; background: #f27052; border: none; border-radius: 4px; font-size: 18px; font-weight: 600; color: white; text-align: center; line-height: 1.33333; text-decoration: none;display:inline-block;" href="{{coupon_url}}">Apply coupon</a></div> <a class="rnoc-ip-coupon-description" style="text-decoration: none; font-size: 16px; line-height: 24px; color: #6c6b70 !important; font-weight: 500!important; margin-bottom: -15px;" href="#">*Not valid with other coupon codes</a></div></div></div>', RNOC_TEXT_DOMAIN);
         }
 
         /**
@@ -647,12 +647,12 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'type' => 'group',
                 'repeatable' => false,
                 'options' => array(
-                    'group_title' => __('Coupon settings - Incentivize the customers for entering their email', RNOC_TEXT_DOMAIN),
+                    'group_title' => __('Coupon settings - Reward customers with a coupon for providing their email address', RNOC_TEXT_DOMAIN),
                     'sortable' => true
                 )
             ));
             $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Enable Coupon ', RNOC_TEXT_DOMAIN),
+                'name' => __('Enable coupon reward for providing email address', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'need_coupon',
                 'type' => 'radio_inline',
                 'options' => array(
@@ -660,23 +660,10 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     '1' => __('Yes', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => '0',
-                'desc' => __('Please enable the add to cart popup for email collection. Only then the users would be able to avail the coupons you set here.', RNOC_TEXT_DOMAIN)
+                'desc' => __('You can reward your visitors with a coupon code when they provide their email address via the Add-to-cart popup.', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Coupon message on popup', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_sub_heading',
-                'type' => 'text',
-                'default' => __('Get a discount in your email!', RNOC_TEXT_DOMAIN),
-                'desc' => __('<b>Note:</b> You need to enable coupon.')
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Coupon message color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color',
-                'type' => 'colorpicker',
-                'default' => '#333333'
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Choose the coupon code', RNOC_TEXT_DOMAIN),
+                'name' => __('Choose the coupon code for the reward', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'woo_coupon',
                 'type' => 'pw_select',
                 'options' => $this->getWooCouponCodes(),
@@ -686,13 +673,26 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'desc' => __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Show coupon code', RNOC_TEXT_DOMAIN),
+                'name' => __('Reward message to show on the popup', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_sub_heading',
+                'type' => 'text',
+                'default' => __('Get a discount in your email!', RNOC_TEXT_DOMAIN),
+                'desc' => __('<b>Note:</b> You need to enable coupon.')
+            ));
+            $general_settings->add_group_field($popup_coupon_settings, array(
+                'name' => __('Message text color', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color',
+                'type' => 'colorpicker',
+                'default' => '#333333'
+            ));
+            $general_settings->add_group_field($popup_coupon_settings, array(
+                'name' => __('Choose how to reveal the reward coupon', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
                 'type' => 'select',
                 'options' => array(
                     "instantly" => __("Instantly using a popup", RNOC_TEXT_DOMAIN),
                     "send_via_email" => __("Send an email", RNOC_TEXT_DOMAIN),
-                    "both" => __("Show instantly and also send an email", RNOC_TEXT_DOMAIN),
+                    "both" => __("Show instantly using a popup and also send an email", RNOC_TEXT_DOMAIN),
                     "auto_apply_and_redirect" => __("Auto apply coupon and redirect to checkout", RNOC_TEXT_DOMAIN),
                     "auto_apply_and_redirect_cart" => __("Auto apply coupon and redirect to cart", RNOC_TEXT_DOMAIN),
                     "send_mail_auto_apply_and_redirect" => __("Send email, auto apply and redirect to checkout", RNOC_TEXT_DOMAIN),
@@ -702,14 +702,14 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     'placeholder' => __('Choose coupon settings', RNOC_TEXT_DOMAIN)
                 ),
                 'default' => "send_via_email",
-                'desc' => __('How to show the coupon to customers', RNOC_TEXT_DOMAIN)
+                'desc' => __('How to show the reward coupon to customers', RNOC_TEXT_DOMAIN)
             ));
             $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Popup template', RNOC_TEXT_DOMAIN),
+                'name' => __('Response Popup template', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template',
                 'type' => 'wysiwyg',
                 'default' => $this->getDefaultPopupTemplate(),
-                'desc' => __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN),
+                'desc' => __('This popup shows after the customer enter their email address and add item to cart. Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN),
                 'attributes' => array(
                     'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
                     'data-conditional-value' => wp_json_encode(array('both', 'instantly')),
