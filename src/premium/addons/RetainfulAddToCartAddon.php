@@ -723,7 +723,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'desc' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN),
                 'attributes' => array(
                     'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
-                    'data-conditional-value' => wp_json_encode(array('both', 'send_via_email')),
+                    'data-conditional-value' => wp_json_encode(array('both', 'send_via_email', 'send_mail_auto_apply_and_redirect', 'send_mail_auto_apply_and_redirect_cart')),
                 ),
             ));
             $general_settings->add_group_field($popup_coupon_settings, array(
@@ -734,7 +734,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'desc' => __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN),
                 'attributes' => array(
                     'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
-                    'data-conditional-value' => wp_json_encode(array('both', 'send_via_email')),
+                    'data-conditional-value' => wp_json_encode(array('both', 'send_via_email', 'send_mail_auto_apply_and_redirect', 'send_mail_auto_apply_and_redirect_cart')),
                 )
             ));
             //Modal design

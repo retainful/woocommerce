@@ -57,7 +57,7 @@
                     $.post("<?php echo admin_url('admin-ajax.php?action=rnoc_coupon_timer_expired') ?>", function (data, status) {
                         if (data.success) {
                             var coupon_det = $('.coupon-<?php echo strtolower($coupon_code); ?>');
-                            coupon_det.remove();
+                            coupon_det.hide();
                             var wrapper = $(".woocommerce-notices-wrapper");
                             var html = '<ul class="woocommerce-error" role="alert"><li><?php echo $coupon_timer_expire_message; ?></li></ul>';
                             wrapper.append(html);

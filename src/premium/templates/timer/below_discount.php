@@ -49,7 +49,7 @@
                     if (data.success) {
                         if (window.rnoc_timer_expired_message_shown === false) {
                             var coupon_det = $('.coupon-<?php echo strtolower($coupon_code); ?>');
-                            coupon_det.remove();
+                            coupon_det.hide();
                             var wrapper = $(".woocommerce-notices-wrapper");
                             var html = '<ul class="woocommerce-error" role="alert"><li><?php echo $coupon_timer_expire_message; ?></li></ul>';
                             wrapper.append(html);
