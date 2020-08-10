@@ -276,69 +276,73 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function setGuestEmailSession()
         {
-            $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
-            $message = '';
-            $error = true;
-            $email = sanitize_email($_REQUEST['email']);
-            $this->wc_functions->setCustomerEmail($email);
-            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
-            $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
-            if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
-                $is_buyer_accepting_marketing = 1;
-            } else {
-                $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
-            }
-            $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
-            //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
-            if (!$run_cart_externally) {
-                $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-                $customer = new WC_Customer();
-                $user_session_id = $abandoned_cart->getUserSessionKey();
-                $customer->set_email($email);
-                if (!empty($user_session_id) && !empty($_REQUEST['email'])) {
-                    global $wpdb;
-                    $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
-                    $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
-                    if (empty($results)) {
-                        $insert_guest = "INSERT INTO `" . $abandoned_cart->guest_cart_history_table . "`(email_id, session_id) VALUES ( %s,%s)";
-                        $wpdb->query($wpdb->prepare($insert_guest, $email, $user_session_id));
-                    } else {
-                        $guest_details_id = $results->id;
-                        $query_update = "UPDATE `" . $abandoned_cart->guest_cart_history_table . "` SET email_id=%s, shipping_county=%s, shipping_zipcode=%s, shipping_charges=%s, session_id=%s WHERE id=%d";
-                        $wpdb->query($wpdb->prepare($query_update, $email, $user_session_id, $guest_details_id));
-                    }
-                    $error = false;
+            if (isset($_POST['security']) && wp_verify_nonce($_POST['set_rnoc_exit_intent_popup_guest_session'], 'set_rnoc_exit_intent_popup_guest_session')) {
+                $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
+                $message = '';
+                $error = true;
+                $email = sanitize_email($_REQUEST['email']);
+                $this->wc_functions->setCustomerEmail($email);
+                $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
+                $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
+                if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
+                    $is_buyer_accepting_marketing = 1;
                 } else {
-                    if (isset($_REQUEST['email'])) {
+                    $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
+                }
+                $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
+                //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
+                if (!$run_cart_externally) {
+                    $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
+                    $customer = new WC_Customer();
+                    $user_session_id = $abandoned_cart->getUserSessionKey();
+                    $customer->set_email($email);
+                    if (!empty($user_session_id) && !empty($_REQUEST['email'])) {
+                        global $wpdb;
+                        $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
+                        $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
+                        if (empty($results)) {
+                            $insert_guest = "INSERT INTO `" . $abandoned_cart->guest_cart_history_table . "`(email_id, session_id) VALUES ( %s,%s)";
+                            $wpdb->query($wpdb->prepare($insert_guest, $email, $user_session_id));
+                        } else {
+                            $guest_details_id = $results->id;
+                            $query_update = "UPDATE `" . $abandoned_cart->guest_cart_history_table . "` SET email_id=%s, shipping_county=%s, shipping_zipcode=%s, shipping_charges=%s, session_id=%s WHERE id=%d";
+                            $wpdb->query($wpdb->prepare($query_update, $email, $user_session_id, $guest_details_id));
+                        }
                         $error = false;
                     } else {
-                        $message = __('Sorry invalid request!', RNOC_TEXT_DOMAIN);
+                        if (isset($_REQUEST['email'])) {
+                            $error = false;
+                        } else {
+                            $message = __('Sorry invalid request!', RNOC_TEXT_DOMAIN);
+                        }
                     }
+                } else {
+                    $error = false;
+                    $cart_api = new \Rnoc\Retainful\Api\AbandonedCart\Cart();
+                    $cart_api->syncCartData(true);
                 }
+                $checkout_url = $this->getCheckoutUrl();
+                $cart_url = $this->getCartUrl();
+                $url_to_redirect = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success', 'checkout');
+                if ($url_to_redirect == "checkout") {
+                    $url = $checkout_url;
+                } elseif ($url_to_redirect == "cart") {
+                    $url = $cart_url;
+                } else {
+                    $url = '';
+                }
+                $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL);
+                if (!empty($coupon_code)) {
+                    $url = $url . '?rnoc_on_exit_coupon_code=' . $coupon_code;
+                }
+                $response = array('error' => $error, 'message' => $message);
+                if (!empty($url)) {
+                    $response['redirect'] = $url;
+                }
+                wp_send_json($response);
             } else {
-                $error = false;
-                $cart_api = new \Rnoc\Retainful\Api\AbandonedCart\Cart();
-                $cart_api->syncCartData(true);
+                wp_send_json_error('invalid data');
             }
-            $checkout_url = $this->getCheckoutUrl();
-            $cart_url = $this->getCartUrl();
-            $url_to_redirect = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success', 'checkout');
-            if ($url_to_redirect == "checkout") {
-                $url = $checkout_url;
-            } elseif ($url_to_redirect == "cart") {
-                $url = $cart_url;
-            } else {
-                $url = '';
-            }
-            $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL);
-            if (!empty($coupon_code)) {
-                $url = $url . '?rnoc_on_exit_coupon_code=' . $coupon_code;
-            }
-            $response = array('error' => $error, 'message' => $message);
-            if (!empty($url)) {
-                $response['redirect'] = $url;
-            }
-            wp_send_json($response);
         }
 
         /**
@@ -376,7 +380,10 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'show_only_for' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', "all"),
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
                 'show_when_its_coupon_applied' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 1),
-                'coupon_code' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '')
+                'coupon_code' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', ''),
+                'nonce' => array(
+                    'set_rnoc_exit_intent_popup_guest_session' => wp_create_nonce('set_rnoc_exit_intent_popup_guest_session')
+                )
             );
             $settings = apply_filters('rnoc_load_exit_intent_popup_settings', $settings);
             wp_localize_script('rnoc-exit-intent-popup', 'retainful_premium_exit_intent_popup', $settings);

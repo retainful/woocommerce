@@ -44,7 +44,8 @@ function initJqueryExitIntentPopupAdmin() {
                 dataType: "json",
                 data: {
                     action: 'rnocp_get_exit_intent_popup_template',
-                    id: template_id
+                    id: template_id,
+                    security:rnocp_admin_params.nonce.rnocp_get_exit_intent_popup_template,
                 },
                 success: function (response) {
                     if (response.success) {

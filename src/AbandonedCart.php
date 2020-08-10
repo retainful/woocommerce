@@ -48,55 +48,59 @@ class AbandonedCart
      */
     function saveGuestData()
     {
-        if ($this->canTrackAbandonedCarts() == false) {
-            return;
-        }
-        if (!is_user_logged_in()) {
-            global $woocommerce;
-            //Can't look up the customer in this situation.
-            if (!isset($woocommerce->session)) {
+        if (isset($_POST['security']) && wp_verify_nonce($_POST['security'])) {
+            if ($this->canTrackAbandonedCarts() == false) {
                 return;
             }
-            //$user_session_id = $this->wc_functions->getPHPSessionCustomerId();
-            $user_session_id = $this->getUserSessionKey();
-            if (!empty($user_session_id) && isset($_POST['billing_email'])) {
-                global $wpdb, $woocommerce;
-                //Post details
-                $billing_first_name = (isset($_POST['billing_first_name'])) ? sanitize_text_field($_POST['billing_first_name']) : '';
-                $billing_last_name = (isset($_POST['billing_last_name'])) ? sanitize_text_field($_POST['billing_last_name']) : '';
-                $billing_company = (isset($_POST['billing_company'])) ? sanitize_text_field($_POST['billing_company']) : '';
-                $billing_address_1 = (isset($_POST['billing_address_1'])) ? sanitize_text_field($_POST['billing_address_1']) : '';
-                $billing_address_2 = (isset($_POST['billing_address_2'])) ? sanitize_text_field($_POST['billing_address_2']) : '';
-                $billing_city = (isset($_POST['billing_city'])) ? sanitize_text_field($_POST['billing_city']) : '';
-                $billing_state = (isset($_POST['billing_state'])) ? sanitize_text_field($_POST['billing_state']) : '';
-                $billing_zipcode = (isset($_POST['billing_postcode'])) ? sanitize_text_field($_POST['billing_postcode']) : '';
-                $billing_country = (isset($_POST['billing_country'])) ? sanitize_text_field($_POST['billing_country']) : '';
-                $billing_phone = (isset($_POST['billing_phone'])) ? sanitize_text_field($_POST['billing_phone']) : '';
-                $billing_email = $_POST['billing_email'];
-                $ship_to_billing = (isset($_POST['ship_to_billing'])) ? $_POST['ship_to_billing'] : '';
-                $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
-                $shipping_first_name = (isset($_POST['shipping_first_name'])) ? sanitize_text_field($_POST['shipping_first_name']) : '';
-                $shipping_last_name = (isset($_POST['shipping_last_name'])) ? sanitize_text_field($_POST['shipping_last_name']) : '';
-                $shipping_company = (isset($_POST['shipping_company'])) ? sanitize_text_field($_POST['shipping_company']) : '';
-                $shipping_address_1 = (isset($_POST['shipping_address_1'])) ? sanitize_text_field($_POST['shipping_address_1']) : '';
-                $shipping_address_2 = (isset($_POST['shipping_address_2'])) ? sanitize_text_field($_POST['shipping_address_2']) : '';
-                $shipping_city = (isset($_POST['shipping_city'])) ? sanitize_text_field($_POST['shipping_city']) : '';
-                $shipping_state = (isset($_POST['shipping_state'])) ? sanitize_text_field($_POST['shipping_state']) : '';
-                $shipping_zipcode = (isset($_POST['shipping_postcode'])) ? sanitize_text_field($_POST['shipping_postcode']) : '';
-                $shipping_country = (isset($_POST['shipping_country'])) ? sanitize_text_field($_POST['shipping_country']) : '';
-                $shipping_charges = $woocommerce->cart->shipping_total;
-                //Check the details already found
-                $query = "SELECT * FROM `" . $this->guest_cart_history_table . "` WHERE session_id = %s";
-                $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
-                if (!empty($results)) {
-                    $guest_details_id = $results->id;
-                    $query_update = "UPDATE `" . $this->guest_cart_history_table . "` SET billing_first_name=%s, billing_last_name=%s, billing_company_name=%s, billing_address_1=%s, billing_address_2=%s, billing_city=%s, billing_county=%s, billing_zipcode=%s, email_id=%s, phone=%s, ship_to_billing=%s, order_notes=%s, shipping_first_name=%s, shipping_last_name=%s, shipping_company_name=%s, shipping_address_1=%s, shipping_address_2=%s, shipping_city=%s, shipping_county=%s, shipping_zipcode=%s, shipping_charges=%s, session_id=%s WHERE id=%d";
-                    $wpdb->query($wpdb->prepare($query_update, $billing_first_name, $billing_last_name, $billing_company, $billing_address_1, $billing_address_2, $billing_city, $billing_state, $billing_zipcode, $billing_email, $billing_phone, $ship_to_billing, $order_notes, $shipping_first_name, $shipping_last_name, $shipping_company, $shipping_address_1, $shipping_address_2, $shipping_city, $shipping_state, $shipping_zipcode, $shipping_charges, $user_session_id, $guest_details_id));
-                } else {
-                    $insert_guest = "INSERT INTO `" . $this->guest_cart_history_table . "`(billing_first_name, billing_last_name, billing_company_name, billing_address_1, billing_address_2, billing_city, billing_county, billing_zipcode, email_id, phone, ship_to_billing, order_notes, shipping_first_name, shipping_last_name, shipping_company_name, shipping_address_1, shipping_address_2, shipping_city, shipping_county, shipping_zipcode, shipping_charges, session_id) VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)";
-                    $wpdb->query($wpdb->prepare($insert_guest, $billing_first_name, $billing_last_name, $billing_company, $billing_address_1, $billing_address_2, $billing_city, $billing_state, $billing_zipcode, $billing_email, $billing_phone, $ship_to_billing, $order_notes, $shipping_first_name, $shipping_last_name, $shipping_company, $shipping_address_1, $shipping_address_2, $shipping_city, $shipping_state, $shipping_zipcode, $shipping_charges, $user_session_id));
+            if (!is_user_logged_in()) {
+                global $woocommerce;
+                //Can't look up the customer in this situation.
+                if (!isset($woocommerce->session)) {
+                    return;
+                }
+                //$user_session_id = $this->wc_functions->getPHPSessionCustomerId();
+                $user_session_id = $this->getUserSessionKey();
+                if (!empty($user_session_id) && isset($_POST['billing_email'])) {
+                    global $wpdb, $woocommerce;
+                    //Post details
+                    $billing_first_name = (isset($_POST['billing_first_name'])) ? sanitize_text_field($_POST['billing_first_name']) : '';
+                    $billing_last_name = (isset($_POST['billing_last_name'])) ? sanitize_text_field($_POST['billing_last_name']) : '';
+                    $billing_company = (isset($_POST['billing_company'])) ? sanitize_text_field($_POST['billing_company']) : '';
+                    $billing_address_1 = (isset($_POST['billing_address_1'])) ? sanitize_text_field($_POST['billing_address_1']) : '';
+                    $billing_address_2 = (isset($_POST['billing_address_2'])) ? sanitize_text_field($_POST['billing_address_2']) : '';
+                    $billing_city = (isset($_POST['billing_city'])) ? sanitize_text_field($_POST['billing_city']) : '';
+                    $billing_state = (isset($_POST['billing_state'])) ? sanitize_text_field($_POST['billing_state']) : '';
+                    $billing_zipcode = (isset($_POST['billing_postcode'])) ? sanitize_text_field($_POST['billing_postcode']) : '';
+                    $billing_country = (isset($_POST['billing_country'])) ? sanitize_text_field($_POST['billing_country']) : '';
+                    $billing_phone = (isset($_POST['billing_phone'])) ? sanitize_text_field($_POST['billing_phone']) : '';
+                    $billing_email = $_POST['billing_email'];
+                    $ship_to_billing = (isset($_POST['ship_to_billing'])) ? $_POST['ship_to_billing'] : '';
+                    $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
+                    $shipping_first_name = (isset($_POST['shipping_first_name'])) ? sanitize_text_field($_POST['shipping_first_name']) : '';
+                    $shipping_last_name = (isset($_POST['shipping_last_name'])) ? sanitize_text_field($_POST['shipping_last_name']) : '';
+                    $shipping_company = (isset($_POST['shipping_company'])) ? sanitize_text_field($_POST['shipping_company']) : '';
+                    $shipping_address_1 = (isset($_POST['shipping_address_1'])) ? sanitize_text_field($_POST['shipping_address_1']) : '';
+                    $shipping_address_2 = (isset($_POST['shipping_address_2'])) ? sanitize_text_field($_POST['shipping_address_2']) : '';
+                    $shipping_city = (isset($_POST['shipping_city'])) ? sanitize_text_field($_POST['shipping_city']) : '';
+                    $shipping_state = (isset($_POST['shipping_state'])) ? sanitize_text_field($_POST['shipping_state']) : '';
+                    $shipping_zipcode = (isset($_POST['shipping_postcode'])) ? sanitize_text_field($_POST['shipping_postcode']) : '';
+                    $shipping_country = (isset($_POST['shipping_country'])) ? sanitize_text_field($_POST['shipping_country']) : '';
+                    $shipping_charges = $woocommerce->cart->shipping_total;
+                    //Check the details already found
+                    $query = "SELECT * FROM `" . $this->guest_cart_history_table . "` WHERE session_id = %s";
+                    $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
+                    if (!empty($results)) {
+                        $guest_details_id = $results->id;
+                        $query_update = "UPDATE `" . $this->guest_cart_history_table . "` SET billing_first_name=%s, billing_last_name=%s, billing_company_name=%s, billing_address_1=%s, billing_address_2=%s, billing_city=%s, billing_county=%s, billing_zipcode=%s, email_id=%s, phone=%s, ship_to_billing=%s, order_notes=%s, shipping_first_name=%s, shipping_last_name=%s, shipping_company_name=%s, shipping_address_1=%s, shipping_address_2=%s, shipping_city=%s, shipping_county=%s, shipping_zipcode=%s, shipping_charges=%s, session_id=%s WHERE id=%d";
+                        $wpdb->query($wpdb->prepare($query_update, $billing_first_name, $billing_last_name, $billing_company, $billing_address_1, $billing_address_2, $billing_city, $billing_state, $billing_zipcode, $billing_email, $billing_phone, $ship_to_billing, $order_notes, $shipping_first_name, $shipping_last_name, $shipping_company, $shipping_address_1, $shipping_address_2, $shipping_city, $shipping_state, $shipping_zipcode, $shipping_charges, $user_session_id, $guest_details_id));
+                    } else {
+                        $insert_guest = "INSERT INTO `" . $this->guest_cart_history_table . "`(billing_first_name, billing_last_name, billing_company_name, billing_address_1, billing_address_2, billing_city, billing_county, billing_zipcode, email_id, phone, ship_to_billing, order_notes, shipping_first_name, shipping_last_name, shipping_company_name, shipping_address_1, shipping_address_2, shipping_city, shipping_county, shipping_zipcode, shipping_charges, session_id) VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)";
+                        $wpdb->query($wpdb->prepare($insert_guest, $billing_first_name, $billing_last_name, $billing_company, $billing_address_1, $billing_address_2, $billing_city, $billing_state, $billing_zipcode, $billing_email, $billing_phone, $ship_to_billing, $order_notes, $shipping_first_name, $shipping_last_name, $shipping_company, $shipping_address_1, $shipping_address_2, $shipping_city, $shipping_state, $shipping_zipcode, $shipping_charges, $user_session_id));
+                    }
                 }
             }
+        } else {
+            wp_send_json_error('invalid data');
         }
     }
 
@@ -809,7 +813,7 @@ class AbandonedCart
         }
         $asset_path = plugins_url('', __FILE__);
         wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'capture_guest_details', $asset_path . '/assets/js/track_guest.js', '', RNOC_VERSION, true);
-        wp_localize_script(RNOC_PLUGIN_PREFIX . 'capture_guest_details', 'retainful_guest_capture_params', array('ajax_url' => admin_url('admin-ajax.php')));
+        wp_localize_script(RNOC_PLUGIN_PREFIX . 'capture_guest_details', 'retainful_guest_capture_params', array('nonce' => wp_create_nonce('save_retainful_guest_data'), 'ajax_url' => admin_url('admin-ajax.php')));
     }
 
     /**

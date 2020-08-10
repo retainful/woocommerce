@@ -208,9 +208,13 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function popupClosed()
         {
-            $popup_action = isset($_POST['popup_action']) ? sanitize_key($_POST['popup_action']) : 1;
-            $this->wc_functions->setSession('rnoc_popup_closed_by_user', $popup_action);
-            wp_send_json_success();
+            if (isset($_POST['security']) && wp_verify_nonce($_POST['security'], 'rnoc_popup_closed')) {
+                $popup_action = isset($_POST['popup_action']) ? sanitize_key($_POST['popup_action']) : 1;
+                $this->wc_functions->setSession('rnoc_popup_closed_by_user', $popup_action);
+                wp_send_json_success();
+            } else {
+                wp_send_json_error('invalid data');
+            }
         }
 
         /**
@@ -218,94 +222,98 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function setGuestEmailSession()
         {
-            $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
-            $message = '';
-            $error = true;
-            $email = sanitize_email($_REQUEST['email']);
-            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0] : array();
-            $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
-            if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
-                $is_buyer_accepting_marketing = 1;
-            } else {
-                $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
-            }
-            $this->wc_functions->initWoocommerceSession();
-            $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
-            $this->wc_functions->setCustomerEmail($email);
-            $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
-            //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
-            if (!$run_cart_externally) {
-                $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-                $customer = new WC_Customer();
-                $user_session_id = $abandoned_cart->getUserSessionKey();
-                $customer->set_email($email);
-                if (!empty($user_session_id) && !empty($_REQUEST['email'])) {
-                    global $wpdb;
-                    $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
-                    $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
-                    if (empty($results)) {
-                        $insert_guest = "INSERT INTO `" . $abandoned_cart->guest_cart_history_table . "`(email_id, session_id) VALUES ( %s,%s)";
-                        $wpdb->query($wpdb->prepare($insert_guest, $email, $user_session_id));
-                    } else {
-                        $guest_details_id = $results->id;
-                        $query_update = "UPDATE `" . $abandoned_cart->guest_cart_history_table . "` SET email_id=%s, shipping_county=%s, shipping_zipcode=%s, shipping_charges=%s, session_id=%s WHERE id=%d";
-                        $wpdb->query($wpdb->prepare($query_update, $email, $user_session_id, $guest_details_id));
-                    }
-                    $error = false;
+            if (isset($_POST['set_rnoc_guest_session']) && wp_verify_nonce($_POST['security'], 'set_rnoc_guest_session')) {
+                $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
+                $message = '';
+                $error = true;
+                $email = sanitize_email($_REQUEST['email']);
+                $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0] : array();
+                $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
+                if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
+                    $is_buyer_accepting_marketing = 1;
                 } else {
-                    if (empty($_REQUEST['email'])) {
+                    $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
+                }
+                $this->wc_functions->initWoocommerceSession();
+                $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
+                $this->wc_functions->setCustomerEmail($email);
+                $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
+                //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
+                if (!$run_cart_externally) {
+                    $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
+                    $customer = new WC_Customer();
+                    $user_session_id = $abandoned_cart->getUserSessionKey();
+                    $customer->set_email($email);
+                    if (!empty($user_session_id) && !empty($_REQUEST['email'])) {
+                        global $wpdb;
+                        $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
+                        $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
+                        if (empty($results)) {
+                            $insert_guest = "INSERT INTO `" . $abandoned_cart->guest_cart_history_table . "`(email_id, session_id) VALUES ( %s,%s)";
+                            $wpdb->query($wpdb->prepare($insert_guest, $email, $user_session_id));
+                        } else {
+                            $guest_details_id = $results->id;
+                            $query_update = "UPDATE `" . $abandoned_cart->guest_cart_history_table . "` SET email_id=%s, shipping_county=%s, shipping_zipcode=%s, shipping_charges=%s, session_id=%s WHERE id=%d";
+                            $wpdb->query($wpdb->prepare($query_update, $email, $user_session_id, $guest_details_id));
+                        }
                         $error = false;
                     } else {
-                        $message = __('Sorry invalid request!', RNOC_TEXT_DOMAIN);
+                        if (empty($_REQUEST['email'])) {
+                            $error = false;
+                        } else {
+                            $message = __('Sorry invalid request!', RNOC_TEXT_DOMAIN);
+                        }
+                    }
+                } else {
+                    $error = false;
+                }
+                $coupon_details = "";
+                $show_coupon_popup = false;
+                $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
+                $redirect_url = null;
+                if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'need_coupon', 0) == 1) {
+                    $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
+                    if (!empty($coupon_code)) {
+                        $show_woo_coupon = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'show_woo_coupon', 'send_via_email');
+                        switch ($show_woo_coupon) {
+                            case "auto_apply_and_redirect":
+                                $this->wc_functions->addDiscount($coupon_code);
+                                $redirect_url = wc_get_checkout_url();
+                                break;
+                            case "auto_apply_and_redirect_cart":
+                                $this->wc_functions->addDiscount($coupon_code);
+                                $redirect_url = wc_get_cart_url();
+                                break;
+                            case "send_mail_auto_apply_and_redirect":
+                                $this->sendEmail($email, $coupon_settings);
+                                $this->wc_functions->addDiscount($coupon_code);
+                                $redirect_url = wc_get_checkout_url();
+                                break;
+                            case "send_mail_auto_apply_and_redirect_cart":
+                                $this->sendEmail($email, $coupon_settings);
+                                $this->wc_functions->addDiscount($coupon_code);
+                                $redirect_url = wc_get_cart_url();
+                                break;
+                            case "instantly":
+                                $show_coupon_popup = true;
+                                $coupon_details = $this->getCouponPopupContent($coupon_settings);
+                                break;
+                            case "both":
+                                $show_coupon_popup = true;
+                                $this->sendEmail($email, $coupon_settings);
+                                $coupon_details = $this->getCouponPopupContent($coupon_settings);
+                                break;
+                            default:
+                            case "send_via_email":
+                                $this->sendEmail($email, $coupon_settings);
+                                break;
+                        }
                     }
                 }
+                wp_send_json(array('error' => $error, 'message' => $message, 'redirect' => $redirect_url, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
             } else {
-                $error = false;
+                wp_send_json_error('invalid data');
             }
-            $coupon_details = "";
-            $show_coupon_popup = false;
-            $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
-            $redirect_url = null;
-            if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'need_coupon', 0) == 1) {
-                $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
-                if (!empty($coupon_code)) {
-                    $show_woo_coupon = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'show_woo_coupon', 'send_via_email');
-                    switch ($show_woo_coupon) {
-                        case "auto_apply_and_redirect":
-                            $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_checkout_url();
-                            break;
-                        case "auto_apply_and_redirect_cart":
-                            $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_cart_url();
-                            break;
-                        case "send_mail_auto_apply_and_redirect":
-                            $this->sendEmail($email, $coupon_settings);
-                            $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_checkout_url();
-                            break;
-                        case "send_mail_auto_apply_and_redirect_cart":
-                            $this->sendEmail($email, $coupon_settings);
-                            $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_cart_url();
-                            break;
-                        case "instantly":
-                            $show_coupon_popup = true;
-                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
-                            break;
-                        case "both":
-                            $show_coupon_popup = true;
-                            $this->sendEmail($email, $coupon_settings);
-                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
-                            break;
-                        default:
-                        case "send_via_email":
-                            $this->sendEmail($email, $coupon_settings);
-                            break;
-                    }
-                }
-            }
-            wp_send_json(array('error' => $error, 'message' => $message, 'redirect' => $redirect_url, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
         }
 
         /**
@@ -446,6 +454,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 "is_email_mandatory" => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1) == 1) ? "yes" : "no",
                 "no_thanks_action" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
                 "show_popup_until" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
+                "nonce" => array(
+                    'set_rnoc_guest_session' => wp_create_nonce('set_rnoc_guest_session')
+                )
             );
             wp_localize_script('rnoc-add-to-cart', 'retainful_premium_add_to_cart_collection_popup_condition', $modal_show);
             $modal_popup_extra_classes = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class', null);
