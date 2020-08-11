@@ -8,7 +8,27 @@
     }
     ?></div>
 <script>
-    var countDownDate = new Date("<?php echo date('M d, Y H:i:s', $coupon_expire_time) ?> UTC").getTime();
+    var timerStarted = parseInt(<?php echo $is_timer_started; ?>);
+    <?php
+    if ($is_timer_reset == 1) {
+    ?>
+    startedTime = new Date().getTime();
+    sessionStorage.setItem('rnoc_coupon_timer_started', startedTime.toString());
+    <?php
+    $woocommerce->removeSession('rnoc_is_coupon_timer_reset');
+    }
+    ?>
+    var timerStartTime = sessionStorage.getItem('rnoc_coupon_timer_started');
+    var startedTime;
+    if (timerStarted === 1 && timerStartTime === null) {
+        startedTime = new Date().getTime();
+        sessionStorage.setItem('rnoc_coupon_timer_started', startedTime.toString());
+    } else {
+        startedTime = parseInt(timerStartTime);
+    }
+    var endedTimeInMin = parseInt("<?php echo $expired_in_min; ?>") * 60000;
+    var countDownDate = startedTime + endedTimeInMin;
+    window.rnoc_timer_expired_message_shown = false;
     var x = setInterval(function () {
         var now = new Date().getTime();
         var distance = countDownDate - now;
@@ -21,19 +41,30 @@
             clearInterval(x);
             document.getElementById("rnoc-coupon-timer-<?php echo $coupon_timer_position ?>").innerHTML = "<?php echo __('EXPIRED', RNOC_TEXT_DOMAIN) ?>";
             <?php
-            if(apply_filters('rnoc_coupon_timer_above_cart_position_reload', true)){
+            if(apply_filters('rnoc_coupon_timer_top_position_reload', true)){
             if($auto_fix_page_reload == 0){
             ?>
-            window.location.reload();
+            jQuery.post("<?php echo admin_url('admin-ajax.php?action=rnoc_coupon_timer_expired') ?>", function (data, status) {
+                if (data.success) {
+                    window.location.reload();
+                }
+            });
             <?php
             }else {
             ?>
             (function ($) {
-                var coupon_det = $('.coupon-<?php echo strtolower($coupon_code); ?>');
-                coupon_det.remove();
-                var wrapper = $(".woocommerce-notices-wrapper");
-                var html = '<ul class="woocommerce-error" role="alert"><li><?php echo $coupon_timer_expire_message; ?></li></ul>';
-                wrapper.append(html);
+                $.post("<?php echo admin_url('admin-ajax.php?action=rnoc_coupon_timer_expired') ?>", function (data, status) {
+                    if (data.success) {
+                        if (window.rnoc_timer_expired_message_shown === false) {
+                            var coupon_det = $('.coupon-<?php echo strtolower($coupon_code); ?>');
+                            coupon_det.hide();
+                            var wrapper = $(".woocommerce-notices-wrapper");
+                            var html = '<ul class="woocommerce-error" role="alert"><li><?php echo $coupon_timer_expire_message; ?></li></ul>';
+                            wrapper.append(html);
+                            window.rnoc_timer_expired_message_shown = true;
+                        }
+                    }
+                });
             })(jQuery);
             <?php
             }

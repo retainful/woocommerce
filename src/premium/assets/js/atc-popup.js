@@ -117,6 +117,7 @@ function initJqueryRetainfulPopupJs() {
                             popup_btn.click();
                         }
                     }
+                    popup_btn.attr('disabled', false);
                     popup_btn.removeClass('rnoc-popup-opener');
                     modal.css('display', 'none');
                     $(document).trigger('retainful_closed_add_to_cart_popup', [modal]);
@@ -252,7 +253,8 @@ function initJqueryRetainfulPopupJs() {
                         local_storage: true,
                         email: email,
                         is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
-                        action: 'set_rnoc_guest_session'
+                        action: 'set_rnoc_guest_session',
+                        security: retainful_premium_add_to_cart_collection_popup_condition.nonce.set_rnoc_guest_session
                     };
                     let response = this.request(rnoc_ajax_url, popup_data);
                     if (!response.error) {

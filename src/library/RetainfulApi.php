@@ -39,7 +39,7 @@ class RetainfulApi
         );
         $response = $this->request($url, array(), 'post', $body, $headers);
         //$response = $this->request($this->domain . 'app/' . $api_key);
-        if (isset($response->success) && $response->success) {
+        if (isset($response->success)) {
             return $this->getPlanDetails($response);
         } else {
             return isset($response->message) ? $response->message : NULL;
@@ -55,7 +55,7 @@ class RetainfulApi
         $plan = isset($response->plan) ? strtolower($response->plan) : 'free';
         $status = isset($response->status) ? strtolower($response->status) : 'active';
         $period_end = isset($response->period_end) ? strtolower($response->period_end) : 'never';
-        $message = isset($response->message) ? strtolower($response->message) : NULL;
+        $message = isset($response->message) ? strtolower($response->message) : 'App connected successfully';
         return array(
             'plan' => (empty($plan)) ? 'free' : $plan,
             'status' => (empty($status)) ? 'active' : $status,

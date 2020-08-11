@@ -25,7 +25,9 @@
             }
             // Check if value is matching
             function valueMatch(value) {
-                return condValue.includes(value) && value !== '';
+                var arrVal = JSON.parse(condValue);
+                console.log(arrVal,condValue,value);
+                return (value!=='' && arrVal.includes(value) >0);
             }
 
             // Select the field by name and loob through
