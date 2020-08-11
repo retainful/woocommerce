@@ -2,8 +2,8 @@
 Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
 Requires at least: 4.0
-Tested up to: 5.4.1
-WC tested up to: 4.3.0
+Tested up to: 5.4.2
+WC tested up to: 4.3.1
 Requires PHP: 5.6
 Stable tag: 2.2.7
 License: GPLv3 or later
@@ -394,3 +394,7 @@ No. There is no charges for support.
 = 2.2.7 =
 * Fix: Add to cart popup "no thanks" link issue fixed
 * New feature: exit intent popup new option added to show popup only for customers who not provided their email address
+
+= 2.2.8 =
+* Fix: Coupon timer improved
+* New feature: Exit intent popup now support mobile devices
