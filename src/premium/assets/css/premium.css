@@ -1,0 +1,27 @@
+.rnoc-coupon-timer-container-above_cart {
+    text-align: center;
+    width: 100%;
+    padding: 15px 5px;
+}
+
+.timer-coupon-code-above_cart, #rnoc-coupon-timer-above_cart, .timer-coupon-code-below_discount, #rnoc-coupon-timer-below_discount, .timer-coupon-code-top, #rnoc-coupon-timer-top {
+    font-weight: 800;
+}
+
+.rnoc-coupon-timer-container-top {
+    text-align: center;
+    width: 100%;
+    right: 0;
+    position: fixed;
+    z-index: 9999;
+    padding: 20px 5px;
+}
+
+.rnoc-coupon-timer-container-below_discount {
+    width: 100%;
+    right: 0;
+    margin: 10px 0;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px 5px;
+}

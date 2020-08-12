@@ -433,7 +433,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addSiteScripts()
         {
-            wp_enqueue_script('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/js/premium.js', array('jquery'), RNOC_VERSION);
             if (!wp_script_is('rnoc-add-to-cart')) {
                 wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/atc-popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
             }
