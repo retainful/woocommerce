@@ -39,7 +39,7 @@
                     enable: 'yes',
                     message: 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}',
                     timer: '{{minutes}}M {{seconds}}S',
-                    display_on: 'top',
+                    display_on: 'bottom',
                     background: '#ffffff',
                     color: '#000000',
                     coupon_code_color: '#000000',
