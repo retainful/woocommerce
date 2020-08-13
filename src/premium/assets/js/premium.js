@@ -8,67 +8,55 @@
     function Retainful_premium(current_settings = {}) {
         this.settings = {};
         var default_settings = {
-            checkout_url: '',
-            cart_url: '',
-            ei_popup: {
-                enable: 'yes',
-                show_for: 'everyone',
-                is_user_logged_in: 'no',
-                coupon_code: null,
-                show_once_its_coupon_applied: 'no',
-                applied_coupons: ['no'],
-                show_popup: 'always',
-                number_of_times_per_page: '1',
-                cookie_expired_at: '1',
-                redirect_url: '1',
-                mobile: {
-                    enable: 'yes',
-                    time_delay: 'yes',
-                    delay: '10',
-                    scroll_distance: 'yes',
-                    distance: '10'
+            "checkout_url": "",
+            "cart_url": "",
+            "ei_popup": {
+                "enable": "yes",
+                "show_for": "all",
+                "is_user_logged_in": "no",
+                "coupon_code": null,
+                "show_once_its_coupon_applied": "no",
+                "applied_coupons": ["no"],
+                "show_popup": "every_time_on_customer_exists",
+                "number_of_times_per_page": "1",
+                "cookie_expired_at": "1",
+                "redirect_url": "1",
+                "mobile": {
+                    "enable": "yes",
+                    "time_delay": "yes",
+                    "delay": "10",
+                    "scroll_distance": "yes",
+                    "distance": "10"
                 }
             },
-            coupon_timer: {
-                enable: 'yes',
-                time_in_minutes: 15,
-                code: 'YmJ4a3ljejI=',
-                expiry_url: '',
-                expired_text: 'Expired',
-                top: {
-                    enable: 'yes',
-                    message: 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}',
-                    timer: '{{minutes}}M {{seconds}}S',
-                    display_on: 'bottom',
-                    background: '#ffffff',
-                    color: '#000000',
-                    coupon_code_color: '#000000',
-                    coupon_timer_color: '#000000',
-                    enable_cta: 'yes',
-                    cta_text: 'Checkout Now',
-                    cta_color: '#ffffff',
-                    cta_background: '#f27052',
-
-                }, above_cart: {
-                    enable: 'yes',
-                    message: 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}',
-                    timer: '{{minutes}}M {{seconds}}S',
-                    background: '#ffffff',
-                    color: '#000000',
-                    coupon_code_color: '#000000',
-                    coupon_timer_color: '#000000',
-                    enable_cta: 'yes',
-                    cta_text: 'Checkout Now',
-                    cta_color: '#ffffff',
-                    cta_background: '#f27052'
-                }, below_discount: {
-                    enable: 'yes',
-                    message: 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}',
-                    timer: '{{minutes}}M {{seconds}}S',
-                    background: '#ffffff',
-                    color: '#000000',
-                    coupon_code_color: '#000000',
-                    coupon_timer_color: '#000000'
+            "coupon_timer": {
+                "enable": "yes",
+                "timer_started": "0",
+                "time_in_minutes": "15",
+                "code": "",
+                "expiry_url": "",
+                "reset_url": "",
+                "expiry_message": "",
+                "expired_text": "Expired",
+                "timer_reset": "0",
+                "top": {
+                    "enable": "yes",
+                    "checkout_url": "",
+                    "message": "Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}",
+                    "timer": "{{minutes}}M {{seconds}}S",
+                    "display_on": "bottom",
+                    "background": "#ffffff",
+                    "color": "#000000",
+                    "coupon_code_color": "#000000",
+                    "coupon_timer_color": "#000000",
+                    "enable_cta": "yes",
+                    "cta_text": "Checkout Now",
+                    "cta_color": "#ffffff",
+                    "cta_background": "#f27052"
+                }, "above_cart": {
+                    "enable": "no"
+                }, "below_discount": {
+                    "enable": "no"
                 }
             }
         }
@@ -98,7 +86,7 @@
         var display_on_top = function (message, settings) {
             var btn = '';
             if (settings.enable_cta === "yes") {
-                btn = '<a href="" style="text-decoration:none;padding: 10px;color: ' + settings.cta_color + ';background-color: ' + settings.cta_background + '">' + settings.cta_text + '</a>';
+                btn = '<a href="' + settings.checkout_url + '" style="text-decoration:none;padding: 10px;color: ' + settings.cta_color + ';background-color: ' + settings.cta_background + '">' + settings.cta_text + '</a>';
             }
             var top_message = '<div class="rnoc-coupon-timer-container-top" style="' + settings.display_on + ':0;background-color:' + settings.background + ';color:' + settings.color + ';">' + message + btn + '</div>';
             $('.rnoc-coupon-timer-container-top').remove();
@@ -110,7 +98,7 @@
         var display_on_above_cart = function (message, settings) {
             var btn = '';
             if (settings.enable_cta === "yes") {
-                btn = '<a href="" style="text-decoration:none;padding: 10px;color: ' + settings.cta_color + ';background-color: ' + settings.cta_background + '">' + settings.cta_text + '</a>';
+                btn = '<a href="' + settings.checkout_url + '" style="text-decoration:none;padding: 10px;color: ' + settings.cta_color + ';background-color: ' + settings.cta_background + '">' + settings.cta_text + '</a>';
             }
             var before_cart_message = '<div class="rnoc-coupon-timer-container-above_cart" style="background-color:' + settings.background + ';color:' + settings.color + ';">' + message + btn + '</div>';
             var container = $(".rnoc_before_cart_container");
@@ -121,9 +109,15 @@
             var container = $(".rnoc-below-discount_container-" + code);
             container.html(before_cart_message);
         }
-        var run_timer = function (started = 1) {
+        var run_timer = function () {
             var start_time = sessionStorage.getItem('rnoc_coupon_timer_started');
-            if (started === 1 && start_time === null) {
+            if (parseInt(settings.timer_reset) === 1) {
+                start_time = new Date().getTime();
+                sessionStorage.setItem('rnoc_coupon_timer_started', start_time.toString());
+                $.post(settings.reset_url, function (data, status) {
+                });
+            }
+            if (start_time === null || start_time === undefined) {
                 start_time = new Date().getTime();
                 sessionStorage.setItem('rnoc_coupon_timer_started', start_time.toString());
             } else {
@@ -167,18 +161,23 @@
                                 var coupon_det = $('.coupon-' + code.toLowerCase());
                                 coupon_det.hide();
                                 var wrapper = $(".woocommerce-notices-wrapper");
-                                var html = '<ul class="woocommerce-error" role="alert"><li><?php echo $coupon_timer_expire_message; ?></li></ul>';
+                                var html = '<ul class="woocommerce-error" role="alert"><li>' + settings.expiry_message + '</li></ul>';
                                 wrapper.append(html);
                             }
                         });
                         window.rnoc_timer_expired_message_shown = true;
                     }
                 }
-            });
+            }, 1000);
         }
-        console.log(settings);
+        //console.log(settings);
         if (settings.enable === 'yes') {
-            run_timer();
+            if (parseInt(settings.timer_started) === 1) {
+                run_timer();
+            }
+            $(document).on('added_to_cart', function (fragment, cart_hash, this_button) {
+                run_timer();
+            });
         }
     }
 
@@ -200,13 +199,13 @@
             var show = false;
             switch (settings.show_for) {
                 default:
-                case "everyone":
+                case "all":
                     show = true;
                     break;
                 case "guest":
                     show = (settings.is_user_logged_in === 'no');
                     break;
-                case "non_email_provided_users":
+                case "non_email_users":
                     var is_email_provided = localStorage.getItem('rnoc_is_email_provided');
                     show = (typeof is_email_provided !== "undefined" || parseInt(is_email_provided) === 0);
                     break;
@@ -216,13 +215,13 @@
             }
             switch (settings.show_popup) {
                 default:
-                case "always":
+                case "every_time_on_customer_exists":
                     show = true;
                     break;
                 case "once_per_page":
                     show = (window.rnoc_ei_popup_showed_for <= 1);
                     break;
-                case "x_times_per_page":
+                case "show_x_times_per_page":
                     show = (window.rnoc_ei_popup_showed_for <= parseInt(settings.number_of_times_per_page));
                     break;
                 case "once_per_session":
@@ -260,29 +259,8 @@
             }
         }
     }
-    window.retainful = new Retainful_premium(
-        {
-            ei_popup: {
-                enable_exit_intent_popup: 'yes',
-                show_for: 'guest',
-                is_user_logged_in: 'no',
-                coupon_code: null,
-                show_once_its_coupon_applied: 'no',
-                applied_coupons: ['no'],
-                show_popup: 'always',
-                number_of_times_per_page: '1',
-                cookie_expired_at: '1',
-                redirect_url: '1',
-                mobile: {
-                    enable: 'yes',
-                    time_delay: 'yes',
-                    delay: '10',
-                    scroll_distance: 'yes',
-                    distance: '10'
-                }
-            }
-        }
-    );
+    console.log(rnoc_premium);
+    window.retainful = new Retainful_premium(rnoc_premium);
     if (window.retainful.is_local_storage_supported()) {
         window.retainful.init_ei_popup();
         window.retainful.init_coupon_timer();

@@ -22,108 +22,50 @@ if (!class_exists('RetainfulPremiumAddon')) {
 
         function init()
         {
-            $encoded = "{
-            checkout_url: '',
-            cart_url: '',
-            ei_popup: {
-                enable: 'yes',
-                show_for: 'everyone',
-                is_user_logged_in: 'no',
-                coupon_code: null,
-                show_once_its_coupon_applied: 'no',
-                applied_coupons: ['no'],
-                show_popup: 'always',
-                number_of_times_per_page: '1',
-                cookie_expired_at: '1',
-                redirect_url: '1',
-                mobile: {
-                    enable: 'yes',
-                    time_delay: 'yes',
-                    delay: '10',
-                    scroll_distance: 'yes',
-                    distance: '10'
-                }
-            },
-            coupon_timer: {
-                enable: 'yes',
-                time_in_minutes: 15,
-                code: 'YmJ4a3ljejI=',
-                expiry_url: '',
-                expired_text: 'Expired',
-                top: {
-                    enable: 'yes',
-                    message: 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}',
-                    timer: '{{minutes}}M {{seconds}}S',
-                    display_on: 'bottom',
-                    background: '#ffffff',
-                    color: '#000000',
-                    coupon_code_color: '#000000',
-                    coupon_timer_color: '#000000',
-                    enable_cta: 'yes',
-                    cta_text: 'Checkout Now',
-                    cta_color: '#ffffff',
-                    cta_background: '#f27052',
+            $arr = array();
+            $this->exitIntentPopupSettings($arr);
+        }
 
-                }, above_cart: {
-                    enable: 'yes',
-                    message: 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}',
-                    timer: '{{minutes}}M {{seconds}}S',
-                    background: '#ffffff',
-                    color: '#000000',
-                    coupon_code_color: '#000000',
-                    coupon_timer_color: '#000000',
-                    enable_cta: 'yes',
-                    cta_text: 'Checkout Now',
-                    cta_color: '#ffffff',
-                    cta_background: '#f27052'
-                }, below_discount: {
-                    enable: 'yes',
-                    message: 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}',
-                    timer: '{{minutes}}M {{seconds}}S',
-                    background: '#ffffff',
-                    color: '#000000',
-                    coupon_code_color: '#000000',
-                    coupon_timer_color: '#000000'
-                }
-            }
-        }";
-            $decoded = json_decode($encoded);
-            /*echo '<pre>';
-            print_r($decoded);
+        function exitIntentPopupSettings(&$premium_settings)
+        {
+            echo '<pre>';
+            print_r($this->premium_addon_settings);
             echo '</pre>';
-            die;*/
-            add_action('wp_footer', array($this, 'enqueueScript'));
-            $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 1);
-            $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
-            if ($need_coupon_timer && !empty($coupon_code)) {
-                add_action('woocommerce_before_cart', array($this, 'beforeCart'));
-                add_filter('woocommerce_cart_totals_coupon_html', array($this, 'belowDiscount'), 100, 2);
+            die;
+            $need_ei_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 1);
+            if ($need_ei_popup == 1) {
+                $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', array());
+                $mobile_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings', array(array()));
+                $mobile_settings = isset($mobile_settings[0]) ? $mobile_settings[0] : array();
+                $premium_settings['ei_popup'] = array(
+                    'enable' => 'yes',
+                    'show_for' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', 'all'),
+                    'is_user_logged_in' => is_user_logged_in() ? 'yes' : 'no',
+                    'coupon_code' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', ''),
+                    'show_once_its_coupon_applied' => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', '0') == 1) ? 'yes' : 'no',
+                    'applied_coupons' => array(),
+                    'show_popup' => $this->getKeyFromArray($show_settings, 'show_option', 'once_per_session'),
+                    'number_of_times_per_page' => $this->getKeyFromArray($show_settings, 'show_count', '1'),
+                    'cookie_expired_at' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', '1'),
+                );
+                if ($this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'enable_mobile_support', '0') == 1) {
+                    $premium_settings['ei_popup']['mobile'] = array(
+                        'enable' => 'yes',
+                        'time_delay' => ($this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'enable_delay_trigger', '0') == 1) ? 'yes' : 'no',
+                        'delay' => $this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec', '0'),
+                        'scroll_distance' => ($this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger', '0') == 1) ? 'yes' : 'no',
+                        'distance' => $this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', '0'),
+                    );
+                } else {
+                    $premium_settings['ei_popup']['mobile'] = array(
+                        'enable' => 'no'
+                    );
+                }
+            } else {
+                $premium_settings['ei_popup'] = array(
+                    'enable' => 'no',
+                );
             }
-        }
-
-        /**
-         * @param $discount_amount_html
-         * @param $coupon
-         * @return string
-         */
-        function belowDiscount($discount_amount_html, $coupon)
-        {
-            $code = $this->wc_functions->getCouponCode($coupon);
-            if (!empty($code)) {
-                $discount_amount_html .= '<div class="rnoc-below-discount_container-' . $code . '"></div>';
-            }
-            return $discount_amount_html;
-        }
-
-        function beforeCart()
-        {
-            echo '<div class="rnoc_before_cart_container"></div>';
-        }
-
-        function enqueueScript()
-        {
-            wp_enqueue_script('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/js/premium.js', array('jquery'), RNOC_VERSION);
-            wp_enqueue_style('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/css/premium.css', array(), RNOC_VERSION);
         }
     }
 }

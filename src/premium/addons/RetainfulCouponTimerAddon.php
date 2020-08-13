@@ -26,37 +26,33 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 add_filter('rnoc_premium_addon_tab', array($this, 'premiumAddonTab'));
                 add_filter('rnoc_premium_addon_tab_content', array($this, 'premiumAddonTabContent'));
             }
-            add_action('wp_ajax_rnoc_coupon_timer_expired', array($this, 'timerExpired'));
-            add_action('wp_ajax_nopriv_rnoc_coupon_timer_expired', array($this, 'timerExpired'));
             $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 1);
             $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
             if ($need_coupon_timer && !empty($coupon_code)) {
                 add_action('woocommerce_add_to_cart', array($this, 'productAddedToCart'));
-                add_action('woocommerce_after_calculate_totals', array($this, 'autoApplyCouponCode'));
-                add_action('wp', array($this, 'showTimer'));
-                add_action('woocommerce_init', array($this, 'showTimer'));
+                add_action('wp_footer', array($this, 'enqueueScript'));
+                add_action('woocommerce_before_cart', array($this, 'beforeCart'));
+                add_filter('woocommerce_cart_totals_coupon_html', array($this, 'belowDiscount'), 100, 2);
+                add_action('wp_ajax_rnoc_coupon_timer_expired', array($this, 'timerExpired'));
+                add_action('wp_ajax_nopriv_rnoc_coupon_timer_expired', array($this, 'timerExpired'));
+                add_action('wp_ajax_rnoc_coupon_timer_reset', array($this, 'timerReset'));
+                add_action('wp_ajax_nopriv_rnoc_coupon_timer_reset', array($this, 'timerReset'));
                 add_action('woocommerce_coupon_is_valid', array($this, 'ValidateCoupon'), 10, 2);
                 add_filter('woocommerce_coupon_error', array($this, 'modifyInvalidCouponMessage'), 10, 3);
                 add_filter('woocommerce_order_status_changed', array($this, 'orderStatusChanged'), 10, 3);
-                add_action('woocommerce_before_cart', array($this, 'initTimerInCart'));
-                add_action('wp_footer', array($this, 'showCouponTimerOnAjaxCall'));
             }
         }
 
-        function timerExpired()
+        function productAddedToCart()
         {
-            $this->wc_functions->setSession('rnoc_is_coupon_timer_time_ended', '1');
-            wp_send_json_success('coupon expired');
-        }
-
-        /**
-         * Refresh the page immediately after user added to cart, because timer need to show after countdown start
-         */
-        function showCouponTimerOnAjaxCall()
-        {
-            $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_started');
+            $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
             if (empty($coupon_expire_time)) {
-                echo '<script type="text/javascript">jQuery(document).on("added_to_cart",function(){window.location.reload();});</script>';
+                $this->wc_functions->setSession('rnoc_is_coupon_timer_time_started', '1');
+                $coupon_timer_apply_coupon = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon', 'automatically');
+                if ($coupon_timer_apply_coupon == "automatically") {
+                    $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
+                    $this->wc_functions->setSession('rnoc_coupon_timer_coupon_code', $coupon_code);
+                }
             }
         }
 
@@ -83,25 +79,6 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         }
 
         /**
-         * validate coupon code
-         * @param $true
-         * @param $coupon
-         * @return bool
-         */
-        function ValidateCoupon($true, $coupon)
-        {
-            $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
-            if (!empty($coupon_expire_time)) {
-                $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
-                $hook_coupon_code = $this->wc_functions->getCouponCode($coupon);
-                if (strtolower($hook_coupon_code) == strtolower($coupon_code)) {
-                    return false;
-                }
-            }
-            return $true;
-        }
-
-        /**
          * Message when coupon expired
          * @param $message
          * @param $error_code
@@ -122,148 +99,62 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         }
 
         /**
-         * init the addon
-         */
-        function showTimer()
-        {
-            $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
-            if (empty($coupon_expire_time)) {
-                $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages', array());
-                if ($this->isValidPagesToDisplay($modal_display_pages)) {
-                    $top_position = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings');
-                    $enable_top_position = $this->getKeyFromArray($top_position, RNOC_PLUGIN_PREFIX . 'enable_position', 1);
-                    if ($enable_top_position) {
-                        add_action('wp_footer', array($this, 'displayTimerOnTop'));
-                    }
-                    $above_cart_position = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings');
-                    $enable_above_cart_position = $this->getKeyFromArray($above_cart_position, RNOC_PLUGIN_PREFIX . 'enable_position', 0);
-                    if ($enable_above_cart_position) {
-                        add_action('woocommerce_before_cart_table', array($this, 'displayTimerAboveCart'));
-                    }
-                    $below_discount_position = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings');
-                    $enable_above_cart_position = $this->getKeyFromArray($below_discount_position, RNOC_PLUGIN_PREFIX . 'enable_position', 0);
-                    if ($enable_above_cart_position) {
-                        add_filter('woocommerce_cart_totals_coupon_html', array($this, 'displayTimerBelowDiscount'), 100, 2);
-                    }
-                }
-            }
-            return true;
-        }
-
-        /**
-         * Default design settings for timer
-         * @return array
-         */
-        function defaultTimerDesign()
-        {
-            $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
-            $checkout_url = $this->getCheckoutUrl();
-            return array(
-                RNOC_PLUGIN_PREFIX . 'enable_position' => 0,
-                RNOC_PLUGIN_PREFIX . 'top_bottom_position' => "top",
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __('Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => ' {{minutes}}M {{seconds}}S',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
-                RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
-                RNOC_PLUGIN_PREFIX . 'checkout_url' => add_query_arg('retainful_ac_coupon', $coupon_code, $checkout_url),
-                RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
-                RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
-            );
-        }
-
-        /**
-         * display timer in float
-         */
-        function displayTimerOnTop()
-        {
-            $top_position = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings', $this->defaultTimerDesign());
-            $this->displayTimerInPlace('top', $this->premium_addon_settings, $top_position);
-        }
-
-        /**
-         * display timer before cart
-         */
-        function displayTimerAboveCart()
-        {
-            $above_cart_position = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings', $this->defaultTimerDesign());
-            $this->displayTimerInPlace('above_cart', $this->premium_addon_settings, $above_cart_position);
-        }
-
-        /**
-         *  display timer below discount data
-         * @param $discount_amount_html
+         * validate coupon code
+         * @param $true
          * @param $coupon
-         */
-        function displayTimerBelowDiscount($discount_amount_html, $coupon)
-        {
-            echo $discount_amount_html;
-            $code = $this->wc_functions->getCouponCode($coupon);
-            if (!empty($code)) {
-                $above_cart_position = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings', $this->defaultTimerDesign());
-                $this->displayTimerInPlace('below_discount', $this->premium_addon_settings, $above_cart_position, $code);
-            }
-        }
-
-        /**
-         * Display timer
-         * @param $position
-         * @param $settings_details
-         * @param $position_settings
-         * @param null $used_code
          * @return bool
          */
-        function displayTimerInPlace($position, $settings_details, $position_settings, $used_code = NULL)
+        function ValidateCoupon($true, $coupon)
         {
-            $is_ended = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
-            $is_started = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_started');
-            if (empty($is_ended) && !empty($is_started)) {
-                $coupon_code = $this->getKeyFromArray($settings_details, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon');
-                if (!is_null($used_code) && strtolower($used_code) != strtolower($coupon_code)) {
+            $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
+            if (!empty($coupon_expire_time)) {
+                $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
+                $hook_coupon_code = $this->wc_functions->getCouponCode($coupon);
+                if (strtolower($hook_coupon_code) == strtolower($coupon_code)) {
                     return false;
                 }
-                $timer_message = $this->getKeyFromArray($position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_message', __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN));
-                $timer_display_format = '"' . $this->getKeyFromArray($position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format', __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN)) . '"';
-                $text_to_replace = array(
-                    'coupon_code' => '<span class="timer-coupon-code-' . $position . '">' . $coupon_code . '</span>',
-                    'coupon_timer' => '<span id="rnoc-coupon-timer-' . $position . '"></span>'
-                );
-                foreach ($text_to_replace as $find => $replace) {
-                    $timer_message = str_replace('{{' . $find . '}}', $replace, $timer_message);
-                }
-                $text_to_replace_timer = array(
-                    'days',
-                    'hours',
-                    'minutes',
-                    'seconds'
-                );
-                foreach ($text_to_replace_timer as $find) {
-                    $timer_display_format = str_replace('{{' . $find . '}}', '"+' . $find . '+"', $timer_display_format);
-                }
-                $expired_on_min = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time', 15);
-                $is_timer_started = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_started');
-                $is_timer_reset = $this->wc_functions->getSession('rnoc_is_coupon_timer_reset');
-                $position_settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_message'] = $timer_message;
-                $position_settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'] = $timer_display_format;
-                $position_settings['is_timer_started'] = (empty($is_timer_started)) ? 0 : 1;
-                $position_settings['is_timer_reset'] = (empty($is_timer_reset)) ? 0 : 1;
-                $position_settings['coupon_timer_position'] = $position;
-                $position_settings['expired_in_min'] = $expired_on_min;
-                $position_settings['auto_fix_page_reload'] = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload', 0);
-                $position_settings['coupon_timer_expire_message'] = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message', 'Sorry! Instant Offer has expired.');
-                $position_settings['coupon_code'] = $coupon_code;
-                $position_settings['woocommerce'] = $this->wc_functions;
-                $override_path = get_theme_file_path('retainful/premium/templates/timer/' . $position . '.php');
-                $template_path = RNOCPREMIUM_PLUGIN_PATH . 'templates/timer/' . $position . '.php';
-                if (file_exists($override_path)) {
-                    $template_path = $override_path;
-                }
-                echo $this->getTemplateContent($template_path, $position_settings, 'coupon_timer_on_' . $position);
             }
-            return true;
+            return $true;
+        }
+
+        /**
+         * set coupon expired
+         */
+        function timerExpired()
+        {
+            $this->wc_functions->setSession('rnoc_is_coupon_timer_time_ended', '1');
+            wp_send_json_success('coupon expired');
+        }
+
+        /**
+         * set coupon rested
+         */
+        function timerReset()
+        {
+            $this->wc_functions->removeSession('rnoc_is_coupon_timer_reset');
+            wp_send_json_success('');
+        }
+
+        /**
+         * @param $discount_amount_html
+         * @param $coupon
+         * @return string
+         */
+        function belowDiscount($discount_amount_html, $coupon)
+        {
+            $code = $this->wc_functions->getCouponCode($coupon);
+            if (!empty($code)) {
+                $discount_amount_html .= '<div class="rnoc-below-discount_container-' . $code . '"></div>';
+            }
+            return $discount_amount_html;
+        }
+
+        /**
+         * before cart
+         */
+        function beforeCart()
+        {
+            echo '<div class="rnoc_before_cart_container"></div>';
         }
 
         /**
@@ -282,43 +173,143 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         }
 
         /**
-         * Automatically init the timer
+         * @param $premium_settings
          */
-        function initTimerInCart()
+        function couponTimerSettings(&$premium_settings)
         {
-            $cart = $this->wc_functions->getCart();
-            if (is_cart() && !empty($cart)) {
-                $this->initTimer();
-            }
-        }
-
-        /**
-         * Apply coupon while adding product to cart
-         */
-        function productAddedToCart()
-        {
-            $this->initTimer();
-        }
-
-        /**
-         * init the timer
-         */
-        function initTimer()
-        {
-            $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
-            if (empty($coupon_expire_time)) {
-                $expired_on_min = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time', 15);
-                if (!empty($expired_on_min)) {
-                    $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
-                    $coupon_timer_apply_coupon = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon', 'automatically');
-                    $this->wc_functions->setSession('rnoc_is_coupon_timer_time_started', '1');
-                    if ($coupon_timer_apply_coupon == "automatically") {
-                        $this->wc_functions->setSession('rnoc_coupon_timer_coupon_code', $coupon_code);
-                    }
+            $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 1);
+            $code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
+            $ended = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
+            if ($need_coupon_timer && !empty($code) && $ended !== 1) {
+                $reset = $this->wc_functions->getSession('rnoc_is_coupon_timer_reset');
+                $started = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_started');
+                $premium_settings['coupon_timer'] = array(
+                    'enable' => 'yes',
+                    'timer_started' => ($started == 1) ? 1 : 0,
+                    'expiry_message' => __($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message', 'Sorry! Instant Offer has expired.'), RNOC_TEXT_DOMAIN),
+                    'code' => base64_encode($code),
+                    'time_in_minutes' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time', 15),
+                    'expiry_url' => admin_url('admin-ajax.php?action=rnoc_coupon_timer_expired'),
+                    'reset_url' => admin_url('admin-ajax.php?action=rnoc_coupon_timer_reset'),
+                    'expired_text' => __('Expired', RNOC_TEXT_DOMAIN),
+                    'timer_reset' => ($reset == 1) ? 1 : 0
+                );
+                $top_position_settings = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings', array());
+                $top_position_enabled = $this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'enable_position', 1);
+                if ($top_position_enabled) {
+                    $premium_settings['coupon_timer']['top'] = array(
+                        'enable' => 'yes',
+                        'checkout_url' => wc_get_checkout_url(),
+                        'message' => __($this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_message', 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}'), RNOC_TEXT_DOMAIN),
+                        'timer' => __($this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format', '{{minutes}}M {{seconds}}S'), RNOC_TEXT_DOMAIN),
+                        'display_on' => $this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'top_bottom_position', 'top'),
+                        'background' => $this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_background', '#ffffff'),
+                        'color' => $this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_color', '#000000'),
+                        'coupon_code_color' => $this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color', '#000000'),
+                        'coupon_timer_color' => $this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color', '#000000'),
+                        'enable_cta' => ($this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'enable_checkout_button', '1') == 1) ? 'yes' : 'no',
+                        'cta_text' => $this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'checkout_button_text', __('Checkout Now', RNOC_TEXT_DOMAIN)),
+                        'cta_color' => $this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'checkout_button_color', '#ffffff'),
+                        'cta_background' => $this->getKeyFromArray($top_position_settings, RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color', '#f27052'),
+                    );
+                } else {
+                    $premium_settings['coupon_timer']['top'] = array(
+                        'enable' => 'no'
+                    );
                 }
+                $above_cart_position_settings = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings', array());
+                $above_cart_position_enabled = $this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'enable_position', 0);
+                if ($above_cart_position_enabled) {
+                    $premium_settings['coupon_timer']['above_cart'] = array(
+                        'enable' => 'yes',
+                        'checkout_url' => wc_get_checkout_url(),
+                        'message' => __($this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_message', 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}'), RNOC_TEXT_DOMAIN),
+                        'timer' => __($this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format', '{{minutes}}M {{seconds}}S'), RNOC_TEXT_DOMAIN),
+                        'background' => $this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_background', '#ffffff'),
+                        'color' => $this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_color', '#000000'),
+                        'coupon_code_color' => $this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color', '#000000'),
+                        'coupon_timer_color' => $this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color', '#000000'),
+                        'enable_cta' => ($this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'enable_checkout_button', '1') == 1) ? 'yes' : 'no',
+                        'cta_text' => $this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'checkout_button_text', __('Checkout Now', RNOC_TEXT_DOMAIN)),
+                        'cta_color' => $this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'checkout_button_color', '#ffffff'),
+                        'cta_background' => $this->getKeyFromArray($above_cart_position_settings, RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color', '#f27052'),
+                    );
+                } else {
+                    $premium_settings['coupon_timer']['above_cart'] = array(
+                        'enable' => 'no'
+                    );
+                }
+                $below_discount_position_settings = $this->getPositionSettings($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings', array());
+                $below_discount_position_enabled = $this->getKeyFromArray($below_discount_position_settings, RNOC_PLUGIN_PREFIX . 'enable_position', 0);
+                if ($below_discount_position_enabled) {
+                    $premium_settings['coupon_timer']['below_discount'] = array(
+                        'enable' => 'yes',
+                        'message' => __($this->getKeyFromArray($below_discount_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_message', 'Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}'), RNOC_TEXT_DOMAIN),
+                        'timer' => __($this->getKeyFromArray($below_discount_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format', '{{minutes}}M {{seconds}}S'), RNOC_TEXT_DOMAIN),
+                        'background' => $this->getKeyFromArray($below_discount_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_background', '#ffffff'),
+                        'color' => $this->getKeyFromArray($below_discount_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_color', '#000000'),
+                        'coupon_code_color' => $this->getKeyFromArray($below_discount_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color', '#000000'),
+                        'coupon_timer_color' => $this->getKeyFromArray($below_discount_position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color', '#000000'),
+                    );
+                } else {
+                    $premium_settings['coupon_timer']['below_discount'] = array(
+                        'enable' => 'no'
+                    );
+                }
+            } else {
+                $premium_settings['coupon_timer'] = array(
+                    'enable' => 'no'
+                );
             }
         }
 
+        /**
+         * enqueue script
+         */
+        function enqueueScript()
+        {
+            $premium_settings = array();
+            $this->couponTimerSettings($premium_settings);
+            $arr = array(
+                'checkout_url' => '',
+                'cart_url' => '',
+                'ei_popup' =>
+                    array(
+                        'enable' => 'yes',
+                        'show_for' => 'everyone',
+                        'is_user_logged_in' => 'no',
+                        'coupon_code' => NULL,
+                        'show_once_its_coupon_applied' => 'no',
+                        'applied_coupons' =>
+                            array(
+                                0 => 'no',
+                            ),
+                        'show_popup' => 'always',
+                        'number_of_times_per_page' => '1',
+                        'cookie_expired_at' => '1',
+                        'redirect_url' => '1',
+                        'mobile' =>
+                            array(
+                                'enable' => 'yes',
+                                'time_delay' => 'yes',
+                                'delay' => '10',
+                                'scroll_distance' => 'yes',
+                                'distance' => '10',
+                            ),
+                    ),
+            );
+            if (!wp_script_is('rnoc-premium')) {
+                wp_enqueue_script('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/js/premium.js', array('jquery'), RNOC_VERSION);
+            }
+            wp_localize_script('rnoc-premium', 'rnoc_premium', $premium_settings);
+            if (!wp_style_is('rnoc-premium')) {
+                wp_enqueue_style('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/css/premium.css', array(), RNOC_VERSION);
+            }
+        }
+
+        /**
+         * auto apply coupon code
+         */
         function autoApplyCouponCode()
         {
             $coupon_code = $this->wc_functions->getSession('rnoc_coupon_timer_coupon_code');
