@@ -270,38 +270,10 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         {
             $premium_settings = array();
             $this->couponTimerSettings($premium_settings);
-            $arr = array(
-                'checkout_url' => '',
-                'cart_url' => '',
-                'ei_popup' =>
-                    array(
-                        'enable' => 'yes',
-                        'show_for' => 'everyone',
-                        'is_user_logged_in' => 'no',
-                        'coupon_code' => NULL,
-                        'show_once_its_coupon_applied' => 'no',
-                        'applied_coupons' =>
-                            array(
-                                0 => 'no',
-                            ),
-                        'show_popup' => 'always',
-                        'number_of_times_per_page' => '1',
-                        'cookie_expired_at' => '1',
-                        'redirect_url' => '1',
-                        'mobile' =>
-                            array(
-                                'enable' => 'yes',
-                                'time_delay' => 'yes',
-                                'delay' => '10',
-                                'scroll_distance' => 'yes',
-                                'distance' => '10',
-                            ),
-                    ),
-            );
             if (!wp_script_is('rnoc-premium')) {
                 wp_enqueue_script('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/js/premium.js', array('jquery'), RNOC_VERSION);
             }
-            wp_localize_script('rnoc-premium', 'rnoc_premium', $premium_settings);
+            wp_localize_script('rnoc-premium', 'rnoc_premium_ct', $premium_settings['coupon_timer']);
             if (!wp_style_is('rnoc-premium')) {
                 wp_enqueue_style('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/css/premium.css', array(), RNOC_VERSION);
             }

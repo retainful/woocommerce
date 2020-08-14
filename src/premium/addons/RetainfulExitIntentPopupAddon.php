@@ -28,53 +28,12 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 add_filter('rnoc_premium_addon_tab_content', array($this, 'premiumAddonTabContent'));
                 add_action('wp_ajax_rnocp_get_exit_intent_popup_template', array($this, 'getPopupTemplateToInsert'));
             }
-            add_action('wp_ajax_nopriv_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
-            //To support the logged in user
-            add_action('wp_ajax_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
-            //add_action('rnoc_exit_intent_after_applying_coupon_code', array($this, 'exitIntentCouponApplied'));
-            add_action('woocommerce_applied_coupon', array($this, 'couponApplied'));
-            add_action('wp', array($this, 'siteInit'));
-        }
-
-        /**
-         * Set coupon code applied
-         */
-        function exitIntentCouponApplied()
-        {
-            $this->wc_functions->setSession('rnoc_exit_intent_coupon_code_applied', 1);
-        }
-
-        function couponApplied($coupon_code)
-        {
-            $eip_coupon = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '');
-            if (strtolower($eip_coupon) == strtolower($coupon_code)) {
-                $this->wc_functions->setSession('rnoc_exit_intent_coupon_code_applied', 1);
+            $need_ei_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 1);
+            add_action('wp_footer', array($this, 'enqueueScript'));
+            if ($need_ei_popup) {
+                add_action('wp_ajax_nopriv_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
+                add_action('wp_ajax_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
             }
-        }
-
-        /**
-         * Get email template by ID
-         */
-        function getPopupTemplateToInsert()
-        {
-            $template_id = (isset($_REQUEST['id'])) ? sanitize_key($_REQUEST['id']) : 0;
-            $content = '';
-            $success = false;
-            if (!empty($template_id)) {
-                $override_path = get_theme_file_path('retainful/premium/templates/exit-intent-popups/' . $template_id . '.php');
-                $template_path = RNOCPREMIUM_PLUGIN_PATH . 'templates/exit-intent-popups/' . $template_id . '.php';
-                if (file_exists($override_path)) {
-                    $template_path = $override_path;
-                }
-                $template = $this->getTemplateContent($template_path);
-                if (!empty($template)) {
-                    $content = $template;
-                    $success = true;
-                } else {
-                    $content = __('Sorry, Template not found', RNOC_TEXT_DOMAIN);
-                }
-            }
-            wp_send_json(array('success' => $success, 'content' => $content));
         }
 
         /**
@@ -174,101 +133,28 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         }
 
         /**
-         * popup template
-         * @return string
+         * Get email template by ID
          */
-        function getPopupTemplate()
+        function getPopupTemplateToInsert()
         {
-            $default_template = $this->getDefaultPopupTemplate();
-            return $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', $default_template);
-        }
-
-        /**
-         * Check the user is capable for doing task
-         * @return bool
-         */
-        function isValidUserToShow()
-        {
-            if (current_user_can('administrator')) {
-                return true;
-            } elseif (!is_user_logged_in()) {
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * init the addon
-         */
-        function siteInit()
-        {
-            if (defined('RNOC_VERSION')) {
-                if (version_compare(RNOC_VERSION, '1.1.5', '>')) {
-                    $this->admin = new Rnoc\Retainful\Admin\Settings();
-                    $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
-                    $this->applyCouponAutomatically();
-                    $need_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 0);
-                    if ($need_popup == 0) {
-                        return false;
-                    }
-                    $need_exit_intent_modal_after_coupon_applied = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 1);
-                    if ($need_exit_intent_modal_after_coupon_applied == 1) {
-                        $is_coupon_applied = $this->wc_functions->getSession('rnoc_exit_intent_coupon_code_applied');
-                        if ($is_coupon_applied) {
-                            return false;
-                        }
-                    }
-                    $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages', array());
-                    if (!$this->isValidPagesToDisplay($modal_display_pages)) {
-                        return false;
-                    }
-                    $need_popup_for = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', "all");
-                    if ($need_popup_for == "non_email_users") {
-                        $customer_email = $this->wc_functions->getCustomerEmail();
-                        if (!empty($customer_email)) {
-                            return false;
-                        }
-                    } elseif ($need_popup_for == "guest" && is_user_logged_in()) {
-                        return false;
-                    }
-                    $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
-                    $show_popup = false;
-                    if ($run_cart_externally) {
-                        $show_popup = true;
-                    } else {
-                        $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-                        $user_session_id = $abandoned_cart->getUserSessionKey();
-                        if (!empty($user_session_id)) {
-                            global $wpdb;
-                            $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
-                            $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
-                            if (empty($results)) {
-                                $show_popup = true;
-                            }
-                        }
-                    }
-                    if ($show_popup) {
-                        add_action('wp_footer', array($this, 'exitIntentPopup'), 10);
-                        add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
-                    }
+            $template_id = (isset($_REQUEST['id'])) ? sanitize_key($_REQUEST['id']) : 0;
+            $content = '';
+            $success = false;
+            if (!empty($template_id)) {
+                $override_path = get_theme_file_path('retainful/premium/templates/exit-intent-popups/' . $template_id . '.php');
+                $template_path = RNOCPREMIUM_PLUGIN_PATH . 'templates/exit-intent-popups/' . $template_id . '.php';
+                if (file_exists($override_path)) {
+                    $template_path = $override_path;
+                }
+                $template = $this->getTemplateContent($template_path);
+                if (!empty($template)) {
+                    $content = $template;
+                    $success = true;
+                } else {
+                    $content = __('Sorry, Template not found', RNOC_TEXT_DOMAIN);
                 }
             }
-            return true;
-        }
-
-        /**
-         * apply coupon automatically
-         */
-        function applyCouponAutomatically()
-        {
-            if (isset($_REQUEST['rnoc_on_exit_coupon_code'])) {
-                $coupon_code = sanitize_text_field($_REQUEST['rnoc_on_exit_coupon_code']);
-                $coupon_code = apply_filters("rnoc_exit_intent_before_applying_coupon_code", $coupon_code);
-                if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
-                    $this->wc_functions->addDiscount($coupon_code);
-                    do_action("rnoc_exit_intent_after_applying_coupon_code", $coupon_code);
-                }
-            }
+            wp_send_json(array('success' => $success, 'content' => $content));
         }
 
         /**
@@ -342,89 +228,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         }
 
         /**
-         * Add the site scripts needed for addon
-         */
-        function addSiteScripts()
-        {
-            $load_exit_intent_popup_scripts_after = apply_filters('rnoc_load_exit_intent_popup_scripts_after', array('jquery'));
-            wp_enqueue_script('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/exit-intent-popup.js', $load_exit_intent_popup_scripts_after, RNOC_VERSION);
-            if (!wp_style_is('rnoc-popup')) {
-                wp_enqueue_style('rnoc-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
-            }
-            $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', 1);
-            $show_option = isset($show_settings['show_option']) ? $show_settings['show_option'] : 'once_per_page';
-            $show_count = isset($show_settings['show_count']) ? $show_settings['show_count'] : 1;
-            $mobile_popup_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0] : array();
-            $delay = $scroll_distance = 0;
-            if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_mobile_support', 0) == 1) {
-                if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_delay_trigger', 0) == 1) {
-                    $delay = (int)$this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec', 0);
-                }
-                if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger', 0) == 1) {
-                    $scroll_distance = (int)$this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', 0);
-                }
-            }
-            $settings = array(
-                'show_option' => $show_option,
-                'cookie_life' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 100),
-                'maxDisplay' => (int)$show_count,
-                'distance' => $scroll_distance,
-                'delay' => $delay,
-                'cookieLife' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 1),
-                'storeName' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup',
-                'consider_cart_created_as_hash' => 'no',
-                'show_only_for' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', "all"),
-                'jquery_url' => includes_url('js/jquery/jquery.js'),
-                'show_when_its_coupon_applied' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 1),
-                'coupon_code' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '')
-            );
-            $settings = apply_filters('rnoc_load_exit_intent_popup_settings', $settings);
-            wp_localize_script('rnoc-exit-intent-popup', 'retainful_premium_exit_intent_popup', $settings);
-        }
-
-        /**
-         * popup html
-         */
-        function exitIntentPopup()
-        {
-            if (!is_admin()) {
-                $content = $this->getPopupTemplate();
-                if (empty($content)) {
-                    $content = $this->getDefaultPopupTemplate();
-                }
-                $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL);
-                $checkout_url = $this->getCheckoutUrl();
-                $cart_url = $this->getCartUrl();
-                $coupon_data = "";
-                if (!empty($coupon_code)) {
-                    $coupon_data = '?rnoc_on_exit_coupon_code=' . $coupon_code;
-                }
-                $email = $this->wc_functions->getCustomerEmail();
-                $to_replace = array(
-                    'coupon_code' => $coupon_code,
-                    'checkout_url' => $checkout_url . $coupon_data,
-                    'checkout_url_without_coupon' => $checkout_url,
-                    'email_collection_form' => ($this->isValidUserToShow() && empty($email)) ? $this->getEmailCollectionForm() : '',
-                    'cart_url_without_coupon' => $cart_url,
-                    'cart_url' => $cart_url . $coupon_data
-                );
-                $to_replace = apply_filters("rnoc_exit_intent_popup_short_codes", $to_replace, $content);
-                foreach ($to_replace as $find => $replace) {
-                    $content = str_replace('{{' . $find . '}}', $replace, $content);
-                }
-                $final_settings = array(
-                    "show_for_admin" => current_user_can('administrator'),
-                    "template" => $content,
-                    "add_on_slug" => 'rnoc-exit-intent-popup-add-on',
-                    "custom_style" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style', NULL),
-                    "no_thanks_action" => 1,
-                    "is_email_mandatory" => 1
-                );
-                echo $this->getTemplateContent(RNOCPREMIUM_PLUGIN_PATH . 'templates/popup_display.php', $final_settings, $this->slug);
-            }
-        }
-
-        /**
          * Email collection form
          * @return mixed|null
          */
@@ -454,25 +257,121 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         }
 
         /**
-         * get the cart url
-         * @return string|null
+         * exit intent popup
          */
-        function getCartUrl()
+        function printExitIntentPopup()
         {
-            if (function_exists('wc_get_cart_url')) {
-                return wc_get_cart_url();
+            $content = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', '');
+            if (empty($content)) {
+                $content = $this->getDefaultPopupTemplate();
             }
-            return NULL;
+            $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL);
+            $checkout_url = $this->getCheckoutUrl();
+            $cart_url = $this->getCartUrl();
+            $coupon_data = "";
+            if (!empty($coupon_code)) {
+                $coupon_data = '?rnoc_on_exit_coupon_code=' . $coupon_code;
+            }
+            $email = $this->wc_functions->getCustomerEmail();
+            $to_replace = array(
+                'coupon_code' => $coupon_code,
+                'checkout_url' => $checkout_url . $coupon_data,
+                'checkout_url_without_coupon' => $checkout_url,
+                'email_collection_form' => ($this->isValidUserToShow() && empty($email)) ? $this->getEmailCollectionForm() : '',
+                'cart_url_without_coupon' => $cart_url,
+                'cart_url' => $cart_url . $coupon_data
+            );
+            $to_replace = apply_filters("rnoc_exit_intent_popup_short_codes", $to_replace, $content);
+            foreach ($to_replace as $find => $replace) {
+                $content = str_replace('{{' . $find . '}}', $replace, $content);
+            }
+            $custom_style = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style', NULL);
+            echo '<div style="display: none;" class="rnoc-ei-popup">' . $content . '<style>' . $custom_style . '</style></div>';
         }
 
         /**
-         * get the current url
-         * @return string|null
+         * popup template
+         * @return string
          */
-        function getCurrentUrl()
+        function getPopupTemplate()
         {
-            global $wp;
-            return home_url($wp->request);
+            $default_template = $this->getDefaultPopupTemplate();
+            return $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', $default_template);
+        }
+
+        /**
+         * Get the default template
+         * @return string
+         */
+        function getDefaultPopupTemplate()
+        {
+            $override_path = get_theme_file_path('retainful/premium/templates/exit-intent-popups/default.php');
+            $template_path = RNOCPREMIUM_PLUGIN_PATH . 'templates/exit-intent-popups/default.php';
+            if (file_exists($override_path)) {
+                $template_path = $override_path;
+            }
+            return $this->getTemplateContent($template_path, array(), 'exit_intent_popup');
+        }
+
+        /**
+         * enqueue script
+         */
+        function enqueueScript()
+        {
+            $premium_settings = array();
+            $this->exitIntentPopupSettings($premium_settings);
+            if (!wp_script_is('rnoc-premium')) {
+                wp_enqueue_script('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/js/premium.js', array('jquery'), RNOC_VERSION);
+            }
+            wp_localize_script('rnoc-premium', 'rnoc_premium_ei_popup', $premium_settings['ei_popup']);
+            if (!wp_style_is('rnoc-premium')) {
+                wp_enqueue_style('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/css/premium.css', array(), RNOC_VERSION);
+            }
+            $this->printExitIntentPopup();
+        }
+
+        /**
+         * exit intent popup settings
+         * @param $premium_settings
+         */
+        function exitIntentPopupSettings(&$premium_settings)
+        {
+            $need_ei_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 1);
+            if ($need_ei_popup == 1) {
+                $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', array());
+                $mobile_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings', array(array()));
+                $mobile_settings = isset($mobile_settings[0]) ? $mobile_settings[0] : array();
+                $code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '');
+                $premium_settings['ei_popup'] = array(
+                    'enable' => 'yes',
+                    'ajax_url' => admin_url('admin-ajax.php'),
+                    'show_for' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', 'all'),
+                    'is_user_logged_in' => is_user_logged_in() ? 'yes' : 'no',
+                    'coupon_code' => !empty($code) ? base64_encode($code) : '',
+                    'show_once_its_coupon_applied' => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', '0') == 1) ? 'yes' : 'no',
+                    'applied_coupons' => array(),
+                    'show_popup' => $this->getKeyFromArray($show_settings, 'show_option', 'once_per_session'),
+                    'number_of_times_per_page' => $this->getKeyFromArray($show_settings, 'show_count', '1'),
+                    'cookie_expired_at' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', '1'),
+                );
+                if ($this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'enable_mobile_support', '0') == 1) {
+                    $premium_settings['ei_popup']['mobile'] = array(
+                        'enable' => 'yes',
+                        'time_delay' => ($this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'enable_delay_trigger', '0') == 1) ? 'yes' : 'no',
+                        'delay' => $this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec', '0'),
+                        'scroll_distance' => ($this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger', '0') == 1) ? 'yes' : 'no',
+                        'distance' => $this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', '0'),
+                    );
+                } else {
+                    $premium_settings['ei_popup']['mobile'] = array(
+                        'enable' => 'no'
+                    );
+                }
+            } else {
+                $premium_settings['ei_popup'] = array(
+                    'enable' => 'no',
+                );
+            }
         }
 
         /**
@@ -503,20 +402,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 ),
             );
             return $settings;
-        }
-
-        /**
-         * Get the default template
-         * @return string
-         */
-        function getDefaultPopupTemplate()
-        {
-            $override_path = get_theme_file_path('retainful/premium/templates/exit-intent-popups/default.php');
-            $template_path = RNOCPREMIUM_PLUGIN_PATH . 'templates/exit-intent-popups/default.php';
-            if (file_exists($override_path)) {
-                $template_path = $override_path;
-            }
-            return $this->getTemplateContent($template_path, array(), 'exit_intent_popup');
         }
 
         /**
