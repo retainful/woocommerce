@@ -101,7 +101,7 @@ class Settings
                     'id' => RNOC_PLUGIN_PREFIX . 'retainful_abandoned_cart',
                     'title' => __('Retainful - Abandoned Carts', RNOC_TEXT_DOMAIN),
                     'parent_slug' => $this->slug . '_license',
-                    'capability' => 'edit_shop_coupons',
+                    'capability' => 'manage_woocommerce',
                     'object_types' => array('options-page'),
                     'option_key' => $this->slug . '_abandoned_cart',
                     'tab_group' => $this->slug,
@@ -140,7 +140,7 @@ class Settings
                     'option_key' => $this->slug . '_abandoned_cart_email_templates',
                     'tab_group' => $this->slug,
                     'parent_slug' => $this->slug . '_license',
-                    'capability' => 'edit_shop_coupons',
+                    'capability' => 'manage_woocommerce',
                     'tab_title' => __('Email Templates', RNOC_TEXT_DOMAIN),
                     'save_button' => __('Save', RNOC_TEXT_DOMAIN)
                 ));
@@ -191,7 +191,7 @@ class Settings
                     'option_key' => $this->slug . '_abandoned_cart_sent_emails',
                     'tab_group' => $this->slug,
                     'parent_slug' => $this->slug . '_license',
-                    'capability' => 'edit_shop_coupons',
+                    'capability' => 'manage_woocommerce',
                     'tab_title' => __('Sent E-Mails', RNOC_TEXT_DOMAIN),
                     'save_button' => __('Save', RNOC_TEXT_DOMAIN)
                 ));
@@ -213,7 +213,7 @@ class Settings
                 'tab_group' => $this->slug,
                 'vertical_tabs' => true,
                 'parent_slug' => $this->slug . '_license',
-                'capability' => 'edit_shop_coupons',
+                'capability' => 'manage_woocommerce',
                 'tab_title' => __('Settings', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN)
             ));
@@ -392,7 +392,7 @@ class Settings
                 'id' => RNOC_PLUGIN_PREFIX . 'retainful',
                 'title' => __('Next order coupon', RNOC_TEXT_DOMAIN),
                 'parent_slug' => $this->slug . '_license',
-                'capability' => 'edit_shop_coupons',
+                'capability' => 'manage_woocommerce',
                 'object_types' => array('options-page'),
                 'option_key' => $this->slug,
                 'tab_group' => $this->slug,
@@ -776,7 +776,7 @@ class Settings
                 'tab_group' => $this->slug,
                 'vertical_tabs' => true,
                 'parent_slug' => $this->slug . '_license',
-                'capability' => 'edit_shop_coupons',
+                'capability' => 'manage_woocommerce',
                 'tab_title' => __('Premium Features', RNOC_TEXT_DOMAIN),
                 'save_button' => __('Save', RNOC_TEXT_DOMAIN),
                 'tabs' => $tabs_array
@@ -1036,13 +1036,13 @@ class Settings
         }
         //License
         $license_arr = array(
-            'capability' => 'edit_shop_coupons',
+            'capability' => 'manage_woocommerce',
             'object_types' => array('options-page'),
             'option_key' => $this->slug . '_license',
             'tab_group' => $this->slug,
             'id' => RNOC_PLUGIN_PREFIX . 'license',
             'icon_url' => 'dashicons-controls-repeat',
-            'position' => 55.5,
+            'position' => 56,
             'title' => __('Retainful', RNOC_TEXT_DOMAIN),
             'tab_title' => (!$run_abandoned_cart_externally) ? __('License', RNOC_TEXT_DOMAIN) : __('Connection'),
             'save_button' => __('Save', RNOC_TEXT_DOMAIN)
