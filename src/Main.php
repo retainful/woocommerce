@@ -237,7 +237,7 @@ class Main
                 $this->showAdminNotice($notice);
             }
         } else {
-            //add_action('admin_notices', array($this, 'showDeprecationNotice'));
+            add_action('admin_notices', array($this, 'showDeprecationNotice'));
             /*
             * Retainful abandoned cart
             */
@@ -315,7 +315,7 @@ class Main
     {
         ?>
         <div class="notice notice-warning is-dismissible">
-            <p>We will be deprecating and removing the Abandoned cart management via the Plugin interface by July 1,
+            <p>We will be deprecating and removing the Abandoned cart management via the Plugin interface by September 1,
                 2020. Please consider switching to Retainful Cloud to manage abandoned carts. It's easy. Just click the
                 switch button and connect your store to the Retainful dashboard</p>
             <p><strong>Why we are making this change?</strong></p>
