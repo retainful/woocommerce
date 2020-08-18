@@ -617,6 +617,94 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'default' => '',
                 'desc' => __('Very helpful for custom designed Add to cart button.<b>Example:</b> .add-to-cart,.custom-add-to-cart-button', RNOC_TEXT_DOMAIN)
             ));
+            //Modal design
+            $popup_design_settings = $general_settings->add_field(array(
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_design_settings',
+                'type' => 'group',
+                'repeatable' => false,
+                'options' => array(
+                    'group_title' => __('Popup Design', RNOC_TEXT_DOMAIN),
+                    'sortable' => true
+                ),
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => 'Sample Preview (Customize the texts and colours below)',
+                'id' => RNOC_PLUGIN_PREFIX . 'popup_preview',
+                'type' => 'popup_preview',
+                'default' => __('Please enter your email', RNOC_TEXT_DOMAIN),
+                'desc' => ''
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Modal heading', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_heading',
+                'type' => 'text',
+                'default' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
+                'desc' => ''
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Modal heading color', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_heading_color',
+                'type' => 'colorpicker',
+                'default' => '#000000'
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Email placeholder', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_email_placeholder',
+                'type' => 'text',
+                'default' => __('Email address', RNOC_TEXT_DOMAIN),
+                'desc' => ''
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Add to cart button text', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_text',
+                'type' => 'text',
+                'default' => __('Add to Cart', RNOC_TEXT_DOMAIN),
+                'desc' => ''
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Add to cart button color', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_color',
+                'type' => 'colorpicker',
+                'default' => '#ffffff'
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color',
+                'type' => 'colorpicker',
+                'default' => '#f27052'
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Popup top border color', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
+                'type' => 'colorpicker',
+                'default' => '#f27052'
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Add to cart popup background color', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_bg_color',
+                'type' => 'colorpicker',
+                'default' => '#F8F0F0'
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Not mandatory text', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text',
+                'type' => 'text',
+                'default' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
+                'desc' => ''
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('No thanks link color', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
+                'type' => 'colorpicker',
+                'default' => '#f27052'
+            ));
+            $general_settings->add_group_field($popup_design_settings, array(
+                'name' => __('Terms', RNOC_TEXT_DOMAIN),
+                'id' => RNOC_PLUGIN_PREFIX . 'modal_terms_text',
+                'type' => 'text',
+                'default' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
+                'desc' => ''
+            ));
             //GDPR settings
             $gdpr_compliance_settings = $general_settings->add_field(array(
                 'id' => RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance',
@@ -736,94 +824,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
                     'data-conditional-value' => wp_json_encode(array('both', 'send_via_email', 'send_mail_auto_apply_and_redirect', 'send_mail_auto_apply_and_redirect_cart')),
                 )
-            ));
-            //Modal design
-            $popup_design_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_design_settings',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('Popup Design', RNOC_TEXT_DOMAIN),
-                    'sortable' => true
-                ),
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => 'Sample Preview (Customize the texts and colours below)',
-                'id' => RNOC_PLUGIN_PREFIX . 'popup_preview',
-                'type' => 'popup_preview',
-                'default' => __('Please enter your email', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Modal heading', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_heading',
-                'type' => 'text',
-                'default' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Modal heading color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_heading_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Email placeholder', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_email_placeholder',
-                'type' => 'text',
-                'default' => __('Email address', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Add to cart button text', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_text',
-                'type' => 'text',
-                'default' => __('Add to Cart', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Add to cart button color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_color',
-                'type' => 'colorpicker',
-                'default' => '#ffffff'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color',
-                'type' => 'colorpicker',
-                'default' => '#f27052'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Popup top border color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
-                'type' => 'colorpicker',
-                'default' => '#f27052'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Add to cart popup background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_bg_color',
-                'type' => 'colorpicker',
-                'default' => '#F8F0F0'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Not mandatory text', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text',
-                'type' => 'text',
-                'default' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('No thanks link color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
-                'type' => 'colorpicker',
-                'default' => '#f27052'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Terms', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_terms_text',
-                'type' => 'text',
-                'default' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
-                'desc' => ''
             ));
             return $general_settings;
         }
