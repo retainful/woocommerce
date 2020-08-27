@@ -28,9 +28,9 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             }
             $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 1);
             $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
+            add_action('wp_footer', array($this, 'enqueueScript'));
             if ($need_coupon_timer && !empty($coupon_code)) {
                 add_action('woocommerce_add_to_cart', array($this, 'productAddedToCart'));
-                add_action('wp_footer', array($this, 'enqueueScript'));
                 add_action('woocommerce_before_cart', array($this, 'beforeCart'));
                 add_filter('woocommerce_cart_totals_coupon_html', array($this, 'belowDiscount'), 100, 2);
                 add_action('wp_ajax_rnoc_coupon_timer_expired', array($this, 'timerExpired'));
