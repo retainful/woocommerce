@@ -33,6 +33,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             if ($need_ei_popup) {
                 add_action('wp_ajax_nopriv_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
                 add_action('wp_ajax_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
+                add_action('wp', array($this, 'applyCouponAutomatically'));
             }
         }
 
@@ -371,6 +372,21 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 $premium_settings['ei_popup'] = array(
                     'enable' => 'no',
                 );
+            }
+        }
+
+        /**
+         * apply coupon automatically
+         */
+        function applyCouponAutomatically()
+        {
+            if (isset($_REQUEST['rnoc_on_exit_coupon_code'])) {
+                $coupon_code = sanitize_text_field($_REQUEST['rnoc_on_exit_coupon_code']);
+                $coupon_code = apply_filters("rnoc_exit_intent_before_applying_coupon_code", $coupon_code);
+                if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
+                    $this->wc_functions->addDiscount($coupon_code);
+                    do_action("rnoc_exit_intent_after_applying_coupon_code", $coupon_code);
+                }
             }
         }
 
