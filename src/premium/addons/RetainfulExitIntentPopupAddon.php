@@ -338,7 +338,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         function exitIntentPopupSettings(&$premium_settings)
         {
             $need_ei_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 1);
-            if ($need_ei_popup == 1) {
+            $selected_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages', array());
+            if ($need_ei_popup == 1 && $this->isValidPagesToDisplay($selected_pages)) {
                 $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', array());
                 $mobile_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings', array(array()));
                 $mobile_settings = isset($mobile_settings[0]) ? $mobile_settings[0] : array();

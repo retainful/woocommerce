@@ -180,7 +180,8 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 1);
             $code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
             $ended = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
-            if ($need_coupon_timer && !empty($code) && $ended !== 1) {
+            $selected_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages', array());
+            if ($need_coupon_timer && !empty($code) && $ended !== 1 && $this->isValidPagesToDisplay($selected_pages)) {
                 $reset = $this->wc_functions->getSession('rnoc_is_coupon_timer_reset');
                 $started = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_started');
                 $premium_settings['coupon_timer'] = array(
