@@ -236,16 +236,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     if ($run_cart_externally) {
                         $show_popup = true;
                     } else {
-                        $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-                        $user_session_id = $abandoned_cart->getUserSessionKey();
-                        if (!empty($user_session_id)) {
-                            global $wpdb;
-                            $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
-                            $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
-                            if (empty($results)) {
-                                $show_popup = true;
-                            }
-                        }
+                        // Remove
                     }
                     if ($show_popup) {
                         add_action('wp_footer', array($this, 'exitIntentPopup'), 10);
@@ -291,30 +282,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
             if (!$run_cart_externally) {
-                $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-                $customer = new WC_Customer();
-                $user_session_id = $abandoned_cart->getUserSessionKey();
-                $customer->set_email($email);
-                if (!empty($user_session_id) && !empty($_REQUEST['email'])) {
-                    global $wpdb;
-                    $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
-                    $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
-                    if (empty($results)) {
-                        $insert_guest = "INSERT INTO `" . $abandoned_cart->guest_cart_history_table . "`(email_id, session_id) VALUES ( %s,%s)";
-                        $wpdb->query($wpdb->prepare($insert_guest, $email, $user_session_id));
-                    } else {
-                        $guest_details_id = $results->id;
-                        $query_update = "UPDATE `" . $abandoned_cart->guest_cart_history_table . "` SET email_id=%s, shipping_county=%s, shipping_zipcode=%s, shipping_charges=%s, session_id=%s WHERE id=%d";
-                        $wpdb->query($wpdb->prepare($query_update, $email, $user_session_id, $guest_details_id));
-                    }
-                    $error = false;
-                } else {
-                    if (isset($_REQUEST['email'])) {
-                        $error = false;
-                    } else {
-                        $message = __('Sorry invalid request!', RNOC_TEXT_DOMAIN);
-                    }
-                }
+                //remove
             } else {
                 $error = false;
                 $cart_api = new \Rnoc\Retainful\Api\AbandonedCart\Cart();

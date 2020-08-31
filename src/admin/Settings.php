@@ -853,16 +853,6 @@ class Settings
     }
 
     /**
-     * Schedule the action scheduler hooks
-     */
-    function actionSchedulerHooks()
-    {
-        $this->scheduleEvents('rnoc_abandoned_clear_abandoned_carts', current_time('timestamp'), array(), 'recurring', 86400);
-        $this->scheduleEvents('rnoc_abandoned_cart_send_email', current_time('timestamp'), array(), 'recurring', 900);
-        $this->schedulePlanChecker();
-    }
-
-    /**
      * Schedule events to check plan
      */
     function schedulePlanChecker()
@@ -1097,15 +1087,6 @@ class Settings
     {
         $this->unScheduleHooks();
         update_option('retainful_run_abandoned_cart_in_cloud', 1);
-    }
-
-    /**
-     * Set the option to manage Abandoned cart to manage in cloud
-     */
-    function setAbandonedCartToManageLocally()
-    {
-        $this->actionSchedulerHooks();
-        update_option('retainful_run_abandoned_cart_in_cloud', 0);
     }
 
     /**

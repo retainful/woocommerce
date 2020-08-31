@@ -22,15 +22,8 @@
       "src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php",
       "src/fields/cmb-field-post-search-ajax/cmb-field-post-search-ajax.php",
       "src/fields/cmb-field-select2/cmb-field-select2.php",
-      "src/fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php",
-      "src/fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php",
-      "src/fields/cmb-field-cart-filter/cmb-field-cart-filter.php",
-      "src/fields/cmb-field-email-templates/cmb-field-email-templates.php",
-      "src/fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php",
       "src/fields/cmb-field-unlock-features/cmb-field-unlock-features.php",
       "src/fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php",
-      "src/fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php",
-      "src/fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php",
       "src/fields/cmb-field-conditional-fields/cmb-field-conditional-fields.php",
       "src/fields/cmb-field-tabs/cmb-field-tabs.php"
     ]
