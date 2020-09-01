@@ -60,14 +60,6 @@ class OrderCoupon
     }
 
     /**
-     * Init the Admin
-     */
-    function init()
-    {
-        $this->admin->renderPage();
-    }
-
-    /**
      * Add settings link
      * @param $links
      * @return array

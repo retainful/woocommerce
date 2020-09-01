@@ -122,7 +122,8 @@ class Main
         add_action('rnocp_activation_trigger', array($this, 'checkUserPlan'));
         add_filter('rnoc_need_to_run_ac_in_cloud', array($this, 'needToRunAbandonedCartExternally'));
         //Activate CMB2 functions
-        $this->rnoc->init();
+        add_action('admin_menu', array($this->admin, 'registerMenu'));
+        $this->admin->renderPage();
         new Currency();
         if ($this->admin->isNextOrderCouponEnabled()) {
             //Get events
