@@ -66,7 +66,13 @@ class Settings
 
     function retainfulLicensePage()
     {
-        $settings = get_option('retainful_premium', array());
+        $settings = get_option($this->slug . '_license', array());
+        $default_settings = array(
+            RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => 0,
+            RNOC_PLUGIN_PREFIX . 'retainful_app_id' => '',
+            RNOC_PLUGIN_PREFIX . 'retainful_app_secret' => '',
+        );
+        $license_settings = wp_parse_args($settings, $default_settings);
         require_once dirname(__FILE__) . '/templates/pages/connection.php';
     }
 
