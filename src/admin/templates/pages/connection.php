@@ -7,7 +7,7 @@ $is_app_connected = ($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] ==
 $api = new \Rnoc\Retainful\library\RetainfulApi();
 $admin_settings = new Rnoc\Retainful\Admin\Settings();
 ?>
-<form id="retainful-license-form">
+<form id="retainful-license-form" class="card">
     <table class="form-table" role="presentation">
         <tbody>
         <tr>

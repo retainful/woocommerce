@@ -4,7 +4,7 @@
  */
 require_once "tabs.php";
 ?>
-<form id="retainful-settings-form">
+<form id="retainful-settings-form" class="card">
     <table class="form-table" role="presentation">
         <tbody>
         <tr>

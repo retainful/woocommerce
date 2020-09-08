@@ -115,6 +115,64 @@ class Settings
     }
 
     /**
+     * save the settings
+     */
+    function saveNocSettings()
+    {
+        $data = $this->clean($_POST);
+        update_option($this->slug, $data);
+        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+    }
+
+    function nextOrderCouponPage()
+    {
+        $settings = get_option($this->slug, array());
+        $default_settings = array(
+            RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon' => '0',
+            RNOC_PLUGIN_PREFIX . 'retainful_coupon_type' => '0',
+            RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount' => '10',
+            RNOC_PLUGIN_PREFIX . 'retainful_expire_days' => '60',
+            RNOC_PLUGIN_PREFIX . 'expire_date_format' => 'F j, Y, g:i a',
+            RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to' => 'all',
+            RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon' => '1',
+            RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page' => '0',
+            RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to' => 'woocommerce_email_customer_details',
+            RNOC_PLUGIN_PREFIX . 'retainful_coupon_message' => '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>',
+            RNOC_PLUGIN_PREFIX . 'preferred_order_status' => array('wc-processing', 'wc-completed'),
+            RNOC_PLUGIN_PREFIX . 'preferred_user_roles' => array('all'),
+            RNOC_PLUGIN_PREFIX . 'limit_per_user' => 99,
+            RNOC_PLUGIN_PREFIX . 'minimum_sub_total' => '',
+            RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products' => array(),
+            RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories' => array(),
+            RNOC_PLUGIN_PREFIX . 'minimum_spend' => '',
+            RNOC_PLUGIN_PREFIX . 'maximum_spend' => '',
+            RNOC_PLUGIN_PREFIX . 'products' => array(),
+            RNOC_PLUGIN_PREFIX . 'exclude_products' => array(),
+            RNOC_PLUGIN_PREFIX . 'product_categories' => array(),
+            RNOC_PLUGIN_PREFIX . 'exclude_product_categories' => array(),
+            RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup' => '1',
+            RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design' => $this->appliedCouponDefaultTemplate(),
+        );
+        $settings = wp_parse_args($settings, $default_settings);
+        $is_app_connected = $this->isAppConnected();
+        $expiry_date_format = $this->getDateFormatOptions();
+        $apply_coupon_for = array(
+            'all' => __('Allow any one to apply coupon', RNOC_TEXT_DOMAIN),
+            'validate_on_checkout' => __('Allow the customer to apply coupon, but validate at checkout', RNOC_TEXT_DOMAIN),
+            'login_users' => __('Allow customer to apply coupon only after login (Not Recommended)', RNOC_TEXT_DOMAIN)
+        );
+        $display_coupon_after = array(
+            'woocommerce_email_order_details' => __('Order details', RNOC_TEXT_DOMAIN),
+            'woocommerce_email_order_meta' => __('Order meta', RNOC_TEXT_DOMAIN),
+            'woocommerce_email_customer_details' => __('Customer details', RNOC_TEXT_DOMAIN)
+        );
+        $order_status = $this->availableOrderStatuses();
+        $user_roles = $this->getUserRoles();
+        $categories = $this->getCategories();
+        require_once dirname(__FILE__) . '/templates/pages/next-order-coupon.php';
+    }
+
+    /**
      * clean the data
      * @param $var
      * @return array|string
@@ -146,7 +204,7 @@ class Settings
         add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat', 55.6);
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
-        add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'retainfulLicensePage'));
+        add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'nextOrderCouponPage'));
         add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulLicensePage'));
         add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
     }
