@@ -21,6 +21,11 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
                 <input name="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>" type="text"
                        id="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>"
                        value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']; ?>" class="regular-text">
+                <p class="description">
+                    <?php
+                    echo sprintf(esc_html__('Get your App-id %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $this->api->app_url . 'settings">here</a>');
+                    ?>
+                </p>
             </td>
         </tr>
         <tr>
@@ -34,23 +39,28 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
                        id="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>"
                        value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret']; ?>"
                        class="regular-text">
+                <p class="description">
+                    <?php
+                    echo sprintf(esc_html__('Get your secret key %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $this->api->app_url . 'settings">here</a>');
+                    ?>
+                </p>
             </td>
         </tr>
         <tr>
             <th>
             </th>
             <td>
-                <button type="button" data-action="rnoc_connect_license"
-                        data-security="<?php echo wp_create_nonce('rnoc_connect_license') ?>"
-                        class="button button-primary"><?php echo (!$is_app_connected) ? __('Connect', RNOC_TEXT_DOMAIN) : __('Re-Connect', RNOC_TEXT_DOMAIN); ?></button>
+                <button type="button" data-action="validate_app_key" id="validate-app-id-and-secret"
+                        data-security="<?php echo wp_create_nonce('validate_app_key') ?>"
+                        class="button button-primary button-green"><?php echo (!$is_app_connected) ? __('Connect', RNOC_TEXT_DOMAIN) : __('Re-Connect', RNOC_TEXT_DOMAIN); ?></button>
                 <?php
                 if ($is_app_connected) {
                     ?>
                     <button type="button" id="disconnect-app-btn" data-action="rnoc_disconnect_license"
                             data-security="<?php echo wp_create_nonce('rnoc_disconnect_license') ?>"
                             class="button"><?= __('Dis-connect', RNOC_TEXT_DOMAIN) ?></button>
-                    <a href="<?php echo $api->app_url ?>" target="_blank"
-                       style="display: inline-block;font-size: 13px;padding: 6px 12px;text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;line-height:18px;"><?php echo __('Visit Your Dashboard', RNOC_TEXT_DOMAIN); ?></a>
+                    <a href="<?php echo $api->app_url ?>" target="_blank" class="button"
+                       style="text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;"><?php echo __('Visit Your Dashboard', RNOC_TEXT_DOMAIN); ?></a>
                     <br>
                     <?php
                 }

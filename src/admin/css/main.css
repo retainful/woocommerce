@@ -3,9 +3,11 @@
 [class*="option-retainful"] {
     font-family: DM Sans, sans-serif !important;
 }
+
 .cmb2-options-page {
     max-width: 100% !important;
 }
+
 .button-red {
     color: #fff !important;
     background-color: #d9534f !important;
@@ -13,6 +15,7 @@
     box-shadow: 0 1px 0 #d42d2a;
     text-decoration: none;
 }
+
 .button-green {
     color: #fff !important;
     background-color: #5cb85c !important;
@@ -20,9 +23,17 @@
     box-shadow: 0 1px 0 #3eae50;
     text-decoration: none;
 }
-p.submit{
-    text-align: right !important;
+.button{
+    padding: 8px !important;
 }
+
+.description{
+    color: #757575;
+    font-style: italic;
+    margin: 0;
+    padding-top: .5em;
+}
+
 .nav-tab-wrapper .nav-tab {
     padding: 15px 20px;
     background: #ffffff;
@@ -30,13 +41,15 @@ p.submit{
     line-height: 1;
     transition: all 0.2s;
 }
+
 .nav-tab-wrapper .nav-tab.nav-tab-active, .nav-tab-wrapper .nav-tab:hover {
     background: none;
     box-shadow: inset 0 3px 0 #ff7f45;
     border-top-color: #ff7f45;
     color: #ff7f45;
 }
-.cmb2-wrap input[type="text"], .cmb2-wrap input[type="number"] {
+
+input[type="text"], input[type="number"] {
     font-size: 14px;
     max-width: 100%;
     padding: 10px;
@@ -70,30 +83,33 @@ p.submit{
     border-spacing: 0;
     border-collapse: separate
 }
-.retainful_abandoned_table>thead>tr>td,
-.retainful_abandoned_table>thead>tr>th
-{
-    padding:14px 12px;
+
+.retainful_abandoned_table > thead > tr > td,
+.retainful_abandoned_table > thead > tr > th {
+    padding: 14px 12px;
 }
-.retainful_abandoned_table>tbody>tr>td,
-.retainful_abandoned_table>tbody>tr>th,
-.retainful_abandoned_table>tfoot>tr>td,
-.retainful_abandoned_table>tfoot>tr>th
-{
+
+.retainful_abandoned_table > tbody > tr > td,
+.retainful_abandoned_table > tbody > tr > th,
+.retainful_abandoned_table > tfoot > tr > td,
+.retainful_abandoned_table > tfoot > tr > th {
     padding: 18px 12px;
     border-top-width: 1px;
     border-top-style: solid;
 }
-.table-bordered>tbody>tr:first-child>td {
-    background:#ecf1fb;
+
+.table-bordered > tbody > tr:first-child > td {
+    background: #ecf1fb;
     color: #292b35;
     font-size: 14px;
     font-weight: bold;
-    padding:15px 12px;
+    padding: 15px 12px;
 }
-.retainful_abandoned_table{
+
+.retainful_abandoned_table {
     margin-bottom: 0;
 }
+
 .retainful_abandoned_table td, .retainful_abandoned_table th {
     padding: 10px;
     vertical-align: middle;
@@ -101,18 +117,22 @@ p.submit{
     font-weight: 600;
     color: #1e2b3d;
 }
+
 .retainful_abandoned_table .bg-light {
     background-color: #fff0e9;
 }
+
 .retainful_abandoned_table thead th {
     vertical-align: bottom;
     border-bottom: 0 solid #f9fbfc;
     border-top: 0 solid #f9fbfc;
 }
+
 .retainful_abandoned_table thead th, .retainful_abandoned_table th {
     color: #39424b;
     font-weight: 600;
 }
+
 .table-bordered {
     border: 1px solid #e6e6f2;
 }
@@ -132,44 +152,46 @@ p.submit{
 
 .retainful_abandoned_table tr.group,
 .retainful_abandoned_table tr.group:hover {
-    background-color: #5969ff ;
+    background-color: #5969ff;
     color: #fff;
     font-size: 18px;
 }
+
 .retainful_abandoned_table .status-dot {
     border-radius: 50px;
     display: inline-block;
     padding: 10px 15px;
     font-size: 13px;
 }
-.retainful_abandoned_table .in-prs-bg
-{
-    background-color:rgba(1, 152, 224, 0.20);
+
+.retainful_abandoned_table .in-prs-bg {
+    background-color: rgba(1, 152, 224, 0.20);
 }
-.retainful_abandoned_table .abd-bg
-{
-    background-color:#ffeaea;
+
+.retainful_abandoned_table .abd-bg {
+    background-color: #ffeaea;
 }
-.retainful_abandoned_table .rcd-bg
-{
+
+.retainful_abandoned_table .rcd-bg {
     background-color: #e0f7e9;
 }
-.retainful_abandoned_table .mr-1
-{
-    margin-right:7px;
+
+.retainful_abandoned_table .mr-1 {
+    margin-right: 7px;
 }
-.retainful_abandoned_table .in-prs-clr
-{
-    color:#0198e0;
+
+.retainful_abandoned_table .in-prs-clr {
+    color: #0198e0;
 }
-.retainful_abandoned_table .abd-clr
-{
-    color:#f13536;
+
+.retainful_abandoned_table .abd-clr {
+    color: #f13536;
 }
-.retainful_abandoned_table .rcd-clr
-{
-    color:#18c364;
+
+.retainful_abandoned_table .rcd-clr {
+    color: #18c364;
 }
+
 .cmb2-wrap .table_data_dp {
     display: block;
     width: 100%;
@@ -177,19 +199,20 @@ p.submit{
     padding: 0;
     margin: 0;
 }
-.cmb2-wrap .dataTables_info
-{
+
+.cmb2-wrap .dataTables_info {
     float: left;
     margin: 25px 0 20px;
     font-weight: 500;
     color: #525252;
 }
-.cmb2-wrap .pagination
-{
+
+.cmb2-wrap .pagination {
     margin: 0;
     padding: 0;
     float: right;
 }
+
 .cmb2-wrap .pagination ul {
     margin: 0;
     padding: 0;
@@ -198,11 +221,13 @@ p.submit{
     vertical-align: baseline;
     background: 0 0;
 }
+
 .cmb2-wrap .pagination li {
     display: inline;
     margin: 0;
     padding: 0;
 }
+
 .cmb2-wrap .pagination li a {
     border: 1px solid #dee6f7;
     color: #525252;
@@ -220,10 +245,12 @@ p.submit{
     font-weight: 600;
     border-radius: 3px;
 }
+
 .cmb2-wrap .pagination li a:hover {
-    background-color:#e2ecff;
+    background-color: #e2ecff;
     color: #333;
 }
+
 .cmb2-wrap .pagination li a.active {
     background-color: #f4f7fd;
     color: #333;
@@ -236,46 +263,53 @@ p.submit{
     border-radius: 4px;
     color: #fff;
 }
+
 .cmb2-wrap .btn-view {
     background: #0585f9;
     border: 1px solid #0585f9;
 }
+
 .cmb2-wrap .btn-danger {
-    background:#f13536;
-    border:1px solid #f13536;
+    background: #f13536;
+    border: 1px solid #f13536;
 }
+
 .cmb2-wrap .action-section .btn-view:hover {
     color: #0585f9;
-    border:1px solid #0585f9;
-    background:#fff;
+    border: 1px solid #0585f9;
+    background: #fff;
 }
+
 .cmb2-wrap .action-section .btn-danger:hover {
-    color: #f13536 ;
-    border:1px solid #f13536;
-    background:#fff;
+    color: #f13536;
+    border: 1px solid #f13536;
+    background: #fff;
 }
-.cmb2-wrap .email-section a
-{
+
+.cmb2-wrap .email-section a {
     font-weight: 600;
     color: #1e2b3d;
     text-decoration: none;
 }
-.email-sectiona a:hover{
+
+.email-sectiona a:hover {
     color: #1e2b3d;
 }
+
 .cmb2-wrap .btn_action {
     padding: 5px 6px;
     line-height: 20px;
     margin-right: 5px;
     border-radius: 3px;
 }
-.cmb2-wrap .dashicons_action
-{
+
+.cmb2-wrap .dashicons_action {
     text-decoration: none;
     font-size: 16px;
     line-height: 20px;
 }
-.cmb2-wrap .customer-type{
+
+.cmb2-wrap .customer-type {
     padding: 5px 10px;
     border-radius: 4px;
     color: #fff;
@@ -287,10 +321,12 @@ p.submit{
     bottom: 1px;
     display: inline-block;
 }
+
 .cmb2-wrap .user_dt {
     background: #0585f9;
     width: 55px;
 }
+
 .cmb2-wrap .guest_dt {
     background: #efa22d;
     width: 35px;

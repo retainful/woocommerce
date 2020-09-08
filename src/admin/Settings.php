@@ -64,6 +64,9 @@ class Settings
         return $url;
     }
 
+    /**
+     * render retainful license page
+     */
     function retainfulLicensePage()
     {
         $settings = get_option($this->slug . '_license', array());
@@ -78,7 +81,7 @@ class Settings
 
     function registerMenu()
     {
-        add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat');
+        add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat', 55.6);
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'retainfulLicensePage'));
@@ -1340,6 +1343,12 @@ class Settings
     {
         $asset_path = plugins_url('', __FILE__);
         wp_enqueue_script('retainful-app-main', $asset_path . '/js/app.js', array(), RNOC_VERSION);
+        wp_localize_script('retainful-app-main', 'retainful_admin', array(
+            'i10n' => array(
+                'please_wait' => __('Please wait...', RNOC_TEXT_DOMAIN)
+            ),
+            'ajax_endpoint' => admin_url('admin-ajax.php?action={{action}}&security={{security}}')
+        ));
         wp_enqueue_style('retainful-admin-css', $asset_path . '/css/main.css', array(), RNOC_VERSION);
     }
 

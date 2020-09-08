@@ -166,6 +166,7 @@ class Main
         $this->canActivateIPFilter();
         //Validate key
         add_action('wp_ajax_validate_app_key', array($this->rnoc, 'validateAppKey'));
+        add_action('wp_ajax_rnoc_disconnect_license', array($this->rnoc, 'disconnectLicense'));
         //Settings link
         add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
         $run_installation_externally = $this->admin->runAbandonedCartExternally();

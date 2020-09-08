@@ -39,7 +39,7 @@ class RetainfulApi
         );
         $response = $this->request($url, array(), 'post', $body, $headers);
         //$response = $this->request($this->domain . 'app/' . $api_key);
-        if (isset($response->success)) {
+        if (isset($response->success) && $response->success) {
             return $this->getPlanDetails($response);
         } else {
             return isset($response->message) ? $response->message : NULL;
