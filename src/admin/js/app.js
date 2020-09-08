@@ -85,6 +85,30 @@
             });
             $(this).attr('disabled', false);
         });
+        $(document).on('submit', '#retainful-settings-form', function (event) {
+            event.preventDefault();
+            let submit = $(this).find(':submit');
+            var action = submit.data('action');
+            var security = submit.data('security');
+            var url = retainful_admin.ajax_endpoint.replace("{{action}}", action).replace("{{security}}", security);
+            submit.attr('disabled', true);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                async: false,
+                dataType: "json",
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.data);
+                    }
+                },
+                error: function () {
+                    alert('Please try again later.');
+                }
+            });
+            submit.attr('disabled', false);
+        });
     });
 
 })(jQuery);

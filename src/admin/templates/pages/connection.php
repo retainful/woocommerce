@@ -8,7 +8,6 @@ $api = new \Rnoc\Retainful\library\RetainfulApi();
 $admin_settings = new Rnoc\Retainful\Admin\Settings();
 ?>
 <form id="retainful-license-form">
-    <input type="hidden" name="security" value="<?php echo wp_create_nonce('rnoc_save_retainful_license') ?>">
     <table class="form-table" role="presentation">
         <tbody>
         <tr>

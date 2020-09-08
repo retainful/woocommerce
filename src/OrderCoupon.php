@@ -61,20 +61,6 @@ class OrderCoupon
     }
 
     /**
-     * disconnect the app
-     */
-    function disconnectLicense()
-    {
-        check_ajax_referer('rnoc_disconnect_license', 'security');
-        $slug = $this->admin->slug;
-        //Save app id before validate key
-        $license_details = get_option($slug . '_license', array());
-        $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
-        update_option($slug . '_license', $license_details);
-        wp_send_json_success(__('App disconnected successfully!', RNOC_TEXT_DOMAIN));
-    }
-
-    /**
      * Add settings link
      * @param $links
      * @return array

@@ -79,11 +79,73 @@ class Settings
         require_once dirname(__FILE__) . '/templates/pages/connection.php';
     }
 
+    /**
+     * disconnect the app
+     */
+    function disconnectLicense()
+    {
+        check_ajax_referer('rnoc_disconnect_license', 'security');
+        $license_details = get_option($this->slug . '_license', array());
+        $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
+        update_option($this->slug . '_license', $license_details);
+        wp_send_json_success(__('App disconnected successfully!', RNOC_TEXT_DOMAIN));
+    }
+
+    /**
+     * retainful ac settings page
+     */
+    function retainfulSettingsPage()
+    {
+        $settings = get_option($this->slug . '_settings', array());
+        $default_settings = array(
+            RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
+            RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
+            RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status' => '0',
+            RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status' => '1',
+            RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
+            RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' => '0',
+            RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => '',
+            RNOC_PLUGIN_PREFIX . 'enable_ip_filter' => '0',
+            RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
+            RNOC_PLUGIN_PREFIX . 'enable_debug_log' => '0',
+            RNOC_PLUGIN_PREFIX . 'handle_storage_using' => 'woocommerce',
+        );
+        $settings = wp_parse_args($settings, $default_settings);
+        require_once dirname(__FILE__) . '/templates/pages/settings.php';
+    }
+
+    /**
+     * clean the data
+     * @param $var
+     * @return array|string
+     */
+    function clean($var)
+    {
+        if (is_array($var)) {
+            return array_map('wc_clean', $var);
+        } else {
+            return is_scalar($var) ? sanitize_text_field($var) : $var;
+        }
+    }
+
+    /**
+     * save the settings
+     */
+    function saveAcSettings()
+    {
+        $data = $this->clean($_POST);
+        update_option($this->slug . '_settings', $data);
+        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+    }
+
+    /**
+     * register plugin related menus
+     */
     function registerMenu()
     {
         add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat', 55.6);
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
-        add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulLicensePage'));
+        add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
         add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulLicensePage'));
         add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
