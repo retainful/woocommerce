@@ -399,7 +399,18 @@ require_once "tabs.php";
                 <td>
                     <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products[]'; ?>"
                             id="exclude_generating_coupon_for_products" multiple
-                            class="regular-text multi-select">
+                            class="wc-product-search"
+                            data-placeholder="<?php esc_attr_e('Search for a product&hellip;', RNOC_TEXT_DOMAIN); ?>"
+                            data-action="woocommerce_json_search_products_and_variations">
+                        <?php
+                        $product_ids = $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products'];
+                        foreach ($product_ids as $product_id) {
+                            $product = wc_get_product($product_id);
+                            if (is_object($product)) {
+                                echo '<option value="' . esc_attr($product_id) . '"' . selected(true, true, false) . '>' . htmlspecialchars(wp_kses_post($product->get_formatted_name())) . '</option>';
+                            }
+                        }
+                        ?>
                     </select>
                     <p class="description">
                         <?php
@@ -543,7 +554,18 @@ require_once "tabs.php";
                 <td>
                     <select name="<?php echo RNOC_PLUGIN_PREFIX . 'products[]'; ?>"
                             id="products" multiple
-                            class="regular-text multi-select">
+                            class="wc-product-search"
+                            data-placeholder="<?php esc_attr_e('Search for a product&hellip;', RNOC_TEXT_DOMAIN); ?>"
+                            data-action="woocommerce_json_search_products_and_variations">
+                        <?php
+                        $product_ids = $settings[RNOC_PLUGIN_PREFIX . 'products'];
+                        foreach ($product_ids as $product_id) {
+                            $product = wc_get_product($product_id);
+                            if (is_object($product)) {
+                                echo '<option value="' . esc_attr($product_id) . '"' . selected(true, true, false) . '>' . htmlspecialchars(wp_kses_post($product->get_formatted_name())) . '</option>';
+                            }
+                        }
+                        ?>
                     </select>
                     <p class="description">
                         <?php
@@ -561,7 +583,18 @@ require_once "tabs.php";
                 <td>
                     <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exclude_products[]'; ?>"
                             id="exclude_products" multiple
-                            class="regular-text multi-select">
+                            class="wc-product-search"
+                            data-placeholder="<?php esc_attr_e('Search for a product&hellip;', RNOC_TEXT_DOMAIN); ?>"
+                            data-action="woocommerce_json_search_products_and_variations">
+                        <?php
+                        $product_ids = $settings[RNOC_PLUGIN_PREFIX . 'exclude_products'];
+                        foreach ($product_ids as $product_id) {
+                            $product = wc_get_product($product_id);
+                            if (is_object($product)) {
+                                echo '<option value="' . esc_attr($product_id) . '"' . selected(true, true, false) . '>' . htmlspecialchars(wp_kses_post($product->get_formatted_name())) . '</option>';
+                            }
+                        }
+                        ?>
                     </select>
                     <p class="description">
                         <?php
