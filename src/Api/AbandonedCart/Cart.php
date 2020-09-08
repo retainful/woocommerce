@@ -199,6 +199,8 @@ class Cart extends RestApi
     function getAbandonedCartJsEngineUrl()
     {
         return apply_filters('rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION);
+        //$path = plugin_dir_url(RNOC_FILE);
+        //return $path.'/src/assets/js/abandoned_cart.min.js';
     }
 
     /**

@@ -367,7 +367,7 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             let tracking_content = '<div id="' + retainful_cart_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retainful_cart_data.cart) + '</div>';
             $(tracking_content).appendTo('body');
         }
-        $('.wc-block-components-checkout-form input#phone,.wc-block-components-checkout-form input#email,input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone').on('change', function () {
+        $('input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone,.wc-block-components-checkout-form input#phone,.wc-block-components-checkout-form input#email').on('change', function () {
             var rnoc_phone = $("#billing_phone").val();
             var rnoc_email = $("#billing_email").val();
 
