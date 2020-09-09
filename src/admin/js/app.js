@@ -55,8 +55,8 @@
                     }
                     if (response.success) {
                         message.html('<p style="color:green;">' + response.success + '</p>');
-                        window.location.reload();
                     }
+                    window.location.reload();
                 },
                 error: function () {
                     alert('Please try again later.');

@@ -15,14 +15,6 @@
       "Rnoc\\Retainful\\Premium\\": "src/premium/",
       "Rnoc\\Retainful\\Integrations\\": "src/integrations/",
       "Rnoc\\Retainful\\Library\\": "src/library/"
-    },
-    "files": [
-      "src/fields/cmb-field-post-search-ajax/cmb-field-post-search-ajax.php",
-      "src/fields/cmb-field-select2/cmb-field-select2.php",
-      "src/fields/cmb-field-unlock-features/cmb-field-unlock-features.php",
-      "src/fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php",
-      "src/fields/cmb-field-conditional-fields/cmb-field-conditional-fields.php",
-      "src/fields/cmb-field-tabs/cmb-field-tabs.php"
-    ]
+    }
   }
 }

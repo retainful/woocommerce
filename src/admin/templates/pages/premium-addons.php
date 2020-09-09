@@ -1,32 +1,13 @@
 <?php
-if (!defined('ABSPATH')) exit;
-
-class CMB2_Field_Premium_Addon_List
-{
-    /**
-     * Initialize the plugin by hooking into CMB2
-     */
-    function __construct()
-    {
-        add_filter('cmb2_render_premium_addon_list', array($this, 'render_premium_addon_list'), 10, 5);
-    }
-
-    /**
-     * Enqueue scripts and styles
-     */
-    public function setupAdminScripts()
-    {
-        $asset_path = apply_filters('cmb2_field_abandoned_cart_dashboard_asset_path', plugins_url('', __FILE__));
-        wp_enqueue_style('abandoned-cart-email-template', $asset_path . '/css/main.css', array(), RNOC_VERSION);
-    }
-
-    /**
-     * Render select box field
-     */
-    function render_premium_addon_list($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
-    {
-        $this->setupAdminScripts();
-        $available_addon_list = apply_filters('rnoc_get_premium_addon_list', array());
+/**
+ * @var $available_addon_list array
+ * @var $base_url string
+ */
+require_once "tabs.php";
+?>
+<form id="retainful-settings-form">
+    <div class="card">
+        <?php
         if (!empty($available_addon_list)) {
             ?>
             <div class="rnoc-grid-container retainful_premium_card_box">
@@ -41,13 +22,16 @@ class CMB2_Field_Premium_Addon_List
                                 <i class="dashicons <?php echo $addon->icon(); ?> retain-icon-premium"></i>
                             </div>
                             <div class="header retainful_premium_heading"><?php echo $title; ?></div>
-                            <div class="retainful_premium_para"><p><?php
+                            <div class="retainful_premium_para">
+                                <p><?php
                                     echo $addon->description();
-                                    ?></p>
+                                    ?>
+                                </p>
                             </div>
                             <div class="footer">
-                                <button type="button" class="view-addon-btn button button-premium"
-                                        data-slug="<?php echo $slug; ?>"><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></button>
+                                <a class="view-addon-btn button button-premium"
+                                   href="<?php echo add_query_arg(array('add-on' => $slug), $base_url) ?>"
+                                ><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></a>
                             </div>
                         </div>
                         <?php
@@ -103,26 +87,5 @@ class CMB2_Field_Premium_Addon_List
             <?php
         }
         ?>
-        <script>
-            jQuery('.view-addon-btn').click(function () {
-                var slug = jQuery(this).data('slug');
-                jQuery('#<?php echo RNOC_PLUGIN_PREFIX; ?>retainful_premium_addon-tab-' + slug).trigger('click');
-            });
-            jQuery('.cmb-tabs div').click(function () {
-                var save_btn = jQuery('#submit-cmb');
-                var save_btn_top = jQuery('#submit-cmb-top');
-                var id = jQuery(this).attr('id');
-                if (id === "rnoc_retainful_premium_addon-tab-general-settings") {
-                    save_btn.hide();
-                    save_btn_top.hide();
-                } else {
-                    save_btn.show();
-                    save_btn_top.show();
-                }
-            });
-        </script>
-        <?php
-    }
-}
-
-new CMB2_Field_Premium_Addon_List();
+    </div>
+</form>

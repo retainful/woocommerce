@@ -169,6 +169,22 @@ class Settings
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
 
+    function retainfulPremiumAddOnsPage()
+    {
+        $page_slug = $this->slug . '_premium';
+        $available_addon_list = apply_filters('rnoc_get_premium_addon_list', array());
+        $base_url = admin_url('admin.php?page=' . $page_slug);
+        if (isset($_GET['add-on'])) {
+            $settings = get_option($page_slug, array());
+            $default_settings = array();
+            $settings = wp_parse_args($settings, $default_settings);
+            $add_on_slug = sanitize_text_field($_GET['add-on']);
+            require_once dirname(__FILE__) . '/templates/pages/premium-addon-settings.php';
+        } else {
+            require_once dirname(__FILE__) . '/templates/pages/premium-addons.php';
+        }
+    }
+
     /**
      * next order coupon page
      */
@@ -259,7 +275,7 @@ class Settings
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
         add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'nextOrderCouponPage'));
-        add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulLicensePage'));
+        add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
         add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
     }
 

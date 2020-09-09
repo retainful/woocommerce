@@ -23,8 +23,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         function init()
         {
             if (is_admin()) {
-                add_filter('rnoc_premium_addon_tab', array($this, 'premiumAddonTab'));
-                add_filter('rnoc_premium_addon_tab_content', array($this, 'premiumAddonTabContent'));
+                add_action('rnoc_premium_addon_settings_page_' . $this->slug, array($this, 'premiumAddonTabContent'), 10, 3);
             }
             add_action('wp_ajax_rnoc_coupon_timer_expired', array($this, 'timerExpired'));
             add_action('wp_ajax_nopriv_rnoc_coupon_timer_expired', array($this, 'timerExpired'));
@@ -329,40 +328,16 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         }
 
         /**
-         * add the settings tabs
          * @param $settings
-         * @return array
+         * @param $base_url
+         * @param $add_on_slug
          */
-        function premiumAddonTab($settings)
+        function premiumAddonTabContent($settings, $base_url, $add_on_slug)
         {
-            $settings[] = array(
-                'id' => $this->slug,
-                'icon' => $this->icon,
-                'title' => __('Coupon Timer', RNOC_TEXT_DOMAIN),
-                'fields' => array(
-                    RNOC_PLUGIN_PREFIX . 'enable_coupon_timer',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message',
-                    RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings',
-                ),
-            );
-            return $settings;
-        }
-
-        /**
-         * add settings field to render
-         * @param $general_settings
-         * @return mixed
-         */
-        function premiumAddonTabContent($general_settings)
-        {
-            $general_settings->add_field(array(
+            if ($this->slug() == $add_on_slug) {
+                echo 'content-imported';
+            }
+            /*$general_settings->add_field(array(
                 'name' => __('Enable Coupon timer?', RNOC_TEXT_DOMAIN),
                 'id' => RNOC_PLUGIN_PREFIX . 'enable_coupon_timer',
                 'type' => 'radio_inline',
@@ -680,7 +655,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 'type' => 'colorpicker',
                 'default' => '#000000'
             ));
-            return $general_settings;
+            return $general_settings;*/
         }
     }
 }
