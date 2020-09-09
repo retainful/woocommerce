@@ -123,7 +123,7 @@ class Main
         add_filter('rnoc_need_to_run_ac_in_cloud', array($this, 'needToRunAbandonedCartExternally'));
         //Activate CMB2 functions
         add_action('admin_menu', array($this->admin, 'registerMenu'));
-        $this->admin->renderPage();
+        $this->admin->initAdminPageStyles();
         new Currency();
         if ($this->admin->isNextOrderCouponEnabled()) {
             //Get events
