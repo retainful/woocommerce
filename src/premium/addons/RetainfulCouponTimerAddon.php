@@ -23,7 +23,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         function init()
         {
             if (is_admin()) {
-                add_action('rnoc_premium_addon_settings_page_' . $this->slug, array($this, 'premiumAddonTabContent'), 10, 3);
+                add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
             }
             add_action('wp_ajax_rnoc_coupon_timer_expired', array($this, 'timerExpired'));
             add_action('wp_ajax_nopriv_rnoc_coupon_timer_expired', array($this, 'timerExpired'));
@@ -336,6 +336,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         {
             if ($this->slug() == $add_on_slug) {
                 $pages = $this->getPageLists();
+                $coupon_codes = $this->getWooCouponCodes();
                 ?>
                 <table class="form-table" role="presentation">
                     <tbody>
@@ -373,10 +374,21 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
-                                   type="text" class="regular-text"
-                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon']; ?>">
+                            <select name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
+                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
+                                    class="rnoc-select2-select">
+                                <?php
+                                if (!empty($coupon_codes)) {
+                                    foreach ($coupon_codes as $code => $label) {
+                                        ?>
+                                        <option value="<?php echo $code ?>" <?php if ($code == $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon']) {
+                                            echo "selected";
+                                        } ?>><?php echo $label; ?></option>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </select>
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons
@@ -386,7 +398,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     <tr>
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'; ?>"><?php
-                                esc_html_e('Choose the coupon code', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Custom pages to display the coupon timer', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
                         <td>
@@ -405,10 +417,6 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                                 }
                                 ?>
                             </select>
-                            <p class="description">
-                                <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
-                                please create the coupon code in WooCommerce -> Coupons
-                            </p>
                         </td>
                     </tr>
                     <tr>

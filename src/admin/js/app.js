@@ -109,7 +109,8 @@
             });
             submit.attr('disabled', false);
         })
-        $('.rnoc-multi-select').select2({width: '100%', placeholder: 'Select Values'});
+        $('.rnoc-multi-select').select2({width: '100%', placeholder: 'Select values'});
+        $('.rnoc-select2-select').select2({width: '100%', placeholder: 'Select value'});
         $('.wc-product-search').each(function () {
             var select2_args = {
                 width: '100%',

@@ -220,6 +220,40 @@ class Settings
                     RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
                     RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000'
                 )),
+                RNOC_PLUGIN_PREFIX . 'need_modal' => '0',
+                RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory' => '1',
+                RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action' => '1',
+                RNOC_PLUGIN_PREFIX . 'close_btn_behavior' => 'just_close',
+                RNOC_PLUGIN_PREFIX . 'modal_show_popup_until' => '1',
+                RNOC_PLUGIN_PREFIX . 'modal_display_pages' => array(),
+                RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class' => '',
+                RNOC_PLUGIN_PREFIX . 'modal_design_settings' => array(0 => array(
+                    RNOC_PLUGIN_PREFIX . 'modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'modal_heading_color' => '#000000',
+                    RNOC_PLUGIN_PREFIX . 'modal_email_placeholder' => __('Email address', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_text' => __('Add to Cart', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_color' => '#ffffff',
+                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color' => '#f27052',
+                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color' => '#f27052',
+                    RNOC_PLUGIN_PREFIX . 'modal_bg_color' => '#F8F0F0',
+                    RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color' => '#f27052',
+                    RNOC_PLUGIN_PREFIX . 'modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
+                )),
+                RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance' => array(0 => array(
+                    RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
+                    RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
+                )),
+                RNOC_PLUGIN_PREFIX . 'modal_coupon_settings' => array(0 => array(
+                    RNOC_PLUGIN_PREFIX . 'need_coupon' => '0',
+                    RNOC_PLUGIN_PREFIX . 'woo_coupon' => '',
+                    RNOC_PLUGIN_PREFIX . 'modal_sub_heading' => __('Get a discount in your email!', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color' => '#333333',
+                    RNOC_PLUGIN_PREFIX . 'show_woo_coupon' => 'send_via_email',
+                    RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template' => '',
+                    RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'coupon_mail_template' => '',
+                )),
             );
             $settings = wp_parse_args($settings, $default_settings);
             $add_on_slug = sanitize_text_field($_GET['add-on']);
