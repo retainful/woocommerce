@@ -14,7 +14,8 @@ require_once "tabs.php";
             ?>
             <ul class="rnoc-premium-addon-nav">
                 <li>
-                    <a class="" href="<?php echo $base_url; ?>"><i class="dashicons dashicons-admin-plugins"></i>&nbsp;Add-ons list</a>
+                    <a class="" href="<?php echo $base_url; ?>"><i class="dashicons dashicons-admin-plugins"></i>&nbsp;Add-ons
+                        list</a>
                 </li>
                 <?php
                 foreach ($available_addon_list as $addon) {
@@ -44,6 +45,19 @@ require_once "tabs.php";
         <?php
         do_action('rnoc_premium_addon_settings_page_' . $add_on_slug, $settings, $base_url, $add_on_slug);
         ?>
+        <table class="form-table">
+            <tbody>
+            <tr>
+                <th>
+                </th>
+                <td>
+                    <button type="submit" data-action="rnoc_save_noc_settings"
+                            data-security="<?php echo wp_create_nonce('rnoc_save_noc_settings') ?>"
+                            class="button button-primary"><?php esc_html_e('save', RNOC_TEXT_DOMAIN); ?></button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
     <button type="submit" data-action="rnoc_save_noc_settings"
             data-security="<?php echo wp_create_nonce('rnoc_save_noc_settings') ?>"

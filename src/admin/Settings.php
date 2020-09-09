@@ -176,7 +176,51 @@ class Settings
         $base_url = admin_url('admin.php?page=' . $page_slug);
         if (isset($_GET['add-on'])) {
             $settings = get_option($page_slug, array());
-            $default_settings = array();
+            $default_settings = array(
+                RNOC_PLUGIN_PREFIX . 'enable_coupon_timer' => '1',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon' => '',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages' => array(),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon' => 'automatically',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time' => '15',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message' => __('Sorry! Instant Offer has expired.', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload' => '0',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings' => array(0 => array(
+                    RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
+                    RNOC_PLUGIN_PREFIX . 'top_bottom_position' => 'top',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
+                    RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
+                    RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
+                    RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
+                )),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings' => array(0 => array(
+                    RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
+                    RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
+                    RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
+                    RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
+                )),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings' => array(0 => array(
+                    RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
+                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000'
+                )),
+            );
             $settings = wp_parse_args($settings, $default_settings);
             $add_on_slug = sanitize_text_field($_GET['add-on']);
             require_once dirname(__FILE__) . '/templates/pages/premium-addon-settings.php';
@@ -812,6 +856,8 @@ class Settings
             'ajax_url' => admin_url('admin-ajax.php'),
         ));
         wp_enqueue_style('retainful-admin-css', $asset_path . '/css/main.css', array(), RNOC_VERSION);
+        wp_enqueue_style('wp-color-picker');
+        wp_enqueue_script('wp-color-picker');
     }
 
     /**

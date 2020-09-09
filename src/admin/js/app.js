@@ -151,6 +151,7 @@
             };
             $(this).select2(select2_args);
         });
+        $('.rnoc-color-field').wpColorPicker();
     });
 
 })(jQuery);
