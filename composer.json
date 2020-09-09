@@ -2,7 +2,6 @@
   "name": "retainful/woocommerce",
   "description": "Simple plugin to give coupons for users next order",
   "require": {
-    "cmb2/cmb2": "^2.5.1",
     "jaybizzle/laravel-crawler-detect": "1.*",
     "ext-openssl": "*",
     "ext-json": "*"
@@ -18,8 +17,6 @@
       "Rnoc\\Retainful\\Library\\": "src/library/"
     },
     "files": [
-      "vendor/cmb2/cmb2/init.php",
-      "src/fields/cmb-field-retainful-app/cmb-field-retainful-app.php",
       "src/fields/cmb-field-post-search-ajax/cmb-field-post-search-ajax.php",
       "src/fields/cmb-field-select2/cmb-field-select2.php",
       "src/fields/cmb-field-unlock-features/cmb-field-unlock-features.php",

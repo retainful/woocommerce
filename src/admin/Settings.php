@@ -169,6 +169,8 @@ class Settings
         $order_status = $this->availableOrderStatuses();
         $user_roles = $this->getUserRoles();
         $categories = $this->getCategories();
+        $is_pro_plan = $this->isProPlan();
+        $unlock_premium_link = $this->unlockPremiumLink();
         require_once dirname(__FILE__) . '/templates/pages/next-order-coupon.php';
     }
 
@@ -1462,14 +1464,32 @@ class Settings
     function addScript()
     {
         $asset_path = plugins_url('', __FILE__);
+        //product search select
+        wp_enqueue_script('rnoc-select2-js', $this->getWooPluginUrl() . '/assets/js/select2/select2.full.min.js', array('jquery'));
+        wp_enqueue_style('rnoc-select2-css', $this->getWooPluginUrl() . '/assets/css/select2.css');
+        wp_enqueue_script('woocommerce_admin');
         wp_enqueue_script('retainful-app-main', $asset_path . '/js/app.js', array(), RNOC_VERSION);
         wp_localize_script('retainful-app-main', 'retainful_admin', array(
             'i10n' => array(
                 'please_wait' => __('Please wait...', RNOC_TEXT_DOMAIN)
             ),
-            'ajax_endpoint' => admin_url('admin-ajax.php?action={{action}}&security={{security}}')
+            'ajax_endpoint' => admin_url('admin-ajax.php?action={{action}}&security={{security}}'),
+            'search_products_nonce' => wp_create_nonce('search-products'),
+            'ajax_url' => admin_url('admin-ajax.php'),
         ));
         wp_enqueue_style('retainful-admin-css', $asset_path . '/css/main.css', array(), RNOC_VERSION);
+    }
+
+    /**
+     * get woocommerce plugin url
+     * @return string|null
+     */
+    function getWooPluginUrl()
+    {
+        if (function_exists('WC')) {
+            return WC()->plugin_url();
+        }
+        return NULL;
     }
 
     /**

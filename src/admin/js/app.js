@@ -108,6 +108,48 @@
                 }
             });
             submit.attr('disabled', false);
+        })
+        $('.rnoc-multi-select').select2({width: '100%', placeholder: 'Select Values'});
+        $('.wc-product-search').each(function () {
+            var select2_args = {
+                width: '100%',
+                allowClear: ($(this).data('allow_clear')),
+                placeholder: $(this).data('placeholder'),
+                minimumInputLength: $(this).data('minimum_input_length') ? $(this).data('minimum_input_length') : '3',
+                escapeMarkup: function (m) {
+                    return m;
+                },
+                ajax: {
+                    url: retainful_admin.ajax_url,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term,
+                            action: $(this).data('action') || 'woocommerce_json_search_products_and_variations',
+                            security: retainful_admin.search_products_nonce,
+                            exclude: $(this).data('exclude'),
+                            exclude_type: $(this).data('exclude_type'),
+                            include: $(this).data('include'),
+                            limit: $(this).data('limit'),
+                            display_stock: $(this).data('display_stock')
+                        };
+                    },
+                    processResults: function (data) {
+                        var terms = [];
+                        if (data) {
+                            $.each(data, function (id, text) {
+                                terms.push({id: id, text: text});
+                            });
+                        }
+                        return {
+                            results: terms
+                        };
+                    },
+                    cache: true
+                }
+            };
+            $(this).select2(select2_args);
         });
     });
 

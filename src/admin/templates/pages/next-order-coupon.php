@@ -6,8 +6,10 @@
  * @var $user_roles array
  * @var $categories array
  * @var $is_app_connected bool
+ * @var $is_pro_plan bool
  * @var $apply_coupon_for array
  * @var $display_coupon_after array
+ * @var $unlock_premium_link string
  */
 require_once "tabs.php";
 ?>
@@ -299,7 +301,7 @@ require_once "tabs.php";
                 <td>
                     <select name="<?php echo RNOC_PLUGIN_PREFIX . 'preferred_order_status[]'; ?>"
                             id="preferred_order_status" multiple
-                            class="regular-text multi-select">
+                            class="rnoc-multi-select">
                         <?php
                         if (!empty($order_status)) {
                             foreach ($order_status as $key => $label) {
@@ -330,26 +332,34 @@ require_once "tabs.php";
                     </label>
                 </th>
                 <td>
-                    <select name="<?php echo RNOC_PLUGIN_PREFIX . 'preferred_user_roles[]'; ?>"
-                            id="preferred_user_roles" multiple
-                            class="regular-text">
-                        <?php
-                        if (!empty($user_roles)) {
-                            foreach ($user_roles as $key => $label) {
-                                ?>
-                                <option value="<?php echo $key; ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'preferred_user_roles'])) {
-                                    echo "selected";
-                                } ?>><?php echo $label; ?></option>
-                                <?php
+                    <?php
+                    if ($is_pro_plan) {
+                        ?>
+                        <select name="<?php echo RNOC_PLUGIN_PREFIX . 'preferred_user_roles[]'; ?>"
+                                id="preferred_user_roles" multiple
+                                class="rnoc-multi-select">
+                            <?php
+                            if (!empty($user_roles)) {
+                                foreach ($user_roles as $key => $label) {
+                                    ?>
+                                    <option value="<?php echo $key; ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'preferred_user_roles'])) {
+                                        echo "selected";
+                                    } ?>><?php echo $label; ?></option>
+                                    <?php
+                                }
                             }
-                        }
-                        ?>
-                    </select>
-                    <p class="description">
+                            ?>
+                        </select>
+                        <p class="description">
+                            <?php
+                            esc_html_e('Coupon codes will generate only for the selected user roles. By default coupon code will generate for all user roles.', RNOC_TEXT_DOMAIN);
+                            ?>
+                        </p>
                         <?php
-                        esc_html_e('Coupon codes will generate only for the selected user roles. By default coupon code will generate for all user roles.', RNOC_TEXT_DOMAIN);
-                        ?>
-                    </p>
+                    } else {
+                        echo $unlock_premium_link;
+                    }
+                    ?>
                 </td>
             </tr>
             <tr>
@@ -359,16 +369,24 @@ require_once "tabs.php";
                         ?><span class="premium-label">Premium</span></label>
                 </th>
                 <td>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'limit_per_user'; ?>"
-                           type="number"
-                           id="limit_per_user"
-                           value="<?php echo intval($settings[RNOC_PLUGIN_PREFIX . 'limit_per_user']); ?>"
-                           class="regular-text">
-                    <p class="description">
-                        <?php
-                        esc_html_e('In order to maximize repeat purchases, you should send one unique coupon with every purchase for the next order. However, if you only want the customer to get next order coupons for 5 times in his life, you can set it to 5. In this case, the customer will receive the coupon only for 5 of his orders. starting 6th order, he will not receive the coupon', RNOC_TEXT_DOMAIN);
+                    <?php
+                    if ($is_pro_plan) {
                         ?>
-                    </p>
+                        <input name="<?php echo RNOC_PLUGIN_PREFIX . 'limit_per_user'; ?>"
+                               type="number"
+                               id="limit_per_user"
+                               value="<?php echo intval($settings[RNOC_PLUGIN_PREFIX . 'limit_per_user']); ?>"
+                               class="regular-text">
+                        <p class="description">
+                            <?php
+                            esc_html_e('In order to maximize repeat purchases, you should send one unique coupon with every purchase for the next order. However, if you only want the customer to get next order coupons for 5 times in his life, you can set it to 5. In this case, the customer will receive the coupon only for 5 of his orders. starting 6th order, he will not receive the coupon', RNOC_TEXT_DOMAIN);
+                            ?>
+                        </p>
+                        <?php
+                    } else {
+                        echo $unlock_premium_link;
+                    }
+                    ?>
                 </td>
             </tr>
             <tr>
@@ -378,16 +396,24 @@ require_once "tabs.php";
                         ?><span class="premium-label">Premium</span></label>
                 </th>
                 <td>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'minimum_sub_total'; ?>"
-                           type="number"
-                           id="minimum_sub_total"
-                           value="<?php echo intval($settings[RNOC_PLUGIN_PREFIX . 'minimum_sub_total']); ?>"
-                           class="regular-text">
-                    <p class="description">
-                        <?php
-                        esc_html_e('Coupon will generate only if the order total greater then or equal to the given value. Leave empty or put 0 for no restriction.', RNOC_TEXT_DOMAIN);
+                    <?php
+                    if ($is_pro_plan) {
                         ?>
-                    </p>
+                        <input name="<?php echo RNOC_PLUGIN_PREFIX . 'minimum_sub_total'; ?>"
+                               type="number"
+                               id="minimum_sub_total"
+                               value="<?php echo intval($settings[RNOC_PLUGIN_PREFIX . 'minimum_sub_total']); ?>"
+                               class="regular-text">
+                        <p class="description">
+                            <?php
+                            esc_html_e('Coupon will generate only if the order total greater then or equal to the given value. Leave empty or put 0 for no restriction.', RNOC_TEXT_DOMAIN);
+                            ?>
+                        </p>
+                        <?php
+                    } else {
+                        echo $unlock_premium_link;
+                    }
+                    ?>
                 </td>
             </tr>
             <tr>
@@ -397,26 +423,34 @@ require_once "tabs.php";
                         ?><span class="premium-label">Premium</span></label>
                 </th>
                 <td>
-                    <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products[]'; ?>"
-                            id="exclude_generating_coupon_for_products" multiple
-                            class="wc-product-search"
-                            data-placeholder="<?php esc_attr_e('Search for a product&hellip;', RNOC_TEXT_DOMAIN); ?>"
-                            data-action="woocommerce_json_search_products_and_variations">
-                        <?php
-                        $product_ids = $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products'];
-                        foreach ($product_ids as $product_id) {
-                            $product = wc_get_product($product_id);
-                            if (is_object($product)) {
-                                echo '<option value="' . esc_attr($product_id) . '"' . selected(true, true, false) . '>' . htmlspecialchars(wp_kses_post($product->get_formatted_name())) . '</option>';
+                    <?php
+                    if ($is_pro_plan) {
+                        ?>
+                        <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products[]'; ?>"
+                                id="exclude_generating_coupon_for_products" multiple
+                                class="wc-product-search"
+                                data-placeholder="<?php esc_attr_e('Search for a product&hellip;', RNOC_TEXT_DOMAIN); ?>"
+                                data-action="woocommerce_json_search_products_and_variations">
+                            <?php
+                            $product_ids = $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products'];
+                            foreach ($product_ids as $product_id) {
+                                $product = wc_get_product($product_id);
+                                if (is_object($product)) {
+                                    echo '<option value="' . esc_attr($product_id) . '"' . selected(true, true, false) . '>' . htmlspecialchars(wp_kses_post($product->get_formatted_name())) . '</option>';
+                                }
                             }
-                        }
-                        ?>
-                    </select>
-                    <p class="description">
+                            ?>
+                        </select>
+                        <p class="description">
+                            <?php
+                            esc_html_e('Coupon code will not be generated when these products were found in the order!', RNOC_TEXT_DOMAIN);
+                            ?>
+                        </p>
                         <?php
-                        esc_html_e('Coupon code will not be generated when these products were found in the order!', RNOC_TEXT_DOMAIN);
-                        ?>
-                    </p>
+                    } else {
+                        echo $unlock_premium_link;
+                    }
+                    ?>
                 </td>
             </tr>
             <tr>
@@ -430,26 +464,34 @@ require_once "tabs.php";
                     </label>
                 </th>
                 <td>
-                    <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories[]'; ?>"
-                            id="exclude_generating_coupon_for_categories" multiple
-                            class="regular-text">
-                        <?php
-                        if (!empty($categories)) {
-                            foreach ($categories as $key => $label) {
-                                ?>
-                                <option value="<?php echo $key; ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories'])) {
-                                    echo "selected";
-                                } ?>><?php echo $label; ?></option>
-                                <?php
+                    <?php
+                    if ($is_pro_plan) {
+                        ?>
+                        <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories[]'; ?>"
+                                id="exclude_generating_coupon_for_categories" multiple
+                                class="rnoc-multi-select">
+                            <?php
+                            if (!empty($categories)) {
+                                foreach ($categories as $key => $label) {
+                                    ?>
+                                    <option value="<?php echo $key; ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories'])) {
+                                        echo "selected";
+                                    } ?>><?php echo $label; ?></option>
+                                    <?php
+                                }
                             }
-                        }
-                        ?>
-                    </select>
-                    <p class="description">
+                            ?>
+                        </select>
+                        <p class="description">
+                            <?php
+                            esc_html_e('Next order coupon will NOT be generated if an order has products from the selected categories.', RNOC_TEXT_DOMAIN);
+                            ?>
+                        </p>
                         <?php
-                        esc_html_e('Next order coupon will NOT be generated if an order has products from the selected categories.', RNOC_TEXT_DOMAIN);
-                        ?>
-                    </p>
+                    } else {
+                        echo $unlock_premium_link;
+                    }
+                    ?>
                 </td>
             </tr>
             <tr>
@@ -613,7 +655,7 @@ require_once "tabs.php";
                 <td>
                     <select name="<?php echo RNOC_PLUGIN_PREFIX . 'product_categories[]'; ?>"
                             id="product_categories" multiple
-                            class="regular-text">
+                            class="rnoc-multi-select">
                         <?php
                         if (!empty($categories)) {
                             foreach ($categories as $key => $label) {
@@ -643,7 +685,7 @@ require_once "tabs.php";
                 <td>
                     <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exclude_product_categories[]'; ?>"
                             id="exclude_product_categories" multiple
-                            class="regular-text">
+                            class="rnoc-multi-select">
                         <?php
                         if (!empty($categories)) {
                             foreach ($categories as $key => $label) {
