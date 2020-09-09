@@ -22,6 +22,9 @@ class OrderCoupon
     function validateAppKey()
     {
         check_ajax_referer('validate_app_key', 'security');
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error('security breach');
+        }
         $is_production = apply_filters('rnoc_is_production_plugin', true);
         if (!$is_production) {
             wp_send_json_error('You can only change you App-Id and Secret key in production store!', 500);

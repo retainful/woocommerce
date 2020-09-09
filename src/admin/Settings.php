@@ -85,6 +85,9 @@ class Settings
     function disconnectLicense()
     {
         check_ajax_referer('rnoc_disconnect_license', 'security');
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error('security breach');
+        }
         $license_details = get_option($this->slug . '_license', array());
         $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
         update_option($this->slug . '_license', $license_details);
@@ -115,15 +118,49 @@ class Settings
     }
 
     /**
-     * save the settings
+     * sanitize the basic html tags
+     * @param $html
+     * @return mixed|void
+     */
+    function sanitizeBasicHtml($html)
+    {
+        $allowed_html = array();
+        $tags = array(
+            'div', 'a', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'b', 'strong', 'i', 'img', 'br'
+        );
+        foreach ($tags as $tag) {
+            $allowed_html[$tag] = array(
+                'class' => array(),
+                'id' => array(),
+                'style' => array()
+            );
+            if ($tag == 'a') {
+                $allowed_html[$tag]['href'] = array();
+            }
+        }
+        $allowed_html = apply_filters('rnoc_sanitize_allowed_basic_html_tags', $allowed_html);
+        $sanitized_html = wp_kses($html, $allowed_html);
+        return apply_filters('rnoc_sanitize_basic_html', $sanitized_html, $html, $allowed_html);
+    }
+
+    /**
+     * save the next order coupon settings
      */
     function saveNocSettings()
     {
+        check_ajax_referer('rnoc_save_noc_settings', 'security');
+        $coupon_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']) ? $_POST[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] : '';
+        $applied_coupon_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design']) ? $_POST[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] : '';
         $data = $this->clean($_POST);
+        $data[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] = $this->sanitizeBasicHtml($coupon_msg);
+        $data[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] = $this->sanitizeBasicHtml($applied_coupon_msg);
         update_option($this->slug, $data);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
 
+    /**
+     * next order coupon page
+     */
     function nextOrderCouponPage()
     {
         $settings = get_option($this->slug, array());
@@ -193,6 +230,10 @@ class Settings
      */
     function saveAcSettings()
     {
+        check_ajax_referer('rnoc_save_settings', 'security');
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error('security breach');
+        }
         $data = $this->clean($_POST);
         update_option($this->slug . '_settings', $data);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
