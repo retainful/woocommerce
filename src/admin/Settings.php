@@ -86,7 +86,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'retainful_app_id' => '',
             RNOC_PLUGIN_PREFIX . 'retainful_app_secret' => '',
         );
-        $license_settings = wp_parse_args($settings, $default_settings);
+        $settings = wp_parse_args($settings, $default_settings);
         require_once dirname(__FILE__) . '/templates/pages/connection.php';
     }
 
@@ -169,6 +169,30 @@ class Settings
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
 
+    /**
+     * save premium addon settings
+     */
+    function savePremiumAddOnSettings()
+    {
+        check_ajax_referer('rnoc_save_premium_addon_settings', 'security');
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error('security breach');
+        }
+        $page_slug = $this->slug . '_premium';
+        $exit_intent_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] : '';
+        $add_to_cart_coupon_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template'] : '';
+        $data = $this->clean($_POST);
+        $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] = $this->sanitizeBasicHtml($exit_intent_popup_template);
+        $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template'] = $this->sanitizeBasicHtml($add_to_cart_coupon_popup_template);
+        $settings = get_option($page_slug, array());
+        $data_to_save = wp_parse_args($data, $settings);
+        update_option($page_slug, $data_to_save);
+        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+    }
+
+    /**
+     * render premium addon page
+     */
     function retainfulPremiumAddOnsPage()
     {
         $page_slug = $this->slug . '_premium';
@@ -253,6 +277,37 @@ class Settings
                     RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template' => '',
                     RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN),
                     RNOC_PLUGIN_PREFIX . 'coupon_mail_template' => '',
+                )),
+                RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal' => 0,
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages' => array(),
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to' => 'all',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon' => '',
+                RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied' => 0,
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings' => array('show_option' => 'once_per_page', 'show_count' => 1),
+                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life' => 1,
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template' => '',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style' => '',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success' => 'checkout',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance' => array(0 => array(
+                    RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
+                    RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
+                )),
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design' => array(0 => array(
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder' => __('Enter E-mail address', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height' => '46px',
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width' => '100%',
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text' => __('Complete checkout', RNOC_TEXT_DOMAIN),
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color' => '#ffffff',
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color' => '#f20561',
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height' => '100%',
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width' => '100%',
+                )),
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings' => array(0 => array(
+                    RNOC_PLUGIN_PREFIX . 'enable_mobile_support' => '0',
+                    RNOC_PLUGIN_PREFIX . 'enable_delay_trigger' => '0',
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec' => '0',
+                    RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger' => '0',
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance' => '0',
                 )),
             );
             $settings = wp_parse_args($settings, $default_settings);

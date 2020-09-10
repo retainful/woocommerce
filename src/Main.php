@@ -169,6 +169,7 @@ class Main
         add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
         add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
         add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
+        add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
         //Settings link
         add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
         $run_installation_externally = $this->admin->runAbandonedCartExternally();

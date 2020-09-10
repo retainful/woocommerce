@@ -23,9 +23,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         function init()
         {
             if (is_admin()) {
-                add_filter('cmb2_render_exit_intent_popup_show_settings', array($this, 'exitIntentPopDisplaySettings'), 10, 5);
-                add_filter('rnoc_premium_addon_tab', array($this, 'premiumAddonTab'));
-                add_filter('rnoc_premium_addon_tab_content', array($this, 'premiumAddonTabContent'));
+                add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
                 add_action('wp_ajax_rnocp_get_exit_intent_popup_template', array($this, 'getPopupTemplateToInsert'));
             }
             add_action('wp_ajax_nopriv_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
@@ -109,68 +107,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             </div>
             <?php
             return ob_get_clean();
-        }
-
-        /**
-         * Show the settings field
-         * @param $field
-         * @param $field_escaped_value
-         * @param $field_object_id
-         * @param $field_object_type
-         * @param $field_type_object
-         */
-        function exitIntentPopDisplaySettings($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
-        {
-            $field_name = $field->_name();
-            $show_option = isset($field_escaped_value['show_option']) ? $field_escaped_value['show_option'] : 'once_per_page';
-            $show_count = isset($field_escaped_value['show_count']) ? $field_escaped_value['show_count'] : 1;
-            ?>
-            <p>
-                <label>
-                    <select name="<?php echo $field_name ?>[show_option]" id="exit_intent_popup_show_option">
-                        <option <?php echo ($show_option == "once_per_page") ? "selected" : ""; ?>
-                                value="once_per_page"><?php echo __('Only once per page', RNOC_TEXT_DOMAIN);//Agrisive 1, count 1
-                            ?></option>
-                        <option <?php echo ($show_option == "every_time_on_customer_exists") ? "selected" : ""; ?>
-                                value="every_time_on_customer_exists"><?php echo __('Every time customer tries to exit', RNOC_TEXT_DOMAIN);//Agrisive 1, count 0
-                            ?></option>
-                        <option <?php echo ($show_option == "show_x_times_per_page") ? "selected" : ""; ?>
-                                value="show_x_times_per_page"><?php echo __('X number of times per page on exit', RNOC_TEXT_DOMAIN);//Agrisive 1, count X
-                            ?></option>
-                        <option <?php echo ($show_option == "once_per_session") ? "selected" : ""; ?>
-                                value="once_per_session"><?php echo __('Only once per session', RNOC_TEXT_DOMAIN);//Agrisive 0, count 1
-                            ?></option>
-                    </select>
-                </label>
-            </p>
-            <p style="display: <?php echo ($show_option == "show_x_times_per_page") ? 'block' : 'none' ?>"
-               id="exit_intent_popup_show_count">
-                <label>
-                    <?php echo __('Number of times', RNOC_TEXT_DOMAIN) ?>
-                    <select name="<?php echo $field_name ?>[show_count]">
-                        <?php
-                        for ($i = 1; $i <= 10; $i++) {
-                            ?>
-                            <option <?php echo ($show_count == $i) ? "selected" : ""; ?>
-                                    value="<?php echo $i ?>"><?php echo $i; ?></option>
-                            <?php
-                        }
-                        ?>
-                    </select>
-                </label>
-            </p>
-            <script>
-                jQuery(document).on('change', '#exit_intent_popup_show_option', function () {
-                    var choosed = jQuery(this).val();
-                    var count_field = jQuery("#exit_intent_popup_show_count");
-                    if (choosed === "show_x_times_per_page") {
-                        count_field.show();
-                    } else {
-                        count_field.hide();
-                    }
-                });
-            </script>
-            <?php
         }
 
         /**
@@ -444,36 +380,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         }
 
         /**
-         * add the settings tabs
-         * @param $settings
-         * @return array
-         */
-        function premiumAddonTab($settings)
-        {
-            $settings[] = array(
-                'id' => $this->slug,
-                'icon' => $this->icon,
-                'title' => __('Exit intent Popup', RNOC_TEXT_DOMAIN),
-                'fields' => array(
-                    RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to',
-                    RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design',
-                ),
-            );
-            return $settings;
-        }
-
-        /**
          * Get the default template
          * @return string
          */
@@ -488,263 +394,748 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         }
 
         /**
-         * add settings field to render
-         * @param $general_settings
-         * @return mixed
+         * @param $settings
+         * @param $base_url
+         * @param $add_on_slug
          */
-        function premiumAddonTabContent($general_settings)
+        function premiumAddonTabContent($settings, $base_url, $add_on_slug)
         {
-            $general_settings->add_field(array(
-                'name' => __('Enable exit intent popup', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal',
-                'type' => 'radio_inline',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => '0',
-                'desc' => __('Exit intent popup will show when, cart contains some items and user tries to leave the site.', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Custom pages to display the pop-up modal on (Optional)', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages',
-                'type' => 'pw_multiselect',
-                'options' => $this->getPageLists(),
-                'attributes' => array(
-                    'placeholder' => __('Select Pages', RNOC_TEXT_DOMAIN)
-                ),
-                'desc' => __('The exit intent popup would be displayed only on the selected pages.If you wish to display the popup in all pages, leave this option empty.', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Show exit intent popup', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to',
-                'type' => 'radio_inline',
-                'options' => array(
-                    'guest' => __('Only for guest', RNOC_TEXT_DOMAIN),
-                    'all' => __('Everyone', RNOC_TEXT_DOMAIN),
-                    'non_email_users' => __('When a customer has not yet provided an email address', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 'all'
-            ));
-            $general_settings->add_field(array(
-                'type' => 'post_search_ajax',
-                'limit' => 1,
-                'valuefield' => 'title',
-                'attributes' => array(
-                    'placeholder' => __('Search and select Coupons..', RNOC_TEXT_DOMAIN)
-                ),
-                'query_args' => array('post_type' => 'shop_coupon', 'post_status' => 'publish'),
-                'name' => __('Choose the coupon code', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon',
-                'desc' => __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Don\'t show exit intent popup once its coupon applied?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
-                'type' => 'radio_inline',
-                'options' => array(
-                    '0' => __('No, keep showing', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes, hide', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => '0'
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Show exit popup', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings',
-                'type' => 'exit_intent_popup_show_settings',
-                'default' => 1,
-                'desc' => __('The maximum number of times the dialog may be shown on a page, or 0 for unlimited. Only applicable on desktop browsers.', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'type' => 'number'
-                )
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Cookie expiry days', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
-                'type' => 'text',
-                'default' => 1,
-                'desc' => __('The cookie (when localStorage isn\'t available) expiry age, in days.', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'type' => 'number'
-                )
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Button redirects to', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success',
-                'type' => 'radio_inline',
-                'options' => array(
-                    'cart' => __('Cart page', RNOC_TEXT_DOMAIN),
-                    'checkout' => __('Checkout page', RNOC_TEXT_DOMAIN),
-                    'same' => __('Stay on same page', RNOC_TEXT_DOMAIN),
-                ),
-                'default' => 'checkout',
-                'desc' => __('This controls whether or not the bounce dialog should be shown on every page view or only on the user\'s first.', RNOC_TEXT_DOMAIN),
-            ));
-            $mobile_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('Mobile popup settings', RNOC_TEXT_DOMAIN),
-                    'sortable' => false
-                )
-            ));
-            $general_settings->add_group_field($mobile_settings, array(
-                'name' => __('Enable mobile device support', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'enable_mobile_support',
-                'type' => 'radio_inline',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'description' => 'The following settings are used to trigger Exit Popup in mobile devices. Since there are a number of ways a visitor can exit in a mobile (Example: Swipe up), you can consider showing the popup either based on time delay (time spent by the customer in the site) or  scrolling (the distance the customer scrolled a page)',
-                'default' => '0'
-            ));
-            $general_settings->add_group_field($mobile_settings, array(
-                'name' => __('Enable time delay based trigger', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'enable_delay_trigger',
-                'type' => 'radio_inline',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => '0'
-            ));
-            $general_settings->add_group_field($mobile_settings, array(
-                'name' => __('Delay seconds', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
-                'type' => 'text',
-                'default' => 0,
-                'desc' => __('rigger the popup after these many seconds a visitor spent time', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'type' => 'number'
-                )
-            ));
-            $general_settings->add_group_field($mobile_settings, array(
-                'name' => __('Enable Scroll based trigger', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger',
-                'type' => 'radio_inline',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => '0'
-            ));
-            $general_settings->add_group_field($mobile_settings, array(
-                'name' => __('Scroll distance', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
-                'type' => 'text',
-                'default' => 0,
-                'desc' => __('Trigger the popup after a visitor scrolled the page to the set distance. Its a percentage value. The distance is the % from the top of the page.', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'type' => 'number'
-                )
-            ));
-            //GDPR settings
-            $gdpr_compliance_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('GDPR Compliance for collecting E-Mail', RNOC_TEXT_DOMAIN),
-                    'sortable' => true
-                )
-            ));
-            $general_settings->add_group_field($gdpr_compliance_settings, array(
-                'name' => __('Show GDPR Compliance checkbox ', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings',
-                'type' => 'select',
-                'default' => 'no_need_gdpr',
-                'options' => $this->complianceMessageOptions()
-            ));
-            $general_settings->add_group_field($gdpr_compliance_settings, array(
-                'name' => __('GDPR Compliance message', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message',
-                'type' => 'textarea',
-                'default' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
-                'desc' => __('You can also use HTML content as well in the message.', RNOC_TEXT_DOMAIN)
-            ));
-            $before_editor = $this->exitIntentPopInsertTemplate();
-            $general_settings->add_field(array(
-                'name' => __('Popup template', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
-                'type' => 'textarea',
-                'before' => $before_editor . '<div class="rnoc-grid"> <div class="grid-column">',
-                'after' => '<button type="button" class="insert-template" id="rnoc_exit_intent_popup_template_show_preview">' . __("Preview", RNOC_TEXT_DOMAIN) . '</button></div><div class="grid-column" id="exit-intent-popup-preview"></div></div><style id="custom-style-container"></style>',
-                'default' => $this->getDefaultPopupTemplate(),
-                'desc' => __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{cart_url}}</b> - Url to redirect to cart page<br><b>{{cart_url_without_coupon}}</b> - Url to redirect to cart page without auto applying coupon<br><b>{{checkout_url}}</b> - Url to redirect user to checkout page<br><b>{{checkout_url_without_coupon}}</b> - Url to redirect user to checkout page without auto apply coupon code<br><b>{{email_collection_form}}</b> - To display email collection form. Note: Email collection form will only show to Guest and Administrator.', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Custom CSS styles', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style',
-                'type' => 'textarea',
-                'default' => ''
-            ));
-            //Form design
-            $form_design_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('Email collection form design', RNOC_TEXT_DOMAIN),
-                    'sortable' => true
-                ),
-            ));
-            $general_settings->add_group_field($form_design_settings, array(
-                'name' => __('Email input placeholder', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder',
-                'type' => 'text',
-                'default' => __('Enter E-mail address', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($form_design_settings, array(
-                'name' => __('Email input height', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height',
-                'type' => 'text',
-                'default' => '46px',
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($form_design_settings, array(
-                'name' => __('Email input width', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width',
-                'type' => 'text',
-                'default' => '100%',
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($form_design_settings, array(
-                'name' => __('Button text', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text',
-                'type' => 'text',
-                'default' => __('Complete checkout', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($form_design_settings, array(
-                'name' => __('Button color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color',
-                'type' => 'colorpicker',
-                'default' => '#ffffff'
-            ));
-            $general_settings->add_group_field($form_design_settings, array(
-                'name' => __('Button background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color',
-                'type' => 'colorpicker',
-                'default' => '#f20561'
-            ));
-            $general_settings->add_group_field($form_design_settings, array(
-                'name' => __('Button height', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height',
-                'type' => 'text',
-                'default' => '100%',
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($form_design_settings, array(
-                'name' => __('Button width', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width',
-                'type' => 'text',
-                'default' => '100%',
-                'desc' => ''
-            ));
-            return $general_settings;
+            if ($this->slug() == $add_on_slug) {
+                $pages = $this->getPageLists();
+                $coupon_codes = $this->getWooCouponCodes();
+                ?>
+                <table class="form-table" role="presentation">
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'; ?>"><?php
+                                esc_html_e('Enable exit intent popup?', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <p class="description">
+                                <?php
+                                esc_html_e('Exit intent popup will show when, cart contains some items and user tries to leave the site.', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'; ?>"><?php
+                                esc_html_e('Custom pages to display the pop-up modal on (Optional)', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <select multiple
+                                    name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages[]'; ?>"
+                                    class="rnoc-multi-select"
+                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'; ?>">
+                                <?php
+                                if (!empty($pages)) {
+                                    foreach ($pages as $key => $label) {
+                                        ?>
+                                        <option value="<?php echo $key ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'modal_display_pages'])) {
+                                            echo "selected";
+                                        } ?>><?php echo $label ?></option>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <p class="description">
+                                <?php
+                                echo __('The exit intent popup would be displayed only on the selected pages.If you wish to display the popup in all pages, leave this option empty.', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'; ?>"><?php
+                                esc_html_e('Show exit intent popup', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'; ?>"
+                                       type="radio"
+                                       value="guest" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'] == 'guest') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Only for guest', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'; ?>"
+                                       type="radio"
+                                       value="all" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'] == 'all') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Everyone', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'; ?>"
+                                       type="radio"
+                                       value="non_email_users" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'] == 'non_email_users') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('When a customer has not yet provided an email address', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"><?php
+                                esc_html_e('Choose the coupon code', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
+                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
+                                    class="rnoc-select2-select">
+                                <?php
+                                if (!empty($coupon_codes)) {
+                                    foreach ($coupon_codes as $code => $label) {
+                                        ?>
+                                        <option value="<?php echo $code ?>" <?php if ($code == $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon']) {
+                                            echo "selected";
+                                        } ?>><?php echo $label; ?></option>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <p class="description">
+                                <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
+                                please create the coupon code in WooCommerce -> Coupons
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'; ?>"><?php
+                                esc_html_e('Don\'t show exit intent popup once its coupon applied?', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes, hide', RNOC_TEXT_DOMAIN); ?>
+                            </label><br>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No, keep showing', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="exit_intent_popup_show_option"><?php
+                                esc_html_e('Show exit popup', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <?php
+                            $show_option = $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings']['show_option'];
+                            $show_count = $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings']['show_count'];
+                            ?>
+                            <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings[show_option]' ?>"
+                                    id="exit_intent_popup_show_option">
+                                <option <?php if ($show_option == 'once_per_page') {
+                                    echo 'selected';
+                                } ?>
+                                        value="once_per_page"><?php esc_html_e('Only once per page', RNOC_TEXT_DOMAIN); ?></option>
+                                <option <?php if ($show_option == 'every_time_on_customer_exists') {
+                                    echo 'selected';
+                                } ?> value="every_time_on_customer_exists"><?php esc_html_e('Every time customer tries to exit', RNOC_TEXT_DOMAIN); ?></option>
+                                <option <?php if ($show_option == 'show_x_times_per_page') {
+                                    echo 'selected';
+                                } ?> value="show_x_times_per_page"><?php esc_html_e('X number of times per page on exit', RNOC_TEXT_DOMAIN); ?></option>
+                                <option <?php if ($show_option == 'once_per_session') {
+                                    echo 'selected';
+                                } ?> value="once_per_session"><?php esc_html_e('Only once per session', RNOC_TEXT_DOMAIN); ?></option>
+                            </select>
+                            <label>
+                                <?php echo __('Number of times', RNOC_TEXT_DOMAIN) ?>
+                                <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings[show_count]' ?>">
+                                    <?php
+                                    for ($i = 1; $i <= 10; $i++) {
+                                        ?>
+                                        <option <?php echo ($show_count == $i) ? "selected" : ""; ?>
+                                                value="<?php echo $i ?>"><?php echo $i; ?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'; ?>"><?php
+                                esc_html_e('Show E-mail collection popup', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'; ?>"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'; ?>"
+                                   type="text" class="regular-text"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life']; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'; ?>"><?php
+                                esc_html_e('Button redirects to', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'; ?>"
+                                       type="radio"
+                                       value="cart" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'] == 'cart') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Cart page', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'; ?>"
+                                       type="radio"
+                                       value="checkout" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'] == 'checkout') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Checkout page', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'; ?>"
+                                       type="radio"
+                                       value="same" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'] == 'same') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Same page', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <p class="description">
+                                <?php
+                                echo __('This controls whether or not the bounce dialog should be shown on every page view or only on the user\'s first.', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('Mobile popup settings', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $top_position_name = RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_mobile_support'; ?>"><?php
+                                esc_html_e('Enable mobile device support', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <p class="description">
+                                The following settings are used to trigger Exit Popup in mobile devices. Since there are
+                                a number of ways a visitor can exit in a mobile (Example: Swipe up), you can consider
+                                showing the popup either based on time delay (time spent by the customer in the site) or
+                                scrolling (the distance the customer scrolled a page)
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'; ?>"><?php
+                                esc_html_e('Enable time delay based trigger', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec'; ?>"><?php
+                                esc_html_e('Delay seconds', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec']; ?>">
+                            </label>
+                            <p class="description">
+                                Trigger the popup after these many seconds a visitor spent time
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope=" row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'; ?>"><?php
+                                esc_html_e('Enable Scroll based trigger', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance'; ?>"><?php
+                                esc_html_e('Scroll distance', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance']; ?>">
+                            </label>
+                            <p class="description">
+                                Trigger the popup after a visitor scrolled the page to the set distance. Its a
+                                percentage value. The distance is the % from the top of the page.
+                            </p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('GDPR Compliance for collecting E-Mail', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $gdpr_compliance_name = RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'; ?>"><?php
+                                esc_html_e('Show GDPR Compliance checkbox', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <select name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'; ?>"
+                                        class="rnoc-select2-select">
+                                    <?php
+                                    foreach ($this->complianceMessageOptions() as $key => $label) {
+                                        ?>
+                                        <option value="<?php echo $key ?>" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'] == $key) {
+                                            echo 'selected';
+                                        } ?> ><?php echo $label ?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'; ?>"><?php
+                                esc_html_e('GDPR Compliance message', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                            <textarea
+                                    name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'; ?>"
+                                    rows="10"
+                                    cols="50"><?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']; ?>
+                            </textarea>
+                            </label>
+                            <p class="description">
+                                <?php
+                                echo __('You can also use HTML content as well in the message.', RNOC_TEXT_DOMAIN)
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('Popup design', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <tbody>
+                    <tr>
+                        <td colspan="2">
+                            <?php
+                            echo $this->exitIntentPopInsertTemplate();
+                            ?>
+                            <div class="rnoc-grid">
+                                <div class="grid-column">
+                                    <textarea id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'; ?>"
+                                              name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'; ?>"
+                                              cols="50" rows="20"
+                                    ><?php
+                                        $template = $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'];
+                                        if (empty($template)) {
+                                            $template = $this->getDefaultPopupTemplate();
+                                        }
+                                        echo $template;
+                                        ?>
+                                    </textarea>
+                                    <button type="button" class="insert-template"
+                                            id="rnoc_exit_intent_popup_template_show_preview"><?php echo __("Preview", RNOC_TEXT_DOMAIN); ?>
+                                    </button>
+                                </div>
+                                <div class="grid-column" id="exit-intent-popup-preview"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'; ?>"><?php
+                                esc_html_e('Custom CSS styles', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <textarea id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'; ?>"
+                                      name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'; ?>"
+                                      cols="50" rows="10"
+                            ><?php
+                                echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'];
+                                ?>
+                            </textarea>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('Mobile popup settings', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $top_position_name = RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_mobile_support'; ?>"><?php
+                                esc_html_e('Enable mobile device support', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <p class="description">
+                                The following settings are used to trigger Exit Popup in mobile devices. Since there are
+                                a number of ways a visitor can exit in a mobile (Example: Swipe up), you can consider
+                                showing the popup either based on time delay (time spent by the customer in the site) or
+                                scrolling (the distance the customer scrolled a page)
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'; ?>"><?php
+                                esc_html_e('Enable time delay based trigger', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec'; ?>"><?php
+                                esc_html_e('Delay seconds', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec']; ?>">
+                            </label>
+                            <p class="description">
+                                Trigger the popup after these many seconds a visitor spent time
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope=" row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'; ?>"><?php
+                                esc_html_e('Enable Scroll based trigger', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance'; ?>"><?php
+                                esc_html_e('Scroll distance', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance']; ?>">
+                            </label>
+                            <p class="description">
+                                Trigger the popup after a visitor scrolled the page to the set distance. Its a
+                                percentage value. The distance is the % from the top of the page.
+                            </p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('Email collection form design', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $email_Collection_form_design_name = RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder'; ?>"><?php
+                                esc_html_e('Email input placeholder', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height'; ?>"><?php
+                                esc_html_e('Email input height', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width'; ?>"><?php
+                                esc_html_e('Email input width', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text'; ?>"><?php
+                                esc_html_e('Button text', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color'; ?>"><?php
+                                esc_html_e('Button color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color'; ?>"><?php
+                                esc_html_e('Button background color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height'; ?>"><?php
+                                esc_html_e('Button height', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width'; ?>"><?php
+                                esc_html_e('Button width', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width]'; ?>"
+                                       type="text" class="regular-text"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <?php
+            }
         }
     }
 }

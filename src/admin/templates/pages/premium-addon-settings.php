@@ -51,16 +51,16 @@ require_once "tabs.php";
                 <th>
                 </th>
                 <td>
-                    <button type="submit" data-action="rnoc_save_noc_settings"
-                            data-security="<?php echo wp_create_nonce('rnoc_save_noc_settings') ?>"
+                    <button type="submit" data-action="rnoc_save_premium_addon_settings"
+                            data-security="<?php echo wp_create_nonce('rnoc_save_premium_addon_settings') ?>"
                             class="button button-primary"><?php esc_html_e('save', RNOC_TEXT_DOMAIN); ?></button>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
-    <button type="submit" data-action="rnoc_save_noc_settings"
-            data-security="<?php echo wp_create_nonce('rnoc_save_noc_settings') ?>"
+    <button type="submit" data-action="rnoc_save_premium_addon_settings"
+            data-security="<?php echo wp_create_nonce('rnoc_save_premium_addon_settings') ?>"
             class="button button-primary button-right-fixed"><i
                 class="dashicons dashicons-yes"></i>&nbsp;&nbsp;<span><?php esc_html_e('save', RNOC_TEXT_DOMAIN); ?></span>
     </button>
