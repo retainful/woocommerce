@@ -32,6 +32,7 @@ class Main
     {
         $woocommerce_functions = new WcFunctions();
         $woocommerce_functions->initWoocommerceSession();
+        do_action('rnoc_after_including_plugin_files', $woocommerce_functions, $this);
     }
 
     /**

@@ -212,6 +212,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $this->wc_functions->initWoocommerceSession();
             $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             $this->wc_functions->setCustomerEmail($email);
+            do_action('rnoc_after_atcp_assigning_email_to_customer', $email, $this);
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
             if (!$run_cart_externally) {
