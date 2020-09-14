@@ -155,29 +155,6 @@ class Settings
     }
 
     /**
-     * retainful ac settings page
-     */
-    function retainfulSettingsPage()
-    {
-        $settings = get_option($this->slug . '_settings', array());
-        $default_settings = array(
-            RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
-            RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
-            RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status' => '0',
-            RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status' => '1',
-            RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
-            RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' => '0',
-            RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => '',
-            RNOC_PLUGIN_PREFIX . 'enable_ip_filter' => '0',
-            RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
-            RNOC_PLUGIN_PREFIX . 'enable_debug_log' => '0',
-            RNOC_PLUGIN_PREFIX . 'handle_storage_using' => 'woocommerce',
-        );
-        $settings = wp_parse_args($settings, $default_settings);
-        require_once dirname(__FILE__) . '/templates/pages/settings.php';
-    }
-
-    /**
      * sanitize the basic html tags
      * @param $html
      * @return mixed|void
@@ -368,6 +345,20 @@ class Settings
     }
 
     /**
+     * clean the data
+     * @param $var
+     * @return array|string
+     */
+    function clean($var)
+    {
+        if (is_array($var)) {
+            return array_map(array($this, 'clean'), $var);
+        } else {
+            return is_scalar($var) ? sanitize_text_field($var) : $var;
+        }
+    }
+
+    /**
      * next order coupon page
      */
     function nextOrderCouponPage()
@@ -421,20 +412,6 @@ class Settings
     }
 
     /**
-     * clean the data
-     * @param $var
-     * @return array|string
-     */
-    function clean($var)
-    {
-        if (is_array($var)) {
-            return array_map('wc_clean', $var);
-        } else {
-            return is_scalar($var) ? sanitize_text_field($var) : $var;
-        }
-    }
-
-    /**
      * save the settings
      */
     function saveAcSettings()
@@ -443,9 +420,49 @@ class Settings
         if (!current_user_can('manage_woocommerce')) {
             wp_send_json_error('security breach');
         }
+        $validator = new Validator($_POST);
+        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', ['js', 'php'])->message('This field contains invalid value');
+        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'track_zero_value_carts', ['yes', 'no'])->message('This field contains invalid value');
+        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'handle_storage_using', ['woocommerce', 'cookie', 'php'])->message('This field contains invalid value');
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
+            RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
+            RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load',
+            RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
+            RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
+            RNOC_PLUGIN_PREFIX . 'enable_debug_log',
+        ), ['0', '1'])->message('This field contains invalid value');
+        if (!$validator->validate()) {
+            wp_send_json_error($validator->errors());
+        }
+        $cart_capture_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $_POST[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : '';
         $data = $this->clean($_POST);
+        $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = $this->sanitizeBasicHtml($cart_capture_msg);
         update_option($this->slug . '_settings', $data);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+    }
+
+    /**
+     * retainful ac settings page
+     */
+    function retainfulSettingsPage()
+    {
+        $settings = get_option($this->slug . '_settings', array());
+        $default_settings = array(
+            RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
+            RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
+            RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status' => '0',
+            RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status' => '1',
+            RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
+            RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' => '0',
+            RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => '',
+            RNOC_PLUGIN_PREFIX . 'enable_ip_filter' => '0',
+            RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
+            RNOC_PLUGIN_PREFIX . 'enable_debug_log' => '0',
+            RNOC_PLUGIN_PREFIX . 'handle_storage_using' => 'woocommerce',
+        );
+        $settings = wp_parse_args($settings, $default_settings);
+        require_once dirname(__FILE__) . '/templates/pages/settings.php';
     }
 
     /**
@@ -667,78 +684,6 @@ class Settings
             }
         }
         return $res;
-    }
-
-    /**
-     * Get license details
-     * @param $run_abandoned_cart_externally
-     * @return \CMB2
-     */
-    function licenseTab($run_abandoned_cart_externally)
-    {
-        $switch_to_plugin_notice = NULL;
-        if ($run_abandoned_cart_externally) {
-            $is_new_installation = $this->isNewInstallation();
-            //If the user is old user then ask user to run abandoned cart to
-            if ($is_new_installation == 0) {
-                $move_to_cloud_url = admin_url('admin.php?page=' . $this->slug . '_license&move_to_local=yes');
-                $switch_to_plugin_notice = '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("If you would like to switch back and manage the abandoned carts via the plugin", RNOC_TEXT_DOMAIN) . '&nbsp; <a href="' . $move_to_cloud_url . '">' . esc_html("Click Here!") . '</a></p>';
-            }
-        }
-        //License
-        $license_arr = array(
-            'capability' => 'edit_shop_coupons',
-            'object_types' => array('options-page'),
-            'option_key' => $this->slug . '_license',
-            'tab_group' => $this->slug,
-            'id' => RNOC_PLUGIN_PREFIX . 'license',
-            'icon_url' => 'dashicons-controls-repeat',
-            'position' => 55.5,
-            'title' => __('Retainful', RNOC_TEXT_DOMAIN),
-            'tab_title' => (!$run_abandoned_cart_externally) ? __('License', RNOC_TEXT_DOMAIN) : __('Connection'),
-            'save_button' => __('Save', RNOC_TEXT_DOMAIN)
-        );
-        if ((!$run_abandoned_cart_externally)) {
-            $license_arr['parent_slug'] = 'woocommerce';
-        }
-        $license = new_cmb2_box($license_arr);
-        $switch_to_cloud_notice = (!$run_abandoned_cart_externally) ? $this->switchToCloudNotice() : NULL;
-        $is_production = apply_filters('rnoc_is_production_plugin', true);
-        if ($is_production) {
-            $license->add_field(array(
-                'name' => __('App ID', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'retainful_app_id',
-                'type' => 'text',
-                'default' => '',
-                'before_row' => $switch_to_cloud_notice . $this->deactivatePremiumPluginNotice(),
-                'desc' => __('Get your App-id <a target="_blank" href="' . $this->api->app_url . 'settings">here</a>', RNOC_TEXT_DOMAIN)
-            ));
-            //if ($run_abandoned_cart_externally) {
-            $license->add_field(array(
-                'name' => __('Secret Key', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'retainful_app_secret',
-                'type' => 'text',
-                'default' => '',
-                'desc' => __('Get your Secret key <a target="_blank" href="' . $this->api->app_url . 'settings">here</a>', RNOC_TEXT_DOMAIN)
-            ));
-            //}
-        }
-        $license->add_field(array(
-            'name' => '',
-            'id' => RNOC_PLUGIN_PREFIX . 'retainful_app',
-            'type' => 'retainful_app',
-            'is_app_in_production' => $is_production,
-            'default' => '',
-            'desc' => '',
-            'after_row' => $switch_to_plugin_notice
-        ));
-        $license->add_field(array(
-            'id' => RNOC_PLUGIN_PREFIX . 'is_retainful_connected',
-            'type' => 'hidden',
-            'default' => 0,
-            'attributes' => array('id' => 'is_retainful_app_connected')
-        ));
-        return $license;
     }
 
     /**

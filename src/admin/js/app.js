@@ -108,6 +108,7 @@
             var security = submit.data('security');
             var url = retainful_admin.ajax_endpoint.replace("{{action}}", action).replace("{{security}}", security);
             submit.attr('disabled', true);
+            $(".error").html('');
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -115,6 +116,13 @@
                 dataType: "json",
                 data: $(this).serialize(),
                 success: function (response) {
+                    if (!response.success) {
+                        for (const [key, value] of Object.entries(response.data)) {
+                            var field = $('[name="' + key + '"]');
+                            var td = field.closest('td');
+                            td.append('<p style="color: red;" class="error">' + value + '</p>');
+                        }
+                    }
                     if (response.success) {
                         alert(response.data);
                     }
