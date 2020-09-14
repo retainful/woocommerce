@@ -181,21 +181,6 @@ class Settings
     }
 
     /**
-     * save the next order coupon settings
-     */
-    function saveNocSettings()
-    {
-        check_ajax_referer('rnoc_save_noc_settings', 'security');
-        $coupon_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']) ? $_POST[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] : '';
-        $applied_coupon_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design']) ? $_POST[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] : '';
-        $data = $this->clean($_POST);
-        $data[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] = $this->sanitizeBasicHtml($coupon_msg);
-        $data[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] = $this->sanitizeBasicHtml($applied_coupon_msg);
-        update_option($this->slug, $data);
-        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
-    }
-
-    /**
      * save premium addon settings
      */
     function savePremiumAddOnSettings()
@@ -359,6 +344,64 @@ class Settings
     }
 
     /**
+     * save the next order coupon settings
+     */
+    function saveNocSettings()
+    {
+        check_ajax_referer('rnoc_save_noc_settings', 'security');
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error('security breach');
+        }
+        $validator = new Validator($_POST);
+        Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
+        Validator::addRule('basicTags', array(__CLASS__, 'validateBasicHtmlTags'), 'Only br, strong, span,div, p tags accepted');
+        $validator->rule('slug', RNOC_PLUGIN_PREFIX . 'expire_date_format');
+        $validator->rule('array', array(
+            RNOC_PLUGIN_PREFIX . 'preferred_order_status',
+            RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
+            RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products',
+            RNOC_PLUGIN_PREFIX . 'exclude_product_categories',
+            RNOC_PLUGIN_PREFIX . 'product_categories',
+            RNOC_PLUGIN_PREFIX . 'exclude_products',
+            RNOC_PLUGIN_PREFIX . 'products',
+        ));
+        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to', ['all', 'validate_on_checkout', 'login_users'])->message('This field contains invalid value');
+        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to', ['woocommerce_email_order_details', 'woocommerce_email_order_meta', 'woocommerce_email_customer_details'])->message('This field contains invalid value');
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon',
+            RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
+            RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon',
+            RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page',
+            RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup',
+        ), ['0', '1'])->message('This field contains invalid value');
+        $validator->rule('float', array(
+            RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount',
+            RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
+            RNOC_PLUGIN_PREFIX . 'minimum_sub_total',
+            RNOC_PLUGIN_PREFIX . 'minimum_spend',
+            RNOC_PLUGIN_PREFIX . 'maximum_spend',
+        ))->message('This field contains invalid value');;
+        $validator->rule('integer', array(
+            RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
+            RNOC_PLUGIN_PREFIX . 'limit_per_user',
+        ))->message('This field contains invalid value');;
+        $validator->rule('basicTags', array(
+            RNOC_PLUGIN_PREFIX . 'retainful_coupon_message',
+            RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design',
+        ))->message('This field contains invalid tags script or iframe');;
+        if (!$validator->validate()) {
+            wp_send_json_error($validator->errors());
+        }
+        $coupon_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']) ? $_POST[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] : '';
+        $applied_coupon_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design']) ? $_POST[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] : '';
+        $data = $this->clean($_POST);
+        $data[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] = $this->sanitizeBasicHtml($coupon_msg);
+        $data[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] = $this->sanitizeBasicHtml($applied_coupon_msg);
+        update_option($this->slug, $data);
+        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+    }
+
+    /**
      * next order coupon page
      */
     function nextOrderCouponPage()
@@ -409,6 +452,43 @@ class Settings
         $is_pro_plan = $this->isProPlan();
         $unlock_premium_link = $this->unlockPremiumLink();
         require_once dirname(__FILE__) . '/templates/pages/next-order-coupon.php';
+    }
+
+    /**
+     * validate the value is float or not
+     * @param $field
+     * @param $value
+     * @param array $params
+     * @param array $fields
+     * @return bool
+     */
+    static function validateFloat($field, $value, array $params, array $fields)
+    {
+        return (is_numeric($value) || is_float($value));
+    }
+
+    /**
+     * validate Input Text Html Tags
+     *
+     * @param $field
+     * @param $value
+     * @param array $params
+     * @param array $fields
+     * @return bool
+     */
+    static function validateBasicHtmlTags($field, $value, array $params, array $fields)
+    {
+        $value = stripslashes($value);
+        $invalid_tags = array("script", "iframe");
+        foreach ($invalid_tags as $tag_name) {
+            $pattern = "#<\s*?$tag_name\b[^>]*>(.*?)</$tag_name\b[^>]*>#s";;
+            preg_match($pattern, $value, $matches);
+            //script or iframe found
+            if (!empty($matches)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

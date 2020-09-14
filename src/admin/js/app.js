@@ -109,6 +109,7 @@
             var url = retainful_admin.ajax_endpoint.replace("{{action}}", action).replace("{{security}}", security);
             submit.attr('disabled', true);
             $(".error").html('');
+            $('.switch-tmce').trigger('click');
             $.ajax({
                 url: url,
                 type: 'POST',
