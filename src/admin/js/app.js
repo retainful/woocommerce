@@ -120,9 +120,25 @@
                     if (!response.success) {
                         for (const [key, value] of Object.entries(response.data)) {
                             var field = $('[name="' + key + '"]');
+                            if (field.length === 0) {
+                                var field_name = key.replace('.*.', '[0][');
+                                field = $('[name="' + field_name + ']"]');
+                            }
+                            var res_html = '';
                             var td = field.closest('td');
-                            td.append('<p style="color: red;" class="error">' + value + '</p>');
+                            if (Array.isArray(value)) {
+                                res_html = '<ul style="color: red;" class="error">';
+                                var i;
+                                for (i = 0; i < value.length; i++) {
+                                    res_html += "<li>" + value[i] + "<li>";
+                                }
+                                res_html += '<ul>';
+                            } else {
+                                res_html = '<p style="color: red;" class="error">' + value + '</p>';
+                            }
+                            td.append(res_html);
                         }
+                        alert('Settings not saved! Please fix all errors and click save!')
                     }
                     if (response.success) {
                         alert(response.data);

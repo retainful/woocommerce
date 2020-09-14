@@ -9,6 +9,9 @@ require_once "tabs.php";
 ?>
 <form id="retainful-settings-form">
     <div class="card" style="width: 25%;float: left;padding: 0;">
+        <div class="common-errors">
+
+        </div>
         <?php
         if (!empty($available_addon_list)) {
             ?>
