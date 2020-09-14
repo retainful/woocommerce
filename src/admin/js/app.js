@@ -38,6 +38,7 @@
             if (app_id.val() === "" && app_secret.val() === "") {
                 return false;
             }
+            $('.error').html('');
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -45,11 +46,26 @@
                 dataType: "json",
                 data: {app_id: app_id.val(), secret_key: app_secret.val()},
                 success: function (response) {
-                    if (response.error && app_id.val() !== "") {
-                        app_id.focus();
-                        message.html('<p style="color:red;">' + response.error + '</p>');
+                    if (response.error && typeof response.error === "object") {
+                        var result = response.error;
+                        for (const [key, value] of Object.entries(result)) {
+                            var field = $('#error_' + key);
+                            var res_html = '';
+                            if (Array.isArray(value)) {
+                                res_html = '<ul>';
+                                var i;
+                                for (i = 0; i < value.length; i++) {
+                                    res_html += "<li>" + value[i] + "<li>";
+                                }
+                                res_html += '<ul>';
+                            } else {
+                                res_html = value;
+                            }
+                            field.html(res_html);
+                        }
+                        return false;
                     }
-                    if (response.error && app_id.val() === "") {
+                    if (response.error && app_id.val() !== "") {
                         app_id.focus();
                         message.html('<p style="color:red;">' + response.error + '</p>');
                     }

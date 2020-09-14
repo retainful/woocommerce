@@ -4,6 +4,7 @@
   "require": {
     "jaybizzle/laravel-crawler-detect": "1.*",
     "ext-openssl": "*",
+    "vlucas/valitron": "*",
     "ext-json": "*"
   },
   "minimum-stability": "stable",

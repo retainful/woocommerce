@@ -7,6 +7,7 @@ use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Integrations\MultiLingual;
 use Rnoc\Retainful\library\RetainfulApi;
 use Rnoc\Retainful\WcFunctions;
+use Valitron\Validator;
 
 class Settings
 {
@@ -88,6 +89,54 @@ class Settings
         );
         $settings = wp_parse_args($settings, $default_settings);
         require_once dirname(__FILE__) . '/templates/pages/connection.php';
+    }
+
+    /**
+     * Validate app Id
+     */
+    function validateAppKey()
+    {
+        check_ajax_referer('validate_app_key', 'security');
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error('security breach');
+        }
+        $validator = new Validator($_POST);
+        $validator->rule('required', ['app_id', 'secret_key']);
+        $validator->rule('slug', ['app_id', 'secret_key']);
+        if (!$validator->validate()) {
+            $response['error'] = $validator->errors();
+            wp_send_json($response);
+        }
+        $is_production = apply_filters('rnoc_is_production_plugin', true);
+        if (!$is_production) {
+            wp_send_json_error('You can only change you App-Id and Secret key in production store!', 500);
+        }
+        $app_id = isset($_REQUEST['app_id']) ? sanitize_text_field($_REQUEST['app_id']) : '';
+        $secret_key = isset($_REQUEST['secret_key']) ? sanitize_text_field($_REQUEST['secret_key']) : '';
+        $options_data = array(
+            RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => '0',
+            RNOC_PLUGIN_PREFIX . 'retainful_app_id' => $app_id,
+            RNOC_PLUGIN_PREFIX . 'retainful_app_secret' => $secret_key
+        );
+        $slug = $this->slug;
+        //Save app id before validate key
+        update_option($slug . '_license', $options_data);
+        $response = array();
+        $this->updateUserAsFreeUser();
+        if (empty($response)) {
+            $api_response = $this->isApiEnabled($app_id, $secret_key);
+            if (isset($api_response['success'])) {
+                //Change app id status
+                $options_data[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 1;
+                update_option($slug . '_license', $options_data);
+                $response['success'] = $api_response['success'];
+            } elseif (isset($api_response['error'])) {
+                $response['error'] = $api_response['error'];
+            } else {
+                $response['error'] = __('Please check the entered details', RNOC_TEXT_DOMAIN);
+            }
+        }
+        wp_send_json($response);
     }
 
     /**
