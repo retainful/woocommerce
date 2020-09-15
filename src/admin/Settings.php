@@ -257,6 +257,64 @@ class Settings
     }
 
     /**
+     * validate coupon timer post data
+     * @param $validator
+     */
+    function validateExitIntentPopup($validator)
+    {
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal',
+            RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger',
+        ), ['0', '1'])->message('This field contains invalid value');
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings.show_option',
+        ), ['once_per_page', 'every_time_on_customer_exists', 'show_x_times_per_page', 'once_per_session'])->message('This field contains invalid value');
+        $validator->rule('array', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages',
+        ), ['0', '1'])->message('This field contains invalid value');
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings',
+        ), ['no_need_gdpr', 'dont_show_checkbox', 'show_and_check_checkbox', 'show_checkbox'])->message('This field contains invalid value');
+        $validator->rule('integer', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings.show_count',
+        ))->message('This field should only accepts number');
+        $validator->rule('color', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color',
+        ))->message('This field accepts only hex color code');
+        $validator->rule('slug', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon',
+        ))->message('This field accepts only hex color code');
+        $validator->rule('basicTags', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'
+        ))->message('Script tag and iframe tag were not allowed ');
+        $validator->rule('regex', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder',
+        ), '/^[\p{L}\p{Nd} .-]+$/')->message('This field should only accepts numbers, alphabets and spaces');
+/*        $validator->rule('regex', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'
+        ), '/^[a-z0-9%:\n\t {};.#\[\]"!]+$/')->message('This field should only accepts css values');*/
+        $validator->rule('regex', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height',
+        ), '/^[a-z0-9%]+$/')->message('This field should only accepts numbers, lowercase alphabets and percentage symbol');
+        if (!$validator->validate()) {
+            wp_send_json_error($validator->errors());
+        }
+    }
+
+    /**
      * save premium addon settings
      */
     function savePremiumAddOnSettings()
@@ -337,6 +395,7 @@ class Settings
         Validator::addRule('basicTags', array(__CLASS__, 'validateBasicHtmlTags'), 'Only br, strong, span,div, p tags accepted');
         Validator::addRule('color', array(__CLASS__, 'validateColor'), 'must contain only hex color code');
         $this->validateCouponTimer($validator);
+        $this->validateExitIntentPopup($validator);
         $page_slug = $this->slug . '_premium';
         $exit_intent_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] : '';
         $add_to_cart_coupon_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template'] : '';

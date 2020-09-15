@@ -149,7 +149,14 @@
                 }
             });
             submit.attr('disabled', false);
-        })
+        });
+        $(document).on('change', '#exit_intent_popup_show_option', function () {
+            if ($(this).val() === 'show_x_times_per_page') {
+                $('#show_x_times_per_page_val').show();
+            }else{
+                $('#show_x_times_per_page_val').hide();
+            }
+        });
         $('.rnoc-multi-select').select2({width: '100%', placeholder: 'Select values'});
         $('.rnoc-select2-select').select2({width: '100%', placeholder: 'Select value'});
         $('.wc-product-search').each(function () {

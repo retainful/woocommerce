@@ -579,7 +579,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                     echo 'selected';
                                 } ?> value="once_per_session"><?php esc_html_e('Only once per session', RNOC_TEXT_DOMAIN); ?></option>
                             </select>
-                            <label>
+                            <label id="show_x_times_per_page_val">
                                 <?php echo __('Number of times', RNOC_TEXT_DOMAIN) ?>
                                 <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings[show_count]' ?>">
                                     <?php
