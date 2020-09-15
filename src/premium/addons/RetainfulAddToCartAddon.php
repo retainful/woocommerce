@@ -592,7 +592,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     <tr>
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'close_btn_behavior'; ?>"><?php
-                                esc_html_e('No thanks action', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Close button behavior', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
                         <td>

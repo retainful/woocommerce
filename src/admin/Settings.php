@@ -290,7 +290,7 @@ class Settings
         ))->message('This field accepts only hex color code');
         $validator->rule('slug', array(
             RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon',
-        ))->message('This field accepts only hex color code');
+        ))->message('This field accepts only numbers,alphabets,hypens and underscores');
         $validator->rule('basicTags', array(
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
@@ -300,15 +300,71 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder',
         ), '/^[\p{L}\p{Nd} .-]+$/')->message('This field should only accepts numbers, alphabets and spaces');
-/*        $validator->rule('regex', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'
-        ), '/^[a-z0-9%:\n\t {};.#\[\]"!]+$/')->message('This field should only accepts css values');*/
+        /*        $validator->rule('regex', array(
+                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'
+                ), '/^[a-z0-9%:\n\t {};.#\[\]"!]+$/')->message('This field should only accepts css values');*/
         $validator->rule('regex', array(
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height',
         ), '/^[a-z0-9%]+$/')->message('This field should only accepts numbers, lowercase alphabets and percentage symbol');
+        if (!$validator->validate()) {
+            wp_send_json_error($validator->errors());
+        }
+    }
+
+    /**
+     * validate coupon timer post data
+     * @param $validator
+     */
+    function validateAddToCartPopup($validator)
+    {
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'need_modal',
+            RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory',
+            RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action',
+            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'need_coupon',
+        ), ['0', '1'])->message('This field contains invalid value');
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'modal_show_popup_until',
+        ), ['1', '2', '3'])->message('This field contains invalid value');
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'close_btn_behavior',
+        ), ['add_and_close', 'just_close'])->message('This field contains invalid value');
+        $validator->rule('array', array(
+            RNOC_PLUGIN_PREFIX . 'modal_display_pages',
+        ))->message('This field contains invalid value');
+        $validator->rule('regex', array(
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_email_placeholder',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_text',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_terms_text',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_heading',
+            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading',
+            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject',
+        ), '/^[\p{L}\p{Nd} .-]+$/')->message('This field should only accepts numbers, alphabets and spaces');
+        $validator->rule('color', array(
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_heading_color',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_color',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_bg_color',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
+            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color',
+        ))->message('This field accepts only hex color code');
+        $validator->rule('slug', array(
+            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'woo_coupon',
+        ))->message('This field accepts only numbers,alphabets,hypens and underscores');
+        $validator->rule('basicTags', array(
+            RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class',
+            RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message',
+            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template',
+            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template',
+        ))->message('Script tag and iframe tag were not allowed ');
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
+        ), ['instantly', 'send_via_email', 'both', 'auto_apply_and_redirect', 'send_mail_auto_apply_and_redirect_cart', 'send_mail_auto_apply_and_redirect', 'auto_apply_and_redirect_cart'])->message('This field contains invalid value');
         if (!$validator->validate()) {
             wp_send_json_error($validator->errors());
         }
@@ -323,79 +379,13 @@ class Settings
         if (!current_user_can('manage_woocommerce')) {
             wp_send_json_error('security breach');
         }
-        $default_settings = array(
-            RNOC_PLUGIN_PREFIX . 'need_modal' => '0',
-            RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory' => '1',
-            RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action' => '1',
-            RNOC_PLUGIN_PREFIX . 'close_btn_behavior' => 'just_close',
-            RNOC_PLUGIN_PREFIX . 'modal_show_popup_until' => '1',
-            RNOC_PLUGIN_PREFIX . 'modal_display_pages' => array(),
-            RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class' => '',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings' => array(0 => array(
-                RNOC_PLUGIN_PREFIX . 'modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'modal_heading_color' => '#000000',
-                RNOC_PLUGIN_PREFIX . 'modal_email_placeholder' => __('Email address', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'modal_add_cart_text' => __('Add to Cart', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'modal_add_cart_color' => '#ffffff',
-                RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color' => '#f27052',
-                RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color' => '#f27052',
-                RNOC_PLUGIN_PREFIX . 'modal_bg_color' => '#F8F0F0',
-                RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color' => '#f27052',
-                RNOC_PLUGIN_PREFIX . 'modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
-            )),
-            RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance' => array(0 => array(
-                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
-                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
-            )),
-            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings' => array(0 => array(
-                RNOC_PLUGIN_PREFIX . 'need_coupon' => '0',
-                RNOC_PLUGIN_PREFIX . 'woo_coupon' => '',
-                RNOC_PLUGIN_PREFIX . 'modal_sub_heading' => __('Get a discount in your email!', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color' => '#333333',
-                RNOC_PLUGIN_PREFIX . 'show_woo_coupon' => 'send_via_email',
-                RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template' => '',
-                RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'coupon_mail_template' => '',
-            )),
-            RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal' => 0,
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages' => array(),
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to' => 'all',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon' => '',
-            RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied' => 0,
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings' => array('show_option' => 'once_per_page', 'show_count' => 1),
-            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life' => 1,
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template' => '',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style' => '',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success' => 'checkout',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance' => array(0 => array(
-                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
-                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
-            )),
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design' => array(0 => array(
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder' => __('Enter E-mail address', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height' => '46px',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width' => '100%',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text' => __('Complete checkout', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color' => '#ffffff',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color' => '#f20561',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height' => '100%',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width' => '100%',
-            )),
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings' => array(0 => array(
-                RNOC_PLUGIN_PREFIX . 'enable_mobile_support' => '0',
-                RNOC_PLUGIN_PREFIX . 'enable_delay_trigger' => '0',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec' => '0',
-                RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger' => '0',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance' => '0',
-            )),
-        );
         $validator = new Validator($_POST);
         Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
         Validator::addRule('basicTags', array(__CLASS__, 'validateBasicHtmlTags'), 'Only br, strong, span,div, p tags accepted');
         Validator::addRule('color', array(__CLASS__, 'validateColor'), 'must contain only hex color code');
         $this->validateCouponTimer($validator);
         $this->validateExitIntentPopup($validator);
+        $this->validateAddToCartPopup($validator);
         $page_slug = $this->slug . '_premium';
         $exit_intent_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] : '';
         $add_to_cart_coupon_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template'] : '';
