@@ -468,38 +468,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         }
 
         /**
-         * add the settings tabs
-         * @param $settings
-         * @return array
-         */
-        function premiumAddonTab($settings)
-        {
-            $settings[] = array(
-                'id' => $this->slug,
-                'icon' => $this->icon,
-                'title' => __('Add to cart Popup', RNOC_TEXT_DOMAIN),
-                'fields' => array(
-                    RNOC_PLUGIN_PREFIX . 'popup_preview',
-                    RNOC_PLUGIN_PREFIX . 'modal_design_settings',
-                    RNOC_PLUGIN_PREFIX . 'close_btn_behavior',
-                    RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory',
-                    RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance',
-                    RNOC_PLUGIN_PREFIX . 'modal_coupon_settings',
-                    RNOC_PLUGIN_PREFIX . 'need_modal',
-                    RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class',
-                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
-                    RNOC_PLUGIN_PREFIX . 'modal_bg_color',
-                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
-                    RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action',
-                    RNOC_PLUGIN_PREFIX . 'modal_show_popup_until',
-                    RNOC_PLUGIN_PREFIX . 'modal_display_pages',
-                    RNOC_PLUGIN_PREFIX . 'woo_coupons'
-                ),
-            );
-            return $settings;
-        }
-
-        /**
          * @param $settings
          * @param $base_url
          * @param $add_on_slug
