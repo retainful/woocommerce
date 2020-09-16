@@ -117,7 +117,7 @@ function initJqueryRetainfulPopupJs() {
                             popup_btn.click();
                         }
                     }
-                    popup_btn.attr('disabled',false);
+                    popup_btn.attr('disabled', false);
                     popup_btn.removeClass('rnoc-popup-opener');
                     modal.css('display', 'none');
                     $(document).trigger('retainful_closed_add_to_cart_popup', [modal]);
@@ -255,6 +255,8 @@ function initJqueryRetainfulPopupJs() {
                         is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
                         action: 'set_rnoc_guest_session'
                     };
+                    var encrypted_email = email;
+                    localStorage.setItem('rnoc_atcp_data', encrypted_email);
                     let response = this.request(rnoc_ajax_url, popup_data);
                     if (!response.error) {
                         if (response.message !== '') {
@@ -283,10 +285,16 @@ function initJqueryRetainfulPopupJs() {
         }
 
         let add_to_cart_popup = new addToCartPopup().setOptions(retainful_premium_add_to_cart_collection_popup_condition);
-        $(document).on('adding_to_cart', (eventData, thisButton) => {
+        $(document).on('adding_to_cart', (eventData, thisButton, postData) => {
             if (add_to_cart_popup.needPopup()) {
                 add_to_cart_popup.displayPopup(thisButton);
                 throw new Error('Retainful intercepts to show popup!');
+            } else {
+                var email = localStorage.getItem('rnoc_atcp_data');
+                if (email !== null && typeof email !== "undefined" && email !== "") {
+                    postData.rnoc_email_popup = email;
+                    localStorage.removeItem('rnoc_atcp_data');
+                }
             }
         });
         $(document).on('click', '#rnoc-add-to-cart-add-on .close-rnoc-popup', (event) => {
@@ -307,6 +315,14 @@ function initJqueryRetainfulPopupJs() {
             if (add_to_cart_popup.needPopup()) {
                 event.preventDefault();
                 add_to_cart_popup.displayPopup($(this));
+            } else {
+                var email = localStorage.getItem('rnoc_atcp_data');
+                if (email !== null && typeof email !== "undefined" && email !== "") {
+                    var user_email = email;
+                    var hidden_ip = '<input type="hidden" name="rnoc_email_popup" value="' + user_email + '" />'
+                    $(this).after(hidden_ip);
+                    localStorage.removeItem('rnoc_atcp_data');
+                }
             }
         });
         if (typeof retainful_premium_add_to_cart_collection !== "undefined" && typeof retainful_premium_add_to_cart_collection.add_to_cart_button_classes !== 'undefined') {
