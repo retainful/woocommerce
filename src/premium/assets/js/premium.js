@@ -62,21 +62,21 @@
             return false;
         }
     }
-    Retainful_premium.prototype.modal = function (content = "") {
+    Retainful_premium.prototype.modal = function (content = "", popup_type = 'atc') {
         $(document).trigger('before_rnoc_show_modal');
-        window.retainful.close_modal();
-        var html_content = $('<div class="rnoc-modal"><div class="rnoc-modal-container"><a href="#0" class="rnoc-close-modal">Close</a> ' + content + '</div></div>');
+        var html_content = $('<div class="rnoc-modal" id="rnoc-modal-' + popup_type + '"><div class="rnoc-modal-container"><a href="#0" class="rnoc-close-modal rnoc-close-modal-' + popup_type + '" data-close="' + popup_type + '">Close</a> ' + content + '</div></div>');
         $('body').append(html_content);
         html_content.show();
-        $(document).trigger('before_rnoc_show_modal');
-        html_content.on('click', '.rnoc-close-modal', function () {
-            $(document).trigger('before_rnoc_close_modal');
+        $(document).trigger('before_rnoc_show_modal', popup_type);
+        html_content.on('click', '.rnoc-close-modal-' + popup_type, function () {
+            $(document).trigger('before_rnoc_close_modal', $(this));
             html_content.remove();
         })
     }
-    Retainful_premium.prototype.close_modal = function () {
-        $(document).trigger('before_rnoc_close_modal');
-        $('.rnoc-modal').remove();
+    Retainful_premium.prototype.close_modal = function (popup_type = 'atc') {
+        var close_btn = $('.rnoc-close-modal-' + popup_type);
+        $(document).trigger('before_rnoc_close_modal', close_btn);
+        $('#rnoc-modal-' + popup_type).remove();
     }
 
     /**
@@ -237,7 +237,7 @@
                 return false;
             }
         });
-        $(document).on('click', '#rnoc-add-to-cart-add-on .close-rnoc-popup', (event) => {
+        $(document).on('.rnoc-close-modal-atc', (event) => {
             event.preventDefault();
             close_atc_popup("3");
         });
@@ -306,7 +306,6 @@
         }
         /**
          * request js
-         * @param url
          * @param body
          * @param headers
          * @param data_type
@@ -341,14 +340,16 @@
                 sessionStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
                 popup_btn.click();
             } else {
-                if (this.getCloseButtonBehaviour() !== "just_close") {
+                if (settings.close_btn_behavior !== "just_close") {
                     sessionStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
                     popup_btn.click();
                 }
             }
             popup_btn.attr('disabled', false);
             popup_btn.removeClass('rnoc-popup-opener');
-            window.retainful.close_modal();
+            if (event !== "3") {
+                window.retainful.close_modal();
+            }
             $(document).trigger('retainful_closed_add_to_cart_popup', [modal]);
         }
         /**
@@ -367,6 +368,7 @@
      */
     Retainful_premium.prototype.init_ei_popup = function (current_settings) {
         window.rnoc_ei_popup_showed_for = 0;
+        window.rnoc_ei_popup_is_active = false;
         window.is_rnoc_mobil_scroll_popup_showed = false;
         var settings = {...this.default_ei_popup_settings, ...current_settings};
         var is_mobile_device = function () {
@@ -416,10 +418,13 @@
                     return false;
                 }
                 if (show) {
-                    var html = $('.rnoc-ei-popup').html();
-                    window.retainful.modal(html);
-                    sessionStorage.setItem('rnoc_ei_popup_showed_count', '1')
-                    window.rnoc_ei_popup_showed_for++;
+                    if (window.rnoc_ei_popup_is_active === false) {
+                        var html = $('.rnoc-ei-popup').html();
+                        window.retainful.modal(html, 'ei');
+                        window.rnoc_ei_popup_is_active = true;
+                        sessionStorage.setItem('rnoc_ei_popup_showed_count', '1')
+                        window.rnoc_ei_popup_showed_for++;
+                    }
                 }
                 switch (settings.show_popup) {
                     default:
