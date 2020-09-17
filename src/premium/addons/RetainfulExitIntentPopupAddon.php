@@ -29,8 +29,9 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 add_action('wp_ajax_rnocp_get_exit_intent_popup_template', array($this, 'getPopupTemplateToInsert'));
             }
             $need_ei_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 1);
-            add_action('wp_footer', array($this, 'enqueueScript'));
+            add_action('wp_enqueue_scripts', array($this, 'enqueueScript'));
             if ($need_ei_popup) {
+                add_action('wp_footer', array($this, 'printExitIntentPopup'));
                 add_action('wp_ajax_nopriv_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
                 add_action('wp_ajax_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
                 add_action('wp', array($this, 'applyCouponAutomatically'));
@@ -328,7 +329,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             if (!wp_style_is('rnoc-premium')) {
                 wp_enqueue_style('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/css/premium.css', array(), RNOC_VERSION);
             }
-            $this->printExitIntentPopup();
         }
 
         /**

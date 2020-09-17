@@ -15,6 +15,10 @@
         this.default_ei_popup_settings = {
             "enable": "no"
         };
+        this.default_atc_popup_settings = {
+            "enable": "no",
+            "custom_classes": ""
+        };
         this.default_ct_settings = {
             "enable": "yes",
             "timer_started": "0",
@@ -45,59 +49,6 @@
                 "enable": "no"
             }
         };
-        var default_settings = {
-            "checkout_url": "",
-            "cart_url": "",
-            "ei_popup": {
-                "enable": "yes",
-                "show_for": "all",
-                "is_user_logged_in": "no",
-                "coupon_code": null,
-                "show_once_its_coupon_applied": "no",
-                "applied_coupons": ["no"],
-                "show_popup": "every_time_on_customer_exists",
-                "number_of_times_per_page": "1",
-                "cookie_expired_at": "1",
-                "redirect_url": "1",
-                "mobile": {
-                    "enable": "yes",
-                    "time_delay": "yes",
-                    "delay": "10",
-                    "scroll_distance": "yes",
-                    "distance": "10"
-                }
-            },
-            "coupon_timer": {
-                "enable": "yes",
-                "timer_started": "0",
-                "time_in_minutes": "15",
-                "code": "",
-                "expiry_url": "",
-                "reset_url": "",
-                "expiry_message": "",
-                "expired_text": "Expired",
-                "timer_reset": "0",
-                "top": {
-                    "enable": "yes",
-                    "checkout_url": "",
-                    "message": "Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}",
-                    "timer": "{{minutes}}M {{seconds}}S",
-                    "display_on": "bottom",
-                    "background": "#ffffff",
-                    "color": "#000000",
-                    "coupon_code_color": "#000000",
-                    "coupon_timer_color": "#000000",
-                    "enable_cta": "yes",
-                    "cta_text": "Checkout Now",
-                    "cta_color": "#ffffff",
-                    "cta_background": "#f27052"
-                }, "above_cart": {
-                    "enable": "no"
-                }, "below_discount": {
-                    "enable": "no"
-                }
-            }
-        }
     }
 
     Retainful_premium.prototype.is_local_storage_supported = function () {
@@ -239,6 +190,178 @@
         }
     }
     /**
+     * Add to cart popup
+     * @param current_settings
+     */
+    Retainful_premium.prototype.init_atc_popup = function (current_settings) {
+        var settings = {...this.default_atc_popup_settings, ...current_settings};
+        var need_popup = function () {
+            if (settings.enable === 'yes') {
+                if (sessionStorage.getItem('retainful_add_to_cart_popup_temporary_silent') === "1") {
+                    sessionStorage.removeItem('retainful_add_to_cart_popup_temporary_silent');
+                    return false;
+                }
+                let popup_closed_by = sessionStorage.getItem("retainful_add_to_cart_popup_closed_by");
+                if (popup_closed_by === "1") {
+                    return false;
+                }
+                if (popup_closed_by === null) {
+                    return true;
+                }
+                let return_val = true;
+                switch (settings.show_popup_until) {
+                    default:
+                    case "1":/*Until provide email */
+                        return_val = (popup_closed_by !== "1");
+                        break;
+                    case "2":/*Until No thanks button clicked */
+                        return_val = (popup_closed_by !== "2");
+                        break;
+                    case "3":/*Until close button clicked */
+                        return_val = (popup_closed_by !== "3");
+                        break;
+                }
+                return return_val;
+            }
+        }
+        $(".ajax_add_to_cart,.single_add_to_cart_button " + settings.custom_classes).on('click', function (e) {
+            if (need_popup() && $(this).hasClass('disabled') === false && $(this).hasClass('acbwm-atcp-allow-click') === false) {
+                e.preventDefault();
+                $(document).trigger('retainful_showing_add_to_cart_popup', [$(this)]);
+                $(this).removeClass('loading');
+                $(this).addClass('rnoc-popup-opener');
+                var html = $('.atc-popup-content').html();
+                window.retainful.modal('<div id="rnoc-add-to-cart-add-on">' + html + '</div>');
+                sessionStorage.setItem('retainful_add_to_cart_opened', 'yes');
+                $(document).trigger('retainful_showed_add_to_cart_popup', [$(this)]);
+                return false;
+            }
+        });
+        $(document).on('click', '#rnoc-add-to-cart-add-on .close-rnoc-popup', (event) => {
+            event.preventDefault();
+            close_atc_popup("3");
+        });
+        $(document).on('click', '#rnoc-add-to-cart-add-on .no-thanks-close-popup', (event) => {
+            event.preventDefault();
+            close_atc_popup("2")
+        });
+        $(document).on('click', '#rnoc-add-to-cart-add-on .rnoc-popup-btn', (event) => {
+            let email = $('#rnoc-add-to-cart-add-on #rnoc-popup-email-field').val();
+            let error_handler = $("#rnoc-add-to-cart-add-on  #rnoc-invalid-mail-message");
+            var is_buyer_accepting_marketing = $('#rnoc-add-to-cart-add-on #rnoc-popup-buyer-accepts-marketing');
+            sync_email(email, is_buyer_accepting_marketing, $('#rnoc-add-to-cart-add-on .rnoc-popup-btn'), event, error_handler);
+        });
+        /**
+         * validate and sync the email
+         * @param email
+         * @param marketing_data
+         * @param submit_button
+         * @param event
+         * @param error_container
+         * @return {{error: boolean}}
+         */
+        var sync_email = function (email, marketing_data, submit_button, event, error_container) {
+            event.preventDefault();
+            error_container.hide();
+            if (settings.is_email_mandatory === "yes" && email === "") {
+                error_container.show();
+                return {"error": true}
+            }
+            if (!is_email(email)) {
+                error_container.show();
+                return {"error": true}
+            } else {
+                submit_button.addClass('loading');
+                submit_button.attr('disabled', true);
+                let popup_data = {
+                    local_storage: true,
+                    email: email,
+                    is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
+                    action: 'set_rnoc_guest_session'
+                };
+                let response = request(popup_data);
+                if (!response.error) {
+                    if (response.message !== '') {
+                        //return {"error": true}
+                    }
+                    if (response.redirect !== null) {
+                        sessionStorage.setItem("rnoc_instant_coupon_popup_redirect", response.redirect);
+                        sessionStorage.setItem("rnoc_instant_coupon_is_redirected", "no");
+                    }
+                    if (response.show_coupon_instant_popup) {
+                        sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "no");
+                        sessionStorage.setItem("rnoc_instant_coupon_popup_html", response.coupon_instant_popup_content);
+                    }
+                    sessionStorage.setItem('rnocp_is_add_to_cart_popup_email_entered', '1');
+                    close_atc_popup("1");
+                } else {
+                    if (response.message !== '') {
+                        //return err
+                    }
+                }
+                submit_button.removeClass('loading');
+                submit_button.attr('disabled', false);
+                return {"error": false};
+            }
+        }
+        /**
+         * request js
+         * @param url
+         * @param body
+         * @param headers
+         * @param data_type
+         * @param method
+         * @param async
+         */
+        var request = function (body = {}, headers = {}, data_type = "json", method = "POST", async = false) {
+            let msg = null;
+            $.ajax({
+                url: settings.ajax_url,
+                headers: headers,
+                method: method,
+                dataType: data_type,
+                data: body,
+                async: async,
+                success: function (response) {
+                    msg = response;
+                },
+                error: function (response) {
+                    msg = response;
+                }
+            });
+            return msg;
+        }
+        var close_atc_popup = function (event = "1") {
+            sessionStorage.setItem('retainful_add_to_cart_popup_closed_by', event);
+            let modal = $('rnoc-add-to-cart-add-on');
+            //Trigger event about hiding popup
+            $(document).trigger('retainful_closing_add_to_cart_popup', [modal]);
+            let popup_btn = $('.rnoc-popup-opener');
+            if (event === "1" || event === "2") {
+                sessionStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
+                popup_btn.click();
+            } else {
+                if (this.getCloseButtonBehaviour() !== "just_close") {
+                    sessionStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
+                    popup_btn.click();
+                }
+            }
+            popup_btn.attr('disabled', false);
+            popup_btn.removeClass('rnoc-popup-opener');
+            window.retainful.close_modal();
+            $(document).trigger('retainful_closed_add_to_cart_popup', [modal]);
+        }
+        /**
+         * Validate is the entered content is email
+         * @param email
+         * @return {boolean}
+         */
+        var is_email = function (email) {
+            var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            return regex.test(email);
+        }
+    }
+    /**
      * exit intent popup
      * @param current_settings
      */
@@ -274,7 +397,6 @@
             if (checkout_form.is('.processing')) {
                 return false;
             }
-            console.log(cart_hash)
             if (cart_hash !== "" && cart_hash !== undefined && cart_hash !== null) {
                 var show = false;
                 switch (settings.show_for) {
@@ -380,8 +502,10 @@
     }
     window.retainful = new Retainful_premium();
     if (window.retainful.is_local_storage_supported()) {
-        window.retainful.init_ei_popup(rnoc_premium_ei_popup);
-        window.retainful.init_coupon_timer(rnoc_premium_ct);
+        $(document).ready(function () {
+            window.retainful.init_ei_popup(rnoc_premium_ei_popup);
+            window.retainful.init_coupon_timer(rnoc_premium_ct);
+            window.retainful.init_atc_popup(rnoc_premium_atcp);
+        });
     }
-}))
-;
+}));

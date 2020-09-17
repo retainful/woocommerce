@@ -33,7 +33,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             add_action('wp_ajax_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
             add_action('wp_ajax_rnoc_popup_closed', array($this, 'popupClosed'));
             add_action('wp_footer', array($this, 'enqueue_script'));
-            add_action('wp', array($this, 'siteInit'));
+            add_action('wp_enqueue_scripts', array($this, 'enqueueScripts'));
+            add_action('wp_footer', array($this, 'addAtcPopupContent'));
+            add_action('wp', array($this, 'applyCouponAutomatically'));
         }
 
         function enqueue_script()
@@ -133,61 +135,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 $popup_template_path = $override_path;
             }
             return $this->getTemplateContent($popup_template_path, $final_settings, $this->slug);
-        }
-
-        /**
-         * init the addon
-         */
-        function siteInit()
-        {
-            if (defined('RNOC_VERSION') && $this->isValidUserToShow()) {
-                if (version_compare(RNOC_VERSION, '1.1.5', '>')) {
-                    $this->admin = new Rnoc\Retainful\Admin\Settings();
-                    $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
-                    $this->applyCouponAutomatically();
-                    if (is_admin()) {
-                        add_action('wp_footer', array($this, 'addPopupEditor'));
-                    }
-                    $need_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_modal', 0);
-                    if ($need_popup == 0) {
-                        return false;
-                    }
-                    add_action('wp_enqueue_scripts', array($this, 'addSiteInstantCouponScripts'));
-                    $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_display_pages', array());
-                    if (!$this->isValidPagesToDisplay($modal_display_pages)) {
-                        return false;
-                    }
-                    $is_popup_closed_by_user = $this->wc_functions->getSession('rnoc_popup_closed_by_user');
-                    if (!empty($is_popup_closed_by_user)) {
-                        return false;
-                    }
-                    $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
-                    $show_popup = false;
-                    if ($run_cart_externally) {
-                        $email = $this->wc_functions->getCustomerEmail();
-                        if (!empty($email)) {
-                            return false;
-                        }
-                        $show_popup = true;
-                    } else {
-                        $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-                        $user_session_id = $abandoned_cart->getUserSessionKey();
-                        if (!empty($user_session_id)) {
-                            global $wpdb;
-                            $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
-                            $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
-                            if (empty($results)) {
-                                $show_popup = true;
-                            }
-                        }
-                    }
-                    if ($show_popup) {
-                        add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
-                        add_action('wp_footer', array($this, 'addToCartPopup'), 10);
-                    }
-                }
-            }
-            return true;
         }
 
         /**
@@ -429,65 +376,50 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         }
 
         /**
-         * Add the site scripts needed for addon
+         * ATC popup settings
+         * @param $premium_settings
          */
-        function addSiteScripts()
+        function addToCartPopupSettings(&$premium_settings)
         {
-            if (!wp_script_is('rnoc-add-to-cart')) {
-                wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/atc-popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
-            }
-            $modal_show_popup_until = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1);
-            $close_btn_behavior = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close');
-            $modal_show = array(
-                'hide_modal_after_show' => $modal_show_popup_until,
-                'close_btn_behavior' => $close_btn_behavior,
-                'jquery_url' => includes_url('js/jquery/jquery.js'),
-                "enable_add_to_cart_popup" => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_modal', 0) == 0) ? "no" : "yes",
-                "is_email_mandatory" => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1) == 1) ? "yes" : "no",
-                "no_thanks_action" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
-                "show_popup_until" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
-            );
-            wp_localize_script('rnoc-add-to-cart', 'retainful_premium_add_to_cart_collection_popup_condition', $modal_show);
-            $modal_popup_extra_classes = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class', null);
-            $extra_classes = !empty($modal_popup_extra_classes) ? array('add_to_cart_button_classes' => $modal_popup_extra_classes) : array();
-            $classes_list = apply_filters('retainful_premium_add_to_cart_collection_button_classes', $extra_classes);
-            if (!empty($classes_list)) {
-                wp_localize_script('rnoc-add-to-cart', 'retainful_premium_add_to_cart_collection', $classes_list);
-            }
-        }
-
-        /**
-         * Add the site scripts needed for addon
-         */
-        function addSiteInstantCouponScripts()
-        {
-            if (!wp_script_is('rnoc-add-to-cart')) {
-                wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/atc-popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
-                $modal_show = array(
-                    'jquery_url' => includes_url('js/jquery/jquery.js')
+            $need_atc_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_modal', 1);
+            $selected_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_display_pages', array());
+            if ($need_atc_popup == 1 && $this->isValidPagesToDisplay($selected_pages)) {
+                $premium_settings['atc_popup'] = array(
+                    'enable' => 'yes',
+                    'ajax_url' => admin_url('admin-ajax.php'),
+                    'show_popup_until' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
+                    'custom_classes' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class', ''),
+                    'is_email_mandatory' => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1) == 1) ? 'yes' : 'no',
+                    'close_btn_behavior' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close'),
                 );
-                wp_localize_script('rnoc-add-to-cart', 'retainful_premium_add_to_cart_collection_popup_condition', $modal_show);
-            }
-            if (!wp_style_is('rnoc-popup')) {
-                wp_enqueue_style('rnoc-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
+            } else {
+                $premium_settings['atc_popup'] = array(
+                    'enable' => 'no',
+                );
             }
         }
 
         /**
-         * popup html
+         * Add the site scripts needed for addon
          */
-        function addToCartPopup()
+        function addAtcPopupContent()
         {
-            $final_settings = array(
-                "show_for_admin" => current_user_can('administrator'),
-                "template" => $this->getPopupTemplate(),
-                "custom_style" => '',
-                "add_on_slug" => 'rnoc-add-to-cart-add-on',
-                "no_thanks_action" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
-                "is_email_mandatory" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1)
-            );
-            if (!is_admin()) {
-                echo $this->getTemplateContent(RNOCPREMIUM_PLUGIN_PATH . 'templates/popup_display.php', $final_settings, $this->slug);
+            echo '<div class="atc-popup-content" style="display: none;">' . $this->getPopupTemplate() . '</div>';
+        }
+
+        /**
+         * enqueue scripts
+         */
+        function enqueueScripts()
+        {
+            $premium_settings = array();
+            $this->addToCartPopupSettings($premium_settings);
+            if (!wp_script_is('rnoc-premium')) {
+                wp_enqueue_script('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/js/premium.js', array('jquery'), RNOC_VERSION);
+            }
+            wp_localize_script('rnoc-premium', 'rnoc_premium_atcp', $premium_settings['atc_popup']);
+            if (!wp_style_is('rnoc-premium')) {
+                wp_enqueue_style('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/css/premium.css', array(), RNOC_VERSION);
             }
         }
 
