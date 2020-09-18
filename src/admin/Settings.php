@@ -552,7 +552,7 @@ class Settings
         $validator = new Validator($_POST);
         Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
         Validator::addRule('basicTags', array(__CLASS__, 'validateBasicHtmlTags'), 'Only br, strong, span,div, p tags accepted');
-        $validator->rule('slug', RNOC_PLUGIN_PREFIX . 'expire_date_format');
+        $validator->rule('regex', RNOC_PLUGIN_PREFIX . 'expire_date_format','/^[a-zA-Z0-9 ,\/:-]+$/')->message('This filed should accepts number, alphabets, hypen, comma, colon and space');
         $validator->rule('array', array(
             RNOC_PLUGIN_PREFIX . 'preferred_order_status',
             RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
