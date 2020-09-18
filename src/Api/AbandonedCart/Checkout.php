@@ -18,6 +18,18 @@ class Checkout extends RestApi
     }
 
     /**
+     * @param $checkout_fields
+     * @return mixed
+     */
+    function moveEmailFieldToTop($checkout_fields)
+    {
+        if (self::$settings->moveEmailFieldToTop()) {
+            $checkout_fields['billing']['billing_email']['priority'] = 4;
+        }
+        return $checkout_fields;
+    }
+
+    /**
      * purchase complete
      * @param $order_id
      * @return null
