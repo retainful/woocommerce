@@ -45,6 +45,11 @@ require_once "tabs.php";
         ?>
     </div>
     <div class="card" style="width: 74%;float: left;margin-left: 5px;">
+        <button type="submit" data-action="rnoc_save_premium_addon_settings"
+                data-security="<?php echo wp_create_nonce('rnoc_save_premium_addon_settings') ?>"
+                class="button button-primary button-right-fixed"><i
+                    class="dashicons dashicons-yes"></i>&nbsp;&nbsp;<span><?php esc_html_e('save', RNOC_TEXT_DOMAIN); ?></span>
+        </button>
         <?php
         do_action('rnoc_premium_addon_settings_page_' . $add_on_slug, $settings, $base_url, $add_on_slug);
         ?>
@@ -62,9 +67,4 @@ require_once "tabs.php";
             </tbody>
         </table>
     </div>
-    <button type="submit" data-action="rnoc_save_premium_addon_settings"
-            data-security="<?php echo wp_create_nonce('rnoc_save_premium_addon_settings') ?>"
-            class="button button-primary button-right-fixed"><i
-                class="dashicons dashicons-yes"></i>&nbsp;&nbsp;<span><?php esc_html_e('save', RNOC_TEXT_DOMAIN); ?></span>
-    </button>
 </form>
