@@ -1038,9 +1038,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             <?php
                             $email_template = $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'];
                             if (empty($email_template)) {
-                                $email_template = $this->getDefaultPopupTemplate();
+                                $email_template = $this->getDefaultEmailTemplate();
                             }
-                            wp_editor($email_template, 'add_to_cart_coupon_popup_template', $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template]');
+                            wp_editor($email_template, 'add_to_cart_coupon_popup_template', array('textarea_name' => $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template]'));
                             ?>
                             <p class="description">
                                 Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b>
@@ -1072,9 +1072,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             <?php
                             $email_template = $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'];
                             if (empty($email_template)) {
-                                $email_template = $this->getDefaultEmailTemplate();
+                                $email_template = $this->getDefaultPopupTemplate();
                             }
-                            wp_editor($email_template, 'coupon_mail_template', $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template]');
+                            wp_editor($email_template, 'coupon_mail_template', array('textarea_name' => $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template]'));
                             ?>
                             <p class="description">
                                 Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b>

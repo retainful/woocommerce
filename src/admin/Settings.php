@@ -343,7 +343,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_heading',
             RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading',
             RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject',
-        ), '/^[\p{L}\p{Nd} .-]+$/')->message('This field should only accepts numbers, alphabets and spaces');
+        ), '/^[\p{L}\p{Nd} .!:*,-]+$/')->message('This field should only accepts numbers, alphabets and spaces');
         $validator->rule('color', array(
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_heading_color',
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_color',
@@ -388,10 +388,16 @@ class Settings
         $this->validateAddToCartPopup($validator);
         $page_slug = $this->slug . '_premium';
         $exit_intent_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] : '';
-        $add_to_cart_coupon_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template'] : '';
+        $add_to_cart_coupon_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] : '';
+        $coupon_mail_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] : '';
         $data = $this->clean($_POST);
         $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] = $this->sanitizeBasicHtml($exit_intent_popup_template);
-        $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]['add_to_cart_coupon_popup_template'] = $this->sanitizeBasicHtml($add_to_cart_coupon_popup_template);
+        if (!empty($add_to_cart_coupon_popup_template)) {
+            $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] = $this->sanitizeBasicHtml($add_to_cart_coupon_popup_template);
+        }
+        if (!empty($coupon_mail_template)) {
+            $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] = $this->sanitizeBasicHtml($coupon_mail_template);
+        }
         $settings = get_option($page_slug, array());
         $data_to_save = wp_parse_args($data, $settings);
         update_option($page_slug, $data_to_save);
@@ -552,7 +558,7 @@ class Settings
         $validator = new Validator($_POST);
         Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
         Validator::addRule('basicTags', array(__CLASS__, 'validateBasicHtmlTags'), 'Only br, strong, span,div, p tags accepted');
-        $validator->rule('regex', RNOC_PLUGIN_PREFIX . 'expire_date_format','/^[a-zA-Z0-9 ,\/:-]+$/')->message('This filed should accepts number, alphabets, hypen, comma, colon and space');
+        $validator->rule('regex', RNOC_PLUGIN_PREFIX . 'expire_date_format', '/^[a-zA-Z0-9 ,\/:-]+$/')->message('This filed should accepts number, alphabets, hypen, comma, colon and space');
         $validator->rule('array', array(
             RNOC_PLUGIN_PREFIX . 'preferred_order_status',
             RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
@@ -573,7 +579,6 @@ class Settings
         ), ['0', '1'])->message('This field contains invalid value');
         $validator->rule('float', array(
             RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount',
-            RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
             RNOC_PLUGIN_PREFIX . 'minimum_sub_total',
             RNOC_PLUGIN_PREFIX . 'minimum_spend',
             RNOC_PLUGIN_PREFIX . 'maximum_spend',
@@ -704,6 +709,7 @@ class Settings
         $validator->rule('in', array(
             RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
             RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
+            RNOC_PLUGIN_PREFIX . 'move_email_field_to_top',
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load',
             RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
             RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
