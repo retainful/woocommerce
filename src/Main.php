@@ -203,6 +203,7 @@ class Main
                     add_action('woocommerce_before_shop_loop', array($cart, 'userGdprMessage'), 10);
                 }
                 add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
+                add_action('wp_footer',array($checkout,'setRetainfulOrderData'));
                 add_filter('rnoc_can_track_abandoned_carts', array($cart, 'isZeroValueCart'), 15);
                 $cart_tracking_engine = $this->admin->getCartTrackingEngine();
                 if ($cart_tracking_engine == "php") {
