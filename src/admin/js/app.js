@@ -8,6 +8,45 @@
                 return false;
             }
         })
+        $(document).on("change", "#exit_intent_popup_show_option", function (event) {
+            var val = $(this).val();
+            eip_show_option(val);
+        })
+        $(document).on("change", "#rnoc_show_woo_coupon", function (event) {
+            var val = $(this).val();
+            atcp_show_woo_coupon(val);
+        })
+        $(document).ready(function () {
+            var val = $("#exit_intent_popup_show_option").val();
+            eip_show_option(val);
+            var show_coupon_field = $("#rnoc_show_woo_coupon").val();
+            atcp_show_woo_coupon(show_coupon_field)
+        })
+
+        function eip_show_option(val) {
+            var input = $("#show_x_times_per_page_val");
+            if (val === "show_x_times_per_page") {
+                input.show();
+            } else {
+                input.hide();
+            }
+        }
+
+        function atcp_show_woo_coupon(val) {
+            var popup = $("#row_atcp_template");
+            var email = $(".row_atcp_mail_template");
+            if (val === "instantly" || val === "both" || val === "auto_apply_and_redirect" || val === "auto_apply_and_redirect_cart") {
+                popup.show();
+            } else {
+                popup.hide();
+            }
+            if (val === "send_via_email" || val === "both" || val === "send_mail_auto_apply_and_redirect" || val === "send_mail_auto_apply_and_redirect_cart") {
+                email.show();
+            } else {
+                email.hide();
+            }
+        }
+
         /*$(document).on("keypress keyup blur", "#app_coupon_value", function (event) {
             $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
             if ((event.which !== 46 || $(this).val().indexOf('.') !== -1) && (event.which < 48 || event.which > 57)) {
@@ -154,7 +193,7 @@
         $(document).on('change', '#exit_intent_popup_show_option', function () {
             if ($(this).val() === 'show_x_times_per_page') {
                 $('#show_x_times_per_page_val').show();
-            }else{
+            } else {
                 $('#show_x_times_per_page_val').hide();
             }
         });

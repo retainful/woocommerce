@@ -4,6 +4,7 @@ namespace Rnoc\Retainful\Admin;
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
+use Rnoc\Retainful\Helpers\Input;
 use Rnoc\Retainful\Integrations\MultiLingual;
 use Rnoc\Retainful\library\RetainfulApi;
 use Rnoc\Retainful\WcFunctions;
@@ -12,6 +13,7 @@ use Valitron\Validator;
 class Settings
 {
     public $slug = 'retainful', $api, $wc_functions;
+    public static $input = null;
 
     /**
      * Settings constructor.
@@ -20,6 +22,9 @@ class Settings
     {
         $this->api = new RetainfulApi();
         $this->wc_functions = new WcFunctions();
+        if (is_null(self::$input)) {
+            self::$input = new Input();
+        }
     }
 
     /**
@@ -53,7 +58,7 @@ class Settings
      */
     function initAdminPageStyles()
     {
-        $page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : NULL;
+        $page = self::$input->get('page', null);
         if (is_admin() && in_array($page, array('retainful', 'retainful_settings', 'retainful_premium', 'retainful_license'))) {
             $this->addScript();
         }
@@ -100,7 +105,8 @@ class Settings
         if (!current_user_can('manage_woocommerce')) {
             wp_send_json_error('security breach');
         }
-        $validator = new Validator($_POST);
+        $post = self::$input->post();
+        $validator = new Validator($post);
         $validator->rule('required', ['app_id', 'secret_key']);
         $validator->rule('slug', ['app_id', 'secret_key']);
         if (!$validator->validate()) {
@@ -161,23 +167,28 @@ class Settings
      */
     function sanitizeBasicHtml($html)
     {
-        $allowed_html = array();
-        $tags = array(
-            'div', 'a', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'b', 'strong', 'i', 'img', 'br'
-        );
-        foreach ($tags as $tag) {
-            $allowed_html[$tag] = array(
-                'class' => array(),
-                'id' => array(),
-                'style' => array()
+        try {
+            $html = html_entity_decode($html);
+            $allowed_html = array();
+            $tags = array(
+                'div', 'a', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'b', 'strong', 'i', 'img', 'br'
             );
-            if ($tag == 'a') {
-                $allowed_html[$tag]['href'] = array();
+            foreach ($tags as $tag) {
+                $allowed_html[$tag] = array(
+                    'class' => array(),
+                    'id' => array(),
+                    'style' => array()
+                );
+                if ($tag == 'a') {
+                    $allowed_html[$tag]['href'] = array();
+                }
             }
+            $allowed_html = apply_filters('rnoc_sanitize_allowed_basic_html_tags', $allowed_html);
+            $sanitized_html = wp_kses($html, $allowed_html);
+            return apply_filters('rnoc_sanitize_basic_html', $sanitized_html, $html, $allowed_html);
+        } catch (\Exception $e) {
+            return '';
         }
-        $allowed_html = apply_filters('rnoc_sanitize_allowed_basic_html_tags', $allowed_html);
-        $sanitized_html = wp_kses($html, $allowed_html);
-        return apply_filters('rnoc_sanitize_basic_html', $sanitized_html, $html, $allowed_html);
     }
 
     /**
@@ -239,7 +250,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'checkout_button_text',
         ))->message('Script tag and iframe tag were not allowed ');
-        if (isset($_POST[RNOC_PLUGIN_PREFIX . 'enable_coupon_timer']) && $_POST[RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'] == 1) {
+        if (self::$input->has_post(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer') && self::$input->post(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', '1') == 1) {
             $validator->rule('required', array(
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'
@@ -379,7 +390,8 @@ class Settings
         if (!current_user_can('manage_woocommerce')) {
             wp_send_json_error('security breach');
         }
-        $validator = new Validator($_POST);
+        $post = self::$input->post();
+        $validator = new Validator($post);
         Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
         Validator::addRule('basicTags', array(__CLASS__, 'validateBasicHtmlTags'), 'Only br, strong, span,div, p tags accepted');
         Validator::addRule('color', array(__CLASS__, 'validateColor'), 'must contain only hex color code');
@@ -387,10 +399,12 @@ class Settings
         $this->validateExitIntentPopup($validator);
         $this->validateAddToCartPopup($validator);
         $page_slug = $this->slug . '_premium';
-        $exit_intent_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] : '';
-        $add_to_cart_coupon_popup_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] : '';
-        $coupon_mail_template = isset($_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template']) ? $_POST[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] : '';
-        $data = $this->clean($_POST);
+        $exit_intent_popup_template = self::$input->post(RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', '');
+        $modal_coupon_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'modal_coupon_settings', array());
+        $add_to_cart_coupon_popup_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] : '';
+        $coupon_mail_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] : '';
+        $post = self::$input->post();
+        $data = $this->clean($post);
         $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] = $this->sanitizeBasicHtml($exit_intent_popup_template);
         if (!empty($add_to_cart_coupon_popup_template)) {
             $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] = $this->sanitizeBasicHtml($add_to_cart_coupon_popup_template);
@@ -412,7 +426,8 @@ class Settings
         $page_slug = $this->slug . '_premium';
         $available_addon_list = apply_filters('rnoc_get_premium_addon_list', array());
         $base_url = admin_url('admin.php?page=' . $page_slug);
-        if (isset($_GET['add-on'])) {
+        $add_on = self::$input->get('add-on', null);
+        if (!empty($add_on)) {
             $settings = get_option($page_slug, array());
             $default_settings = array(
                 RNOC_PLUGIN_PREFIX . 'enable_coupon_timer' => '1',
@@ -525,7 +540,7 @@ class Settings
                 )),
             );
             $settings = wp_parse_args($settings, $default_settings);
-            $add_on_slug = sanitize_text_field($_GET['add-on']);
+            $add_on_slug = sanitize_text_field($add_on);
             require_once dirname(__FILE__) . '/templates/pages/premium-addon-settings.php';
         } else {
             require_once dirname(__FILE__) . '/templates/pages/premium-addons.php';
@@ -555,7 +570,8 @@ class Settings
         if (!current_user_can('manage_woocommerce')) {
             wp_send_json_error('security breach');
         }
-        $validator = new Validator($_POST);
+        $post = self::$input->post();
+        $validator = new Validator($post);
         Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
         Validator::addRule('basicTags', array(__CLASS__, 'validateBasicHtmlTags'), 'Only br, strong, span,div, p tags accepted');
         $validator->rule('regex', RNOC_PLUGIN_PREFIX . 'expire_date_format', '/^[a-zA-Z0-9 ,\/:-]+$/')->message('This filed should accepts number, alphabets, hypen, comma, colon and space');
@@ -594,9 +610,10 @@ class Settings
         if (!$validator->validate()) {
             wp_send_json_error($validator->errors());
         }
-        $coupon_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']) ? $_POST[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] : '';
-        $applied_coupon_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design']) ? $_POST[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] : '';
-        $data = $this->clean($_POST);
+        $coupon_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'retainful_coupon_message', '');
+        $applied_coupon_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design', '');
+        $post = self::$input->post();
+        $data = $this->clean($post);
         $data[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] = $this->sanitizeBasicHtml($coupon_msg);
         $data[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] = $this->sanitizeBasicHtml($applied_coupon_msg);
         update_option($this->slug, $data);
@@ -681,6 +698,7 @@ class Settings
     static function validateBasicHtmlTags($field, $value, array $params, array $fields)
     {
         $value = stripslashes($value);
+        $value = html_entity_decode($value);
         $invalid_tags = array("script", "iframe");
         foreach ($invalid_tags as $tag_name) {
             $pattern = "#<\s*?$tag_name\b[^>]*>(.*?)</$tag_name\b[^>]*>#s";;
@@ -702,7 +720,8 @@ class Settings
         if (!current_user_can('manage_woocommerce')) {
             wp_send_json_error('security breach');
         }
-        $validator = new Validator($_POST);
+        $post = self::$input->post();
+        $validator = new Validator($post);
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', ['js', 'php'])->message('This field contains invalid value');
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'track_zero_value_carts', ['yes', 'no'])->message('This field contains invalid value');
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'handle_storage_using', ['woocommerce', 'cookie', 'php'])->message('This field contains invalid value');
@@ -718,8 +737,9 @@ class Settings
         if (!$validator->validate()) {
             wp_send_json_error($validator->errors());
         }
-        $cart_capture_msg = isset($_POST[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $_POST[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : '';
-        $data = $this->clean($_POST);
+        $cart_capture_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '');
+        $post = self::$input->post();
+        $data = $this->clean($post);
         $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = $this->sanitizeBasicHtml($cart_capture_msg);
         update_option($this->slug . '_settings', $data);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));

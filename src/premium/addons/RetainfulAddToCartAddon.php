@@ -908,7 +908,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     <tr>
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'need_coupon'; ?>"><?php
-                                esc_html_e('Enable Top / bottom position', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Enable coupon reward for providing email address', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
                         <td>
@@ -1002,8 +1002,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <select name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'show_woo_coupon]'; ?>"
-                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'show_woo_coupon'; ?>"
-                                    class="rnoc-select2-select">
+                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'show_woo_coupon'; ?>">
                                 <?php
                                 $options = array(
                                     "instantly" => __("Instantly using a popup", RNOC_TEXT_DOMAIN),
@@ -1028,7 +1027,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             </p>
                         </td>
                     </tr>
-                    <tr>
+                    <tr id="row_atcp_template">
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'; ?>"><?php
                                 esc_html_e('Response Popup template', RNOC_TEXT_DOMAIN);
@@ -1038,7 +1037,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             <?php
                             $email_template = $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'];
                             if (empty($email_template)) {
-                                $email_template = $this->getDefaultEmailTemplate();
+                                $email_template = $this->getDefaultPopupTemplate();
                             }
                             wp_editor($email_template, 'add_to_cart_coupon_popup_template', array('textarea_name' => $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template]'));
                             ?>
@@ -1048,7 +1047,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             </p>
                         </td>
                     </tr>
-                    <tr>
+                    <tr class="row_atcp_mail_template">
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'; ?>"><?php
                                 esc_html_e('Email subject', RNOC_TEXT_DOMAIN);
@@ -1062,7 +1061,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                    value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject']; ?>">
                         </td>
                     </tr>
-                    <tr>
+                    <tr class="row_atcp_mail_template">
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_mail_template'; ?>"><?php
                                 esc_html_e('Email template (Used for the email that is sent when customer enters his email in the Add to Cart Popup)', RNOC_TEXT_DOMAIN);
@@ -1072,7 +1071,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             <?php
                             $email_template = $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'];
                             if (empty($email_template)) {
-                                $email_template = $this->getDefaultPopupTemplate();
+                                $email_template = $this->getDefaultEmailTemplate();
                             }
                             wp_editor($email_template, 'coupon_mail_template', array('textarea_name' => $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template]'));
                             ?>
