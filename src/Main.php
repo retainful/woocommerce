@@ -6,6 +6,7 @@ if (!defined('ABSPATH')) exit;
 use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
+use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Integrations\Currency;
 
 class Main
@@ -181,9 +182,19 @@ class Main
             $app_id = $this->admin->getApiKey();
             if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
                 add_action('wp_loaded', array($this->admin, 'schedulePlanChecker'));
-                /*
-                * Retainful abandoned cart api
-                */
+                /**
+                 * next order coupon management
+                 */
+                $noc = new CouponManagement();
+                add_filter('woocommerce_coupon_discount_types', array($noc, 'couponDiscountTypes'));
+                add_action('woocommerce_coupon_options', array($noc, 'couponOptions'), 20, 2);
+                add_action('woocommerce_process_shop_coupon_meta', array($noc, 'processShopCouponMeta'), 20, 2);
+                if (!is_admin()) {
+                    add_action('woocommerce_coupon_loaded', array($noc, 'couponLoaded'), 9);
+                }
+                /**
+                 * Retainful abandoned cart api
+                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
                 add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
