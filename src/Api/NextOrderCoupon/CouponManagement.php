@@ -3,93 +3,38 @@
 namespace Rnoc\Retainful\Api\NextOrderCoupon;
 class CouponManagement
 {
-    function couponDiscountTypes($types)
+    /**
+     * link to view retainful coupon
+     * @param $types
+     * @return mixed
+     */
+    function viewsEditShopCoupon($types)
     {
-        $types['retainful'] = __('Retainful', 'woocommerce');
+        // Add NOC link.
+        if (current_user_can('manage_woocommerce')) {
+            $class = (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == $_GET['filter-by']) ? 'current' : '';
+            $admin_url = admin_url('edit.php?post_type=shop_coupon');
+            $query_string = add_query_arg(array('filter-by' => rawurlencode('retainful-next-order-coupon')), $admin_url);
+            $query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful'));
+            $types['retainful'] = '<a href="' . esc_url($query_string) . '" class="' . esc_attr($class) . '">' . __('Retainful - Next order coupons', 'woocommerce') . ' (' . $query->found_posts . ')</a>';
+        }
         return $types;
     }
 
     /**
-     * save the data in post meta
-     * @param $post_id
-     * @param $post
+     * query to filter
+     * @param $query_vars
+     * @return mixed
      */
-    function processShopCouponMeta($post_id, $post)
+    function requestQuery($query_vars)
     {
-        if (!current_user_can('manage_woocommerce')) {
-            wp_die(__('You do not have sufficient permission to perform this operation', 'wt-smart-coupons-for-woocommerce'));
-        }
-        if (isset($_POST['_rnoc_discount_type']) && !empty($_POST['_rnoc_discount_type']) && in_array($_POST['_rnoc_discount_type'], array('rnoc_flat', 'rnoc_percent'))) {
-            $rnoc_discount_type = sanitize_text_field($_POST['_rnoc_discount_type']);
-        } else {
-            $rnoc_discount_type = 'rnoc_percent';
-        }
-        update_post_meta($post_id, '_rnoc_discount_type', $rnoc_discount_type);
-    }
-
-    /**
-     * @param $coupon \WC_Coupon
-     */
-    function couponLoaded($coupon)
-    {
-        if (method_exists($coupon, 'get_meta')) {
-            $discount_type = $coupon->get_meta('_rnoc_discount_type', true);
-            if ($discount_type == "rnoc_flat") {
-                $to_discount_type = "fixed_cart";
-            } else {
-                $to_discount_type = "percent";
+        global $typenow;
+        if ($typenow == "shop_coupon") {
+            if (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == $_GET['filter-by']) {
+                $query_vars['meta_key'] = "_rnoc_shop_coupon_type";
+                $query_vars['meta_value'] = "retainful";
             }
-            $coupon->set_discount_type($to_discount_type);
         }
-    }
-
-    /**
-     * additional fields to show coupon
-     * @param $id
-     * @param $coupon
-     */
-    function couponOptions($id, $coupon)
-    {
-        ?>
-        <div id="rnoc_coupon_field_template" style="display: none">
-            <?php
-            $val = get_post_meta($id, '_rnoc_discount_type', true);
-            woocommerce_wp_select(
-                array(
-                    'id' => '_rnoc_discount_type',
-                    'label' => __('Coupon type', RNOC_TEXT_DOMAIN),
-                    'options' => array(
-                        'rnoc_percent' => __("Percentage", RNOC_TEXT_DOMAIN),
-                        'rnoc_flat' => __("Flat", RNOC_TEXT_DOMAIN),
-                    ),
-                    'value' => $val,
-                )
-            );
-            ?>
-        </div>
-        <script type="application/javascript">
-            jQuery(document).on('change', '[name="discount_type"]', function () {
-                var val = jQuery(this).val();
-                handleRetainfulCoupon(val);
-            })
-            jQuery(document).ready(function () {
-                var val = jQuery('[name="discount_type"]').val();
-                handleRetainfulCoupon(val);
-            });
-
-            function handleRetainfulCoupon(val) {
-                var field = jQuery("#rnoc_coupon_field_template");
-                var coupon_amount_field = jQuery(".coupon_amount_field");
-                var discount_type_field = jQuery(".rnoc_discount_type_field");
-                coupon_amount_field.before(field.html());
-                field.html('');
-                if (val === "retainful") {
-                    discount_type_field.show();
-                } else {
-                    discount_type_field.hide();
-                }
-            }
-        </script>
-        <?php
+        return $query_vars;
     }
 }

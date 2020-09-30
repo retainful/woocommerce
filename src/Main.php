@@ -11,7 +11,7 @@ use Rnoc\Retainful\Integrations\Currency;
 
 class Main
 {
-    public static $init;
+    public static $init, $noc;
     public $rnoc, $admin, $abandoned_cart_api;
 
     /**
@@ -20,8 +20,10 @@ class Main
     function __construct()
     {
         $this->rnoc = ($this->rnoc == NULL) ? new OrderCoupon() : $this->rnoc;
+        self::$noc = (is_null(self::$noc)) ? new CouponManagement() : self::$noc;
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         add_action('init', array($this, 'activateEvents'));
+        add_action('before_woocommerce_init', array($this, 'beforeWoocommerceInit'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
         if (!$this->admin->isPremiumPluginActive()) {
             //init the retainful premium
@@ -104,6 +106,15 @@ class Main
     }
 
     /**
+     * before Woocommerce init
+     */
+    function beforeWoocommerceInit()
+    {
+        add_filter('views_edit-shop_coupon', array(self::$noc, 'viewsEditShopCoupon'));
+        add_filter('request', array(self::$noc, 'requestQuery'));
+    }
+
+    /**
      * Activate the required events
      */
     function activateEvents()
@@ -182,16 +193,6 @@ class Main
             $app_id = $this->admin->getApiKey();
             if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
                 add_action('wp_loaded', array($this->admin, 'schedulePlanChecker'));
-                /**
-                 * next order coupon management
-                 */
-                $noc = new CouponManagement();
-                add_filter('woocommerce_coupon_discount_types', array($noc, 'couponDiscountTypes'));
-                add_action('woocommerce_coupon_options', array($noc, 'couponOptions'), 20, 2);
-                add_action('woocommerce_process_shop_coupon_meta', array($noc, 'processShopCouponMeta'), 20, 2);
-                if (!is_admin()) {
-                    add_action('woocommerce_coupon_loaded', array($noc, 'couponLoaded'), 9);
-                }
                 /**
                  * Retainful abandoned cart api
                  */
