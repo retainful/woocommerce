@@ -1,9 +1,7 @@
 <?php
 
 namespace Rnoc\Retainful\Helpers;
-
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-
 class Input
 {
     /**
@@ -196,7 +194,7 @@ class Input
     function set_status_header($code = 200, $text = '')
     {
         if (empty($text)) {
-            is_int($code) OR $code = (int)$code;
+            is_int($code) or $code = (int)$code;
             $stati = array(
                 100 => 'Continue',
                 101 => 'Switching Protocols',
@@ -261,6 +259,9 @@ class Input
      */
     protected function _clean_input_data($str)
     {
+        if (is_object($str)) {
+            return $str;
+        }
         if (is_array($str)) {
             $new_array = array();
             foreach (array_keys($str) as $key) {
@@ -369,7 +370,7 @@ class Input
      */
     protected function _fetch_from_array(&$array, $index = NULL, $default = NULL, $xss_clean = NULL)
     {
-        is_bool($xss_clean) OR $xss_clean = $this->_enable_xss;
+        is_bool($xss_clean) or $xss_clean = $this->_enable_xss;
         // If $index is NULL, it means that the whole $array is requested
         $index = (!isset($index) || is_null($index)) ? array_keys($array) : $index;
         // allow fetching multiple keys at once
@@ -411,6 +412,9 @@ class Input
      */
     function xss_clean($str, $is_image = FALSE)
     {
+        if (is_object($str)) {
+            return $str;
+        }
         // Is the string an array?
         if (is_array($str)) {
             foreach ($str as $key => &$value) {
@@ -659,7 +663,7 @@ class Input
         if (!is_array($this->_input_stream)) {
             // $this->raw_input_stream will trigger __get().
             parse_str($this->_raw_input_stream, $this->_input_stream);
-            is_array($this->_input_stream) OR $this->_input_stream = array();
+            is_array($this->_input_stream) or $this->_input_stream = array();
         }
         return $this->_fetch_from_array($this->_input_stream, $index, $default, $xss_clean);
     }
@@ -768,7 +772,7 @@ class Input
     function __get($name)
     {
         if ($name === 'raw_input_stream') {
-            isset($this->_raw_input_stream) OR $this->_raw_input_stream = file_get_contents('php://input');
+            isset($this->_raw_input_stream) or $this->_raw_input_stream = file_get_contents('php://input');
             return $this->_raw_input_stream;
         } elseif ($name === 'ip_address') {
             return $this->ip_address;
@@ -834,23 +838,23 @@ class Input
      */
     function get_random_bytes($length)
     {
-        if (empty($length) OR !ctype_digit((string)$length)) {
+        if (empty($length) or !ctype_digit((string)$length)) {
             return FALSE;
         }
         if (function_exists('random_bytes')) {
             try {
                 // The cast is required to avoid TypeError
                 return random_bytes((int)$length);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // If random_bytes() can't do the job, we can't either ...
                 // There's no point in using fallbacks.
-                log_message('error', $e->getMessage());
+                //log_message('error', $e->getMessage());
                 return FALSE;
             }
         }
         if (is_readable('/dev/urandom') && ($fp = fopen('/dev/urandom', 'rb')) !== FALSE) {
             // Try not to waste entropy ...
-            is_php('5.4') && stream_set_chunk_size($fp, $length);
+            $this->is_php('5.4') && stream_set_chunk_size($fp, $length);
             $output = fread($fp, $length);
             fclose($fp);
             if ($output !== FALSE) {
@@ -875,8 +879,7 @@ class Input
             return $str;
         }
         static $_entities;
-        isset($charset) OR $charset = $this->charset;
-
+        isset($charset) or $charset = $this->charset;
         $flag = $this->is_php('5.4')
             ? ENT_COMPAT | ENT_HTML5
             : ENT_COMPAT;
@@ -923,8 +926,7 @@ class Input
      * @param $matches
      * @return string
      */
-    protected
-    function _compact_exploded_words($matches)
+    protected function _compact_exploded_words($matches)
     {
         return preg_replace('/\s+/s', '', $matches[1]) . $matches[2];
     }
@@ -937,7 +939,7 @@ class Input
      * and prevents PREG_BACKTRACK_LIMIT_ERROR from being triggered in
      * PHP 5.2+ on link-heavy strings
      *
-     * @param   array
+     * @param array
      * @return  string
      */
     protected function _js_link_removal($match)
@@ -961,7 +963,7 @@ class Input
      * and prevents PREG_BACKTRACK_LIMIT_ERROR from being triggered in
      * PHP 5.2+ on image tag heavy strings
      *
-     * @param   array
+     * @param array
      * @return  string
      */
     protected function _js_img_removal($match)
@@ -982,21 +984,17 @@ class Input
      *
      * Filters tag attributes for consistency and safety
      *
-     * @param   string
+     * @param string
      * @return  string
      */
     protected function _filter_attributes($str)
     {
         $out = '';
-
-        if (preg_match_all('#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches))
-        {
-            foreach ($matches[0] as $match)
-            {
+        if (preg_match_all('#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches)) {
+            foreach ($matches[0] as $match) {
                 $out .= preg_replace("#/\*.*?\*/#s", '', $match);
             }
         }
-
         return $out;
     }
 
@@ -1049,7 +1047,7 @@ class Input
                     // Is it indeed an "evil" attribute?
                     preg_match($is_evil_pattern, $attribute['name'][0])
                     // Or does it have an equals sign, but no value and not quoted? Strip that too!
-                    OR (trim($attribute['value'][0]) === '')
+                    or (trim($attribute['value'][0]) === '')
                 ) {
                     $attributes[] = 'xss=removed';
                 } else {
