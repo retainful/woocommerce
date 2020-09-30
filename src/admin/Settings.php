@@ -168,6 +168,7 @@ class Settings
     function sanitizeBasicHtml($html)
     {
         try {
+            $html = stripslashes($html);
             $html = html_entity_decode($html);
             $allowed_html = array();
             $tags = array(
@@ -399,13 +400,15 @@ class Settings
         $this->validateExitIntentPopup($validator);
         $this->validateAddToCartPopup($validator);
         $page_slug = $this->slug . '_premium';
-        $exit_intent_popup_template = self::$input->post(RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', '');
-        $modal_coupon_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'modal_coupon_settings', array());
+        $modal_coupon_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'modal_coupon_settings', array(), false);
+        $exit_intent_popup_template = self::$input->post(RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', '', false);
         $add_to_cart_coupon_popup_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] : '';
         $coupon_mail_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] : '';
         $post = self::$input->post();
         $data = $this->clean($post);
-        $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] = $this->sanitizeBasicHtml($exit_intent_popup_template);
+        if (!empty($exit_intent_popup_template)) {
+            $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] = $this->sanitizeBasicHtml($exit_intent_popup_template);
+        }
         if (!empty($add_to_cart_coupon_popup_template)) {
             $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] = $this->sanitizeBasicHtml($add_to_cart_coupon_popup_template);
         }
@@ -413,7 +416,9 @@ class Settings
             $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] = $this->sanitizeBasicHtml($coupon_mail_template);
         }
         $settings = get_option($page_slug, array());
-        $data_to_save = wp_parse_args($data, $settings);
+        $default_settings = $this->getDefaultPremiumAddonsValues();
+        $new_settings = wp_parse_args($data, $default_settings);
+        $data_to_save = wp_parse_args($new_settings, $settings);
         update_option($page_slug, $data_to_save);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
@@ -429,122 +434,132 @@ class Settings
         $add_on = self::$input->get('add-on', null);
         if (!empty($add_on)) {
             $settings = get_option($page_slug, array());
-            $default_settings = array(
-                RNOC_PLUGIN_PREFIX . 'enable_coupon_timer' => '1',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon' => '',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages' => array(),
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon' => 'automatically',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time' => '15',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message' => __('Sorry! Instant Offer has expired.', RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload' => '0',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings' => array(0 => array(
-                    RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
-                    RNOC_PLUGIN_PREFIX . 'top_bottom_position' => 'top',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
-                    RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
-                    RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
-                    RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
-                )),
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings' => array(0 => array(
-                    RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
-                    RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
-                    RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
-                    RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
-                )),
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings' => array(0 => array(
-                    RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000'
-                )),
-                RNOC_PLUGIN_PREFIX . 'need_modal' => '0',
-                RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory' => '1',
-                RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action' => '1',
-                RNOC_PLUGIN_PREFIX . 'close_btn_behavior' => 'just_close',
-                RNOC_PLUGIN_PREFIX . 'modal_show_popup_until' => '1',
-                RNOC_PLUGIN_PREFIX . 'modal_display_pages' => array(),
-                RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class' => '',
-                RNOC_PLUGIN_PREFIX . 'modal_design_settings' => array(0 => array(
-                    RNOC_PLUGIN_PREFIX . 'modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'modal_heading_color' => '#000000',
-                    RNOC_PLUGIN_PREFIX . 'modal_email_placeholder' => __('Email address', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_text' => __('Add to Cart', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_color' => '#ffffff',
-                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color' => '#f27052',
-                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color' => '#f27052',
-                    RNOC_PLUGIN_PREFIX . 'modal_bg_color' => '#F8F0F0',
-                    RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color' => '#f27052',
-                    RNOC_PLUGIN_PREFIX . 'modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
-                )),
-                RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance' => array(0 => array(
-                    RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
-                    RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
-                )),
-                RNOC_PLUGIN_PREFIX . 'modal_coupon_settings' => array(0 => array(
-                    RNOC_PLUGIN_PREFIX . 'need_coupon' => '0',
-                    RNOC_PLUGIN_PREFIX . 'woo_coupon' => '',
-                    RNOC_PLUGIN_PREFIX . 'modal_sub_heading' => __('Get a discount in your email!', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color' => '#333333',
-                    RNOC_PLUGIN_PREFIX . 'show_woo_coupon' => 'send_via_email',
-                    RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template' => '',
-                    RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'coupon_mail_template' => '',
-                )),
-                RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal' => 0,
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages' => array(),
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to' => 'all',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon' => '',
-                RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied' => 0,
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings' => array('show_option' => 'once_per_page', 'show_count' => 1),
-                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life' => 1,
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template' => '',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style' => '',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success' => 'checkout',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance' => array(0 => array(
-                    RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
-                    RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
-                )),
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design' => array(0 => array(
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder' => __('Enter E-mail address', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height' => '46px',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width' => '100%',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text' => __('Complete checkout', RNOC_TEXT_DOMAIN),
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color' => '#ffffff',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color' => '#f20561',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height' => '100%',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width' => '100%',
-                )),
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings' => array(0 => array(
-                    RNOC_PLUGIN_PREFIX . 'enable_mobile_support' => '0',
-                    RNOC_PLUGIN_PREFIX . 'enable_delay_trigger' => '0',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec' => '0',
-                    RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger' => '0',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance' => '0',
-                )),
-            );
+            $default_settings = $this->getDefaultPremiumAddonsValues();
             $settings = wp_parse_args($settings, $default_settings);
             $add_on_slug = sanitize_text_field($add_on);
             require_once dirname(__FILE__) . '/templates/pages/premium-addon-settings.php';
         } else {
             require_once dirname(__FILE__) . '/templates/pages/premium-addons.php';
         }
+    }
+
+    /**
+     * get the default values for premium addons
+     * @return mixed|void
+     */
+    function getDefaultPremiumAddonsValues()
+    {
+        $default_settings = array(
+            RNOC_PLUGIN_PREFIX . 'enable_coupon_timer' => '1',
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon' => '',
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages' => array(),
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon' => 'automatically',
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time' => '15',
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message' => __('Sorry! Instant Offer has expired.', RNOC_TEXT_DOMAIN),
+            RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload' => '0',
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings' => array(0 => array(
+                RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
+                RNOC_PLUGIN_PREFIX . 'top_bottom_position' => 'top',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
+                RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
+                RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
+                RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
+            )),
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings' => array(0 => array(
+                RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
+                RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
+                RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
+                RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
+            )),
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings' => array(0 => array(
+                RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000'
+            )),
+            RNOC_PLUGIN_PREFIX . 'need_modal' => '0',
+            RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory' => '1',
+            RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action' => '1',
+            RNOC_PLUGIN_PREFIX . 'close_btn_behavior' => 'just_close',
+            RNOC_PLUGIN_PREFIX . 'modal_show_popup_until' => '1',
+            RNOC_PLUGIN_PREFIX . 'modal_display_pages' => array(),
+            RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class' => '',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings' => array(0 => array(
+                RNOC_PLUGIN_PREFIX . 'modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_heading_color' => '#000000',
+                RNOC_PLUGIN_PREFIX . 'modal_email_placeholder' => __('Email address', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_add_cart_text' => __('Add to Cart', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_add_cart_color' => '#ffffff',
+                RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color' => '#f27052',
+                RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color' => '#f27052',
+                RNOC_PLUGIN_PREFIX . 'modal_bg_color' => '#F8F0F0',
+                RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color' => '#f27052',
+                RNOC_PLUGIN_PREFIX . 'modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
+            )),
+            RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance' => array(0 => array(
+                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
+                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
+            )),
+            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings' => array(0 => array(
+                RNOC_PLUGIN_PREFIX . 'need_coupon' => '0',
+                RNOC_PLUGIN_PREFIX . 'woo_coupon' => '',
+                RNOC_PLUGIN_PREFIX . 'modal_sub_heading' => __('Get a discount in your email!', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color' => '#333333',
+                RNOC_PLUGIN_PREFIX . 'show_woo_coupon' => 'send_via_email',
+                RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template' => '',
+                RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_mail_template' => '',
+            )),
+            RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal' => 0,
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages' => array(),
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to' => 'all',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon' => '',
+            RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied' => 0,
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings' => array('show_option' => 'once_per_page', 'show_count' => 1),
+            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life' => 1,
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template' => '',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style' => '',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success' => 'checkout',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance' => array(0 => array(
+                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
+                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
+            )),
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design' => array(0 => array(
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder' => __('Enter E-mail address', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height' => '46px',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width' => '100%',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text' => __('Complete checkout', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color' => '#ffffff',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color' => '#f20561',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height' => '100%',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width' => '100%',
+            )),
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings' => array(0 => array(
+                RNOC_PLUGIN_PREFIX . 'enable_mobile_support' => '0',
+                RNOC_PLUGIN_PREFIX . 'enable_delay_trigger' => '0',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec' => '0',
+                RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger' => '0',
+                RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance' => '0',
+            )),
+        );
+        return apply_filters('rnoc_premium_addon_default_values', $default_settings);
     }
 
     /**
