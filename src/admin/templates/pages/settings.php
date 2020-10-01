@@ -282,7 +282,7 @@ require_once "tabs.php";
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'handle_storage_using'; ?>"><?php
-                    esc_html_e('Enable debug log?', RNOC_TEXT_DOMAIN);
+                    esc_html_e('Session handler', RNOC_TEXT_DOMAIN);
                     ?></label>
             </th>
             <td>

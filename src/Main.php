@@ -167,6 +167,7 @@ class Main
         $this->canActivateIPFilter();
         //Validate key
         add_action('wp_ajax_validate_app_key', array($this->admin, 'validateAppKey'));
+        add_action('wp_ajax_rnoc_get_search_coupon', array($this->admin, 'getSearchedCoupons'));
         add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
         add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
         add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));

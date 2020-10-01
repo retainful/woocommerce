@@ -1230,6 +1230,35 @@ class Settings
     }
 
     /**
+     *
+     */
+    function getSearchedCoupons()
+    {
+        check_ajax_referer('rnoc_get_search_coupon', 'security');
+        $search_code = self::$input->get('coupon');
+        $args = array(
+            "post_type" => "shop_coupon",
+            "numberposts" => 10,
+            "s" => $search_code,
+            "post_status" => "publish"
+        );
+        $coupon_codes = get_posts($args);
+        if (empty($coupon_codes)) {
+            wp_send_json_error('No Coupons found!');
+        } else {
+            $result = array();
+            foreach ($coupon_codes as $coupon_code_post) {
+                /**
+                 * @var $coupon_code_post \WP_Post
+                 */
+                $coupon_code = $coupon_code_post->post_title;
+                $result[$coupon_code] = $coupon_code;
+            }
+            wp_send_json_success($result);
+        }
+    }
+
+    /**
      * Make coupon expire date from order date
      * @param $ordered_date
      * @return string|null
@@ -1266,6 +1295,9 @@ class Settings
         wp_localize_script('retainful-app-main', 'retainful_admin', array(
             'i10n' => array(
                 'please_wait' => __('Please wait...', RNOC_TEXT_DOMAIN)
+            ),
+            'security' => array(
+                'get_search_coupon' => wp_create_nonce('rnoc_get_search_coupon')
             ),
             'ajax_endpoint' => admin_url('admin-ajax.php?action={{action}}&security={{security}}'),
             'search_products_nonce' => wp_create_nonce('search-products'),

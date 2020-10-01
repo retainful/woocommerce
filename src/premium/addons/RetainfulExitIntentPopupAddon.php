@@ -506,21 +506,11 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
-                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
-                                    class="rnoc-select2-select">
-                                <?php
-                                if (!empty($coupon_codes)) {
-                                    foreach ($coupon_codes as $code => $label) {
-                                        ?>
-                                        <option value="<?php echo $code ?>" <?php if ($code == $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon']) {
-                                            echo "selected";
-                                        } ?>><?php echo $label; ?></option>
-                                        <?php
-                                    }
-                                }
-                                ?>
-                            </select>
+                            <input type="text"
+                                   name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
+                                   class="search-and-select-coupon"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon']; ?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons

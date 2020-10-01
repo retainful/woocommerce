@@ -1,5 +1,39 @@
 (function ($) {
     $(document).ready(function () {
+        var search_coupon_field = $(".search-and-select-coupon");
+        search_coupon_field.wrap('<div class="rnoc-autocomplete"></div>');
+        var auto_complete_holder = $("<ul class='rnoc-auto-complete-results'></ul>");
+        search_coupon_field.after(auto_complete_holder);
+        search_coupon_field.on("keyup", function () {
+            var code = $(this).val();
+            if (code.length >= 3) {
+                var url = retainful_admin.ajax_endpoint.replace("{{action}}", "rnoc_get_search_coupon").replace("{{security}}", retainful_admin.security.get_search_coupon);
+                url = url + "&coupon=" + code;
+                $.get(url, function (response) {
+                    if (response.success) {
+                        auto_complete_holder.html('');
+                        var items = response.data;
+                        for (const [key, value] of Object.entries(items)) {
+                            var li = $("<li class='rnoc-coupon-sugg' data-code='" + key + "'>" + value + "</li>");
+                            li.on('click', function () {
+                                var code = $(this).data("code");
+                                search_coupon_field.val(code);
+                                auto_complete_holder.html('');
+                            })
+                            auto_complete_holder.append(li);
+                        }
+                    } else {
+                        auto_complete_holder.html('');
+                    }
+                })
+            } else if (code.length > 0) {
+                auto_complete_holder.html('<li>Type 3 or more characters to search</li>');
+            } else {
+                auto_complete_holder.html('');
+            }
+        })
+    });
+    $(document).ready(function () {
         $(document).on("click", "#rnoc_retainful #submit-cmb", function (event) {
             var is_noc_explained = $('[name="rnoc_enable_next_order_coupon"]:checked').val();
             var noc_coupon_val = $('[name="rnoc_retainful_coupon_amount"]').val();

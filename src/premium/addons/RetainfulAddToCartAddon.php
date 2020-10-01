@@ -954,21 +954,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <select name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'woo_coupon]'; ?>"
-                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'woo_coupon'; ?>"
-                                    class="rnoc-select2-select">
-                                <?php
-                                if (!empty($coupon_codes)) {
-                                    foreach ($coupon_codes as $code => $label) {
-                                        ?>
-                                        <option value="<?php echo $code ?>" <?php if ($code == ''/*$settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'woo_coupon']*/) {
-                                            echo "selected";
-                                        } ?>><?php echo $label; ?></option>
-                                        <?php
-                                    }
-                                }
-                                ?>
-                            </select>
+                            <input type="text"
+                                   name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'woo_coupon]'; ?>"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'woo_coupon'; ?>"
+                                   class="search-and-select-coupon"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'woo_coupon']; ?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons
