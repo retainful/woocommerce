@@ -1605,6 +1605,7 @@ class Settings
         $settings = get_option($this->slug, array());
         if (!empty($settings)) {
             $coupon['coupon_type'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] : 0;
+            $coupon['coupon_applicable_to'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to'] : 'all';
             $coupon['coupon_amount'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) && ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] > 0) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
             $coupon['product_ids'] = isset($settings[RNOC_PLUGIN_PREFIX . 'products']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'products']) ? $settings[RNOC_PLUGIN_PREFIX . 'products'] : array();
             $coupon['exclude_product_ids'] = isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_products']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'exclude_products']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_products'] : array();

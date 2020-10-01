@@ -927,7 +927,9 @@ class OrderCoupon
             if (isset($settings['exclude_product_categories']) && !empty($settings['exclude_product_categories'])) {
                 add_post_meta($id, 'exclude_product_categories', $settings['exclude_product_categories']);
             }
-            add_post_meta($id, 'customer_email', $email);
+            if (isset($settings['coupon_applicable_to']) && !empty($settings['coupon_applicable_to']) && $settings['coupon_applicable_to'] != "all") {
+                add_post_meta($id, 'customer_email', $email);
+            }
             add_post_meta($id, 'usage_limit', '1');
             if (!empty($expired_date)) {
                 add_post_meta($id, 'expiry_date', $expired_date);
