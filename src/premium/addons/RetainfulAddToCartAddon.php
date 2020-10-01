@@ -32,6 +32,18 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             add_action('wp_ajax_rnoc_popup_closed', array($this, 'popupClosed'));
             add_action('wp_footer', array($this, 'enqueue_script'));
             add_action('wp', array($this, 'siteInit'));
+            add_action('woocommerce_add_to_cart', array($this, 'productAddedToCart'));
+        }
+
+        /**
+         * after product added to cart
+         */
+        function productAddedToCart()
+        {
+            if (isset($_POST['rnoc_email_popup']) && !empty($_POST['rnoc_email_popup'])) {
+                $email = sanitize_text_field($_POST['rnoc_email_popup']);
+                $this->wc_functions->setCustomerEmail($email);
+            }
         }
 
         function enqueue_script()

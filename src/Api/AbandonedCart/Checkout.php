@@ -18,6 +18,17 @@ class Checkout extends RestApi
     }
 
     /**
+     * set retainful related data to order
+     */
+    function setRetainfulOrderData()
+    {
+        $draft_order = self::$woocommerce->getSession('store_api_draft_order');
+        if (!empty($draft_order) && intval($draft_order) > 0) {
+            $this->purchaseComplete(intval($draft_order));
+        }
+    }
+
+    /**
      * @param $checkout_fields
      * @return mixed
      */
