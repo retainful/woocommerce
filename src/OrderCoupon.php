@@ -280,9 +280,9 @@ class OrderCoupon
                             $coupon_array = array(
                                 'coupon_amount' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
                                 'coupon_code' => $coupon_code,
-                                'shop_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getShopUrl()),
-                                'cart_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getCartUrl()),
-                                'checkout_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getCheckoutUrl()),
+                                'shop_url' => $this->wc_functions->getShopUrl(),
+                                'cart_url' => $this->wc_functions->getCartUrl(),
+                                'checkout_url' => $this->wc_functions->getCheckoutUrl(),
                             );
                             foreach ($coupon_array as $key => $val) {
                                 $popup_content = str_replace('{{' . $key . '}}', $val, $popup_content);
