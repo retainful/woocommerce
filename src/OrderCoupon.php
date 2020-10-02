@@ -310,6 +310,9 @@ class OrderCoupon
      */
     function showAppliedCouponPopup()
     {
+        if (isset($_GET['noc-cta']) && $_GET['noc-cta'] == 1) {
+            return;
+        }
         if (isset($_GET['retainful_coupon_code']) && !empty($_GET['retainful_coupon_code'])) {
             $coupon_code = sanitize_text_field($_GET['retainful_coupon_code']);
             $settings = $this->admin->getUsageRestrictions();
@@ -331,9 +334,9 @@ class OrderCoupon
                             $coupon_array = array(
                                 'coupon_amount' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
                                 'coupon_code' => $coupon_code,
-                                'shop_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getShopUrl()),
-                                'cart_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getCartUrl()),
-                                'checkout_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getCheckoutUrl()),
+                                'shop_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $this->wc_functions->getShopUrl()),
+                                'cart_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $this->wc_functions->getCartUrl()),
+                                'checkout_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $this->wc_functions->getCheckoutUrl()),
                             );
                             foreach ($coupon_array as $key => $val) {
                                 $popup_content = str_replace('{{' . $key . '}}', $val, $popup_content);
