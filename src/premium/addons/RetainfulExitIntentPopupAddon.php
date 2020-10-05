@@ -587,7 +587,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tr>
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'; ?>"><?php
-                                esc_html_e('Show E-mail collection popup', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Cookie expiry days', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
                         <td>
@@ -600,7 +600,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tr>
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'; ?>"><?php
-                                esc_html_e('Button redirects to', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Where to redirect after entering email?', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
                         <td>
@@ -644,7 +644,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 </div>
                 <table class="form-table" role="presentation">
                     <?php
-                    $top_position_name = RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings[0]'
+                    $mobile_popup_settings = RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings[0]'
                     ?>
                     <tbody>
                     <tr>
@@ -655,7 +655,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '1') {
                                     echo "checked";
@@ -663,7 +663,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
                             </label>
                             <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '0') {
                                     echo "checked";
@@ -686,7 +686,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '1') {
                                     echo "checked";
@@ -694,7 +694,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
                             </label>
                             <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '0') {
                                     echo "checked";
@@ -711,7 +711,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec]'; ?>"
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec]'; ?>"
                                        type="text" class="regular-text"
                                        value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec']; ?>">
                             </label>
@@ -728,7 +728,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '1') {
                                     echo "checked";
@@ -736,7 +736,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
                             </label>
                             <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '0') {
                                     echo "checked";
@@ -753,7 +753,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance]'; ?>"
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance]'; ?>"
                                        type="text" class="regular-text"
                                        value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance']; ?>">
                             </label>
@@ -852,6 +852,11 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 </div>
                                 <div class="grid-column" id="exit-intent-popup-preview"></div>
                             </div>
+                            <div>
+                                <?php
+                                echo __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{cart_url}}</b> - Url to redirect to cart page<br><b>{{cart_url_without_coupon}}</b> - Url to redirect to cart page without auto applying coupon<br><b>{{checkout_url}}</b> - Url to redirect user to checkout page<br><b>{{checkout_url_without_coupon}}</b> - Url to redirect user to checkout page without auto apply coupon code<br><b>{{email_collection_form}}</b> - To display email collection form. Note: Email collection form will only show to Guest and Administrator.', RNOC_TEXT_DOMAIN)
+                                ?>
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -868,134 +873,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'];
                                 ?>
                             </textarea>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div class="rnoc-tag">
-                    <?php
-                    echo __('Mobile popup settings', RNOC_TEXT_DOMAIN)
-                    ?>
-                </div>
-                <table class="form-table" role="presentation">
-                    <?php
-                    $top_position_name = RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings[0]'
-                    ?>
-                    <tbody>
-                    <tr>
-                        <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_mobile_support'; ?>"><?php
-                                esc_html_e('Enable mobile device support', RNOC_TEXT_DOMAIN);
-                                ?></label>
-                        </th>
-                        <td>
-                            <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
-                                       type="radio"
-                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '1') {
-                                    echo "checked";
-                                } ?>>
-                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
-                            </label>
-                            <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
-                                       type="radio"
-                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '0') {
-                                    echo "checked";
-                                } ?>>
-                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
-                            </label>
-                            <p class="description">
-                                The following settings are used to trigger Exit Popup in mobile devices. Since there are
-                                a number of ways a visitor can exit in a mobile (Example: Swipe up), you can consider
-                                showing the popup either based on time delay (time spent by the customer in the site) or
-                                scrolling (the distance the customer scrolled a page)
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'; ?>"><?php
-                                esc_html_e('Enable time delay based trigger', RNOC_TEXT_DOMAIN);
-                                ?></label>
-                        </th>
-                        <td>
-                            <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
-                                       type="radio"
-                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '1') {
-                                    echo "checked";
-                                } ?>>
-                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
-                            </label>
-                            <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
-                                       type="radio"
-                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '0') {
-                                    echo "checked";
-                                } ?>>
-                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
-                            </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec'; ?>"><?php
-                                esc_html_e('Delay seconds', RNOC_TEXT_DOMAIN);
-                                ?></label>
-                        </th>
-                        <td>
-                            <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec]'; ?>"
-                                       type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec']; ?>">
-                            </label>
-                            <p class="description">
-                                Trigger the popup after these many seconds a visitor spent time
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope=" row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'; ?>"><?php
-                                esc_html_e('Enable Scroll based trigger', RNOC_TEXT_DOMAIN);
-                                ?></label>
-                        </th>
-                        <td>
-                            <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
-                                       type="radio"
-                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '1') {
-                                    echo "checked";
-                                } ?>>
-                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
-                            </label>
-                            <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
-                                       type="radio"
-                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '0') {
-                                    echo "checked";
-                                } ?>>
-                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
-                            </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance'; ?>"><?php
-                                esc_html_e('Scroll distance', RNOC_TEXT_DOMAIN);
-                                ?></label>
-                        </th>
-                        <td>
-                            <label>
-                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance]'; ?>"
-                                       type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance']; ?>">
-                            </label>
-                            <p class="description">
-                                Trigger the popup after a visitor scrolled the page to the set distance. Its a
-                                percentage value. The distance is the % from the top of the page.
-                            </p>
                         </td>
                     </tr>
                     </tbody>

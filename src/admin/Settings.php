@@ -237,6 +237,9 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color',
         ))->message('This field accepts only hex color code');
+        $validator->rule('min', array(
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'
+        ), 0)->message('This field should accepts only positive value');
         $validator->rule('in', array(
             RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon',
         ), ['automatically', 'manually'])->message('This field contains invalid value');
@@ -287,6 +290,11 @@ class Settings
         $validator->rule('array', array(
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages',
         ), ['0', '1'])->message('This field contains invalid value');
+        $validator->rule('min', array(
+            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
+        ), 1)->message('This field accepts only value greater than or equal to 1');
         $validator->rule('in', array(
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings',
         ), ['no_need_gdpr', 'dont_show_checkbox', 'show_and_check_checkbox', 'show_checkbox'])->message('This field contains invalid value');
@@ -613,7 +621,15 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'minimum_sub_total',
             RNOC_PLUGIN_PREFIX . 'minimum_spend',
             RNOC_PLUGIN_PREFIX . 'maximum_spend',
-        ))->message('This field contains invalid value');;
+        ))->message('This field contains invalid value');
+        $validator->rule('min', array(
+            RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount',
+            RNOC_PLUGIN_PREFIX . 'minimum_sub_total',
+            RNOC_PLUGIN_PREFIX . 'minimum_spend',
+            RNOC_PLUGIN_PREFIX . 'maximum_spend',
+            RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
+            RNOC_PLUGIN_PREFIX . 'limit_per_user',
+        ), 0)->message('This field should accepts only positive value');
         $validator->rule('integer', array(
             RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
             RNOC_PLUGIN_PREFIX . 'limit_per_user',
@@ -636,11 +652,11 @@ class Settings
     }
 
     /**
-     * next order coupon page
+     * default noc settings
+     * @return mixed|void
      */
-    function nextOrderCouponPage()
+    function getDefaultNocSettings()
     {
-        $settings = get_option($this->slug, array());
         $default_settings = array(
             RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon' => '0',
             RNOC_PLUGIN_PREFIX . 'retainful_coupon_type' => '0',
@@ -667,6 +683,16 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup' => '1',
             RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design' => $this->appliedCouponDefaultTemplate(),
         );
+        return apply_filters('rnoc_get_default_noc_settings', $default_settings);
+    }
+
+    /**
+     * next order coupon page
+     */
+    function nextOrderCouponPage()
+    {
+        $settings = get_option($this->slug, array());
+        $default_settings = $this->getDefaultNocSettings();
         $settings = wp_parse_args($settings, $default_settings);
         $is_app_connected = $this->isAppConnected();
         $expiry_date_format = $this->getDateFormatOptions();
@@ -1235,26 +1261,30 @@ class Settings
     function getSearchedCoupons()
     {
         check_ajax_referer('rnoc_get_search_coupon', 'security');
-        $search_code = self::$input->get('coupon');
-        $args = array(
-            "post_type" => "shop_coupon",
-            "numberposts" => 10,
-            "s" => $search_code,
-            "post_status" => "publish"
-        );
-        $coupon_codes = get_posts($args);
-        if (empty($coupon_codes)) {
-            wp_send_json_error('No Coupons found!');
-        } else {
-            $result = array();
-            foreach ($coupon_codes as $coupon_code_post) {
-                /**
-                 * @var $coupon_code_post \WP_Post
-                 */
-                $coupon_code = $coupon_code_post->post_title;
-                $result[$coupon_code] = $coupon_code;
+        if(current_user_can('manage_woocommerce')) {
+            $search_code = self::$input->get('coupon');
+            $args = array(
+                "post_type" => "shop_coupon",
+                "numberposts" => 10,
+                "s" => $search_code,
+                "post_status" => "publish"
+            );
+            $coupon_codes = get_posts($args);
+            if (empty($coupon_codes)) {
+                wp_send_json_error('No Coupons found!');
+            } else {
+                $result = array();
+                foreach ($coupon_codes as $coupon_code_post) {
+                    /**
+                     * @var $coupon_code_post \WP_Post
+                     */
+                    $coupon_code = $coupon_code_post->post_title;
+                    $result[$coupon_code] = $coupon_code;
+                }
+                wp_send_json_success($result);
             }
-            wp_send_json_success($result);
+        }else{
+            wp_send_json_error('You don\'t had enough right to search coupons');
         }
     }
 
