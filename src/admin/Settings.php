@@ -1205,16 +1205,15 @@ class Settings
      */
     function availableOrderStatuses()
     {
-        $default = array('all' => __('All', RNOC_TEXT_DOMAIN));
         $woo_functions = new WcFunctions();
         $woo_statuses = $woo_functions->getAvailableOrderStatuses();
-        if (isset($woo_statuses['wc-pending'])) {
-            unset($woo_statuses['wc-pending']);
-        }
         if (is_array($woo_statuses)) {
-            return array_merge($default, $woo_statuses);
+            if (isset($woo_statuses['wc-pending'])) {
+                unset($woo_statuses['wc-pending']);
+            }
+            return $woo_statuses;
         }
-        return $default;
+        return array();
     }
 
     /**
