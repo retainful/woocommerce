@@ -24,10 +24,6 @@
     text-decoration: none;
 }
 
-.button {
-    padding: 8px !important;
-}
-
 .button-right-fixed {
     position: fixed;
     top: 40%;
@@ -46,7 +42,7 @@
     padding-top: .5em;
 }
 
-.nav-tab-wrapper .nav-tab {
+/* .nav-tab-wrapper .nav-tab {
     padding: 15px 20px;
     background: #ffffff;
     color: #39424b;
@@ -59,7 +55,7 @@
     box-shadow: inset 0 3px 0 #ff7f45;
     border-top-color: #ff7f45;
     color: #ff7f45;
-}
+} */
 
 input[type="text"], input[type="number"] {
     font-size: 14px;

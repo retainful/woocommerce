@@ -1334,6 +1334,7 @@ class Settings
             'ajax_url' => admin_url('admin-ajax.php'),
         ));
         wp_enqueue_style('retainful-admin-css', $asset_path . '/css/main.css', array(), RNOC_VERSION);
+        wp_enqueue_style('retainful-admin-style-css', $asset_path . '/css/style.css', array(), RNOC_VERSION);
         wp_enqueue_style('wp-color-picker');
         wp_enqueue_script('wp-color-picker');
     }
