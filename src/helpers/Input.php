@@ -1003,8 +1003,7 @@ class Input
      * @param $matches
      * @return string
      */
-    protected
-    function _sanitize_naughty_html($matches)
+    protected function _sanitize_naughty_html($matches)
     {
         static $naughty_tags = array(
             'alert', 'area', 'prompt', 'confirm', 'applet', 'audio', 'basefont', 'base', 'behavior', 'bgsound',
@@ -1068,8 +1067,7 @@ class Input
      * @param $match
      * @return mixed
      */
-    protected
-    function _convert_attribute($match)
+    protected function _convert_attribute($match)
     {
         return str_replace(array('>', '<', '\\'), array('&gt;', '&lt;', '\\\\'), $match[0]);
     }
