@@ -602,7 +602,7 @@ class OrderCoupon
         if (!empty($valid_order_statuses)) {
             if (!in_array('all', $valid_order_statuses)) {
                 $order_status = 'wc-' . $this->wc_functions->getStatus($order);
-                if (!in_array($order_status, $valid_order_statuses)) {
+                if ($order_status == "wc-pending" || !in_array($order_status, $valid_order_statuses)) {
                     $status = false;
                 }
             }

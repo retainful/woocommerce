@@ -250,8 +250,11 @@ class Order extends RestApi
         $order_id = self::$woocommerce->getOrderId($order);
         $data = array();
         $next_order_coupon = self::$woocommerce->getPostMeta($order_id, '_rnoc_next_order_coupon');
+        $order_coupon_obj = new OrderCoupon();
+        if(empty($next_order_coupon)){
+            $next_order_coupon = $order_coupon_obj->createNewCoupon($order_id, array());
+        }
         if (!empty($next_order_coupon)) {
-            $order_coupon_obj = new OrderCoupon();
             $coupon_details = $order_coupon_obj->getCouponByCouponCode($next_order_coupon);
             if (!empty($coupon_details)) {
                 $coupon_id = $coupon_details->ID;

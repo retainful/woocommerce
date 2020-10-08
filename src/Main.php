@@ -232,7 +232,7 @@ class Main
                 // handle updating Retainful order data after a successful payment, for certain gateways
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
                 // handle placed orders
-                add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 10, 1);
+                add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
                 add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
                 //Todo: multi currency and multi lingual
                 #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));

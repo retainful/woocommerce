@@ -1151,13 +1151,15 @@ class Settings
      */
     function availableOrderStatuses()
     {
-        $default = array('all' => __('All', RNOC_TEXT_DOMAIN));
         $woo_functions = new WcFunctions();
         $woo_statuses = $woo_functions->getAvailableOrderStatuses();
         if (is_array($woo_statuses)) {
-            return array_merge($default, $woo_statuses);
+            if (isset($woo_statuses['wc-pending'])) {
+                unset($woo_statuses['wc-pending']);
+            }
+            return $woo_statuses;
         }
-        return $default;
+        return array();
     }
 
     /**
@@ -1261,7 +1263,7 @@ class Settings
     function getSearchedCoupons()
     {
         check_ajax_referer('rnoc_get_search_coupon', 'security');
-        if(current_user_can('manage_woocommerce')) {
+        if (current_user_can('manage_woocommerce')) {
             $search_code = self::$input->get('coupon');
             $args = array(
                 "post_type" => "shop_coupon",
@@ -1283,7 +1285,7 @@ class Settings
                 }
                 wp_send_json_success($result);
             }
-        }else{
+        } else {
             wp_send_json_error('You don\'t had enough right to search coupons');
         }
     }
