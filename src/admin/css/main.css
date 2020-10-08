@@ -299,8 +299,8 @@ input[type="text"], input[type="number"] {
     position: absolute;
     list-style: none;
     background: #fff;
-    min-width: 200px;
-    top: 40px;
+    min-width: 235px;
+    top: 45px;
     z-index: 999;
 }
 
@@ -308,7 +308,7 @@ input[type="text"], input[type="number"] {
     border-top: 1px solid #ddd;
 }
 .rnoc-auto-complete-results li {
-    padding: 5px;
+    padding: 10px;
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd;
     border-left: 1px solid #ddd;

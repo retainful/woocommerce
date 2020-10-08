@@ -404,6 +404,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 $pages = $this->getPageLists();
                 $coupon_codes = $this->getWooCouponCodes();
                 ?>
+                <input type="hidden" name="addon" value="eip">
                 <table class="form-table" role="presentation">
                     <tbody>
                     <tr>
@@ -443,7 +444,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <select multiple
+                            <select multiple="multiple"
                                     name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages[]'; ?>"
                                     class="rnoc-multi-select"
                                     id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'; ?>">
@@ -510,6 +511,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                    name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
                                    class="search-and-select-coupon"
+                                   autocomplete="off"
                                    value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon']; ?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
@@ -783,8 +785,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </th>
                         <td>
                             <label>
-                                <select name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'; ?>"
-                                        class="rnoc-select2-select">
+                                <select name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'; ?>">
                                     <?php
                                     foreach ($this->complianceMessageOptions() as $key => $label) {
                                         ?>

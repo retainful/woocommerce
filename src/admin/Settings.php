@@ -424,9 +424,26 @@ class Settings
             $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] = $this->sanitizeBasicHtml($coupon_mail_template);
         }
         $settings = get_option($page_slug, array());
-        $default_settings = $this->getDefaultPremiumAddonsValues();
-        $new_settings = wp_parse_args($data, $default_settings);
-        $data_to_save = wp_parse_args($new_settings, $settings);
+        $page = self::$input->post('addon', 'atcp');
+        switch ($page) {
+            default:
+            case "atcp":
+                if (!isset($data[RNOC_PLUGIN_PREFIX . 'modal_display_pages'])) {
+                    $data[RNOC_PLUGIN_PREFIX . 'modal_display_pages'] = array();
+                }
+                break;
+            case "ct":
+                if (!isset($data[RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'])) {
+                    $data[RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'] = array();
+                }
+                break;
+            case "eip":
+                if (!isset($data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'])) {
+                    $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'] = array();
+                }
+                break;
+        }
+        $data_to_save = wp_parse_args($data, $settings);
         update_option($page_slug, $data_to_save);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }

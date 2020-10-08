@@ -338,6 +338,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 $pages = $this->getPageLists();
                 $coupon_codes = $this->getWooCouponCodes();
                 ?>
+                <input type="hidden" name="addon" value="ct">
                 <table class="form-table" role="presentation">
                     <tbody>
                     <tr>
@@ -375,7 +376,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                         </th>
                         <td>
                             <input type="text" name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
-                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>" class="search-and-select-coupon" value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'] ?>">
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>" class="search-and-select-coupon" autocomplete="off" value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'] ?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons
@@ -389,7 +390,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <select multiple name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages[]'; ?>"
+                            <select multiple="multiple" name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages[]'; ?>"
                                     class="rnoc-multi-select"
                                     id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'; ?>">
                                 <?php

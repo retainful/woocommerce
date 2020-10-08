@@ -490,6 +490,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 $pages = $this->getPageLists();
                 $coupon_codes = $this->getWooCouponCodes();
                 ?>
+                <input type="hidden" name="addon" value="atcp">
                 <table class="form-table" role="presentation">
                     <tbody>
                     <tr>
@@ -634,7 +635,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <select multiple name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages[]'; ?>"
+                            <select multiple="multiple"
+                                    name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages[]'; ?>"
                                     class="rnoc-multi-select"
                                     id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages'; ?>">
                                 <?php
@@ -868,8 +870,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <label>
-                                <select name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'; ?>"
-                                        class="rnoc-select2-select">
+                                <select name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'; ?>">
                                     <?php
                                     foreach ($this->complianceMessageOptions() as $key => $label) {
                                         ?>
@@ -958,6 +959,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                    name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'woo_coupon]'; ?>"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'woo_coupon'; ?>"
                                    class="search-and-select-coupon"
+                                   autocomplete="off"
                                    value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'woo_coupon']; ?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,

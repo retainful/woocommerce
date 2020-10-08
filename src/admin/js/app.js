@@ -180,7 +180,6 @@
             var action = submit.data('action');
             var security = submit.data('security');
             var url = retainful_admin.ajax_endpoint.replace("{{action}}", action).replace("{{security}}", security);
-            console.log($(this).serializeArray());
             submit.attr('disabled', true);
             $(".error").html('');
             $('.switch-tmce').trigger('click');

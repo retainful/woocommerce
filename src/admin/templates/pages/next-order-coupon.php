@@ -654,7 +654,7 @@ require_once "tabs.php";
                 </th>
                 <td>
                     <select name="<?php echo RNOC_PLUGIN_PREFIX . 'product_categories[]'; ?>"
-                            id="product_categories" multiple
+                            id="product_categories" multiple="multiple"
                             class="rnoc-multi-select">
                         <?php
                         if (!empty($categories)) {
@@ -684,7 +684,7 @@ require_once "tabs.php";
                 </th>
                 <td>
                     <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exclude_product_categories[]'; ?>"
-                            id="exclude_product_categories" multiple
+                            id="exclude_product_categories" multiple="multiple"
                             class="rnoc-multi-select">
                         <?php
                         if (!empty($categories)) {
