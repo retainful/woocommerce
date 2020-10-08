@@ -81,6 +81,16 @@ class Checkout extends RestApi
     }
 
     /**
+     * @return mixed|void
+     */
+    function generateNocCouponForManualOrders()
+    {
+        $has_backorder_coupon = self::$settings->autoGenerateCouponsForOldOrders();
+        $need_noc_coupon = ($has_backorder_coupon && is_admin());
+        return apply_filters('rnoc_generate_noc_coupon_for_manual_orders', $need_noc_coupon, $this);
+    }
+
+    /**
      * Sync the order with API
      * @param $order_id
      * @return void|null
@@ -94,10 +104,9 @@ class Checkout extends RestApi
         $order_obj = new Order();
         $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
         if (empty($cart_token)) {
-            $has_backorder_coupon = self::$settings->autoGenerateCouponsForOldOrders();
-            if ($has_backorder_coupon && is_admin()) {
+            if ($this->generateNocCouponForManualOrders()) {
                 $noc_details = $order_obj->getNextOrderCouponDetails($order);
-                if (is_array($noc_details) && !empty($noc_details)) {
+                if (is_array($noc_details) && !empty($noc_details) && isset($noc_details[0]['code']) && !empty($noc_details[0]['code'])) {
                     $cart_token = $this->generateCartToken();
                     self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
                 } else {
