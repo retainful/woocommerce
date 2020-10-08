@@ -97,7 +97,7 @@ class Checkout extends RestApi
             $has_backorder_coupon = self::$settings->autoGenerateCouponsForOldOrders();
             if ($has_backorder_coupon && is_admin()) {
                 $noc_details = $order_obj->getNextOrderCouponDetails($order);
-                if (is_array($noc_details) && !empty($noc_details) && isset($noc_details['code']) && !empty($noc_details['code'])) {
+                if (is_array($noc_details) && !empty($noc_details)) {
                     $cart_token = $this->generateCartToken();
                     self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
                 } else {
