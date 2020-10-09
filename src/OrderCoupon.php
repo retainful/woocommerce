@@ -107,16 +107,10 @@ class OrderCoupon
                 $post_id = $coupon_details->ID;
                 $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
                 if ($coupon_amount > 0) {
-                    $is_api_enabled = $this->admin->isAppConnected();
-                    $tracker = '';
-                    if (!empty($is_api_enabled) && $sending_email) {
-                        $request_params = $this->getRequestParams($order);
-                        $tracker .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
-                    }
                     $coupon_type = get_post_meta($post_id, 'coupon_type', true);
                     $order_coupon_data = array(
                         'wec_next_order_coupon_code' => $coupon_code,
-                        'wec_next_order_coupon' => $coupon_code . $tracker,
+                        'wec_next_order_coupon' => $coupon_code,
                         'wec_next_order_coupon_value' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
                         'woo_mb_site_url_link_with_coupon' => site_url() . '?retainful_coupon_code=' . $coupon_code,
                     );
@@ -253,14 +247,6 @@ class OrderCoupon
                     }
                     $message = $this->admin->getCouponMessage();
                     $message = str_replace(array_keys($string_to_replace), $string_to_replace, $message);
-                    $is_api_enabled = $this->admin->isAppConnected();
-                    if ($is_api_enabled && !$sent_to_admin) {
-                        $request_params = $this->getRequestParams($order);
-                        if (isset($request_params['new_coupon']) && empty($request_params['new_coupon'])) {
-                            $request_params['new_coupon'] = $coupon_code;
-                        }
-                        $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
-                    }
                 }
             }
             $message = apply_filters('rnoc_before_displaying_next_order_coupon', $message, $order);

@@ -1869,26 +1869,6 @@ class Settings
     }
 
     /**
-     * Link to track Email
-     * @param $url
-     * @param $params
-     * @return string
-     */
-    function getPixelTagLink($url, $params)
-    {
-        if (!isset($params['app_id'])) {
-            $params['app_id'] = $this->getApiKey();
-        }
-        if (!isset($params['email_open'])) {
-            $params['email_open'] = 1;
-        }
-        if (isset($params['applied_coupon'])) {
-            unset($params['applied_coupon']);
-        }
-        return $this->api->emailTrack($url, $params);
-    }
-
-    /**
      * Show up the survey form
      */
     function setupSurveyForm()
