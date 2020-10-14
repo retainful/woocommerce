@@ -47,6 +47,7 @@ class Main
         //Register custom endpoint for API
         register_rest_route('retainful-api/v1', '/verify', array(
             'methods' => 'POST',
+            'permission_callback' => '__return_true',
             'callback' => array($this, 'verifyAppId')
         ));
     }
