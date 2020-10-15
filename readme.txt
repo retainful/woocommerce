@@ -3,9 +3,9 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
 Requires at least: 4.0
 Tested up to: 5.5
-WC tested up to: 4.3.1
+WC tested up to: 4.5.2
 Requires PHP: 5.6
-Stable tag: 2.2.9
+Stable tag: 2.3.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -401,3 +401,14 @@ No. There is no charges for support.
 
 = 2.2.9 =
 * Fix: Support upto 5.5 added
+
+= 2.3.0 =
+* Fix: Add to cart popup added
+
+= 2.3.1 =
+* Fix: NOC issue on manual order created by admin
+* Fix: tracking pixel issue fixed
+* Fix: rest api permission callback issue fixed
+* Fix: removed cmb2 dependency
+* Fix: settings page redesigned
+* Fix: validation added
