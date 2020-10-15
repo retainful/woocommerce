@@ -23,9 +23,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         function init()
         {
             if (is_admin()) {
-                add_filter('cmb2_render_popup_preview', array($this, 'renderPopupPreview'), 10, 5);
-                add_filter('rnoc_premium_addon_tab', array($this, 'premiumAddonTab'));
-                add_filter('rnoc_premium_addon_tab_content', array($this, 'premiumAddonTabContent'));
+                add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
             }
             add_action('wp_ajax_nopriv_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
             add_action('wp_ajax_nopriv_rnoc_popup_closed', array($this, 'popupClosed'));
@@ -36,6 +34,18 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             add_action('wp_enqueue_scripts', array($this, 'enqueueScripts'));
             add_action('wp_footer', array($this, 'addAtcPopupContent'));
             add_action('wp', array($this, 'applyCouponAutomatically'));
+            add_action('woocommerce_add_to_cart', array($this, 'productAddedToCart'));
+        }
+
+        /**
+         * after product added to cart
+         */
+        function productAddedToCart()
+        {
+            if (isset($_POST['rnoc_email_popup']) && !empty($_POST['rnoc_email_popup'])) {
+                $email = sanitize_text_field($_POST['rnoc_email_popup']);
+                $this->wc_functions->setCustomerEmail($email);
+            }
         }
 
         function enqueue_script()
@@ -64,15 +74,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 });
             </script>
             <?php
-        }
-
-        /**
-         * Render select box field
-         */
-        public function renderPopupPreview($field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object)
-        {
-            $this->setupAdminScripts();
-            echo $this->getPopupTemplate();
         }
 
         /**
@@ -179,33 +180,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $this->wc_functions->initWoocommerceSession();
             $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             $this->wc_functions->setCustomerEmail($email);
+            do_action('rnoc_after_atcp_assigning_email_to_customer', $email, $this);
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
             if (!$run_cart_externally) {
-                $abandoned_cart = new \Rnoc\Retainful\AbandonedCart();
-                $customer = new WC_Customer();
-                $user_session_id = $abandoned_cart->getUserSessionKey();
-                $customer->set_email($email);
-                if (!empty($user_session_id) && !empty($_REQUEST['email'])) {
-                    global $wpdb;
-                    $query = "SELECT * FROM `" . $abandoned_cart->guest_cart_history_table . "` WHERE session_id = %s";
-                    $results = $wpdb->get_row($wpdb->prepare($query, $user_session_id), OBJECT);
-                    if (empty($results)) {
-                        $insert_guest = "INSERT INTO `" . $abandoned_cart->guest_cart_history_table . "`(email_id, session_id) VALUES ( %s,%s)";
-                        $wpdb->query($wpdb->prepare($insert_guest, $email, $user_session_id));
-                    } else {
-                        $guest_details_id = $results->id;
-                        $query_update = "UPDATE `" . $abandoned_cart->guest_cart_history_table . "` SET email_id=%s, shipping_county=%s, shipping_zipcode=%s, shipping_charges=%s, session_id=%s WHERE id=%d";
-                        $wpdb->query($wpdb->prepare($query_update, $email, $user_session_id, $guest_details_id));
-                    }
-                    $error = false;
-                } else {
-                    if (empty($_REQUEST['email'])) {
-                        $error = false;
-                    } else {
-                        $message = __('Sorry invalid request!', RNOC_TEXT_DOMAIN);
-                    }
-                }
+                //remove
             } else {
                 $error = false;
             }
@@ -442,322 +421,610 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         }
 
         /**
-         * add the settings tabs
          * @param $settings
-         * @return array
+         * @param $base_url
+         * @param $add_on_slug
          */
-        function premiumAddonTab($settings)
+        function premiumAddonTabContent($settings, $base_url, $add_on_slug)
         {
-            $settings[] = array(
-                'id' => $this->slug,
-                'icon' => $this->icon,
-                'title' => __('Add to cart Popup', RNOC_TEXT_DOMAIN),
-                'fields' => array(
-                    RNOC_PLUGIN_PREFIX . 'popup_preview',
-                    RNOC_PLUGIN_PREFIX . 'modal_design_settings',
-                    RNOC_PLUGIN_PREFIX . 'close_btn_behavior',
-                    RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory',
-                    RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance',
-                    RNOC_PLUGIN_PREFIX . 'modal_coupon_settings',
-                    RNOC_PLUGIN_PREFIX . 'need_modal',
-                    RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class',
-                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
-                    RNOC_PLUGIN_PREFIX . 'modal_bg_color',
-                    RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
-                    RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action',
-                    RNOC_PLUGIN_PREFIX . 'modal_show_popup_until',
-                    RNOC_PLUGIN_PREFIX . 'modal_display_pages',
-                    RNOC_PLUGIN_PREFIX . 'woo_coupons'
-                ),
-            );
-            return $settings;
-        }
-
-        /**
-         * add settings field to render
-         * @param $general_settings
-         * @return mixed
-         */
-        function premiumAddonTabContent($general_settings)
-        {
-            $general_settings->add_field(array(
-                'name' => __('Enable Add to cart popup modal', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'need_modal',
-                'type' => 'radio_inline',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => '0'
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Email address is mandatory ?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory',
-                'type' => 'radio_inline',
-                'classes' => 'retainful-coupon-group',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 1
-            ));
-            $general_settings->add_field(array(
-                'name' => __('No thanks action', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action',
-                'type' => 'radio_inline',
-                'options' => array(
-                    '0' => __('Do not allow adding the item to cart and Do not show "No thanks" link', RNOC_TEXT_DOMAIN),
-                    '1' => __('Allow adding item to cart (Show "No thanks" link)', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 1
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Close button behavior', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'close_btn_behavior',
-                'type' => 'radio_inline',
-                'options' => array(
-                    'add_and_close' => __('Add item to cart and close', RNOC_TEXT_DOMAIN),
-                    'just_close' => __('Just close the popup', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 'just_close'
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Show E-mail collection popup', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_show_popup_until',
-                'type' => 'radio',
-                'options' => array(
-                    '1' => __('Until user provides an E-Mail address', RNOC_TEXT_DOMAIN),
-                    '2' => __('Until user clicks "No thanks" link (It will stop showing once user clicked no thanks)', RNOC_TEXT_DOMAIN),
-                    '3' => __('Until user clicks close button of the popup (It will stop when user clicks the close button once)', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 1
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Custom pages to display the pop-up modal on (Optional)', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_display_pages',
-                'type' => 'pw_multiselect',
-                'options' => $this->getPageLists(),
-                'attributes' => array(
-                    'placeholder' => __('Select Pages', RNOC_TEXT_DOMAIN)
-                ),
-                'desc' => __('The add to cart popup would be displayed only on the selected pages.If you wish to display the popup in all pages, leave this option empty.', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Custom classes', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class',
-                'type' => 'textarea',
-                'default' => '',
-                'desc' => __('Very helpful for custom designed Add to cart button.<b>Example:</b> .add-to-cart,.custom-add-to-cart-button', RNOC_TEXT_DOMAIN)
-            ));
-            //GDPR settings
-            $gdpr_compliance_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('GDPR Compliance for collecting E-Mail', RNOC_TEXT_DOMAIN),
-                    'sortable' => true
-                )
-            ));
-            $general_settings->add_group_field($gdpr_compliance_settings, array(
-                'name' => __('Show GDPR Compliance checkbox ', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings',
-                'type' => 'select',
-                'default' => 'no_need_gdpr',
-                'options' => $this->complianceMessageOptions()
-            ));
-            $general_settings->add_group_field($gdpr_compliance_settings, array(
-                'name' => __('GDPR Compliance message', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message',
-                'type' => 'textarea',
-                'default' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
-                'desc' => __('You can also use HTML content as well in the message.', RNOC_TEXT_DOMAIN)
-            ));
-            //coupon settings
-            $popup_coupon_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_coupon_settings',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('Coupon settings - Reward customers with a coupon for providing their email address', RNOC_TEXT_DOMAIN),
-                    'sortable' => true
-                )
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Enable coupon reward for providing email address', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'need_coupon',
-                'type' => 'radio_inline',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => '0',
-                'desc' => __('You can reward your visitors with a coupon code when they provide their email address via the Add-to-cart popup.', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Choose the coupon code for the reward', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'woo_coupon',
-                'type' => 'pw_select',
-                'options' => $this->getWooCouponCodes(),
-                'attributes' => array(
-                    'placeholder' => __('Select Coupon', RNOC_TEXT_DOMAIN)
-                ),
-                'desc' => __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Reward message to show on the popup', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_sub_heading',
-                'type' => 'text',
-                'default' => __('Get a discount in your email!', RNOC_TEXT_DOMAIN),
-                'desc' => __('<b>Note:</b> You need to enable coupon.')
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Message text color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color',
-                'type' => 'colorpicker',
-                'default' => '#333333'
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Choose how to reveal the reward coupon', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
-                'type' => 'select',
-                'options' => array(
-                    "instantly" => __("Instantly using a popup", RNOC_TEXT_DOMAIN),
-                    "send_via_email" => __("Send an email", RNOC_TEXT_DOMAIN),
-                    "both" => __("Show instantly using a popup and also send an email", RNOC_TEXT_DOMAIN),
-                    "auto_apply_and_redirect" => __("Auto apply coupon and redirect to checkout", RNOC_TEXT_DOMAIN),
-                    "auto_apply_and_redirect_cart" => __("Auto apply coupon and redirect to cart", RNOC_TEXT_DOMAIN),
-                    "send_mail_auto_apply_and_redirect" => __("Send email, auto apply and redirect to checkout", RNOC_TEXT_DOMAIN),
-                    "send_mail_auto_apply_and_redirect_cart" => __("Send email, auto apply and redirect to cart", RNOC_TEXT_DOMAIN),
-                ),
-                'attributes' => array(
-                    'placeholder' => __('Choose coupon settings', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => "send_via_email",
-                'desc' => __('How to show the reward coupon to customers', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Response Popup template', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template',
-                'type' => 'wysiwyg',
-                'default' => $this->getDefaultPopupTemplate(),
-                'desc' => __('This popup shows after the customer enter their email address and add item to cart. Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
-                    'data-conditional-value' => wp_json_encode(array('both', 'instantly')),
-                )
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Email subject', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject',
-                'type' => 'text',
-                'default' => __('You got a new coupon code, Grab it now!', RNOC_TEXT_DOMAIN),
-                'desc' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
-                    'data-conditional-value' => wp_json_encode(array('both', 'send_via_email', 'send_mail_auto_apply_and_redirect', 'send_mail_auto_apply_and_redirect_cart')),
-                ),
-            ));
-            $general_settings->add_group_field($popup_coupon_settings, array(
-                'name' => __('Email template (Used for the email that is sent when customer enters his email in the Add to Cart Popup)', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_mail_template',
-                'type' => 'wysiwyg',
-                'default' => $this->getDefaultEmailTemplate(),
-                'desc' => __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'data-conditional-id' => RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
-                    'data-conditional-value' => wp_json_encode(array('both', 'send_via_email', 'send_mail_auto_apply_and_redirect', 'send_mail_auto_apply_and_redirect_cart')),
-                )
-            ));
-            //Modal design
-            $popup_design_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_design_settings',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('Popup Design', RNOC_TEXT_DOMAIN),
-                    'sortable' => true
-                ),
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => 'Sample Preview (Customize the texts and colours below)',
-                'id' => RNOC_PLUGIN_PREFIX . 'popup_preview',
-                'type' => 'popup_preview',
-                'default' => __('Please enter your email', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Modal heading', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_heading',
-                'type' => 'text',
-                'default' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Modal heading color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_heading_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Email placeholder', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_email_placeholder',
-                'type' => 'text',
-                'default' => __('Email address', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Add to cart button text', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_text',
-                'type' => 'text',
-                'default' => __('Add to Cart', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Add to cart button color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_color',
-                'type' => 'colorpicker',
-                'default' => '#ffffff'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Add to cart button background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color',
-                'type' => 'colorpicker',
-                'default' => '#f27052'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Popup top border color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
-                'type' => 'colorpicker',
-                'default' => '#f27052'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Add to cart popup background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_bg_color',
-                'type' => 'colorpicker',
-                'default' => '#F8F0F0'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Not mandatory text', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text',
-                'type' => 'text',
-                'default' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('No thanks link color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
-                'type' => 'colorpicker',
-                'default' => '#f27052'
-            ));
-            $general_settings->add_group_field($popup_design_settings, array(
-                'name' => __('Terms', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'modal_terms_text',
-                'type' => 'text',
-                'default' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            return $general_settings;
+            if ($this->slug() == $add_on_slug) {
+                $pages = $this->getPageLists();
+                $coupon_codes = $this->getWooCouponCodes();
+                ?>
+                <input type="hidden" name="addon" value="atcp">
+                <table class="form-table" role="presentation">
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'need_modal'; ?>"><?php
+                                esc_html_e('Enable Add to cart popup modal?', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_modal'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'need_modal_1'; ?>"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_modal'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_modal'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'need_modal_0'; ?>"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_modal'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'; ?>"><?php
+                                esc_html_e('Email address is mandatory?', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'; ?>"><?php
+                                esc_html_e('No thanks action', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Allow adding item to cart (Show "No thanks" link)', RNOC_TEXT_DOMAIN); ?>
+                            </label><br>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Do not allow adding the item to cart and Do not show "No thanks" link', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'close_btn_behavior'; ?>"><?php
+                                esc_html_e('Close button behavior', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'close_btn_behavior'; ?>"
+                                       type="radio"
+                                       value="add_and_close" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'close_btn_behavior'] == 'add_and_close') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Add item to cart and close', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'close_btn_behavior'; ?>"
+                                       type="radio"
+                                       value="just_close" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'close_btn_behavior'] == 'just_close') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Just close the popup', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'; ?>"><?php
+                                esc_html_e('Show E-mail collection popup', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Until user provides an E-Mail address', RNOC_TEXT_DOMAIN); ?>
+                            </label><br>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'; ?>"
+                                       type="radio"
+                                       value="2" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'] == '2') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Until user clicks "No thanks" link (It will stop showing once user clicked no thanks)', RNOC_TEXT_DOMAIN); ?>
+                            </label><br>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'; ?>"
+                                       type="radio"
+                                       value="3" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'] == '3') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Until user clicks close button of the popup (It will stop when user clicks the close button once)', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages'; ?>"><?php
+                                esc_html_e('Custom pages to display the pop-up modal on (Optional)', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <select multiple="multiple"
+                                    name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages[]'; ?>"
+                                    class="rnoc-multi-select"
+                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages'; ?>">
+                                <?php
+                                if (!empty($pages)) {
+                                    foreach ($pages as $key => $label) {
+                                        ?>
+                                        <option value="<?php echo $key ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'modal_display_pages'])) {
+                                            echo "selected";
+                                        } ?>><?php echo $label ?></option>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <p class="description">
+                                <?php
+                                echo __('The add to cart popup would be displayed only on the selected pages.If you wish to display the popup in all pages, leave this option empty.', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'; ?>"><?php
+                                esc_html_e('Custom classes', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                        <textarea name="<?php echo RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'; ?>"
+                                  rows="5" cols="50"
+                                  id="<?php echo RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'; ?>"><?php echo $settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class']; ?>
+                        </textarea>
+                            <p class="description">
+                                <?php
+                                echo __('Very helpful for custom designed Add to cart button.<b>Example:</b> .add-to-cart,.custom-add-to-cart-button', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('Popup Design', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $modal_design_name = RNOC_PLUGIN_PREFIX . 'modal_design_settings[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <td colspan="2">
+                            <?php
+                            $this->setupAdminScripts();
+                            echo $this->getPopupTemplate();
+                            ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_heading'; ?>"><?php
+                                esc_html_e('Modal heading', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_heading]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_heading'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_heading']; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_heading_color'; ?>"><?php
+                                esc_html_e('Modal heading color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_heading_color]'; ?>"
+                                   type="text" class="rnoc-color-field"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_heading_color'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_heading_color']; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_email_placeholder'; ?>"><?php
+                                esc_html_e('Email placeholder', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_email_placeholder]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_email_placeholder'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_placeholder']; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_add_cart_text'; ?>"><?php
+                                esc_html_e('Add to cart button text', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_text]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_add_cart_text'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_text']; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_add_cart_color'; ?>"><?php
+                                esc_html_e('Add to cart button color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color'; ?>"><?php
+                                esc_html_e('Add to cart button background color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color'; ?>"><?php
+                                esc_html_e('Popup top border color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_bg_color'; ?>"><?php
+                                esc_html_e('Add to cart popup background color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_bg_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_bg_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text'; ?>"><?php
+                                esc_html_e('Not mandatory text', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text']; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color'; ?>"><?php
+                                esc_html_e('No thanks link color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_terms_text'; ?>"><?php
+                                esc_html_e('Terms', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_terms_text]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_terms_text'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_terms_text']; ?>">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('GDPR Compliance for collecting E-Mail', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $gdpr_compliance_name = RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'; ?>"><?php
+                                esc_html_e('Show GDPR Compliance checkbox', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <select name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'; ?>">
+                                    <?php
+                                    foreach ($this->complianceMessageOptions() as $key => $label) {
+                                        ?>
+                                        <option value="<?php echo $key ?>" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'] == $key) {
+                                            echo 'selected';
+                                        } ?> ><?php echo $label ?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'; ?>"><?php
+                                esc_html_e('GDPR Compliance message', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                            <textarea
+                                    name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'; ?>"
+                                    rows="10"
+                                    cols="50"><?php echo $settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']; ?>
+                            </textarea>
+                            </label>
+                            <p class="description">
+                                <?php
+                                echo __('You can also use HTML content as well in the message.', RNOC_TEXT_DOMAIN)
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('Coupon settings - Reward customers with a coupon for providing their email address', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $modal_coupon_settings_name = RNOC_PLUGIN_PREFIX . 'modal_coupon_settings[0]';
+                    $coupon_codes = $this->getWooCouponCodes();
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'need_coupon'; ?>"><?php
+                                esc_html_e('Enable coupon reward for providing email address', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'need_coupon]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'need_coupon'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'need_coupon]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'need_coupon'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <p class="description">
+                                <?php
+                                echo __('You can reward your visitors with a coupon code when they provide their email address via the Add-to-cart popup.', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'woo_coupon'; ?>"><?php
+                                esc_html_e('Choose the coupon code for the reward', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input type="text"
+                                   name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'woo_coupon]'; ?>"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'woo_coupon'; ?>"
+                                   class="search-and-select-coupon"
+                                   autocomplete="off"
+                                   placeholder="<?php esc_html_e('Search for a coupon code', RNOC_TEXT_DOMAIN); ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'woo_coupon']; ?>">
+                            <p class="description">
+                                <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
+                                please create the coupon code in WooCommerce -> Coupons
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_sub_heading'; ?>"><?php
+                                esc_html_e('Reward message to show on the popup', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input type="text"
+                                   name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading]'; ?>"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_sub_heading'; ?>"
+                                   class="regular-text"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading']; ?>">
+                            <p class="description">
+                                <b>Note</b>:You need to enable coupon
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color'; ?>"><?php
+                                esc_html_e('Message text color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input type="text"
+                                   name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color]'; ?>"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color'; ?>"
+                                   class="rnoc-color-field"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color']; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'show_woo_coupon'; ?>"><?php
+                                esc_html_e('Choose how to reveal the reward coupon', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <select name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'show_woo_coupon]'; ?>"
+                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'show_woo_coupon'; ?>">
+                                <?php
+                                $options = array(
+                                    "instantly" => __("Instantly using a popup", RNOC_TEXT_DOMAIN),
+                                    "send_via_email" => __("Send an email", RNOC_TEXT_DOMAIN),
+                                    "both" => __("Show instantly using a popup and also send an email", RNOC_TEXT_DOMAIN),
+                                    "auto_apply_and_redirect" => __("Auto apply coupon and redirect to checkout", RNOC_TEXT_DOMAIN),
+                                    "auto_apply_and_redirect_cart" => __("Auto apply coupon and redirect to cart", RNOC_TEXT_DOMAIN),
+                                    "send_mail_auto_apply_and_redirect" => __("Send email, auto apply and redirect to checkout", RNOC_TEXT_DOMAIN),
+                                    "send_mail_auto_apply_and_redirect_cart" => __("Send email, auto apply and redirect to cart", RNOC_TEXT_DOMAIN),
+                                );
+                                foreach ($options as $key => $label) {
+                                    ?>
+                                    <option value="<?php echo $key ?>" <?php if ($key == $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'show_woo_coupon']) {
+                                        echo "selected";
+                                    } ?>><?php echo $label; ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                            <p class="description">
+                                How to show the reward coupon to customers
+                            </p>
+                        </td>
+                    </tr>
+                    <tr id="row_atcp_template">
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'; ?>"><?php
+                                esc_html_e('Response Popup template', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <?php
+                            $email_template = $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'];
+                            if (empty($email_template)) {
+                                $email_template = $this->getDefaultPopupTemplate();
+                            }
+                            wp_editor($email_template, 'add_to_cart_coupon_popup_template', array('textarea_name' => $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template]'));
+                            ?>
+                            <p class="description">
+                                Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b>
+                                - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically
+                            </p>
+                        </td>
+                    </tr>
+                    <tr class="row_atcp_mail_template">
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'; ?>"><?php
+                                esc_html_e('Email subject', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input type="text"
+                                   name="<?php echo $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject]'; ?>"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'; ?>"
+                                   class="regular-text"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject']; ?>">
+                        </td>
+                    </tr>
+                    <tr class="row_atcp_mail_template">
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_mail_template'; ?>"><?php
+                                esc_html_e('Email template (Used for the email that is sent when customer enters his email in the Add to Cart Popup)', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <?php
+                            $email_template = $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'];
+                            if (empty($email_template)) {
+                                $email_template = $this->getDefaultEmailTemplate();
+                            }
+                            wp_editor($email_template, 'coupon_mail_template', array('textarea_name' => $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template]'));
+                            ?>
+                            <p class="description">
+                                Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b>
+                                - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically
+                            </p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <?php
+            }
         }
     }
 }

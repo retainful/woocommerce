@@ -23,8 +23,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         function init()
         {
             if (is_admin()) {
-                add_filter('rnoc_premium_addon_tab', array($this, 'premiumAddonTab'));
-                add_filter('rnoc_premium_addon_tab_content', array($this, 'premiumAddonTabContent'));
+                add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
             }
             $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 1);
             $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
@@ -293,358 +292,727 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         }
 
         /**
-         * add the settings tabs
          * @param $settings
-         * @return array
+         * @param $base_url
+         * @param $add_on_slug
          */
-        function premiumAddonTab($settings)
+        function premiumAddonTabContent($settings, $base_url, $add_on_slug)
         {
-            $settings[] = array(
-                'id' => $this->slug,
-                'icon' => $this->icon,
-                'title' => __('Coupon Timer', RNOC_TEXT_DOMAIN),
-                'fields' => array(
-                    RNOC_PLUGIN_PREFIX . 'enable_coupon_timer',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message',
-                    RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings',
-                    RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings',
-                ),
-            );
-            return $settings;
-        }
-
-        /**
-         * add settings field to render
-         * @param $general_settings
-         * @return mixed
-         */
-        function premiumAddonTabContent($general_settings)
-        {
-            $general_settings->add_field(array(
-                'name' => __('Enable Coupon timer?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'enable_coupon_timer',
-                'type' => 'radio_inline',
-                'classes' => 'retainful-coupon-group',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 1
-            ));
-            $general_settings->add_field(array(
-                'type' => 'post_search_ajax',
-                'limit' => 1,
-                'valuefield' => 'title',
-                'attributes' => array(
-                    'placeholder' => __('Search and select Coupons..', RNOC_TEXT_DOMAIN)
-                ),
-                'query_args' => array('post_type' => 'shop_coupon', 'post_status' => 'publish'),
-                'name' => __('Choose the coupon code', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon',
-                'desc' => __('<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found, please create the coupon code in WooCommerce -> Coupons', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Custom pages to display the coupon timer', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages',
-                'type' => 'pw_multiselect',
-                'options' => $this->getPageLists(),
-                'attributes' => array(
-                    'placeholder' => __('Select Pages', RNOC_TEXT_DOMAIN)
-                )
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Apply coupon', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon',
-                'type' => 'radio_inline',
-                'classes' => 'retainful-coupon-group',
-                'options' => array(
-                    'automatically' => __('Automatically', RNOC_TEXT_DOMAIN),
-                    'manually' => __('Manually', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 'automatically'
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Time', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time',
-                'type' => 'text',
-                'desc' => __('In minutes', RNOC_TEXT_DOMAIN),
-                'attributes' => array(
-                    'type' => 'number',
-                    'class' => 'number_only_field',
-                    'min' => 1
-                ),
-                'default' => 15
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Coupon expiry message', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message',
-                'type' => 'text',
-                'desc' => __('Display this text when coupon expires.', RNOC_TEXT_DOMAIN),
-                'default' => __('Sorry! Instant Offer has expired.', RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_field(array(
-                'name' => __('Fix repeat reloading of page when coupon expires?', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload',
-                'type' => 'radio_inline',
-                'classes' => 'retainful-coupon-group',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 0
-            ));
-            //Top position settings
-            $top_position_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('Top / bottom position display settings', RNOC_TEXT_DOMAIN),
-                    'sortable' => true
-                ),
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Enable Top / bottom position', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'enable_position',
-                'type' => 'radio_inline',
-                'classes' => 'retainful-coupon-group',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 1
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Position', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'top_bottom_position',
-                'type' => 'radio_inline',
-                'options' => array(
-                    'top' => __('Top', RNOC_TEXT_DOMAIN),
-                    'bottom' => __('Bottom', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => "top"
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Message', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_message',
-                'type' => 'text',
-                'desc' => __('Use below short codes<br>{{coupon_code}} => to show coupon code<br>{{coupon_timer}} => remaining time timer', RNOC_TEXT_DOMAIN),
-                'default' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Timer format', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format',
-                'type' => 'text',
-                'desc' => __('Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => to show remaining hours<br>{{minutes}} - to show remaining minutes<br>{{seconds}} - to display remaining seconds', RNOC_TEXT_DOMAIN),
-                'default' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_background',
-                'type' => 'colorpicker',
-                'default' => '#ffffff'
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Coupon code color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Coupon Timer color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Enable checkout button', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'enable_checkout_button',
-                'type' => 'radio_inline',
-                'options' => array(
-                    0 => __('No', RNOC_TEXT_DOMAIN),
-                    1 => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 1
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Call to action button text', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_text',
-                'type' => 'text',
-                'default' => __('Checkout Now', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Call to action button color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_color',
-                'type' => 'colorpicker',
-                'default' => '#ffffff'
-            ));
-            $general_settings->add_group_field($top_position_settings, array(
-                'name' => __('Call to action button background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
-                'type' => 'colorpicker',
-                'default' => '#f27052'
-            ));
-            //Above cart position settings
-            $above_cart_position_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('Above cart display settings', RNOC_TEXT_DOMAIN),
-                    'sortable' => true
-                ),
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Enable "Above cart" position', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'enable_position',
-                'type' => 'radio_inline',
-                'classes' => 'retainful-coupon-group',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 0
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Message', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_message',
-                'type' => 'text',
-                'desc' => __('Use below short codes<br>{{coupon_code}} => to show coupon code<br>{{coupon_timer}} => remaining time timer', RNOC_TEXT_DOMAIN),
-                'default' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Timer format', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format',
-                'type' => 'text',
-                'desc' => __('Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => to show remaining hours<br>{{minutes}} - to show remaining minutes<br>{{seconds}} - to display remaining seconds', RNOC_TEXT_DOMAIN),
-                'default' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_background',
-                'type' => 'colorpicker',
-                'default' => '#ffffff'
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Coupon code color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Coupon Timer color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Enable checkout button', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'enable_checkout_button',
-                'type' => 'radio_inline',
-                'options' => array(
-                    0 => __('No', RNOC_TEXT_DOMAIN),
-                    1 => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 1
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Call to action button text', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_text',
-                'type' => 'text',
-                'default' => __('Checkout Now', RNOC_TEXT_DOMAIN),
-                'desc' => ''
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Call to action button color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_color',
-                'type' => 'colorpicker',
-                'default' => '#ffffff'
-            ));
-            $general_settings->add_group_field($above_cart_position_settings, array(
-                'name' => __('Call to action button background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
-                'type' => 'colorpicker',
-                'default' => '#f27052'
-            ));
-            //Below applied coupon settings
-            $below_discount_position_settings = $general_settings->add_field(array(
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings',
-                'type' => 'group',
-                'repeatable' => false,
-                'options' => array(
-                    'group_title' => __('Below applied coupon display settings', RNOC_TEXT_DOMAIN),
-                    'sortable' => true
-                ),
-            ));
-            $general_settings->add_group_field($below_discount_position_settings, array(
-                'name' => __('Enable "Below applied coupon" position', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'enable_position',
-                'type' => 'radio_inline',
-                'classes' => 'retainful-coupon-group',
-                'options' => array(
-                    '0' => __('No', RNOC_TEXT_DOMAIN),
-                    '1' => __('Yes', RNOC_TEXT_DOMAIN)
-                ),
-                'default' => 0
-            ));
-            $general_settings->add_group_field($below_discount_position_settings, array(
-                'name' => __('Message', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_message',
-                'type' => 'text',
-                'desc' => __('Use below short codes<br>{{coupon_code}} => to show coupon code<br>{{coupon_timer}} => remaining time timer', RNOC_TEXT_DOMAIN),
-                'default' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_group_field($below_discount_position_settings, array(
-                'name' => __('Timer format', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format',
-                'type' => 'text',
-                'desc' => __('Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => to show remaining hours<br>{{minutes}} - to show remaining minutes<br>{{seconds}} - to display remaining seconds', RNOC_TEXT_DOMAIN),
-                'default' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN)
-            ));
-            $general_settings->add_group_field($below_discount_position_settings, array(
-                'name' => __('Background color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_background',
-                'type' => 'colorpicker',
-                'default' => '#ffffff'
-            ));
-            $general_settings->add_group_field($below_discount_position_settings, array(
-                'name' => __('Color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($below_discount_position_settings, array(
-                'name' => __('Coupon code color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            $general_settings->add_group_field($below_discount_position_settings, array(
-                'name' => __('Coupon Timer color', RNOC_TEXT_DOMAIN),
-                'id' => RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color',
-                'type' => 'colorpicker',
-                'default' => '#000000'
-            ));
-            return $general_settings;
+            if ($this->slug() == $add_on_slug) {
+                $pages = $this->getPageLists();
+                $coupon_codes = $this->getWooCouponCodes();
+                ?>
+                <input type="hidden" name="addon" value="ct">
+                <table class="form-table" role="presentation">
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'; ?>"><?php
+                                esc_html_e('Enable Coupon timer?', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_coupon_timer_1'; ?>"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_coupon_timer_0'; ?>"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"><?php
+                                esc_html_e('Choose the coupon code', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input type="text" name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
+                                   placeholder="<?php esc_html_e('Search for a coupon code', RNOC_TEXT_DOMAIN); ?>"
+                                   class="search-and-select-coupon" autocomplete="off"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'] ?>">
+                            <p class="description">
+                                <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
+                                please create the coupon code in WooCommerce -> Coupons
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'; ?>"><?php
+                                esc_html_e('Custom pages to display the coupon timer', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <select multiple="multiple"
+                                    name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages[]'; ?>"
+                                    class="rnoc-multi-select"
+                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'; ?>">
+                                <?php
+                                if (!empty($pages)) {
+                                    foreach ($pages as $key => $label) {
+                                        ?>
+                                        <option value="<?php echo $key ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'])) {
+                                            echo "selected";
+                                        } ?>><?php echo $label ?></option>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'; ?>"><?php
+                                esc_html_e('Apply coupon', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon_automatically'; ?>"
+                                       value="automatically" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'] == 'automatically') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Automatically', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon_manually'; ?>"
+                                       value="manually" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'] == 'manually') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Manually', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'; ?>"><?php
+                                esc_html_e('Time', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'; ?>"
+                                   type="number" class="regular-text number-only-field"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time']; ?>">
+                            <p class="description">
+                                <?php
+                                echo __('In minutes', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message'; ?>"><?php
+                                esc_html_e('Coupon expiry message', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message']; ?>">
+                            <p class="description">
+                                <?php
+                                echo __('Display this text when coupon expires.', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'; ?>"><?php
+                                esc_html_e('Fix repeat reloading of page when coupon expires?', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload_1'; ?>"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload_0'; ?>"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('Top / bottom position display settings', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $top_position_name = RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_position'; ?>"><?php
+                                esc_html_e('Enable Top / bottom position', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'top_bottom_position'; ?>"><?php
+                                esc_html_e('Position', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'top_bottom_position]'; ?>"
+                                       type="radio"
+                                       value="top" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'top_bottom_position'] == 'top') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Top', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'top_bottom_position]'; ?>"
+                                       type="radio"
+                                       value="bottom" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'top_bottom_position'] == 'bottom') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Bottom', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_message'; ?>"><?php
+                                esc_html_e('Message', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_message'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message']; ?>">
+                            <p class="description">
+                                <?php
+                                echo __('Use below short codes<br>{{coupon_code}} => to show coupon code<br>{{coupon_timer}} => remaining time timer', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'; ?>"><?php
+                                esc_html_e('Timer display format', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format']; ?>">
+                            <p class="description">
+                                <?php
+                                echo __('Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => to show remaining hours<br>{{minutes}} - to show remaining minutes<br>{{seconds}} - to display remaining seconds', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_background'; ?>"><?php
+                                esc_html_e('Background color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_color'; ?>"><?php
+                                esc_html_e('Color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color'; ?>"><?php
+                                esc_html_e('Coupon code color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color'; ?>"><?php
+                                esc_html_e('Coupon timer color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_checkout_button'; ?>"><?php
+                                esc_html_e('Enable checkout button', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_text'; ?>"><?php
+                                esc_html_e('Call to action button text', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_text]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_text'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_text']; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_color'; ?>"><?php
+                                esc_html_e('Call to action button color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color'; ?>"><?php
+                                esc_html_e('Call to action button background color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('Above cart display settings', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $above_cart_position_name = RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_position'; ?>"><?php
+                                esc_html_e('Enable above cart position', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_message1'; ?>"><?php
+                                esc_html_e('Message', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_message1'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message']; ?>">
+                            <p class="description">
+                                <?php
+                                echo __('Use below short codes<br>{{coupon_code}} => to show coupon code<br>{{coupon_timer}} => remaining time timer', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format1'; ?>"><?php
+                                esc_html_e('Timer display format', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format1'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format']; ?>">
+                            <p class="description">
+                                <?php
+                                echo __('Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => to show remaining hours<br>{{minutes}} - to show remaining minutes<br>{{seconds}} - to display remaining seconds', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_background'; ?>"><?php
+                                esc_html_e('Background color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_color'; ?>"><?php
+                                esc_html_e('Color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color'; ?>"><?php
+                                esc_html_e('Coupon code color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color'; ?>"><?php
+                                esc_html_e('Coupon timer color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_checkout_button'; ?>"><?php
+                                esc_html_e('Enable checkout button', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_text1'; ?>"><?php
+                                esc_html_e('Call to action button text', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_text]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_text1'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_text']; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_color'; ?>"><?php
+                                esc_html_e('Call to action button color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color'; ?>"><?php
+                                esc_html_e('Call to action button background color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('Below applied coupon display settings', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $below_discount_position_name = RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_position'; ?>"><?php
+                                esc_html_e('Enable below applied coupon position', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_message2'; ?>"><?php
+                                esc_html_e('Message', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_message2'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message']; ?>">
+                            <p class="description">
+                                <?php
+                                echo __('Use below short codes<br>{{coupon_code}} => to show coupon code<br>{{coupon_timer}} => remaining time timer', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format2'; ?>"><?php
+                                esc_html_e('Timer display format', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format2'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format']; ?>">
+                            <p class="description">
+                                <?php
+                                echo __('Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => to show remaining hours<br>{{minutes}} - to show remaining minutes<br>{{seconds}} - to display remaining seconds', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_background'; ?>"><?php
+                                esc_html_e('Background color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_color'; ?>"><?php
+                                esc_html_e('Color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color'; ?>"><?php
+                                esc_html_e('Coupon code color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color'; ?>"><?php
+                                esc_html_e('Coupon timer color', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color]'; ?>"
+                                       type="text" class="rnoc-color-field"
+                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color']; ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <?php
+            }
         }
     }
 }

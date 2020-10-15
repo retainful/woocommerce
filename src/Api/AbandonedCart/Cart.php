@@ -322,6 +322,7 @@ class Cart extends RestApi
         }
     }
 
+
     /**
      * Check weather Retainful needs to track the cart or not
      * @return bool

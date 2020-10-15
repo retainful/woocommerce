@@ -17,57 +17,6 @@ class OrderCoupon
     }
 
     /**
-     * Validate app Id
-     */
-    function validateAppKey()
-    {
-        $is_production = apply_filters('rnoc_is_production_plugin', true);
-        if (!$is_production) {
-            wp_send_json_error('You can only change you App-Id and Secret key in production store!', 500);
-        }
-        $app_id = isset($_REQUEST['app_id']) ? sanitize_text_field($_REQUEST['app_id']) : '';
-        $secret_key = isset($_REQUEST['secret_key']) ? sanitize_text_field($_REQUEST['secret_key']) : '';
-        $options_data = array(
-            RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => '0',
-            RNOC_PLUGIN_PREFIX . 'retainful_app_id' => $app_id,
-            RNOC_PLUGIN_PREFIX . 'retainful_app_secret' => $secret_key
-        );
-        $slug = $this->admin->slug;
-        //Save app id before validate key
-        update_option($slug . '_license', $options_data);
-        $response = array();
-        $this->admin->updateUserAsFreeUser();
-        if (empty($app_id)) {
-            $response['error'] = __('Please enter App-Id', RNOC_TEXT_DOMAIN);
-        }
-        if (empty($secret_key)) {
-            $response['error'] = __('Please enter App-Secret', RNOC_TEXT_DOMAIN);
-        }
-        if (empty($response)) {
-            $api_response = $this->admin->isApiEnabled($app_id, $secret_key);
-            if (isset($api_response['success'])) {
-                //Change app id status
-                $options_data[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 1;
-                update_option($slug . '_license', $options_data);
-                $response['success'] = $api_response['success'];
-            } elseif (isset($api_response['error'])) {
-                $response['error'] = $api_response['error'];
-            } else {
-                $response['error'] = __('Please check the entered details', RNOC_TEXT_DOMAIN);
-            }
-        }
-        wp_send_json($response);
-    }
-
-    /**
-     * Init the Admin
-     */
-    function init()
-    {
-        $this->admin->renderPage();
-    }
-
-    /**
      * Add settings link
      * @param $links
      * @return array
@@ -107,16 +56,10 @@ class OrderCoupon
                 $post_id = $coupon_details->ID;
                 $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
                 if ($coupon_amount > 0) {
-                    $is_api_enabled = $this->admin->isAppConnected();
-                    $tracker = '';
-                    if (!empty($is_api_enabled) && $sending_email) {
-                        $request_params = $this->getRequestParams($order);
-                        $tracker .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
-                    }
                     $coupon_type = get_post_meta($post_id, 'coupon_type', true);
                     $order_coupon_data = array(
                         'wec_next_order_coupon_code' => $coupon_code,
-                        'wec_next_order_coupon' => $coupon_code . $tracker,
+                        'wec_next_order_coupon' => $coupon_code,
                         'wec_next_order_coupon_value' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
                         'woo_mb_site_url_link_with_coupon' => site_url() . '?retainful_coupon_code=' . $coupon_code,
                     );
@@ -253,14 +196,6 @@ class OrderCoupon
                     }
                     $message = $this->admin->getCouponMessage();
                     $message = str_replace(array_keys($string_to_replace), $string_to_replace, $message);
-                    $is_api_enabled = $this->admin->isAppConnected();
-                    if ($is_api_enabled && !$sent_to_admin) {
-                        $request_params = $this->getRequestParams($order);
-                        if (isset($request_params['new_coupon']) && empty($request_params['new_coupon'])) {
-                            $request_params['new_coupon'] = $coupon_code;
-                        }
-                        $message .= '<img width="1" height="1" src="' . $this->admin->getPixelTagLink('track/pixel.gif', $request_params) . '" />';
-                    }
                 }
             }
             $message = apply_filters('rnoc_before_displaying_next_order_coupon', $message, $order);
@@ -310,6 +245,9 @@ class OrderCoupon
      */
     function showAppliedCouponPopup()
     {
+        if (isset($_GET['noc-cta']) && $_GET['noc-cta'] == 1) {
+            return;
+        }
         if (isset($_GET['retainful_coupon_code']) && !empty($_GET['retainful_coupon_code'])) {
             $coupon_code = sanitize_text_field($_GET['retainful_coupon_code']);
             $settings = $this->admin->getUsageRestrictions();
@@ -331,9 +269,9 @@ class OrderCoupon
                             $coupon_array = array(
                                 'coupon_amount' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
                                 'coupon_code' => $coupon_code,
-                                'shop_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getShopUrl()),
-                                'cart_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getCartUrl()),
-                                'checkout_url' => add_query_arg('retainful_coupon_code', $coupon_code, $this->wc_functions->getCheckoutUrl()),
+                                'shop_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $this->wc_functions->getShopUrl()),
+                                'cart_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $this->wc_functions->getCartUrl()),
+                                'checkout_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $this->wc_functions->getCheckoutUrl()),
                             );
                             foreach ($coupon_array as $key => $val) {
                                 $popup_content = str_replace('{{' . $key . '}}', $val, $popup_content);
@@ -650,7 +588,7 @@ class OrderCoupon
         if (!empty($valid_order_statuses)) {
             if (!in_array('all', $valid_order_statuses)) {
                 $order_status = 'wc-' . $this->wc_functions->getStatus($order);
-                if (!in_array($order_status, $valid_order_statuses)) {
+                if ($order_status == "wc-pending" || !in_array($order_status, $valid_order_statuses)) {
                     $status = false;
                 }
             }
@@ -710,7 +648,7 @@ class OrderCoupon
             $order_email = $this->wc_functions->getOrderEmail($order);
             $args = array(
                 'posts_per_page' => -1,
-                'post_type' => 'rnoc_order_coupon',
+                'post_type' => array('rnoc_order_coupon', 'shop_coupon'),
                 'meta_key' => 'email',
                 'meta_value' => $order_email
             );
@@ -945,21 +883,58 @@ class OrderCoupon
         $post = array(
             'post_title' => $new_coupon_code,
             'post_name' => $new_coupon_code . '-' . $order_id,
-            'post_content' => 'Virtual coupon code created through Retainful Next order coupon',
-            'post_type' => 'rnoc_order_coupon',
+            'post_content' => '',
+            'post_type' => 'shop_coupon',
             'post_status' => 'publish'
         );
         $id = wp_insert_post($post, true);
         if ($id) {
             $settings = $this->admin->getCouponSettings();
-            add_post_meta($id, 'order_id', $order_id);
+            $expired_date = $this->admin->getCouponExpireDate($order_date);
+            $coupon_type = isset($settings['coupon_type']) ? sanitize_text_field($settings['coupon_type']) : '0';
+            add_post_meta($id, 'discount_type', ($coupon_type == 0) ? "percent" : "fixed_cart");
+            $amount = isset($settings['coupon_amount']) ? sanitize_text_field($settings['coupon_amount']) : '0';
+            add_post_meta($id, 'coupon_amount', $amount);
+            //
+            if (isset($settings['minimum_amount']) && ($settings['minimum_amount'] > 0)) {
+                add_post_meta($id, 'minimum_amount', floatval($settings['minimum_amount']));
+            }
+            if (isset($settings['maximum_amount']) && ($settings['maximum_amount'] > 0)) {
+                add_post_meta($id, 'maximum_amount', floatval($settings['maximum_amount']));
+            }
+            add_post_meta($id, 'individual_use', isset($settings['individual_use']) ? $settings['individual_use'] : 'no');
+            add_post_meta($id, 'exclude_sale_items', isset($settings['exclude_sale_items']) ? $settings['exclude_sale_items'] : 'no');
+            if (isset($settings['product_ids']) && !empty($settings['product_ids'])) {
+                add_post_meta($id, 'product_ids', implode(',', $settings['product_ids']));
+            }
+            if (isset($settings['exclude_product_ids']) && !empty($settings['exclude_product_ids'])) {
+                add_post_meta($id, 'exclude_product_ids', implode(',', $settings['exclude_product_ids']));
+            }
+            if (isset($settings['product_categories']) && !empty($settings['product_categories'])) {
+                add_post_meta($id, 'product_categories', $settings['product_categories']);
+            }
+            if (isset($settings['exclude_product_categories']) && !empty($settings['exclude_product_categories'])) {
+                add_post_meta($id, 'exclude_product_categories', $settings['exclude_product_categories']);
+            }
+            if (isset($settings['coupon_applicable_to']) && !empty($settings['coupon_applicable_to']) && $settings['coupon_applicable_to'] != "all") {
+                add_post_meta($id, 'customer_email', $email);
+            }
+            add_post_meta($id, 'usage_limit', '1');
+            if (!empty($expired_date)) {
+                add_post_meta($id, 'expiry_date', $expired_date);
+            }
+            add_post_meta($id, 'apply_before_tax', 'yes');
+            add_post_meta($id, 'free_shipping', 'no');
+            add_post_meta($id, '_rnoc_shop_coupon_type', 'retainful');
+            //old
             add_post_meta($id, 'email', $email);
             $order = $this->wc_functions->getOrder($order_id);
             $user_id = $this->wc_functions->getOrderUserId($order);
             add_post_meta($id, 'user_id', $user_id);
-            add_post_meta($id, 'coupon_type', isset($settings['coupon_type']) ? sanitize_text_field($settings['coupon_type']) : '0');
-            add_post_meta($id, 'coupon_value', isset($settings['coupon_amount']) ? sanitize_text_field($settings['coupon_amount']) : '0');
-            add_post_meta($id, 'coupon_expired_on', $this->admin->getCouponExpireDate($order_date));
+            add_post_meta($id, 'order_id', $order_id);
+            add_post_meta($id, 'coupon_type', $coupon_type);
+            add_post_meta($id, 'coupon_value', $amount);
+            add_post_meta($id, 'coupon_expired_on', $expired_date);
         }
         return $id;
     }
@@ -972,7 +947,7 @@ class OrderCoupon
     function isCouponFound($order_id)
     {
         if (empty($order_id)) return NULL;
-        $post_args = array('post_type' => 'rnoc_order_coupon', 'numberposts' => '1', 'post_status' => 'publish', 'meta_key' => 'order_id', 'meta_value' => $order_id);
+        $post_args = array('post_type' => array('rnoc_order_coupon', 'shop_coupon'), 'numberposts' => '1', 'post_status' => 'publish', 'meta_key' => 'order_id', 'meta_value' => $order_id);
         $posts = get_posts($post_args);
         if (!empty($posts)) {
             foreach ($posts as $post) {
@@ -995,7 +970,7 @@ class OrderCoupon
     {
         $coupon_code = sanitize_text_field($coupon_code);
         if (empty($coupon_code)) return NULL;
-        $post_args = array('post_type' => 'rnoc_order_coupon', 'numberposts' => '1', 'title' => strtoupper($coupon_code));
+        $post_args = array('post_type' => array('rnoc_order_coupon', 'shop_coupon'), 'numberposts' => '1', 'title' => strtoupper($coupon_code));
         $posts = get_posts($post_args);
         if (!empty($posts)) {
             foreach ($posts as $post) {

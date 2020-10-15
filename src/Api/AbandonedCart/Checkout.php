@@ -18,6 +18,29 @@ class Checkout extends RestApi
     }
 
     /**
+     * set retainful related data to order
+     */
+    function setRetainfulOrderData()
+    {
+        $draft_order = self::$woocommerce->getSession('store_api_draft_order');
+        if (!empty($draft_order) && intval($draft_order) > 0) {
+            $this->purchaseComplete(intval($draft_order));
+        }
+    }
+
+    /**
+     * @param $checkout_fields
+     * @return mixed
+     */
+    function moveEmailFieldToTop($checkout_fields)
+    {
+        if (self::$settings->moveEmailFieldToTop()) {
+            $checkout_fields['billing']['billing_email']['priority'] = 4;
+        }
+        return $checkout_fields;
+    }
+
+    /**
      * purchase complete
      * @param $order_id
      * @return null
@@ -70,6 +93,16 @@ class Checkout extends RestApi
     }
 
     /**
+     * @return mixed|void
+     */
+    function generateNocCouponForManualOrders()
+    {
+        $has_backorder_coupon = self::$settings->autoGenerateCouponsForOldOrders();
+        $need_noc_coupon = ($has_backorder_coupon && is_admin());
+        return apply_filters('rnoc_generate_noc_coupon_for_manual_orders', $need_noc_coupon, $this);
+    }
+
+    /**
      * Sync the order with API
      * @param $order_id
      * @return void|null
@@ -80,9 +113,22 @@ class Checkout extends RestApi
             return null;
         }
         $order = self::$woocommerce->getOrder($order_id);
+        $order_obj = new Order();
         $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
         if (empty($cart_token)) {
-            //todo: generate and set token
+            if ($this->generateNocCouponForManualOrders()) {
+                $noc_details = $order_obj->getNextOrderCouponDetails($order);
+                if (is_array($noc_details) && !empty($noc_details) && isset($noc_details[0]['code']) && !empty($noc_details[0]['code'])) {
+                    $cart_token = $this->generateCartToken();
+                    self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
+                } else {
+                    return;
+                }
+            } else {
+                return;
+            }
+        }
+        if (empty($cart_token)) {
             return;
         }
         $order_status = self::$woocommerce->getStatus($order);
@@ -93,7 +139,6 @@ class Checkout extends RestApi
             self::$woocommerce->setOrderMeta($order_id, $this->order_cancelled_date_key_for_db, $order_cancelled_at);
             $this->unsetOrderTempData();
         }
-        $order_obj = new Order();
         $order_data = $order_obj->getOrderData($order);
         if (empty($order_data)) {
             return null;
