@@ -87,8 +87,7 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
                 extract($params);
                 include $path;
                 $content = ob_get_clean();
-                $final_content = apply_filters('rnocp_modify_addon_template', $content);
-                return $final_content;
+                return apply_filters('rnocp_modify_addon_template', $content);
             }
             return NULL;
         }
@@ -173,6 +172,18 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
         {
             if (function_exists('wc_get_checkout_url')) {
                 return wc_get_checkout_url();
+            }
+            return NULL;
+        }
+
+        /**
+         * get the cart url
+         * @return string|null
+         */
+        function getCartUrl()
+        {
+            if (function_exists('wc_get_cart_url')) {
+                return wc_get_cart_url();
             }
             return NULL;
         }
