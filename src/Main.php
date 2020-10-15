@@ -6,11 +6,12 @@ if (!defined('ABSPATH')) exit;
 use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
+use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Integrations\Currency;
 
 class Main
 {
-    public static $init;
+    public static $init, $noc;
     public $rnoc, $admin, $abandoned_cart_api;
 
     /**
@@ -19,8 +20,10 @@ class Main
     function __construct()
     {
         $this->rnoc = ($this->rnoc == NULL) ? new OrderCoupon() : $this->rnoc;
+        self::$noc = (is_null(self::$noc)) ? new CouponManagement() : self::$noc;
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         add_action('init', array($this, 'activateEvents'));
+        add_action('before_woocommerce_init', array($this, 'beforeWoocommerceInit'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
         if (!$this->admin->isPremiumPluginActive()) {
             //init the retainful premium
@@ -104,6 +107,15 @@ class Main
     }
 
     /**
+     * before Woocommerce init
+     */
+    function beforeWoocommerceInit()
+    {
+        add_filter('views_edit-shop_coupon', array(self::$noc, 'viewsEditShopCoupon'));
+        add_filter('request', array(self::$noc, 'requestQuery'));
+    }
+
+    /**
      * Activate the required events
      */
     function activateEvents()
@@ -183,9 +195,9 @@ class Main
             $app_id = $this->admin->getApiKey();
             if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
                 add_action('wp_loaded', array($this->admin, 'schedulePlanChecker'));
-                /*
-                * Retainful abandoned cart api
-                */
+                /**
+                 * Retainful abandoned cart api
+                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
                 add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
