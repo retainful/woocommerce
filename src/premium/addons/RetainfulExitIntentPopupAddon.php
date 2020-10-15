@@ -512,6 +512,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
                                    class="search-and-select-coupon"
                                    autocomplete="off"
+                                   placeholder="<?php esc_html_e('Search and choose coupon code', RNOC_TEXT_DOMAIN); ?>"
                                    value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon']; ?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
@@ -895,11 +896,10 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <label>
-                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder]'; ?>"
-                                       type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder']; ?>">
-                            </label>
+                            <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder']; ?>">
                         </td>
                     </tr>
                     <tr>
@@ -937,11 +937,10 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <label>
-                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text]'; ?>"
-                                       type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text']; ?>">
-                            </label>
+                            <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text'; ?>"
+                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text']; ?>">
                         </td>
                     </tr>
                     <tr>

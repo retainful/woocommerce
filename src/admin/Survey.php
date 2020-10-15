@@ -20,7 +20,7 @@ class Survey
         $this->plugin = $plugin;
         $this->name = $plugin_name;
         $this->plugin_text_domain = $text_domain;
-        if ($this->isPluginPage() || !$this->isDevelopmentSite()) {
+        if ($this->isPluginPage()) {
             add_action('admin_print_scripts', array($this, 'js'), 20);
             add_action('admin_print_scripts', array($this, 'css'));
             add_action('admin_footer', array($this, 'modal'));
@@ -288,7 +288,6 @@ class Survey
 							<span title="<?php esc_attr_e('Close', $this->plugin_text_domain); ?> "
                                   class="<?php echo $this->plugin; ?>-deactivate-survey-close">✕</span>
 						</span>
-
                     <span class="<?php echo $this->plugin; ?>-deactivate-survey-desc">
 							<?php
                             printf(
@@ -338,6 +337,10 @@ class Survey
      */
     function isPluginPage()
     {
+        global $pagenow;
+        if ($pagenow == "plugins.php") {
+            return true;
+        }
         $screen = function_exists('get_current_screen') ? get_current_screen() : false;
         if (empty($screen)) {
             return false;
