@@ -512,7 +512,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
                                    class="search-and-select-coupon"
                                    autocomplete="off"
-                                   placeholder="<?php esc_html_e('Search and choose coupon code', RNOC_TEXT_DOMAIN); ?>"
+                                   placeholder="<?php esc_html_e('Search for a coupon code', RNOC_TEXT_DOMAIN); ?>"
                                    value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon']; ?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,

@@ -1351,7 +1351,7 @@ class Settings
                 'please_wait' => __('Please wait...', RNOC_TEXT_DOMAIN)
             ),
             'security' => array(
-                'get_search_coupon' => wp_create_nonce('rnoc_get_search_coupon')
+                'get_search_coupon' => wp_create_nonce('rnoc_get_search_coupon'),
             ),
             'ajax_endpoint' => admin_url('admin-ajax.php?action={{action}}&security={{security}}'),
             'search_products_nonce' => wp_create_nonce('search-products'),

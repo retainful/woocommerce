@@ -377,7 +377,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                         <td>
                             <input type="text" name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
-                                   placeholder="<?php esc_html_e('Search and choose coupon code', RNOC_TEXT_DOMAIN); ?>"
+                                   placeholder="<?php esc_html_e('Search for a coupon code', RNOC_TEXT_DOMAIN); ?>"
                                    class="search-and-select-coupon" autocomplete="off"
                                    value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'] ?>">
                             <p class="description">
