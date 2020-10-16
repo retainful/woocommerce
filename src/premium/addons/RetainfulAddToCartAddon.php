@@ -217,12 +217,12 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             break;
                         case "instantly":
                             $show_coupon_popup = true;
-                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
+                            $coupon_details = $this->getMailCouponContent($coupon_settings, "popup");
                             break;
                         case "both":
                             $show_coupon_popup = true;
                             $this->sendEmail($email, $coupon_settings);
-                            $coupon_details = $this->getCouponPopupContent($coupon_settings);
+                            $coupon_details = $this->getMailCouponContent($coupon_settings, "popup");
                             break;
                         default:
                         case "send_via_email":
@@ -252,23 +252,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 $message = __('We have sent the coupon code to your email.', RNOC_TEXT_DOMAIN);
             }
             return $message;
-        }
-
-        /**
-         * @param $coupon_settings
-         * @return mixed|null
-         */
-        function getCouponPopupContent($coupon_settings)
-        {
-            $final_settings = array(
-                "show_for_admin" => current_user_can('administrator'),
-                "template" => $this->getMailCouponContent($coupon_settings, "popup"),
-                "custom_style" => '',
-                "add_on_slug" => 'rnoc-add-to-cart-add-on-instant-coupon',
-                "no_thanks_action" => 1,
-                "is_email_mandatory" => 1
-            );
-            return $this->getTemplateContent(RNOCPREMIUM_PLUGIN_PATH . 'templates/popup_display.php', $final_settings, $this->slug);
         }
 
         /**

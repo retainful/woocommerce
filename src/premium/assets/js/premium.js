@@ -69,13 +69,13 @@
         html_content.show();
         $(document).trigger('before_rnoc_show_modal', popup_type);
         html_content.on('click', '.rnoc-close-modal-' + popup_type, function () {
-            $(document).trigger('before_rnoc_close_modal', $(this));
+            $(document).trigger('before_rnoc_close_modal_' + popup_type + '_by_btn_click', $(this));
             html_content.remove();
         })
     }
     Retainful_premium.prototype.close_modal = function (popup_type = 'atc') {
         var close_btn = $('.rnoc-close-modal-' + popup_type);
-        $(document).trigger('before_rnoc_close_modal', close_btn);
+        $(document).trigger('before_rnoc_close_modal_' + popup_type, close_btn);
         $('#rnoc-modal-' + popup_type).remove();
     }
 
@@ -190,6 +190,24 @@
         }
     }
     /**
+     * Add to cart instant popup
+     */
+    Retainful_premium.prototype.show_instant_popup = function () {
+        let is_once_redirected = sessionStorage.getItem("rnoc_instant_coupon_is_redirected");
+        if (is_once_redirected && is_once_redirected === "no") {
+            let redirect_url = sessionStorage.getItem("rnoc_instant_coupon_popup_redirect");
+            sessionStorage.setItem("rnoc_instant_coupon_is_redirected", "yes");
+            window.location.href = redirect_url;
+        }
+
+        let is_popup_showed = sessionStorage.getItem("rnoc_instant_coupon_popup_showed");
+        if (is_popup_showed && is_popup_showed === "no") {
+            let popup_html = sessionStorage.getItem("rnoc_instant_coupon_popup_html");
+            window.retainful.modal(popup_html);
+            sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "yes");
+        }
+    }
+    /**
      * Add to cart popup
      * @param current_settings
      */
@@ -235,11 +253,20 @@
                 sessionStorage.setItem('retainful_add_to_cart_opened', 'yes');
                 $(document).trigger('retainful_showed_add_to_cart_popup', [$(this)]);
                 return false;
+            } else {
+                var email = localStorage.getItem('rnoc_atcp_data');
+                if (email !== null && typeof email !== "undefined" && email !== "") {
+                    var hidden_ip = '<input type="hidden" name="rnoc_email_popup" value="' + email + '" />'
+                    $(this).after(hidden_ip);
+                    localStorage.removeItem('rnoc_atcp_data');
+                }
             }
         });
-        $(document).on('.rnoc-close-modal-atc', (event) => {
-            event.preventDefault();
+        $(document).on('before_rnoc_close_modal_atc_by_btn_click', () => {
             close_atc_popup("3");
+        });
+        $(document).on('added_to_cart', (fragment, cart_hash, this_button) => {
+            window.retainful.show_instant_popup();
         });
         $(document).on('click', '#rnoc-add-to-cart-add-on .no-thanks-close-popup', (event) => {
             event.preventDefault();
@@ -279,6 +306,7 @@
                     is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
                     action: 'set_rnoc_guest_session'
                 };
+                localStorage.setItem('rnoc_atcp_data', email);
                 let response = request(popup_data);
                 if (!response.error) {
                     if (response.message !== '') {
@@ -511,6 +539,7 @@
             window.retainful.init_ei_popup(rnoc_premium_ei_popup);
             window.retainful.init_coupon_timer(rnoc_premium_ct);
             window.retainful.init_atc_popup(rnoc_premium_atcp);
+            window.retainful.show_instant_popup();
         });
     }
 }));
