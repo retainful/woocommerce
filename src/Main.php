@@ -49,6 +49,11 @@ class Main
             'permission_callback' => '__return_true',
             'callback' => array($this, 'verifyAppId')
         ));
+        register_rest_route('retainful-api/v1', '/coupon', array(
+            'methods' => 'POST',
+            'permission_callback' => '__return_true',
+            'callback' => 'Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement::createRestCoupon'
+        ));
     }
 
     /**
