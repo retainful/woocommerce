@@ -242,16 +242,32 @@
                 return return_val;
             }
         }
+
+        var display_popup = function(thisButton){
+            $(document).trigger('retainful_showing_add_to_cart_popup', [thisButton]);
+            thisButton.removeClass('loading');
+            thisButton.addClass('rnoc-popup-opener');
+            var html = $('.atc-popup-content').html();
+            window.retainful.modal('<div id="rnoc-add-to-cart-add-on">' + html + '</div>');
+            sessionStorage.setItem('retainful_add_to_cart_opened', 'yes');
+            $(document).trigger('retainful_showed_add_to_cart_popup', [thisButton]);
+        }
+        $(document).on('adding_to_cart', (eventData, thisButton, postData) => {
+            if (need_popup()) {
+                display_popup(thisButton);
+                throw new Error('Retainful intercepts to show popup!');
+            } else {
+                var email = localStorage.getItem('rnoc_atcp_data');
+                if (email !== null && typeof email !== "undefined" && email !== "") {
+                    postData.rnoc_email_popup = email;
+                    localStorage.removeItem('rnoc_atcp_data');
+                }
+            }
+        });
         $(".ajax_add_to_cart,.single_add_to_cart_button " + settings.custom_classes).on('click', function (e) {
             if (need_popup() && $(this).hasClass('disabled') === false && $(this).hasClass('acbwm-atcp-allow-click') === false) {
                 e.preventDefault();
-                $(document).trigger('retainful_showing_add_to_cart_popup', [$(this)]);
-                $(this).removeClass('loading');
-                $(this).addClass('rnoc-popup-opener');
-                var html = $('.atc-popup-content').html();
-                window.retainful.modal('<div id="rnoc-add-to-cart-add-on">' + html + '</div>');
-                sessionStorage.setItem('retainful_add_to_cart_opened', 'yes');
-                $(document).trigger('retainful_showed_add_to_cart_popup', [$(this)]);
+                display_popup($(this));
                 return false;
             } else {
                 var email = localStorage.getItem('rnoc_atcp_data');
