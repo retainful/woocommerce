@@ -318,7 +318,7 @@ class OrderCoupon
         if (empty($coupon_code))
             return false;
         $return = array();
-        $coupon_details = $this->isValidCoupon($coupon_code);
+        $coupon_details = $this->isValidCoupon($coupon_code,null, array('rnoc_order_coupon'));
         if (!empty($coupon_details)) {
             $usage_restrictions = $this->admin->getUsageRestrictions();
             //Return true if there is any usage restriction
@@ -402,7 +402,7 @@ class OrderCoupon
     {
         if (empty($coupon_code))
             return $response;
-        $coupon_details = $this->isValidCoupon($coupon_code);
+        $coupon_details = $this->isValidCoupon($coupon_code, null,array('rnoc_order_coupon'));
         if (!empty($coupon_details)) {
             $is_coupon_already_applied = false;
             /*if (!empty(self::$applied_coupons) && self::$applied_coupons != $coupon_code)
@@ -502,11 +502,12 @@ class OrderCoupon
      * Check the given Coupon code is valid or not
      * @param $coupon
      * @param null $order
+     * @param string[] $coupon_type
      * @return String|null
      */
-    function isValidCoupon($coupon, $order = NULL)
+    function isValidCoupon($coupon, $order = NULL, $coupon_type = array('rnoc_order_coupon', 'shop_coupon'))
     {
-        $coupon_details = $this->getCouponByCouponCode($coupon);
+        $coupon_details = $this->getCouponByCouponCode($coupon, $coupon_type);
         if (!empty($coupon_details) && $coupon_details->post_status == "publish") {
             $coupon_only_for = $this->admin->couponFor();
             $current_user_id = $current_email = '';
@@ -920,6 +921,7 @@ class OrderCoupon
                 add_post_meta($id, 'customer_email', $email);
             }
             add_post_meta($id, 'usage_limit', '1');
+            add_post_meta($id, 'usage_limit_per_user', '1');
             if (!empty($expired_date)) {
                 add_post_meta($id, 'expiry_date', $expired_date);
             }
@@ -964,13 +966,14 @@ class OrderCoupon
 
     /**
      * @param $coupon_code
+     * @param string[] $coupon_type
      * @return Object|null
      */
-    function getCouponByCouponCode($coupon_code)
+    function getCouponByCouponCode($coupon_code, $coupon_type = array('rnoc_order_coupon', 'shop_coupon'))
     {
         $coupon_code = sanitize_text_field($coupon_code);
         if (empty($coupon_code)) return NULL;
-        $post_args = array('post_type' => array('rnoc_order_coupon', 'shop_coupon'), 'numberposts' => '1', 'title' => strtoupper($coupon_code));
+        $post_args = array('post_type' => $coupon_type, 'numberposts' => '1', 'title' => strtoupper($coupon_code));
         $posts = get_posts($post_args);
         if (!empty($posts)) {
             foreach ($posts as $post) {
