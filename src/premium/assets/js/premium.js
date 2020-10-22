@@ -491,9 +491,10 @@
         if (settings.enable === "yes") {
             $(document).on('submit', '#rnoc_exit_intent_popup_form', function (event) {
                 event.preventDefault();
-                var popup_submit_btn = $('.rnoc-exit-intent-popup-submit-button');
-                var message = $("#rnoc-invalid-mail-message-exit-intent");
-                var email = $('#rnoc-exit-intent-popup-email-field');
+                var popup_submit_btn = $(this).find('.rnoc-exit-intent-popup-submit-button');
+                var message = $(this).find("#rnoc-invalid-mail-message-exit-intent");
+                var email = $(this).find('#rnoc-exit-intent-popup-email-field');
+                console.log(email.val());
                 var is_buyer_accepting_marketing = $('#rnoc-exit-intent-popup-buyer-accepts-marketing');
                 message.hide();
                 if (!is_email(email.val()) || email.val() === '') {
