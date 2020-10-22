@@ -316,10 +316,10 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
             RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'
         ))->message('Script tag and iframe tag were not allowed ');
-        $validator->rule('regex', array(
+        /*$validator->rule('regex', array(
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder',
-        ), '/^[\p{L}\p{Nd} .-]+$/')->message('This field should only accepts numbers, alphabets and spaces');
+        ), '/^[\p{L}\p{Nd} .-]+$/')->message('This field should only accepts numbers, alphabets and spaces');*/
         /*        $validator->rule('regex', array(
                     RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'
                 ), '/^[a-z0-9%:\n\t {};.#\[\]"!]+$/')->message('This field should only accepts css values');*/
@@ -355,7 +355,7 @@ class Settings
         $validator->rule('array', array(
             RNOC_PLUGIN_PREFIX . 'modal_display_pages',
         ))->message('This field contains invalid value');
-        $validator->rule('regex', array(
+        /*$validator->rule('regex', array(
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_email_placeholder',
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_text',
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text',
@@ -363,7 +363,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_heading',
             RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading',
             RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject',
-        ), '/^[\p{L}\p{Nd} .!:*,-]+$/')->message('This field should only accepts numbers, alphabets and spaces');
+        ), '/^[\p{L}\p{Nd} .!:*,-]+$/')->message('This field should only accepts numbers, alphabets and spaces');*/
         $validator->rule('color', array(
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_heading_color',
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_color',
