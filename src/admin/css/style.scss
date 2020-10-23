@@ -217,7 +217,10 @@
       float: right;
     }
   }
-  input[type="checkbox"]:checked::before,
+  input[type="checkbox"]:checked::before {
+    width: 28px;
+    float: none;
+  }
   input[type="radio"]:checked::before {
     float: none;
     width: 0;

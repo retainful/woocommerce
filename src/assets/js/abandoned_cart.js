@@ -1,7 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
+    let default_retainful_cart_data = {
+        "ajax_url": "",
+        "jquery_url": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+        "ip": "",
+        "version": "",
+        "public_key": "",
+        "api_url": "",
+        "tracking_element_selector": "retainful-abandoned-cart-data",
+        "cart_tracking_engine": "js",
+    };
+    let rnoc_cart_js_data = {};
+    if (typeof retainful_cart_data === "undefined") {
+        rnoc_cart_js_data = {...default_retainful_cart_data, ...{}};
+    } else {
+        rnoc_cart_js_data = {...default_retainful_cart_data, ...retainful_cart_data}
+    }
     if (typeof jQuery == "undefined") {
-        // alert("jquery undefined");
-
         function getScript(url, success) {
             let script = document.createElement('script');
             script.src = url;
@@ -20,25 +34,21 @@ document.addEventListener("DOMContentLoaded", function () {
             head.appendChild(script);
         }
 
-        let jquery_url = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js";
-        if (retainful_cart_data.jquery_url !== undefined) {
-            jquery_url = retainful_cart_data.jquery_url;
-        }
-        getScript(jquery_url, function () {
+        getScript(rnoc_cart_js_data.jquery_url, function () {
             if (typeof jQuery == "undefined") {
                 console.log("retainful unable to include jQuery");
             } else {
                 jQuery.noConflict();
-                initJqueryRetainfulAbandonedCartsTracking();
+                initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data);
             }
         });
     } else {
         // alert('defined');
-        initJqueryRetainfulAbandonedCartsTracking();
+        initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data);
     }
 });
 
-function initJqueryRetainfulAbandonedCartsTracking() {
+function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
     jQuery(function ($) {
         class Retainful {
             /**
@@ -334,12 +344,12 @@ function initJqueryRetainfulAbandonedCartsTracking() {
 
             validateEmail(value) {
                 var valid = true;
-                if (value.indexOf('@') == -1) {
+                if (value.indexOf('@') === -1) {
                     valid = false;
                 } else {
                     var parts = value.split('@');
                     var domain = parts[1];
-                    if (domain.indexOf('.') == -1) {
+                    if (domain.indexOf('.') === -1) {
                         valid = false;
                     } else {
                         var domainParts = domain.split('.');
@@ -353,87 +363,88 @@ function initJqueryRetainfulAbandonedCartsTracking() {
             }
         }
 
-        let retainful = new Retainful(retainful_cart_data.api_url, retainful_cart_data.public_key).setCartTrackingElementId(retainful_cart_data.tracking_element_selector);
-        if (retainful_cart_data.cart_tracking_engine === "js") {
-            retainful.setAjaxUrl(retainful_cart_data.ajax_url);
-            retainful.setIp(retainful_cart_data.ip);
-            retainful.setVersion(retainful_cart_data.version);
+        let retainful = new Retainful(rnoc_cart_js_data.api_url, rnoc_cart_js_data.public_key).setCartTrackingElementId(rnoc_cart_js_data.tracking_element_selector);
+        if (rnoc_cart_js_data.cart_tracking_engine === "js") {
+            retainful.setAjaxUrl(rnoc_cart_js_data.ajax_url);
+            retainful.setIp(rnoc_cart_js_data.ip);
+            retainful.setVersion(rnoc_cart_js_data.version);
             retainful.initCartTracking();
             $(document).ready(function () {
                 retainful.syncCart();
             });
         }
-        if (retainful_cart_data.cart !== undefined) {
-            let tracking_content = '<div id="' + retainful_cart_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retainful_cart_data.cart) + '</div>';
+        if (rnoc_cart_js_data.cart !== undefined) {
+            let tracking_content = '<div id="' + rnoc_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(rnoc_cart_js_data.cart) + '</div>';
             $(tracking_content).appendTo('body');
         }
         $('input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone').on('change', function () {
+            let msg = null;
             var rnoc_phone = $("#billing_phone").val();
             var rnoc_email = $("#billing_email").val();
 
-             if( typeof rnoc_email === 'undefined' ){
-                 return ;
-             }
+            if (typeof rnoc_email === 'undefined') {
+                return;
+            }
 
-             var atposition = rnoc_email.indexOf("@");
-             var dotposition = rnoc_email.lastIndexOf(".");
-         
+            var atposition = rnoc_email.indexOf("@");
+            var dotposition = rnoc_email.lastIndexOf(".");
 
-             if (typeof rnoc_phone === 'undefined' || rnoc_phone === null) { //If phone number field does not exist on the Checkout form
-                 rnoc_phone = '';
-             }
-              /*$('input#billing_email').on('change', function () {*/
-                if (!(atposition < 1 || dotposition < atposition + 2 || dotposition + 2 >= rnoc_email.length) || rnoc_phone.length >= 1) {
-                    var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
-                    var guest_data = {
-                        billing_first_name: $('#billing_first_name').val(),
-                        billing_last_name: $('#billing_last_name').val(),
-                        billing_company: $('#billing_company').val(),
-                        billing_address_1: $('#billing_address_1').val(),
-                        billing_address_2: $('#billing_address_2').val(),
-                        billing_city: $('#billing_city').val(),
-                        billing_state: $('#billing_state').val(),
-                        billing_postcode: $('#billing_postcode').val(),
-                        billing_country: $('#billing_country').val(),
-                        billing_phone: $('#billing_phone').val(),
-                        billing_email: $('#billing_email').val(),
-                        ship_to_billing: ship_to_bill,
-                        order_notes: $('#order_comments').val(),
-                        shipping_first_name: $('#shipping_first_name').val(),
-                        shipping_last_name: $('#shipping_last_name').val(),
-                        shipping_company: $('#shipping_company').val(),
-                        shipping_address_1: $('#shipping_address_1').val(),
-                        shipping_address_2: $('#shipping_address_2').val(),
-                        shipping_city: $('#shipping_city').val(),
-                        shipping_state: $('#shipping_state').val(),
-                        shipping_postcode: $('#shipping_postcode').val(),
-                        shipping_country: $('#shipping_country').val(),
-                        action: 'rnoc_track_user_data'
-                    };
-                    if(retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
-                        let result = $.ajax({
-                            url: retainful_cart_data.ajax_url,
-                            headers: {},
-                            method: 'POST',
-                            dataType: 'json',
-                            data: guest_data,
-                            async: true,
-                            success: function (response) {
-                                if (response.success && response.data) {
-                                    retainful.syncCart(response.data, true);
-                                }
-                            },
-                            error: function (response) {
-                                msg = response;
+
+            if (typeof rnoc_phone === 'undefined' || rnoc_phone === null) { //If phone number field does not exist on the Checkout form
+                rnoc_phone = '';
+            }
+            /*$('input#billing_email').on('change', function () {*/
+            if (!(atposition < 1 || dotposition < atposition + 2 || dotposition + 2 >= rnoc_email.length) || rnoc_phone.length >= 1) {
+                var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
+                var guest_data = {
+                    billing_first_name: $('#billing_first_name').val(),
+                    billing_last_name: $('#billing_last_name').val(),
+                    billing_company: $('#billing_company').val(),
+                    billing_address_1: $('#billing_address_1').val(),
+                    billing_address_2: $('#billing_address_2').val(),
+                    billing_city: $('#billing_city').val(),
+                    billing_state: $('#billing_state').val(),
+                    billing_postcode: $('#billing_postcode').val(),
+                    billing_country: $('#billing_country').val(),
+                    billing_phone: $('#billing_phone').val(),
+                    billing_email: $('#billing_email').val(),
+                    ship_to_billing: ship_to_bill,
+                    order_notes: $('#order_comments').val(),
+                    shipping_first_name: $('#shipping_first_name').val(),
+                    shipping_last_name: $('#shipping_last_name').val(),
+                    shipping_company: $('#shipping_company').val(),
+                    shipping_address_1: $('#shipping_address_1').val(),
+                    shipping_address_2: $('#shipping_address_2').val(),
+                    shipping_city: $('#shipping_city').val(),
+                    shipping_state: $('#shipping_state').val(),
+                    shipping_postcode: $('#shipping_postcode').val(),
+                    shipping_country: $('#shipping_country').val(),
+                    action: 'rnoc_track_user_data'
+                };
+                if (retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
+                    $.ajax({
+                        url: rnoc_cart_js_data.ajax_url,
+                        headers: {},
+                        method: 'POST',
+                        dataType: 'json',
+                        data: guest_data,
+                        async: true,
+                        success: function (response) {
+                            if (response.success && response.data) {
+                                retainful.syncCart(response.data, true);
                             }
-                        });
-                    }else{
+                        },
+                        error: function (response) {
+                            msg = response;
+                        }
+                    });
+                } else {
                     //console.log('Email validation failed');
-                    }
-                    
-                }else{
-                    //console.log('Not a valid email yet');
                 }
+
+            } else {
+                //console.log('Not a valid email yet');
+            }
         });
     });
 }

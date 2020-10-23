@@ -259,7 +259,10 @@
 [class*=retainful] label .label-cta {
   float: right;
 }
-[class*=retainful] input[type=checkbox]:checked::before,
+[class*=retainful] input[type=checkbox]:checked::before {
+  width: 28px;
+  float: none;
+}
 [class*=retainful] input[type=radio]:checked::before {
   float: none;
   width: 0;
