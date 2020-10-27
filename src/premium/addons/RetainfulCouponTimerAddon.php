@@ -271,7 +271,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             $premium_settings = array();
             $this->couponTimerSettings($premium_settings);
             if (!wp_script_is('rnoc-premium')) {
-                wp_enqueue_script('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/js/premium.js', array('jquery'), RNOC_VERSION);
+                wp_enqueue_script('rnoc-premium', RNOCPREMIUM_PLUGIN_URL . 'assets/js/premium.min.js', array('jquery'), RNOC_VERSION);
             }
             wp_localize_script('rnoc-premium', 'rnoc_premium_ct', $premium_settings['coupon_timer']);
             if (!wp_style_is('rnoc-premium')) {
