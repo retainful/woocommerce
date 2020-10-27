@@ -597,7 +597,7 @@ class Settings
         if (is_array($var)) {
             return array_map(array($this, 'clean'), $var);
         } else {
-            return is_scalar($var) ? stripslashes(sanitize_text_field($var)) : $var;
+            return is_scalar($var) ? sanitize_text_field($var) : $var;
         }
     }
 

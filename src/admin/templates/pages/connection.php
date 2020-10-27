@@ -19,7 +19,7 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
             <td>
                 <input name="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>" type="text"
                        id="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>"
-                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']; ?>" class="regular-text">
+                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']); ?>" class="regular-text">
                 <p class="error" id="error_app_id" style="color: red;"></p>
                 <p class="description">
                     <?php
@@ -37,7 +37,7 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
             <td>
                 <input name="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>" type="text"
                        id="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>"
-                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret']; ?>"
+                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret']); ?>"
                        class="regular-text">
                 <p class="error" id="error_secret_key" style="color: red;"></p>
                 <p class="description">

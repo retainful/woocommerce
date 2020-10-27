@@ -1,4 +1,4 @@
-<div class="rnoc-coupon-timer-container-<?php echo $coupon_timer_position ?>"><?php echo $rnoc_coupon_timer_message; ?></div>
+<div class="rnoc-coupon-timer-container-<?php echo $coupon_timer_position ?>"><?php echo rnocEscAttr($rnoc_coupon_timer_message); ?></div>
 <script>
     var timerStarted = parseInt(<?php echo $is_timer_started; ?>);
     <?php

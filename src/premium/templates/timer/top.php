@@ -1,9 +1,9 @@
 <div class="rnoc-coupon-timer-container-<?php echo $coupon_timer_position ?>"><?php
-    echo $rnoc_coupon_timer_message;
+    echo rnocEscAttr($rnoc_coupon_timer_message);
     if ($rnoc_enable_checkout_button && !empty($rnoc_enable_checkout_button)) {
         ?>
         <a href="<?php echo $rnoc_checkout_url; ?>"
-           style="text-decoration:none;padding: 10px;color: <?php echo $rnoc_checkout_button_color ?>;background-color: <?php echo $rnoc_checkout_button_bg_color ?>"><?php echo $rnoc_checkout_button_text; ?></a>
+           style="text-decoration:none;padding: 10px;color: <?php echo $rnoc_checkout_button_color ?>;background-color: <?php echo $rnoc_checkout_button_bg_color ?>"><?php echo rnocEscAttr($rnoc_checkout_button_text); ?></a>
         <?php
     }
     ?></div>

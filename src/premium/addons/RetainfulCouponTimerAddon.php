@@ -379,7 +379,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'; ?>"
                                    placeholder="<?php esc_html_e('Search for a coupon code', RNOC_TEXT_DOMAIN); ?>"
                                    class="search-and-select-coupon" autocomplete="off"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'] ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon']) ?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons
@@ -466,7 +466,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <input name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message']); ?>">
                             <p class="description">
                                 <?php
                                 echo __('Display this text when coupon expires.', RNOC_TEXT_DOMAIN);
@@ -573,7 +573,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_message'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message']); ?>">
                             <p class="description">
                                 <?php
                                 echo __('Use below short codes<br>{{coupon_code}} => to show coupon code<br>{{coupon_timer}} => remaining time timer', RNOC_TEXT_DOMAIN);
@@ -591,7 +591,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format']); ?>">
                             <p class="description">
                                 <?php
                                 echo __('Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => to show remaining hours<br>{{minutes}} - to show remaining minutes<br>{{seconds}} - to display remaining seconds', RNOC_TEXT_DOMAIN);
@@ -609,7 +609,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -623,7 +623,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -637,7 +637,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -651,7 +651,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -690,7 +690,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_text]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_text'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_text']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_text']); ?>">
                         </td>
                     </tr>
                     <tr>
@@ -703,7 +703,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -717,7 +717,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -768,7 +768,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_message1'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message']); ?>">
                             <p class="description">
                                 <?php
                                 echo __('Use below short codes<br>{{coupon_code}} => to show coupon code<br>{{coupon_timer}} => remaining time timer', RNOC_TEXT_DOMAIN);
@@ -786,7 +786,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format1'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format']); ?>">
                             <p class="description">
                                 <?php
                                 echo __('Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => to show remaining hours<br>{{minutes}} - to show remaining minutes<br>{{seconds}} - to display remaining seconds', RNOC_TEXT_DOMAIN);
@@ -804,7 +804,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -818,7 +818,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -832,7 +832,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -846,7 +846,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -885,7 +885,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_text]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'checkout_button_text1'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_text']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_text']); ?>">
                         </td>
                     </tr>
                     <tr>
@@ -898,7 +898,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -912,7 +912,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -963,7 +963,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_message2'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message']); ?>">
                             <p class="description">
                                 <?php
                                 echo __('Use below short codes<br>{{coupon_code}} => to show coupon code<br>{{coupon_timer}} => remaining time timer', RNOC_TEXT_DOMAIN);
@@ -981,7 +981,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format2'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format']); ?>">
                             <p class="description">
                                 <?php
                                 echo __('Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => to show remaining hours<br>{{minutes}} - to show remaining minutes<br>{{seconds}} - to display remaining seconds', RNOC_TEXT_DOMAIN);
@@ -999,7 +999,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -1013,7 +1013,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -1027,7 +1027,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -1041,7 +1041,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo $below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color']); ?>">
                             </label>
                         </td>
                     </tr>
