@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.5
 WC tested up to: 4.5.2
 Requires PHP: 5.6
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -412,3 +412,6 @@ No. There is no charges for support.
 * Fix: removed cmb2 dependency
 * Fix: settings page redesigned
 * Fix: validation added
+
+= 2.3.2 =
+* Improvement: Reduce number of loading premium JS and CSS
