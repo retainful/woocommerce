@@ -454,7 +454,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                    class="search-and-select-coupon"
                                    autocomplete="off"
                                    placeholder="<?php esc_html_e('Search for a coupon code', RNOC_TEXT_DOMAIN); ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon']); ?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons
@@ -538,7 +538,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'; ?>"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'; ?>"
                                    type="text" class="regular-text"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life']); ?>">
                         </td>
                     </tr>
                     <tr>
@@ -657,7 +657,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <label>
                                 <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec']); ?>">
                             </label>
                             <p class="description">
                                 Trigger the popup after these many seconds a visitor spent time
@@ -699,7 +699,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <label>
                                 <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance']); ?>">
                             </label>
                             <p class="description">
                                 Trigger the popup after a visitor scrolled the page to the set distance. Its a
@@ -752,7 +752,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <textarea
                                     name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'; ?>"
                                     rows="10"
-                                    cols="50"><?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']; ?>
+                                    cols="50"><?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']); ?>
                             </textarea>
                             </label>
                             <p class="description">
@@ -840,7 +840,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder']); ?>">
                         </td>
                     </tr>
                     <tr>
@@ -853,7 +853,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <label>
                                 <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -867,7 +867,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <label>
                                 <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -881,7 +881,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text]'; ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text'; ?>"
-                                   value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text']; ?>">
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text']); ?>">
                         </td>
                     </tr>
                     <tr>
@@ -894,7 +894,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <label>
                                 <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -908,7 +908,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <label>
                                 <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -922,7 +922,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <label>
                                 <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height']); ?>">
                             </label>
                         </td>
                     </tr>
@@ -936,7 +936,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             <label>
                                 <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width']; ?>">
+                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width']); ?>">
                             </label>
                         </td>
                     </tr>

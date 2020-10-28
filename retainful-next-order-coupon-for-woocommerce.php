@@ -190,6 +190,12 @@ if (!function_exists('rnocGetInstalledWoocommerceVersion')) {
         return $wc_installed_version;
     }
 }
+if (!function_exists('rnocEscAttr')) {
+    function rnocEscAttr($txt)
+    {
+        return stripslashes(esc_attr__($txt));
+    }
+}
 /**
  * check is woocommerce is active
  */

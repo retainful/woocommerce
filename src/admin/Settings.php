@@ -475,7 +475,7 @@ class Settings
     function getDefaultPremiumAddonsValues()
     {
         $default_settings = array(
-            RNOC_PLUGIN_PREFIX . 'enable_coupon_timer' => '1',
+            RNOC_PLUGIN_PREFIX . 'enable_coupon_timer' => '0',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon' => '',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages' => array(),
             RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon' => 'automatically',

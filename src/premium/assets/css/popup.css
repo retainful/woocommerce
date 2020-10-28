@@ -254,6 +254,13 @@
 
 }
 
+.rnoc-ip-coupon-code, a.rnoc-ip-coupon-apply-btn {
+
+    display: inline-block;
+
+}
+
+
 @media (max-width: 992px) {
     .rnoc-popup {
         width: 100%;
@@ -279,7 +286,7 @@
 
 @media (max-width: 768px) {
     .rnoc-popup {
-        width: 100%;
+        width: 90%;
     }
 
     .rnoc-popup .rnoc-lw-title {

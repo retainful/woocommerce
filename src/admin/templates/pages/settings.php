@@ -202,7 +202,7 @@ require_once "tabs.php";
             <td>
                 <textarea name="<?php echo RNOC_PLUGIN_PREFIX . 'cart_capture_msg'; ?>"
                           id="<?php echo RNOC_PLUGIN_PREFIX . 'cart_capture_msg'; ?>" cols="60" rows="10"
-                ><?php echo trim($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']); ?>
+                ><?php echo rnocEscAttr(trim($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])); ?>
                 </textarea>
                 <p class="description">
                     <?php
@@ -245,7 +245,7 @@ require_once "tabs.php";
             <td>
                 <textarea name="<?php echo RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'; ?>"
                           id="<?php echo RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'; ?>" cols="60" rows="10"
-                ><?php echo trim($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']); ?>
+                ><?php echo rnocEscAttr(trim($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])); ?>
                 </textarea>
                 <p class="description">
                     <?php

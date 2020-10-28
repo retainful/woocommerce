@@ -520,7 +520,7 @@ require_once "tabs.php";
                     <input name="<?php echo RNOC_PLUGIN_PREFIX . 'minimum_spend'; ?>"
                            type="number"
                            id="minimum_spend"
-                           value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'minimum_spend']; ?>"
+                           value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'minimum_spend']); ?>"
                            class="regular-text">
                     <p class="description">
                         <?php
@@ -539,7 +539,7 @@ require_once "tabs.php";
                     <input name="<?php echo RNOC_PLUGIN_PREFIX . 'maximum_spend'; ?>"
                            type="number"
                            id="maximum_spend"
-                           value="<?php echo $settings[RNOC_PLUGIN_PREFIX . 'maximum_spend']; ?>"
+                           value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'maximum_spend']); ?>"
                            class="regular-text">
                     <p class="description">
                         <?php
