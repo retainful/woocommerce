@@ -1,5 +1,5 @@
 <div class="rnoc-coupon-timer-container-<?php echo $coupon_timer_position ?>"><?php
-    echo rnocEscAttr($rnoc_coupon_timer_message);
+    echo $rnoc_coupon_timer_message;
     if ($rnoc_enable_checkout_button && !empty($rnoc_enable_checkout_button)) {
         ?>
         <a href="<?php echo $rnoc_checkout_url; ?>"

@@ -667,7 +667,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         <td>
                         <textarea name="<?php echo RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'; ?>"
                                   rows="5" cols="50"
-                                  id="<?php echo RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'; ?>"><?php echo $settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class']; ?>
+                                  id="<?php echo RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'; ?>"><?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class']); ?>
                         </textarea>
                             <p class="description">
                                 <?php
@@ -889,7 +889,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             <textarea
                                     name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'; ?>"
                                     rows="10"
-                                    cols="50"><?php echo $settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']; ?>
+                                    cols="50"><?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']); ?>
                             </textarea>
                             </label>
                             <p class="description">
