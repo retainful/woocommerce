@@ -49,7 +49,6 @@ class Main
             'permission_callback' => '__return_true',
             'callback' => array($this, 'verifyAppId')
         ));
-
         /*register_rest_route('retainful-api/v1', '/coupon', array(
             'methods' => 'POST',
             'permission_callback' => '__return_true',
@@ -89,7 +88,7 @@ class Main
             $response_code = 'UNKNOWN_ERROR';
         }
         $response = array(
-            'success' => ($response_code == 'INSTALLED_CONNECTED') ? true : false,
+            'success' => ($response_code == 'INSTALLED_CONNECTED'),
             'message' => '',
             'code' => $response_code,
             'data' => array(
@@ -99,17 +98,6 @@ class Main
         $response_object = new \WP_REST_Response($response);
         $response_object->set_status(200);
         return $response_object;
-    }
-
-    /**
-     * Check the woocommerce ac need to run externally
-     * @param $need_ac_externally
-     * @return bool|mixed|void
-     */
-    function needToRunAbandonedCartExternally($need_ac_externally)
-    {
-        $need_ac_externally = $this->admin->runAbandonedCartExternally();
-        return $need_ac_externally;
     }
 
     /**
@@ -140,7 +128,6 @@ class Main
         //Check for dependencies
         add_action('plugins_loaded', array($this, 'checkDependencies'));
         add_action('rnocp_activation_trigger', array($this, 'checkUserPlan'));
-        add_filter('rnoc_need_to_run_ac_in_cloud', array($this, 'needToRunAbandonedCartExternally'));
         //Activate CMB2 functions
         add_action('admin_menu', array($this->admin, 'registerMenu'));
         $this->admin->initAdminPageStyles();
@@ -193,75 +180,72 @@ class Main
         add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
         //Settings link
         add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
-        $run_installation_externally = $this->admin->runAbandonedCartExternally();
-        if ($run_installation_externally) {
-            //If the user is old user then ask user to run abandoned cart to
-            $is_app_connected = $this->admin->isAppConnected();
-            $secret_key = $this->admin->getSecretKey();
-            $app_id = $this->admin->getApiKey();
-            if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
-                add_action('wp_loaded', array($this->admin, 'schedulePlanChecker'));
-                /**
-                 * Retainful abandoned cart api
-                 */
-                $cart = new Cart();
-                $checkout = new Checkout();
-                add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
-                add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
-                //Sync the order by the scheduled events
-                add_filter('woocommerce_checkout_fields', array($checkout, 'moveEmailFieldToTop'));
-                add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
-                add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
-                add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
-                add_action('wp_ajax_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
-                add_action('wp_ajax_nopriv_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
-                add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
-                //add_action('wp_login', array($cart, 'userLoggedIn'));
-                add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
-                add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
-                //Add tracking message
-                if (is_user_logged_in()) {
-                    add_action('woocommerce_after_add_to_cart_button', array($cart, 'userGdprMessage'), 10);
-                    add_action('woocommerce_before_shop_loop', array($cart, 'userGdprMessage'), 10);
-                }
-                add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
-                add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
-                add_filter('rnoc_can_track_abandoned_carts', array($cart, 'isZeroValueCart'), 15);
-                $cart_tracking_engine = $this->admin->getCartTrackingEngine();
-                if ($cart_tracking_engine == "php") {
-                    //PHP tracking
-                    add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
-                } else {
-                    //Js tracking
-                    add_action('wp_footer', array($cart, 'renderAbandonedCartTrackingDiv'));
-                    add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
-                }
-                add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
-                add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
-                add_action('wp_authenticate', array($cart, 'userLoggedOn'));
-                add_action('user_register', array($cart, 'userSignedUp'));
-                add_action('wp_logout', array($cart, 'userLoggedOut'));
-                //Set order as recovered
-                // handle payment complete, from a direct gateway
-                //add_action('woocommerce_new_order', array($checkout, 'purchaseComplete'));
-                add_filter('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
-                add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
-                add_action('woocommerce_checkout_order_processed', array($checkout, 'checkoutOrderProcessed'));
-                add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
-                // handle updating Retainful order data after a successful payment, for certain gateways
-                add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
-                // handle placed orders
-                add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
-                add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
-                //Todo: multi currency and multi lingual
-                #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
-            } else {
-                $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
-                $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
-                $this->showAdminNotice($notice);
+        //If the user is old user then ask user to run abandoned cart to
+        $is_app_connected = $this->admin->isAppConnected();
+        $secret_key = $this->admin->getSecretKey();
+        $app_id = $this->admin->getApiKey();
+        if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
+            add_action('wp_loaded', array($this->admin, 'schedulePlanChecker'));
+            /**
+             * Retainful abandoned cart api
+             */
+            $cart = new Cart();
+            $checkout = new Checkout();
+            $referral_program = new Api\Referral\ReferralManagement();
+            add_action('wp_footer',array($referral_program,'printReferralPopup'));
+            add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
+            add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
+            //Sync the order by the scheduled events
+            add_filter('woocommerce_checkout_fields', array($checkout, 'moveEmailFieldToTop'));
+            add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
+            add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
+            add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
+            add_action('wp_ajax_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
+            add_action('wp_ajax_nopriv_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
+            add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
+            //add_action('wp_login', array($cart, 'userLoggedIn'));
+            add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
+            add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
+            //Add tracking message
+            if (is_user_logged_in()) {
+                add_action('woocommerce_after_add_to_cart_button', array($cart, 'userGdprMessage'), 10);
+                add_action('woocommerce_before_shop_loop', array($cart, 'userGdprMessage'), 10);
             }
+            add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
+            add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
+            add_filter('rnoc_can_track_abandoned_carts', array($cart, 'isZeroValueCart'), 15);
+            $cart_tracking_engine = $this->admin->getCartTrackingEngine();
+            if ($cart_tracking_engine == "php") {
+                //PHP tracking
+                add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
+            } else {
+                //Js tracking
+                add_action('wp_footer', array($cart, 'renderAbandonedCartTrackingDiv'));
+                add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
+            }
+            add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
+            add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
+            add_action('wp_authenticate', array($cart, 'userLoggedOn'));
+            add_action('user_register', array($cart, 'userSignedUp'));
+            add_action('wp_logout', array($cart, 'userLoggedOut'));
+            //Set order as recovered
+            // handle payment complete, from a direct gateway
+            //add_action('woocommerce_new_order', array($checkout, 'purchaseComplete'));
+            add_filter('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
+            add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
+            add_action('woocommerce_checkout_order_processed', array($checkout, 'checkoutOrderProcessed'));
+            add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
+            // handle updating Retainful order data after a successful payment, for certain gateways
+            add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
+            // handle placed orders
+            add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
+            add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
+            //Todo: multi currency and multi lingual
+            #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
         } else {
-            //remove
+            $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
+            $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
+            $this->showAdminNotice($notice);
         }
         $is_retainful_v2_0_1_migration_completed = get_option('is_retainful_v2_0_1_migration_completed', 0);
         if (!$is_retainful_v2_0_1_migration_completed) {

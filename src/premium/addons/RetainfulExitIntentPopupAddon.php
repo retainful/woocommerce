@@ -100,9 +100,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function setGuestEmailSession()
         {
-            $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
             $message = '';
-            $error = true;
+            $error = false;
             $email = sanitize_email($_REQUEST['email']);
             $this->wc_functions->setCustomerEmail($email);
             $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
@@ -114,13 +113,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             }
             $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
-            if (!$run_cart_externally) {
-                //remove
-            } else {
-                $error = false;
-                $cart_api = new \Rnoc\Retainful\Api\AbandonedCart\Cart();
-                $cart_api->syncCartData(true);
-            }
+            $cart_api = new \Rnoc\Retainful\Api\AbandonedCart\Cart();
+            $cart_api->syncCartData(true);
             $checkout_url = $this->getCheckoutUrl();
             $cart_url = $this->getCartUrl();
             $url_to_redirect = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success', 'checkout');

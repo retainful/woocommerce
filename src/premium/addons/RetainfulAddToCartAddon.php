@@ -166,9 +166,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function setGuestEmailSession()
         {
-            $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
             $message = '';
-            $error = true;
+            $error = false;
             $email = sanitize_email($_REQUEST['email']);
             $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0] : array();
             $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
@@ -182,12 +181,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $this->wc_functions->setCustomerEmail($email);
             do_action('rnoc_after_atcp_assigning_email_to_customer', $email, $this);
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
-            //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
-            if (!$run_cart_externally) {
-                //remove
-            } else {
-                $error = false;
-            }
             $coupon_details = "";
             $show_coupon_popup = false;
             $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
