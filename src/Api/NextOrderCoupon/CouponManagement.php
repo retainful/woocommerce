@@ -142,6 +142,9 @@ class CouponManagement
             $query_string = add_query_arg(array('filter-by' => rawurlencode('retainful-next-order-coupon')), $admin_url);
             $query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful'));
             $types['retainful'] = '<a href="' . esc_url($query_string) . '" class="' . esc_attr($class) . '">' . __('Retainful - Next order coupons', 'woocommerce') . ' (' . $query->found_posts . ')</a>';
+//            $expired_coupons_query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful'));
+//            echo '<pre>';print_r($expired_coupons_query);echo '</pre>';die;
+//            $types['retainful_expired_coupons'] = $expired_coupons_query->found_posts;
         }
         return $types;
     }
@@ -155,7 +158,7 @@ class CouponManagement
     {
         global $typenow;
         if ($typenow == "shop_coupon") {
-            if (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == $_GET['filter-by']) {
+            if (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == sanitize_text_field($_GET['filter-by'])) {
                 $query_vars['meta_key'] = "_rnoc_shop_coupon_type";
                 $query_vars['meta_value'] = "retainful";
             }

@@ -16,7 +16,6 @@ class ReferralManagement
         <div id="rtl-shopify-init" data-app-key="<?php echo $api_key; ?>"
             <?php
             if (is_user_logged_in()) {
-                $secret_key = $settings->getSecretKey();
                 $user = wp_get_current_user();
                 $order_count = wc_get_customer_order_count($user->ID);
                 $total_spent = wc_get_customer_total_spent($user->ID);
