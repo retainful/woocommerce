@@ -1085,23 +1085,7 @@ class Settings
      */
     function runAbandonedCartExternally()
     {
-        $response = false;
-        $is_new_installation = $this->isNewInstallation();
-        if ($is_new_installation) {
-            $response = true;
-        }
-        $retainful_run_abandoned_cart_in_cloud = get_option('retainful_run_abandoned_cart_in_cloud', 0);
-        if ($retainful_run_abandoned_cart_in_cloud) {
-            $response = true;
-        }
-        $retainful_check_is_new_installation = get_option('retainful_check_is_new_installation', 0);
-        if (empty($retainful_check_is_new_installation)) {
-            $is_new_installation = $this->isInstalledFresh();
-            update_option('retainful_is_new_installation', $is_new_installation);
-            update_option('retainful_check_is_new_installation', 1);
-            $response = $is_new_installation;
-        }
-        return apply_filters('retainful_manage_abandon_carts_in_cloud', $response);
+       return true;
     }
 
     /**
