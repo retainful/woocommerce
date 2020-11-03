@@ -2,6 +2,8 @@
 
 namespace Rnoc\Retainful\Api\NextOrderCoupon;
 
+use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Valitron\Validator;
 
 class CouponManagement
@@ -14,30 +16,17 @@ class CouponManagement
         ));
         $validator->rule('dateFormat', 'expiry_date', 'Y-m-d');
         $validator->rule('in', array(
-            'individual_use',
-            'free_shipping',
-        ), array('yes', 'no'));
+            'value_type',
+        ), array('percentage', 'fixed_amount'));
         $validator->rule('in', array(
-            'discount_type',
-        ), array('percent', 'fixed_cart', 'fixed_product'));
-        $validator->rule('array', array(
-            'product_ids',
-            'exclude_product_ids',
-            'product_categories',
-            'exclude_product_categories',
-        ));
+            'target_type',
+        ), array('shipping_line', 'line_item'));
         $validator->rule('numeric', array(
-            'coupon_amount',
-            'minimum_amount',
-            'maximum_amount',
+            'value'
         ));
         $validator->rule('integer', array(
             'usage_limit',
             'usage_limit_per_user',
-            'product_ids.*',
-            'exclude_product_ids.*',
-            'product_categories.*',
-            'exclude_product_categories.*',
         ));
         $validator->rule('email', 'customer_email');
         $validate = $validator->validate();
@@ -51,59 +40,90 @@ class CouponManagement
      */
     static function createRestCoupon(\WP_REST_Request $request)
     {
-        $defaultParams = array(
-            'coupon_code' => null,
-            'discount_type' => 'fixed_cart',
-            'free_shipping' => 'no',
-            'coupon_amount' => 0,
-            'minimum_amount' => 0,
-            'maximum_amount' => 0,
-            'expiry_date' => null,
-            'individual_use' => 'yes',
-            'usage_limit' => 1,
-            'usage_limit_per_user' => 1,
-            'customer_email' => null,
-            'product_ids' => array(),
-            'exclude_product_ids' => array(),
-            'product_categories' => array(),
-            'exclude_product_categories' => array(),
-        );
         $requestParams = $request->get_params();
-        $params = wp_parse_args($requestParams, $defaultParams);
-        $is_valid_data = true;
-        $errors = array();
-        self::validateRestCoupon($params, $is_valid_data, $errors);
-        if ($is_valid_data) {
-            $old_coupon = self::getCouponByCouponCode($params['coupon_code']);
-            if (!empty($old_coupon) && $old_coupon instanceof \WP_Post) {
-                $coupon_id = $old_coupon->ID;
-            } else {
-                $new_coupon = array(
-                    'post_title' => $params['coupon_code'],
-                    'post_name' => $params['coupon_code'] . '-' . rand(1, 2000000),
-                    'post_content' => '',
-                    'post_type' => 'shop_coupon',
-                    'post_status' => 'publish'
+        $defaultRequestParams = array(
+            'discount_rule' => array(),
+            'digest' => ''
+        );
+        $params = wp_parse_args($requestParams, $defaultRequestParams);
+        if (is_array($params['discount_rule']) && !empty($params['discount_rule']) && is_string($params['digest']) && !empty($params['digest'])) {
+            $settings = new Settings();
+            $secret = $settings->getSecretKey();
+            $cipher_text_raw = wp_json_encode($params['discount_rule']);
+            $reverse_hmac = hash_hmac('sha256', $cipher_text_raw, $secret);
+            if (hash_equals($reverse_hmac, $params['digest'])) {
+                $defaultRuleParams = array(
+                    'coupon_code' => null,
+                    'usage_limit' => 1,
+                    'usage_limit_per_user' => 1,
+                    'value_type' => 'percentage',
+                    'value' => 0,
+                    'target_type' => 'line_item',
+                    'customer_email' => null,
+                    'ends_at' => null,
+                    'prerequisite_subtotal_range' => array('greater_than_or_equal_to' => 0),
+                    'individual_use' => 'yes',
                 );
-                $coupon_id = wp_insert_post($new_coupon, true);
-            }
-            $status = 200;
-            if (!empty($coupon_id)) {
-                if (!empty($params)) {
-                    foreach ($params as $meta_key => $meta_value) {
-                        if (in_array($meta_key, array('product_ids', 'exclude_product_ids')) && is_array($meta_value)) {
-                            $meta_value = implode(',', $meta_value);
-                        }
-                        update_post_meta($coupon_id, $meta_key, $meta_value);
+                $ruleParams = wp_parse_args($params['discount_rule'], $defaultRuleParams);
+                $is_valid_data = true;
+                $errors = array();
+                self::validateRestCoupon($ruleParams, $is_valid_data, $errors);
+                if ($is_valid_data) {
+                    $data = array(
+                        'coupon_code' => $ruleParams['coupon_code'],
+                        'discount_type' => ($ruleParams['value_type'] == "fixed_amount") ? 'fixed_cart' : 'percentage',
+                        'free_shipping' => ($ruleParams['target_type'] == "shipping_line") ? 'yes' : 'no',
+                        'coupon_amount' => ($ruleParams['value'] < 0) ? floatval($ruleParams['value']) * -1 : 0,
+                        'minimum_amount' => (floatval($ruleParams['prerequisite_subtotal_range']['greater_than_or_equal_to']) > 0) ? floatval($ruleParams['prerequisite_subtotal_range']['greater_than_or_equal_to']) : null,
+                        'maximum_amount' => 0,
+                        'expiry_date' => (!empty($ruleParams['ends_at'])) ? $ruleParams['ends_at'] : null,
+                        'individual_use' => 'yes',
+                        'usage_limit' => $ruleParams['usage_limit'],
+                        'usage_limit_per_user' => $ruleParams['usage_limit_per_user'],
+                        'customer_email' => $ruleParams['customer_email'],
+                        'product_ids' => array(),
+                        'exclude_product_ids' => array(),
+                        'product_categories' => array(),
+                        'exclude_product_categories' => array(),
+                    );
+                    $old_coupon = self::getCouponByCouponCode($data['coupon_code']);
+                    if (!empty($old_coupon) && $old_coupon instanceof \WP_Post) {
+                        $coupon_id = $old_coupon->ID;
+                    } else {
+                        $new_coupon = array(
+                            'post_title' => $data['coupon_code'],
+                            'post_name' => $data['coupon_code'] . '-' . rand(1, 2000000),
+                            'post_content' => '',
+                            'post_type' => 'shop_coupon',
+                            'post_status' => 'publish'
+                        );
+                        $coupon_id = wp_insert_post($new_coupon, true);
                     }
+                    $status = 200;
+                    if (!empty($coupon_id)) {
+                        if (!empty($data)) {
+                            foreach ($data as $meta_key => $meta_value) {
+                                if (in_array($meta_key, array('product_ids', 'exclude_product_ids')) && is_array($meta_value)) {
+                                    $meta_value = implode(',', $meta_value);
+                                }
+                                update_post_meta($coupon_id, $meta_key, $meta_value);
+                            }
+                        }
+                        $response = array('success' => true, 'RESPONSE_CODE' => 'COUPON_CODE_CREATED_OR_UPDATED', 'external_price_rule_id' => $coupon_id, 'code' => $data['coupon_code']);
+                    } else {
+                        $response = array('success' => false, 'RESPONSE_CODE' => 'UNABLE_TO_CREATE_OR_UPDATE', 'message' => 'Coupon code was not created!');
+                    }
+                } else {
+                    $status = 400;
+                    $response = $errors;
                 }
-                $response = array('success' => true, 'CODE' => 'COUPON_CREATED_OR_UPDATE', 'message' => 'Coupon code created or updated successfully!');
             } else {
-                $response = array('success' => false, 'CODE' => 'UNABLE_TO_CREATE_OR_UPDATE', 'message' => 'Coupon code was not created!');
+                $status = 400;
+                $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
             }
         } else {
             $status = 400;
-            $response = $errors;
+            $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
         }
         return new \WP_REST_Response($response, $status);
     }
