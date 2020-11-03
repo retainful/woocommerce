@@ -252,18 +252,18 @@
             sessionStorage.setItem('retainful_add_to_cart_opened', 'yes');
             $(document).trigger('retainful_showed_add_to_cart_popup', [thisButton]);
         }
-        $(document).on('adding_to_cart', (eventData, thisButton, postData) => {
-            if (need_popup()) {
-                display_popup(thisButton);
-                throw new Error('Retainful intercepts to show popup!');
-            } else {
-                var email = localStorage.getItem('rnoc_atcp_data');
-                if (email !== null && typeof email !== "undefined" && email !== "") {
-                    postData.rnoc_email_popup = email;
-                    localStorage.removeItem('rnoc_atcp_data');
-                }
-            }
-        });
+        // $(document).on('adding_to_cart', (eventData, thisButton, postData) => {
+        //     if (need_popup()) {
+        //         display_popup(thisButton);
+        //         throw new Error('Retainful intercepts to show popup!');
+        //     } else {
+        //         var email = localStorage.getItem('rnoc_atcp_data');
+        //         if (email !== null && typeof email !== "undefined" && email !== "") {
+        //             postData.rnoc_email_popup = email;
+        //             localStorage.removeItem('rnoc_atcp_data');
+        //         }
+        //     }
+        // });
         $(".ajax_add_to_cart,.single_add_to_cart_button " + settings.custom_classes).on('click', function (e) {
             if (need_popup() && $(this).hasClass('disabled') === false && $(this).hasClass('acbwm-atcp-allow-click') === false) {
                 e.preventDefault();

@@ -22,7 +22,8 @@ class ReferralManagement
             'id' => null,
             'tags' => array(),
             'digest' => null,
-            'accepts_marketing' => null
+            'accepts_marketing' => null,
+            'is_thank_you_page' => (!empty(is_wc_endpoint_url('order-received'))) ? "yes" : "no"
         );
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
@@ -46,6 +47,6 @@ class ReferralManagement
             $user_arr = array();
         }
         $params = wp_parse_args($user_arr, $default_params);
-        include_once plugin_dir_path(RNOC_FILE).'src/templates/referral.php';
+        include_once plugin_dir_path(RNOC_FILE) . 'src/templates/referral.php';
     }
 }

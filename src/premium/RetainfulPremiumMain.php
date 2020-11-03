@@ -34,8 +34,7 @@ class RetainfulPremiumMain
      */
     function getAddonLists()
     {
-        $list = $this->getAvailableAddon();
-        return $list;
+        return $this->getAvailableAddon();
     }
 
     /**

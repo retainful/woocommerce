@@ -13,5 +13,6 @@
      data-customer-tags="<?php echo rawurlencode(implode(',', $params['tags'])); ?>"
      data-customer-total-spent="<?php echo $params['total_spent'] ?>"
      data-digest="<?php echo $params['digest']; ?>"
+     data-is-thank-you-page="<?php echo $params['is_thank_you_page']; ?>"
 >
 </div>
