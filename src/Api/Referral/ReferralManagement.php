@@ -42,9 +42,16 @@ class ReferralManagement
         }
         $data = implode('', $user_arr);
         $digest = hash_hmac('sha256', $data, $secret);
+        $account_url = esc_url(get_permalink(get_option('woocommerce_myaccount_page_id')));
         $default_params = array(
             'digest' => $digest,
-            'is_thank_you_page' => (!empty(is_wc_endpoint_url('order-received'))) ? "yes" : "no"
+            'window' => array(
+                'is_thank_you_page' => (!empty(is_wc_endpoint_url('order-received'))),
+                'customer_id' => $user_arr['id'],
+                'customer_email' => $user_arr['email'],
+                'login_url' => $account_url,
+                'register_url' => $account_url,
+            )
         );
         $params = wp_parse_args($user_arr, $default_params);
         include_once plugin_dir_path(RNOC_FILE) . 'src/templates/referral.php';

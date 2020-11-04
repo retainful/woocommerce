@@ -64,19 +64,21 @@
     }
     Retainful_premium.prototype.modal = function (content = "", popup_type = 'atc') {
         $(document).trigger('before_rnoc_show_modal');
-        var html_content = $('<div class="rnoc-modal" id="rnoc-modal-' + popup_type + '"><div class="rnoc-modal-container"><a href="#0" class="rnoc-close-modal rnoc-close-modal-' + popup_type + '" data-close="' + popup_type + '">Close</a> ' + content + '</div></div>');
+        var html_content = $('<div class="rnoc-modal" id="rnoc-modal-' + popup_type + '"><div class="rnoc-modal-container"><a href="#" class="rnoc-close-modal rnoc-close-modal-' + popup_type + '" data-close="' + popup_type + '">Close</a> ' + content + '</div></div>');
         $('body').append(html_content);
         html_content.show();
         $(document).trigger('before_rnoc_show_modal', popup_type);
         html_content.on('click', '.rnoc-close-modal-' + popup_type, function () {
             $(document).trigger('before_rnoc_close_modal_' + popup_type + '_by_btn_click', $(this));
             html_content.remove();
+            return false;
         })
     }
     Retainful_premium.prototype.close_modal = function (popup_type = 'atc') {
         var close_btn = $('.rnoc-close-modal-' + popup_type);
         $(document).trigger('before_rnoc_close_modal_' + popup_type, close_btn);
         $('#rnoc-modal-' + popup_type).remove();
+        return false;
     }
 
     /**
@@ -243,7 +245,7 @@
             }
         }
 
-        var display_popup = function(thisButton){
+        var display_popup = function (thisButton) {
             $(document).trigger('retainful_showing_add_to_cart_popup', [thisButton]);
             thisButton.removeClass('loading');
             thisButton.addClass('rnoc-popup-opener');

@@ -13,6 +13,8 @@
      data-customer-tags="<?php echo $params['tags']; ?>"
      data-customer-total-spent="<?php echo $params['total_spent'] ?>"
      data-digest="<?php echo $params['digest']; ?>"
-     data-is-thank-you-page="<?php echo $params['is_thank_you_page']; ?>"
 >
 </div>
+<script type="application/javascript">
+    window.retainful_referral = <?php echo wp_json_encode($params['window']) ?>;
+</script>
