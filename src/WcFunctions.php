@@ -523,6 +523,19 @@ class WcFunctions
     }
 
     /**
+     * get Order User Id
+     * @param $order \WC_Order
+     * @return null
+     */
+    function getOrderCustomerId($order)
+    {
+        if (method_exists($order, 'get_customer_id')) {
+            return $order->get_customer_id();
+        }
+        return NULL;
+    }
+
+    /**
      * get Order User
      * @param $order
      * @return null
@@ -664,6 +677,19 @@ class WcFunctions
             }
         } else {
             return $email;
+        }
+    }
+
+    /**
+     * get customer billing Email
+     * @return bool
+     */
+    function getCustomerId()
+    {
+        if (method_exists(WC()->customer, 'get_id')) {
+            return WC()->customer->get_id();
+        } else {
+            return 0;
         }
     }
 

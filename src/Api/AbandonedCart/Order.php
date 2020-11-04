@@ -8,7 +8,7 @@ class Order extends RestApi
 {
     /**
      * Get the customer details
-     * @param $order
+     * @param $order \WC_Order
      * @return array
      */
     function getCustomerDetails($order)
@@ -21,8 +21,15 @@ class Order extends RestApi
             $user_id = 0;
             $created_at = $updated_at = current_time('timestamp', true);
         }
-        $user_info = array(
+        $customer_id = $order->get_customer_id();
+        $last_order = wc_get_customer_last_order($user_id);
+        $last_order_id = null;
+        if (!empty($last_order) && $last_order instanceof \WC_Order) {
+            $last_order_id = $retainful::$woocommerce->getOrderId($last_order);
+        }
+        return array(
             'id' => $user_id,
+            'customer_id' => $customer_id,
             'email' => $retainful::$woocommerce->getBillingEmail($order),
             'phone' => $retainful::$woocommerce->getBillingPhone($order),
             'state' => $retainful::$woocommerce->getBillingState($order),
@@ -31,14 +38,13 @@ class Order extends RestApi
             'created_at' => $this->formatToIso8601($created_at),
             'first_name' => $retainful::$woocommerce->getBillingLastName($order),
             'updated_at' => $this->formatToIso8601($updated_at),
-            'total_spent' => 0,
-            'orders_count' => 0,
-            'last_order_id' => NULL,
+            'total_spent' => wc_get_customer_total_spent($user_id),
+            'orders_count' => wc_get_customer_order_count($user_id),
+            'last_order_id' => $last_order_id,
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,
         );
-        return $user_info;
     }
 
     /**

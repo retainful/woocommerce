@@ -58,13 +58,14 @@ class ReferralManagement
      */
     function printReferralPopup()
     {
-        global $retainful;
+        global $wp, $retainful;
         $api_key = $retainful::$plugin_admin->getApiKey();
         $secret = $retainful::$plugin_admin->getSecretKey();
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
-            $order_count = wc_get_customer_order_count($user->ID);
-            $total_spent = wc_get_customer_total_spent($user->ID);
+            $customer_id = get_current_user_id();
+            $order_count = wc_get_customer_order_count($customer_id);
+            $total_spent = wc_get_customer_total_spent($customer_id);
             $user_arr = array(
                 'api_key' => $api_key,
                 'accepts_marketing' => '1',
@@ -92,12 +93,21 @@ class ReferralManagement
         $data = implode('', $user_arr);
         $digest = hash_hmac('sha256', $data, $secret);
         $account_url = esc_url(get_permalink(get_option('woocommerce_myaccount_page_id')));
+        $window_obj_email = $user_arr['email'];
+        $is_thank_you_page = (!empty(is_wc_endpoint_url('order-received')));
+        $order_id = isset($wp->query_vars['order-received']) ? $wp->query_vars['order-received'] : 0;
+        if ($is_thank_you_page && empty($window_obj_email) && !empty($order_id)) {
+            $order = wc_get_order($order_id);
+            if ($order instanceof \WC_Order) {
+                $window_obj_email = $retainful::$woocommerce->getBillingEmail($order);
+            }
+        }
         $default_params = array(
             'digest' => $digest,
             'window' => array(
-                'is_thank_you_page' => (!empty(is_wc_endpoint_url('order-received'))),
+                'is_thank_you_page' => $is_thank_you_page,
                 'customer_id' => $user_arr['id'],
-                'customer_email' => $user_arr['email'],
+                'customer_email' => $window_obj_email,
                 'login_url' => $account_url,
                 'register_url' => $account_url,
             )
