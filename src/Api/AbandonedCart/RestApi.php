@@ -13,7 +13,7 @@ use Rnoc\Retainful\WcFunctions;
 
 class RestApi
 {
-    public static $cart, $checkout, $settings, $api, $woocommerce, $storage;
+    public static $cart, $checkout, $settings, $api, $storage;
     protected $cart_token_key = "rnoc_user_cart_token", $cart_token_key_for_db = "_rnoc_user_cart_token";
     protected $user_ip_key = "rnoc_user_ip_address", $user_ip_key_for_db = "_rnoc_user_ip_address";
     protected $order_placed_date_key_for_db = "_rnoc_order_placed_at", $order_cancelled_date_key_for_db = "_rnoc_order_cancelled_at";
@@ -29,34 +29,6 @@ class RestApi
     /** The HMAC hash algorithm to use to sign the encrypted cart data */
     const HMAC_ALGORITHM = 'sha256';
 
-    function __construct()
-    {
-        self::$settings = !empty(self::$settings) ? self::$settings : new Settings();
-        self::$api = !empty(self::$api) ? self::$api : new RetainfulApi();
-        self::$woocommerce = !empty(self::$woocommerce) ? self::$woocommerce : new WcFunctions();
-        $this->initStorage();
-    }
-
-    /**
-     * init the storage classes
-     */
-    function initStorage()
-    {
-        $storage_handler = self::$settings->getStorageHandler();
-        switch ($storage_handler) {
-            case "php";
-                self::$storage = new PhpSession();
-                break;
-            case "cookie";
-                self::$storage = new Cookie();
-                break;
-            default:
-            case "woocommerce":
-                self::$storage = new WooSession();
-                break;
-        }
-    }
-
     /**
      * Set the cart token for the session
      * @param $cart_token
@@ -64,13 +36,14 @@ class RestApi
      */
     function setCartToken($cart_token, $user_id = null)
     {
+        global $retainful;
         $cart_token = apply_filters('rnoc_before_set_cart_token', $cart_token, $user_id, $this);
-        $old_cart_token = self::$storage->getValue($this->cart_token_key);
+        $old_cart_token = $retainful::$storage->getValue($this->cart_token_key);
         if (empty($old_cart_token)) {
-            self::$settings->logMessage($cart_token, 'setting cart token');
+            $retainful::$plugin_admin->logMessage($cart_token, 'setting cart token');
             $current_time = current_time('timestamp', true);
-            self::$storage->setValue($this->cart_token_key, $cart_token);
-            self::$storage->setValue($this->cart_tracking_started_key, $current_time);
+            $retainful::$storage->setValue($this->cart_token_key, $cart_token);
+            $retainful::$storage->setValue($this->cart_tracking_started_key, $current_time);
             if (!empty($user_id) || $user_id = get_current_user_id()) {
                 update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
                 $this->setCartCreatedDate($user_id, $current_time);
@@ -84,7 +57,8 @@ class RestApi
      */
     function formatDecimalPrice($price)
     {
-        $decimals = self::$woocommerce->priceDecimals();
+        global $retainful;
+        $decimals = $retainful::$woocommerce->priceDecimals();
         return round($price, $decimals);
     }
 
@@ -94,7 +68,8 @@ class RestApi
      */
     function formatDecimalPriceRemoveTrailingZeros($price)
     {
-        $decimals = self::$woocommerce->priceDecimals();
+        global $retainful;
+        $decimals = $retainful::$woocommerce->priceDecimals();
         $rounded_price = round($price, $decimals);
         return number_format($rounded_price, $decimals, '.', '');
     }
@@ -120,7 +95,8 @@ class RestApi
      */
     function removeSessionShippingDetails()
     {
-        self::$storage->removeValue('rnoc_shipping_address');
+        global $retainful;
+        $retainful::$storage->removeValue('rnoc_shipping_address');
     }
 
     /**
@@ -129,7 +105,8 @@ class RestApi
      */
     function generateCartHash()
     {
-        $cart = self::$woocommerce->getCart();
+        global $retainful;
+        $cart = $retainful::$woocommerce->getCart();
         $cart_session = array();
         if (!empty($cart)) {
             foreach ($cart as $key => $values) {
@@ -137,7 +114,7 @@ class RestApi
                 unset($cart_session[$key]['data']); // Unset product object.
             }
         }
-        return $cart_session ? md5(wp_json_encode($cart_session) . self::$woocommerce->getCartTotalForEdit()) : '';
+        return $cart_session ? md5(wp_json_encode($cart_session) . $retainful::$woocommerce->getCartTotalForEdit()) : '';
     }
 
     /**
@@ -202,7 +179,8 @@ class RestApi
      */
     function removeSessionBillingDetails()
     {
-        self::$storage->removeValue('rnoc_billing_address');
+        global $retainful;
+        $retainful::$storage->removeValue('rnoc_billing_address');
     }
 
     /**
@@ -212,10 +190,11 @@ class RestApi
      */
     function isPendingRecovery($user_id = NULL)
     {
+        global $retainful;
         if ($user_id || ($user_id = get_current_user_id())) {
             return (bool)get_user_meta($user_id, $this->pending_recovery_key_for_db, true);
         } else {
-            return (bool)self::$storage->getValue($this->pending_recovery_key);
+            return (bool)$retainful::$storage->getValue($this->pending_recovery_key);
         }
     }
 
@@ -226,13 +205,14 @@ class RestApi
      */
     function retrieveCartToken($user_id = null)
     {
+        global $retainful;
         if ($user_id == null) {
             $user_id = get_current_user_id();
         }
         if (!empty($user_id)) {
             $token = get_user_meta($user_id, $this->cart_token_key_for_db, true);
         } else {
-            $token = self::$storage->getValue($this->cart_token_key);
+            $token = $retainful::$storage->getValue($this->cart_token_key);
         }
         return apply_filters('rnoc_retrieve_cart_token', $token, $user_id, $this);
     }
@@ -279,7 +259,8 @@ class RestApi
      */
     function hashTheData($data)
     {
-        $secret = self::$settings->getSecretKey();
+        global $retainful;
+        $secret = $retainful::$plugin_admin->getSecretKey();
         return hash_hmac(self::HMAC_ALGORITHM, $data, $secret);
     }
 
@@ -410,7 +391,8 @@ class RestApi
      */
     public function isOrderInPendingRecovery($order_id)
     {
-        $order = self::$woocommerce->getOrder($order_id);
+        global $retainful;
+        $order = $retainful::$woocommerce->getOrder($order_id);
         if (!$order instanceof \WC_Order) {
             return false;
         }
@@ -437,13 +419,14 @@ class RestApi
      */
     function markOrderAsRecovered($order_id)
     {
-        $order = self::$woocommerce->getOrder($order_id);
+        global $retainful;
+        $order = $retainful::$woocommerce->getOrder($order_id);
         if (!$order instanceof \WC_Order || $this->isOrderRecovered($order_id)) {
             return;
         }
-        self::$woocommerce->deleteOrderMeta($order_id, $this->pending_recovery_key_for_db);
-        self::$woocommerce->setOrderMeta($order_id, $this->order_recovered_key_for_db, true);
-        self::$woocommerce->setOrderNote($order_id, __('Order recovered by Retainful.', RNOC_TEXT_DOMAIN));
+        $retainful::$woocommerce->deleteOrderMeta($order_id, $this->pending_recovery_key_for_db);
+        $retainful::$woocommerce->setOrderMeta($order_id, $this->order_recovered_key_for_db, true);
+        $retainful::$woocommerce->setOrderNote($order_id, __('Order recovered by Retainful.', RNOC_TEXT_DOMAIN));
         do_action('rnoc_abandoned_order_recovered', $order);
     }
 
@@ -463,7 +446,8 @@ class RestApi
      */
     function considerOnHoldAsAbandoned()
     {
-        $settings = self::$settings->getAdminSettings();
+        global $retainful;
+        $settings = $retainful::$plugin_admin->getAdminSettings();
         return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status'] : 0;
     }
 
@@ -473,7 +457,8 @@ class RestApi
      */
     function considerCancelledAsAbandoned()
     {
-        $settings = self::$settings->getAdminSettings();
+        global $retainful;
+        $settings = $retainful::$plugin_admin->getAdminSettings();
         return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'] : 1;
     }
 
@@ -483,7 +468,8 @@ class RestApi
      */
     function refreshFragmentsOnPageLoad()
     {
-        $settings = self::$settings->getAdminSettings();
+        global $retainful;
+        $settings = $retainful::$plugin_admin->getAdminSettings();
         return isset($settings[RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load']) ? $settings[RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'] : 0;
     }
 
@@ -529,12 +515,13 @@ class RestApi
     function encryptData($data, $secret = NULL)
     {
         if (extension_loaded('openssl')) {
+            global $retainful;
             if (is_array($data) || is_object($data)) {
                 $data = wp_json_encode($data);
             }
             try {
                 if (empty($secret)) {
-                    $secret = self::$settings->getSecretKey();
+                    $secret = $retainful::$plugin_admin->getSecretKey();
                 }
                 $iv_len = openssl_cipher_iv_length(self::CIPHER_METHOD);
                 $iv = openssl_random_pseudo_bytes($iv_len);
@@ -555,7 +542,8 @@ class RestApi
      */
     function decryptData($data_hash)
     {
-        $secret = self::$settings->getSecretKey();
+        global $retainful;
+        $secret = $retainful::$plugin_admin->getSecretKey();
         $string = base64_decode($data_hash);
         list($iv, $hmac, $cipher_text_raw) = explode(':retainful:', $string);
         $reverse_hmac = hash_hmac(self::HMAC_ALGORITHM, $cipher_text_raw, $secret, true);
@@ -571,7 +559,8 @@ class RestApi
      */
     function getCurrentCurrencyCode()
     {
-        $default_currency = self::$settings->getBaseCurrency();
+        global $retainful;
+        $default_currency = $retainful::$plugin_admin->getBaseCurrency();
         return apply_filters('rnoc_get_current_currency_code', $default_currency);
     }
 
@@ -582,10 +571,11 @@ class RestApi
      */
     function userCartCreatedAt($user_id = NULL)
     {
+        global $retainful;
         if ($user_id || $user_id = get_current_user_id()) {
             $cart_created_at = get_user_meta($user_id, $this->cart_tracking_started_key_for_db, true);
         } else {
-            $cart_created_at = self::$storage->getValue($this->cart_tracking_started_key);
+            $cart_created_at = $retainful::$storage->getValue($this->cart_tracking_started_key);
         }
         return $cart_created_at;
     }
@@ -615,11 +605,12 @@ class RestApi
      */
     function syncCart($cart_details, $extra_headers)
     {
-        $app_id = self::$settings->getApiKey();
+        global $retainful;
+        $app_id = $retainful::$plugin_admin->getApiKey();
         $response = false;
         if (!empty($cart_details)) {
-            self::$settings->logMessage('cart synced with PHP', 'synced by');
-            $response = self::$api->syncCartDetails($app_id, $cart_details, $extra_headers);
+            $retainful::$plugin_admin->logMessage('cart synced with PHP', 'synced by');
+            $response = $retainful::$api->syncCartDetails($app_id, $cart_details, $extra_headers);
         }
         return $response;
     }
@@ -630,10 +621,11 @@ class RestApi
      */
     function isBuyerAcceptsMarketing()
     {
+        global $retainful;
         if (is_user_logged_in()) {
             return true;
         } else {
-            $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
+            $is_buyer_accepts_marketing = $retainful::$woocommerce->getSession('is_buyer_accepting_marketing');
             if ($is_buyer_accepts_marketing == 1) {
                 return true;
             }
@@ -676,7 +668,8 @@ class RestApi
     function getUserAgent($order = null)
     {
         if (!empty($order)) {
-            return self::$woocommerce->getOrderMeta($order, '_rnoc_get_http_user_agent');
+            global $retainful;
+            return $retainful::$woocommerce->getOrderMeta($order, '_rnoc_get_http_user_agent');
         } else {
             if (isset($_SERVER['HTTP_USER_AGENT']) && !empty($_SERVER['HTTP_USER_AGENT'])) {
                 return $_SERVER['HTTP_USER_AGENT'];
@@ -693,7 +686,8 @@ class RestApi
     function getUserAcceptLanguage($order = null)
     {
         if (!empty($order)) {
-            return self::$woocommerce->getOrderMeta($order, '_rnoc_get_http_accept_language');
+            global $retainful;
+            return $retainful::$woocommerce->getOrderMeta($order, '_rnoc_get_http_accept_language');
         } else {
             if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && !empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                 $lang = trim($_SERVER['HTTP_ACCEPT_LANGUAGE']);

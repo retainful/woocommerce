@@ -9,11 +9,6 @@ use stdClass;
 
 class Cart extends RestApi
 {
-    function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * User logged in the store
      * @param $user_name
@@ -38,8 +33,9 @@ class Cart extends RestApi
      */
     function userLoggedOut()
     {
-        self::$storage->removeValue($this->cart_token_key);
-        self::$storage->removeValue($this->cart_tracking_started_key);
+        global $retainful;
+        $retainful::$storage->removeValue($this->cart_token_key);
+        $retainful::$storage->removeValue($this->cart_tracking_started_key);
         //$this->removeSessionBillingDetails();
         //$this->removeSessionShippingDetails();
     }
@@ -50,11 +46,12 @@ class Cart extends RestApi
      */
     function userSignedUp($user_id)
     {
-        $cart_token = self::$storage->getValue($this->cart_token_key);
+        global $retainful;
+        $cart_token = $retainful::$storage->getValue($this->cart_token_key);
         if (!empty($cart_token)) {
             update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
         }
-        $cart_created_at = self::$storage->getValue($this->cart_tracking_started_key);
+        $cart_created_at = $retainful::$storage->getValue($this->cart_tracking_started_key);
         if (!empty($cart_created_at)) {
             update_user_meta($user_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
         }
@@ -67,7 +64,8 @@ class Cart extends RestApi
      */
     function guestGdprMessage($fields)
     {
-        $settings = self::$settings->getAdminSettings();
+        global $retainful;
+        $settings = $retainful::$plugin_admin->getAdminSettings();
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
         if ($enable_gdpr_compliance) {
             if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
@@ -83,7 +81,8 @@ class Cart extends RestApi
      */
     function userGdprMessage()
     {
-        $settings = self::$settings->getAdminSettings();
+        global $retainful;
+        $settings = $retainful::$plugin_admin->getAdminSettings();
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
         if ($enable_gdpr_compliance) {
             if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
@@ -97,6 +96,7 @@ class Cart extends RestApi
      */
     function setCustomerData()
     {
+        global $retainful;
         if (isset($_POST['billing_email'])) {
             //Post details
             $billing_first_name = (isset($_POST['billing_first_name'])) ? sanitize_text_field($_POST['billing_first_name']) : '';
@@ -134,7 +134,7 @@ class Cart extends RestApi
                 'billing_country' => $billing_country,
                 'billing_phone' => $billing_phone
             );
-            self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
+            $retainful::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
             $this->setCustomerBillingDetails($billing_address);
             //Shipping to same billing address
             if (!empty($ship_to_billing)) {
@@ -164,12 +164,12 @@ class Cart extends RestApi
             }
             $this->setSessionShippingDetails($shipping_address);
             //Billing email
-            self::$woocommerce->setCustomerEmail($billing_email);
+            $retainful::$woocommerce->setCustomerEmail($billing_email);
             //Set update and created date
-            $session_created_at = self::$storage->getValue('rnoc_session_created_at');
+            $session_created_at = $retainful::$storage->getValue('rnoc_session_created_at');
             $current_time = current_time('timestamp', true);
             if (empty($session_created_at)) {
-                self::$storage->setValue('rnoc_session_created_at', $current_time);
+                $retainful::$storage->setValue('rnoc_session_created_at', $current_time);
             }
         }
         if ($this->isValidCartToTrack()) {
@@ -210,6 +210,7 @@ class Cart extends RestApi
             wp_enqueue_script('wc-cart-fragments');
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
+            global $retainful;
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
             $user_ip = $this->getClientIp();
             $user_ip = $this->formatUserIP($user_ip);
@@ -218,10 +219,10 @@ class Cart extends RestApi
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
                 'ip' => $user_ip,
                 'version' => RNOC_VERSION,
-                'public_key' => self::$settings->getApiKey(),
-                'api_url' => self::$api->getAbandonedCartEndPoint(),
+                'public_key' => $retainful::$plugin_admin->getApiKey(),
+                'api_url' => $retainful::$api->getAbandonedCartEndPoint(),
                 'tracking_element_selector' => $this->getTrackingElementId(),
-                'cart_tracking_engine' => self::$settings->getCartTrackingEngine()
+                'cart_tracking_engine' => $retainful::$plugin_admin->getCartTrackingEngine()
             );
             $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
             wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
@@ -275,21 +276,22 @@ class Cart extends RestApi
      */
     function applyAbandonedCartCoupon()
     {
+        global $retainful;
         if (isset($_REQUEST['retainful_ac_coupon']) && !empty($_REQUEST['retainful_ac_coupon'])) {
             $coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
-            self::$storage->setValue('rnoc_ac_coupon', $coupon_code);
+            $retainful::$storage->setValue('rnoc_ac_coupon', $coupon_code);
         }
-        $session_coupon = self::$storage->getValue('rnoc_ac_coupon');
+        $session_coupon = $retainful::$storage->getValue('rnoc_ac_coupon');
         if (!empty($session_coupon)) {
-            if (self::$woocommerce->isValidCoupon($session_coupon)) {
-                $cart = self::$woocommerce->getCart();
-                if (!empty($cart) && !self::$woocommerce->hasDiscount($session_coupon)) {
-                    if (self::$woocommerce->addDiscount($session_coupon)) {
-                        self::$storage->removeValue('rnoc_ac_coupon');
+            if ($retainful::$woocommerce->isValidCoupon($session_coupon)) {
+                $cart = $retainful::$woocommerce->getCart();
+                if (!empty($cart) && !$retainful::$woocommerce->hasDiscount($session_coupon)) {
+                    if ($retainful::$woocommerce->addDiscount($session_coupon)) {
+                        $retainful::$storage->removeValue('rnoc_ac_coupon');
                     }
                 }
             } else {
-                self::$storage->removeValue('rnoc_ac_coupon');
+                $retainful::$storage->removeValue('rnoc_ac_coupon');
             }
         }
     }
@@ -299,6 +301,7 @@ class Cart extends RestApi
      */
     function cartUpdated()
     {
+        global $retainful;
         $cart_token = $this->getCartToken();
         if ($cart_token) {
             try {
@@ -313,7 +316,7 @@ class Cart extends RestApi
                 //log exception
             }
         }
-        if (!$cart_token && !self::$woocommerce->isCartEmpty()) {
+        if (!$cart_token && !$retainful::$woocommerce->isCartEmpty()) {
             try {
                 $this->syncCartData();
             } catch (Exception $exception) {
@@ -322,13 +325,13 @@ class Cart extends RestApi
         }
     }
 
-
     /**
      * Check weather Retainful needs to track the cart or not
      * @return bool
      */
     function needToTrackCart()
     {
+        global $retainful;
         $cart_hash = $this->generateCartHash();
         $cart_created_at = $this->userCartCreatedAt();
         if (empty($cart_hash) && empty($cart_created_at)) {
@@ -338,7 +341,7 @@ class Cart extends RestApi
         } elseif (!empty($cart_hash) && empty($cart_created_at)) {
             //TODO What if it fails to create cart created time
             $time = current_time('timestamp', true);
-            self::$storage->setValue($this->cart_tracking_started_key, $time);
+            $retainful::$storage->setValue($this->cart_tracking_started_key, $time);
             if ($user_id = get_current_user_id()) {
                 $this->setCartCreatedDate($user_id, $time);
             }
@@ -357,12 +360,13 @@ class Cart extends RestApi
      */
     function comparePreviousCartHash($current_cart_hash)
     {
-        $old_cart_hash = self::$storage->getValue($this->previous_cart_hash_key);
+        global $retainful;
+        $old_cart_hash = $retainful::$storage->getValue($this->previous_cart_hash_key);
         $is_not_similar = ($old_cart_hash != $current_cart_hash);
         if ($is_not_similar) {
-            self::$storage->setValue($this->previous_cart_hash_key, $current_cart_hash);
+            $retainful::$storage->setValue($this->previous_cart_hash_key, $current_cart_hash);
         }
-        self::$storage->setValue('rnoc_current_cart_hash', $current_cart_hash);
+        $retainful::$storage->setValue('rnoc_current_cart_hash', $current_cart_hash);
         return $is_not_similar;
     }
 
@@ -372,13 +376,14 @@ class Cart extends RestApi
      */
     function syncCartData($force_sync = false)
     {
+        global $retainful;
         if (!$this->isValidCartToTrack()) {
             return;
         }
         if ($force_sync || $this->needToTrackCart()) {
             $cart = $this->getUserCart();
             if (!empty($cart)) {
-                self::$settings->logMessage($cart, 'cart');
+                $retainful::$plugin_admin->logMessage($cart, 'cart');
                 $client_ip = $this->formatUserIP($this->getClientIp());
                 $cart_hash = $this->encryptData($cart);
                 if (!empty($cart_hash)) {
@@ -402,8 +407,9 @@ class Cart extends RestApi
      */
     function isZeroValueCart($return)
     {
-        if (self::$settings->trackZeroValueCarts() == "no") {
-            if (!empty(self::$woocommerce->getCart()) && self::$woocommerce->getCartSubTotal() <= 0 && self::$woocommerce->getCartTotalPrice() <= 0) {
+        global $retainful;
+        if ($retainful::$plugin_admin->trackZeroValueCarts() == "no") {
+            if (!empty($retainful::$woocommerce->getCart()) && $retainful::$woocommerce->getCartSubTotal() <= 0 && $retainful::$woocommerce->getCartTotalPrice() <= 0) {
                 $return = false;
             }
         }
@@ -431,8 +437,9 @@ class Cart extends RestApi
      */
     function handlePersistentCart()
     {
+        global $retainful;
         // bail for guest users, when the cart is empty, or when doing a WP cron request
-        if (!is_user_logged_in() || self::$woocommerce->isCartEmpty() || defined('DOING_CRON')) {
+        if (!is_user_logged_in() || $retainful::$woocommerce->isCartEmpty() || defined('DOING_CRON')) {
             return NULL;
         }
         $user_id = get_current_user_id();
@@ -466,7 +473,8 @@ class Cart extends RestApi
      */
     function removeCartToken($user_id = NULL)
     {
-        self::$storage->removeValue($this->cart_token_key);
+        global $retainful;
+        $retainful::$storage->removeValue($this->cart_token_key);
         if ($user_id || ($user_id = get_current_user_id())) {
             delete_user_meta($user_id, $this->cart_token_key_for_db);
             delete_user_meta($user_id, $this->pending_recovery_key_for_db);
@@ -479,8 +487,9 @@ class Cart extends RestApi
      */
     function getCartLineItemsDetails()
     {
+        global $retainful;
         $items = array();
-        $cart = self::$woocommerce->getCart();
+        $cart = $retainful::$woocommerce->getCart();
         if (!empty($cart)) {
             foreach ($cart as $item_key => $item_details) {
                 //Deceleration
@@ -492,9 +501,9 @@ class Cart extends RestApi
                 $item = apply_filters('woocommerce_cart_item_product', $item_details['data'], $item_details, $item_key);
                 if (empty($item)) {
                     if (!empty($variant_id)) {
-                        $item = self::$woocommerce->getProduct($variant_id);
+                        $item = $retainful::$woocommerce->getProduct($variant_id);
                     } elseif (!empty($product_id)) {
-                        $item = self::$woocommerce->getProduct($product_id);
+                        $item = $retainful::$woocommerce->getProduct($product_id);
                     }
                 }
                 $line_tax = (isset($item_details['line_tax']) && !empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0;
@@ -509,13 +518,13 @@ class Cart extends RestApi
                         'compare_at' => 0,
                     );
                 }
-                $image_url = self::$woocommerce->getProductImageSrc($item);
+                $image_url = $retainful::$woocommerce->getProductImageSrc($item);
                 if (!empty($item) && !empty($item_quantity)) {
                     $item_array = array(
                         'key' => $item_key,
-                        'sku' => self::$woocommerce->getItemSku($item),
-                        'price' => $this->formatDecimalPriceRemoveTrailingZeros(self::$woocommerce->getCartItemPrice($item)),
-                        'title' => self::$woocommerce->getItemName($item),
+                        'sku' => $retainful::$woocommerce->getItemSku($item),
+                        'price' => $this->formatDecimalPriceRemoveTrailingZeros($retainful::$woocommerce->getCartItemPrice($item)),
+                        'title' => $retainful::$woocommerce->getItemName($item),
                         'vendor' => 'woocommerce',
                         'taxable' => ($line_tax != 0),
                         'quantity' => $item_quantity,
@@ -523,10 +532,10 @@ class Cart extends RestApi
                         'line_price' => $this->formatDecimalPriceRemoveTrailingZeros($this->getLineItemTotal($item_details)),
                         'product_id' => $product_id,
                         'variant_id' => $variant_id,
-                        'variant_price' => $this->formatDecimalPriceRemoveTrailingZeros(($is_variable_item) ? self::$woocommerce->getCartItemPrice($item) : 0),
-                        'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
+                        'variant_price' => $this->formatDecimalPriceRemoveTrailingZeros(($is_variable_item) ? $retainful::$woocommerce->getCartItemPrice($item) : 0),
+                        'variant_title' => ($is_variable_item) ? $retainful::$woocommerce->getItemName($item) : 0,
                         'image_url' => $image_url,
-                        'product_url' => self::$woocommerce->getProductUrl($item, $item_details),
+                        'product_url' => $retainful::$woocommerce->getProductUrl($item, $item_details),
                         'user_id' => NULL,
                         'properties' => array()
                     );
@@ -544,8 +553,9 @@ class Cart extends RestApi
      */
     function getLineItemTotal($item_details)
     {
+        global $retainful;
         $line_total = (isset($item_details['line_total']) && !empty($item_details['line_total'])) ? $item_details['line_total'] : 0;
-        if (!self::$woocommerce->isPriceExcludingTax()) {
+        if (!$retainful::$woocommerce->isPriceExcludingTax()) {
             $line_total_tax = (isset($item_details['line_tax']) && !empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0;
         } else {
             $line_total_tax = 0;
@@ -560,7 +570,8 @@ class Cart extends RestApi
      */
     function getCartTaxDetails()
     {
-        $tax_details = self::$woocommerce->getCartTaxes();
+        global $retainful;
+        $tax_details = $retainful::$woocommerce->getCartTaxes();
         $taxes = array();
         if (!empty($tax_details)) {
             foreach ($tax_details as $key => $tax_detail) {
@@ -622,17 +633,18 @@ class Cart extends RestApi
      */
     function getUserCart()
     {
+        global $retainful;
         $language_helper = new MultiLingual();
         $current_language = $language_helper->getCurrentLanguage();
         $customer_details = $this->getCustomerDetails();
         $cart_token = $this->getCartToken();
         $current_currency_code = $this->getCurrentCurrencyCode();
-        $default_currency_code = self::$settings->getBaseCurrency();
+        $default_currency_code = $retainful::$plugin_admin->getBaseCurrency();
         $cart_created_at = $this->userCartCreatedAt();
-        $cart_total = $this->formatDecimalPrice(self::$woocommerce->getCartTotalPrice());
+        $cart_total = $this->formatDecimalPrice($retainful::$woocommerce->getCartTotalPrice());
         $cart_hash = $this->generateCartHash();
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
-        $recovered_at = self::$storage->getValue('rnoc_recovered_at');
+        $recovered_at = $retainful::$storage->getValue('rnoc_recovered_at');
         $cart = array(
             'cart_type' => 'cart',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
@@ -646,32 +658,32 @@ class Cart extends RestApi
             'currency' => $default_currency_code,
             'customer' => $customer_details,
             'tax_lines' => $this->getCartTaxDetails(),
-            'total_tax' => self::$woocommerce->getCartTotalTax(),
+            'total_tax' => $retainful::$woocommerce->getCartTotalTax(),
             'cart_token' => $cart_token,
             'created_at' => $this->formatToIso8601($cart_created_at),
             'line_items' => $this->getCartLineItemsDetails(),
             'updated_at' => $this->formatToIso8601(''),
             'total_price' => $cart_total,
             'completed_at' => NULL,
-            'discount_codes' => self::$woocommerce->getAppliedDiscounts(),
+            'discount_codes' => $retainful::$woocommerce->getAppliedDiscounts(),
             'shipping_lines' => array(),
-            'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getCartSubTotal()),
+            'subtotal_price' => $this->formatDecimalPrice($retainful::$woocommerce->getCartSubTotal()),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
-            'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
+            'taxes_included' => (!$retainful::$woocommerce->isPriceExcludingTax()),
             'customer_locale' => $current_language,
             'order_status' => NULL,
-            'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getCartTotalDiscount()),
+            'total_discounts' => $this->formatDecimalPrice($retainful::$woocommerce->getCartTotalDiscount()),
             'shipping_address' => $this->getCustomerShippingAddressDetails(),
             'billing_address' => $this->getCustomerBillingAddressDetails(),
             'presentment_currency' => $current_currency_code,
             'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
-            'total_line_items_price' => $this->formatDecimalPrice(self::$woocommerce->getCartTotal()),
+            'total_line_items_price' => $this->formatDecimalPrice($retainful::$woocommerce->getCartTotal()),
             'buyer_accepts_marketing' => $this->isBuyerAcceptsMarketing(),
-            'client_session' => self::$woocommerce->getClientSession(),
+            'client_session' => $retainful::$woocommerce->getClientSession(),
             'woocommerce_totals' => $this->getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
-            'recovered_by_retainful' => (self::$storage->getValue('rnoc_recovered_by_retainful')) ? true : false,
-            'recovered_cart_token' => self::$storage->getValue('rnoc_recovered_cart_token'),
+            'recovered_by_retainful' => ($retainful::$storage->getValue('rnoc_recovered_by_retainful')) ? true : false,
+            'recovered_cart_token' => $retainful::$storage->getValue('rnoc_recovered_cart_token'),
             'client_details' => $this->getClientDetails()
         );
         return apply_filters('rnoc_get_user_cart', $cart);
@@ -683,12 +695,13 @@ class Cart extends RestApi
      */
     function getCartTotals()
     {
+        global $retainful;
         return array(
-            'total_price' => $this->formatDecimalPrice(self::$woocommerce->getCartTotalPrice()),
-            'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getCartSubTotal()),
-            'total_tax' => $this->formatDecimalPrice(self::$woocommerce->getCartTaxTotal() + self::$woocommerce->getCartShippingTaxTotal()),
-            'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getCartDiscountTotal()),
-            'total_shipping' => $this->formatDecimalPrice(self::$woocommerce->getCartShippingTotal()),
+            'total_price' => $this->formatDecimalPrice($retainful::$woocommerce->getCartTotalPrice()),
+            'subtotal_price' => $this->formatDecimalPrice($retainful::$woocommerce->getCartSubTotal()),
+            'total_tax' => $this->formatDecimalPrice($retainful::$woocommerce->getCartTaxTotal() + $retainful::$woocommerce->getCartShippingTaxTotal()),
+            'total_discounts' => $this->formatDecimalPrice($retainful::$woocommerce->getCartDiscountTotal()),
+            'total_shipping' => $this->formatDecimalPrice($retainful::$woocommerce->getCartShippingTotal()),
             'fee_items' => $this->getCartFeeDetails(),
         );
     }
@@ -699,8 +712,9 @@ class Cart extends RestApi
      */
     function getCartFeeDetails()
     {
+        global $retainful;
         $fee_items = array();
-        if ($fees = self::$woocommerce->getCartFees()) {
+        if ($fees = $retainful::$woocommerce->getCartFees()) {
             foreach ($fees as $fee) {
                 $fee_items[] = array(
                     'title' => html_entity_decode($fee->name),
@@ -717,7 +731,8 @@ class Cart extends RestApi
      */
     function recoverCart()
     {
-        $checkout_url = self::$woocommerce->getCheckoutUrl();
+        global $retainful;
+        $checkout_url = $retainful::$woocommerce->getCheckoutUrl();
         try {
             $this->reCreateCart();
         } catch (Exception $exception) {
@@ -754,6 +769,7 @@ class Cart extends RestApi
      */
     function reCreateCart()
     {
+        global $retainful;
         $data = wc_clean(rawurldecode($_REQUEST['token']));
         $hash = wc_clean($_REQUEST['hash']);
         if ($this->isHashMatches($hash, $data)) {
@@ -765,8 +781,8 @@ class Cart extends RestApi
                 if (empty($cart_token)) {
                     throw new Exception('Cart token missed');
                 }
-                $app_id = self::$settings->getApiKey();
-                $data = self::$api->retrieveCartDetails($app_id, $cart_token);
+                $app_id = $retainful::$plugin_admin->getApiKey();
+                $data = $retainful::$api->retrieveCartDetails($app_id, $cart_token);
                 //When the cart details from API was empty, then we no need to proceed further
                 if (empty($data)) {
                     return false;
@@ -774,27 +790,27 @@ class Cart extends RestApi
                 do_action('rnoc_before_recreate_cart', $data);
                 $order_id = $this->getOrderIdFromCartToken($cart_token);
                 $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
-                if ($order_id && $order = self::$woocommerce->getOrder($order_id)) {
+                if ($order_id && $order = $retainful::$woocommerce->getOrder($order_id)) {
                     // re-enable a cancelled order for payment
-                    if (self::$woocommerce->hasOrderStatus($order, 'cancelled')) {
-                        self::$woocommerce->setOrderStatus($order, 'pending', $note);
+                    if ($retainful::$woocommerce->hasOrderStatus($order, 'cancelled')) {
+                        $retainful::$woocommerce->setOrderStatus($order, 'pending', $note);
                     } else {
-                        self::$woocommerce->setOrderNote($order, $note);
+                        $retainful::$woocommerce->setOrderNote($order, $note);
                     }
-                    $redirect = self::$woocommerce->isOrderNeedPayment($order) ? self::$woocommerce->getOrderPaymentURL($order) : self::$woocommerce->getOrderReceivedURL($order);
-                    self::$storage->setValue($this->pending_recovery_key, true);
+                    $redirect = $retainful::$woocommerce->isOrderNeedPayment($order) ? $retainful::$woocommerce->getOrderPaymentURL($order) : $retainful::$woocommerce->getOrderReceivedURL($order);
+                    $retainful::$storage->setValue($this->pending_recovery_key, true);
                     // set (or refresh, if already set) session
-                    self::$woocommerce->setSessionCookie(true);
+                    $retainful::$woocommerce->setSessionCookie(true);
                     wp_safe_redirect($redirect);
                     exit;
                 }
                 $is_buyer_accept_marketing = (isset($data->buyer_accepts_marketing) && $data->buyer_accepts_marketing) ? 1 : 0;
-                self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accept_marketing);
-                $user_currency = isset($data->presentment_currency) ? $data->presentment_currency : self::$woocommerce->getDefaultCurrency();
+                $retainful::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accept_marketing);
+                $user_currency = isset($data->presentment_currency) ? $data->presentment_currency : $retainful::$woocommerce->getDefaultCurrency();
                 apply_filters('rnoc_set_current_currency_code', $user_currency);
-                self::$storage->setValue('rnoc_recovered_at', current_time('timestamp', true));
-                self::$storage->setValue('rnoc_recovered_by_retainful', 1);
-                self::$storage->setValue('rnoc_recovered_cart_token', $cart_token);
+                $retainful::$storage->setValue('rnoc_recovered_at', current_time('timestamp', true));
+                $retainful::$storage->setValue('rnoc_recovered_by_retainful', 1);
+                $retainful::$storage->setValue('rnoc_recovered_cart_token', $cart_token);
                 // check if cart is associated with a registered user / persistent cart
                 $user_id = $this->getUserIdFromCartToken($cart_token);
                 $cart_recreated = false;
@@ -802,7 +818,7 @@ class Cart extends RestApi
                 if ($user_id && $this->loginUser($user_id)) {
                     // save order note to be applied after redirect
                     update_user_meta($user_id, $this->order_note_key_for_db, $note);
-                    $current_cart = self::$woocommerce->getCart();
+                    $current_cart = $retainful::$woocommerce->getCart();
                     if (empty($current_cart)) {
                         $cart_recreated = false;
                     } else {
@@ -812,18 +828,18 @@ class Cart extends RestApi
                 $cart_recreated = apply_filters('rnoc_cart_re_created', $cart_recreated, $data);
                 if (!$cart_recreated) {
                     // set customer note in session, if present
-                    self::$storage->setValue($this->order_note_key, $note);
+                    $retainful::$storage->setValue($this->order_note_key, $note);
                     // guest user
                     $this->reCreateCartForGuestUsers($data);
                 }
                 $this->populateSessionDetails($data);
-                $cart_session = self::$woocommerce->getSession('cart');
+                $cart_session = $retainful::$woocommerce->getSession('cart');
                 if (empty($cart_session)) {
                     $client_session = isset($data->client_session) ? $data->client_session : array();
                     if (!empty($client_session)) {
                         $cart = json_decode(wp_json_encode($client_session->cart), true);
                         if (!empty($cart)) {
-                            self::$woocommerce->setSession('cart', $cart);
+                            $retainful::$woocommerce->setSession('cart', $cart);
                         }
                     } else {
                         $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
@@ -841,8 +857,9 @@ class Cart extends RestApi
      */
     function getTrackingCartData()
     {
+        global $retainful;
         $cart = $this->getUserCart();
-        self::$settings->logMessage($cart, 'cart');
+        $retainful::$plugin_admin->logMessage($cart, 'cart');
         $data = array(
             'cart_token' => $this->getCartToken(),
             'cart_hash' => $this->generateCartHash(),
@@ -885,6 +902,7 @@ class Cart extends RestApi
      */
     function addToCartFragments($fragments)
     {
+        global $retainful;
         $selector = 'div#' . $this->getTrackingElementId();
         $data = array();
         $cart_created_at = $this->userCartCreatedAt();
@@ -896,9 +914,9 @@ class Cart extends RestApi
             if (!empty($cart_created_at)) {
                 $data = $this->getTrackingCartData();
             } else {
-                $force_refresh = self::$storage->getValue('rnoc_force_refresh_cart');
-                if (empty($force_refresh) && !empty(self::$woocommerce->getCart())) {
-                    self::$storage->setValue('rnoc_force_refresh_cart', 1);
+                $force_refresh = $retainful::$storage->getValue('rnoc_force_refresh_cart');
+                if (empty($force_refresh) && !empty($retainful::$woocommerce->getCart())) {
+                    $retainful::$storage->setValue('rnoc_force_refresh_cart', 1);
                     $data = array('force_refresh_carts' => 1);
                 }
             }
@@ -922,9 +940,10 @@ class Cart extends RestApi
      */
     function populateSessionDetails($data)
     {
+        global $retainful;
         $customer_email = isset($data->email) ? $data->email : '';
         //Setting the email
-        self::$woocommerce->setCustomerEmail($customer_email);
+        $retainful::$woocommerce->setCustomerEmail($customer_email);
         $billing_details = isset($data->billing_address) ? $data->billing_address : new stdClass();
         $billing_address = array(
             'billing_first_name' => isset($billing_details->first_name) ? $billing_details->first_name : NULL,
@@ -962,12 +981,13 @@ class Cart extends RestApi
      */
     private function getValidCoupons($coupons)
     {
+        global $retainful;
         $valid_coupons = array();
         if ($coupons) {
             foreach ($coupons as $coupon) {
                 $coupon_code = isset($coupon->code) ? $coupon->code : NULL;
                 $coupon_code = apply_filters('rnoc_recover_cart_before_validate_coupon', $coupon_code, $coupon);
-                if (!empty($coupon_code) && self::$woocommerce->isValidCoupon($coupon_code)) {
+                if (!empty($coupon_code) && $retainful::$woocommerce->isValidCoupon($coupon_code)) {
                     $valid_coupons[] = $coupon_code;
                 }
             }
@@ -982,9 +1002,10 @@ class Cart extends RestApi
      */
     function reCreateCartForGuestUsers($data)
     {
+        global $retainful;
         // set Retainful data in session
         $this->setCartToken($data->cart_token);
-        self::$woocommerce->setSession($this->pending_recovery_key, true);
+        $retainful::$woocommerce->setSession($this->pending_recovery_key, true);
         $created_at = isset($data->created_at) ? strtotime($data->created_at) : current_time('mysql', true);
         $this->setCartCreatedDate(null, $created_at);
         //$cart = isset($data->line_items) ? $data->line_items : array();
@@ -998,18 +1019,18 @@ class Cart extends RestApi
                 $shipping_method_counts = (array)$client_session->shipping_method_counts;
                 $chosen_payment_method = $client_session->chosen_payment_method;
                 // base session data
-                self::$woocommerce->setSession('cart', $cart);
-                self::$woocommerce->setSession('applied_coupons', $this->getValidCoupons($applied_coupons));
-                self::$woocommerce->setSession('chosen_shipping_methods', $chosen_shipping_methods);
-                self::$woocommerce->setSession('shipping_method_counts', $shipping_method_counts);
-                self::$woocommerce->setSession('chosen_payment_method', $chosen_payment_method);
+                $retainful::$woocommerce->setSession('cart', $cart);
+                $retainful::$woocommerce->setSession('applied_coupons', $this->getValidCoupons($applied_coupons));
+                $retainful::$woocommerce->setSession('chosen_shipping_methods', $chosen_shipping_methods);
+                $retainful::$woocommerce->setSession('shipping_method_counts', $shipping_method_counts);
+                $retainful::$woocommerce->setSession('chosen_payment_method', $chosen_payment_method);
             }
         } else {
             $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
             $this->recreateCartFromCartContents($cart_contents);
         }
         // set (or refresh, if already set) session
-        self::$woocommerce->setSessionCookie(true);
+        $retainful::$woocommerce->setSessionCookie(true);
     }
 
     /**
@@ -1017,9 +1038,10 @@ class Cart extends RestApi
      */
     function recreateCartFromCartContents($cart_contents)
     {
+        global $retainful;
         if (!empty($cart_contents)) {
-            self::$woocommerce->emptyUserCart();
-            self::$woocommerce->clearWooNotices();
+            $retainful::$woocommerce->emptyUserCart();
+            $retainful::$woocommerce->clearWooNotices();
             $remove_list = $this->mustCartItemsKeys();
             foreach ($cart_contents as $key => $cart_item) {
                 $array_cart_item = json_decode(wp_json_encode($cart_item), true);
@@ -1032,7 +1054,7 @@ class Cart extends RestApi
                 if (is_object($variation)) {
                     $variation = json_decode(wp_json_encode($variation), true);
                 }
-                self::$woocommerce->addToCart($cart_item->product_id, $variant_id, $cart_item->quantity, $variation, $array_cart_item);
+                $retainful::$woocommerce->addToCart($cart_item->product_id, $variant_id, $cart_item->quantity, $variation, $array_cart_item);
             }
         }
     }
@@ -1193,7 +1215,8 @@ class Cart extends RestApi
      */
     function hashTheData($data)
     {
-        $secret = self::$settings->getSecretKey();
+        global $retainful;
+        $secret = $retainful::$plugin_admin->getSecretKey();
         return hash_hmac(self::HMAC_ALGORITHM, $data, $secret);
     }
 
@@ -1203,7 +1226,8 @@ class Cart extends RestApi
      */
     function getCustomerDetails()
     {
-        $billing_email = self::$woocommerce->getCustomerEmail();
+        global $retainful;
+        $billing_email = $retainful::$woocommerce->getCustomerEmail();
         if ($user_id = get_current_user_id()) {
             $user_data = wp_get_current_user();
             if (empty($billing_email)) {
@@ -1216,7 +1240,7 @@ class Cart extends RestApi
             $billing_phone = get_user_meta($user_id, 'billing_phone', true);
         } else {
             $user_id = 0;
-            $created_at = self::$storage->getValue('rnoc_session_created_at');
+            $created_at = $retainful::$storage->getValue('rnoc_session_created_at');
             $updated_at = current_time('timestamp', true);
             $billing_details = $this->getCustomerCheckoutDetails('billing');
             if (empty($billing_details)) {

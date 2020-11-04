@@ -3,11 +3,8 @@
 namespace Rnoc\Retainful\Admin;
 if (!defined('ABSPATH')) exit;
 
-use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Helpers\Input;
 use Rnoc\Retainful\Integrations\MultiLingual;
-use Rnoc\Retainful\library\RetainfulApi;
-use Rnoc\Retainful\WcFunctions;
 use Valitron\Validator;
 
 class Settings
@@ -20,8 +17,6 @@ class Settings
      */
     function __construct()
     {
-        $this->api = new RetainfulApi();
-        $this->wc_functions = new WcFunctions();
         if (is_null(self::$input)) {
             self::$input = new Input();
         }
@@ -62,6 +57,20 @@ class Settings
         if (is_admin() && in_array($page, array('retainful', 'retainful_settings', 'retainful_premium', 'retainful_license'))) {
             $this->addScript();
         }
+    }
+
+    /**
+     * Add settings link
+     * @param $links
+     * @return array
+     */
+    function pluginActionLinks($links)
+    {
+        $action_links = array(
+            'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('Connection', RNOC_TEXT_DOMAIN) . '</a>',
+            'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', RNOC_TEXT_DOMAIN) . '</a>',
+        );
+        return array_merge($action_links, $links);
     }
 
     /**
@@ -1143,8 +1152,8 @@ class Settings
      */
     function availableOrderStatuses()
     {
-        $woo_functions = new WcFunctions();
-        $woo_statuses = $woo_functions->getAvailableOrderStatuses();
+        global $retainful;
+        $woo_statuses = $retainful::$woocommerce->getAvailableOrderStatuses();
         if (is_array($woo_statuses)) {
             if (isset($woo_statuses['wc-pending'])) {
                 unset($woo_statuses['wc-pending']);
@@ -1465,7 +1474,8 @@ class Settings
      */
     function unlockPremiumLink()
     {
-        return '<a href="' . $this->api->upgradePremiumUrl() . '">' . __("Unlock this feature by upgrading to Premium", RNOC_TEXT_DOMAIN) . '</a>';
+        global $retainful;
+        return '<a href="' . $retainful::$api->upgradePremiumUrl() . '">' . __("Unlock this feature by upgrading to Premium", RNOC_TEXT_DOMAIN) . '</a>';
     }
 
     /**
@@ -1477,6 +1487,7 @@ class Settings
      */
     function isApiEnabled($api_key = "", $secret_key = NULL, $store_data = NULL)
     {
+        global $retainful;
         if (empty($api_key)) {
             $api_key = $this->getApiKey();
         }
@@ -1487,7 +1498,7 @@ class Settings
             $store_data = $this->storeDetails($api_key, $secret_key);
         }
         if (!empty($api_key)) {
-            if ($details = $this->api->validateApi($api_key, $store_data)) {
+            if ($details = $retainful::$api->validateApi($api_key, $store_data)) {
                 if (empty($details) || is_string($details)) {
                     $this->updateUserAsFreeUser();
                     return array('error' => $details);
@@ -1510,7 +1521,8 @@ class Settings
      */
     function updateUserAsFreeUser()
     {
-        $details = $this->api->getPlanDetails();
+        global $retainful;
+        $details = $retainful::$api->getPlanDetails();
         $this->updatePlanDetails($details);
     }
 
@@ -1578,7 +1590,8 @@ class Settings
      */
     function getBaseCurrency()
     {
-        $base_currency = $this->wc_functions->getDefaultCurrency();
+        global $retainful;
+        $base_currency = $retainful::$woocommerce->getDefaultCurrency();
         return apply_filters('rnoc_get_default_currency_code', $base_currency);
     }
 
@@ -1588,7 +1601,8 @@ class Settings
      */
     function getAllAvailableCurrencies()
     {
-        $base_currency = $this->wc_functions->getDefaultCurrency();
+        global $retainful;
+        $base_currency = $retainful::$woocommerce->getDefaultCurrency();
         $currencies = array($base_currency);
         return apply_filters('rnoc_get_available_currencies', $currencies);
     }
@@ -1601,15 +1615,15 @@ class Settings
      */
     function storeDetails($api_key, $secret_key)
     {
+        global $retainful;
         $scheme = wc_site_is_https() ? 'https' : 'http';
         $country_details = get_option('woocommerce_default_country');
         list($country_code, $state_code) = explode(':', $country_details);
         $lang_helper = new MultiLingual();
         $default_language = $lang_helper->getDefaultLanguage();
-        $api_obj = new RestApi();
         $details = array(
             'woocommerce_app_id' => $api_key,
-            'secret_key' => $api_obj->encryptData($api_key, $secret_key),
+            'secret_key' => $retainful::$abandoned_cart->encryptData($api_key, $secret_key),
             'id' => NULL,
             'name' => get_option('blogname'),
             'email' => get_option('admin_email'),
@@ -1869,11 +1883,12 @@ class Settings
      */
     function sendCouponDetails($url, $params)
     {
+        global $retainful;
         if (!isset($params['app_id'])) {
             $params['app_id'] = $this->getApiKey();
         }
-        $url = $this->api->domain . $url;
-        $response = $this->api->request($url, $params);
+        $url = $retainful::$api->domain . $url;
+        $response = $retainful::$api->request($url, $params);
         if (isset($response->success) && $response->success) {
             //Do any stuff if success
             return true;

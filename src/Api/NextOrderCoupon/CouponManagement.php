@@ -2,8 +2,6 @@
 
 namespace Rnoc\Retainful\Api\NextOrderCoupon;
 
-use Rnoc\Retainful\Admin\Settings;
-use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Valitron\Validator;
 
 class CouponManagement
@@ -40,6 +38,7 @@ class CouponManagement
      */
     static function createRestCoupon(\WP_REST_Request $request)
     {
+        global $retainful;
         $requestParams = $request->get_params();
         $defaultRequestParams = array(
             'discount_rule' => array(),
@@ -47,8 +46,7 @@ class CouponManagement
         );
         $params = wp_parse_args($requestParams, $defaultRequestParams);
         if (is_array($params['discount_rule']) && !empty($params['discount_rule']) && is_string($params['digest']) && !empty($params['digest'])) {
-            $settings = new Settings();
-            $secret = $settings->getSecretKey();
+            $secret = $retainful::$plugin_admin->getSecretKey();
             $cipher_text_raw = wp_json_encode($params['discount_rule']);
             $reverse_hmac = hash_hmac('sha256', $cipher_text_raw, $secret);
             if (hash_equals($reverse_hmac, $params['digest'])) {

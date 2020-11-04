@@ -6,36 +6,235 @@ if (!defined('ABSPATH')) exit;
 use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
+use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
+use Rnoc\Retainful\Api\AbandonedCart\Storage\PhpSession;
+use Rnoc\Retainful\Api\AbandonedCart\Storage\WooSession;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
+use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\Currency;
+use Rnoc\Retainful\library\RetainfulApi;
+use Rnoc\Retainful\Premium\RetainfulPremiumMain;
 
 class Main
 {
-    public static $init, $noc;
-    public $rnoc, $admin, $abandoned_cart_api;
+    /**
+     * @var self
+     */
+    public static $init;
+    /**
+     * @var null|PhpSession|Cookie|WooSession
+     */
+    public static $storage = null;
+    /**
+     * @var null|RetainfulApi
+     */
+    public static $api = null;
+    /**
+     * @var null|OrderCoupon
+     */
+    public static $next_order_coupon = null;
+    /**
+     * @var null|CouponManagement
+     */
+    public static $coupon_api = null;
+    /**
+     * @var null|Cart
+     */
+    public static $abandoned_cart = null;
+    /**
+     * @var null|Checkout
+     */
+    public static $abandoned_cart_checkout = null;
+    /**
+     * @var null|Settings
+     */
+    public static $plugin_admin = null;
+    /**
+     * @var null|ReferralManagement
+     */
+    public static $referral_program = null;
+    /**
+     * @var null|RetainfulPremiumMain
+     */
+    public static $premium_features = null;
+    /**
+     * @var null|WcFunctions
+     */
+    public static $woocommerce = null;
 
     /**
      * Main constructor.
      */
     function __construct()
     {
-        $this->rnoc = ($this->rnoc == NULL) ? new OrderCoupon() : $this->rnoc;
-        self::$noc = (is_null(self::$noc)) ? new CouponManagement() : self::$noc;
-        $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
-        add_action('init', array($this, 'activateEvents'));
-        add_action('before_woocommerce_init', array($this, 'beforeWoocommerceInit'));
-        add_action('woocommerce_init', array($this, 'includePluginFiles'));
-        if (!$this->admin->isPremiumPluginActive()) {
-            //init the retainful premium
-            new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
-        }
+        add_action('woocommerce_init', array($this, 'initClassesAndHooks'), 11);
     }
 
-    function includePluginFiles()
+    /**
+     * Init all classes and its hooks
+     */
+    function initClassesAndHooks()
     {
-        $woocommerce_functions = new WcFunctions();
-        $woocommerce_functions->initWoocommerceSession();
-        do_action('rnoc_after_including_plugin_files', $woocommerce_functions, $this);
+        /**
+         * Init classes
+         */
+        self::$woocommerce = (is_null(self::$woocommerce)) ? new WcFunctions() : self::$woocommerce;
+        self::$next_order_coupon = (is_null(self::$next_order_coupon)) ? new OrderCoupon() : self::$next_order_coupon;
+        self::$abandoned_cart = (is_null(self::$abandoned_cart)) ? new Cart() : self::$abandoned_cart;
+        self::$abandoned_cart_checkout = (is_null(self::$abandoned_cart_checkout)) ? new Checkout() : self::$abandoned_cart_checkout;
+        self::$plugin_admin = (is_null(self::$plugin_admin)) ? new Settings() : self::$plugin_admin;
+        self::$referral_program = (is_null(self::$referral_program)) ? new ReferralManagement() : self::$referral_program;
+        self::$coupon_api = (is_null(self::$coupon_api)) ? new CouponManagement() : self::$coupon_api;
+        $storage_handler = self::$plugin_admin->getStorageHandler();
+        switch ($storage_handler) {
+            case "php";
+                self::$storage = new PhpSession();
+                break;
+            case "cookie";
+                self::$storage = new Cookie();
+                break;
+            default:
+            case "woocommerce":
+                self::$storage = new WooSession();
+                break;
+        }
+        self::$api = empty(self::$api) ? new RetainfulApi() : self::$api;
+        if (!self::$plugin_admin->isPremiumPluginActive()) {
+            self::$premium_features = (is_null(self::$premium_features)) ? new RetainfulPremiumMain() : self::$premium_features;
+        }
+        //Remove scheduled hooks
+        register_deactivation_hook(RNOC_FILE, array($this, 'onPluginDeactivation'));
+        add_filter('views_edit-shop_coupon', array(self::$coupon_api, 'viewsEditShopCoupon'));
+        add_filter('request', array(self::$coupon_api, 'requestQuery'));
+        /**
+         * Init class hooks
+         */
+        self::$woocommerce->initWoocommerceSession();
+        if (is_admin()) {
+            add_action('admin_init', array(self::$plugin_admin, 'setupSurveyForm'), 10);
+            add_action('admin_menu', array(self::$plugin_admin, 'registerMenu'));
+            self::$plugin_admin->initAdminPageStyles();
+            //Validate key
+            add_action('wp_ajax_validate_app_key', array(self::$plugin_admin, 'validateAppKey'));
+            add_action('wp_ajax_rnoc_get_search_coupon', array(self::$plugin_admin, 'getSearchedCoupons'));
+            add_action('wp_ajax_rnoc_disconnect_license', array(self::$plugin_admin, 'disconnectLicense'));
+            add_action('wp_ajax_rnoc_save_settings', array(self::$plugin_admin, 'saveAcSettings'));
+            add_action('wp_ajax_rnoc_save_noc_settings', array(self::$plugin_admin, 'saveNocSettings'));
+            add_action('wp_ajax_rnoc_save_premium_addon_settings', array(self::$plugin_admin, 'savePremiumAddOnSettings'));
+            //Settings link
+            add_filter('plugin_action_links_' . RNOC_BASE_FILE, array(self::$plugin_admin, 'pluginActionLinks'));
+            //Check plan
+            $this->checkApi();
+        }
+        //add end points
+        add_action('rest_api_init', array($this, 'registerEndPoints'));
+        //Check for dependencies
+        add_action('plugins_loaded', array($this, 'checkDependencies'));
+        new Currency();
+        if (self::$plugin_admin->isNextOrderCouponEnabled()) {
+            //Get events
+            add_action('woocommerce_checkout_update_order_meta', array(self::$next_order_coupon, 'createNewCoupon'), 10, 2);
+            add_action('woocommerce_order_status_changed', array(self::$next_order_coupon, 'onAfterPayment'), 10, 1);
+            add_action('woocommerce_get_shop_coupon_data', array(self::$next_order_coupon, 'addVirtualCoupon'), 10, 2);
+            add_action('rnoc_create_new_next_order_coupon', array(self::$next_order_coupon, 'createNewCoupon'), 10, 2);
+            add_action('rnoc_initiated', array(self::$next_order_coupon, 'setCouponToSession'));
+            add_action('wp_loaded', array(self::$next_order_coupon, 'addCouponToCheckout'), 10);
+            //Attach coupon to email
+            $hook = self::$plugin_admin->couponMessageHook();
+            if (!empty($hook))
+                add_action($hook, array(self::$next_order_coupon, 'attachOrderCoupon'), 10, 4);
+            //add action for filter
+            add_action('rnoc_show_order_coupon', array(self::$next_order_coupon, 'attachOrderCoupon'), 10, 4);
+            //Sync the coupon details with retainful
+            add_action('retainful_cron_sync_coupon_details', array(self::$next_order_coupon, 'cronSendCouponDetails'), 1);
+            //Remove coupon code after placing order
+            add_action('woocommerce_thankyou', array(self::$next_order_coupon, 'removeCouponFromSession'), 10, 1);
+            // Show coupon in order thankyou page
+            add_action('woocommerce_thankyou', array(self::$next_order_coupon, 'showCouponInThankYouPage'), 10, 1);
+            //Remove Code from session
+            add_action('woocommerce_removed_coupon', array(self::$next_order_coupon, 'removeCouponFromCart'));
+            /*
+             * Support for woocommerce email customizer
+             */
+            add_filter('woo_email_drag_and_drop_builder_retainful_settings_url', array(self::$next_order_coupon, 'wooEmailCustomizerRetainfulSettingsUrl'));
+            //Tell Email customizes about handling coupons..
+            add_filter('woo_email_drag_and_drop_builder_handling_retainful', '__return_true');
+            //set coupon details for Email customizer
+            add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_data', array(self::$next_order_coupon, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3);
+            //sent retainful additional short codes
+            add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array(self::$next_order_coupon, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
+            add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array(self::$next_order_coupon, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
+            add_filter('wp_footer', array(self::$next_order_coupon, 'showAppliedCouponPopup'));
+        }
+        $this->canActivateIPFilter();
+        //If the user is old user then ask user to run abandoned cart to
+        $is_app_connected = self::$plugin_admin->isAppConnected();
+        $secret_key = self::$plugin_admin->getSecretKey();
+        $app_id = self::$plugin_admin->getApiKey();
+        if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
+            add_action('wp_loaded', array(self::$plugin_admin, 'schedulePlanChecker'));
+            add_action('wp_footer', array(self::$referral_program, 'printReferralPopup'));
+            add_filter('script_loader_src', array(self::$abandoned_cart, 'addCloudFlareAttrScript'), 10, 2);
+            add_filter('clean_url', array(self::$abandoned_cart, 'uncleanUrl'), 10, 3);
+            //Sync the order by the scheduled events
+            add_filter('woocommerce_checkout_fields', array(self::$abandoned_cart_checkout, 'moveEmailFieldToTop'));
+            add_action('retainful_sync_abandoned_cart_order', array(self::$abandoned_cart_checkout, 'syncOrderByScheduler'), 1);
+            add_action('wp_ajax_rnoc_track_user_data', array(self::$abandoned_cart, 'setCustomerData'));
+            add_action('wp_ajax_nopriv_rnoc_track_user_data', array(self::$abandoned_cart, 'setCustomerData'));
+            add_action('wp_ajax_rnoc_ajax_get_encrypted_cart', array(self::$abandoned_cart, 'ajaxGetEncryptedCart'));
+            add_action('wp_ajax_nopriv_rnoc_ajax_get_encrypted_cart', array(self::$abandoned_cart, 'ajaxGetEncryptedCart'));
+            add_action('woocommerce_cart_loaded_from_session', array(self::$abandoned_cart, 'handlePersistentCart'));
+            //add_action('wp_login', array($cart, 'userLoggedIn'));
+            add_action('woocommerce_api_retainful', array(self::$abandoned_cart, 'recoverUserCart'));
+            add_action('wp_loaded', array(self::$abandoned_cart, 'applyAbandonedCartCoupon'));
+            //Add tracking message
+            if (is_user_logged_in()) {
+                add_action('woocommerce_after_add_to_cart_button', array(self::$abandoned_cart, 'userGdprMessage'), 10);
+                add_action('woocommerce_before_shop_loop', array(self::$abandoned_cart, 'userGdprMessage'), 10);
+            }
+            add_filter('woocommerce_checkout_fields', array(self::$abandoned_cart, 'guestGdprMessage'), 10, 1);
+            add_action('wp_footer', array(self::$abandoned_cart_checkout, 'setRetainfulOrderData'));
+            add_filter('rnoc_can_track_abandoned_carts', array(self::$abandoned_cart, 'isZeroValueCart'), 15);
+            $cart_tracking_engine = self::$plugin_admin->getCartTrackingEngine();
+            if ($cart_tracking_engine == "php") {
+                //PHP tracking
+                add_action('woocommerce_after_calculate_totals', array(self::$abandoned_cart, 'syncCartData'));
+            } else {
+                //Js tracking
+                add_action('wp_footer', array(self::$abandoned_cart, 'renderAbandonedCartTrackingDiv'));
+                add_filter('woocommerce_add_to_cart_fragments', array(self::$abandoned_cart, 'addToCartFragments'));
+            }
+            add_action('wp_footer', array(self::$abandoned_cart, 'printRefreshFragmentScript'));
+            add_action('wp_enqueue_scripts', array(self::$abandoned_cart, 'addCartTrackingScripts'));
+            add_action('wp_authenticate', array(self::$abandoned_cart, 'userLoggedOn'));
+            add_action('user_register', array(self::$abandoned_cart, 'userSignedUp'));
+            add_action('wp_logout', array(self::$abandoned_cart, 'userLoggedOut'));
+            //Set order as recovered
+            // handle payment complete, from a direct gateway
+            //add_action('woocommerce_new_order', array($checkout, 'purchaseComplete'));
+            add_filter('woocommerce_thankyou', array(self::$abandoned_cart_checkout, 'payPageOrderCompletion'));
+            add_action('woocommerce_payment_complete', array(self::$abandoned_cart_checkout, 'paymentCompleted'));
+            add_action('woocommerce_checkout_order_processed', array(self::$abandoned_cart_checkout, 'checkoutOrderProcessed'));
+            add_filter('woocommerce_payment_successful_result', array(self::$abandoned_cart_checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
+            // handle updating Retainful order data after a successful payment, for certain gateways
+            add_action('woocommerce_order_status_changed', array(self::$abandoned_cart_checkout, 'orderStatusChanged'), 15, 3);
+            // handle placed orders
+            add_action('woocommerce_order_status_changed', array(self::$abandoned_cart_checkout, 'orderUpdated'), 11, 1);
+            add_action('woocommerce_update_order', array(self::$abandoned_cart_checkout, 'orderUpdated'), 10, 1);
+            //Todo: multi currency and multi lingual
+            #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
+        } else {
+            $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
+            $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
+            $this->showAdminNotice($notice);
+        }
+        $is_retainful_v2_0_1_migration_completed = get_option('is_retainful_v2_0_1_migration_completed', 0);
+        if (!$is_retainful_v2_0_1_migration_completed) {
+            $this->migrationV201();
+        }
+        //Premium check
+        add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
+        do_action('rnoc_initiated');
     }
 
     /**
@@ -66,9 +265,9 @@ class Main
         $app_id = sanitize_text_field($data->get_param('app_id'));
         $app_secret = sanitize_text_field($data->get_param('app_secret'));
         $site_url = site_url();
-        $entered_app_id = $this->admin->getApiKey();
-        $entered_secret_key = $this->admin->getSecretKey();
-        $is_app_connected = $this->admin->isAppConnected();
+        $entered_app_id = self::$plugin_admin->getApiKey();
+        $entered_secret_key = self::$plugin_admin->getSecretKey();
+        $is_app_connected = self::$plugin_admin->isAppConnected();
         $response_code = NULL;
         if (empty($entered_secret_key) && empty($entered_app_id)) {
             $response_code = 'INSTALLED_NO_APP_ID_AND_NO_SECRET_KEY_FOUND';
@@ -101,165 +300,11 @@ class Main
     }
 
     /**
-     * before Woocommerce init
+     * can activate IP filter
      */
-    function beforeWoocommerceInit()
-    {
-        add_filter('views_edit-shop_coupon', array(self::$noc, 'viewsEditShopCoupon'));
-        add_filter('request', array(self::$noc, 'requestQuery'));
-    }
-
-    /**
-     * Activate the required events
-     */
-    function activateEvents()
-    {
-        //Deactivation survey form
-        if (is_admin()) {
-            add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
-        }
-        //Register deactivation hook
-        register_deactivation_hook(RNOC_FILE, array($this, 'onPluginDeactivation'));
-        add_action('retainful_plugin_activated', array($this, 'createRequiredTables'));
-        //add end points
-        add_action('rest_api_init', array($this, 'registerEndPoints'));
-        //Detect woocommerce plugin deactivation
-        add_action('deactivated_plugin', array($this, 'detectPluginDeactivation'), 10, 2);
-        //Check for dependencies
-        add_action('plugins_loaded', array($this, 'checkDependencies'));
-        add_action('rnocp_activation_trigger', array($this, 'checkUserPlan'));
-        //Activate CMB2 functions
-        add_action('admin_menu', array($this->admin, 'registerMenu'));
-        $this->admin->initAdminPageStyles();
-        new Currency();
-        if ($this->admin->isNextOrderCouponEnabled()) {
-            //Get events
-            add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
-            add_action('woocommerce_order_status_changed', array($this->rnoc, 'onAfterPayment'), 10, 1);
-            add_action('woocommerce_get_shop_coupon_data', array($this->rnoc, 'addVirtualCoupon'), 10, 2);
-            add_action('rnoc_create_new_next_order_coupon', array($this->rnoc, 'createNewCoupon'), 10, 2);
-            add_action('rnoc_initiated', array($this->rnoc, 'setCouponToSession'));
-            add_action('wp_loaded', array($this->rnoc, 'addCouponToCheckout'), 10);
-            //Attach coupon to email
-            $hook = $this->admin->couponMessageHook();
-            if (!empty($hook))
-                add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
-            //add action for filter
-            add_action('rnoc_show_order_coupon', array($this->rnoc, 'attachOrderCoupon'), 10, 4);
-            //Sync the coupon details with retainful
-            add_action('retainful_cron_sync_coupon_details', array($this->rnoc, 'cronSendCouponDetails'), 1);
-            //Remove coupon code after placing order
-            add_action('woocommerce_thankyou', array($this->rnoc, 'removeCouponFromSession'), 10, 1);
-            // Show coupon in order thankyou page
-            add_action('woocommerce_thankyou', array($this->rnoc, 'showCouponInThankYouPage'), 10, 1);
-            //Remove Code from session
-            add_action('woocommerce_removed_coupon', array($this->rnoc, 'removeCouponFromCart'));
-            /*
-             * Support for woocommerce email customizer
-             */
-            add_filter('woo_email_drag_and_drop_builder_retainful_settings_url', array($this->rnoc, 'wooEmailCustomizerRetainfulSettingsUrl'));
-            //Tell Email customizes about handling coupons..
-            add_filter('woo_email_drag_and_drop_builder_handling_retainful', '__return_true');
-            //set coupon details for Email customizer
-            add_filter('woo_email_drag_and_drop_builder_retainful_next_order_coupon_data', array($this->rnoc, 'wooEmailCustomizerRetainfulCouponContent'), 10, 3);
-            //sent retainful additional short codes
-            add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode', array($this->rnoc, 'wooEmailCustomizerRegisterRetainfulShortCodes'), 10);
-            add_filter('woo_email_drag_and_drop_builder_load_additional_shortcode_data', array($this->rnoc, 'wooEmailCustomizerRetainfulShortCodesValues'), 10, 3);
-            add_filter('wp_footer', array($this->rnoc, 'showAppliedCouponPopup'));
-        }
-        /**
-         * Ip filtering
-         */
-        $this->canActivateIPFilter();
-        //Validate key
-        add_action('wp_ajax_validate_app_key', array($this->admin, 'validateAppKey'));
-        add_action('wp_ajax_rnoc_get_search_coupon', array($this->admin, 'getSearchedCoupons'));
-        add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
-        add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
-        add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
-        add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
-        //Settings link
-        add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
-        //If the user is old user then ask user to run abandoned cart to
-        $is_app_connected = $this->admin->isAppConnected();
-        $secret_key = $this->admin->getSecretKey();
-        $app_id = $this->admin->getApiKey();
-        if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
-            add_action('wp_loaded', array($this->admin, 'schedulePlanChecker'));
-            /**
-             * Retainful abandoned cart api
-             */
-            $cart = new Cart();
-            $checkout = new Checkout();
-            $referral_program = new Api\Referral\ReferralManagement();
-            add_action('wp_footer',array($referral_program,'printReferralPopup'));
-            add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
-            add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
-            //Sync the order by the scheduled events
-            add_filter('woocommerce_checkout_fields', array($checkout, 'moveEmailFieldToTop'));
-            add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
-            add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
-            add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
-            add_action('wp_ajax_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
-            add_action('wp_ajax_nopriv_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
-            add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
-            //add_action('wp_login', array($cart, 'userLoggedIn'));
-            add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
-            add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
-            //Add tracking message
-            if (is_user_logged_in()) {
-                add_action('woocommerce_after_add_to_cart_button', array($cart, 'userGdprMessage'), 10);
-                add_action('woocommerce_before_shop_loop', array($cart, 'userGdprMessage'), 10);
-            }
-            add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
-            add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
-            add_filter('rnoc_can_track_abandoned_carts', array($cart, 'isZeroValueCart'), 15);
-            $cart_tracking_engine = $this->admin->getCartTrackingEngine();
-            if ($cart_tracking_engine == "php") {
-                //PHP tracking
-                add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
-            } else {
-                //Js tracking
-                add_action('wp_footer', array($cart, 'renderAbandonedCartTrackingDiv'));
-                add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
-            }
-            add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
-            add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
-            add_action('wp_authenticate', array($cart, 'userLoggedOn'));
-            add_action('user_register', array($cart, 'userSignedUp'));
-            add_action('wp_logout', array($cart, 'userLoggedOut'));
-            //Set order as recovered
-            // handle payment complete, from a direct gateway
-            //add_action('woocommerce_new_order', array($checkout, 'purchaseComplete'));
-            add_filter('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
-            add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
-            add_action('woocommerce_checkout_order_processed', array($checkout, 'checkoutOrderProcessed'));
-            add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
-            // handle updating Retainful order data after a successful payment, for certain gateways
-            add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
-            // handle placed orders
-            add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
-            add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
-            //Todo: multi currency and multi lingual
-            #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
-        } else {
-            $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
-            $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
-            $this->showAdminNotice($notice);
-        }
-        $is_retainful_v2_0_1_migration_completed = get_option('is_retainful_v2_0_1_migration_completed', 0);
-        if (!$is_retainful_v2_0_1_migration_completed) {
-            $this->migrationV201();
-        }
-        //Premium check
-        add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
-        do_action('rnoc_initiated');
-        $this->checkApi();
-    }
-
     function canActivateIPFilter()
     {
-        $settings = $this->admin->getAdminSettings();
+        $settings = self::$plugin_admin->getAdminSettings();
         if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && isset($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])) {
             $ip = $settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'];
             if (!empty($ip)) {
@@ -274,11 +319,11 @@ class Main
      */
     function migrationV201()
     {
-        $premium_settings = get_option($this->admin->slug . '_premium');
-        $admin_settings = $this->admin->getAdminSettings();
+        $premium_settings = get_option(self::$plugin_admin->slug . '_premium');
+        $admin_settings = self::$plugin_admin->getAdminSettings();
         $admin_settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter'] = isset($premium_settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) ? $premium_settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter'] : 0;
         $admin_settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'] = isset($premium_settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) ? $premium_settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'] : '';
-        update_option($this->admin->slug . '_settings', $admin_settings);
+        update_option(self::$plugin_admin->slug . '_settings', $admin_settings);
         update_option('is_retainful_v2_0_1_migration_completed', 1);
     }
 
@@ -295,9 +340,9 @@ class Main
      */
     function removeAllScheduledActions()
     {
-        $this->admin->removeFinishedHooks('rnoc_abandoned_clear_abandoned_carts');
-        $this->admin->removeFinishedHooks('rnoc_abandoned_cart_send_email');
-        $this->admin->removeFinishedHooks('rnocp_check_user_plan');
+        self::$plugin_admin->removeFinishedHooks('rnoc_abandoned_clear_abandoned_carts');
+        self::$plugin_admin->removeFinishedHooks('rnoc_abandoned_cart_send_email');
+        self::$plugin_admin->removeFinishedHooks('rnocp_check_user_plan');
     }
 
     /**
@@ -316,14 +361,14 @@ class Main
      */
     function checkUserPlan()
     {
-        $api_key = $this->admin->getApiKey();
-        $secret_key = $this->admin->getSecretKey();
+        $api_key = self::$plugin_admin->getApiKey();
+        $secret_key = self::$plugin_admin->getSecretKey();
         if (!empty($api_key) && !empty($secret_key)) {
-            $this->admin->isApiEnabled($api_key, $secret_key);
+            self::$plugin_admin->isApiEnabled($api_key, $secret_key);
         } else {
-            $this->admin->updateUserAsFreeUser();
+            self::$plugin_admin->updateUserAsFreeUser();
         }
-        $this->admin->removeFinishedHooks('rnocp_check_user_plan', 'publish');
+        self::$plugin_admin->removeFinishedHooks('rnocp_check_user_plan', 'publish');
     }
 
     /**
@@ -359,11 +404,7 @@ class Main
      */
     public static function instance()
     {
-        return self::$init = (self::$init == NULL) ? new self() : self::$init;
-    }
-
-    function removeDependentTables()
-    {
+        return self::$init = is_null(self::$init) ? new self() : self::$init;
     }
 
     /**
@@ -376,19 +417,6 @@ class Main
             RNOC_PLUGIN_PREFIX . 'abandoned_cart_history',
             RNOC_PLUGIN_PREFIX . 'guest_abandoned_cart_history'
         );
-    }
-
-    /**
-     * detect woocommerce have been deactivated
-     * @param $plugin
-     * @param $network_activation
-     */
-    function detectPluginDeactivation($plugin, $network_activation)
-    {
-        if (in_array($plugin, array('woocommerce/woocommerce.php'))) {
-            deactivate_plugins(plugin_basename(__FILE__));
-            //Todo - Deactivate this plugin
-        }
     }
 
     /**
@@ -413,7 +441,7 @@ class Main
     {
         $is_migrated = get_option('retainful_v_1_1_3_migration_completed', 0);
         if (!$is_migrated) {
-            $slug = $this->admin->slug;
+            $slug = self::$plugin_admin->slug;
             $retainful_page = get_option($slug, array());
             $licence_page = get_option($slug . '_license', array());
             $usage_restriction_page = get_option($slug . '_usage_restriction', array());

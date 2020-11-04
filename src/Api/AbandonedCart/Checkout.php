@@ -6,11 +6,6 @@ use Exception;
 
 class Checkout extends RestApi
 {
-    function __construct()
-    {
-        parent::__construct();
-    }
-
     function recoverHeldOrders()
     {
         $recover_held_orders = apply_filters('rnoc_recover_held_orders', 'no');
@@ -22,7 +17,8 @@ class Checkout extends RestApi
      */
     function setRetainfulOrderData()
     {
-        $draft_order = self::$woocommerce->getSession('store_api_draft_order');
+        global $retainful;
+        $draft_order = $retainful::$woocommerce->getSession('store_api_draft_order');
         if (!empty($draft_order) && intval($draft_order) > 0) {
             $this->purchaseComplete(intval($draft_order));
         }
@@ -34,7 +30,8 @@ class Checkout extends RestApi
      */
     function moveEmailFieldToTop($checkout_fields)
     {
-        if (self::$settings->moveEmailFieldToTop()) {
+        global $retainful;
+        if ($retainful::$plugin_admin->moveEmailFieldToTop()) {
             $checkout_fields['billing']['billing_email']['priority'] = 4;
         }
         return $checkout_fields;
@@ -47,6 +44,7 @@ class Checkout extends RestApi
      */
     function purchaseComplete($order_id)
     {
+        global $retainful;
         if (empty($order_id)) {
             return NULL;
         }
@@ -56,22 +54,22 @@ class Checkout extends RestApi
             $cart_created_at = $this->userCartCreatedAt();
             $user_ip = $this->retrieveUserIp();
             $is_buyer_accepts_marketing = ($this->isBuyerAcceptsMarketing()) ? 1 : 0;
-            $cart_hash = self::$storage->getValue('rnoc_current_cart_hash');
-            $recovered_at = self::$storage->getValue('rnoc_recovered_at');
-            $recovered_by = self::$storage->getValue('rnoc_recovered_by_retainful');
-            $recovered_cart_token = self::$storage->getValue('rnoc_recovered_cart_token');
+            $cart_hash = $retainful::$storage->getValue('rnoc_current_cart_hash');
+            $recovered_at = $retainful::$storage->getValue('rnoc_recovered_at');
+            $recovered_by = $retainful::$storage->getValue('rnoc_recovered_by_retainful');
+            $recovered_cart_token = $retainful::$storage->getValue('rnoc_recovered_cart_token');
             $user_agent = $this->getUserAgent();
             $user_accept_language = $this->getUserAcceptLanguage();
-            self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
-            self::$woocommerce->setOrderMeta($order_id, $this->cart_hash_key_for_db, $cart_hash);
-            self::$woocommerce->setOrderMeta($order_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
-            self::$woocommerce->setOrderMeta($order_id, $this->user_ip_key_for_db, $user_ip);
-            self::$woocommerce->setOrderMeta($order_id, $this->accepts_marketing_key_for_db, $is_buyer_accepts_marketing);
-            self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_at', $recovered_at);
-            self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_by', $recovered_by);
-            self::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_cart_token', $recovered_cart_token);
-            self::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_user_agent', $user_agent);
-            self::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_accept_language', $user_accept_language);
+            $retainful::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
+            $retainful::$woocommerce->setOrderMeta($order_id, $this->cart_hash_key_for_db, $cart_hash);
+            $retainful::$woocommerce->setOrderMeta($order_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
+            $retainful::$woocommerce->setOrderMeta($order_id, $this->user_ip_key_for_db, $user_ip);
+            $retainful::$woocommerce->setOrderMeta($order_id, $this->accepts_marketing_key_for_db, $is_buyer_accepts_marketing);
+            $retainful::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_at', $recovered_at);
+            $retainful::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_by', $recovered_by);
+            $retainful::$woocommerce->setOrderMeta($order_id, '_rnoc_recovered_cart_token', $recovered_cart_token);
+            $retainful::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_user_agent', $user_agent);
+            $retainful::$woocommerce->setOrderMeta($order_id, '_rnoc_get_http_accept_language', $user_accept_language);
             $this->markOrderAsPendingRecovery($order_id);
             //$this->unsetOrderTempData();
         }
@@ -97,7 +95,8 @@ class Checkout extends RestApi
      */
     function generateNocCouponForManualOrders()
     {
-        $has_backorder_coupon = self::$settings->autoGenerateCouponsForOldOrders();
+        global $retainful;
+        $has_backorder_coupon = $retainful::$plugin_admin->autoGenerateCouponsForOldOrders();
         $need_noc_coupon = ($has_backorder_coupon && is_admin());
         return apply_filters('rnoc_generate_noc_coupon_for_manual_orders', $need_noc_coupon, $this);
     }
@@ -112,15 +111,16 @@ class Checkout extends RestApi
         if (empty($order_id)) {
             return null;
         }
-        $order = self::$woocommerce->getOrder($order_id);
+        global $retainful;
+        $order = $retainful::$woocommerce->getOrder($order_id);
         $order_obj = new Order();
-        $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+        $cart_token = $retainful::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
         if (empty($cart_token)) {
             if ($this->generateNocCouponForManualOrders()) {
                 $noc_details = $order_obj->getNextOrderCouponDetails($order);
                 if (is_array($noc_details) && !empty($noc_details) && isset($noc_details[0]['code']) && !empty($noc_details[0]['code'])) {
                     $cart_token = $this->generateCartToken();
-                    self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
+                    $retainful::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
                 } else {
                     return;
                 }
@@ -131,12 +131,12 @@ class Checkout extends RestApi
         if (empty($cart_token)) {
             return;
         }
-        $order_status = self::$woocommerce->getStatus($order);
-        $order_cancelled_at = self::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db);
+        $order_status = $retainful::$woocommerce->getStatus($order);
+        $order_cancelled_at = $retainful::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db);
         // handle order cancellation
         if (!$order_cancelled_at && 'cancelled' === $order_status) {
             $order_cancelled_at = current_time('timestamp', true);
-            self::$woocommerce->setOrderMeta($order_id, $this->order_cancelled_date_key_for_db, $order_cancelled_at);
+            $retainful::$woocommerce->setOrderMeta($order_id, $this->order_cancelled_date_key_for_db, $order_cancelled_at);
             $this->unsetOrderTempData();
         }
         $order_data = $order_obj->getOrderData($order);
@@ -144,11 +144,11 @@ class Checkout extends RestApi
             return null;
         }
         $order_data['cancelled_at'] = (!empty($order_cancelled_at)) ? $this->formatToIso8601($order_cancelled_at) : NULL;
-        self::$settings->logMessage($order_data);
+        $retainful::$plugin_admin->logMessage($order_data);
         $cart_hash = $this->encryptData($order_data);
-        $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
+        $client_ip = $retainful::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
         if (!empty($cart_hash)) {
-            $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+            $token = $retainful::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
             $extra_headers = array(
                 "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
                 "X-Retainful-Version" => RNOC_VERSION,
@@ -174,10 +174,11 @@ class Checkout extends RestApi
      */
     function scheduleCartSync($order_id)
     {
+        global $retainful;
         $hook = 'retainful_sync_abandoned_cart_order';
         $meta_key = '_rnoc_order_id';
-        if (self::$settings->hasAnyActiveScheduleExists($hook, $order_id, $meta_key) == false) {
-            self::$settings->scheduleEvents($hook, current_time('timestamp') + 60, array($meta_key => $order_id));
+        if ($retainful::$plugin_admin->hasAnyActiveScheduleExists($hook, $order_id, $meta_key) == false) {
+            $retainful::$plugin_admin->scheduleEvents($hook, current_time('timestamp') + 60, array($meta_key => $order_id));
         }
     }
 
@@ -189,14 +190,14 @@ class Checkout extends RestApi
      */
     public function orderStatusChanged($order_id, $old_status, $new_status)
     {
-        global $wp;
+        global $wp, $retainful;
         try {
             // PayPal IPN request
             if (!empty($wp->query_vars['wc-api']) && 'WC_Gateway_Paypal' === $wp->query_vars['wc-api']) {
-                $order = self::$woocommerce->getOrder($order_id);
+                $order = $retainful::$woocommerce->getOrder($order_id);
                 // PayPal order is completed or authorized: clear any user session
                 // data so that we don't have to rely on the thank-you page rendering
-                if ((self::$woocommerce->isOrderPaid($order) || $new_status == 'on-hold') && ($user_id = self::$woocommerce->getOrderUserId($order))) {
+                if (($retainful::$woocommerce->isOrderPaid($order) || $new_status == 'on-hold') && ($user_id = $retainful::$woocommerce->getOrderUserId($order))) {
                     delete_user_meta($user_id, '_woocommerce_persistent_cart_' . get_current_blog_id());
                     if ($this->isPendingRecovery($user_id)) {
                         $this->markOrderAsPendingRecovery($order_id);
@@ -219,9 +220,9 @@ class Checkout extends RestApi
      */
     function isPlaced($order, $old_status, $new_status)
     {
-        $placed = self::$woocommerce->isOrderPaid($order) || ($new_status === 'on-hold' && !$this->recoverHeldOrders());
-        $placed = apply_filters('rnoc_abandoned_cart_is_order_get_placed', $placed, $order, $old_status, $new_status, $this);
-        return $placed;
+        global $retainful;
+        $placed = $retainful::$woocommerce->isOrderPaid($order) || ($new_status === 'on-hold' && !$this->recoverHeldOrders());
+        return apply_filters('rnoc_abandoned_cart_is_order_get_placed', $placed, $order, $old_status, $new_status, $this);
     }
 
     /**
@@ -238,13 +239,14 @@ class Checkout extends RestApi
      */
     function checkoutOrderProcessed($order_id)
     {
+        global $retainful;
         if ($this->isPendingRecovery()) {
             $this->markOrderAsPendingRecovery($order_id);
         }
         try {
             $cart_token = $this->retrieveCartToken();
             if (!empty($cart_token)) {
-                $order = self::$woocommerce->getOrder($order_id);
+                $order = $retainful::$woocommerce->getOrder($order_id);
                 $this->purchaseComplete($order_id);
                 $this->syncOrderToAPI($order, $order_id);
                 //$this->unsetOrderTempData();
@@ -261,15 +263,16 @@ class Checkout extends RestApi
     function syncOrderToAPI($order, $order_id)
     {
         if ($this->needInstantOrderSync()) {
+            global $retainful;
             $order_obj = new Order();
             $cart = $order_obj->getOrderData($order);
             if (!empty($cart)) {
-                self::$settings->logMessage($cart);
+                $retainful::$plugin_admin->logMessage($cart);
                 $cart_hash = $this->encryptData($cart);
                 //Reduce the loading speed
-                $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
+                $client_ip = $retainful::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
                 if (!empty($cart_hash)) {
-                    $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+                    $token = $retainful::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
                     $extra_headers = array(
                         "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
                         "X-Retainful-Version" => RNOC_VERSION,
@@ -300,10 +303,11 @@ class Checkout extends RestApi
      */
     function setOrderCartToken($cart_token, $order_id)
     {
+        global $retainful;
         if (empty($cart_token)) {
             $cart_token = $this->generateCartToken();
         }
-        self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
+        $retainful::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
     }
 
     /**
@@ -314,8 +318,9 @@ class Checkout extends RestApi
      */
     function maybeUpdateOrderOnSuccessfulPayment($result, $order_id)
     {
-        $order = self::$woocommerce->getOrder($order_id);
-        if (!$cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db)) {
+        global $retainful;
+        $order = $retainful::$woocommerce->getOrder($order_id);
+        if (!$cart_token = $retainful::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db)) {
             return $result;
         }
         $this->syncOrderToAPI($order, $order_id);
@@ -329,8 +334,9 @@ class Checkout extends RestApi
      */
     function paymentCompleted($order_id)
     {
-        if (self::$woocommerce->getOrder($order_id)) {
-            self::$woocommerce->setCustomerPayingForOrder($order_id);
+        global $retainful;
+        if ($retainful::$woocommerce->getOrder($order_id)) {
+            $retainful::$woocommerce->setCustomerPayingForOrder($order_id);
         }
         $cart_token = $this->retrieveCartToken();
         if (!empty($cart_token)) {
@@ -344,15 +350,16 @@ class Checkout extends RestApi
      */
     function unsetOrderTempData($user_id = NULL)
     {
-        self::$storage->removeValue($this->cart_token_key);
-        self::$storage->removeValue($this->pending_recovery_key);
-        self::$storage->removeValue($this->cart_tracking_started_key);
-        self::$storage->removeValue($this->previous_cart_hash_key);
+        global $retainful;
+        $retainful::$storage->removeValue($this->cart_token_key);
+        $retainful::$storage->removeValue($this->pending_recovery_key);
+        $retainful::$storage->removeValue($this->cart_tracking_started_key);
+        $retainful::$storage->removeValue($this->previous_cart_hash_key);
         //This was set in plugin since 2.0.4
-        self::$storage->removeValue('rnoc_force_refresh_cart');
-        self::$storage->removeValue('rnoc_recovered_at');
-        self::$storage->removeValue('rnoc_recovered_by_retainful');
-        self::$storage->removeValue('rnoc_recovered_cart_token');
+        $retainful::$storage->removeValue('rnoc_force_refresh_cart');
+        $retainful::$storage->removeValue('rnoc_recovered_at');
+        $retainful::$storage->removeValue('rnoc_recovered_by_retainful');
+        $retainful::$storage->removeValue('rnoc_recovered_cart_token');
         if ($user_id || ($user_id = get_current_user_id())) {
             $this->removeTempDataForUser($user_id);
         }
@@ -376,10 +383,7 @@ class Checkout extends RestApi
      */
     function markOrderAsPendingRecovery($order_id)
     {
-        /*$order = self::$woocommerce->getOrder($order_id);
-        if (!$order instanceof \WC_Order) {
-            return;
-        }*/
-        self::$woocommerce->setOrderMeta($order_id, $this->pending_recovery_key_for_db, true);
+        global $retainful;
+        $retainful::$woocommerce->setOrderMeta($order_id, $this->pending_recovery_key_for_db, true);
     }
 }

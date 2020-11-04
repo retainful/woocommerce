@@ -9,10 +9,9 @@ class ReferralManagement
 {
     function printReferralPopup()
     {
-        $settings = new Settings();
-        $api_key = $settings->getApiKey();
-        $secret = $settings->getSecretKey();
-        $rest_api = new RestApi();
+        global $retainful;
+        $api_key = $retainful::$plugin_admin->getApiKey();
+        $secret = $retainful::$plugin_admin->getSecretKey();
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
             $order_count = wc_get_customer_order_count($user->ID);

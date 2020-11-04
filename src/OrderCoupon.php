@@ -3,32 +3,9 @@
 namespace Rnoc\Retainful;
 if (!defined('ABSPATH')) exit;
 
-use Rnoc\Retainful\Admin\Settings;
-
 class OrderCoupon
 {
-    public $wc_functions, $admin;
     protected static $applied_coupons = NULL;
-
-    function __construct()
-    {
-        $this->wc_functions = new WcFunctions();
-        $this->admin = new Settings();
-    }
-
-    /**
-     * Add settings link
-     * @param $links
-     * @return array
-     */
-    function pluginActionLinks($links)
-    {
-        $action_links = array(
-            'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('Connection', RNOC_TEXT_DOMAIN) . '</a>',
-            'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', RNOC_TEXT_DOMAIN) . '</a>',
-        );
-        return array_merge($action_links, $links);
-    }
 
     /**
      * Send required details for email customizer
@@ -39,8 +16,9 @@ class OrderCoupon
      */
     function wooEmailCustomizerRetainfulCouponContent($order_coupon_data, $order, $sending_email)
     {
-        $order_id = $this->wc_functions->getOrderId($order);
-        $coupon_code = $this->wc_functions->getPostMeta($order_id, '_rnoc_next_order_coupon');
+        global $retainful;
+        $order_id = $retainful::$woocommerce->getOrderId($order);
+        $coupon_code = $retainful::$woocommerce->getPostMeta($order_id, '_rnoc_next_order_coupon');
         if (!empty($coupon_code)) {
             $coupon_details = $this->getCouponDetails($coupon_code);
             if (!empty($coupon_details)) {
@@ -51,7 +29,7 @@ class OrderCoupon
                     $order_coupon_data = array(
                         'wec_next_order_coupon_code' => $coupon_code,
                         'wec_next_order_coupon' => $coupon_code,
-                        'wec_next_order_coupon_value' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
+                        'wec_next_order_coupon_value' => ($coupon_type) ? $retainful::$woocommerce->formatPrice($coupon_amount) : $coupon_amount . '%',
                         'woo_mb_site_url_link_with_coupon' => site_url() . '?retainful_coupon_code=' . $coupon_code,
                     );
                 }
@@ -67,7 +45,8 @@ class OrderCoupon
      */
     function wooEmailCustomizerRegisterRetainfulShortCodes($short_codes)
     {
-        if ($this->admin->isAppConnected()) {
+        global $retainful;
+        if ($retainful::$plugin_admin->isAppConnected()) {
             $short_codes['retainful_coupon_expiry_date'] = "Next order coupon expiry date";
         }
         return $short_codes;
@@ -82,16 +61,17 @@ class OrderCoupon
      */
     function wooEmailCustomizerRetainfulShortCodesValues($short_codes, $order, $sending_email)
     {
-        if ($this->admin->isAppConnected()) {
+        global $retainful;
+        if ($retainful::$plugin_admin->isAppConnected()) {
             $short_codes['retainful_coupon_expiry_date'] = '';
-            $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+            $coupon_code = $retainful::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon');
             if (!empty($coupon_code)) {
                 $coupon_details = $this->getCouponDetails($coupon_code);
                 if (!empty($coupon_details)) {
                     $post_id = $coupon_details->ID;
                     $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
                     if (!empty($coupon_expiry_date)) {
-                        $date_format = $this->admin->getExpireDateFormat();
+                        $date_format = $retainful::$plugin_admin->getExpireDateFormat();
                         $short_codes['retainful_coupon_expiry_date'] = $this->formatDate($coupon_expiry_date, $date_format);
                     }
                 }
@@ -117,16 +97,17 @@ class OrderCoupon
      */
     function cronSendCouponDetails($order_id)
     {
+        global $retainful;
         if (!isset($order_id) || empty($order_id))
             return false;
-        $api_key = $this->admin->getApiKey();
-        if ($this->admin->isAppConnected() && !empty($api_key)) {
-            $order = $this->wc_functions->getOrder($order_id);
+        $api_key = $retainful::$plugin_admin->getApiKey();
+        if ($retainful::$plugin_admin->isAppConnected() && !empty($api_key)) {
+            $order = $retainful::$woocommerce->getOrder($order_id);
             $this->updateAppliedCouponDetails($order_id, $order);
             $request_params = $this->getRequestParams($order);
-            $this->admin->logMessage($request_params, 'next order coupon');
+            $retainful::$plugin_admin->logMessage($request_params, 'next order coupon');
             $request_params['app_id'] = $api_key;
-            return $this->admin->sendCouponDetails('track', $request_params);
+            return $retainful::$plugin_admin->sendCouponDetails('track', $request_params);
         }
         return false;
     }
@@ -137,8 +118,9 @@ class OrderCoupon
      */
     function showCouponInThankYouPage($order_id)
     {
-        if (!empty($this->admin->showCouponInThankYouPage())) {
-            $order = $this->wc_functions->getOrder($order_id);
+        global $retainful;
+        if (!empty($retainful::$plugin_admin->showCouponInThankYouPage())) {
+            $order = $retainful::$woocommerce->getOrder($order_id);
             $this->attachOrderCoupon($order, false);
         }
     }
@@ -152,15 +134,16 @@ class OrderCoupon
      */
     function attachOrderCoupon($order, $sent_to_admin, $plain_text = '', $email = '')
     {
-        $order_id = $this->wc_functions->getOrderId($order);
+        global $retainful;
+        $order_id = $retainful::$woocommerce->getOrderId($order);
         $coupon_code = '';
-        if ($this->admin->autoGenerateCouponsForOldOrders()) {
+        if ($retainful::$plugin_admin->autoGenerateCouponsForOldOrders()) {
             //Create new coupon if coupon not found for order while sending the email
             $coupon_code = $this->createNewCoupon($order_id, array());
             //$this->scheduleSync($order_id);
         }
         if (empty($coupon_code)) {
-            $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+            $coupon_code = $retainful::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon');
         }
         if (!empty($coupon_code)) {
             $message = "";
@@ -172,7 +155,7 @@ class OrderCoupon
                     $coupon_type = get_post_meta($post_id, 'coupon_type', true);
                     $coupon_url = add_query_arg('retainful_coupon_code', $coupon_code, site_url());
                     $string_to_replace = array(
-                        '{{coupon_amount}}' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
+                        '{{coupon_amount}}' => ($coupon_type) ? $retainful::$woocommerce->formatPrice($coupon_amount) : $coupon_amount . '%',
                         '{{coupon_code}}' => $coupon_code,
                         'http://{{coupon_url}}' => $coupon_url,
                         'https://{{coupon_url}}' => $coupon_url,
@@ -180,12 +163,12 @@ class OrderCoupon
                     );
                     $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
                     if (!empty($coupon_expiry_date)) {
-                        $date_format = $this->admin->getExpireDateFormat();
+                        $date_format = $retainful::$plugin_admin->getExpireDateFormat();
                         $string_to_replace['{{coupon_expiry_date}}'] = $this->formatDate($coupon_expiry_date, $date_format);
                     } else {
                         $string_to_replace['{{coupon_expiry_date}}'] = '';
                     }
-                    $message = $this->admin->getCouponMessage();
+                    $message = $retainful::$plugin_admin->getCouponMessage();
                     $message = str_replace(array_keys($string_to_replace), $string_to_replace, $message);
                 }
             }
@@ -222,11 +205,12 @@ class OrderCoupon
      */
     public function addCouponToCheckout()
     {
-        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
-        if (!empty($coupon_code) && !empty($this->wc_functions->getCart()) && !$this->wc_functions->hasDiscount($coupon_code)) {
+        global $retainful;
+        $coupon_code = $retainful::$woocommerce->getSession('retainful_coupon_code');
+        if (!empty($coupon_code) && !empty($retainful::$woocommerce->getCart()) && !$retainful::$woocommerce->hasDiscount($coupon_code)) {
             //Do not apply coupon until the coupon is valid
             if ($this->checkCouponBeforeCouponApply($coupon_code)) {
-                $this->wc_functions->addDiscount($coupon_code);
+                $retainful::$woocommerce->addDiscount($coupon_code);
             }
         }
     }
@@ -236,14 +220,15 @@ class OrderCoupon
      */
     function showAppliedCouponPopup()
     {
+        global $retainful;
         if (isset($_GET['noc-cta']) && $_GET['noc-cta'] == 1) {
             return;
         }
         if (isset($_GET['retainful_coupon_code']) && !empty($_GET['retainful_coupon_code'])) {
             $coupon_code = sanitize_text_field($_GET['retainful_coupon_code']);
-            $settings = $this->admin->getUsageRestrictions();
+            $settings = $retainful::$plugin_admin->getUsageRestrictions();
             $need_popup = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'] : 1;
-            $popup_content = (isset($settings[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'])) ? $settings[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] : $this->admin->appliedCouponDefaultTemplate();
+            $popup_content = (isset($settings[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'])) ? $settings[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] : $retainful::$plugin_admin->appliedCouponDefaultTemplate();
             if ($need_popup && !empty($popup_content)) {
                 $override_path = get_theme_file_path('retainful/templates/applied_coupon_popup.php');
                 $cart_template_path = RNOC_PLUGIN_PATH . 'src/admin/templates/applied_coupon_popup.php';
@@ -258,17 +243,17 @@ class OrderCoupon
                         if ($coupon_amount > 0) {
                             $coupon_type = get_post_meta($post_id, 'coupon_type', true);
                             $coupon_array = array(
-                                'coupon_amount' => ($coupon_type) ? $this->wc_functions->formatPrice($coupon_amount) : $coupon_amount . '%',
+                                'coupon_amount' => ($coupon_type) ? $retainful::$woocommerce->formatPrice($coupon_amount) : $coupon_amount . '%',
                                 'coupon_code' => $coupon_code,
-                                'shop_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $this->wc_functions->getShopUrl()),
-                                'cart_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $this->wc_functions->getCartUrl()),
-                                'checkout_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $this->wc_functions->getCheckoutUrl()),
+                                'shop_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $retainful::$woocommerce->getShopUrl()),
+                                'cart_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $retainful::$woocommerce->getCartUrl()),
+                                'checkout_url' => add_query_arg(array('retainful_coupon_code' => $coupon_code, 'noc-cta' => 1), $retainful::$woocommerce->getCheckoutUrl()),
                             );
                             foreach ($coupon_array as $key => $val) {
                                 $popup_content = str_replace('{{' . $key . '}}', $val, $popup_content);
                             }
                             include $cart_template_path;
-                            $this->wc_functions->setSession('rnoc_is_coupon_applied_popup_showed', 1);
+                            $retainful::$woocommerce->setSession('rnoc_is_coupon_applied_popup_showed', 1);
                         }
                     }
                 }
@@ -282,7 +267,8 @@ class OrderCoupon
      */
     function removeCouponFromCart($remove_coupon)
     {
-        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+        global $retainful;
+        $coupon_code = $retainful::$woocommerce->getSession('retainful_coupon_code');
         if (strtoupper($remove_coupon) == strtoupper($coupon_code) && $this->checkCouponBeforeCouponApply($remove_coupon)) {
             $this->removeCouponFromSession();
         }
@@ -293,9 +279,10 @@ class OrderCoupon
      */
     function removeCouponFromSession()
     {
-        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+        global $retainful;
+        $coupon_code = $retainful::$woocommerce->getSession('retainful_coupon_code');
         if (!empty($coupon_code)) {
-            $this->wc_functions->removeSession('retainful_coupon_code');
+            $retainful::$woocommerce->removeSession('retainful_coupon_code');
         }
     }
 
@@ -306,12 +293,13 @@ class OrderCoupon
      */
     public function checkCouponBeforeCouponApply($coupon_code)
     {
+        global $retainful;
         if (empty($coupon_code))
             return false;
         $return = array();
-        $coupon_details = $this->isValidCoupon($coupon_code,null, array('rnoc_order_coupon'));
+        $coupon_details = $this->isValidCoupon($coupon_code, null, array('rnoc_order_coupon'));
         if (!empty($coupon_details)) {
-            $usage_restrictions = $this->admin->getUsageRestrictions();
+            $usage_restrictions = $retainful::$plugin_admin->getUsageRestrictions();
             //Return true if there is any usage restriction
             if (empty($usage_restrictions))
                 return true;
@@ -320,7 +308,7 @@ class OrderCoupon
             if (!empty($coupon_expiry_date) && current_time('timestamp', true) > strtotime($coupon_expiry_date)) {
                 array_push($return, false);
             }
-            $cart_total = $this->wc_functions->getCartTotal();
+            $cart_total = $retainful::$woocommerce->getCartTotal();
             //Check for minimum spend
             $minimum_spend = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'minimum_spend']) && $usage_restrictions[RNOC_PLUGIN_PREFIX . 'minimum_spend'] > 0) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'minimum_spend'] : '';
             if (!empty($minimum_spend) && $cart_total < $minimum_spend) {
@@ -331,9 +319,9 @@ class OrderCoupon
             if (!empty($maximum_spend) && $cart_total > $maximum_spend) {
                 array_push($return, false);
             }
-            $products_in_cart = $this->wc_functions->getProductIdsInCart();
+            $products_in_cart = $retainful::$woocommerce->getProductIdsInCart();
             //Check the cart having only sale items
-            $sale_products_in_cart = $this->wc_functions->getSaleProductIdsInCart();
+            $sale_products_in_cart = $retainful::$woocommerce->getSaleProductIdsInCart();
             if ((count($sale_products_in_cart) >= count($products_in_cart)) && isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'exclude_sale_items'])) {
                 array_push($return, false);
             }
@@ -342,7 +330,7 @@ class OrderCoupon
             if (!empty($must_in_cart_products) && count(array_intersect($must_in_cart_products, $products_in_cart)) == 0) {
                 array_push($return, false);
             }
-            $categories_in_cart = $this->wc_functions->getCategoryIdsOfProductInCart();
+            $categories_in_cart = $retainful::$woocommerce->getCategoryIdsOfProductInCart();
             //Check for must in categories of cart
             $must_in_cart_categories = (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'] : array();
             if (!empty($must_in_cart_categories) && count(array_intersect($must_in_cart_categories, $categories_in_cart)) == 0) {
@@ -367,6 +355,7 @@ class OrderCoupon
      */
     function setCouponToSession()
     {
+        global $retainful;
         $request_coupon_code = null;
         if (isset($_REQUEST['retainful_coupon_code'])) {
             $request_coupon_code = sanitize_text_field($_REQUEST['retainful_coupon_code']);
@@ -374,11 +363,11 @@ class OrderCoupon
         if (isset($_REQUEST['retainful_ac_coupon'])) {
             $request_coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
         }
-        $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
+        $coupon_code = $retainful::$woocommerce->getSession('retainful_coupon_code');
         if (!empty($request_coupon_code) && empty($coupon_code)) {
             $coupon_details = $this->getCouponByCouponCode($request_coupon_code);
             if (!empty($coupon_details)) {
-                $this->wc_functions->setSession('retainful_coupon_code', $request_coupon_code); // Set the coupon code in session
+                $retainful::$woocommerce->setSession('retainful_coupon_code', $request_coupon_code); // Set the coupon code in session
             }
         }
     }
@@ -391,9 +380,10 @@ class OrderCoupon
      */
     function addVirtualCoupon($response, $coupon_code)
     {
+        global $retainful;
         if (empty($coupon_code))
             return $response;
-        $coupon_details = $this->isValidCoupon($coupon_code, null,array('rnoc_order_coupon'));
+        $coupon_details = $this->isValidCoupon($coupon_code, null, array('rnoc_order_coupon'));
         if (!empty($coupon_details)) {
             $is_coupon_already_applied = false;
             /*if (!empty(self::$applied_coupons) && self::$applied_coupons != $coupon_code)
@@ -401,7 +391,7 @@ class OrderCoupon
             if (isset($coupon_details->ID) && !empty($coupon_details->ID) && !$is_coupon_already_applied) {
                 self::$applied_coupons = $coupon_code;
                 $discount_type = 'fixed_cart';
-                $usage_restrictions = $this->admin->getUsageRestrictions();
+                $usage_restrictions = $retainful::$plugin_admin->getUsageRestrictions();
                 $coupon_type = get_post_meta($coupon_details->ID, 'coupon_type', true);
                 $coupon_value = get_post_meta($coupon_details->ID, 'coupon_value', true);
                 $coupon_expiry_date = get_post_meta($coupon_details->ID, 'coupon_expired_on', true);
@@ -444,9 +434,10 @@ class OrderCoupon
      */
     function onAfterPayment($order_id)
     {
+        global $retainful;
         if (empty($order_id))
             return false;
-        $order = $this->wc_functions->getOrder($order_id);
+        $order = $retainful::$woocommerce->getOrder($order_id);
         $this->updateAppliedCouponDetails($order_id, $order);
         $request_params = $this->getRequestParams($order);
         if (isset($request_params['applied_coupon']) && !empty($request_params['applied_coupon'])) {
@@ -471,16 +462,17 @@ class OrderCoupon
      */
     function scheduleSync($order_id)
     {
-        $is_api_enabled = $this->admin->isAppConnected();
+        global $retainful;
+        $is_api_enabled = $retainful::$plugin_admin->isAppConnected();
         if ($is_api_enabled) {
             //Handle API Requests
-            $api_key = $this->admin->getApiKey();
+            $api_key = $retainful::$plugin_admin->getApiKey();
             if (!empty($api_key)) {
                 $woocommerce_version = rnocGetInstalledWoocommerceVersion();
                 if (version_compare($woocommerce_version, '3.5', '>=')) {
                     $hook = 'retainful_cron_sync_coupon_details';
                     $meta_key = '_rnoc_order_id';
-                    $this->admin->scheduleEvents($hook, current_time('timestamp') + 60, array($meta_key => $order_id));
+                    $retainful::$plugin_admin->scheduleEvents($hook, current_time('timestamp') + 60, array($meta_key => $order_id));
                 } else {
                     //For old versions directly sync the cou[on details
                     $this->cronSendCouponDetails($order_id);
@@ -498,15 +490,16 @@ class OrderCoupon
      */
     function isValidCoupon($coupon, $order = NULL, $coupon_type = array('rnoc_order_coupon', 'shop_coupon'))
     {
+        global $retainful;
         $coupon_details = $this->getCouponByCouponCode($coupon, $coupon_type);
         if (!empty($coupon_details) && $coupon_details->post_status == "publish") {
-            $coupon_only_for = $this->admin->couponFor();
+            $coupon_only_for = $retainful::$plugin_admin->couponFor();
             $current_user_id = $current_email = '';
             if ($coupon_only_for != 'all') {
                 if (!empty($order)) {
-                    $current_user_id = $this->wc_functions->getOrderUserId($order);
+                    $current_user_id = $retainful::$woocommerce->getOrderUserId($order);
                     if ($coupon_only_for != 'login_users') {
-                        $current_email = $this->wc_functions->getOrderEmail($order);
+                        $current_email = $retainful::$woocommerce->getOrderEmail($order);
                     }
                 } else {
                     $current_user_id = get_current_user_id();
@@ -541,8 +534,9 @@ class OrderCoupon
      */
     function getRequestParams($order)
     {
+        global $retainful;
         if (empty($order)) return array();
-        $new_coupon = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
+        $new_coupon = $retainful::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon');
         $coupon_details = $this->getCouponByCouponCode($new_coupon);
         $expire_date = $apply_url = '';
         if (!empty($coupon_details)) {
@@ -555,14 +549,14 @@ class OrderCoupon
             }
         }
         return array(
-            'order_id' => $this->wc_functions->getOrderId($order),
-            'email' => $this->wc_functions->getOrderEmail($order),
-            'firstname' => $this->wc_functions->getOrderFirstName($order),
-            'lastname' => $this->wc_functions->getOrderLastName($order),
-            'total' => $this->wc_functions->getOrderTotal($order),
-            'new_coupon' => $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon'),
-            'applied_coupon' => $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon_applied'),
-            'order_date' => strtotime($this->wc_functions->getOrderDate($order)),
+            'order_id' => $retainful::$woocommerce->getOrderId($order),
+            'email' => $retainful::$woocommerce->getOrderEmail($order),
+            'firstname' => $retainful::$woocommerce->getOrderFirstName($order),
+            'lastname' => $retainful::$woocommerce->getOrderLastName($order),
+            'total' => $retainful::$woocommerce->getOrderTotal($order),
+            'new_coupon' => $retainful::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon'),
+            'applied_coupon' => $retainful::$woocommerce->getOrderMeta($order, '_rnoc_next_order_coupon_applied'),
+            'order_date' => strtotime($retainful::$woocommerce->getOrderDate($order)),
             'expired_at' => $expire_date,
             'apply_url' => $apply_url
         );
@@ -575,11 +569,12 @@ class OrderCoupon
      */
     function hasValidOrderStatus($order)
     {
+        global $retainful;
         $status = true;
-        $valid_order_statuses = $this->admin->getCouponValidOrderStatuses();
+        $valid_order_statuses = $retainful::$plugin_admin->getCouponValidOrderStatuses();
         if (!empty($valid_order_statuses)) {
             if (!in_array('all', $valid_order_statuses)) {
-                $order_status = 'wc-' . $this->wc_functions->getStatus($order);
+                $order_status = 'wc-' . $retainful::$woocommerce->getStatus($order);
                 if ($order_status == "wc-pending" || !in_array($order_status, $valid_order_statuses)) {
                     $status = false;
                 }
@@ -595,8 +590,9 @@ class OrderCoupon
      */
     function hasValidUserRoles($order)
     {
+        global $retainful;
         $status = true;
-        $valid_user_roles = $this->admin->getCouponValidUserRoles();
+        $valid_user_roles = $retainful::$plugin_admin->getCouponValidUserRoles();
         if (!empty($valid_user_roles)) {
             if (!in_array('all', $valid_user_roles)) {
                 $order_roles = $this->getUserRoleFromOrder($order);
@@ -615,10 +611,11 @@ class OrderCoupon
      */
     function getUserRoleFromOrder($order)
     {
-        $user = $this->wc_functions->getOrderUser($order);
+        global $retainful;
+        $user = $retainful::$woocommerce->getOrderUser($order);
         if (empty($user)) {
-            $user_email = $this->wc_functions->getOrderEmail($order);
-            $user = $this->wc_functions->getUserByEmail($user_email);
+            $user_email = $retainful::$woocommerce->getOrderEmail($order);
+            $user = $retainful::$woocommerce->getUserByEmail($user_email);
         }
         if (!empty($user)) {
             $user_roles = isset($user->roles) ? $user->roles : array();
@@ -634,10 +631,11 @@ class OrderCoupon
      */
     function isValidCouponLimit($order)
     {
+        global $retainful;
         $status = true;
-        $limit = $this->admin->getCouponLimitPerUser();
+        $limit = $retainful::$plugin_admin->getCouponLimitPerUser();
         if (!empty($limit)) {
-            $order_email = $this->wc_functions->getOrderEmail($order);
+            $order_email = $retainful::$woocommerce->getOrderEmail($order);
             $args = array(
                 'posts_per_page' => -1,
                 'post_type' => array('rnoc_order_coupon', 'shop_coupon'),
@@ -660,10 +658,11 @@ class OrderCoupon
      */
     function isMinimumOrderTotalReached($order)
     {
+        global $retainful;
         $status = true;
-        $minimum_total = $this->admin->getMinimumOrderTotalForCouponGeneration();
+        $minimum_total = $retainful::$plugin_admin->getMinimumOrderTotalForCouponGeneration();
         if (!empty($minimum_total)) {
-            $order_total = $this->wc_functions->getOrderTotal($order);
+            $order_total = $retainful::$woocommerce->getOrderTotal($order);
             $status = ($order_total >= $minimum_total);
         }
         return apply_filters("rnoc_is_minimum_sub_total_reached", $status, $order);
@@ -676,10 +675,11 @@ class OrderCoupon
      */
     function hasValidProductsToGenerateCoupon($order)
     {
+        global $retainful;
         $status = true;
-        $invalid_products = $this->admin->getInvalidProductsForCoupon();
+        $invalid_products = $retainful::$plugin_admin->getInvalidProductsForCoupon();
         if (!empty($invalid_products)) {
-            $cart = $this->wc_functions->getOrderItems($order);
+            $cart = $retainful::$woocommerce->getOrderItems($order);
             if (!empty($cart)) {
                 foreach ($cart as $item_key => $item_details) {
                     $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
@@ -702,16 +702,17 @@ class OrderCoupon
      */
     function hasValidCategoriesToGenerateCoupon($order)
     {
+        global $retainful;
         $status = true;
-        $invalid_categories = $this->admin->getInvalidCategoriesForCoupon();
+        $invalid_categories = $retainful::$plugin_admin->getInvalidCategoriesForCoupon();
         if (!empty($invalid_categories)) {
-            $cart = $this->wc_functions->getOrderItems($order);
+            $cart = $retainful::$woocommerce->getOrderItems($order);
             if (!empty($cart)) {
                 foreach ($cart as $item_key => $item_details) {
                     $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
                     $product_id = (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0;
                     $id = (!empty($variant_id)) ? $variant_id : $product_id;
-                    $product_category_ids = $this->wc_functions->getProductCategoryIds($id);
+                    $product_category_ids = $retainful::$woocommerce->getProductCategoryIds($id);
                     if (is_array($product_category_ids) && is_array($invalid_categories)) {
                         if (count(array_intersect($invalid_categories, $product_category_ids)) > 0) {
                             $status = false;
@@ -732,23 +733,24 @@ class OrderCoupon
      */
     function createNewCoupon($order_id, $data)
     {
+        global $retainful;
         $order_id = sanitize_key($order_id);
         if (empty($order_id)) return false;
-        $order = $this->wc_functions->getOrder($order_id);
+        $order = $retainful::$woocommerce->getOrder($order_id);
         if (!$order) {
             return false;
         }
-        $coupon_settings = $this->admin->getCouponSettings();
+        $coupon_settings = $retainful::$plugin_admin->getCouponSettings();
         if (!$this->hasValidCategoriesToGenerateCoupon($order) || !$this->hasValidProductsToGenerateCoupon($order) || !$this->isValidCouponLimit($order) || !$this->isMinimumOrderTotalReached($order) || !$this->hasValidOrderStatus($order) || !$this->hasValidUserRoles($order) || !isset($coupon_settings['coupon_amount']) || empty($coupon_settings['coupon_amount'])) {
             return NULL;
         }
-        $email = $this->wc_functions->getOrderEmail($order);
+        $email = $retainful::$woocommerce->getOrderEmail($order);
         //Sometime email not found in the order object when order created from backend. So, get  from the request
         if (empty($email)) {
             $email = (isset($_REQUEST['_billing_email']) && !empty($_REQUEST['_billing_email'])) ? $_REQUEST['_billing_email'] : '';
         }
         $coupon = $this->isCouponFound($order_id);
-        $order_date = $this->wc_functions->getOrderDate($order);
+        $order_date = $retainful::$woocommerce->getOrderDate($order);
         if (empty($coupon)) {
             $new_coupon_code = strtoupper(uniqid());
             $new_coupon_code = chunk_split($new_coupon_code, 5, '-');
@@ -776,7 +778,8 @@ class OrderCoupon
      */
     function updateAppliedCouponDetails($order_id, $order)
     {
-        $used_coupons = $this->wc_functions->getUsedCoupons($order);
+        global $retainful;
+        $used_coupons = $retainful::$woocommerce->getUsedCoupons($order);
         if (!empty($used_coupons)) {
             foreach ($used_coupons as $used_coupon) {
                 if (empty($used_coupon))
@@ -797,9 +800,10 @@ class OrderCoupon
      */
     function getCouponDetails($coupon)
     {
+        global $retainful;
         $coupon_details = $this->getCouponByCouponCode($coupon);
         if (!empty($coupon_details)) {
-            $coupon_only_for = $this->admin->couponFor();
+            $coupon_only_for = $retainful::$plugin_admin->couponFor();
             if ($coupon_only_for == 'all') {
                 return $coupon_details;
             } else if ($coupon_only_for == 'login_users') {
@@ -823,7 +827,8 @@ class OrderCoupon
      */
     function getCurrentEmail()
     {
-        $postData = isset($_REQUEST['post_data']) ? $_REQUEST['post_data'] : '';
+        global $retainful;
+        $postData = isset($_REQUEST['post_data']) ? wc_clean($_REQUEST['post_data']) : '';
         $postDataArray = array();
         if (is_string($postData) && $postData != '') {
             parse_str($postData, $postDataArray);
@@ -835,8 +840,8 @@ class OrderCoupon
         if (!get_current_user_id()) {
             $order_id = isset($_REQUEST['order-received']) ? sanitize_key($_REQUEST['order-received']) : 0;
             if ($order_id) {
-                $order = $this->wc_functions->getOrder($order_id);
-                $postDataArray['billing_email'] = $this->wc_functions->getOrderEmail($order);
+                $order = $retainful::$woocommerce->getOrder($order_id);
+                $postDataArray['billing_email'] = $retainful::$woocommerce->getOrderEmail($order);
             }
         }
         $user_email = '';
@@ -867,6 +872,7 @@ class OrderCoupon
      */
     function addNewCouponToOrder($new_coupon_code, $order_id, $email, $order_date)
     {
+        global $retainful;
         $new_coupon_code = sanitize_text_field($new_coupon_code);
         $order_id = sanitize_text_field($order_id);
         $email = sanitize_email($email);
@@ -881,8 +887,8 @@ class OrderCoupon
         );
         $id = wp_insert_post($post, true);
         if ($id) {
-            $settings = $this->admin->getCouponSettings();
-            $expired_date = $this->admin->getCouponExpireDate($order_date);
+            $settings = $retainful::$plugin_admin->getCouponSettings();
+            $expired_date = $retainful::$plugin_admin->getCouponExpireDate($order_date);
             $coupon_type = isset($settings['coupon_type']) ? sanitize_text_field($settings['coupon_type']) : '0';
             add_post_meta($id, 'discount_type', ($coupon_type == 0) ? "percent" : "fixed_cart");
             $amount = isset($settings['coupon_amount']) ? sanitize_text_field($settings['coupon_amount']) : '0';
@@ -921,8 +927,8 @@ class OrderCoupon
             add_post_meta($id, '_rnoc_shop_coupon_type', 'retainful');
             //old
             add_post_meta($id, 'email', $email);
-            $order = $this->wc_functions->getOrder($order_id);
-            $user_id = $this->wc_functions->getOrderUserId($order);
+            $order = $retainful::$woocommerce->getOrder($order_id);
+            $user_id = $retainful::$woocommerce->getOrderUserId($order);
             add_post_meta($id, 'user_id', $user_id);
             add_post_meta($id, 'order_id', $order_id);
             add_post_meta($id, 'coupon_type', $coupon_type);

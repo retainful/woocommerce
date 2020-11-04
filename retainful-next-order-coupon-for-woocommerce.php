@@ -206,4 +206,10 @@ require __DIR__ . '/vendor/autoload.php';
 
 use Rnoc\Retainful\Main;
 
-Main::instance();
+function retainful()
+{
+    return Main::instance();
+}
+
+global $retainful;
+$retainful = retainful();
