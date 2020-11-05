@@ -6,6 +6,7 @@ require_once "tabs.php";
 $is_app_connected = ($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] == 1);
 $api = new \Rnoc\Retainful\library\RetainfulApi();
 $admin_settings = new Rnoc\Retainful\Admin\Settings();
+global $retainful;
 ?>
 <form id="retainful-license-form" class="card">
     <table class="form-table" role="presentation">
@@ -19,11 +20,12 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
             <td>
                 <input name="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>" type="text"
                        id="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>"
-                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']); ?>" class="regular-text">
+                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']); ?>"
+                       class="regular-text">
                 <p class="error" id="error_app_id" style="color: red;"></p>
                 <p class="description">
                     <?php
-                    echo sprintf(esc_html__('Get your App-id %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $this->api->app_url . 'settings">here</a>');
+                    echo sprintf(esc_html__('Get your App-id %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $retainful::$api->app_url . 'settings">here</a>');
                     ?>
                 </p>
             </td>
@@ -42,7 +44,7 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
                 <p class="error" id="error_secret_key" style="color: red;"></p>
                 <p class="description">
                     <?php
-                    echo sprintf(esc_html__('Get your secret key %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $this->api->app_url . 'settings">here</a>');
+                    echo sprintf(esc_html__('Get your secret key %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $retainful::$api->app_url . 'settings">here</a>');
                     ?>
                 </p>
             </td>

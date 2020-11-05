@@ -47,7 +47,7 @@ class CouponManagement
         $params = wp_parse_args($requestParams, $defaultRequestParams);
         if (is_array($params['discount_rule']) && !empty($params['discount_rule']) && is_string($params['digest']) && !empty($params['digest'])) {
             $secret = $retainful::$plugin_admin->getSecretKey();
-            $cipher_text_raw = wp_json_encode($params['discount_rule']);
+            $cipher_text_raw = json_encode($params['discount_rule'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             $reverse_hmac = hash_hmac('sha256', $cipher_text_raw, $secret);
             if (hash_equals($reverse_hmac, $params['digest'])) {
                 $defaultRuleParams = array(
