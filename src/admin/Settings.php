@@ -259,9 +259,6 @@ class Settings
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'
             ))->message('This field is required');
-            $validator->rule('regex', array(
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'
-            ), '/^[\p{L}\p{Nd} .%\/_-]+$/')->message('This field should only accepts numbers, alphabets, under scores, hypens and spaces');
             $validator->rule('integer', array(
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'
             ))->message('This fields should contains only number');
@@ -308,9 +305,6 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color',
         ))->message('This field accepts only hex color code');
-        $validator->rule('regex', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'
-        ), '/^[\p{L}\p{Nd} .%\/_-]+$/')->message('This field should only accepts numbers, alphabets, under scores, hypens and spaces');
         $validator->rule('basicTags', array(
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
@@ -373,9 +367,6 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
             RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color',
         ))->message('This field accepts only hex color code');
-        $validator->rule('regex', array(
-            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'woo_coupon'
-        ), '/^[\p{L}\p{Nd} .%\/_-]+$/')->message('This field should only accepts numbers, alphabets, under scores, hypens and spaces');
         $validator->rule('basicTags', array(
             RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class',
             RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message',
