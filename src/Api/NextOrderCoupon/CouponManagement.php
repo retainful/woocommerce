@@ -6,6 +6,12 @@ use Valitron\Validator;
 
 class CouponManagement
 {
+    /**
+     * validate the $_POST
+     * @param $data
+     * @param $validate
+     * @param $errors
+     */
     static function validateRestCoupon($data, &$validate, &$errors)
     {
         $validator = new Validator($data);
@@ -83,6 +89,7 @@ class CouponManagement
                         'exclude_product_ids' => array(),
                         'product_categories' => array(),
                         'exclude_product_categories' => array(),
+                        '_rnoc_shop_coupon_type' => 'retainful-referral'
                     );
                     $old_coupon = self::getCouponByCouponCode($data['coupon_code']);
                     if (!empty($old_coupon) && $old_coupon instanceof \WP_Post) {
@@ -160,9 +167,10 @@ class CouponManagement
             $query_string = add_query_arg(array('filter-by' => rawurlencode('retainful-next-order-coupon')), $admin_url);
             $query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful'));
             $types['retainful'] = '<a href="' . esc_url($query_string) . '" class="' . esc_attr($class) . '">' . __('Retainful - Next order coupons', 'woocommerce') . ' (' . $query->found_posts . ')</a>';
-//            $expired_coupons_query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful'));
-//            echo '<pre>';print_r($expired_coupons_query);echo '</pre>';die;
-//            $types['retainful_expired_coupons'] = $expired_coupons_query->found_posts;
+            $referral_class = (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == $_GET['filter-by']) ? 'current' : '';
+            $referral_query_string = add_query_arg(array('filter-by' => rawurlencode('retainful-referral-coupon')), $admin_url);
+            $referral_query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful-referral'));
+            $types['retainful_referral'] = '<a href="' . esc_url($referral_query_string) . '" class="' . esc_attr($referral_class) . '">' . __('Retainful - referral coupons', 'woocommerce') . ' (' . $referral_query->found_posts . ')</a>';
         }
         return $types;
     }
@@ -179,6 +187,9 @@ class CouponManagement
             if (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == sanitize_text_field($_GET['filter-by'])) {
                 $query_vars['meta_key'] = "_rnoc_shop_coupon_type";
                 $query_vars['meta_value'] = "retainful";
+            } else if (isset($_GET['filter-by']) && 'retainful-referral-coupon' == sanitize_text_field($_GET['filter-by'])) {
+                $query_vars['meta_key'] = "_rnoc_shop_coupon_type";
+                $query_vars['meta_value'] = "retainful-referral";
             }
         }
         return $query_vars;

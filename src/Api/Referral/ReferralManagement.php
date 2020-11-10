@@ -22,8 +22,8 @@ class ReferralManagement
             $reverse_hmac = hash_hmac('sha256', $params['email'], $secret);
             if (hash_equals($reverse_hmac, $params['digest'])) {
                 $user = get_user_by_email($params['email']);
+                $status = 200;
                 if (!empty($user) && $user instanceof \WP_User) {
-                    $status = 200;
                     $order_count = wc_get_customer_order_count($user->ID);
                     $total_spent = wc_get_customer_total_spent($user->ID);
                     $response = array(
@@ -39,8 +39,18 @@ class ReferralManagement
                         'RESPONSE_CODE' => 'CUSTOMER_DATA_FOUND'
                     );
                 } else {
-                    $status = 404;
-                    $response = array('success' => false, 'RESPONSE_CODE' => 'CUSTOMER_NOT_FOUND', 'message' => 'Customer not found!');
+                    $response = array(
+                        'id' => '',
+                        'email' => '',
+                        'first_name' => '',
+                        'last_name' => '',
+                        'accepts_marketing' => '',
+                        'order_count' => '',
+                        'total_spent' => '',
+                        'tags' => '',
+                        'success' => true,
+                        'RESPONSE_CODE' => 'CUSTOMER_DATA_NOT_FOUND'
+                    );
                 }
             } else {
                 $status = 400;
@@ -108,8 +118,8 @@ class ReferralManagement
                 'is_thank_you_page' => $is_thank_you_page,
                 'customer_id' => $user_arr['id'],
                 'customer_email' => $window_obj_email,
-                'login_url' => $account_url,
-                'register_url' => $account_url,
+                'login_url' => apply_filters('rnoc_referral_login_url', $account_url),
+                'register_url' => apply_filters('rnoc_referral_register_url', $account_url),
             )
         );
         $params = wp_parse_args($user_arr, $default_params);
