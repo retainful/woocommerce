@@ -1579,6 +1579,55 @@ class WcFunctions
     }
 
     /**
+     * get total orders for billing emails
+     * @param $email
+     * @return int
+     */
+    function getCustomerTotalOrders($email)
+    {
+        $customer_orders = $this->getCustomerOrdersByEmail($email);
+        if (is_array($customer_orders)) {
+            return count($customer_orders);
+        }
+        return 0;
+    }
+
+    /**
+     * get the customer total spent
+     * @param $email
+     * @return float
+     */
+    function getCustomerTotalSpent($email)
+    {
+        $customer_orders = $this->getCustomerOrdersByEmail($email);
+        $sum = 0;
+        if (is_array($customer_orders)) {
+            foreach ($customer_orders as $order) {
+                if ($order instanceof \WP_Post) {
+                    $sum = $sum + floatval(get_post_meta($order->ID, '_order_total', true));
+                }
+            }
+        }
+        return floatval($sum);
+    }
+
+    /**
+     * @param $email
+     * @return int
+     */
+    function getCustomerOrdersByEmail($email)
+    {
+        $customer_orders = get_posts(array(
+            'numberposts' => -1,
+            'meta_key' => '_billing_email',
+            'meta_value' => $email,
+            'post_type' => wc_get_order_types(),
+            'post_status' => array_keys(wc_get_order_statuses()),
+        ));
+        return apply_filters('rnoc_get_customer_orders_by_email', $customer_orders);
+    }
+
+    /**
      * Get Shipping first name
      * @param $order
      * @return null

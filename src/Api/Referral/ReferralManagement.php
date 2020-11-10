@@ -24,8 +24,8 @@ class ReferralManagement
                 $user = get_user_by_email($params['email']);
                 $status = 200;
                 if (!empty($user) && $user instanceof \WP_User) {
-                    $order_count = wc_get_customer_order_count($user->ID);
-                    $total_spent = wc_get_customer_total_spent($user->ID);
+                    $order_count = $retainful::$woocommerce->getCustomerTotalOrders($user->user_email);
+                    $total_spent = $retainful::$woocommerce->getCustomerTotalSpent($user->user_email);
                     $response = array(
                         'id' => strval($user->ID),
                         'email' => strval($user->user_email),
@@ -73,9 +73,8 @@ class ReferralManagement
         $secret = $retainful::$plugin_admin->getSecretKey();
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
-            $customer_id = get_current_user_id();
-            $order_count = wc_get_customer_order_count($customer_id);
-            $total_spent = wc_get_customer_total_spent($customer_id);
+            $total_spent = $retainful::$woocommerce->getCustomerTotalSpent($user->user_email);
+            $order_count = $retainful::$woocommerce->getCustomerTotalOrders($user->user_email);
             $user_arr = array(
                 'api_key' => $api_key,
                 'accepts_marketing' => '1',

@@ -27,10 +27,12 @@ class Order extends RestApi
         if (!empty($last_order) && $last_order instanceof \WC_Order) {
             $last_order_id = $retainful::$woocommerce->getOrderId($last_order);
         }
+        $billing_email = $retainful::$woocommerce->getBillingEmail($order);
+        $orders_count = $retainful::$woocommerce->getCustomerTotalOrders($billing_email);
         return array(
             'id' => $user_id,
             'customer_id' => $customer_id,
-            'email' => $retainful::$woocommerce->getBillingEmail($order),
+            'email' => $billing_email,
             'phone' => $retainful::$woocommerce->getBillingPhone($order),
             'state' => $retainful::$woocommerce->getBillingState($order),
             'currency' => NULL,
@@ -38,8 +40,8 @@ class Order extends RestApi
             'created_at' => $this->formatToIso8601($created_at),
             'first_name' => $retainful::$woocommerce->getBillingLastName($order),
             'updated_at' => $this->formatToIso8601($updated_at),
-            'total_spent' => wc_get_customer_total_spent($user_id),
-            'orders_count' => wc_get_customer_order_count($user_id),
+            'total_spent' => $retainful::$woocommerce->getCustomerTotalSpent($billing_email),
+            'orders_count' => ($orders_count == 1) ? 0 : $orders_count,
             'last_order_id' => $last_order_id,
             'verified_email' => true,
             'last_order_name' => NULL,
@@ -202,6 +204,7 @@ class Order extends RestApi
             'cart_type' => 'order',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
             'r_order_id' => $order_id,
+            'order_number' => $order_id,
             'plugin_version' => RNOC_VERSION,
             'cart_hash' => $cart_hash,
             'ip' => $user_ip,
