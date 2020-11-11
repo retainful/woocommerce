@@ -7,7 +7,7 @@ class RetainfulApi
 {
     public $app_url = "https://app.retainful.com/";
     public $domain = "https://apibeta.retainful.com/v1/";
-    public $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
+    public $abandoned_cart_api_url = "https://apibeta.retainful.com/v1/woocommerce/";
 
     /**
      * Upgrade premium URL

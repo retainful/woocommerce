@@ -17,10 +17,12 @@ class ReferralManagement
             'digest' => ''
         );
         $params = wp_parse_args($requestParams, $defaultRequestParams);
+        $retainful::$plugin_admin->logMessage($params, 'Customer API request digest not matched ');
         if (!empty($params['email']) && is_email($params['email']) && is_string($params['digest']) && !empty($params['digest'])) {
             $secret = $retainful::$plugin_admin->getSecretKey();
             $reverse_hmac = hash_hmac('sha256', $params['email'], $secret);
             if (hash_equals($reverse_hmac, $params['digest'])) {
+                $retainful::$plugin_admin->logMessage($reverse_hmac, 'API request digest matched');
                 $user = get_user_by_email($params['email']);
                 $status = 200;
                 if (!empty($user) && $user instanceof \WP_User) {
@@ -38,6 +40,7 @@ class ReferralManagement
                         'success' => true,
                         'RESPONSE_CODE' => 'CUSTOMER_DATA_FOUND'
                     );
+                    $retainful::$plugin_admin->logMessage($user, 'API request customer found');
                 } else {
                     $response = array(
                         'id' => '',
@@ -51,8 +54,10 @@ class ReferralManagement
                         'success' => true,
                         'RESPONSE_CODE' => 'CUSTOMER_DATA_NOT_FOUND'
                     );
+                    $retainful::$plugin_admin->logMessage(array(), 'API request customer not found');
                 }
             } else {
+                $retainful::$plugin_admin->logMessage($reverse_hmac, 'API request digest not matched');
                 $status = 400;
                 $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
             }
@@ -60,6 +65,7 @@ class ReferralManagement
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
         }
+        $retainful::$plugin_admin->logMessage($response, 'API request response');
         return new \WP_REST_Response($response, $status);
     }
 

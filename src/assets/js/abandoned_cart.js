@@ -378,49 +378,66 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             $(tracking_content).appendTo('body');
         }
         $('input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone').on('change', function () {
-            let msg = null;
             var rnoc_phone = $("#billing_phone").val();
             var rnoc_email = $("#billing_email").val();
+            var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
+            var guest_data = {
+                billing_first_name: $('#billing_first_name').val(),
+                billing_last_name: $('#billing_last_name').val(),
+                billing_company: $('#billing_company').val(),
+                billing_address_1: $('#billing_address_1').val(),
+                billing_address_2: $('#billing_address_2').val(),
+                billing_city: $('#billing_city').val(),
+                billing_state: $('#billing_state').val(),
+                billing_postcode: $('#billing_postcode').val(),
+                billing_country: $('#billing_country').val(),
+                billing_phone: $('#billing_phone').val(),
+                billing_email: $('#billing_email').val(),
+                ship_to_billing: ship_to_bill,
+                order_notes: $('#order_comments').val(),
+                shipping_first_name: $('#shipping_first_name').val(),
+                shipping_last_name: $('#shipping_last_name').val(),
+                shipping_company: $('#shipping_company').val(),
+                shipping_address_1: $('#shipping_address_1').val(),
+                shipping_address_2: $('#shipping_address_2').val(),
+                shipping_city: $('#shipping_city').val(),
+                shipping_state: $('#shipping_state').val(),
+                shipping_postcode: $('#shipping_postcode').val(),
+                shipping_country: $('#shipping_country').val(),
+                action: 'rnoc_track_user_data'
+            };
+            updateCheckout(rnoc_email, rnoc_phone, guest_data);
+        });
+        $('.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone').on('change', function () {
+            var rnoc_email = $(".wp-block-woocommerce-checkout input#email").val();
+            var rnoc_phone = $(".wp-block-woocommerce-checkout input#phone").val();
+            var guest_data = {
+                billing_first_name: $('.wp-block-woocommerce-checkout #billing-first_name').val(),
+                billing_last_name: $('.wp-block-woocommerce-checkout #billing-last_name').val(),
+                billing_address_1: $('.wp-block-woocommerce-checkout #billing-address_1').val(),
+                billing_address_2: $('.wp-block-woocommerce-checkout #billing-address_2').val(),
+                billing_city: $('.wp-block-woocommerce-checkout #billing-city').val(),
+                billing_postcode: $('.wp-block-woocommerce-checkout #billing-postcode').val(),
+                billing_phone: rnoc_phone,
+                billing_email: rnoc_email,
+                ship_to_billing: 1,
+                action: 'rnoc_track_user_data'
+            };
+            updateCheckout(rnoc_email, rnoc_phone, guest_data);
+        });
 
+        function updateCheckout(rnoc_email, rnoc_phone, guest_data) {
+            let msg = null;
             if (typeof rnoc_email === 'undefined') {
                 return;
             }
-
             var atposition = rnoc_email.indexOf("@");
             var dotposition = rnoc_email.lastIndexOf(".");
-
-
             if (typeof rnoc_phone === 'undefined' || rnoc_phone === null) { //If phone number field does not exist on the Checkout form
                 rnoc_phone = '';
             }
             /*$('input#billing_email').on('change', function () {*/
             if (!(atposition < 1 || dotposition < atposition + 2 || dotposition + 2 >= rnoc_email.length) || rnoc_phone.length >= 1) {
-                var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
-                var guest_data = {
-                    billing_first_name: $('#billing_first_name').val(),
-                    billing_last_name: $('#billing_last_name').val(),
-                    billing_company: $('#billing_company').val(),
-                    billing_address_1: $('#billing_address_1').val(),
-                    billing_address_2: $('#billing_address_2').val(),
-                    billing_city: $('#billing_city').val(),
-                    billing_state: $('#billing_state').val(),
-                    billing_postcode: $('#billing_postcode').val(),
-                    billing_country: $('#billing_country').val(),
-                    billing_phone: $('#billing_phone').val(),
-                    billing_email: $('#billing_email').val(),
-                    ship_to_billing: ship_to_bill,
-                    order_notes: $('#order_comments').val(),
-                    shipping_first_name: $('#shipping_first_name').val(),
-                    shipping_last_name: $('#shipping_last_name').val(),
-                    shipping_company: $('#shipping_company').val(),
-                    shipping_address_1: $('#shipping_address_1').val(),
-                    shipping_address_2: $('#shipping_address_2').val(),
-                    shipping_city: $('#shipping_city').val(),
-                    shipping_state: $('#shipping_state').val(),
-                    shipping_postcode: $('#shipping_postcode').val(),
-                    shipping_country: $('#shipping_country').val(),
-                    action: 'rnoc_track_user_data'
-                };
                 if (retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
                     $.ajax({
                         url: rnoc_cart_js_data.ajax_url,
@@ -445,6 +462,6 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             } else {
                 //console.log('Not a valid email yet');
             }
-        });
+        }
     });
 }

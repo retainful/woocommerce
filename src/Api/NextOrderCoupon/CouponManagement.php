@@ -51,11 +51,13 @@ class CouponManagement
             'digest' => ''
         );
         $params = wp_parse_args($requestParams, $defaultRequestParams);
+        $retainful::$plugin_admin->logMessage($params, 'API coupon created request');
         if (is_array($params['discount_rule']) && !empty($params['discount_rule']) && is_string($params['digest']) && !empty($params['digest'])) {
             $secret = $retainful::$plugin_admin->getSecretKey();
             $cipher_text_raw = json_encode($params['discount_rule'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             $reverse_hmac = hash_hmac('sha256', $cipher_text_raw, $secret);
             if (hash_equals($reverse_hmac, $params['digest'])) {
+                $retainful::$plugin_admin->logMessage($reverse_hmac, 'API request digest matched');
                 $defaultRuleParams = array(
                     'coupon_code' => null,
                     'usage_limit' => 1,
@@ -69,9 +71,11 @@ class CouponManagement
                     'individual_use' => 'yes',
                 );
                 $ruleParams = wp_parse_args($params['discount_rule'], $defaultRuleParams);
+                $retainful::$plugin_admin->logMessage($ruleParams, 'API coupon request');
                 $is_valid_data = true;
                 $errors = array();
                 self::validateRestCoupon($ruleParams, $is_valid_data, $errors);
+                $retainful::$plugin_admin->logMessage($errors, 'API request errors');
                 if ($is_valid_data) {
                     $data = array(
                         'coupon_code' => $ruleParams['coupon_code'],
@@ -123,6 +127,7 @@ class CouponManagement
                     $response = $errors;
                 }
             } else {
+                $retainful::$plugin_admin->logMessage($reverse_hmac, 'API request digest not matched');
                 $status = 400;
                 $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
             }
