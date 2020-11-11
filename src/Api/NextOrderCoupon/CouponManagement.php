@@ -54,7 +54,12 @@ class CouponManagement
         $retainful::$plugin_admin->logMessage($params, 'API coupon created request');
         if (is_array($params['discount_rule']) && !empty($params['discount_rule']) && is_string($params['digest']) && !empty($params['digest'])) {
             $secret = $retainful::$plugin_admin->getSecretKey();
-            $cipher_text_raw = json_encode($params['discount_rule'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $to_hash = array(
+                'value_type' => (isset($params['discount_rule']['value_type'])) ? $params['discount_rule']['value_type'] : "",
+                'value' => (isset($params['discount_rule']['value'])) ? $params['discount_rule']['value'] : "",
+                'coupon_code' => (isset($params['discount_rule']['coupon_code'])) ? $params['discount_rule']['coupon_code'] : "",
+            );
+            $cipher_text_raw = json_encode($to_hash, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             $reverse_hmac = hash_hmac('sha256', $cipher_text_raw, $secret);
             if (hash_equals($reverse_hmac, $params['digest'])) {
                 $retainful::$plugin_admin->logMessage($reverse_hmac, 'API request digest matched');

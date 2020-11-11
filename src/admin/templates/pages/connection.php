@@ -37,7 +37,7 @@ global $retainful;
                     ?></label>
             </th>
             <td>
-                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>" type="text"
+                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>" type="password"
                        id="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>"
                        value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret']); ?>"
                        class="regular-text">
