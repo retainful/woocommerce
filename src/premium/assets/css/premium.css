@@ -20,6 +20,16 @@ modal
     border-radius: 5px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
+.rnoc-modal-container .rnoc-inner-popup{
+    height: 100%;
+    max-height: 90vh;
+    overflow: auto;
+}
+@media (min-width: 601px) and (max-width: 992px){
+    .rnoc-modal-container {
+        width: 68%;
+    }
+}
 
 @media only screen and (max-width: 600px) {
     .rnoc-modal-container {
