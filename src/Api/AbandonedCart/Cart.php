@@ -207,7 +207,7 @@ class Cart extends RestApi
      */
     function getReferralUrl()
     {
-        return apply_filters('referral_engine_url', 'https://js.retainful.com/shopify/v1/referral-beta-woocommerce.js');
+        return apply_filters('referral_engine_url', 'https://js.retainful.com/woocommerce/v1/referral-wocommerce.js');
     }
 
     /**
