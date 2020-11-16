@@ -17,12 +17,12 @@ class ReferralManagement
             'digest' => ''
         );
         $params = wp_parse_args($requestParams, $defaultRequestParams);
-        $retainful::$plugin_admin->logMessage($params, 'Customer API request digest not matched ');
+        $retainful::$plugin_admin->logMessage($params, 'Customer API request params ');
         if (!empty($params['email']) && is_email($params['email']) && is_string($params['digest']) && !empty($params['digest'])) {
             $secret = $retainful::$plugin_admin->getSecretKey();
             $reverse_hmac = hash_hmac('sha256', $params['email'], $secret);
             if (hash_equals($reverse_hmac, $params['digest'])) {
-                $retainful::$plugin_admin->logMessage($reverse_hmac, 'API request digest matched');
+                $retainful::$plugin_admin->logMessage($reverse_hmac, 'customer API request digest matched');
                 $user = get_user_by_email($params['email']);
                 $status = 200;
                 if (!empty($user) && $user instanceof \WP_User) {
