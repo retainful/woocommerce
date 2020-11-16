@@ -377,33 +377,6 @@ class Main
     }
 
     /**
-     * Insert default email template
-     * @param $table
-     */
-    function insertDefaultEmailTemplate($table)
-    {
-        ob_start();
-        include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-1.html');
-        $content = ob_get_clean();
-        $email_body = addslashes($content);
-        ob_start();
-        include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-2.html');
-        $content1 = ob_get_clean();
-        $email_body1 = addslashes($content1);
-        ob_start();
-        include(RNOC_PLUGIN_PATH . 'src/admin/templates/default-3.html');
-        $content2 = ob_get_clean();
-        $email_body2 = addslashes($content2);
-        global $wpdb;
-        $default_template = $wpdb->get_row('SELECT id FROM ' . $table . ' WHERE default_template = "1"');
-        if (empty($default_template)) {
-            $template_subject = "Hey {{customer_name}}!! You left something in your cart";
-            $query = 'INSERT INTO `' . $table . '` ( subject, body, is_active, frequency, day_or_hour, default_template,template_name )VALUES ( "' . $template_subject . '","' . $email_body . '","1","1","Hours","1","initial"),( "' . $template_subject . '","' . $email_body1 . '","0","1","Hours","6","After 6 hours"),( "' . $template_subject . '","' . $email_body2 . '","0","1","Days","1","After 1 day")';
-            $wpdb->query($query);
-        }
-    }
-
-    /**
      * Initiate the plugin
      * @return Main
      */

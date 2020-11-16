@@ -73,7 +73,6 @@ class CouponManagement
                     'customer_email' => null,
                     'ends_at' => null,
                     'prerequisite_subtotal_range' => array('greater_than_or_equal_to' => 0),
-                    'individual_use' => 'yes',
                 );
                 $ruleParams = wp_parse_args($params['discount_rule'], $defaultRuleParams);
                 $retainful::$plugin_admin->logMessage($ruleParams, 'API coupon request');
@@ -90,7 +89,6 @@ class CouponManagement
                         'minimum_amount' => (floatval($ruleParams['prerequisite_subtotal_range']['greater_than_or_equal_to']) > 0) ? floatval($ruleParams['prerequisite_subtotal_range']['greater_than_or_equal_to']) : null,
                         'maximum_amount' => 0,
                         'expiry_date' => (!empty($ruleParams['ends_at'])) ? $ruleParams['ends_at'] : null,
-                        'individual_use' => 'yes',
                         'usage_limit' => $ruleParams['usage_limit'],
                         'usage_limit_per_user' => $ruleParams['usage_limit_per_user'],
                         'customer_email' => $ruleParams['customer_email'],

@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.5
 WC tested up to: 4.6.1
 Requires PHP: 5.6
-Stable tag: 2.3.2
+Stable tag: 2.4.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,3 +415,6 @@ No. There is no charges for support.
 
 = 2.3.2 =
 * Fix: Stripslashes issue fixed
+
+= 2.4.0 =
+* New feature: Referral program
