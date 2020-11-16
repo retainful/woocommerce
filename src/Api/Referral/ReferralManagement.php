@@ -28,7 +28,7 @@ class ReferralManagement
                 if (!empty($user) && $user instanceof \WP_User) {
                     $order_count = $retainful::$woocommerce->getCustomerTotalOrders($user->user_email);
                     $total_spent = $retainful::$woocommerce->getCustomerTotalSpent($user->user_email);
-                    $response = array(
+                    $response = array(array(
                         'id' => strval($user->ID),
                         'email' => strval($user->user_email),
                         'first_name' => strval($user->first_name),
@@ -37,23 +37,10 @@ class ReferralManagement
                         'order_count' => strval($order_count),
                         'total_spent' => strval($total_spent),
                         'tags' => '',
-                        'success' => true,
-                        'RESPONSE_CODE' => 'CUSTOMER_DATA_FOUND'
-                    );
+                    ));
                     $retainful::$plugin_admin->logMessage($user, 'API request customer found');
                 } else {
-                    $response = array(
-                        'id' => '',
-                        'email' => '',
-                        'first_name' => '',
-                        'last_name' => '',
-                        'accepts_marketing' => '',
-                        'order_count' => '',
-                        'total_spent' => '',
-                        'tags' => '',
-                        'success' => true,
-                        'RESPONSE_CODE' => 'CUSTOMER_DATA_NOT_FOUND'
-                    );
+                    $response = array();
                     $retainful::$plugin_admin->logMessage(array(), 'API request customer not found');
                 }
             } else {
