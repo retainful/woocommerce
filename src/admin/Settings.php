@@ -187,7 +187,10 @@ class Settings
                 $allowed_html[$tag] = array(
                     'class' => array(),
                     'id' => array(),
-                    'style' => array()
+                    'style' => array(),
+                    'src' => array(),
+                    'width' => array(),
+                    'height' => array()
                 );
                 if ($tag == 'a') {
                     $allowed_html[$tag]['href'] = array();

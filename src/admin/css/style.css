@@ -535,5 +535,14 @@
 [class*=retainful] .nav-tab-wrapper .nav-tab:last-child:after {
   content: none;
 }
+[class*=retainful] .rnoc-popup {
+  width: 75%;
+  margin: 0 auto;
+}
+[class*=retainful] .rnoc-popup #rnoc-popup-email-field {
+  display: unset;
+  width: unset;
+  min-height: unset;
+}
 
 /*# sourceMappingURL=style.css.map */
