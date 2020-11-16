@@ -1,6 +1,6 @@
-=== Retainful - WooCommerce Cart Abandonment Recovery and Next Order Coupons ===
+=== Retainful - WooCommerce Abandoned Cart Recovery, Next Order Coupons, Referrals and Refer-a-Friend program ===
 Contributors: retainful, flycart
-Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
+Tags: abandoned cart, referrals, woocommerce, marketing, referral program
 Requires at least: 4.0
 Tested up to: 5.5
 WC tested up to: 4.6.1
@@ -9,11 +9,15 @@ Stable tag: 2.4.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Stop cart abandonment in WooCommerce and recover lost revenue with Retainful. Drive repeat purchases by sending Next Order Coupons and increase the sales.
+Boost sales with Retainful - a complete WooCommerce Marketing tool. Recover abandoned carts in WooCommerce, add a referral program & drive repeat sales by sending Next Order Coupons.
 
 == Description ==
 
-[Retainful](https://www.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=visit_site) helps you recover abandoned carts and drive repeat purchases in your WooCommerce store. It can capture the email address and automatically send a series of email reminders when customers abandon their carts in your shop.
+[Retainful](https://www.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=visit_site) helps you grow sales by automating your essential marketing activities of your WooCommerce store
+
+* **Recover abandoned carts :** A complete WooCommerce Abandoned Cart Recovery solution to stop cart abandonment and boost revenue.
+* **Referral / Refer-a-Friend Program :** Create and automate a powerful Customer Referral campaign for your WooCommerce store and grow sales through Word-of-mouth referrals
+* **Next Order Coupons :** Drive Repeat purchases by sending a single-use, unique coupon for the next purchase when a customer places a successful order. Automatically send a follow up campaign to remind customers about the coupon for the next order. So your customers keep coming back for more. 
 
 == Abandoned Cart Recovery in WooCommerce ==
 
@@ -32,14 +36,16 @@ All these abandoned cart email reminders can be scheduled and sent automatically
 
 Retainful can automatically send these abandoned cart reminders and it stops the moment customer completes the purchase.
 
-**How does Retainful work?**
+[Learn more about sending a series of cart recovery reminders and its best practices](https://help.retainful.com/abandoned-cart-recovery/sending-abandoned-cart-recovery-emails)
 
-- The plugin captures the email address as soon as customer enters it at the checkout step. 
-- If the customer has not completed the purchase within 30 minutes, ifirst email reminder is sent automatically with a unique recovery link
+**How Retainful helps you recover abandoned carts in WooCommerce?**
+
+- The plugin captures the email address as soon as customer enters it at the checkout step. Guest checkout supported. No need for the customer to register or log in.
+- If the customer has not completed the purchase within 30 minutes, first email reminder is sent automatically with a unique recovery link
 - Customer clicks the link to recover his cart. 
 - Completes the purchase
 
-With Retainful Premium plans, you can also [capture customer's email when they add an item to cart](https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) or when they try to leave your site without buying, i.e, [Exit Intent Popup](https://www.retainful.com/docs/woocommerce/exit-intent-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) 
+With Retainful Premium plans, you can also [capture customer's email when they add an item to cart](https://help.retainful.com/tools/add-to-cart-email-capture-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) or when they try to leave your site without buying, i.e, [Exit Intent Popup](https://help.retainful.com/tools/exit-intent-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) 
 
 **How to get started with Retainful?**
 
@@ -47,9 +53,47 @@ With Retainful Premium plans, you can also [capture customer's email when they a
 2. [Sign up for a free account](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) and get your API Keys
 3. Connect to Retainful
 
-[Get Retainful](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) | [Documentation](https://www.retainful.com/docs?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
+[Get Retainful](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=signup) | [Documentation](https://help.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) | [Upgrade to Premium](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
 
 Retainful can do more than recovering your lost sales. It can drive repeat purchases in your store. Say hello to [Next Order Coupons for WooCommerce](https://www.retainful.com/blog/how-to-provide-next-order-coupon-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=next-order-coupon)
+
+== Referral : Refer-a-friend Program - A customer referral program for WooCommerce ==
+
+Reward your customers for referring their friends to your store and grow sales through Word of Mouth.
+
+Add a [Refer-a-Friend program](https://www.retainful.com/referrals) to your WooCommerce store wth Retainful and automate your Customer Referral Program to boost sales organically. 
+You can create a referral program for your store in just 3 simple steps.
+
+**How a Referral program works**
+
+1. Your existing customers buys something from your store
+2. We generate a unique referral code / link and send to your customers.
+3. They refer their friends to your store. 
+4. When friends shop at your store through the referral, they get rewarded.
+5. Once the friends made a successful referral purchase, the senders (your existing customers) rewarded too :-)
+
+**Both the sender (your customer) and the receiver (friend) gets rewarded for a successful referral.**
+
+[See how a Referral program works](https://www.retainful.com/referrals?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=referral) at Retainful.
+
+**How to create a Referral program**
+
+In 3 simple steps, you can create a Refer-a-Friend program for your WooCommerce store.
+
+1. Create a reward for the sender (advocate / your existing customers)
+2. Create a reward for the receiver (friend)
+3. Go live
+
+No developers required. [Create a Referral Program](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=referral)
+
+**Referral Widgets**
+
+Retainful comes with beautiful Referral widgets that helps customers to discover your Referral program easily. 
+Customers can get their referral code, claim the rewards, see a list of rewards (if they log in) and more using the widgets. 
+
+[Learn how to customize referral widgets](https://help.retainful.com/referral-program/branding?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=referral)
+
+[Get Started and Add a Refer a Friend program](https://app.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=referral) for your store.
 
 == Next Order Coupons ==
 
@@ -86,6 +130,16 @@ Instead, you can let Retainful handle abandoned cart recovery campaigns for you.
 * See **real-time carts**, i.e, carts of the customers who are purchasing in your site at the very moment
 * Compare **Abandoned order value** and the **Recovered order** values
 * Mailchimp integration (Retainful 2.0)
+
+== Referral Program / Refer-a-Friend Campaign Features ==
+
+* Create rewards for both sender (your existing customers) and their friends (receivers)
+* Three reward types - percentage discount, flat/fixed discount, free shipping
+* Reward widgets - Add a beautiful widget for your customers to discover your referral program easily
+* Post purchase emails with referral code / link - automatically email the referral code / link to the customer when they make a successful purchase
+* Reward emails - Notify the reward to the friends when they use the referral link. Also notify your existing customers when their friends make a successful purchase and include the reward for them.
+* Branding - Customize the reward and referral widgets fully to match your branding.
+* Customize reward emails easily using the visual drag and drop editor. 
 
 === Next Order Coupon features: ===
 
@@ -128,26 +182,26 @@ Retainful comes with **premium add-ons** to recover the sales effectively.
 
 **Exit-Intent Popup**
 
-[Convert your visitors into customers](https://www.retainful.com/docs/woocommerce/exit-intent-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) when they try to leave your shop with items in their cart. Track the mouse behaviour of your customers and trigger a popup with coupon or collect email when the customer tries to exit.
+[Convert your visitors into customers](https://help.retainful.com/tools/exit-intent-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) when they try to leave your shop with items in their cart. Track the mouse behaviour of your customers and trigger a popup with coupon or collect email when the customer tries to exit.
 With the exit popups, you can encourage the visitors to complete their purchase ot leave their email.
 
 **Add-to-cart Email Capture Popup**
 
-[Collect the email address](https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) before the customer adds an item to cart.
+[Collect the email address](https://help.retainful.com/tools/add-to-cart-email-capture-popup?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link) before the customer adds an item to cart.
 Trigger a popup when the customer clicks add to cart and get their email address. The popup is fully customisable. Change the colour, background, text and the labels.
 This enables you to follow-up the customer even if he abandons the cart.
 If an existing customer logs in, automatically associate their cart with their email.
 
 **Countdown Timer with Automatic Coupon Application**
 
-Add an urgency to complete the checkout by showing a [countdown timer with an offer](https://www.retainful.com/docs/woocommerce/coupon-timer?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link). Let it apply a coupon automatically and set a countdown timer for the coupon.
+Add an urgency to complete the checkout by showing a [countdown timer with an offer](https://help.retainful.com/tools/coupon-timer?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=doc_link). Let it apply a coupon automatically and set a countdown timer for the coupon.
 The feature implements the two proven psychological motivators - Urgency and FOMO (Fear of Missing Out). Once the timer ends, the coupon is removed. So the customer will purchase because he does not want to miss the offer.
 
 **Coupon for Email Collection**
 
 Not every visitor will be ready to input their email address at the time of adding an item to cart. Instead of plainly asking for the email, you can say "get a 10% discount code in your email. Please enter your email".
 This will encourage the customer to enter their email ID to get the coupon code. Retainful allows you to collect the Email ID and send an email with the coupon code.
-[Learn more about incentivizing your visitors](https://www.retainful.com/docs/woocommerce/collect-email-address-before-adding-to-cart-in-woocommerce/#motivating-customers-with-an-offer-in-email-collection-popup)
+[Learn more about incentivizing your visitors](https://help.retainful.com/tools/add-to-cart-email-capture-popup#reward-customers-for-providing-their-email-address)
 
 You can try the Premium add-ons free for 14 days. We offer a 14-day trial period for you to test drive the features.
 
@@ -164,7 +218,7 @@ Check out our [pricing page](https://www.retainful.com/pricing?utm_source=wp_dir
 Get a world class support from the Retainful team. We are a customer-first team. Use the [support form](https://www.retainful.com/support?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=support) or leave a message via the Live Chat icon at [Retainful.com](https://www.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=visit_site)
 We'd love to hear from you!
 
-[Documentation](https://www.retainful.com/docs/woocommerce/install-retainful-plugin-for-woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
+[Documentation](https://help.retainful.com/installation/woocommerce?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=upgrade)
 
 == Did not find a feature? ==
 
