@@ -5,7 +5,7 @@
 require_once "tabs.php";
 $is_app_connected = ($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] == 1);
 $api = new \Rnoc\Retainful\library\RetainfulApi();
-$admin_settings = new Rnoc\Retainful\Admin\Settings();
+$admin_settings = new Rnoc\Retainful\Admin\Admin();
 global $retainful;
 ?>
 <form id="retainful-license-form" class="card">

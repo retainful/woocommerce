@@ -3,7 +3,7 @@
 namespace Rnoc\Retainful;
 if (!defined('ABSPATH')) exit;
 
-use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Admin\Admin;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
 use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
@@ -46,7 +46,7 @@ class Main
      */
     public static $abandoned_cart_checkout = null;
     /**
-     * @var null|Settings
+     * @var null|Admin
      */
     public static $plugin_admin = null;
     /**
@@ -82,7 +82,7 @@ class Main
         self::$next_order_coupon = (is_null(self::$next_order_coupon)) ? new OrderCoupon() : self::$next_order_coupon;
         self::$abandoned_cart = (is_null(self::$abandoned_cart)) ? new Cart() : self::$abandoned_cart;
         self::$abandoned_cart_checkout = (is_null(self::$abandoned_cart_checkout)) ? new Checkout() : self::$abandoned_cart_checkout;
-        self::$plugin_admin = (is_null(self::$plugin_admin)) ? new Settings() : self::$plugin_admin;
+        self::$plugin_admin = (is_null(self::$plugin_admin)) ? new Admin() : self::$plugin_admin;
         self::$referral_program = (is_null(self::$referral_program)) ? new ReferralManagement() : self::$referral_program;
         self::$coupon_api = (is_null(self::$coupon_api)) ? new CouponManagement() : self::$coupon_api;
         $storage_handler = self::$plugin_admin->getStorageHandler();
@@ -173,7 +173,9 @@ class Main
         $app_id = self::$plugin_admin->getApiKey();
         if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
             add_action('wp_loaded', array(self::$plugin_admin, 'schedulePlanChecker'));
-            add_action('wp_footer', array(self::$referral_program, 'printReferralPopup'));
+            if (self::$plugin_admin->isProPlan()) {
+                add_action('wp_footer', array(self::$referral_program, 'printReferralPopup'));
+            }
             add_filter('script_loader_src', array(self::$abandoned_cart, 'addCloudFlareAttrScript'), 10, 2);
             add_filter('clean_url', array(self::$abandoned_cart, 'uncleanUrl'), 10, 3);
             //Sync the order by the scheduled events

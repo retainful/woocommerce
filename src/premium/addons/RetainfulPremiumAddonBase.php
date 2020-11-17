@@ -12,7 +12,7 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
 
         function __construct()
         {
-            $this->admin = new Rnoc\Retainful\Admin\Settings();
+            $this->admin = new Rnoc\Retainful\Admin\Admin();
             $this->plan = array('pro', 'business', 'professional');
             $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
             $this->premium_addon_settings = $this->admin->getPremiumAddonSettings();
