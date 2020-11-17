@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.5
 WC tested up to: 4.6.1
 Requires PHP: 5.6
-Stable tag: 2.4.0
+Stable tag: 2.4.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -472,3 +472,6 @@ No. There is no charges for support.
 
 = 2.4.0 =
 * New feature: Referral program
+
+= 2.4.1 =
+* Fix: Premium popups issue fixed

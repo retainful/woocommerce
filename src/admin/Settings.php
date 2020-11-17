@@ -417,9 +417,10 @@ class Settings
         $exit_intent_popup_template = self::$input->post(RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', '', false);
         $add_to_cart_coupon_popup_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] : '';
         $coupon_mail_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] : '';
-        $post = self::$input->post();
-        $add_to_cart_gdpr_message = isset($post[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $post[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
-        $ei_gdpr_message = isset($post[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $post[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
+        $atc_gdpr_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance', array(), false);
+        $add_to_cart_gdpr_message = isset($atc_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $atc_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
+        $ei_gdpr_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance', array(), false);
+        $ei_gdpr_message = isset($ei_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $ei_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
         $data = $this->clean($post);
         if (!empty($exit_intent_popup_template)) {
             $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] = $this->sanitizeBasicHtml($exit_intent_popup_template);
