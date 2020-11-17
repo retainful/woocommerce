@@ -188,12 +188,14 @@ class Settings
                     'class' => array(),
                     'id' => array(),
                     'style' => array(),
-                    'src' => array(),
-                    'width' => array(),
-                    'height' => array()
                 );
                 if ($tag == 'a') {
                     $allowed_html[$tag]['href'] = array();
+                }
+                if ($tag == 'img') {
+                    $allowed_html[$tag]['src'] = array();
+                    $allowed_html[$tag]['width'] = array();
+                    $allowed_html[$tag]['height'] = array();
                 }
             }
             $allowed_html = apply_filters('rnoc_sanitize_allowed_basic_html_tags', $allowed_html);
@@ -416,12 +418,20 @@ class Settings
         $add_to_cart_coupon_popup_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] : '';
         $coupon_mail_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] : '';
         $post = self::$input->post();
+        $add_to_cart_gdpr_message = isset($post[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $post[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
+        $ei_gdpr_message = isset($post[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $post[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
         $data = $this->clean($post);
         if (!empty($exit_intent_popup_template)) {
             $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] = $this->sanitizeBasicHtml($exit_intent_popup_template);
         }
         if (!empty($add_to_cart_coupon_popup_template)) {
             $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] = $this->sanitizeBasicHtml($add_to_cart_coupon_popup_template);
+        }
+        if (!empty($add_to_cart_gdpr_message)) {
+            $data[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] = $this->sanitizeBasicHtml($add_to_cart_gdpr_message);
+        }
+        if (!empty($ei_gdpr_message)) {
+            $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] = $this->sanitizeBasicHtml($ei_gdpr_message);
         }
         if (!empty($coupon_mail_template)) {
             $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] = $this->sanitizeBasicHtml($coupon_mail_template);

@@ -684,61 +684,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 </table>
                 <div class="rnoc-tag">
                     <?php
-                    echo __('GDPR Compliance for collecting E-Mail', RNOC_TEXT_DOMAIN)
-                    ?>
-                </div>
-                <table class="form-table" role="presentation">
-                    <?php
-                    $gdpr_compliance_name = RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance[0]'
-                    ?>
-                    <tbody>
-                    <tr>
-                        <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'; ?>"><?php
-                                esc_html_e('Show GDPR Compliance checkbox', RNOC_TEXT_DOMAIN);
-                                ?></label>
-                        </th>
-                        <td>
-                            <label>
-                                <select name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'; ?>">
-                                    <?php
-                                    foreach ($this->complianceMessageOptions() as $key => $label) {
-                                        ?>
-                                        <option value="<?php echo $key ?>" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'] == $key) {
-                                            echo 'selected';
-                                        } ?> ><?php echo $label ?></option>
-                                        <?php
-                                    }
-                                    ?>
-                                </select>
-                            </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'; ?>"><?php
-                                esc_html_e('GDPR Compliance message', RNOC_TEXT_DOMAIN);
-                                ?></label>
-                        </th>
-                        <td>
-                            <label>
-                            <textarea
-                                    name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'; ?>"
-                                    rows="10"
-                                    cols="50"><?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']); ?>
-                            </textarea>
-                            </label>
-                            <p class="description">
-                                <?php
-                                echo __('You can also use HTML content as well in the message.', RNOC_TEXT_DOMAIN)
-                                ?>
-                            </p>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div class="rnoc-tag">
-                    <?php
                     echo __('Popup design', RNOC_TEXT_DOMAIN)
                     ?>
                 </div>
@@ -911,6 +856,61 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                        type="text" class="regular-text"
                                        value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width']); ?>">
                             </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="rnoc-tag">
+                    <?php
+                    echo __('GDPR Compliance for collecting E-Mail', RNOC_TEXT_DOMAIN)
+                    ?>
+                </div>
+                <table class="form-table" role="presentation">
+                    <?php
+                    $gdpr_compliance_name = RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance[0]'
+                    ?>
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'; ?>"><?php
+                                esc_html_e('Show GDPR Compliance checkbox', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <select name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'; ?>">
+                                    <?php
+                                    foreach ($this->complianceMessageOptions() as $key => $label) {
+                                        ?>
+                                        <option value="<?php echo $key ?>" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'] == $key) {
+                                            echo 'selected';
+                                        } ?> ><?php echo $label ?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'; ?>"><?php
+                                esc_html_e('GDPR Compliance message', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                            <textarea
+                                    name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'; ?>"
+                                    rows="10"
+                                    cols="50"><?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']); ?>
+                            </textarea>
+                            </label>
+                            <p class="description">
+                                <?php
+                                echo __('You can also use HTML content as well in the message.', RNOC_TEXT_DOMAIN)
+                                ?>
+                            </p>
                         </td>
                     </tr>
                     </tbody>
