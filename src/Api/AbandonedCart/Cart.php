@@ -202,24 +202,12 @@ class Cart extends RestApi
     }
 
     /**
-     * get the referral url
-     * @return mixed|void
-     */
-    function getReferralUrl()
-    {
-        return apply_filters('referral_engine_url', 'https://js.retainful.com/woocommerce/v1/referral-wocommerce.js');
-    }
-
-    /**
      * Adding the script to track user cart
      */
     function addCartTrackingScripts()
     {
         if (!wp_script_is('wc-cart-fragments', 'enqueued')) {
             wp_enqueue_script('wc-cart-fragments');
-        }
-        if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'referral', 'enqueued')) {
-            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'referral', $this->getReferralUrl(), array(), RNOC_VERSION, true);
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             global $retainful;

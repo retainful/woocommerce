@@ -173,7 +173,10 @@ class Main
         $app_id = self::$plugin_admin->getApiKey();
         if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
             add_action('wp_loaded', array(self::$plugin_admin, 'schedulePlanChecker'));
-            add_action('wp_footer', array(self::$referral_program, 'printReferralPopup'));
+            if (self::$plugin_admin->isProPlan()) {
+                add_action('wp_footer', array(self::$referral_program, 'printReferralPopup'));
+                add_action('wp_enqueue_scripts', array(self::$referral_program, 'referralProgramScripts'));
+            }
             add_filter('script_loader_src', array(self::$abandoned_cart, 'addCloudFlareAttrScript'), 10, 2);
             add_filter('clean_url', array(self::$abandoned_cart, 'uncleanUrl'), 10, 3);
             //Sync the order by the scheduled events

@@ -57,6 +57,25 @@ class ReferralManagement
     }
 
     /**
+     * include referral program script
+     */
+    function referralProgramScripts()
+    {
+        if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'referral', 'enqueued')) {
+            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'referral', $this->getReferralUrl(), array(), RNOC_VERSION, true);
+        }
+    }
+
+    /**
+     * get the referral url
+     * @return mixed|void
+     */
+    function getReferralUrl()
+    {
+        return apply_filters('referral_engine_url', 'https://js.retainful.com/woocommerce/v1/referral-wocommerce.js');
+    }
+
+    /**
      * echo the referral div
      */
     function printReferralPopup()
