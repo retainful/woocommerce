@@ -1606,8 +1606,8 @@ class WcFunctions
             $customer_orders = $this->getCustomerOrdersByEmail($email);
             if (is_array($customer_orders)) {
                 foreach ($customer_orders as $order) {
-                    if ($order instanceof \WP_Post) {
-                        $sum = $sum + floatval(get_post_meta($order->ID, '_order_total', true));
+                    if ($order instanceof \WC_Order) {
+                        $sum = $sum + $this->getOrderTotal($order);
                     }
                 }
             }
@@ -1617,18 +1617,19 @@ class WcFunctions
 
     /**
      * @param $email
-     * @return int
+     * @return array[]
      */
     function getCustomerOrdersByEmail($email)
     {
-        $customer_orders = get_posts(array(
-            'numberposts' => -1,
-            'meta_key' => '_billing_email',
-            'meta_value' => $email,
-            'post_type' => wc_get_order_types(),
-            'post_status' => array_keys(wc_get_order_statuses()),
-        ));
-        return apply_filters('rnoc_get_customer_orders_by_email', $customer_orders);
+        if (!empty($email) && is_email($email)) {
+            $args = array(
+                'customer' => $email,
+            );
+            $orders = $this->getOrdersList($args);
+            return apply_filters('rnoc_get_customer_orders_by_email', $orders);
+        } else {
+            return array();
+        }
     }
 
     /**
