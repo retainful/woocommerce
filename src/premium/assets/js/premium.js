@@ -528,9 +528,18 @@
     window.retainful = new Retainful_premium();
     if (window.retainful.is_local_storage_supported()) {
         $(document).ready(function () {
-            window.retainful.init_ei_popup(rnoc_premium_ei_popup);
-            window.retainful.init_coupon_timer(rnoc_premium_ct);
-            window.retainful.init_atc_popup(rnoc_premium_atcp);
+            try {
+                window.retainful.init_ei_popup(rnoc_premium_ei_popup);
+            } catch (e) {
+            }
+            try {
+                window.retainful.init_coupon_timer(rnoc_premium_ct);
+            } catch (e) {
+            }
+            try {
+                window.retainful.init_atc_popup(rnoc_premium_atcp);
+            } catch (e) {
+            }
             window.retainful.show_instant_popup();
         });
     }

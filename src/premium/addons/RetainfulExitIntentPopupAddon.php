@@ -26,9 +26,9 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
                 add_action('wp_ajax_rnocp_get_exit_intent_popup_template', array($this, 'getPopupTemplateToInsert'));
             }
-            $need_ei_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 1);
-            add_action('wp_enqueue_scripts', array($this, 'enqueueScript'));
+            $need_ei_popup = $this->isExitIntentPopupEnabled();
             if ($need_ei_popup) {
+                add_action('wp_enqueue_scripts', array($this, 'enqueueScript'));
                 add_action('wp_footer', array($this, 'printExitIntentPopup'));
                 add_action('wp_ajax_nopriv_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
                 add_action('wp_ajax_set_rnoc_exit_intent_popup_guest_session', array($this, 'setGuestEmailSession'));
@@ -239,12 +239,21 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         }
 
         /**
+         * is exit intent popup enabled?
+         * @return mixed|null
+         */
+        function isExitIntentPopupEnabled()
+        {
+            return $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 0);
+        }
+
+        /**
          * exit intent popup settings
          * @param $premium_settings
          */
         function exitIntentPopupSettings(&$premium_settings)
         {
-            $need_ei_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 0);
+            $need_ei_popup = $this->isExitIntentPopupEnabled();
             $selected_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages', array());
             if ($need_ei_popup == 1 && $this->isValidPagesToDisplay($selected_pages)) {
                 $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', array());
@@ -296,36 +305,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     do_action("rnoc_exit_intent_after_applying_coupon_code", $coupon_code);
                 }
             }
-        }
-
-        /**
-         * add the settings tabs
-         * @param $settings
-         * @return array
-         */
-        function premiumAddonTab($settings)
-        {
-            $settings[] = array(
-                'id' => $this->slug,
-                'icon' => $this->icon,
-                'title' => __('Exit intent Popup', RNOC_TEXT_DOMAIN),
-                'fields' => array(
-                    RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to',
-                    RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance',
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design',
-                ),
-            );
-            return $settings;
         }
 
         /**

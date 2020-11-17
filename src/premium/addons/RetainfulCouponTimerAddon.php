@@ -25,10 +25,10 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             if (is_admin()) {
                 add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
             }
-            $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 0);
+            $need_coupon_timer = $this->isCtEnabled();
             $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
-            add_action('wp_enqueue_scripts', array($this, 'enqueueScript'));
             if ($need_coupon_timer && !empty($coupon_code)) {
+                add_action('wp_enqueue_scripts', array($this, 'enqueueScript'));
                 add_action('woocommerce_add_to_cart', array($this, 'productAddedToCart'));
                 add_action('woocommerce_before_cart', array($this, 'beforeCart'));
                 add_filter('woocommerce_cart_totals_coupon_html', array($this, 'belowDiscount'), 100, 2);
@@ -42,6 +42,18 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             }
         }
 
+        /**
+         * Check Coupon timer enabled or not
+         * @return mixed|null
+         */
+        function isCtEnabled()
+        {
+            return $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 0);
+        }
+
+        /**
+         * after item added to cart
+         */
         function productAddedToCart()
         {
             $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
@@ -176,7 +188,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
          */
         function couponTimerSettings(&$premium_settings)
         {
-            $need_coupon_timer = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', 0);
+            $need_coupon_timer = $this->isCtEnabled();
             $code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
             $ended = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
             $selected_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages', array());

@@ -20,21 +20,26 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $this->icon = 'dashicons-cart';
         }
 
+        /**
+         * init the addon
+         */
         function init()
         {
             if (is_admin()) {
                 add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
             }
-            add_action('wp_ajax_nopriv_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
-            add_action('wp_ajax_nopriv_rnoc_popup_closed', array($this, 'popupClosed'));
-            //To support the logged in user
-            add_action('wp_ajax_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
-            add_action('wp_ajax_rnoc_popup_closed', array($this, 'popupClosed'));
-            add_action('wp_footer', array($this, 'enqueue_script'));
-            add_action('wp_enqueue_scripts', array($this, 'enqueueScripts'));
-            add_action('wp_footer', array($this, 'addAtcPopupContent'));
-            add_action('wp', array($this, 'applyCouponAutomatically'));
-            add_action('woocommerce_add_to_cart', array($this, 'productAddedToCart'));
+            if ($this->isAddToCartPopupEnabled()) {
+                add_action('wp_ajax_nopriv_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
+                add_action('wp_ajax_nopriv_rnoc_popup_closed', array($this, 'popupClosed'));
+                //To support the logged in user
+                add_action('wp_ajax_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
+                add_action('wp_ajax_rnoc_popup_closed', array($this, 'popupClosed'));
+                add_action('wp_footer', array($this, 'enqueueAtcPopupScript'));
+                add_action('wp_enqueue_scripts', array($this, 'enqueueScripts'));
+                add_action('wp_footer', array($this, 'addAtcPopupContent'));
+                add_action('wp', array($this, 'applyCouponAutomatically'));
+                add_action('woocommerce_add_to_cart', array($this, 'productAddedToCart'));
+            }
         }
 
         /**
@@ -48,7 +53,10 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             }
         }
 
-        function enqueue_script()
+        /**
+         * enqueue the snippet
+         */
+        function enqueueAtcPopupScript()
         {
             ?>
             <script>
@@ -331,12 +339,21 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         }
 
         /**
+         * check is add to cart popup enabled
+         * @return mixed|null
+         */
+        function isAddToCartPopupEnabled()
+        {
+            return $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_modal', 0);
+        }
+
+        /**
          * ATC popup settings
          * @param $premium_settings
          */
         function addToCartPopupSettings(&$premium_settings)
         {
-            $need_atc_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_modal', 1);
+            $need_atc_popup = $this->isAddToCartPopupEnabled();
             $selected_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_display_pages', array());
             if ($need_atc_popup == 1 && $this->isValidPagesToDisplay($selected_pages)) {
                 $premium_settings['atc_popup'] = array(

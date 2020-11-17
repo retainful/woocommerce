@@ -858,15 +858,6 @@ class Settings
     }
 
     /**
-     * check the premium plugin is active
-     * @return bool
-     */
-    function isPremiumPluginActive()
-    {
-        return is_plugin_active('retainful-abandoned-cart-premium/retainful-abandoned-cart-premium.php');
-    }
-
-    /**
      * applied Coupon Default Template
      * @return string
      */

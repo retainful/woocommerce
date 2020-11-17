@@ -99,7 +99,7 @@ class Main
                 break;
         }
         self::$api = empty(self::$api) ? new RetainfulApi() : self::$api;
-        if (!self::$plugin_admin->isPremiumPluginActive()) {
+        if (self::$plugin_admin->isProPlan()) {
             self::$premium_features = (is_null(self::$premium_features)) ? new RetainfulPremiumMain() : self::$premium_features;
         }
         //Remove scheduled hooks
