@@ -1585,9 +1585,11 @@ class WcFunctions
      */
     function getCustomerTotalOrders($email)
     {
-        $customer_orders = $this->getCustomerOrdersByEmail($email);
-        if (is_array($customer_orders)) {
-            return count($customer_orders);
+        if (!empty($email) && is_email($email)) {
+            $customer_orders = $this->getCustomerOrdersByEmail($email);
+            if (is_array($customer_orders)) {
+                return count($customer_orders);
+            }
         }
         return 0;
     }
@@ -1599,12 +1601,14 @@ class WcFunctions
      */
     function getCustomerTotalSpent($email)
     {
-        $customer_orders = $this->getCustomerOrdersByEmail($email);
         $sum = 0;
-        if (is_array($customer_orders)) {
-            foreach ($customer_orders as $order) {
-                if ($order instanceof \WP_Post) {
-                    $sum = $sum + floatval(get_post_meta($order->ID, '_order_total', true));
+        if (!empty($email) && is_email($email)) {
+            $customer_orders = $this->getCustomerOrdersByEmail($email);
+            if (is_array($customer_orders)) {
+                foreach ($customer_orders as $order) {
+                    if ($order instanceof \WP_Post) {
+                        $sum = $sum + floatval(get_post_meta($order->ID, '_order_total', true));
+                    }
                 }
             }
         }

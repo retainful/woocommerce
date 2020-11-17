@@ -1264,11 +1264,6 @@ class Cart extends RestApi
             $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
             $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
         }
-        $last_order = wc_get_customer_last_order($user_id);
-        $last_order_id = null;
-        if (!empty($last_order) && $last_order instanceof \WC_Order) {
-            $last_order_id = $retainful::$woocommerce->getOrderId($last_order);
-        }
         return array(
             'id' => $user_id,
             'customer_id' => $customer_id,
@@ -1280,9 +1275,9 @@ class Cart extends RestApi
             'currency' => NULL,
             'created_at' => $this->formatToIso8601($created_at),
             'updated_at' => $this->formatToIso8601($updated_at),
-            'total_spent' => $retainful::$woocommerce->getCustomerTotalSpent($billing_email),
-            'orders_count' => $retainful::$woocommerce->getCustomerTotalOrders($billing_email),
-            'last_order_id' => $last_order_id,
+            'total_spent' => null,
+            'orders_count' => null,
+            'last_order_id' => null,
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,
