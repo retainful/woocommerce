@@ -20,34 +20,7 @@
             "custom_classes": ""
         };
         this.default_ct_settings = {
-            "enable": "yes",
-            "timer_started": "0",
-            "time_in_minutes": "15",
-            "code": "",
-            "expiry_url": "",
-            "reset_url": "",
-            "expiry_message": "",
-            "expired_text": "Expired",
-            "timer_reset": "0",
-            "top": {
-                "enable": "yes",
-                "checkout_url": "",
-                "message": "Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}",
-                "timer": "{{minutes}}M {{seconds}}S",
-                "display_on": "bottom",
-                "background": "#ffffff",
-                "color": "#000000",
-                "coupon_code_color": "#000000",
-                "coupon_timer_color": "#000000",
-                "enable_cta": "yes",
-                "cta_text": "Checkout Now",
-                "cta_color": "#ffffff",
-                "cta_background": "#f27052"
-            }, "above_cart": {
-                "enable": "no"
-            }, "below_discount": {
-                "enable": "no"
-            }
+            "enable": "no"
         };
     }
 
