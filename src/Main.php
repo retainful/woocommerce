@@ -175,6 +175,7 @@ class Main
             add_action('wp_loaded', array(self::$plugin_admin, 'schedulePlanChecker'));
             if (self::$plugin_admin->isProPlan()) {
                 add_action('wp_footer', array(self::$referral_program, 'printReferralPopup'));
+                add_action('wp_enqueue_scripts', array(self::$referral_program, 'referralProgramScripts'));
             }
             add_filter('script_loader_src', array(self::$abandoned_cart, 'addCloudFlareAttrScript'), 10, 2);
             add_filter('clean_url', array(self::$abandoned_cart, 'uncleanUrl'), 10, 3);
