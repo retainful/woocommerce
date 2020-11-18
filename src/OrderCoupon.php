@@ -441,7 +441,7 @@ class OrderCoupon
         $this->updateAppliedCouponDetails($order_id, $order);
         $request_params = $this->getRequestParams($order);
         if (isset($request_params['applied_coupon']) && !empty($request_params['applied_coupon'])) {
-            $coupon_details = $this->isValidCoupon($request_params['applied_coupon'], $order);
+            $coupon_details = $this->isValidCoupon($request_params['applied_coupon'], $order, array('rnoc_order_coupon'));
             if (!empty($coupon_details)) {
                 $my_post = array(
                     'ID' => $coupon_details->ID,
