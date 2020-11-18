@@ -65,12 +65,12 @@ class Cart extends RestApi
     function guestGdprMessage($fields)
     {
         global $retainful;
-        $settings = $retainful::$plugin_admin->getAdminSettings();
-        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
-        if ($enable_gdpr_compliance) {
-            if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
+        $enable_gdpr_compliance = $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0);
+        if ($enable_gdpr_compliance == 1) {
+            $gdpr_message = $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '');
+            if (!empty($gdpr_message)) {
                 $existing_label = $fields['billing']['billing_email']['label'];
-                $fields['billing']['billing_email']['label'] = $existing_label . "<br><small>" . $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] . "</small>";
+                $fields['billing']['billing_email']['label'] = $existing_label . "<br><small>" . $gdpr_message . "</small>";
             }
         }
         return $fields;
@@ -82,11 +82,11 @@ class Cart extends RestApi
     function userGdprMessage()
     {
         global $retainful;
-        $settings = $retainful::$plugin_admin->getAdminSettings();
-        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
+        $enable_gdpr_compliance = $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0);
         if ($enable_gdpr_compliance) {
-            if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
-                echo "<p><small>" . __($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'], RNOC_TEXT_DOMAIN) . "</small></p>";
+            $cart_capture_msg = $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'cart_capture_msg', 0);
+            if (!empty($cart_capture_msg)) {
+                echo "<p><small>" . __($cart_capture_msg, RNOC_TEXT_DOMAIN) . "</small></p>";
             }
         }
     }

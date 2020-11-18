@@ -318,11 +318,12 @@ class Main
      */
     function canActivateIPFilter()
     {
-        $settings = self::$plugin_admin->getAdminSettings();
-        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && isset($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])) {
-            $ip = $settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'];
+        global $retainful;
+        $enable_ip_filter = $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'enable_ip_filter', 0);
+        $ignored_ips = $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'enable_ip_filter', '');
+        if (!empty($enable_ip_filter) && !empty($ignored_ips)) {
             if (!empty($ip)) {
-                $ip_filter = new IpFiltering($ip);
+                $ip_filter = new IpFiltering($ignored_ips);
                 add_filter('rnoc_is_cart_has_valid_ip', array($ip_filter, 'trackAbandonedCart'), 10, 2);
             }
         }
@@ -333,11 +334,11 @@ class Main
      */
     function migrationV201()
     {
-        $premium_settings = get_option(self::$plugin_admin->slug . '_premium');
-        $admin_settings = self::$plugin_admin->getAdminSettings();
-        $admin_settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter'] = isset($premium_settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) ? $premium_settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter'] : 0;
-        $admin_settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'] = isset($premium_settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) ? $premium_settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'] : '';
-        update_option(self::$plugin_admin->slug . '_settings', $admin_settings);
+        global $retainful;
+        $admin_settings = $retainful::$settings->get('general_settings', null, array(), true);
+        $admin_settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter'] = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'enable_ip_filter', 0);
+        $admin_settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'] = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses', '');
+        $retainful::$settings->set('general_settings', $admin_settings);
         update_option('is_retainful_v2_0_1_migration_completed', 1);
     }
 

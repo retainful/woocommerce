@@ -447,8 +447,7 @@ class RestApi
     function considerOnHoldAsAbandoned()
     {
         global $retainful;
-        $settings = $retainful::$plugin_admin->getAdminSettings();
-        return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status'] : 0;
+        return $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status', 0);
     }
 
     /**
@@ -458,8 +457,7 @@ class RestApi
     function considerCancelledAsAbandoned()
     {
         global $retainful;
-        $settings = $retainful::$plugin_admin->getAdminSettings();
-        return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'] : 1;
+        return $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status', 1);
     }
 
     /**
@@ -469,8 +467,7 @@ class RestApi
     function refreshFragmentsOnPageLoad()
     {
         global $retainful;
-        $settings = $retainful::$plugin_admin->getAdminSettings();
-        return isset($settings[RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load']) ? $settings[RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'] : 0;
+        return $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load', 0);
     }
 
     /**

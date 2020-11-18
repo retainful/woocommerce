@@ -847,8 +847,9 @@ class Admin
      */
     function logMessage($message, $log_in_as = "checkout")
     {
-        $admin_settings = $this->getAdminSettings();
-        if (isset($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log'])) {
+        global $retainful;
+        $enable_log = $retainful::$settings->get('general_settings', RNOC_PLUGIN_PREFIX . 'enable_debug_log', 0);
+        if ($enable_log == 1) {
             try {
                 if (is_array($message) || is_object($message)) {
                     $message = json_encode($message);
@@ -913,16 +914,6 @@ class Admin
     }
 
     /**
-     * Get the abandoned cart settings
-     * @return array|mixed
-     */
-    function getAdminSettings()
-    {
-        global $retainful;
-        return $retainful::$settings->get('general_settings', null, array(), true);
-    }
-
-    /**
      * get the cart tracking engine
      * @return mixed|string
      */
@@ -972,7 +963,7 @@ class Admin
     }
 
     /**
-     *
+     * search for coupons
      */
     function getSearchedCoupons()
     {
@@ -1247,25 +1238,14 @@ class Admin
     }
 
     /**
-     * License settings
-     * @return mixed|void
-     */
-    function getLicenseDetails()
-    {
-        return get_option($this->slug . '_license', array());
-    }
-
-    /**
      * Check fo entered API key is valid or not
      * @return bool
      */
     function isAppConnected()
     {
-        $settings = $this->getLicenseDetails();
-        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'])) {
-            return true;
-        }
-        return false;
+        global $retainful;
+        $is_connected = $retainful::$settings->get('connection', RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0);
+        return ($is_connected == 1);
     }
 
     /**
@@ -1274,11 +1254,8 @@ class Admin
      */
     function getApiKey()
     {
-        $settings = $this->getLicenseDetails();
-        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id'])) {
-            return $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id'];
-        }
-        return NULL;
+        global $retainful;
+        return $retainful::$settings->get('connection', RNOC_PLUGIN_PREFIX . 'retainful_app_id', null);
     }
 
     /**
@@ -1287,11 +1264,8 @@ class Admin
      */
     function getSecretKey()
     {
-        $settings = $this->getLicenseDetails();
-        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret'])) {
-            return $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret'];
-        }
-        return NULL;
+        global $retainful;
+        return $retainful::$settings->get('connection', RNOC_PLUGIN_PREFIX . 'retainful_app_secret', null);
     }
 
     /**
@@ -1331,7 +1305,7 @@ class Admin
         list($country_code, $state_code) = explode(':', $country_details);
         $lang_helper = new MultiLingual();
         $default_language = $lang_helper->getDefaultLanguage();
-        $details = array(
+        return array(
             'woocommerce_app_id' => $api_key,
             'secret_key' => $retainful::$abandoned_cart->encryptData($api_key, $secret_key),
             'id' => NULL,
@@ -1352,7 +1326,6 @@ class Admin
             'enabled_presentment_currencies' => $this->getAllAvailableCurrencies(),
             'primary_locale' => $default_language
         );
-        return $details;
     }
 
     /**
@@ -1374,9 +1347,10 @@ class Admin
      */
     function getCouponMessage()
     {
-        $settings = get_option($this->slug, array());
-        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']) && !empty(isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']))) {
-            return __($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'], RNOC_TEXT_DOMAIN);
+        global $retainful;
+        $noc_message = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'retainful_coupon_message', null);
+        if (!empty($noc_message)) {
+            return __($noc_message, RNOC_TEXT_DOMAIN);
         } else {
             return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>', RNOC_TEXT_DOMAIN);
         }
@@ -1388,12 +1362,9 @@ class Admin
      */
     function isNextOrderCouponEnabled()
     {
-        $settings = get_option($this->slug, array());
-        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']) && empty($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon'])) {
-            return false;
-        } else {
-            return true;
-        }
+        global $retainful;
+        $is_enabled = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon', '0');
+        return ($is_enabled == 1);
     }
 
     /**
@@ -1402,21 +1373,19 @@ class Admin
      */
     function getCouponSettings()
     {
+        global $retainful;
         $coupon = array();
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            $coupon['coupon_type'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] : 0;
-            $coupon['coupon_applicable_to'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to'] : 'all';
-            $coupon['coupon_amount'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) && ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] > 0) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
-            $coupon['product_ids'] = isset($settings[RNOC_PLUGIN_PREFIX . 'products']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'products']) ? $settings[RNOC_PLUGIN_PREFIX . 'products'] : array();
-            $coupon['exclude_product_ids'] = isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_products']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'exclude_products']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_products'] : array();
-            $coupon['minimum_amount'] = isset($settings[RNOC_PLUGIN_PREFIX . 'minimum_spend']) && ($settings[RNOC_PLUGIN_PREFIX . 'minimum_spend'] > 0) ? $settings[RNOC_PLUGIN_PREFIX . 'minimum_spend'] : 0;
-            $coupon['maximum_amount'] = isset($settings[RNOC_PLUGIN_PREFIX . 'maximum_spend']) && ($settings[RNOC_PLUGIN_PREFIX . 'maximum_spend'] > 0) ? $settings[RNOC_PLUGIN_PREFIX . 'maximum_spend'] : 0;
-            $coupon['individual_use'] = isset($settings[RNOC_PLUGIN_PREFIX . 'individual_use_only']) && ($settings[RNOC_PLUGIN_PREFIX . 'individual_use_only'] == 1) ? 'yes' : 'no';
-            $coupon['exclude_sale_items'] = isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_sale_items']) && ($settings[RNOC_PLUGIN_PREFIX . 'exclude_sale_items'] == 1) ? 'yes' : 'no';
-            $coupon['product_categories'] = isset($settings[RNOC_PLUGIN_PREFIX . 'product_categories']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'product_categories']) ? $settings[RNOC_PLUGIN_PREFIX . 'product_categories'] : array();
-            $coupon['exclude_product_categories'] = isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_product_categories']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'exclude_product_categories']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'] : array();
-        }
+        $coupon['coupon_type'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'retainful_coupon_type', 0);
+        $coupon['coupon_applicable_to'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to', 'all');
+        $coupon['coupon_amount'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount', 0);
+        $coupon['product_ids'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'products', array());
+        $coupon['exclude_product_ids'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'exclude_products', array());
+        $coupon['minimum_amount'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'minimum_spend', 0);
+        $coupon['maximum_amount'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'maximum_spend', 0);
+        $coupon['individual_use'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'individual_use_only', 'no');
+        $coupon['exclude_sale_items'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'exclude_sale_items', 'no');
+        $coupon['product_categories'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'product_categories', array());
+        $coupon['exclude_product_categories'] = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'exclude_product_categories', array());
         return $coupon;
     }
 
@@ -1426,12 +1395,9 @@ class Admin
      */
     function getCouponValidOrderStatuses()
     {
+        global $retainful;
         $statuses = array('wc-processing', 'wc-completed');
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            return isset($settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status'] : $statuses;
-        }
-        return $statuses;
+        return $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'preferred_order_status', $statuses);
     }
 
     /**
@@ -1440,12 +1406,9 @@ class Admin
      */
     function showCouponInThankYouPage()
     {
-        $show_on_thankyou_page = 0;
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            return isset($settings[RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page']) ? $settings[RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page'] : $show_on_thankyou_page;
-        }
-        return $show_on_thankyou_page;
+        global $retainful;
+        $show = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page', 0);
+        return ($show == 1);
     }
 
     /**
@@ -1454,12 +1417,8 @@ class Admin
      */
     function enableCouponResponsePopup()
     {
-        $enable = 1;
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup']) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'] : $enable;
-        }
-        return $enable;
+        global $retainful;
+        return $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup', 1);
     }
 
     /**
@@ -1470,10 +1429,8 @@ class Admin
     {
         $roles = array('all');
         if ($this->isProPlan()) {
-            $usage_restrictions = get_option($this->slug, array());
-            if (!empty($usage_restrictions)) {
-                return isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'preferred_user_roles']) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'preferred_user_roles'] : $roles;
-            }
+            global $retainful;
+            return $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'preferred_user_roles', $roles);
         }
         return $roles;
     }
@@ -1486,10 +1443,8 @@ class Admin
     {
         $limit = 99;
         if ($this->isProPlan()) {
-            $settings = get_option($this->slug, array());
-            if (!empty($settings)) {
-                return isset($settings[RNOC_PLUGIN_PREFIX . 'limit_per_user']) ? $settings[RNOC_PLUGIN_PREFIX . 'limit_per_user'] : $limit;
-            }
+            global $retainful;
+            return $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'limit_per_user', $limit);
         }
         return $limit;
     }
@@ -1502,10 +1457,8 @@ class Admin
     {
         $minimum_sub_total = 0;
         if ($this->isProPlan()) {
-            $settings = get_option($this->slug, array());
-            if (!empty($settings)) {
-                return isset($settings[RNOC_PLUGIN_PREFIX . 'minimum_sub_total']) ? $settings[RNOC_PLUGIN_PREFIX . 'minimum_sub_total'] : $minimum_sub_total;
-            }
+            global $retainful;
+            return $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'minimum_sub_total', $minimum_sub_total);
         }
         return $minimum_sub_total;
     }
@@ -1518,10 +1471,8 @@ class Admin
     {
         $products = array();
         if ($this->isProPlan()) {
-            $settings = get_option($this->slug, array());
-            if (!empty($settings)) {
-                return isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products'] : $products;
-            }
+            global $retainful;
+            return $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products', $products);
         }
         return $products;
     }
@@ -1534,10 +1485,8 @@ class Admin
     {
         $categories = array();
         if ($this->isProPlan()) {
-            $settings = get_option($this->slug, array());
-            if (!empty($settings)) {
-                return isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories'] : $categories;
-            }
+            global $retainful;
+            return $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories', $categories);
         }
         return $categories;
     }
@@ -1548,13 +1497,9 @@ class Admin
      */
     function autoGenerateCouponsForOldOrders()
     {
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            if (isset($settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon']) && $settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon'] == 0) {
-                return false;
-            }
-        }
-        return true;
+        global $retainful;
+        $auto_generate = $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon', 1);
+        return ($auto_generate == 1);
     }
 
     /**
@@ -1563,12 +1508,8 @@ class Admin
      */
     function couponFor()
     {
-        $coupon_applicable_for = 'all';
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            $coupon_applicable_for = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to'] : 'all';
-        }
-        return $coupon_applicable_for;
+        global $retainful;
+        return $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to', 'all');
     }
 
     /**
@@ -1577,12 +1518,8 @@ class Admin
      */
     function couponMessageHook()
     {
-        $hook = 'woocommerce_email_customer_details';
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            $hook = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
-        }
-        return $hook;
+        global $retainful;
+        return $retainful::$settings->get('next_order_coupon', RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to', 'woocommerce_email_customer_details');
     }
 
     /**
@@ -1616,5 +1553,6 @@ class Admin
         if (!apply_filters('rnoc_need_survey_form', true)) return false;
         $survey = new Survey();
         $survey->init(RNOC_PLUGIN_SLUG, 'Retainful - next order coupon for woocommerce', RNOC_TEXT_DOMAIN);
+        return null;
     }
 }
