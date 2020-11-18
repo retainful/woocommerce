@@ -4,6 +4,7 @@ namespace Rnoc\Retainful;
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Admin;
+use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
 use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
@@ -25,6 +26,10 @@ class Main
      * @var null|PhpSession|Cookie|WooSession
      */
     public static $storage = null;
+    /**
+     * @var null | Settings
+     */
+    public static $settings = null;
     /**
      * @var null|RetainfulApi
      */
@@ -78,6 +83,7 @@ class Main
         /**
          * Init classes
          */
+        self::$settings = (is_null(self::$settings)) ? new Settings() : self::$settings;
         self::$woocommerce = (is_null(self::$woocommerce)) ? new WcFunctions() : self::$woocommerce;
         self::$next_order_coupon = (is_null(self::$next_order_coupon)) ? new OrderCoupon() : self::$next_order_coupon;
         self::$abandoned_cart = (is_null(self::$abandoned_cart)) ? new Cart() : self::$abandoned_cart;

@@ -315,12 +315,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function getMailHeaders()
         {
-            $email_templates_settings = $this->admin->getEmailTemplatesSettings();
             $admin_email = get_option('admin_email');
             $details = array(
-                "from_name" => $this->getKeyFromArray($email_templates_settings, RNOC_PLUGIN_PREFIX . 'email_from_name', __('Admin', RNOC_TEXT_DOMAIN)),
-                "from_address" => $this->getKeyFromArray($email_templates_settings, RNOC_PLUGIN_PREFIX . 'email_from_address', $admin_email),
-                "replay_address" => $this->getKeyFromArray($email_templates_settings, RNOC_PLUGIN_PREFIX . 'email_reply_address', $admin_email)
+                "from_name" => __('Admin', RNOC_TEXT_DOMAIN),
+                "from_address" => $admin_email,
+                "replay_address" => $admin_email
             );
             $details = apply_filters('rnocp_reward_coupon_mail_sender_details', $details);
             extract($details);
