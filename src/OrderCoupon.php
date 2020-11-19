@@ -734,6 +734,9 @@ class OrderCoupon
     function createNewCoupon($order_id, $data)
     {
         global $retainful;
+        if (!$retainful::$plugin_admin->isNextOrderCouponEnabled()) {
+            return false;
+        }
         $order_id = sanitize_key($order_id);
         if (empty($order_id)) return false;
         $order = $retainful::$woocommerce->getOrder($order_id);
