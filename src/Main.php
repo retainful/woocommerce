@@ -99,7 +99,8 @@ class Main
                 break;
         }
         self::$api = empty(self::$api) ? new RetainfulApi() : self::$api;
-        if (self::$plugin_admin->isProPlan()) {
+        $is_app_connected = self::$plugin_admin->isAppConnected();
+        if (self::$plugin_admin->isProPlan() && $is_app_connected) {
             self::$premium_features = (is_null(self::$premium_features)) ? new RetainfulPremiumMain() : self::$premium_features;
         }
         //Remove scheduled hooks
@@ -168,7 +169,6 @@ class Main
         }
         $this->canActivateIPFilter();
         //If the user is old user then ask user to run abandoned cart to
-        $is_app_connected = self::$plugin_admin->isAppConnected();
         $secret_key = self::$plugin_admin->getSecretKey();
         $app_id = self::$plugin_admin->getApiKey();
         if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
