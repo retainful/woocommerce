@@ -100,11 +100,12 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function setGuestEmailSession()
         {
+            global $retainful;
             $message = '';
             $error = false;
             $email = sanitize_email($_REQUEST['email']);
             $this->wc_functions->setCustomerEmail($email);
-            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
+            $gdpr_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance', array(), false, 0);
             $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
             if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
                 $is_buyer_accepting_marketing = 1;
@@ -117,7 +118,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $cart_api->syncCartData(true);
             $checkout_url = $this->getCheckoutUrl();
             $cart_url = $this->getCartUrl();
-            $url_to_redirect = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success', 'checkout');
+            $url_to_redirect = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success', 'checkout');
             if ($url_to_redirect == "checkout") {
                 $url = $checkout_url;
             } elseif ($url_to_redirect == "cart") {
@@ -125,7 +126,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             } else {
                 $url = '';
             }
-            $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL);
+            $coupon_code = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', null);
             if (!empty($coupon_code)) {
                 $url = $url . '?rnoc_on_exit_coupon_code=' . $coupon_code;
             }
@@ -142,14 +143,14 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function getEmailCollectionForm()
         {
+            global $retainful;
             $override_path = get_theme_file_path('retainful/premium/templates/exit-intent-popups/email_collection_form.php');
             $template_path = RNOCPREMIUM_PLUGIN_PATH . 'templates/exit-intent-popups/email_collection_form.php';
             if (file_exists($override_path)) {
                 $template_path = $override_path;
             }
-            $form_designs = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design', array());
-            $form_designs = isset($form_designs[0]) ? $form_designs[0] : array();
-            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
+            $form_designs = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design', array(), false, 0);
+            $gdpr_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance', array(), false, 0);
             $final_settings = array(
                 'place_holder' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder', __('Enter E-mail address', RNOC_TEXT_DOMAIN)),
                 'button_color' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color', '#ffffff'),
@@ -170,11 +171,12 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function printExitIntentPopup()
         {
-            $content = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', '');
+            global $retainful;
+            $content = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', '');
             if (empty($content)) {
                 $content = $this->getDefaultPopupTemplate();
             }
-            $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', NULL);
+            $coupon_code = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', null);
             $checkout_url = $this->getCheckoutUrl();
             $cart_url = $this->getCartUrl();
             $coupon_data = "";
@@ -194,7 +196,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             foreach ($to_replace as $find => $replace) {
                 $content = str_replace('{{' . $find . '}}', $replace, $content);
             }
-            $custom_style = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style', NULL);
+            $custom_style = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style', null);
             echo '<div style="display: none;" class="rnoc-ei-popup">' . $content . '<style>' . $custom_style . '</style></div>';
         }
 
@@ -204,8 +206,9 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function getPopupTemplate()
         {
+            global $retainful;
             $default_template = $this->getDefaultPopupTemplate();
-            return $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', $default_template);
+            return $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', $default_template);
         }
 
         /**
@@ -244,7 +247,42 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function isExitIntentPopupEnabled()
         {
-            return $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 0);
+            global $retainful;
+            return $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 0);
+        }
+
+        function needEiPopup($show_popup_for)
+        {
+            global $retainful;
+            if ($show_popup_for == "non_email_users") {
+                $customer_email = $retainful::$woocommerce->getCustomerBillingEmail();
+                if (!empty($customer_email) && is_email($customer_email)) {
+                    return false;
+                }
+                return true;
+            } else {
+                return true;
+            }
+        }
+
+        /**
+         * get all applied coupons
+         * @return array
+         */
+        function getAppliedCoupons()
+        {
+            global $retainful;
+            $applied_coupons = $retainful::$woocommerce->getAppliedCartCoupons();
+            $codes = array();
+            if (!empty($applied_coupons)) {
+                foreach ($applied_coupons as $coupon) {
+                    if ($coupon instanceof \WC_Coupon) {
+                        $code = $retainful::$woocommerce->getCouponCode($coupon);
+                        $codes[] = !empty($code) ? strtoupper($code) : '';
+                    }
+                }
+            }
+            return array_filter($codes);
         }
 
         /**
@@ -253,24 +291,25 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function exitIntentPopupSettings(&$premium_settings)
         {
+            global $retainful;
             $need_ei_popup = $this->isExitIntentPopupEnabled();
-            $selected_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages', array());
-            if ($need_ei_popup == 1 && $this->isValidPagesToDisplay($selected_pages)) {
-                $show_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', array());
-                $mobile_settings = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings', array(array()));
-                $mobile_settings = isset($mobile_settings[0]) ? $mobile_settings[0] : array();
-                $code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '');
+            $selected_pages = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages', array());
+            $show_popup_for = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', 'all');
+            if ($need_ei_popup == 1 && $this->isValidPagesToDisplay($selected_pages) && $this->needEiPopup($show_popup_for)) {
+                $show_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings', array());
+                $mobile_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings', array(), false, 0);
+                $code = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '');
                 $premium_settings['ei_popup'] = array(
                     'enable' => 'yes',
                     'ajax_url' => admin_url('admin-ajax.php'),
-                    'show_for' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', 'all'),
+                    'show_for' => $show_popup_for,
                     'is_user_logged_in' => is_user_logged_in() ? 'yes' : 'no',
-                    'coupon_code' => !empty($code) ? base64_encode($code) : '',
-                    'show_once_its_coupon_applied' => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', '0') == 1) ? 'yes' : 'no',
-                    'applied_coupons' => array(),
+                    'coupon_code' => !empty($code) ? strtoupper($code) : '',
+                    'show_once_its_coupon_applied' => ($retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 0) == 0) ? 'yes' : 'no',
+                    'applied_coupons' => $this->getAppliedCoupons(),
                     'show_popup' => $this->getKeyFromArray($show_settings, 'show_option', 'once_per_session'),
                     'number_of_times_per_page' => $this->getKeyFromArray($show_settings, 'show_count', '1'),
-                    'cookie_expired_at' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', '1'),
+                    'cookie_expired_at' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 1)
                 );
                 if ($this->getKeyFromArray($mobile_settings, RNOC_PLUGIN_PREFIX . 'enable_mobile_support', '0') == 1) {
                     $premium_settings['ei_popup']['mobile'] = array(

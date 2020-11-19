@@ -61,7 +61,6 @@
     Retainful_premium.prototype.init_coupon_timer = function (current_settings) {
         var settings = {...this.default_ct_settings, ...current_settings};
         var timer_message = function (timer_settings, position, code, days, hours, minutes, seconds) {
-            console.log(timer_settings)
             var message = timer_settings.message;
             var timer = timer_settings.timer;
             var timer_html = timer.replace('{{seconds}}', seconds).replace('{{minutes}}', minutes).replace('{{hours}}', hours).replace('{{days}}', days);
@@ -434,18 +433,6 @@
                         show = (typeof is_email_provided !== "undefined" || parseInt(is_email_provided) === 0);
                         break;
                 }
-                if (!show) {
-                    return false;
-                }
-                if (show) {
-                    if (window.rnoc_ei_popup_is_active === false) {
-                        var html = $('.rnoc-ei-popup').html();
-                        window.retainful.modal(html, 'ei');
-                        window.rnoc_ei_popup_is_active = true;
-                        sessionStorage.setItem('rnoc_ei_popup_showed_count', '1')
-                        window.rnoc_ei_popup_showed_for++;
-                    }
-                }
                 switch (settings.show_popup) {
                     default:
                     case "every_time_on_customer_exists":
@@ -462,9 +449,38 @@
                         show = (typeof rnoc_ei_popup_showed_count != "undefined");
                         break;
                 }
+                switch (settings.show_once_its_coupon_applied) {
+                    default :
+                    case "yes":
+                        show = true;
+                        break;
+                    case "no":
+                        let code = settings.coupon_code;
+                        if ($('tr.cart-discount.coupon-' + code.toLowerCase()).length > 0) {
+                            show = false;
+                        }
+                        if ($('tr.cart-discount.coupon-' + code.toUpperCase()).length > 0) {
+                            show = false;
+                        }
+                        break;
+                }
+                if (show) {
+                    if (window.rnoc_ei_popup_is_active === false) {
+                        var html = $('.rnoc-ei-popup').html();
+                        window.retainful.modal(html, 'ei');
+                        window.rnoc_ei_popup_is_active = true;
+                        sessionStorage.setItem('rnoc_ei_popup_showed_count', '1')
+                        window.rnoc_ei_popup_showed_for++;
+                    }
+                } else {
+                    return false;
+                }
             }
         }
         if (settings.enable === "yes") {
+            $(document).on('before_rnoc_close_modal_ei_by_btn_click', () => {
+                window.rnoc_ei_popup_is_active = false;
+            });
             $(document).on('submit', '#rnoc_exit_intent_popup_form', function (event) {
                 event.preventDefault();
                 var popup_submit_btn = $(this).find('.rnoc-exit-intent-popup-submit-button');
