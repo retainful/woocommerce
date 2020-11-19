@@ -61,10 +61,11 @@
     Retainful_premium.prototype.init_coupon_timer = function (current_settings) {
         var settings = {...this.default_ct_settings, ...current_settings};
         var timer_message = function (timer_settings, position, code, days, hours, minutes, seconds) {
+            console.log(timer_settings)
             var message = timer_settings.message;
             var timer = timer_settings.timer;
             var timer_html = timer.replace('{{seconds}}', seconds).replace('{{minutes}}', minutes).replace('{{hours}}', hours).replace('{{days}}', days);
-            return message.replace('{{coupon_code}}', '<span class="timer-coupon-code-' + position + '" style="color: ' + position.coupon_code_color + '">' + code + '</span>').replace('{{coupon_timer}}', '<span id="rnoc-coupon-timer-' + position + '" style="color: ' + position.coupon_timer_color + '">' + timer_html + '</span>');
+            return message.replace('{{coupon_code}}', '<span class="timer-coupon-code-' + position + '" style="color: ' + timer_settings.coupon_code_color + '">' + code + '</span>').replace('{{coupon_timer}}', '<span id="rnoc-coupon-timer-' + position + '" style="color: ' + timer_settings.coupon_timer_color + '">' + timer_html + '</span>');
         }
         var display_on_top = function (message, settings) {
             var btn = '';
