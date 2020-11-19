@@ -262,7 +262,7 @@ class Order extends RestApi
         $data = array();
         $next_order_coupon = $retainful::$woocommerce->getPostMeta($order_id, '_rnoc_next_order_coupon');
         $order_coupon_obj = new OrderCoupon();
-        if (empty($next_order_coupon)) {
+        if (empty($next_order_coupon) && $retainful::$plugin_admin->isNextOrderCouponEnabled()) {
             $next_order_coupon = $order_coupon_obj->createNewCoupon($order_id, array());
         }
         if (!empty($next_order_coupon)) {
