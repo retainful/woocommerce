@@ -104,7 +104,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $message = '';
             $error = false;
             $email = sanitize_email($_REQUEST['email']);
-            $this->wc_functions->setCustomerEmail($email);
+            $retainful::$woocommerce->setCustomerEmail($email);
             $gdpr_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance', array(), false, 0);
             $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
             if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
@@ -112,7 +112,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             } else {
                 $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
             }
-            $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
+            $retainful::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
             $cart_api = new \Rnoc\Retainful\Api\AbandonedCart\Cart();
             $cart_api->syncCartData(true);
@@ -183,7 +183,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             if (!empty($coupon_code)) {
                 $coupon_data = '?rnoc_on_exit_coupon_code=' . $coupon_code;
             }
-            $email = $this->wc_functions->getCustomerEmail();
+            $email = $retainful::$woocommerce->getCustomerEmail();
             $to_replace = array(
                 'coupon_code' => $coupon_code,
                 'checkout_url' => $checkout_url . $coupon_data,
@@ -251,6 +251,11 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             return $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 0);
         }
 
+        /**
+         * cgeck to include the EI popup
+         * @param $show_popup_for
+         * @return bool
+         */
         function needEiPopup($show_popup_for)
         {
             global $retainful;
@@ -336,11 +341,12 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function applyCouponAutomatically()
         {
+            global $retainful;
             if (isset($_REQUEST['rnoc_on_exit_coupon_code'])) {
                 $coupon_code = sanitize_text_field($_REQUEST['rnoc_on_exit_coupon_code']);
                 $coupon_code = apply_filters("rnoc_exit_intent_before_applying_coupon_code", $coupon_code);
-                if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
-                    $this->wc_functions->addDiscount($coupon_code);
+                if (!empty($coupon_code) && !$retainful::$woocommerce->hasDiscount($coupon_code)) {
+                    $retainful::$woocommerce->addDiscount($coupon_code);
                     do_action("rnoc_exit_intent_after_applying_coupon_code", $coupon_code);
                 }
             }

@@ -46,8 +46,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         function productAddedToCart()
         {
             if (isset($_POST['rnoc_email_popup']) && !empty($_POST['rnoc_email_popup'])) {
+                global $retainful;
                 $email = sanitize_email($_POST['rnoc_email_popup']);
-                $this->wc_functions->setCustomerEmail($email);
+                $retainful::$woocommerce->setCustomerEmail($email);
             }
         }
 
@@ -150,10 +151,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function applyCouponAutomatically()
         {
+            global $retainful;
             if (isset($_REQUEST['retainful_email_coupon_code'])) {
                 $coupon_code = sanitize_text_field($_REQUEST['retainful_email_coupon_code']);
-                if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
-                    $this->wc_functions->addDiscount($coupon_code);
+                if (!empty($coupon_code) && !$retainful::$woocommerce->hasDiscount($coupon_code)) {
+                    $retainful::$woocommerce->addDiscount($coupon_code);
                 }
             }
         }
@@ -174,11 +176,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             } else {
                 $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
             }
-            $this->wc_functions->initWoocommerceSession();
-            $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
-            $this->wc_functions->setCustomerEmail($email);
+            $retainful::$woocommerce->initWoocommerceSession();
+            $retainful::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
+            $retainful::$woocommerce->setCustomerEmail($email);
             do_action('rnoc_after_atcp_assigning_email_to_customer', $email, $this);
-            $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
+            $retainful::$plugin_admin->logMessage($email, 'Add to cart email collection popup email entered');
             $coupon_details = "";
             $show_coupon_popup = false;
             $coupon_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_coupon_settings', array(), false, 0);
@@ -189,21 +191,21 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     $show_woo_coupon = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'show_woo_coupon', 'send_via_email');
                     switch ($show_woo_coupon) {
                         case "auto_apply_and_redirect":
-                            $this->wc_functions->addDiscount($coupon_code);
+                            $retainful::$woocommerce->addDiscount($coupon_code);
                             $redirect_url = wc_get_checkout_url();
                             break;
                         case "auto_apply_and_redirect_cart":
-                            $this->wc_functions->addDiscount($coupon_code);
+                            $retainful::$woocommerce->addDiscount($coupon_code);
                             $redirect_url = wc_get_cart_url();
                             break;
                         case "send_mail_auto_apply_and_redirect":
                             $this->sendEmail($email, $coupon_settings);
-                            $this->wc_functions->addDiscount($coupon_code);
+                            $retainful::$woocommerce->addDiscount($coupon_code);
                             $redirect_url = wc_get_checkout_url();
                             break;
                         case "send_mail_auto_apply_and_redirect_cart":
                             $this->sendEmail($email, $coupon_settings);
-                            $this->wc_functions->addDiscount($coupon_code);
+                            $retainful::$woocommerce->addDiscount($coupon_code);
                             $redirect_url = wc_get_cart_url();
                             break;
                         case "instantly":
@@ -253,11 +255,12 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function getMailCouponContent($coupon_settings, $template = "mail")
         {
+            global $retainful;
             $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
             $mail_content = "";
             if (!empty($coupon_code)) {
                 $mail_content = ($template == "mail") ? $this->getMailContent() : $this->getPopupContent();
-                $cart_page_link = $this->wc_functions->getCartUrl();
+                $cart_page_link = $retainful::$woocommerce->getCartUrl();
                 $string_to_replace = array(
                     '{{coupon_code}}' => $coupon_code,
                     '{{coupon_url}}' => $cart_page_link . '?retainful_email_coupon_code=' . $coupon_code

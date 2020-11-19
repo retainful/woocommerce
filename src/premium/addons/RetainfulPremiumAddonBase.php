@@ -8,14 +8,11 @@
 if (!class_exists('RetainfulPremiumAddonBase')) {
     abstract class RetainfulPremiumAddonBase
     {
-        public $title = NULL, $icon = NULL, $description = NULL, $slug = '', $version = '1.0.0', $path, $url, $admin, $wc_functions, $plan = array(), $premium_addon_settings = array();
+        public $title = NULL, $icon = NULL, $description = NULL, $slug = '', $version = '1.0.0', $path, $url, $plan = array();
 
         function __construct()
         {
-            $this->admin = new Rnoc\Retainful\Admin\Admin();
             $this->plan = array('pro', 'business', 'professional');
-            $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
-            $this->premium_addon_settings = $this->admin->getPremiumAddonSettings();
         }
 
         /**

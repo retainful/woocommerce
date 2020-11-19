@@ -59,13 +59,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         function productAddedToCart()
         {
             global $retainful;
-            $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
+            $coupon_expire_time = $retainful::$woocommerce->getSession('rnoc_is_coupon_timer_time_ended');
             if (empty($coupon_expire_time)) {
-                $this->wc_functions->setSession('rnoc_is_coupon_timer_time_started', '1');
+                $retainful::$woocommerce->setSession('rnoc_is_coupon_timer_time_started', '1');
                 $coupon_timer_apply_coupon = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon', 'automatically');
                 if ($coupon_timer_apply_coupon == "automatically") {
                     $coupon_code = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', null);
-                    $this->wc_functions->setSession('rnoc_coupon_timer_coupon_code', $coupon_code);
+                    $retainful::$woocommerce->setSession('rnoc_coupon_timer_coupon_code', $coupon_code);
                 }
             }
         }
@@ -78,14 +78,15 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
          */
         function orderStatusChanged($order_id, $old_status, $new_status)
         {
-            $this->wc_functions->removeSession('rnoc_is_coupon_timer_time_started');
-            $this->wc_functions->removeSession('rnoc_is_coupon_timer_time_ended');
-            $this->wc_functions->setSession('rnoc_is_coupon_timer_reset', 1);
+            global $retainful;
+            $retainful::$woocommerce->removeSession('rnoc_is_coupon_timer_time_started');
+            $retainful::$woocommerce->removeSession('rnoc_is_coupon_timer_time_ended');
+            $retainful::$woocommerce->setSession('rnoc_is_coupon_timer_reset', 1);
             global $retainful;
             $coupon_code = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', null);
-            $order = $this->wc_functions->getOrder($order_id);
+            $order = $retainful::$woocommerce->getOrder($order_id);
             if (!empty($order)) {
-                $used_coupon_codes = $this->wc_functions->getUsedCoupons($order);
+                $used_coupon_codes = $retainful::$woocommerce->getUsedCoupons($order);
                 if (is_array($used_coupon_codes) && !empty($used_coupon_codes) && in_array($coupon_code, $used_coupon_codes)) {
                     update_post_meta($order_id, '_rnocp_coupon_timer_recovered', 1);
                     update_post_meta($order_id, '_rnocp_coupon_timer_used_coupon', $coupon_code);
@@ -103,10 +104,10 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         function modifyInvalidCouponMessage($message, $error_code, $coupon)
         {
             global $retainful;
-            $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
+            $coupon_expire_time = $retainful::$woocommerce->getSession('rnoc_is_coupon_timer_time_ended');
             if (!empty($coupon_expire_time)) {
                 $coupon_code = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', null);
-                $hook_coupon_code = $this->wc_functions->getCouponCode($coupon);
+                $hook_coupon_code = $retainful::$woocommerce->getCouponCode($coupon);
                 if ((strtolower($hook_coupon_code) == strtolower($coupon_code)) && ($error_code == 101 || $error_code == 100)) {
                     $message = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message', __('Sorry! Instant Offer has expired.', RNOC_TEXT_DOMAIN));
                 }
@@ -123,10 +124,10 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         function ValidateCoupon($true, $coupon)
         {
             global $retainful;
-            $coupon_expire_time = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
+            $coupon_expire_time = $retainful::$woocommerce->getSession('rnoc_is_coupon_timer_time_ended');
             if (!empty($coupon_expire_time)) {
                 $coupon_code = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', null);
-                $hook_coupon_code = $this->wc_functions->getCouponCode($coupon);
+                $hook_coupon_code = $retainful::$woocommerce->getCouponCode($coupon);
                 if (strtolower($hook_coupon_code) == strtolower($coupon_code)) {
                     return false;
                 }
@@ -139,7 +140,8 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
          */
         function timerExpired()
         {
-            $this->wc_functions->setSession('rnoc_is_coupon_timer_time_ended', '1');
+            global $retainful;
+            $retainful::$woocommerce->setSession('rnoc_is_coupon_timer_time_ended', '1');
             wp_send_json_success('coupon expired');
         }
 
@@ -148,7 +150,8 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
          */
         function timerReset()
         {
-            $this->wc_functions->removeSession('rnoc_is_coupon_timer_reset');
+            global $retainful;
+            $retainful::$woocommerce->removeSession('rnoc_is_coupon_timer_reset');
             wp_send_json_success('');
         }
 
@@ -159,7 +162,8 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
          */
         function belowDiscount($discount_amount_html, $coupon)
         {
-            $code = $this->wc_functions->getCouponCode($coupon);
+            global $retainful;
+            $code = $retainful::$woocommerce->getCouponCode($coupon);
             if (!empty($code)) {
                 $discount_amount_html .= '<div class="rnoc-below-discount_container-' . $code . '"></div>';
             }
@@ -197,11 +201,11 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
             global $retainful;
             $need_coupon_timer = $this->isCtEnabled();
             $code = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', null);
-            $ended = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_ended');
+            $ended = $retainful::$woocommerce->getSession('rnoc_is_coupon_timer_time_ended');
             $selected_pages = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages', array());
             if ($need_coupon_timer && !empty($code) && $ended !== 1 && $this->isValidPagesToDisplay($selected_pages)) {
-                $reset = $this->wc_functions->getSession('rnoc_is_coupon_timer_reset');
-                $started = $this->wc_functions->getSession('rnoc_is_coupon_timer_time_started');
+                $reset = $retainful::$woocommerce->getSession('rnoc_is_coupon_timer_reset');
+                $started = $retainful::$woocommerce->getSession('rnoc_is_coupon_timer_time_started');
                 $premium_settings['coupon_timer'] = array(
                     'enable' => 'yes',
                     'timer_started' => ($started == 1) ? 1 : 0,
@@ -303,10 +307,11 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
          */
         function autoApplyCouponCode()
         {
-            $coupon_code = $this->wc_functions->getSession('rnoc_coupon_timer_coupon_code');
-            if (!empty($coupon_code) && $this->wc_functions->isValidCoupon($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
-                $this->wc_functions->addDiscount($coupon_code);
-                $this->wc_functions->removeSession('rnoc_coupon_timer_coupon_code');
+            global $retainful;
+            $coupon_code = $retainful::$woocommerce->getSession('rnoc_coupon_timer_coupon_code');
+            if (!empty($coupon_code) && $retainful::$woocommerce->isValidCoupon($coupon_code) && !$retainful::$woocommerce->hasDiscount($coupon_code)) {
+                $retainful::$woocommerce->addDiscount($coupon_code);
+                $retainful::$woocommerce->removeSession('rnoc_coupon_timer_coupon_code');
             }
         }
 
