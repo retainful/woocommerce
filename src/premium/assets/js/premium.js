@@ -178,7 +178,7 @@
         let is_popup_showed = sessionStorage.getItem("rnoc_instant_coupon_popup_showed");
         if (is_popup_showed && is_popup_showed === "no") {
             let popup_html = sessionStorage.getItem("rnoc_instant_coupon_popup_html");
-            window.retainful.modal(popup_html);
+            window.retainful.modal(popup_html,'atcip');
             sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "yes");
         }
     }
