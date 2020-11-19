@@ -64,7 +64,7 @@
             var message = timer_settings.message;
             var timer = timer_settings.timer;
             var timer_html = timer.replace('{{seconds}}', seconds).replace('{{minutes}}', minutes).replace('{{hours}}', hours).replace('{{days}}', days);
-            return message.replace('{{coupon_code}}', '<span class="timer-coupon-code-' + position + '" style="color: ' + position.coupon_code_color + '">' + code + '</span>').replace('{{coupon_timer}}', '<span id="rnoc-coupon-timer-' + position + '" style="color: ' + position.coupon_timer_color + '">' + timer_html + '</span>');
+            return message.replace('{{coupon_code}}', '<span class="timer-coupon-code-' + position + '" style="color: ' + timer_settings.coupon_code_color + '">' + code + '</span>').replace('{{coupon_timer}}', '<span id="rnoc-coupon-timer-' + position + '" style="color: ' + timer_settings.coupon_timer_color + '">' + timer_html + '</span>');
         }
         var display_on_top = function (message, settings) {
             var btn = '';
@@ -178,7 +178,7 @@
         let is_popup_showed = sessionStorage.getItem("rnoc_instant_coupon_popup_showed");
         if (is_popup_showed && is_popup_showed === "no") {
             let popup_html = sessionStorage.getItem("rnoc_instant_coupon_popup_html");
-            window.retainful.modal(popup_html,'atcip');
+            window.retainful.modal(popup_html, 'atcip');
             sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "yes");
         }
     }
@@ -433,18 +433,6 @@
                         show = (typeof is_email_provided !== "undefined" || parseInt(is_email_provided) === 0);
                         break;
                 }
-                if (!show) {
-                    return false;
-                }
-                if (show) {
-                    if (window.rnoc_ei_popup_is_active === false) {
-                        var html = $('.rnoc-ei-popup').html();
-                        window.retainful.modal(html, 'ei');
-                        window.rnoc_ei_popup_is_active = true;
-                        sessionStorage.setItem('rnoc_ei_popup_showed_count', '1')
-                        window.rnoc_ei_popup_showed_for++;
-                    }
-                }
                 switch (settings.show_popup) {
                     default:
                     case "every_time_on_customer_exists":
@@ -461,9 +449,38 @@
                         show = (typeof rnoc_ei_popup_showed_count != "undefined");
                         break;
                 }
+                switch (settings.show_once_its_coupon_applied) {
+                    default :
+                    case "yes":
+                        show = true;
+                        break;
+                    case "no":
+                        let code = settings.coupon_code;
+                        if ($('tr.cart-discount.coupon-' + code.toLowerCase()).length > 0) {
+                            show = false;
+                        }
+                        if ($('tr.cart-discount.coupon-' + code.toUpperCase()).length > 0) {
+                            show = false;
+                        }
+                        break;
+                }
+                if (show) {
+                    if (window.rnoc_ei_popup_is_active === false) {
+                        var html = $('.rnoc-ei-popup').html();
+                        window.retainful.modal(html, 'ei');
+                        window.rnoc_ei_popup_is_active = true;
+                        sessionStorage.setItem('rnoc_ei_popup_showed_count', '1')
+                        window.rnoc_ei_popup_showed_for++;
+                    }
+                } else {
+                    return false;
+                }
             }
         }
         if (settings.enable === "yes") {
+            $(document).on('before_rnoc_close_modal_ei_by_btn_click', () => {
+                window.rnoc_ei_popup_is_active = false;
+            });
             $(document).on('submit', '#rnoc_exit_intent_popup_form', function (event) {
                 event.preventDefault();
                 var popup_submit_btn = $(this).find('.rnoc-exit-intent-popup-submit-button');
