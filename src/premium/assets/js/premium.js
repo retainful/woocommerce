@@ -446,8 +446,12 @@
                             show = (window.rnoc_ei_popup_showed_for < parseInt(settings.number_of_times_per_page));
                             break;
                         case "once_per_session":
-                            var rnoc_ei_popup_showed_count = sessionStorage.getItem('rnoc_ei_popup_showed_count');
-                            show = (parseInt(rnoc_ei_popup_showed_count) !== 1);
+                            var rnoc_ei_popup_showed_count = parseInt(sessionStorage.getItem('rnoc_ei_popup_showed_count'));
+                            if (rnoc_ei_popup_showed_count >= 1) {
+                                show = false;
+                            } else {
+                                show = true;
+                            }
                             break;
                     }
                 }
