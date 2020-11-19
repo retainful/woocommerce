@@ -427,6 +427,7 @@ class Main
      */
     function doMigration()
     {
+        //TODO: Remove migration
         $is_migrated = get_option('retainful_v_1_1_3_migration_completed', 0);
         if (!$is_migrated) {
             $slug = self::$plugin_admin->slug;

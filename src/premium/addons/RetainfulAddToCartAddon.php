@@ -30,10 +30,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             }
             if ($this->isAddToCartPopupEnabled()) {
                 add_action('wp_ajax_nopriv_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
-                add_action('wp_ajax_nopriv_rnoc_popup_closed', array($this, 'popupClosed'));
                 //To support the logged in user
                 add_action('wp_ajax_set_rnoc_guest_session', array($this, 'setGuestEmailSession'));
-                add_action('wp_ajax_rnoc_popup_closed', array($this, 'popupClosed'));
                 add_action('wp_footer', array($this, 'enqueueAtcPopupScript'));
                 add_action('wp_enqueue_scripts', array($this, 'enqueueScripts'));
                 add_action('wp_footer', array($this, 'addAtcPopupContent'));
@@ -48,7 +46,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         function productAddedToCart()
         {
             if (isset($_POST['rnoc_email_popup']) && !empty($_POST['rnoc_email_popup'])) {
-                $email = sanitize_text_field($_POST['rnoc_email_popup']);
+                $email = sanitize_email($_POST['rnoc_email_popup']);
                 $this->wc_functions->setCustomerEmail($email);
             }
         }
@@ -101,8 +99,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function getPopupTemplate()
         {
-            $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
-            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0] : array();
+            global $retainful;
+            $coupon_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_coupon_settings', array(), false, 0);
+            $gdpr_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance', array(), false, 0);
             $coupon_message = '';
             $coupon_message_color = '#333333';
             if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'need_coupon', 0) == 1) {
@@ -125,19 +124,19 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'rnoc_modal_add_cart_border_top_color' => '#f27052',
                 'rnoc_modal_add_cart_no_thanks_color' => '#f27052',
                 'rnoc_modal_bg_color' => '#F8F0F0',
-                'rnoc_close_btn_behavior' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close'),
+                'rnoc_close_btn_behavior' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close'),
                 'rnoc_modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
                 'rnoc_modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
                 'rnoc_coupon_message' => '',
-                'rnoc_no_thanks_action' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
-                'rnoc_modal_show_popup_until' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
+                'rnoc_no_thanks_action' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
+                'rnoc_modal_show_popup_until' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
                 'rnoc_popup_email_field' => (!is_admin()) ? '' : 'readonly',
                 'rnoc_popup_form_close' => (is_admin()) ? '' : '</form>',
                 'rnoc_gdpr_check_box_settings' => $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr'),
                 'rnoc_gdpr_check_box_message' => $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message', __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN))
             );
-            $choosed_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0] : $default_settings;
-            $final_settings = array_merge($default_settings, $choosed_settings);
+            $chosen_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_design_settings', $default_settings, false, 0);
+            $final_settings = wp_parse_args($chosen_settings, $default_settings);
             $override_path = get_theme_file_path('retainful/premium/templates/popup.php');
             $popup_template_path = RNOCPREMIUM_PLUGIN_PATH . 'templates/popup.php';
             if (file_exists($override_path)) {
@@ -160,24 +159,15 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         }
 
         /**
-         * Popup showed and closed
-         */
-        function popupClosed()
-        {
-            $popup_action = isset($_POST['popup_action']) ? sanitize_key($_POST['popup_action']) : 1;
-            $this->wc_functions->setSession('rnoc_popup_closed_by_user', $popup_action);
-            wp_send_json_success();
-        }
-
-        /**
          * set session email and create coupon if available
          */
         function setGuestEmailSession()
         {
+            global $retainful;
             $message = '';
             $error = false;
             $email = sanitize_email($_REQUEST['email']);
-            $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0] : array();
+            $gdpr_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance', array(), false, 0);
             $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
             if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
                 $is_buyer_accepting_marketing = 1;
@@ -191,7 +181,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
             $coupon_details = "";
             $show_coupon_popup = false;
-            $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
+            $coupon_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_coupon_settings', array(), false, 0);
             $redirect_url = null;
             if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'need_coupon', 0) == 1) {
                 $coupon_code = $this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'woo_coupon');
@@ -285,7 +275,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function getMailContent()
         {
-            $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
+            global $retainful;
+            $coupon_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_coupon_settings', array(), false, 0);
             if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'coupon_mail_template')) {
                 $mail_content = __($coupon_settings[RNOC_PLUGIN_PREFIX . 'coupon_mail_template'], RNOC_TEXT_DOMAIN);
             } else {
@@ -300,7 +291,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function getPopupContent()
         {
-            $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
+            global $retainful;
+            $coupon_settings = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_coupon_settings', array(), false, 0);
             if ($this->getKeyFromArray($coupon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template')) {
                 $content = __($coupon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'], RNOC_TEXT_DOMAIN);
             } else {
@@ -316,19 +308,15 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         function getMailHeaders()
         {
             $admin_email = get_option('admin_email');
-            $details = array(
-                "from_name" => __('Admin', RNOC_TEXT_DOMAIN),
-                "from_address" => $admin_email,
-                "replay_address" => $admin_email
-            );
-            $details = apply_filters('rnocp_reward_coupon_mail_sender_details', $details);
-            extract($details);
+            $from_name = apply_filters('rnocp_reward_coupon_mail_from_name', __('Admin', RNOC_TEXT_DOMAIN));
+            $from_address = apply_filters('rnocp_reward_coupon_mail_from_address', $admin_email);
+            $reply_address = apply_filters('rnocp_reward_coupon_mail_reply_address', $admin_email);
             $charset = (function_exists('get_bloginfo')) ? get_bloginfo('charset') : 'UTF-8';
             //Prepare for sending emails
             $headers = array(
                 "From: \"$from_name\" <$from_address>",
                 "Return-Path: <" . $from_address . ">",
-                "Reply-To: \"" . $from_name . "\" <" . $replay_address . ">",
+                "Reply-To: \"" . $from_name . "\" <" . $reply_address . ">",
                 "X-Mailer: PHP" . phpversion(),
                 "Content-Type: text/html; charset=\"" . $charset . "\""
             );
@@ -343,7 +331,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function isAddToCartPopupEnabled()
         {
-            return $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_modal', 0);
+            global $retainful;
+            return $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'need_modal', 0);
         }
 
         /**
@@ -352,16 +341,17 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addToCartPopupSettings(&$premium_settings)
         {
+            global $retainful;
+            $selected_pages = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_display_pages', array());
             $need_atc_popup = $this->isAddToCartPopupEnabled();
-            $selected_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_display_pages', array());
             if ($need_atc_popup == 1 && $this->isValidPagesToDisplay($selected_pages)) {
                 $premium_settings['atc_popup'] = array(
                     'enable' => 'yes',
                     'ajax_url' => admin_url('admin-ajax.php'),
-                    'show_popup_until' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
-                    'custom_classes' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class', ''),
-                    'is_email_mandatory' => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1) == 1) ? 'yes' : 'no',
-                    'close_btn_behavior' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close'),
+                    'show_popup_until' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
+                    'custom_classes' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class', ''),
+                    'is_email_mandatory' => ($retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1) == 1) ? 'yes' : 'no',
+                    'close_btn_behavior' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close'),
                 );
             } else {
                 $premium_settings['atc_popup'] = array(

@@ -95,37 +95,38 @@ class Settings
      * @param string $default
      * @param bool $all
      * @param bool $depth
+     * @param string $depth_key
      * @return array|mixed|string
      */
-    function get($category, $key = "", $default = "", $all = false, $depth = false)
+    function get($category, $key = "", $default = "", $all = false, $depth = false, $depth_key = null)
     {
         switch ($category) {
             case "connection":
                 if ($all) {
                     return self::$settings['connection'];
                 } else {
-                    return $this->getByKey(self::$settings['connection'], $key, $depth, $default);
+                    return $this->getByKey(self::$settings['connection'], $key, $depth, $depth_key, $default);
                 }
                 break;
             case "premium":
                 if ($all) {
                     return self::$settings['premium'];
                 } else {
-                    return $this->getByKey(self::$settings['premium'], $key, $depth, $default);
+                    return $this->getByKey(self::$settings['premium'], $key, $depth, $depth_key, $default);
                 }
                 break;
             case "next_order_coupon":
                 if ($all) {
                     return self::$settings['next_order_coupon'];
                 } else {
-                    return $this->getByKey(self::$settings['next_order_coupon'], $key, $depth, $default);
+                    return $this->getByKey(self::$settings['next_order_coupon'], $key, $depth, $depth_key, $default);
                 }
                 break;
             case "general_settings":
                 if ($all) {
                     return self::$settings['general_settings'];
                 } else {
-                    return $this->getByKey(self::$settings['general_settings'], $key, $depth, $default);
+                    return $this->getByKey(self::$settings['general_settings'], $key, $depth, $depth_key, $default);
                 }
                 break;
             default:
@@ -139,13 +140,17 @@ class Settings
      * @param $settings
      * @param $key
      * @param $depth
+     * @param $depth_key
      * @param $default
      * @return mixed
      */
-    function getByKey($settings, $key, $depth, $default)
+    function getByKey($settings, $key, $depth, $depth_key, $default)
     {
-        if ($depth) {
-            return isset($settings[$depth][$key]) ? $settings[$depth][$key] : $default;
+        if (is_int($depth) && $depth >= 0) {
+            if (empty($depth_key)) {
+                return isset($settings[$key][$depth]) ? $settings[$key][$depth] : $default;
+            }
+            return isset($settings[$key][$depth][$depth_key]) ? $settings[$key][$depth][$depth_key] : $default;
         } else {
             return isset($settings[$key]) ? $settings[$key] : $default;
         }
