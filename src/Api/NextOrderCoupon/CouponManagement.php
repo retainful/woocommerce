@@ -67,7 +67,7 @@ class CouponManagement
                     'coupon_code' => null,
                     'usage_limit' => 1,
                     'usage_limit_per_user' => 1,
-                    'value_type' => 'percentage',
+                    'value_type' => 'percent',
                     'value' => 0,
                     'target_type' => 'line_item',
                     'customer_email' => null,
@@ -83,7 +83,7 @@ class CouponManagement
                 if ($is_valid_data) {
                     $data = array(
                         'coupon_code' => $ruleParams['coupon_code'],
-                        'discount_type' => ($ruleParams['value_type'] == "fixed_amount") ? 'fixed_cart' : 'percentage',
+                        'discount_type' => ($ruleParams['value_type'] == "fixed_amount") ? 'fixed_cart' : 'percent',
                         'free_shipping' => ($ruleParams['target_type'] == "shipping_line") ? 'yes' : 'no',
                         'coupon_amount' => ($ruleParams['value'] < 0) ? floatval($ruleParams['value']) * -1 : 0,
                         'minimum_amount' => (floatval($ruleParams['prerequisite_subtotal_range']['greater_than_or_equal_to']) > 0) ? floatval($ruleParams['prerequisite_subtotal_range']['greater_than_or_equal_to']) : null,
