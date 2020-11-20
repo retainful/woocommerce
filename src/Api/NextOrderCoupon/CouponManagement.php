@@ -67,7 +67,7 @@ class CouponManagement
                     'coupon_code' => null,
                     'usage_limit' => 1,
                     'usage_limit_per_user' => 1,
-                    'value_type' => 'percent',
+                    'value_type' => 'percentage',
                     'value' => 0,
                     'target_type' => 'line_item',
                     'customer_email' => null,
