@@ -2,7 +2,7 @@
 
 namespace Rnoc\Retainful\Premium;
 
-use Rnoc\Retainful\Admin\Admin;
+use Rnoc\Retainful\Admin\Settings;
 
 class RetainfulPremiumMain
 {
@@ -40,7 +40,7 @@ class RetainfulPremiumMain
         }
         $path = RNOCPREMIUM_PLUGIN_PATH . 'addons/';
         if ($handle = opendir($path)) {
-            $admin = new Admin();
+            $admin = new Settings();
             $plan_details = $admin->getPlanDetails();
             $plan = isset($plan_details['plan']) ? $plan_details['plan'] : 'free';
             while (false !== ($entry = readdir($handle))) {

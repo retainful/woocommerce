@@ -4,12 +4,6 @@ namespace Rnoc\Retainful\Api\AbandonedCart;
 
 use DateTime;
 use Exception;
-use Rnoc\Retainful\Admin\Admin;
-use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
-use Rnoc\Retainful\Api\AbandonedCart\Storage\PhpSession;
-use Rnoc\Retainful\Api\AbandonedCart\Storage\WooSession;
-use Rnoc\Retainful\library\RetainfulApi;
-use Rnoc\Retainful\WcFunctions;
 
 class RestApi
 {

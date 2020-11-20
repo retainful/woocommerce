@@ -4,8 +4,6 @@
  */
 require_once "tabs.php";
 $is_app_connected = ($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] == 1);
-$api = new \Rnoc\Retainful\library\RetainfulApi();
-$admin_settings = new Rnoc\Retainful\Admin\Admin();
 global $retainful;
 ?>
 <form id="retainful-license-form" class="card">
@@ -62,7 +60,7 @@ global $retainful;
                     <button type="button" id="disconnect-app-btn" data-action="rnoc_disconnect_license"
                             data-security="<?php echo wp_create_nonce('rnoc_disconnect_license') ?>"
                             class="button"><?= __('Dis-connect', RNOC_TEXT_DOMAIN) ?></button>
-                    <a href="<?php echo $api->app_url ?>" target="_blank" class="button"
+                    <a href="<?php echo $retainful::$api->app_url ?>" target="_blank" class="button"
                        style="text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;border-color:#F27052;"><?php echo __('Visit Your Dashboard', RNOC_TEXT_DOMAIN); ?></a>
                     <br>
                     <?php
@@ -77,7 +75,7 @@ global $retainful;
             <td colspan="2">
                 <?php
                 if ($is_app_connected) {
-                    $plan = $admin_settings->getUserActivePlan();
+                    $plan = $retainful::$plugin_admin->getUserActivePlan();
                     ?>
                     <div style="display:block;background: #fff;border: 1px solid #eee;color:#333;padding: 20px;max-width: 600px;width: 100%;text-align:center;border-radius: 4px;box-shadow: 0 0 5px 0 #ddd;margin: 20px auto;">
                         <p style="margin: 20px 0 10px;">
@@ -89,18 +87,18 @@ global $retainful;
                                 <p style="margin: 15px 0;color:#777;font-size: 17px;line-height:1.6;">
                                     <?php echo __('Manage abandoned carts, emails & next order coupons', RNOC_TEXT_DOMAIN); ?>
                                 </p>
-                                <a href="<?php echo $api->app_url ?>" target="_blank"
+                                <a href="<?php echo $retainful::$api->app_url ?>" target="_blank"
                                    style="display: inline-block;font-size: 16px;padding: 10px 20px;text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;line-height:1.8;margin-bottom: 20px;"><?php echo __('Visit Your Dashboard', RNOC_TEXT_DOMAIN); ?></a>
                             </div>
                             <?php
-                            if (!$admin_settings->isProPlan()) {
+                            if (!$retainful::$plugin_admin->isProPlan()) {
                                 ?>
                                 <div class="premium-msg">
                                     <p style="margin: 15px 0;color:#777;font-size: 17px;line-height:1.6;">
                                         <?php echo __('Upgrade to Premium and get more features like Email Collection during add to cart and Coupon for email entry.', RNOC_TEXT_DOMAIN); ?>
                                     </p>
                                     <p style="margin: 20px 0 0;">
-                                        <a href="<?php echo $api->upgradePremiumUrl(); ?>" target="_blank"
+                                        <a href="<?php echo $retainful::$api->upgradePremiumUrl(); ?>" target="_blank"
                                            style="display: inline-block;font-size: 16px;padding: 10px 20px;text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;line-height:1.8;margin-bottom: 20px;"><?php echo __('Upgrade to Premium', RNOC_TEXT_DOMAIN); ?></a>
                                     </p>
                                 </div>

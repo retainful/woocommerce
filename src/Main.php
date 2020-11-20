@@ -3,8 +3,8 @@
 namespace Rnoc\Retainful;
 if (!defined('ABSPATH')) exit;
 
-use Rnoc\Retainful\Admin\Admin;
 use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Admin\Options;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
 use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
@@ -27,7 +27,7 @@ class Main
      */
     public static $storage = null;
     /**
-     * @var null | Settings
+     * @var null | Options
      */
     public static $settings = null;
     /**
@@ -51,7 +51,7 @@ class Main
      */
     public static $abandoned_cart_checkout = null;
     /**
-     * @var null|Admin
+     * @var null|Settings
      */
     public static $plugin_admin = null;
     /**
@@ -83,12 +83,13 @@ class Main
         /**
          * Init classes
          */
-        self::$settings = (is_null(self::$settings)) ? new Settings() : self::$settings;
+        self::$api = empty(self::$api) ? new RetainfulApi() : self::$api;
+        self::$settings = (is_null(self::$settings)) ? new Options() : self::$settings;
         self::$woocommerce = (is_null(self::$woocommerce)) ? new WcFunctions() : self::$woocommerce;
         self::$next_order_coupon = (is_null(self::$next_order_coupon)) ? new OrderCoupon() : self::$next_order_coupon;
         self::$abandoned_cart = (is_null(self::$abandoned_cart)) ? new Cart() : self::$abandoned_cart;
         self::$abandoned_cart_checkout = (is_null(self::$abandoned_cart_checkout)) ? new Checkout() : self::$abandoned_cart_checkout;
-        self::$plugin_admin = (is_null(self::$plugin_admin)) ? new Admin() : self::$plugin_admin;
+        self::$plugin_admin = (is_null(self::$plugin_admin)) ? new Settings() : self::$plugin_admin;
         self::$referral_program = (is_null(self::$referral_program)) ? new ReferralManagement() : self::$referral_program;
         self::$coupon_api = (is_null(self::$coupon_api)) ? new CouponManagement() : self::$coupon_api;
         $storage_handler = self::$plugin_admin->getStorageHandler();
@@ -104,7 +105,6 @@ class Main
                 self::$storage = new WooSession();
                 break;
         }
-        self::$api = empty(self::$api) ? new RetainfulApi() : self::$api;
         $is_app_connected = self::$plugin_admin->isAppConnected();
         if (self::$plugin_admin->isProPlan() && $is_app_connected) {
             self::$premium_features = (is_null(self::$premium_features)) ? new RetainfulPremiumMain() : self::$premium_features;
@@ -178,7 +178,7 @@ class Main
         $secret_key = self::$plugin_admin->getSecretKey();
         $app_id = self::$plugin_admin->getApiKey();
         if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
-            add_action('wp_loaded', array(self::$plugin_admin, 'schedulePlanChecker'),31);
+            add_action('wp_loaded', array(self::$plugin_admin, 'schedulePlanChecker'), 31);
             if (self::$plugin_admin->isProPlan()) {
                 add_action('wp_footer', array(self::$referral_program, 'printReferralPopup'));
                 add_action('wp_enqueue_scripts', array(self::$referral_program, 'referralProgramScripts'));
@@ -236,10 +236,6 @@ class Main
             $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
             $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
             $this->showAdminNotice($notice);
-        }
-        $is_retainful_v2_0_1_migration_completed = get_option('is_retainful_v2_0_1_migration_completed', 0);
-        if (!$is_retainful_v2_0_1_migration_completed) {
-            $this->migrationV201();
         }
         //Premium check
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
@@ -327,19 +323,6 @@ class Main
                 add_filter('rnoc_is_cart_has_valid_ip', array($ip_filter, 'trackAbandonedCart'), 10, 2);
             }
         }
-    }
-
-    /**
-     * Migration for 2.1.0
-     */
-    function migrationV201()
-    {
-        global $retainful;
-        $admin_settings = $retainful::$settings->get('general_settings', null, array(), true);
-        $admin_settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter'] = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'enable_ip_filter', 0);
-        $admin_settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'] = $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses', '');
-        $retainful::$settings->set('general_settings', $admin_settings);
-        update_option('is_retainful_v2_0_1_migration_completed', 1);
     }
 
     /**
