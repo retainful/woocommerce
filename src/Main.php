@@ -145,7 +145,7 @@ class Main
             add_action('woocommerce_get_shop_coupon_data', array(self::$next_order_coupon, 'addVirtualCoupon'), 10, 2);
             add_action('rnoc_create_new_next_order_coupon', array(self::$next_order_coupon, 'createNewCoupon'), 10, 2);
             add_action('rnoc_initiated', array(self::$next_order_coupon, 'setCouponToSession'));
-            add_action('wp_loaded', array(self::$next_order_coupon, 'addCouponToCheckout'), 10);
+            add_action('wp_loaded', array(self::$next_order_coupon, 'addCouponToCheckout'), 30);
             //Attach coupon to email
             $hook = self::$plugin_admin->couponMessageHook();
             if (!empty($hook))
@@ -178,7 +178,7 @@ class Main
         $secret_key = self::$plugin_admin->getSecretKey();
         $app_id = self::$plugin_admin->getApiKey();
         if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
-            add_action('wp_loaded', array(self::$plugin_admin, 'schedulePlanChecker'));
+            add_action('wp_loaded', array(self::$plugin_admin, 'schedulePlanChecker'),31);
             if (self::$plugin_admin->isProPlan()) {
                 add_action('wp_footer', array(self::$referral_program, 'printReferralPopup'));
                 add_action('wp_enqueue_scripts', array(self::$referral_program, 'referralProgramScripts'));
