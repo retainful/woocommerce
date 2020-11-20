@@ -117,7 +117,7 @@ class Main
          * Init class hooks
          */
         self::$woocommerce->initWoocommerceSession();
-        if (is_admin()) {
+        if (is_admin() || is_blog_admin()) {
             add_action('admin_init', array(self::$plugin_admin, 'setupSurveyForm'), 10);
             add_action('admin_menu', array(self::$plugin_admin, 'registerMenu'));
             self::$plugin_admin->initAdminPageStyles();

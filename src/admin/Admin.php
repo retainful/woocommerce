@@ -28,7 +28,7 @@ class Admin
     function initAdminPageStyles()
     {
         $page = self::$input->get('page', null);
-        if (is_admin() && in_array($page, array('retainful', 'retainful_settings', 'retainful_premium', 'retainful_license'))) {
+        if ((is_admin() || is_blog_admin()) && in_array($page, array('retainful', 'retainful_settings', 'retainful_premium', 'retainful_license'))) {
             $this->addScript();
         }
     }

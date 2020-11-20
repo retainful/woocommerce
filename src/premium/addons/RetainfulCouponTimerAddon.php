@@ -23,7 +23,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         function init()
         {
             global $retainful;
-            if (is_admin()) {
+            if (is_admin() || is_blog_admin()) {
                 add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
             }
             $need_coupon_timer = $this->isCtEnabled();

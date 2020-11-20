@@ -25,7 +25,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function init()
         {
-            if (is_admin()) {
+            if (is_admin() || is_blog_admin()) {
                 add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
             }
             if ($this->isAddToCartPopupEnabled()) {
@@ -113,7 +113,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 }
             }
             $default_settings = array(
-                'rnoc_popup_form_open' => (is_admin()) ? '' : '<form id="rnoc_popup_form" class="rnoc-lw-wrap">',
+                'rnoc_popup_form_open' => (is_admin() || is_blog_admin()) ? '' : '<form id="rnoc_popup_form" class="rnoc-lw-wrap">',
                 'rnoc_modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
                 'rnoc_modal_heading_color' => '#000000',
                 'rnoc_modal_sub_heading' => $coupon_message,
@@ -131,8 +131,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'rnoc_coupon_message' => '',
                 'rnoc_no_thanks_action' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
                 'rnoc_modal_show_popup_until' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
-                'rnoc_popup_email_field' => (!is_admin()) ? '' : 'readonly',
-                'rnoc_popup_form_close' => (is_admin()) ? '' : '</form>',
+                'rnoc_popup_email_field' => (!is_admin() || is_blog_admin()) ? '' : 'readonly',
+                'rnoc_popup_form_close' => (is_admin() || is_blog_admin()) ? '' : '</form>',
                 'rnoc_gdpr_check_box_settings' => $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr'),
                 'rnoc_gdpr_check_box_message' => $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message', __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN))
             );

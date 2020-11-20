@@ -22,7 +22,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
 
         function init()
         {
-            if (is_admin()) {
+            if (is_admin() || is_blog_admin()) {
                 add_action('rnoc_premium_addon_settings_page_' . $this->slug(), array($this, 'premiumAddonTabContent'), 10, 3);
                 add_action('wp_ajax_rnocp_get_exit_intent_popup_template', array($this, 'getPopupTemplateToInsert'));
             }
