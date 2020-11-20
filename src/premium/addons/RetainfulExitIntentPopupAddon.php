@@ -309,9 +309,9 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     'ajax_url' => admin_url('admin-ajax.php'),
                     'show_for' => $show_popup_for,
                     'is_user_logged_in' => is_user_logged_in() ? 'yes' : 'no',
-                    'coupon_code' => !empty($code) ? strtoupper($code) : '',
-                    'show_once_its_coupon_applied' => ($retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 0) == 0) ? 'yes' : 'no',
-                    'applied_coupons' => $this->getAppliedCoupons(),
+                    'coupon_code' => !empty($code) ? sanitize_text_field($code) : '',
+                    'show_once_its_coupon_applied' => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', '0') == 1) ? 'yes' : 'no',
+                    'applied_coupons' => array(),
                     'show_popup' => $this->getKeyFromArray($show_settings, 'show_option', 'once_per_session'),
                     'number_of_times_per_page' => $this->getKeyFromArray($show_settings, 'show_count', '1'),
                     'cookie_expired_at' => $retainful::$settings->get('premium', RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life', 1)

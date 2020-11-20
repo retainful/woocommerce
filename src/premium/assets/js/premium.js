@@ -178,7 +178,7 @@
         let is_popup_showed = sessionStorage.getItem("rnoc_instant_coupon_popup_showed");
         if (is_popup_showed && is_popup_showed === "no") {
             let popup_html = sessionStorage.getItem("rnoc_instant_coupon_popup_html");
-            window.retainful.modal(popup_html);
+            window.retainful.modal(popup_html, 'atcip');
             sessionStorage.setItem("rnoc_instant_coupon_popup_showed", "yes");
         }
     }
@@ -433,21 +433,61 @@
                         show = (typeof is_email_provided !== "undefined" || parseInt(is_email_provided) === 0);
                         break;
                 }
-                switch (settings.show_popup) {
-                    default:
-                    case "every_time_on_customer_exists":
-                        show = true;
-                        break;
-                    case "once_per_page":
-                        show = (window.rnoc_ei_popup_showed_for <= 1);
-                        break;
-                    case "show_x_times_per_page":
-                        show = (window.rnoc_ei_popup_showed_for <= parseInt(settings.number_of_times_per_page));
-                        break;
-                    case "once_per_session":
-                        var rnoc_ei_popup_showed_count = sessionStorage.getItem('rnoc_ei_popup_showed_count');
-                        show = (typeof rnoc_ei_popup_showed_count != "undefined");
-                        break;
+                if (show) {
+                    switch (settings.show_popup) {
+                        default:
+                        case "every_time_on_customer_exists":
+                            show = true;
+                            break;
+                        case "once_per_page":
+                            show = (window.rnoc_ei_popup_showed_for < 1);
+                            break;
+                        case "show_x_times_per_page":
+                            show = (window.rnoc_ei_popup_showed_for < parseInt(settings.number_of_times_per_page));
+                            break;
+                        case "once_per_session":
+                            var rnoc_ei_popup_showed_count = parseInt(sessionStorage.getItem('rnoc_ei_popup_showed_count'));
+                            if (rnoc_ei_popup_showed_count >= 1) {
+                                show = false;
+                            } else {
+                                show = true;
+                            }
+                            break;
+                    }
+                }
+                if (show) {
+                    switch (settings.show_once_its_coupon_applied) {
+                        default :
+                        case "yes":
+                            show = true;
+                            break;
+                        case "no":
+                            let code = settings.coupon_code;
+                            if ($('tr.cart-discount.coupon-' + code.toLowerCase()).length > 0) {
+                                show = false;
+                            }
+                            if ($('tr.cart-discount.coupon-' + code.toUpperCase()).length > 0) {
+                                show = false;
+                            }
+                            break;
+                    }
+                }
+                if (show) {
+                    if (window.rnoc_ei_popup_is_active === false) {
+                        var html = $('.rnoc-ei-popup').html();
+                        window.retainful.modal(html, 'ei');
+                        window.rnoc_ei_popup_is_active = true;
+                        let showedCount = parseInt(sessionStorage.getItem('rnoc_ei_popup_showed_count'));
+                        if (showedCount >= 1) {
+                            showedCount++;
+                        } else {
+                            showedCount = 1;
+                        }
+                        sessionStorage.setItem('rnoc_ei_popup_showed_count', showedCount.toString())
+                        window.rnoc_ei_popup_showed_for++;
+                    }
+                } else {
+                    return false;
                 }
                 switch (settings.show_once_its_coupon_applied) {
                     default :

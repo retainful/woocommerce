@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.5
 WC tested up to: 4.7.0
 Requires PHP: 5.6
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -481,3 +481,9 @@ No. There is no charges for support.
 
 = 2.5.0 =
 * Fix: Next order coupon expiry
+
+= 2.5.1 =
+* Fix: Automatically coupons get generated, when NOC disabled
+* Fix: Exit intent popup not shown when the settings is display every time of customer exists
+* Fix: Add to cart popup shown even after email entered
+* Fix: Coupon timer colors not applied
