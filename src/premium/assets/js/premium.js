@@ -404,6 +404,10 @@
             var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
             return regex.test(email);
         }
+        var isEmailProvided = function () {
+            var is_email_provided = sessionStorage.getItem('rnocp_is_add_to_cart_popup_email_entered');
+            return parseInt(is_email_provided) === 1;
+        }
         var show_popup = function () {
             let cart_hash;
             for (let key in sessionStorage) {
@@ -429,8 +433,7 @@
                         show = (settings.is_user_logged_in === 'no');
                         break;
                     case "non_email_users":
-                        var is_email_provided = sessionStorage.getItem('rnocp_is_add_to_cart_popup_email_entered');
-                        show = parseInt(is_email_provided) !== 1;
+                        show = !isEmailProvided();
                         break;
                 }
                 if (show) {
@@ -471,6 +474,9 @@
                             }
                             break;
                     }
+                }
+                if (settings.show_for === "non_email_users") {
+                    show = !isEmailProvided();
                 }
                 if (show) {
                     if (window.rnoc_ei_popup_is_active === false) {

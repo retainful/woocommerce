@@ -268,7 +268,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     'show_for' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', 'all'),
                     'is_user_logged_in' => is_user_logged_in() ? 'yes' : 'no',
                     'coupon_code' => !empty($code) ? sanitize_text_field($code) : '',
-                    'show_once_its_coupon_applied' => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', '0') == 0) ? 'yes' : 'no',
+                    'show_once_its_coupon_applied' => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', '0') == 1) ? 'yes' : 'no',
                     'applied_coupons' => array(),
                     'show_popup' => $this->getKeyFromArray($show_settings, 'show_option', 'once_per_session'),
                     'number_of_times_per_page' => $this->getKeyFromArray($show_settings, 'show_count', '1'),
@@ -439,7 +439,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tr>
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'; ?>"><?php
-                                esc_html_e('Show exit intent popup once its coupon applied?', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Don\'t show exit intent popup once its coupon applied?', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
                         <td>
