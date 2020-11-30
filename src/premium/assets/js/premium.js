@@ -430,7 +430,7 @@
                         break;
                     case "non_email_users":
                         var is_email_provided = sessionStorage.getItem('rnocp_is_add_to_cart_popup_email_entered');
-                        show = (typeof is_email_provided !== "undefined" || parseInt(is_email_provided) === 0);
+                        show = parseInt(is_email_provided) !== 1;
                         break;
                 }
                 if (show) {

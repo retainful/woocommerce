@@ -439,6 +439,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             /*$('input#billing_email').on('change', function () {*/
             if (!(atposition < 1 || dotposition < atposition + 2 || dotposition + 2 >= rnoc_email.length) || rnoc_phone.length >= 1) {
                 if (retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
+                    sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "1");
                     $.ajax({
                         url: rnoc_cart_js_data.ajax_url,
                         headers: {},
@@ -456,6 +457,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                         }
                     });
                 } else {
+                    sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "0");
                     //console.log('Email validation failed');
                 }
 
