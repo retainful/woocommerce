@@ -254,7 +254,7 @@ class Cart extends RestApi
      */
     function addCloudFlareAttrScript($src, $handle)
     {
-        if ($handle == RNOC_PLUGIN_PREFIX . 'track-user-cart') {
+        if (in_array($handle, array(RNOC_PLUGIN_PREFIX . 'track-user-cart', RNOC_PLUGIN_PREFIX . 'referral'))) {
             return $src . "' data-cfasync='false";
         }
         return $src;
