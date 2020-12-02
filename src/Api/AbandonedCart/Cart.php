@@ -272,6 +272,19 @@ class Cart extends RestApi
     }
 
     /**
+     * Recover user cart
+     */
+    function recoverCartWithShortLink()
+    {
+        if (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart'])) {
+            $cart_id = sanitize_text_field($_REQUEST['rnoc_cart']);
+            if ($this->isPrefixMatch($cart_id, 'crt_')) {
+                $this->recoverCart();
+            }
+        }
+    }
+
+    /**
      * Add abandon cart coupon automatically
      */
     function applyAbandonedCartCoupon()
@@ -763,6 +776,26 @@ class Cart extends RestApi
     }
 
     /**
+     * get the cart token
+     * @param bool $data_only
+     * @return array|string|null
+     */
+    function getCartTokenFromRequest($data_only = false)
+    {
+        if (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart'])) {
+            return wc_clean(rawurldecode($_REQUEST['rnoc_cart']));
+        } else {
+            $request_data = wc_clean(rawurldecode($_REQUEST['token']));
+            if ($data_only) {
+                return $request_data;
+            }
+            $data = json_decode(base64_decode($request_data));
+            // readability
+            return isset($data->cart_token) ? $data->cart_token : NULL;
+        }
+    }
+
+    /**
      * Recreate cart
      * @return bool
      * @throws Exception
@@ -770,19 +803,24 @@ class Cart extends RestApi
     function reCreateCart()
     {
         global $retainful;
-        $data = wc_clean(rawurldecode($_REQUEST['token']));
+        $data = $this->getCartTokenFromRequest(true);
         $hash = wc_clean($_REQUEST['hash']);
-        if ($this->isHashMatches($hash, $data)) {
-            // decode
-            $data = json_decode(base64_decode($data));
-            // readability
-            $cart_token = isset($data->cart_token) ? $data->cart_token : NULL;
+        $is_short_link_request = (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart']));
+        if ($this->isHashMatches($hash, $data) || $is_short_link_request) {
+            $cart_token = $this->getCartTokenFromRequest();
             if (!empty($cart_token)) {
                 if (empty($cart_token)) {
                     throw new Exception('Cart token missed');
                 }
                 $app_id = $retainful::$plugin_admin->getApiKey();
-                $data = $retainful::$api->retrieveCartDetails($app_id, $cart_token);
+                if (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart'])) {
+                    $id_hash = $this->hashTheData($cart_token);
+                    $ip = $this->getClientIp();
+                    $format_ip = $this->formatUserIP($ip);
+                    echo $data = $retainful::$api->retrieveShortLinkCartDetails($app_id, $cart_token, $id_hash, $format_ip);die;
+                } else {
+                    $data = $retainful::$api->retrieveCartDetails($app_id, $cart_token);
+                }
                 //When the cart details from API was empty, then we no need to proceed further
                 if (empty($data)) {
                     return false;

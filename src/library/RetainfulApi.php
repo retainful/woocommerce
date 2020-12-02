@@ -252,4 +252,29 @@ class RetainfulApi
         }
         return NULL;
     }
+
+    /**
+     * Sync the cart details to server
+     * @param $app_id
+     * @param string $cart_token
+     * @param string $cart_hash
+     * @param string $ip
+     * @return array|bool|mixed|object|string
+     */
+    function retrieveShortLinkCartDetails($app_id, $cart_token, $cart_hash, $ip)
+    {
+        $url = rtrim($this->domain, '/');
+        $url .= '/webhook/woocommerce/cart';
+        $request_url = add_query_arg(array('app_id' => $app_id, 'rnoc_cart' => $cart_token, 'rnoc_hash' => $cart_hash), $url);
+        $headers = array(
+            'app_id' => $app_id,
+            'x-client-referrer-ip' => $ip,
+            'x-retainful-version' => RNOC_VERSION
+        );
+        $response = $this->request($request_url, array(), 'get', '', $headers);
+        if (isset($response->success) && $response->success) {
+            return isset($response->data) ? $response->data : NULL;
+        }
+        return NULL;
+    }
 }
