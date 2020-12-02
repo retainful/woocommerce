@@ -271,6 +271,16 @@ class Cart extends RestApi
         }
     }
 
+    function recoverCartWithShortLink()
+    {
+        if (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart'])) {
+            $cart_id = sanitize_text_field($_REQUEST['rnoc_cart']);
+            if ($this->isPrefixMatch($cart_id, 'crt_')) {
+                $this->recoverCart(true);
+            }
+        }
+    }
+
     /**
      * Add abandon cart coupon automatically
      */
@@ -729,17 +739,30 @@ class Cart extends RestApi
     /**
      * Recover the user cart
      */
-    function recoverCart()
+    function recoverCart($is_short_link = false)
     {
         global $retainful;
         $checkout_url = $retainful::$woocommerce->getCheckoutUrl();
+
         try {
-            $this->reCreateCart();
+            if($is_short_link) {
+                $cart_data = $this->retriveCartDataFromApiWithShortUrl();
+            }else {
+                $cart_data = $this->retriveCartDataFromApiWithCartToken();
+            }
+        }catch (Exception $e) {
+
+        }
+
+        if(is_null($cart_data)) return false;
+
+        try {
+            $this->reCreateCart($cart_data);
         } catch (Exception $exception) {
         }
         if (!empty($_GET)) {
             foreach ($_GET as $key => $value) {
-                if (!in_array($key, array("token", "hash", "wc-api"))) {
+                if (!in_array($key, array("token", "hash", "wc-api", "rnoc_cart"))) {
                     $checkout_url = add_query_arg($key, $value, $checkout_url);
                 }
             }
@@ -762,14 +785,10 @@ class Cart extends RestApi
         }
     }
 
-    /**
-     * Recreate cart
-     * @return bool
-     * @throws Exception
-     */
-    function reCreateCart()
-    {
+
+    function retriveCartDataFromApiWithCartToken() {
         global $retainful;
+        $cart_data = NULL;
         $data = wc_clean(rawurldecode($_REQUEST['token']));
         $hash = wc_clean($_REQUEST['hash']);
         if ($this->isHashMatches($hash, $data)) {
@@ -777,16 +796,66 @@ class Cart extends RestApi
             $data = json_decode(base64_decode($data));
             // readability
             $cart_token = isset($data->cart_token) ? $data->cart_token : NULL;
+            if (empty($cart_token)) {
+                return $cart_data;
+            }
+
             if (!empty($cart_token)) {
-                if (empty($cart_token)) {
-                    throw new Exception('Cart token missed');
-                }
                 $app_id = $retainful::$plugin_admin->getApiKey();
-                $data = $retainful::$api->retrieveCartDetails($app_id, $cart_token);
+                $cart_data = $retainful::$api->retrieveCartDetails($app_id, $cart_token);
                 //When the cart details from API was empty, then we no need to proceed further
-                if (empty($data)) {
-                    return false;
+                if (empty($cart_data)) {
+                    $cart_data = NULL;
                 }
+            }
+        }
+        return $cart_data;
+    }
+
+    function retriveCartDataFromApiWithShortUrl() {
+        $cart_id = false;
+        $cart_data = NULL;
+
+        if (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart'])) {
+            $cart_id = wc_clean(sanitize_title(rawurldecode($_REQUEST['rnoc_cart'])));
+        }
+        if(!$cart_id) return $cart_data;
+        
+          $cart_hash = $this->hashTheData($cart_id);
+          $ip = $this->getClientIp();
+          $format_ip = $this->formatUserIP($ip);
+          
+            
+            $url = rtrim($this->abandoned_cart_api_url, '/');
+            $url .= '/abandoned_checkouts/short/' . $cart_id;
+            $request_url = add_query_arg(array('app_id' => $app_id, 'rnoc_cart_id' =>  $cart_id, 'rnoc_hash' => $cart_hash), $url);
+            $headers = array(
+                'app_id' => $app_id,
+                'x-client-referrer-ip' => $ip,
+                'x-retainful-version' => RNOC_VERSION
+            );
+            $response = $this->request($request_url, array(), 'get', '', $headers);
+            if (isset($response->success) && $response->success) {
+               $cart_data = isset($response->data) ? $response->data : NULL;
+            }
+            return $cart_data;
+
+    }
+
+    /**
+     * Recreate cart
+     * @return bool
+     * @throws Exception
+     */
+    function reCreateCart($data)
+    {
+        global $retainful;
+        if(is_null($data)) return false;
+
+        $cart_token = isset($data->cart_token) ? $data->cart_token : NULL;
+        if(is_null($cart_token)) return false;
+
+
                 do_action('rnoc_before_recreate_cart', $data);
                 $order_id = $this->getOrderIdFromCartToken($cart_token);
                 $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
@@ -846,8 +915,8 @@ class Cart extends RestApi
                         $this->recreateCartFromCartContents($cart_contents);
                     }
                 }
-            }
-        }
+            
+        
         return false;
     }
 
