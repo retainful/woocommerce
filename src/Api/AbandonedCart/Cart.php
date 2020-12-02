@@ -272,6 +272,19 @@ class Cart extends RestApi
     }
 
     /**
+     * Recover user cart
+     */
+    function recoverCartWithShortLink()
+    {
+        if (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart']) && !empty($_REQUEST['hash'])) {
+            $cart_id = sanitize_text_field($_REQUEST['rnoc_cart']);
+            if ($this->isPrefixMatch($cart_id, 'crt_')) {
+                $this->recoverCart();
+            }
+        }
+    }
+
+    /**
      * Add abandon cart coupon automatically
      */
     function applyAbandonedCartCoupon()
@@ -763,6 +776,25 @@ class Cart extends RestApi
     }
 
     /**
+     * get the cart token
+     * @param bool $data_only
+     * @return array|string|null
+     */
+    function getCartTokenFromRequest($data_only = false){
+        if (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart'])) {
+            return wc_clean(rawurldecode($_REQUEST['rnoc_cart']));
+        } else {
+            $request_data = wc_clean(rawurldecode($_REQUEST['token']));
+            if($data_only){
+                return $request_data;
+            }
+            $data = json_decode(base64_decode($request_data));
+            // readability
+            return isset($data->cart_token) ? $data->cart_token : NULL;
+        }
+    }
+
+    /**
      * Recreate cart
      * @return bool
      * @throws Exception
@@ -770,13 +802,10 @@ class Cart extends RestApi
     function reCreateCart()
     {
         global $retainful;
-        $data = wc_clean(rawurldecode($_REQUEST['token']));
+        $data = $this->getCartTokenFromRequest(true);
         $hash = wc_clean($_REQUEST['hash']);
         if ($this->isHashMatches($hash, $data)) {
-            // decode
-            $data = json_decode(base64_decode($data));
-            // readability
-            $cart_token = isset($data->cart_token) ? $data->cart_token : NULL;
+            $cart_token = $this->getCartTokenFromRequest();
             if (!empty($cart_token)) {
                 if (empty($cart_token)) {
                     throw new Exception('Cart token missed');

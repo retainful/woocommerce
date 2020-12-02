@@ -30,6 +30,18 @@ class RestApi
     const HMAC_ALGORITHM = 'sha256';
 
     /**
+     * check is prefix match
+     * @param $text
+     * @param $prefix
+     * @return bool
+     */
+    function isPrefixMatch($text, $prefix)
+    {
+        $len = strlen($prefix);
+        return (substr($text, 0, $len) === $prefix);
+    }
+
+    /**
      * Set the cart token for the session
      * @param $cart_token
      * @param $user_id

@@ -190,6 +190,7 @@ class Main
             //add_action('wp_login', array($cart, 'userLoggedIn'));
             add_action('woocommerce_api_retainful', array(self::$abandoned_cart, 'recoverUserCart'));
             add_action('wp_loaded', array(self::$abandoned_cart, 'applyAbandonedCartCoupon'));
+            add_action('wp_loaded', array(self::$abandoned_cart, 'recoverCartWithShortLink'));
             //Add tracking message
             if (is_user_logged_in()) {
                 add_action('woocommerce_after_add_to_cart_button', array(self::$abandoned_cart, 'userGdprMessage'), 10);
