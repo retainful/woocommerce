@@ -422,6 +422,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                     action: 'rnoc_track_user_data'
                 };
                 if (retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
+                    sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "1");
                     $.ajax({
                         url: rnoc_cart_js_data.ajax_url,
                         headers: {},
@@ -439,11 +440,10 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                         }
                     });
                 } else {
-                    //console.log('Email validation failed');
+                    sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "0");
                 }
 
             } else {
-                //console.log('Not a valid email yet');
             }
         });
     });

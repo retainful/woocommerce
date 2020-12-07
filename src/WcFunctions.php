@@ -1830,4 +1830,58 @@ class WcFunctions
         }
         return false;
     }
+
+    /**
+     * get total orders for billing emails
+     * @param $email
+     * @return int
+     */
+    function getCustomerTotalOrders($email)
+    {
+        if (!empty($email) && is_email($email)) {
+            $customer_orders = $this->getCustomerOrdersByEmail($email);
+            if (is_array($customer_orders)) {
+                return count($customer_orders);
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * get the customer total spent
+     * @param $email
+     * @return float
+     */
+    function getCustomerTotalSpent($email)
+    {
+        $sum = 0;
+        if (!empty($email) && is_email($email)) {
+            $customer_orders = $this->getCustomerOrdersByEmail($email);
+            if (is_array($customer_orders)) {
+                foreach ($customer_orders as $order) {
+                    if ($order instanceof \WC_Order) {
+                        $sum = $sum + $this->getOrderTotal($order);
+                    }
+                }
+            }
+        }
+        return floatval($sum);
+    }
+
+    /**
+     * @param $email
+     * @return array[]
+     */
+    function getCustomerOrdersByEmail($email)
+    {
+        if (!empty($email) && is_email($email)) {
+            $args = array(
+                'customer' => $email,
+            );
+            $orders = $this->getOrdersList($args);
+            return apply_filters('rnoc_get_customer_orders_by_email', $orders);
+        } else {
+            return array();
+        }
+    }
 }

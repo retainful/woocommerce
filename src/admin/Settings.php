@@ -40,18 +40,6 @@ class Settings
         return NULL;
     }
 
-    /**
-     * switch to cloud notice
-     * @return string
-     */
-    function deactivatePremiumPluginNotice()
-    {
-        if ($this->isPremiumPluginActive()) {
-            $deactivate_link = $this->pluginActionLink('retainful-abandoned-cart-premium/retainful-abandoned-cart-premium.php', 'deactivate');
-            return '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("Premium addons now availale in the Retainful Core plugin itself. So a separate Premium add-ons plugin is not necessary. You can de-activate the plugin.", RNOC_TEXT_DOMAIN) . '<a href="' . $deactivate_link . '" class="button button-primary">' . __('De-activate', RNOC_TEXT_DOMAIN) . '</a></p>';
-        }
-        return NULL;
-    }
 
     /**
      * page styles
@@ -182,6 +170,11 @@ class Settings
                 );
                 if ($tag == 'a') {
                     $allowed_html[$tag]['href'] = array();
+                }
+                if ($tag == 'img') {
+                    $allowed_html[$tag]['src'] = array();
+                    $allowed_html[$tag]['width'] = array();
+                    $allowed_html[$tag]['height'] = array();
                 }
             }
             $allowed_html = apply_filters('rnoc_sanitize_allowed_basic_html_tags', $allowed_html);
@@ -403,13 +396,22 @@ class Settings
         $exit_intent_popup_template = self::$input->post(RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', '', false);
         $add_to_cart_coupon_popup_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] : '';
         $coupon_mail_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] : '';
-        $post = self::$input->post();
+        $atc_gdpr_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance', array(), false);
+        $add_to_cart_gdpr_message = isset($atc_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $atc_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
+        $ei_gdpr_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance', array(), false);
+        $ei_gdpr_message = isset($ei_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $ei_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
         $data = $this->clean($post);
         if (!empty($exit_intent_popup_template)) {
             $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] = $this->sanitizeBasicHtml($exit_intent_popup_template);
         }
         if (!empty($add_to_cart_coupon_popup_template)) {
             $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] = $this->sanitizeBasicHtml($add_to_cart_coupon_popup_template);
+        }
+        if (!empty($add_to_cart_gdpr_message)) {
+            $data[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] = $this->sanitizeBasicHtml($add_to_cart_gdpr_message);
+        }
+        if (!empty($ei_gdpr_message)) {
+            $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] = $this->sanitizeBasicHtml($ei_gdpr_message);
         }
         if (!empty($coupon_mail_template)) {
             $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] = $this->sanitizeBasicHtml($coupon_mail_template);
@@ -846,15 +848,6 @@ class Settings
     }
 
     /**
-     * check the premium plugin is active
-     * @return bool
-     */
-    function isPremiumPluginActive()
-    {
-        return is_plugin_active('retainful-abandoned-cart-premium/retainful-abandoned-cart-premium.php');
-    }
-
-    /**
      * applied Coupon Default Template
      * @return string
      */
@@ -1076,7 +1069,7 @@ class Settings
      */
     function runAbandonedCartExternally()
     {
-       return true;
+        return true;
     }
 
     /**

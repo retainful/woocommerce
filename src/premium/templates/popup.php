@@ -30,7 +30,7 @@
                                id="rnoc-popup-buyer-accepts-marketing" <?php echo ($rnoc_gdpr_check_box_settings == 'show_and_check_checkbox') ? "checked" : "" ?>/>&nbsp;
                         <?php
                     }
-                    echo rnocEscAttr($rnoc_gdpr_check_box_message);
+                    echo $rnoc_gdpr_check_box_message;
                     ?>
                 </label>
             </div>

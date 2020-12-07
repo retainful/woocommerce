@@ -20,9 +20,6 @@ class RetainfulPremiumMain
      */
     function init()
     {
-        if (!$this->checkDependency()) {
-            return false;
-        }
         $this->initAddon();
         add_filter('rnoc_get_premium_addon_list', array($this, 'getAddonLists'));
         return true;
@@ -79,19 +76,5 @@ class RetainfulPremiumMain
         foreach ($available_addons as $addon) {
             $addon->init();
         }
-    }
-
-    /**
-     * Check the retainful installed and activated
-     * @return bool
-     */
-    function checkDependency()
-    {
-        if (defined('RNOC_VERSION')) {
-            if (version_compare(RNOC_VERSION, '1.1.5', '>')) {
-                return true;
-            }
-        }
-        return false;
     }
 }

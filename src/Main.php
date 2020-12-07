@@ -6,6 +6,8 @@ if (!defined('ABSPATH')) exit;
 use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
+use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
+use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\Currency;
 
 class Main
@@ -22,10 +24,8 @@ class Main
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
-        if (!$this->admin->isPremiumPluginActive()) {
-            //init the retainful premium
-            new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
-        }
+        //init the retainful premium
+        new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
     }
 
     function includePluginFiles()
@@ -45,6 +45,16 @@ class Main
             'methods' => 'POST',
             'permission_callback' => '__return_true',
             'callback' => array($this, 'verifyAppId')
+        ));
+        register_rest_route('retainful-api/v1', '/coupon', array(
+            'methods' => 'POST',
+            'permission_callback' => '__return_true',
+            'callback' => 'Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement::createRestCoupon'
+        ));
+        register_rest_route('retainful-api/v1', '/customer', array(
+            'methods' => 'GET',
+            'permission_callback' => '__return_true',
+            'callback' => 'Rnoc\Retainful\Api\Referral\ReferralManagement::getCustomer'
         ));
     }
 
@@ -111,6 +121,9 @@ class Main
         //Deactivation survey form
         if (is_admin()) {
             add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
+            $coupon_api = new CouponManagement();
+            add_filter('views_edit-shop_coupon', array($coupon_api, 'viewsEditShopCoupon'));
+            add_filter('request', array($coupon_api, 'requestQuery'));
         }
         //Register deactivation hook
         register_deactivation_hook(RNOC_FILE, array($this, 'onPluginDeactivation'));
@@ -188,6 +201,11 @@ class Main
                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
+                if ($this->admin->isProPlan()) {
+                    $referral_program = new ReferralManagement();
+                    add_action('wp_footer', array($referral_program, 'printReferralPopup'));
+                    add_action('wp_enqueue_scripts', array($referral_program, 'referralProgramScripts'));
+                }
                 add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
                 add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
                 //Sync the order by the scheduled events
