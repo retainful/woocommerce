@@ -318,7 +318,7 @@ class OrderCoupon
         if (empty($coupon_code))
             return false;
         $return = array();
-        $coupon_details = $this->isValidCoupon($coupon_code);
+        $coupon_details = $this->isValidCoupon($coupon_code, null, array('rnoc_order_coupon'));
         if (!empty($coupon_details)) {
             $usage_restrictions = $this->admin->getUsageRestrictions();
             //Return true if there is any usage restriction
@@ -402,7 +402,7 @@ class OrderCoupon
     {
         if (empty($coupon_code))
             return $response;
-        $coupon_details = $this->isValidCoupon($coupon_code);
+        $coupon_details = $this->isValidCoupon($coupon_code, null, array('rnoc_order_coupon'));
         if (!empty($coupon_details)) {
             $is_coupon_already_applied = false;
             /*if (!empty(self::$applied_coupons) && self::$applied_coupons != $coupon_code)
@@ -502,11 +502,12 @@ class OrderCoupon
      * Check the given Coupon code is valid or not
      * @param $coupon
      * @param null $order
+     * @param string[] $coupon_type
      * @return String|null
      */
-    function isValidCoupon($coupon, $order = NULL)
+    function isValidCoupon($coupon, $order = NULL, $coupon_type = array('rnoc_order_coupon', 'shop_coupon'))
     {
-        $coupon_details = $this->getCouponByCouponCode($coupon);
+        $coupon_details = $this->getCouponByCouponCode($coupon, $coupon_type);
         if (!empty($coupon_details) && $coupon_details->post_status == "publish") {
             $coupon_only_for = $this->admin->couponFor();
             $current_user_id = $current_email = '';
@@ -625,8 +626,8 @@ class OrderCoupon
     {
         $user = $this->wc_functions->getOrderUser($order);
         if (empty($user)) {
-            $user_email = $this->wc_functions->getOrderEmail($order);
-            $user = $this->wc_functions->getUserByEmail($user_email);
+            $user_email = $retainful::$woocommerce->getOrderEmail($order);
+            $user = $retainful::$woocommerce->getUserByEmail($user_email);
         }
         if (!empty($user)) {
             $user_roles = isset($user->roles) ? $user->roles : array();
@@ -648,7 +649,7 @@ class OrderCoupon
             $order_email = $this->wc_functions->getOrderEmail($order);
             $args = array(
                 'posts_per_page' => -1,
-                'post_type' => 'rnoc_order_coupon',
+                'post_type' => array('rnoc_order_coupon', 'shop_coupon'),
                 'meta_key' => 'email',
                 'meta_value' => $order_email
             );
@@ -834,7 +835,7 @@ class OrderCoupon
      */
     function getCurrentEmail()
     {
-        $postData = isset($_REQUEST['post_data']) ? $_REQUEST['post_data'] : '';
+        $postData = isset($_REQUEST['post_data']) ? wc_clean($_REQUEST['post_data']) : '';
         $postDataArray = array();
         if (is_string($postData) && $postData != '') {
             parse_str($postData, $postDataArray);
@@ -886,21 +887,59 @@ class OrderCoupon
         $post = array(
             'post_title' => $new_coupon_code,
             'post_name' => $new_coupon_code . '-' . $order_id,
-            'post_content' => 'Virtual coupon code created through Retainful Next order coupon',
-            'post_type' => 'rnoc_order_coupon',
+            'post_content' => '',
+            'post_type' => 'shop_coupon',
             'post_status' => 'publish'
         );
         $id = wp_insert_post($post, true);
         if ($id) {
             $settings = $this->admin->getCouponSettings();
-            add_post_meta($id, 'order_id', $order_id);
+            $expired_date = $this->admin->getCouponExpireDate($order_date);
+            $coupon_type = isset($settings['coupon_type']) ? sanitize_text_field($settings['coupon_type']) : '0';
+            add_post_meta($id, 'discount_type', ($coupon_type == 0) ? "percent" : "fixed_cart");
+            $amount = isset($settings['coupon_amount']) ? sanitize_text_field($settings['coupon_amount']) : '0';
+            add_post_meta($id, 'coupon_amount', $amount);
+            //
+            if (isset($settings['minimum_amount']) && ($settings['minimum_amount'] > 0)) {
+                add_post_meta($id, 'minimum_amount', floatval($settings['minimum_amount']));
+            }
+            if (isset($settings['maximum_amount']) && ($settings['maximum_amount'] > 0)) {
+                add_post_meta($id, 'maximum_amount', floatval($settings['maximum_amount']));
+            }
+            add_post_meta($id, 'individual_use', isset($settings['individual_use']) ? $settings['individual_use'] : 'no');
+            add_post_meta($id, 'exclude_sale_items', isset($settings['exclude_sale_items']) ? $settings['exclude_sale_items'] : 'no');
+            if (isset($settings['product_ids']) && !empty($settings['product_ids'])) {
+                add_post_meta($id, 'product_ids', implode(',', $settings['product_ids']));
+            }
+            if (isset($settings['exclude_product_ids']) && !empty($settings['exclude_product_ids'])) {
+                add_post_meta($id, 'exclude_product_ids', implode(',', $settings['exclude_product_ids']));
+            }
+            if (isset($settings['product_categories']) && !empty($settings['product_categories'])) {
+                add_post_meta($id, 'product_categories', $settings['product_categories']);
+            }
+            if (isset($settings['exclude_product_categories']) && !empty($settings['exclude_product_categories'])) {
+                add_post_meta($id, 'exclude_product_categories', $settings['exclude_product_categories']);
+            }
+            if (isset($settings['coupon_applicable_to']) && !empty($settings['coupon_applicable_to']) && $settings['coupon_applicable_to'] != "all") {
+                add_post_meta($id, 'customer_email', $email);
+            }
+            add_post_meta($id, 'usage_limit', '1');
+            add_post_meta($id, 'usage_limit_per_user', '1');
+            if (!empty($expired_date)) {
+                add_post_meta($id, 'expiry_date', $expired_date);
+            }
+            add_post_meta($id, 'apply_before_tax', 'yes');
+            add_post_meta($id, 'free_shipping', 'no');
+            add_post_meta($id, '_rnoc_shop_coupon_type', 'retainful');
+            //old
             add_post_meta($id, 'email', $email);
             $order = $this->wc_functions->getOrder($order_id);
             $user_id = $this->wc_functions->getOrderUserId($order);
             add_post_meta($id, 'user_id', $user_id);
-            add_post_meta($id, 'coupon_type', isset($settings['coupon_type']) ? sanitize_text_field($settings['coupon_type']) : '0');
-            add_post_meta($id, 'coupon_value', isset($settings['coupon_amount']) ? sanitize_text_field($settings['coupon_amount']) : '0');
-            add_post_meta($id, 'coupon_expired_on', $this->admin->getCouponExpireDate($order_date));
+            add_post_meta($id, 'order_id', $order_id);
+            add_post_meta($id, 'coupon_type', $coupon_type);
+            add_post_meta($id, 'coupon_value', $amount);
+            add_post_meta($id, 'coupon_expired_on', $expired_date);
         }
         return $id;
     }
@@ -913,7 +952,7 @@ class OrderCoupon
     function isCouponFound($order_id)
     {
         if (empty($order_id)) return NULL;
-        $post_args = array('post_type' => 'rnoc_order_coupon', 'numberposts' => '1', 'post_status' => 'publish', 'meta_key' => 'order_id', 'meta_value' => $order_id);
+        $post_args = array('post_type' => array('rnoc_order_coupon', 'shop_coupon'), 'numberposts' => '1', 'post_status' => 'publish', 'meta_key' => 'order_id', 'meta_value' => $order_id);
         $posts = get_posts($post_args);
         if (!empty($posts)) {
             foreach ($posts as $post) {
@@ -930,13 +969,14 @@ class OrderCoupon
 
     /**
      * @param $coupon_code
+     * @param string[] $coupon_type
      * @return Object|null
      */
-    function getCouponByCouponCode($coupon_code)
+    function getCouponByCouponCode($coupon_code, $coupon_type = array('rnoc_order_coupon', 'shop_coupon'))
     {
         $coupon_code = sanitize_text_field($coupon_code);
         if (empty($coupon_code)) return NULL;
-        $post_args = array('post_type' => 'rnoc_order_coupon', 'numberposts' => '1', 'title' => strtoupper($coupon_code));
+        $post_args = array('post_type' => $coupon_type, 'numberposts' => '1', 'title' => strtoupper($coupon_code));
         $posts = get_posts($post_args);
         if (!empty($posts)) {
             foreach ($posts as $post) {
