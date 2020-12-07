@@ -626,8 +626,8 @@ class OrderCoupon
     {
         $user = $this->wc_functions->getOrderUser($order);
         if (empty($user)) {
-            $user_email = $retainful::$woocommerce->getOrderEmail($order);
-            $user = $retainful::$woocommerce->getUserByEmail($user_email);
+            $user_email = $this->wc_functions->getOrderEmail($order);
+            $user = $this->wc_functions->getUserByEmail($user_email);
         }
         if (!empty($user)) {
             $user_roles = isset($user->roles) ? $user->roles : array();
