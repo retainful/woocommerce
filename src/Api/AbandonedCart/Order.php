@@ -195,6 +195,7 @@ class Order extends RestApi
             'cart_type' => 'order',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
             'r_order_id' => $order_id,
+            'order_number' => $order_id,
             'plugin_version' => RNOC_VERSION,
             'cart_hash' => $cart_hash,
             'ip' => $user_ip,
