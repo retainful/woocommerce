@@ -40,7 +40,6 @@ class Settings
         return NULL;
     }
 
-
     /**
      * page styles
      */
@@ -81,6 +80,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'retainful_app_secret' => '',
         );
         $settings = wp_parse_args($settings, $default_settings);
+        $need_premium_features_link = $this->needPremiumFeaturesLinks();
         require_once dirname(__FILE__) . '/templates/pages/connection.php';
     }
 
@@ -450,6 +450,8 @@ class Settings
         $available_addon_list = apply_filters('rnoc_get_premium_addon_list', array());
         $base_url = admin_url('admin.php?page=' . $page_slug);
         $add_on = self::$input->get('add-on', null);
+        $is_migrated_to_cloud = $this->isPremiumFeaturesMigratedToCloud();
+        $need_premium_features_link = $this->needPremiumFeaturesLinks();
         if (!empty($add_on)) {
             $settings = get_option($page_slug, array());
             $default_settings = $this->getDefaultPremiumAddonsValues();
@@ -721,6 +723,7 @@ class Settings
         $categories = $this->getCategories();
         $is_pro_plan = $this->isProPlan();
         $unlock_premium_link = $this->unlockPremiumLink();
+        $need_premium_features_link = $this->needPremiumFeaturesLinks();
         require_once dirname(__FILE__) . '/templates/pages/next-order-coupon.php';
     }
 
@@ -817,6 +820,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'handle_storage_using' => 'woocommerce',
         );
         $settings = wp_parse_args($settings, $default_settings);
+        $need_premium_features_link = $this->needPremiumFeaturesLinks();
         require_once dirname(__FILE__) . '/templates/pages/settings.php';
     }
 
@@ -843,8 +847,45 @@ class Settings
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
         add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'nextOrderCouponPage'));
-        add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
+        if ($this->needPremiumFeaturesLinks()) {
+            add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
+        }
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
+    }
+
+    /**
+     * need premium features in plugin
+     * @return bool
+     */
+    function needPremiumFeatures()
+    {
+        return (!$this->isFreshInstallation() && $this->isProPlan() && !$this->isPremiumFeaturesMigratedToCloud());
+    }
+    /**
+     * need premium features in plugin
+     * @return bool
+     */
+    function needPremiumFeaturesLinks()
+    {
+        return (!$this->isFreshInstallation() && $this->isProPlan());
+    }
+
+    /**
+     * need premium features in plugin
+     * @return bool
+     */
+    function isPremiumFeaturesMigratedToCloud()
+    {
+        if (is_admin()) {
+            if (isset($_GET['migrate-to-cloud']) && !empty($_GET['migrate-to-cloud'])) {
+                $migrated = sanitize_text_field($_GET['migrate-to-cloud']);
+                if (in_array($migrated, array("yes", "no"))) {
+                    update_option('rnoc_is_premium_migrated_to_cloud', $migrated);
+                    return ($migrated == "yes");
+                }
+            }
+        }
+        return (get_option('rnoc_is_premium_migrated_to_cloud', 'no') === 'yes');
     }
 
     /**
@@ -1884,5 +1925,17 @@ class Settings
         if (!apply_filters('rnoc_need_survey_form', true)) return false;
         $survey = new Survey();
         $survey->init(RNOC_PLUGIN_SLUG, 'Retainful - next order coupon for woocommerce', RNOC_TEXT_DOMAIN);
+        return null;
+    }
+
+    /**
+     * check is fresh installation
+     * @return bool
+     */
+    function isFreshInstallation()
+    {
+        $page_slug = $this->slug . '_premium';
+        $settings = get_option($page_slug, array());
+        return empty($settings);
     }
 }

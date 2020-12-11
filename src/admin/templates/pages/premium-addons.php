@@ -2,8 +2,13 @@
 /**
  * @var $available_addon_list array
  * @var $base_url string
+ * @var $is_migrated_to_cloud bool
  */
 require_once "tabs.php";
+require_once "premium-migrate-option.php";
+if($is_migrated_to_cloud){
+    return;
+}
 ?>
 <div class="card">
     <?php

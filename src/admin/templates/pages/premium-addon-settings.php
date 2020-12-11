@@ -4,8 +4,13 @@
  * @var $available_addon_list array
  * @var $base_url string
  * @var $add_on_slug string
+ * @var $is_migrated_to_cloud bool
  */
 require_once "tabs.php";
+require_once "premium-migrate-option.php";
+if($is_migrated_to_cloud){
+    return;
+}
 ?>
 <form id="retainful-settings-form">
     <div class="card" style="width: 25%;float: left;padding: 0;">

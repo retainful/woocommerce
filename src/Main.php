@@ -24,8 +24,10 @@ class Main
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
-        //init the retainful premium
-        new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
+        if ($this->admin->needPremiumFeatures()) {
+            //init the retainful premium
+            new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
+        }
     }
 
     function includePluginFiles()
