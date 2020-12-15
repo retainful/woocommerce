@@ -779,7 +779,6 @@ class Settings
         $validator->rule('in', array(
             RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
             RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
-            RNOC_PLUGIN_PREFIX . 'move_email_field_to_top',
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load',
             RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
             RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
@@ -805,7 +804,6 @@ class Settings
         $default_settings = array(
             RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
             RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
-            RNOC_PLUGIN_PREFIX . 'move_email_field_to_top' => '0',
             RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status' => '0',
             RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status' => '1',
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
@@ -818,20 +816,6 @@ class Settings
         );
         $settings = wp_parse_args($settings, $default_settings);
         require_once dirname(__FILE__) . '/templates/pages/settings.php';
-    }
-
-    /**
-     * move top of the field
-     * @return bool
-     */
-    function moveEmailFieldToTop()
-    {
-        $settings = get_option($this->slug . '_settings', array());
-        $move_top = 0;
-        if (isset($settings[RNOC_PLUGIN_PREFIX . 'move_email_field_to_top'])) {
-            $move_top = $settings[RNOC_PLUGIN_PREFIX . 'move_email_field_to_top'];
-        }
-        return ($move_top == 1);
     }
 
     /**
