@@ -106,17 +106,6 @@ class Main
     }
 
     /**
-     * Check the woocommerce ac need to run externally
-     * @param $need_ac_externally
-     * @return bool|mixed|void
-     */
-    function needToRunAbandonedCartExternally($need_ac_externally)
-    {
-        $need_ac_externally = $this->admin->runAbandonedCartExternally();
-        return $need_ac_externally;
-    }
-
-    /**
      * Activate the required events
      */
     function activateEvents()
@@ -138,7 +127,6 @@ class Main
         //Check for dependencies
         add_action('plugins_loaded', array($this, 'checkDependencies'));
         add_action('rnocp_activation_trigger', array($this, 'checkUserPlan'));
-        add_filter('rnoc_need_to_run_ac_in_cloud', array($this, 'needToRunAbandonedCartExternally'));
         //Activate CMB2 functions
         add_action('admin_menu', array($this->admin, 'registerMenu'));
         $this->admin->initAdminPageStyles();
@@ -206,7 +194,7 @@ class Main
                 $referral_program = new ReferralManagement();
                 add_action('wp_footer', array($referral_program, 'printReferralPopup'));
                 add_action('wp_enqueue_scripts', array($referral_program, 'referralProgramScripts'));
-                if(!$this->admin->managePremiumFeaturesLocally()){
+                if (!$this->admin->managePremiumFeaturesLocally()) {
                     $pro_addons = new AddOns();
                     add_action('wp_enqueue_scripts', array($pro_addons, 'proAddonsScripts'));
                     add_filter('script_loader_src', array($pro_addons, 'addScriptAttr'), 11, 2);
@@ -260,11 +248,11 @@ class Main
                 add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
                 //Todo: multi currency and multi lingual
                 #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
-            } else {
-                $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
-                $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
-                $this->showAdminNotice($notice);
             }
+        } else {
+            $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('re-connect', RNOC_TEXT_DOMAIN) : __('connect', RNOC_TEXT_DOMAIN);
+            $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
+            $this->showAdminNotice($notice);
         }
         $is_retainful_v2_0_1_migration_completed = get_option('is_retainful_v2_0_1_migration_completed', 0);
         if (!$is_retainful_v2_0_1_migration_completed) {

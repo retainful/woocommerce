@@ -845,6 +845,7 @@ class Settings
     {
         return (!$this->isFreshInstallation() && $this->isProPlan() && !$this->isPremiumFeaturesMigratedToCloud());
     }
+
     /**
      * need premium features in plugin
      * @return bool
@@ -1086,15 +1087,6 @@ class Settings
     function isNewInstallation()
     {
         return get_option('retainful_is_new_installation', 1);
-    }
-
-    /**
-     * check abandoned cart need to run locally or externally
-     * @return bool|mixed|void
-     */
-    function runAbandonedCartExternally()
-    {
-        return true;
     }
 
     /**

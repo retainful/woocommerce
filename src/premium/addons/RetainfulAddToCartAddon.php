@@ -162,17 +162,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     if (!empty($is_popup_closed_by_user)) {
                         return false;
                     }
-                    $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
-                    $show_popup = false;
-                    if ($run_cart_externally) {
-                        $email = $this->wc_functions->getCustomerEmail();
-                        if (!empty($email)) {
-                            return false;
-                        }
-                        $show_popup = true;
-                    } else {
-                        //remove
+                    $email = $this->wc_functions->getCustomerEmail();
+                    if (!empty($email)) {
+                        return false;
                     }
+                    $show_popup = true;
                     if ($show_popup) {
                         add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
                         add_action('wp_footer', array($this, 'addToCartPopup'), 10);
@@ -210,9 +204,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function setGuestEmailSession()
         {
-            $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
             $message = '';
-            $error = true;
             $email = sanitize_email($_REQUEST['email']);
             $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0] : array();
             $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
@@ -227,11 +219,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             do_action('rnoc_after_atcp_assigning_email_to_customer', $email, $this);
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
-            if (!$run_cart_externally) {
-                //remove
-            } else {
-                $error = false;
-            }
+            $error = false;
             $coupon_details = "";
             $show_coupon_popup = false;
             $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
@@ -403,7 +391,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addSiteScripts()
         {
-
             if (!wp_script_is('rnoc-add-to-cart')) {
                 wp_enqueue_script('rnoc-add-to-cart', RNOCPREMIUM_PLUGIN_URL . 'assets/js/atc-popup.min.js', array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
             }
@@ -1042,7 +1029,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             wp_editor($email_template, 'add_to_cart_coupon_popup_template', array('textarea_name' => $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template]'));
                             ?>
                             <p class="description">
-                                Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b>
+                                Please use the below short codes to show the Coupon details in the
+                                message.<br><b>{{coupon_code}}</b>
                                 - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically
                             </p>
                         </td>
@@ -1076,7 +1064,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             wp_editor($email_template, 'coupon_mail_template', array('textarea_name' => $modal_coupon_settings_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template]'));
                             ?>
                             <p class="description">
-                                Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b>
+                                Please use the below short codes to show the Coupon details in the
+                                message.<br><b>{{coupon_code}}</b>
                                 - Coupon code<br><b>{{coupon_url}}</b> - Url to apply coupon automatically
                             </p>
                         </td>
