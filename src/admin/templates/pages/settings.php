@@ -113,33 +113,6 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'move_email_field_to_top'; ?>"><?php
-                    esc_html_e('Move Email field to top of the form?', RNOC_TEXT_DOMAIN);
-                    ?></label>
-            </th>
-            <td>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'move_email_field_to_top'; ?>"
-                           type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'move_email_field_to_top'; ?>"
-                           value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'move_email_field_to_top'] == '1') {
-                        echo "checked";
-                    } ?>>
-                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
-                </label>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'move_email_field_to_top'; ?>"
-                           type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'move_email_field_to_top'; ?>"
-                           value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'move_email_field_to_top'] == '0') {
-                        echo "checked";
-                    } ?>>
-                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
-                </label>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'; ?>"><?php
                     esc_html_e('Fix for Cart sync not working', RNOC_TEXT_DOMAIN);
                     ?></label>
