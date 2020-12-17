@@ -81,19 +81,19 @@ class Main
             $response_code = 'INSTALLED_NO_APP_ID_FOUND';
         } elseif (empty($entered_secret_key)) {
             $response_code = 'INSTALLED_NO_SECRET_KEY_FOUND';
-        } elseif (!empty($entered_app_id) && $app_id != $entered_app_id) {
+        } elseif ($app_id != $entered_app_id) {
             $response_code = 'INSTALLED_DIFFERENT_APP_ID';
-        } elseif (!empty($entered_secret_key) && $app_secret != $entered_secret_key) {
+        } elseif ($app_secret != $entered_secret_key) {
             $response_code = 'INSTALLED_DIFFERENT_SECRET_KEY';
-        } elseif (!empty($entered_secret_key) && !empty($entered_secret_key) && !$is_app_connected) {
+        } elseif (!$is_app_connected) {
             $response_code = 'INSTALLED_NOT_CONNECTED';
-        } elseif (!empty($entered_app_id) && !empty($entered_secret_key) && $app_secret == $entered_secret_key && $app_id == $entered_app_id && $is_app_connected) {
+        } elseif ($app_secret == $entered_secret_key && $app_id == $entered_app_id && $is_app_connected) {
             $response_code = 'INSTALLED_CONNECTED';
         } else {
             $response_code = 'UNKNOWN_ERROR';
         }
         $response = array(
-            'success' => ($response_code == 'INSTALLED_CONNECTED') ? true : false,
+            'success' => $response_code == 'INSTALLED_CONNECTED',
             'message' => '',
             'code' => $response_code,
             'data' => array(
