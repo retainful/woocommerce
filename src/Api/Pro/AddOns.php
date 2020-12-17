@@ -52,7 +52,7 @@ class AddOns
                 $first_name = strval($user->first_name);
                 $user_id = strval($user->ID);
             } else {
-                $email = '';
+                $email = $admin->wc_functions->getCustomerBillingEmail();
                 $first_name = '';
                 $user_id = '';
             }
@@ -68,6 +68,6 @@ class AddOns
      */
     function getProAddOnsUrl()
     {
-        return apply_filters('pro_addons_engine_url', "https://js.retainful.com/woocommerce/popup/production/retainful-popups.js");
+        return apply_filters('pro_addons_engine_url', "https://js.retainful.com/woocommerce/popup/production/retainful-popups.js?t=" . time());
     }
 }

@@ -198,7 +198,7 @@ class Cart extends RestApi
      */
     function getAbandonedCartJsEngineUrl()
     {
-        return apply_filters('rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION);
+        return apply_filters('rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION . '&t=' . time());
     }
 
     /**
@@ -1210,11 +1210,11 @@ class Cart extends RestApi
             }
             $created_at = $updated_at = strtotime($user_data->user_registered);
             $billing_first_name = get_user_meta($user_id, 'billing_first_name', true);
-            if(empty($billing_first_name)){
+            if (empty($billing_first_name)) {
                 $billing_first_name = $user_data->first_name;
             }
             $billing_last_name = get_user_meta($user_id, 'billing_last_name', true);
-            if(empty($billing_last_name)){
+            if (empty($billing_last_name)) {
                 $billing_last_name = $user_data->last_name;
             }
             $billing_state = get_user_meta($user_id, 'billing_state', true);
