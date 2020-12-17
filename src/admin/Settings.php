@@ -857,7 +857,7 @@ class Settings
      * need premium features in plugin
      * @return bool
      */
-    function needPremiumFeatures()
+    function managePremiumFeaturesLocally()
     {
         return (!$this->isFreshInstallation() && $this->isProPlan() && !$this->isPremiumFeaturesMigratedToCloud());
     }
