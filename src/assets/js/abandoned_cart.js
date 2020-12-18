@@ -377,6 +377,13 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             let tracking_content = '<div id="' + rnoc_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(rnoc_cart_js_data.cart) + '</div>';
             $(tracking_content).appendTo('body');
         }
+        $(document).on('rnoc_cart_email_provided',function(e,res){
+            console.log('cart hash',"res.cart_hash received");
+            if(res.cart_hash){
+                console.log('cart hash',res.cart_hash);
+                retainful.syncCart(res.cart_hash, true);
+            }
+        });
         $('input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone').on('change', function () {
             let msg = null;
             var rnoc_phone = $("#billing_phone").val();
