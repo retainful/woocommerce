@@ -90,8 +90,8 @@ class ReferralManagement
         $secret = $admin->getSecretKey();
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
-            $total_spent = $wc->getCustomerTotalSpent($user->user_email);
-            $order_count = $wc->getCustomerTotalOrders($user->user_email);
+            $total_spent = $wc->getCustomerTotalSpentFromSession($user->user_email);
+            $order_count = $wc->getCustomerTotalOrdersFromSession($user->user_email);
             $user_arr = array(
                 'api_key' => $api_key,
                 'accepts_marketing' => '1',
@@ -122,6 +122,9 @@ class ReferralManagement
         $window_obj_email = $user_arr['email'];
         $is_thank_you_page = (!empty(is_wc_endpoint_url('order-received')));
         $order_id = isset($wp->query_vars['order-received']) ? $wp->query_vars['order-received'] : 0;
+        if ($is_thank_you_page) {
+            $wc->removeTotalOrdersAndSpentFromSession();
+        }
         if ($is_thank_you_page && empty($window_obj_email) && !empty($order_id)) {
             $order = wc_get_order($order_id);
             if ($order instanceof \WC_Order) {
