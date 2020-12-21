@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.5
 WC tested up to: 4.8.0
 Requires PHP: 5.6
-Stable tag: 2.5.2
+Stable tag: 2.5.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -440,3 +440,6 @@ No. There is no charges for support.
 = 2.5.2 =
 * Fix: issues in loading pro JS
 * Fix: Removed option "Move email field to top"
+
+= 2.5.3 =
+* Improvement: Optimized customer's total spent and customer's total orders query
