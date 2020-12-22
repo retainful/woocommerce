@@ -1855,13 +1855,12 @@ class WcFunctions
     function getCustomerTotalOrdersFromSession($email)
     {
         $customer_total_orders = $this->getSession('rnoc_customer_total_orders');
-        if (!empty($customer_total_orders) && isset($customer_total_orders[$email])) {
-            return intval($customer_total_orders[$email]);
+        if (!is_null($customer_total_orders)) {
+            return intval($customer_total_orders);
         } else {
             $total_orders = $this->getCustomerTotalOrders($email);
-            $spent[$email] = $total_orders;
             $this->setSession('rnoc_customer_total_orders', $total_orders);
-            return $total_orders;
+            return intval($total_orders);
         }
     }
 
@@ -1903,13 +1902,12 @@ class WcFunctions
     function getCustomerTotalSpentFromSession($email)
     {
         $customer_total_spent = $this->getSession('rnoc_customer_total_spent');
-        if (!empty($customer_total_spent) && isset($customer_total_spent[$email])) {
-            return floatval($customer_total_spent[$email]);
+        if (!is_null($customer_total_spent)) {
+            return floatval($customer_total_spent);
         } else {
             $total_spent = $this->getCustomerTotalSpent($email);
-            $spent[$email] = $total_spent;
             $this->setSession('rnoc_customer_total_spent', $total_spent);
-            return $total_spent;
+            return floatval($total_spent);
         }
     }
 
