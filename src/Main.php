@@ -204,7 +204,6 @@ class Main
                 if ($this->admin->isProPlan()) {
                     $referral_program = new ReferralManagement();
                     add_action('wp_footer', array($referral_program, 'printReferralPopup'));
-                    add_action('wp_enqueue_scripts', array($referral_program, 'referralProgramScripts'));
                 }
                 add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
                 add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
