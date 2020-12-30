@@ -195,9 +195,7 @@ class Main
                 add_action('wp_footer', array($referral_program, 'printReferralPopup'));
                 if (!$this->admin->managePremiumFeaturesLocally()) {
                     $pro_addons = new AddOns();
-                    add_action('wp_enqueue_scripts', array($pro_addons, 'proAddonsScripts'));
-                    add_filter('script_loader_src', array($pro_addons, 'addScriptAttr'), 11, 2);
-                    add_filter('clean_url', array($pro_addons, 'uncleanUrl'), 10, 3);
+                    add_action('wp_footer', array($pro_addons, 'printProPopupScript'));
                 }
                 add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
                 add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
