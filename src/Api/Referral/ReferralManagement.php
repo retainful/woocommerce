@@ -60,16 +60,6 @@ class ReferralManagement
     }
 
     /**
-     * include referral program script
-     */
-    function referralProgramScripts()
-    {
-        if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'referral', 'enqueued')) {
-            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'referral', $this->getReferralUrl(), array(), RNOC_VERSION, true);
-        }
-    }
-
-    /**
      * get the referral url
      * @return mixed|void
      */
@@ -133,6 +123,7 @@ class ReferralManagement
         }
         $default_params = array(
             'digest' => $digest,
+            'referral_url' => $this->getReferralUrl(),
             'window' => array(
                 'is_thank_you_page' => $is_thank_you_page,
                 'customer_id' => $user_arr['id'],

@@ -3,6 +3,14 @@
  * @var $params array
  */
 ?>
+<script>
+    !function (e, c) {
+        !function (e) {
+            const o = c.createElement("script");
+            o.type = "application/javascript", o.src = e, c.body.appendChild(o)
+        }("<?php echo $params['referral_url'] ?>")
+    }(window, document);
+</script>
 <div id="rtl-shopify-init" data-app-key="<?php echo $params['api_key']; ?>"
      data-customer-accepts-marketing="<?php echo $params['accepts_marketing']; ?>"
      data-customer-email="<?php echo $params['email']; ?>"

@@ -193,7 +193,6 @@ class Main
             if ($this->admin->isProPlan()) {
                 $referral_program = new ReferralManagement();
                 add_action('wp_footer', array($referral_program, 'printReferralPopup'));
-                add_action('wp_enqueue_scripts', array($referral_program, 'referralProgramScripts'));
                 if (!$this->admin->managePremiumFeaturesLocally()) {
                     $pro_addons = new AddOns();
                     add_action('wp_enqueue_scripts', array($pro_addons, 'proAddonsScripts'));
