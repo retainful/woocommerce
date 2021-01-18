@@ -65,7 +65,7 @@ class ReferralManagement
      */
     function getReferralUrl()
     {
-        return apply_filters('referral_engine_url', 'https://js.retainful.com/woocommerce/v1/referral-wocommerce.js?t='.time());
+        return apply_filters('referral_engine_url', 'https://js.retainful.com/woocommerce/v1/referral-woocommerce.js?t='.time());
     }
 
     /**
