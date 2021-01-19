@@ -447,10 +447,14 @@ class RestApi
         do_action('rnoc_abandoned_order_recovered', $order);
     }
 
-    function cancelledOrderStatus($order_status)
+    function mutateOrderStatus($order_status)
     {
         if ($this->considerCancelledAsAbandoned() == 1) {
             if (in_array($order_status, array("cancelled"))) {
+                $order_status = "pending";
+            }
+        } elseif ($this->considerOnHoldAsAbandoned() == 1) {
+            if (in_array($order_status, array("on-hold"))) {
                 $order_status = "pending";
             }
         }

@@ -190,7 +190,7 @@ class Order extends RestApi
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
         $recovered_at = self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_at');
         $order_status = self::$woocommerce->getStatus($order);
-        $order_status = $this->cancelledOrderStatus($order_status);
+        $order_status = $this->mutateOrderStatus($order_status);
         $order_data = array(
             'cart_type' => 'order',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
