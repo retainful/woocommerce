@@ -776,7 +776,10 @@ class Cart extends RestApi
                 if ($order_id && $order = self::$woocommerce->getOrder($order_id)) {
                     // If the order status is not checkout-draft, then proceed payment step
                     // This issue occurred when using checkout-block
-                    if(!self::$woocommerce->hasOrderStatus($order, 'checkout-draft')) {
+                    if (self::$woocommerce->hasOrderStatus($order, 'checkout-draft')) {
+                        //setting order id to session inorder to remove the duplication
+                        self::$woocommerce->setSession('store_api_draft_order', $order_id);
+                    } else {
                         // re-enable a cancelled order for payment
                         if (self::$woocommerce->hasOrderStatus($order, 'cancelled')) {
                             self::$woocommerce->setOrderStatus($order, 'pending', $note);
