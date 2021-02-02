@@ -544,7 +544,7 @@ class Settings
                 RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color' => '#333333',
                 RNOC_PLUGIN_PREFIX . 'show_woo_coupon' => 'send_via_email',
                 RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template' => '',
-                RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject' => __('Email subject for sending the coupon mail.', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject' => __('Your coupon code', RNOC_TEXT_DOMAIN),
                 RNOC_PLUGIN_PREFIX . 'coupon_mail_template' => '',
             )),
             RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal' => 0,

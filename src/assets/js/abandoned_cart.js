@@ -293,17 +293,19 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 }
                 let cart_hash = this.getCartHash();
                 if ((cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) || (force_sync)) {
-                    this.previous_cart_hash = cart_hash;
-                    let headers = {
-                        "app_id": this.getPublicKey(),
-                        "Content-Type": "application/json",
-                        "X-Client-Referrer-IP": this.getIp(),
-                        "X-Retainful-Version": this.getVersion(),
-                        "X-Cart-Token": this.getCartToken(),
-                        "Cart-Token": this.getCartToken()
-                    };
-                    let body = {"data": cart_data};
-                    this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
+                    if(cart_data.length > 10) {
+                        this.previous_cart_hash = cart_hash;
+                        let headers = {
+                            "app_id": this.getPublicKey(),
+                            "Content-Type": "application/json",
+                            "X-Client-Referrer-IP": this.getIp(),
+                            "X-Retainful-Version": this.getVersion(),
+                            "X-Cart-Token": this.getCartToken(),
+                            "Cart-Token": this.getCartToken()
+                        };
+                        let body = {"data": cart_data};
+                        this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
+                    }
                 }
                 if (this.force_refresh_carts !== null && !this.is_force_synced) {
                     this.is_force_synced = true;

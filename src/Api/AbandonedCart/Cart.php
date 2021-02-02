@@ -774,18 +774,25 @@ class Cart extends RestApi
                 $order_id = $this->getOrderIdFromCartToken($cart_token);
                 $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
                 if ($order_id && $order = self::$woocommerce->getOrder($order_id)) {
-                    // re-enable a cancelled order for payment
-                    if (self::$woocommerce->hasOrderStatus($order, 'cancelled')) {
-                        self::$woocommerce->setOrderStatus($order, 'pending', $note);
+                    // If the order status is not checkout-draft, then proceed payment step
+                    // This issue occurred when using checkout-block
+                    if (self::$woocommerce->hasOrderStatus($order, 'checkout-draft')) {
+                        //setting order id to session inorder to remove the duplication
+                        self::$woocommerce->setSession('store_api_draft_order', $order_id);
                     } else {
-                        self::$woocommerce->setOrderNote($order, $note);
+                        // re-enable a cancelled order for payment
+                        if (self::$woocommerce->hasOrderStatus($order, 'cancelled')) {
+                            self::$woocommerce->setOrderStatus($order, 'pending', $note);
+                        } else {
+                            self::$woocommerce->setOrderNote($order, $note);
+                        }
+                        $redirect = self::$woocommerce->isOrderNeedPayment($order) ? self::$woocommerce->getOrderPaymentURL($order) : self::$woocommerce->getOrderReceivedURL($order);
+                        self::$storage->setValue($this->pending_recovery_key, true);
+                        // set (or refresh, if already set) session
+                        self::$woocommerce->setSessionCookie(true);
+                        wp_safe_redirect($redirect);
+                        exit;
                     }
-                    $redirect = self::$woocommerce->isOrderNeedPayment($order) ? self::$woocommerce->getOrderPaymentURL($order) : self::$woocommerce->getOrderReceivedURL($order);
-                    self::$storage->setValue($this->pending_recovery_key, true);
-                    // set (or refresh, if already set) session
-                    self::$woocommerce->setSessionCookie(true);
-                    wp_safe_redirect($redirect);
-                    exit;
                 }
                 $is_buyer_accept_marketing = (isset($data->buyer_accepts_marketing) && $data->buyer_accepts_marketing) ? 1 : 0;
                 self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accept_marketing);

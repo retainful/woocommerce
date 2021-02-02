@@ -387,7 +387,7 @@ class RestApi
      */
     function isOrderHasValidOrderStatus($order_status)
     {
-        $invalid_order_status = apply_filters('rnoc_abandoned_cart_invalid_order_statuses', array('pending', 'failed'));
+        $invalid_order_status = apply_filters('rnoc_abandoned_cart_invalid_order_statuses', array('pending', 'failed', 'checkout-draft'));
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
         if ($consider_on_hold_order_as_ac == 1) {
             $invalid_order_status[] = 'on-hold';
@@ -447,12 +447,20 @@ class RestApi
         do_action('rnoc_abandoned_order_recovered', $order);
     }
 
-    function cancelledOrderStatus($order_status)
+    function changeOrderStatus($order_status)
     {
         if ($this->considerCancelledAsAbandoned() == 1) {
             if (in_array($order_status, array("cancelled"))) {
                 $order_status = "pending";
             }
+        }
+        if ($this->considerOnHoldAsAbandoned() == 1) {
+            if (in_array($order_status, array("on-hold"))) {
+                $order_status = "pending";
+            }
+        }
+        if (in_array($order_status, array('checkout-draft'))) {
+            $order_status = "pending";
         }
         return $order_status;
     }
