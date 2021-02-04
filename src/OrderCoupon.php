@@ -717,10 +717,8 @@ class OrderCoupon
             $cart = $this->wc_functions->getOrderItems($order);
             if (!empty($cart)) {
                 foreach ($cart as $item_key => $item_details) {
-                    $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
                     $product_id = (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0;
-                    $id = (!empty($variant_id)) ? $variant_id : $product_id;
-                    $product_category_ids = $this->wc_functions->getProductCategoryIds($id);
+                    $product_category_ids = $this->wc_functions->getProductCategoryIds($product_id);
                     if (is_array($product_category_ids) && is_array($invalid_categories)) {
                         if (count(array_intersect($invalid_categories, $product_category_ids)) > 0) {
                             $status = false;
