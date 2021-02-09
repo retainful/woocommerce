@@ -26,7 +26,10 @@ class AddOns
         $api_key = $admin->getApiKey();
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
-            $email = strval($user->user_email);
+            $email = $admin->wc_functions->getCustomerBillingEmail();
+            if (empty($email)) {
+                $email = strval($user->user_email);
+            }
             $first_name = strval($user->first_name);
             $user_id = strval($user->ID);
         } else {
