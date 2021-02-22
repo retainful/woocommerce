@@ -299,8 +299,8 @@ class WcFunctions
      */
     function getOrderSubTotal($order)
     {
-        if (method_exists($order, 'get_subtotal_to_display')) {
-            return $order->get_subtotal_to_display();
+        if (method_exists($order, 'get_subtotal')) {
+            return $order->get_subtotal();
         }
         return 0;
     }

@@ -85,6 +85,7 @@ class RestApi
     function formatDecimalPrice($price)
     {
         $decimals = self::$woocommerce->priceDecimals();
+        $price = floatval($price);
         return round($price, $decimals);
     }
 
