@@ -201,7 +201,8 @@ class Main
                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
-                if ($this->admin->isProPlan()) {
+                $need_referral_program = apply_filters("retainful_enable_referral_program", true);
+                if ($this->admin->isProPlan() && $need_referral_program) {
                     $referral_program = new ReferralManagement();
                     add_action('wp_footer', array($referral_program, 'printReferralPopup'));
                 }
