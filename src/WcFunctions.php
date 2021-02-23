@@ -27,8 +27,8 @@ class WcFunctions
      */
     function getOrder($order_id)
     {
-        if (is_numeric($order_id) && function_exists('wc_get_order')) {
-            return wc_get_order($order_id);
+        if (function_exists('wc_get_order')) {
+            return wc_get_order(intval($order_id));
         }
         return NULL;
     }
@@ -43,8 +43,8 @@ class WcFunctions
 
     function getProduct($product_id)
     {
-        if (is_numeric($product_id) && function_exists('wc_get_product')) {
-            return wc_get_product($product_id);
+        if (function_exists('wc_get_product')) {
+            return wc_get_product(intval($product_id));
         }
         return array();
     }
@@ -80,7 +80,7 @@ class WcFunctions
 
     function getProductName($product)
     {
-        if (is_object($product) && $product instanceof \WC_Product && method_exists($product, 'get_formatted_name')) {
+        if (is_object($product) && method_exists($product, 'get_formatted_name')) {
             return $product->get_formatted_name();
         }
         return NULL;
@@ -117,7 +117,7 @@ class WcFunctions
      */
     function getOrderEmail($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_email')) {
+        if (is_object($order) && method_exists($order, 'get_billing_email')) {
             return $order->get_billing_email();
         } elseif (isset($order->billing_email)) {
             return $order->billing_email;
@@ -134,7 +134,7 @@ class WcFunctions
      */
     function setOrderStatus($order, $status, $note)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'update_status')) {
+        if (is_object($order) && method_exists($order, 'update_status')) {
             return $order->update_status($status, $note);
         }
         return false;
@@ -148,7 +148,7 @@ class WcFunctions
      */
     function hasOrderStatus($order, $status)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'has_status')) {
+        if (is_object($order) && method_exists($order, 'has_status')) {
             return $order->has_status($status);
         }
         return false;
@@ -182,8 +182,8 @@ class WcFunctions
         if (empty($item_id) || empty($meta_key)) {
             return NULL;
         }
-        if (is_numeric($item_id) && function_exists('wc_get_order_item_meta')) {
-            return wc_get_order_item_meta($item_id, $meta_key, true);
+        if (function_exists('wc_get_order_item_meta')) {
+            return wc_get_order_item_meta(intval($item_id), $meta_key, true);
         }
         return NULL;
     }
@@ -196,11 +196,11 @@ class WcFunctions
     function getUsedCoupons($order)
     {
         if (version_compare(self::$wc_version, '3.7.0', '<')) {
-            if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_used_coupons')) {
+            if (is_object($order) && method_exists($order, 'get_used_coupons')) {
                 return $order->get_used_coupons();
             }
         } else {
-            if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_coupon_codes')) {
+            if (is_object($order) && method_exists($order, 'get_coupon_codes')) {
                 return $order->get_coupon_codes();
             }
         }
@@ -214,7 +214,7 @@ class WcFunctions
      */
     function getStatus($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_status')) {
+        if (is_object($order) && method_exists($order, 'get_status')) {
             $order_status = $order->get_status();
             return strtolower($order_status);
         }
@@ -228,7 +228,7 @@ class WcFunctions
      */
     function getOrderItemsTotal($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_order_item_totals')) {
+        if (is_object($order) && method_exists($order, 'get_order_item_totals')) {
             return $order->get_order_item_totals();
         }
         return NULL;
@@ -244,10 +244,7 @@ class WcFunctions
     function getOrderMeta($order, $meta_key)
     {
         $order_id = $this->getOrderId($order);
-        if (is_numeric($order_id)) {
-            return get_post_meta($order_id, $meta_key, true);
-        }
-        return "";
+        return get_post_meta(intval($order_id), $meta_key, true);
     }
 
     /**
@@ -258,10 +255,7 @@ class WcFunctions
      */
     function deleteOrderMeta($order_id, $meta_key)
     {
-        if (is_numeric($order_id)) {
-            return delete_post_meta($order_id, $meta_key);
-        }
-        return null;
+        return delete_post_meta(intval($order_id), $meta_key);
     }
 
     /**
@@ -272,10 +266,7 @@ class WcFunctions
      */
     function getPostMeta($post_id, $meta_key)
     {
-        if (is_numeric($post_id)) {
-            return get_post_meta($post_id, $meta_key, true);
-        }
-        return null;
+        return get_post_meta(intval($post_id), $meta_key, true);
     }
 
     /**
@@ -287,8 +278,8 @@ class WcFunctions
      */
     function setOrderMeta($order_id, $meta_key, $meta_value)
     {
-        if (is_numeric($order_id) && !empty($meta_key)) {
-            return update_post_meta($order_id, $meta_key, $meta_value);
+        if (!empty($meta_key)) {
+            return update_post_meta(intval($order_id), $meta_key, $meta_value);
         }
         return null;
     }
@@ -300,7 +291,7 @@ class WcFunctions
      */
     function getOrderId($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_id')) {
+        if (is_object($order) && method_exists($order, 'get_id')) {
             return $order->get_id();
         } elseif (is_object($order) && isset($order->id)) {
             return $order->id;
@@ -315,7 +306,7 @@ class WcFunctions
      */
     function getOrderSubTotal($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_subtotal')) {
+        if (is_object($order) && method_exists($order, 'get_subtotal')) {
             return $order->get_subtotal();
         }
         return 0;
@@ -328,7 +319,7 @@ class WcFunctions
      */
     function getProductUrl($product)
     {
-        if (is_object($product) && $product instanceof \WC_Product && method_exists($product, 'get_permalink')) {
+        if (is_object($product) && method_exists($product, 'get_permalink')) {
             return $product->get_permalink();
         }
         return "";
@@ -368,7 +359,7 @@ class WcFunctions
      */
     function getOrderDiscount($order, $excluding = true)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_total_discount')) {
+        if (is_object($order) && method_exists($order, 'get_total_discount')) {
             return $order->get_total_discount($excluding);
         }
         return 0;
@@ -382,7 +373,7 @@ class WcFunctions
      */
     function getOrderShippingTotal($order, $context = "edit")
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_total')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_total')) {
             return $order->get_shipping_total($context);
         }
         return 0;
@@ -395,7 +386,7 @@ class WcFunctions
      */
     function getOrderFees($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_fees')) {
+        if (is_object($order) && method_exists($order, 'get_fees')) {
             return $order->get_fees();
         }
         return 0;
@@ -408,7 +399,7 @@ class WcFunctions
      */
     function setOrderNote($order, $note)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'add_order_note')) {
+        if (is_object($order) && method_exists($order, 'add_order_note')) {
             $order->add_order_note($note);
         }
     }
@@ -420,7 +411,7 @@ class WcFunctions
      */
     function isOrderPaid($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'is_paid')) {
+        if (is_object($order) && method_exists($order, 'is_paid')) {
             $order->is_paid();
         }
         return false;
@@ -433,7 +424,7 @@ class WcFunctions
      */
     function isOrderNeedPayment($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'needs_payment')) {
+        if (is_object($order) && method_exists($order, 'needs_payment')) {
             return $order->needs_payment();
         }
         return NULL;
@@ -446,7 +437,7 @@ class WcFunctions
      */
     function getOrderPaymentURL($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_checkout_payment_url')) {
+        if (is_object($order) && method_exists($order, 'get_checkout_payment_url')) {
             return $order->get_checkout_payment_url();
         }
         return NULL;
@@ -459,7 +450,7 @@ class WcFunctions
      */
     function getOrderReceivedURL($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_checkout_order_received_url')) {
+        if (is_object($order) && method_exists($order, 'get_checkout_order_received_url')) {
             return $order->get_checkout_order_received_url();
         }
         return NULL;
@@ -472,7 +463,7 @@ class WcFunctions
      */
     function getOrderFirstName($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_first_name')) {
+        if (is_object($order) && method_exists($order, 'get_billing_first_name')) {
             return $order->get_billing_first_name();
         }
         return NULL;
@@ -485,7 +476,7 @@ class WcFunctions
      */
     function getOrderLastName($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_last_name')) {
+        if (is_object($order) && method_exists($order, 'get_billing_last_name')) {
             return $order->get_billing_last_name();
         }
         return NULL;
@@ -498,7 +489,7 @@ class WcFunctions
      */
     function getOrderTotal($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_total')) {
+        if (is_object($order) && method_exists($order, 'get_total')) {
             return $order->get_total();
         }
         return NULL;
@@ -512,7 +503,7 @@ class WcFunctions
      */
     function getOrderDate($order, $format = NULL)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_date_created')) {
+        if (is_object($order) && method_exists($order, 'get_date_created')) {
             $date = $order->get_date_created();
             if (!is_null($format)) {
                 $date = $date->format($format);
@@ -529,7 +520,7 @@ class WcFunctions
      */
     function getOrderUserId($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_user_id')) {
+        if (is_object($order) && method_exists($order, 'get_user_id')) {
             return $order->get_user_id();
         } elseif (is_object($order) && isset($order->user_id)) {
             return $order->user_id;
@@ -544,7 +535,7 @@ class WcFunctions
      */
     function getOrderUser($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_user')) {
+        if (is_object($order) && method_exists($order, 'get_user')) {
             return $order->get_user();
         }
         return NULL;
@@ -727,8 +718,8 @@ class WcFunctions
      */
     function setCustomerPayingForOrder($order_id)
     {
-        if (is_numeric($order_id) && function_exists('wc_paying_customer')) {
-            wc_paying_customer($order_id);
+        if (function_exists('wc_paying_customer')) {
+            wc_paying_customer(intval($order_id));
         }
     }
 
@@ -1075,7 +1066,7 @@ class WcFunctions
      */
     function getCouponUsageCount($coupon)
     {
-        if (is_object($coupon) && $coupon instanceof \WC_Coupon && method_exists($coupon, 'get_usage_count')) {
+        if (is_object($coupon) && method_exists($coupon, 'get_usage_count')) {
             return $coupon->get_usage_count();
         }
         return 0;
@@ -1083,7 +1074,7 @@ class WcFunctions
 
     function getCouponDateExpires($coupon)
     {
-        if (is_object($coupon) && $coupon instanceof \WC_Coupon && method_exists($coupon, 'get_date_expires')) {
+        if (is_object($coupon) && method_exists($coupon, 'get_date_expires')) {
             return $coupon->get_date_expires();
         }
         return '';
@@ -1091,7 +1082,7 @@ class WcFunctions
 
     function getCouponDiscountType($coupon)
     {
-        if (is_object($coupon) && $coupon instanceof \WC_Coupon && method_exists($coupon, 'get_discount_type')) {
+        if (is_object($coupon) && method_exists($coupon, 'get_discount_type')) {
             return $coupon->get_discount_type();
         }
         return '';
@@ -1344,7 +1335,7 @@ class WcFunctions
      */
     function getCouponCode($coupon)
     {
-        if (is_object($coupon) && $coupon instanceof \WC_Coupon && method_exists($coupon, 'get_code')) {
+        if (is_object($coupon) && method_exists($coupon, 'get_code')) {
             return $coupon->get_code();
         }
         return NULL;
@@ -1418,7 +1409,7 @@ class WcFunctions
      */
     function getBillingFirstName($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_first_name')) {
+        if (is_object($order) && method_exists($order, 'get_billing_first_name')) {
             return $order->get_billing_first_name();
         }
         return NULL;
@@ -1431,7 +1422,7 @@ class WcFunctions
      */
     function getOrderCurrency($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_currency')) {
+        if (is_object($order) && method_exists($order, 'get_currency')) {
             return $order->get_currency();
         }
         return NULL;
@@ -1444,7 +1435,7 @@ class WcFunctions
      */
     function getBillingLastName($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_last_name')) {
+        if (is_object($order) && method_exists($order, 'get_billing_last_name')) {
             return $order->get_billing_last_name();
         }
         return NULL;
@@ -1457,7 +1448,7 @@ class WcFunctions
      */
     function getBillingEmail($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_email')) {
+        if (is_object($order) && method_exists($order, 'get_billing_email')) {
             return $order->get_billing_email();
         }
         return NULL;
@@ -1470,7 +1461,7 @@ class WcFunctions
      */
     function getBillingAddressOne($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_address_1')) {
+        if (is_object($order) && method_exists($order, 'get_billing_address_1')) {
             return $order->get_billing_address_1();
         }
         return NULL;
@@ -1483,7 +1474,7 @@ class WcFunctions
      */
     function getBillingAddressTwo($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_address_2')) {
+        if (is_object($order) && method_exists($order, 'get_billing_address_2')) {
             return $order->get_billing_address_2();
         }
         return NULL;
@@ -1496,7 +1487,7 @@ class WcFunctions
      */
     function getBillingCity($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_city')) {
+        if (is_object($order) && method_exists($order, 'get_billing_city')) {
             return $order->get_billing_city();
         }
         return NULL;
@@ -1509,7 +1500,7 @@ class WcFunctions
      */
     function getBillingState($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_state')) {
+        if (is_object($order) && method_exists($order, 'get_billing_state')) {
             return $order->get_billing_state();
         }
         return NULL;
@@ -1522,7 +1513,7 @@ class WcFunctions
      */
     function getBillingCountry($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_country')) {
+        if (is_object($order) && method_exists($order, 'get_billing_country')) {
             return $order->get_billing_country();
         }
         return NULL;
@@ -1535,7 +1526,7 @@ class WcFunctions
      */
     function getBillingPostCode($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_postcode')) {
+        if (is_object($order) && method_exists($order, 'get_billing_postcode')) {
             return $order->get_billing_postcode();
         }
         return NULL;
@@ -1548,7 +1539,7 @@ class WcFunctions
      */
     function getBillingCompany($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_company')) {
+        if (is_object($order) && method_exists($order, 'get_billing_company')) {
             return $order->get_billing_company();
         }
         return NULL;
@@ -1561,7 +1552,7 @@ class WcFunctions
      */
     function getBillingPhone($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_billing_phone')) {
+        if (is_object($order) && method_exists($order, 'get_billing_phone')) {
             return $order->get_billing_phone();
         }
         return NULL;
@@ -1574,7 +1565,7 @@ class WcFunctions
      */
     function getShippingFirstName($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_first_name')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_first_name')) {
             return $order->get_shipping_first_name();
         }
         return NULL;
@@ -1587,7 +1578,7 @@ class WcFunctions
      */
     function getShippingLastName($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_last_name')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_last_name')) {
             return $order->get_shipping_last_name();
         }
         return NULL;
@@ -1600,7 +1591,7 @@ class WcFunctions
      */
     function getShippingAddressOne($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_address_1')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_address_1')) {
             return $order->get_shipping_address_1();
         }
         return NULL;
@@ -1613,7 +1604,7 @@ class WcFunctions
      */
     function getShippingAddressFormatted($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_formatted_shipping_address')) {
+        if (is_object($order) && method_exists($order, 'get_formatted_shipping_address')) {
             return $order->get_formatted_shipping_address();
         }
         return NULL;
@@ -1626,7 +1617,7 @@ class WcFunctions
      */
     function getShippingAddressTwo($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_address_2')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_address_2')) {
             return $order->get_shipping_address_2();
         }
         return NULL;
@@ -1639,7 +1630,7 @@ class WcFunctions
      */
     function getShippingCity($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_city')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_city')) {
             return $order->get_shipping_city();
         }
         return NULL;
@@ -1652,7 +1643,7 @@ class WcFunctions
      */
     function getShippingState($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_state')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_state')) {
             return $order->get_shipping_state();
         }
         return NULL;
@@ -1665,7 +1656,7 @@ class WcFunctions
      */
     function getShippingCountry($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_country')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_country')) {
             return $order->get_shipping_country();
         }
         return NULL;
@@ -1678,7 +1669,7 @@ class WcFunctions
      */
     function getShippingPostCode($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_postcode')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_postcode')) {
             return $order->get_shipping_postcode();
         }
         return NULL;
@@ -1691,7 +1682,7 @@ class WcFunctions
      */
     function getShippingCompany($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_shipping_company')) {
+        if (is_object($order) && method_exists($order, 'get_shipping_company')) {
             return $order->get_shipping_company();
         }
         return NULL;
@@ -1704,7 +1695,7 @@ class WcFunctions
      */
     function getOrderTotalTax($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_total_tax')) {
+        if (is_object($order) && method_exists($order, 'get_total_tax')) {
             return $order->get_total_tax();
         }
         return NULL;
@@ -1717,7 +1708,7 @@ class WcFunctions
      */
     function getOrderItems($order)
     {
-        if (is_object($order) && $order instanceof \WC_Order && method_exists($order, 'get_items')) {
+        if (is_object($order) && method_exists($order, 'get_items')) {
             return $order->get_items();
         }
         return array();
@@ -1806,7 +1797,7 @@ class WcFunctions
     function getPriceExcludingTax($product)
     {
         $price = 0;
-        if (is_object($product) && $product instanceof \WC_Product && function_exists('wc_get_price_excluding_tax')) {
+        if (is_object($product) && function_exists('wc_get_price_excluding_tax')) {
             $price = wc_get_price_excluding_tax($product);
         }
         return $price;
@@ -1820,7 +1811,7 @@ class WcFunctions
     function getPriceIncludingTax($product)
     {
         $price = 0;
-        if (is_object($product) && $product instanceof \WC_Product && function_exists('wc_get_price_including_tax')) {
+        if (is_object($product) && function_exists('wc_get_price_including_tax')) {
             $price = wc_get_price_including_tax($product);
         }
         return $price;
@@ -1839,7 +1830,7 @@ class WcFunctions
     {
         if (class_exists('WC_Coupon')) {
             $coupon = new \WC_Coupon($coupon_code);
-            if (method_exists($coupon,"is_valid")) {
+            if (method_exists($coupon, "is_valid")) {
                 return $coupon->is_valid();
             }
         }
