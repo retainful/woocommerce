@@ -444,7 +444,7 @@ class RestApi
         }
         self::$woocommerce->deleteOrderMeta($order_id, $this->pending_recovery_key_for_db);
         self::$woocommerce->setOrderMeta($order_id, $this->order_recovered_key_for_db, true);
-        self::$woocommerce->setOrderNote($order_id, __('Order recovered by Retainful.', RNOC_TEXT_DOMAIN));
+        self::$woocommerce->setOrderNote($order, __('Order recovered by Retainful.', RNOC_TEXT_DOMAIN));
         do_action('rnoc_abandoned_order_recovered', $order);
     }
 
