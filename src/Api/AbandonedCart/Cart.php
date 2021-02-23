@@ -525,7 +525,7 @@ class Cart extends RestApi
                         'variant_price' => $this->formatDecimalPriceRemoveTrailingZeros(($is_variable_item) ? self::$woocommerce->getCartItemPrice($item) : 0),
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
                         'image_url' => $image_url,
-                        'product_url' => self::$woocommerce->getProductUrl($item, $item_details),
+                        'product_url' => self::$woocommerce->getProductUrl($item),
                         'user_id' => NULL,
                         'properties' => array()
                     );
