@@ -17,7 +17,7 @@ class WooSession extends Base
         /**
          * make sure the session was created
          */
-        if (method_exists(WC()->session, 'has_session')) {
+        if (is_object(WC()->session) && method_exists(WC()->session, 'has_session')) {
             if (!WC()->session->has_session() && !defined('DOING_CRON')) {
                 if (method_exists(WC()->session, 'set_customer_session_cookie')) {
                     WC()->session->set_customer_session_cookie(true);
@@ -47,7 +47,7 @@ class WooSession extends Base
         if (empty($key)) {
             return NULL;
         }
-        if (method_exists(WC()->session, 'set')) {
+        if (is_object(WC()->session) && method_exists(WC()->session, 'set')) {
             WC()->session->set($key, $value);
         }
         return true;
@@ -63,7 +63,7 @@ class WooSession extends Base
         if (empty($key)) {
             return NULL;
         }
-        if (method_exists(WC()->session, 'get')) {
+        if (is_object(WC()->session) && method_exists(WC()->session, 'get')) {
             return WC()->session->get($key);
         }
         return NULL;
@@ -78,7 +78,7 @@ class WooSession extends Base
     {
         if (empty($key))
             return false;
-        if (method_exists(WC()->session, '__unset')) {
+        if (is_object(WC()->session) && method_exists(WC()->session, '__unset')) {
             WC()->session->__unset($key);
         }
         return true;
