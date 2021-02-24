@@ -403,7 +403,7 @@ class Cart extends RestApi
     function isZeroValueCart($return, $order = false)
     {
         if (self::$settings->trackZeroValueCarts() == "no") {
-            if ($order instanceof \WC_Order) {
+            if (is_object($order) && $order instanceof \WC_Order) {
                 if (!empty(self::$woocommerce->getOrderItems($order)) && self::$woocommerce->getOrderSubTotal($order) <= 0 && self::$woocommerce->getOrderTotal($order) <= 0) {
                     $return = false;
                 }
