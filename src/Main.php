@@ -225,7 +225,7 @@ class Main
                 }
                 add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
                 add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
-                add_filter('rnoc_can_track_abandoned_carts', array($cart, 'isZeroValueCart'), 15);
+                add_filter('rnoc_can_track_abandoned_carts', array($cart, 'isZeroValueCart'), 15, 2);
                 $cart_tracking_engine = $this->admin->getCartTrackingEngine();
                 if ($cart_tracking_engine == "php") {
                     //PHP tracking

@@ -653,11 +653,12 @@ class RestApi
     /**
      * need to track carts or not
      * @param string $ip_address
+     * @param $order null | \WC_Order | \WC_Cart
      * @return bool
      */
-    function canTrackAbandonedCarts($ip_address = NULL)
+    function canTrackAbandonedCarts($ip_address = NULL, $order = null)
     {
-        if (apply_filters('rnoc_is_cart_has_valid_ip', true, $ip_address) && apply_filters('rnoc_can_track_abandoned_carts', true)) {
+        if (apply_filters('rnoc_is_cart_has_valid_ip', true, $ip_address) && apply_filters('rnoc_can_track_abandoned_carts', true, $order)) {
             return true;
         }
         return false;
