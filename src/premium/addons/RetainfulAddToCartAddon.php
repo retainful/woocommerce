@@ -697,10 +697,12 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     <tbody>
                     <tr>
                         <td colspan="2">
-                            <?php
-                            $this->setupAdminScripts();
-                            echo $this->getPopupTemplate();
-                            ?>
+                            <div style="width: 60%;margin: 0 auto;">
+                                <?php
+                                $this->setupAdminScripts();
+                                echo $this->getPopupTemplate();
+                                ?>
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -750,7 +752,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_email_field_width]'; ?>"
-                                   type="text" class="regular-text"
+                                   type="number" class="regular-text"
+                                   step="any"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_email_field_width'; ?>"
                                    value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) ? rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) : 70; ?>">
                         </td>
@@ -776,7 +779,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_button_field_width]'; ?>"
-                                   type="text" class="regular-text"
+                                   type="number" class="regular-text"
+                                   step="any"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_button_field_width'; ?>"
                                    value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) ? rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) : 70; ?>">
                         </td>
