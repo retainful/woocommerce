@@ -397,13 +397,20 @@ class Cart extends RestApi
     /**
      * Need to track zero value carts or not
      * @param $return
+     * @param $order
      * @return mixed
      */
-    function isZeroValueCart($return)
+    function isZeroValueCart($return, $order = false)
     {
         if (self::$settings->trackZeroValueCarts() == "no") {
-            if (!empty(self::$woocommerce->getCart()) && self::$woocommerce->getCartSubTotal() <= 0 && self::$woocommerce->getCartTotalPrice() <= 0) {
-                $return = false;
+            if (is_object($order) && $order instanceof \WC_Order) {
+                if (!empty(self::$woocommerce->getOrderItems($order)) && self::$woocommerce->getOrderSubTotal($order) <= 0 && self::$woocommerce->getOrderTotal($order) <= 0) {
+                    $return = false;
+                }
+            } else {
+                if (!empty(self::$woocommerce->getCart()) && self::$woocommerce->getCartSubTotal() <= 0 && self::$woocommerce->getCartTotalPrice() <= 0) {
+                    $return = false;
+                }
             }
         }
         return $return;
@@ -525,7 +532,7 @@ class Cart extends RestApi
                         'variant_price' => $this->formatDecimalPriceRemoveTrailingZeros(($is_variable_item) ? self::$woocommerce->getCartItemPrice($item) : 0),
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
                         'image_url' => $image_url,
-                        'product_url' => self::$woocommerce->getProductUrl($item, $item_details),
+                        'product_url' => self::$woocommerce->getProductUrl($item),
                         'user_id' => NULL,
                         'properties' => array()
                     );

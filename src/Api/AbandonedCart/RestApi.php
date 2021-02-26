@@ -85,6 +85,7 @@ class RestApi
     function formatDecimalPrice($price)
     {
         $decimals = self::$woocommerce->priceDecimals();
+        $price = floatval($price);
         return round($price, $decimals);
     }
 
@@ -443,7 +444,7 @@ class RestApi
         }
         self::$woocommerce->deleteOrderMeta($order_id, $this->pending_recovery_key_for_db);
         self::$woocommerce->setOrderMeta($order_id, $this->order_recovered_key_for_db, true);
-        self::$woocommerce->setOrderNote($order_id, __('Order recovered by Retainful.', RNOC_TEXT_DOMAIN));
+        self::$woocommerce->setOrderNote($order, __('Order recovered by Retainful.', RNOC_TEXT_DOMAIN));
         do_action('rnoc_abandoned_order_recovered', $order);
     }
 
@@ -652,11 +653,12 @@ class RestApi
     /**
      * need to track carts or not
      * @param string $ip_address
+     * @param $order null | \WC_Order | \WC_Cart
      * @return bool
      */
-    function canTrackAbandonedCarts($ip_address = NULL)
+    function canTrackAbandonedCarts($ip_address = NULL, $order = null)
     {
-        if (apply_filters('rnoc_is_cart_has_valid_ip', true, $ip_address) && apply_filters('rnoc_can_track_abandoned_carts', true)) {
+        if (apply_filters('rnoc_is_cart_has_valid_ip', true, $ip_address) && apply_filters('rnoc_can_track_abandoned_carts', true, $order)) {
             return true;
         }
         return false;

@@ -170,13 +170,13 @@ class Order extends RestApi
     function getOrderData($order)
     {
         $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
-        if (!$this->canTrackAbandonedCarts($user_ip)) {
+        if (!$this->canTrackAbandonedCarts($user_ip, $order)) {
             return array();
         }
         $order_id = self::$woocommerce->getOrderId($order);
         $cart_token = $this->getOrderCartToken($order);
-        if(empty($cart_token)){
-            return  array();
+        if (empty($cart_token)) {
+            return array();
         }
         $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
         $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
@@ -252,7 +252,7 @@ class Order extends RestApi
         $data = array();
         $next_order_coupon = self::$woocommerce->getPostMeta($order_id, '_rnoc_next_order_coupon');
         $order_coupon_obj = new OrderCoupon();
-        if(empty($next_order_coupon) && self::$settings->isNextOrderCouponEnabled()){
+        if (empty($next_order_coupon) && self::$settings->isNextOrderCouponEnabled()) {
             $next_order_coupon = $order_coupon_obj->createNewCoupon($order_id, array());
         }
         if (!empty($next_order_coupon)) {

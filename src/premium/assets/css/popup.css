@@ -12,6 +12,10 @@
     background-color: rgba(0, 0, 0, 0.7);
 }
 
+.rnoc-form-input-field, .rnoc-form-button-field, .rnoc-accepts-marketing-form-field {
+    margin: 0 auto;
+}
+
 .rnoc-popup-modal button:disabled, .rnoc-popup-modal button.loading {
     opacity: 0.5 !important;
     cursor: not-allowed !important;
@@ -112,7 +116,6 @@
 
     .rnoc-popup-modal .close-rnoc-popup {
         right: 1%;
-
         top: 86px;
     }
 }
@@ -168,33 +171,33 @@
 }
 
 .rnoc-popup .rnoc-lw-input {
-    display: inline-block;
-    width: 52%;
+    display: block;
+    width: 100%;
     font-size: 1em;
-    border-radius: 5px 0px 0px 5px;
+    border-radius: 5px;
     box-shadow: 0 3px 5px 0 rgba(37, 39, 44, 0.12);
     height: 47px;
     max-height: 47px;
     padding: 0 15px;
     border: 1px solid rgba(0, 0, 0, 0.12);
-    margin-bottom: 2%;
+    margin-bottom: 10px;
     font-weight: 500;
 }
 
 .rnoc-popup .rnoc-lw-btn {
-    width: 45%;
-    display: inline-block;
+    width: 100%;
+    display: block;
     padding: 14px 20px;
     height: 48px;
     max-height: 48px;
     border: none;
-    border-radius: 0px 5px 5px 0px;
+    border-radius: 5px;
     font-size: 1em;
     line-height: 1em;
     box-shadow: 0 3px 5px 0 rgba(37, 39, 44, 0.17);
     font-weight: 600;
     color: white;
-    margin: 15px -7px;
+    margin: 15px auto;
     text-align: center;
     cursor: pointer;
 }
@@ -213,11 +216,9 @@
 }
 
 .rnoc-popup .rnoc-pp-label {
-    text-align: left;
-    margin-left: 4%;
-    margin-bottom: 3%;
+    text-align: center;
+    margin: 0 auto 15px auto;
     font-size: 1em;
-    margin-top: 3%;
 }
 
 .rnoc-popup .rnoc-pp-label a {
@@ -285,8 +286,17 @@
 }
 
 @media (max-width: 768px) {
+    .rnoc-popup-modal .close-rnoc-popup {
+        right: 1%;
+        top: 5px;
+    }
+
+    .rnoc-popup-modal {
+        padding-top: 20px;
+    }
+
     .rnoc-popup {
-        width: 90%;
+        width: 100%;
     }
 
     .rnoc-popup .rnoc-lw-title {
