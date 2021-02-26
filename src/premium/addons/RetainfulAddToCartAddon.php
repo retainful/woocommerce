@@ -115,6 +115,8 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 'rnoc_modal_add_cart_border_top_color' => '#f27052',
                 'rnoc_modal_add_cart_no_thanks_color' => '#f27052',
                 'rnoc_modal_bg_color' => '#F8F0F0',
+                'rnoc_modal_email_field_width' => 70,
+                'rnoc_modal_button_field_width' => 70,
                 'rnoc_close_btn_behavior' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close'),
                 'rnoc_modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
                 'rnoc_modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
@@ -742,6 +744,19 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_email_field_width'; ?>"><?php
+                                esc_html_e('Email field width(%)', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_email_field_width]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_email_field_width'; ?>"
+                                   value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) ? rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) : 70; ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_add_cart_text'; ?>"><?php
                                 esc_html_e('Add to cart button text', RNOC_TEXT_DOMAIN);
                                 ?></label>
@@ -751,6 +766,19 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                    type="text" class="regular-text"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_add_cart_text'; ?>"
                                    value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_text']); ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_button_field_width'; ?>"><?php
+                                esc_html_e('Add to cart button width(%)', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo $modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_button_field_width]'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_button_field_width'; ?>"
+                                   value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) ? rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) : 70; ?>">
                         </td>
                     </tr>
                     <tr>

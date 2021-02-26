@@ -40,7 +40,6 @@ class Settings
         return NULL;
     }
 
-
     /**
      * page styles
      */
@@ -522,7 +521,9 @@ class Settings
                 RNOC_PLUGIN_PREFIX . 'modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
                 RNOC_PLUGIN_PREFIX . 'modal_heading_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'modal_email_placeholder' => __('Email address', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_email_field_width' => 70,
                 RNOC_PLUGIN_PREFIX . 'modal_add_cart_text' => __('Add to Cart', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_button_field_width' => 70,
                 RNOC_PLUGIN_PREFIX . 'modal_add_cart_color' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color' => '#f27052',
                 RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color' => '#f27052',
