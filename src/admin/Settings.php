@@ -1263,24 +1263,53 @@ class Settings
     /**
      * Make coupon expire date from order date
      * @param $ordered_date
-     * @return string|null
+     * @return array
      */
     function getCouponExpireDate($ordered_date)
     {
+        $response = array(
+            'woo_coupons' => null,
+            'retainful_coupons' => null
+        );
         if (empty($ordered_date))
-            return NULL;
+            return $response;
         $settings = get_option($this->slug, array());
-        $expire_days = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days'] : 60;
-        if (!empty($settings) && $this->isAppConnected() && !empty($expire_days)) {
-            try {
-                $expiry_date = new \DateTime($ordered_date);
-                $expiry_date->add(new \DateInterval('P' . $expire_days . 'D'));
-                return $expiry_date->format(\DateTime::ATOM);
-            } catch (\Exception $e) {
-                return NULL;
+        $expire_days = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) ? intval($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) : 0;
+        if ($this->isAppConnected() && $expire_days > 0) {
+            $response['retainful_coupons'] = $this->addDaysToDate($ordered_date, $expire_days);
+            $response['woo_coupons'] = $this->addDaysToDate($ordered_date, $expire_days + 1);
+        }
+        return $response;
+    }
+
+    function addDaysToDate($date, $days)
+    {
+        if ($date && intval($days) > 0) {
+            $date = $this->formatDate($date, 'Y-m-d');
+            if (!empty($date)) {
+                $timestamp = strtotime($date);
+                $days_in_seconds = intval($days) * 86400;
+                $last_date_timestamp = $timestamp + $days_in_seconds;
+                echo $last_date = date('Y-m-d H:i:s', $last_date_timestamp);
+                return $this->formatDate($last_date, \DateTime::ATOM);
             }
         }
-        return NULL;
+        return null;
+    }
+
+    /**
+     * @param $date
+     * @param $format
+     * @return string|null
+     */
+    function formatDate($date, $format)
+    {
+        try {
+            $date_obj = new \DateTime($date);
+            return $date_obj->format($format);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
