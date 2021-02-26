@@ -755,7 +755,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                    type="number" class="regular-text"
                                    step="any"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_email_field_width'; ?>"
-                                   value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) ? rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) : 70; ?>">
+                                   value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) ? floatval($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) : 70; ?>">
                         </td>
                     </tr>
                     <tr>
@@ -782,7 +782,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                    type="number" class="regular-text"
                                    step="any"
                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_button_field_width'; ?>"
-                                   value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) ? rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) : 70; ?>">
+                                   value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) ? floatval($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) : 70; ?>">
                         </td>
                     </tr>
                     <tr>

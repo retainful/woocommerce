@@ -341,15 +341,10 @@ class Settings
         $validator->rule('array', array(
             RNOC_PLUGIN_PREFIX . 'modal_display_pages',
         ))->message('This field contains invalid value');
-        /*$validator->rule('regex', array(
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_email_placeholder',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_text',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_terms_text',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_heading',
-            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading',
-            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject',
-        ), '/^[\p{L}\p{Nd} .!:*,-]+$/')->message('This field should only accepts numbers, alphabets and spaces');*/
+        $validator->rule('regex', array(
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_email_field_width',
+            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_button_field_width',
+        ), '/^(\d*\.)?\d+$/')->message('This field should only accepts numbers and decimals');
         $validator->rule('color', array(
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_heading_color',
             RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_color',
