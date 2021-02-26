@@ -923,8 +923,8 @@ class OrderCoupon
             }
             add_post_meta($id, 'usage_limit', '1');
             add_post_meta($id, 'usage_limit_per_user', '1');
-            if (!empty($expired_date)) {
-                add_post_meta($id, 'expiry_date', $expired_date);
+            if (isset($expired_date['woo_coupons']) && !empty($expired_date['woo_coupons'])) {
+                add_post_meta($id, 'expiry_date', $expired_date['woo_coupons']);
             }
             add_post_meta($id, 'apply_before_tax', 'yes');
             add_post_meta($id, 'free_shipping', 'no');
@@ -937,7 +937,9 @@ class OrderCoupon
             add_post_meta($id, 'order_id', $order_id);
             add_post_meta($id, 'coupon_type', $coupon_type);
             add_post_meta($id, 'coupon_value', $amount);
-            add_post_meta($id, 'coupon_expired_on', $expired_date);
+            if (isset($expired_date['retainful_coupons']) && !empty($expired_date['retainful_coupons'])) {
+                add_post_meta($id, 'coupon_expired_on', $expired_date['retainful_coupons']);
+            }
         }
         return $id;
     }
