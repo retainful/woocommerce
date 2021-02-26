@@ -673,7 +673,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'retainful_coupon_type' => '0',
             RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount' => '10',
             RNOC_PLUGIN_PREFIX . 'retainful_expire_days' => '60',
-            RNOC_PLUGIN_PREFIX . 'expire_date_format' => 'F j, Y, g:i a',
+            RNOC_PLUGIN_PREFIX . 'expire_date_format' => 'F j, Y',
             RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to' => 'all',
             RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon' => '1',
             RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page' => '0',
@@ -1214,17 +1214,14 @@ class Settings
      */
     function getDateFormatOptions()
     {
-        return array(
-            'jS D M g:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'jS D M g:i a'),
-            'jS D M, Y g:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'jS D M, Y g:i a'),
-            'F j, Y, g:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'F j, Y, g:i a'),
+        $date_formats = array(
+            'F j, Y' => get_date_from_gmt(date('Y-m-d h:i:s'), 'F j, Y'),
             'Y-m-d' => get_date_from_gmt(date('Y-m-d h:i:s'), 'Y-m-d'),
-            'Y-m-d h:i:s' => get_date_from_gmt(date('Y-m-d h:i:s'), 'Y-m-d h:i:s'),
-            'Y-m-d h:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'Y-m-d h:i a'),
+            'Y/m/d' => get_date_from_gmt(date('Y-m-d h:i:s'), 'Y/m/d'),
+            'd-m-Y' => get_date_from_gmt(date('Y-m-d h:i:s'), 'd-m-Y'),
             'd/m/Y' => get_date_from_gmt(date('Y-m-d h:i:s'), 'd/m/Y'),
-            'd/m/Y h:i:s' => get_date_from_gmt(date('Y-m-d h:i:s'), 'd/m/Y h:i:s'),
-            'd/m/Y h:i a' => get_date_from_gmt(date('Y-m-d h:i:s'), 'd/m/Y h:i a'),
         );
+        return apply_filters('rnoc_dateformat_options', $date_formats);
     }
 
     /**

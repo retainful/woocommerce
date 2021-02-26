@@ -938,7 +938,7 @@ class OrderCoupon
             add_post_meta($id, 'coupon_type', $coupon_type);
             add_post_meta($id, 'coupon_value', $amount);
             if (isset($expired_date['retainful_coupons']) && !empty($expired_date['retainful_coupons'])) {
-                add_post_meta($id, 'coupon_expired_on', $expired_date);
+                add_post_meta($id, 'coupon_expired_on', $expired_date['retainful_coupons']);
             }
         }
         return $id;
