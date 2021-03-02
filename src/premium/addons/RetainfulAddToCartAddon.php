@@ -172,10 +172,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             return false;
                         }
                         $show_popup = true;
-                    } else {
-                        //remove
                     }
-                    if ($show_popup) {
+                    $is_checkout_page = apply_filters("rnoc_need_atc_popup_in_checkout_page", is_checkout());
+                    if ($show_popup && $is_checkout_page == false) {
                         add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
                         add_action('wp_footer', array($this, 'addToCartPopup'), 10);
                     }
