@@ -244,21 +244,21 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     switch ($show_woo_coupon) {
                         case "auto_apply_and_redirect":
                             $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_checkout_url();
+                            $redirect_url = $this->getCheckoutUrl();
                             break;
                         case "auto_apply_and_redirect_cart":
                             $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_cart_url();
+                            $redirect_url = $this->getCartUrl();
                             break;
                         case "send_mail_auto_apply_and_redirect":
                             $this->sendEmail($email, $coupon_settings);
                             $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_checkout_url();
+                            $redirect_url = $this->getCheckoutUrl();
                             break;
                         case "send_mail_auto_apply_and_redirect_cart":
                             $this->sendEmail($email, $coupon_settings);
                             $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_cart_url();
+                            $redirect_url = $this->getCartUrl();
                             break;
                         case "instantly":
                             $show_coupon_popup = true;

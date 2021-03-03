@@ -358,18 +358,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         }
 
         /**
-         * get the cart url
-         * @return string|null
-         */
-        function getCartUrl()
-        {
-            if (function_exists('wc_get_cart_url')) {
-                return wc_get_cart_url();
-            }
-            return NULL;
-        }
-
-        /**
          * get the current url
          * @return string|null
          */

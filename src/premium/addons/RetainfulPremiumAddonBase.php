@@ -166,15 +166,29 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
         }
 
         /**
+         * get the cart url
+         * @return string|null
+         */
+        function getCartUrl()
+        {
+            $cart_url = "";
+            if (function_exists('wc_get_cart_url')) {
+                $cart_url = wc_get_cart_url();
+            }
+            return apply_filters("rnoc_get_cart_page_url", $cart_url);
+        }
+
+        /**
          * get the checkout url
          * @return string|null
          */
         function getCheckoutUrl()
         {
+            $checkout_url = "";
             if (function_exists('wc_get_checkout_url')) {
-                return wc_get_checkout_url();
+                $checkout_url = wc_get_checkout_url();
             }
-            return NULL;
+            return apply_filters('rnoc_get_checkout_url', $checkout_url);
         }
 
         function complianceMessageOptions()
