@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.6
 WC tested up to: 5.0.0
 Requires PHP: 5.6
-Stable tag: 2.5.7
+Stable tag: 2.5.8
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -456,3 +456,12 @@ No. There is no charges for support.
 
 = 2.5.7 =
 * Fix: NOC is generating for invalid categories
+
+= 2.5.8 =
+* Fix: https://wordpress.org/support/topic/plugin-incompatible-with-mercadopago-payment-gatewat/
+* hook added to enable/disable referral program
+* Fix: Issue in adding order note for the recovered orders.
+* Improvement: code improved to handle invalid params passed to functions
+* improvement: added option to get the width of add to cart popup input fields from the customer.
+* Filter added to stop loading ATC popup in the checkout page
+* Filter added to change cart and checkout page URL
