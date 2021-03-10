@@ -800,6 +800,7 @@ class Settings
         $default_settings = array(
             RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
             RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
+            RNOC_PLUGIN_PREFIX . 'enable_referral_widget' => 'yes',
             RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status' => '0',
             RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status' => '1',
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
@@ -1167,6 +1168,17 @@ class Settings
     {
         $settings = $this->getAdminSettings();
         return (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'])) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] : 'js';
+    }
+
+    /**
+     * is referral widget is required for store
+     * @return mixed|void
+     */
+    function needReferralWidget()
+    {
+        $settings = $this->getAdminSettings();
+        $need_widget = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'] : 'yes';
+        return apply_filters("retainful_enable_referral_program", ($need_widget === "yes"));
     }
 
     /**

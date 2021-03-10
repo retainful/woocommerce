@@ -9,6 +9,31 @@ require_once "tabs.php";
         <tbody>
         <tr>
             <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>"><?php
+                    esc_html_e('Enable Referral Widget for your store?', RNOC_TEXT_DOMAIN);
+                    ?> <span class="premium-label">Premium</span></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget_yes'; ?>"
+                           value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'] == 'yes') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget_no'; ?>"
+                           value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'] == 'no') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'; ?>"><?php
                     esc_html_e('Cart tracking engine?', RNOC_TEXT_DOMAIN);
                     ?></label>
