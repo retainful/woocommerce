@@ -1006,25 +1006,41 @@ class Settings
      */
     function removeFinishedHooks($post_title, $status = "")
     {
-        $available_action_names = $this->availableScheduledActions();
-        if (!empty($post_title) && !in_array($post_title, $available_action_names)) {
-            return false;
-        }
-        global $wpdb;
-        $res = true;
-        $where = "";
-        if (!empty($status)) {
-            $where = "AND post_status = '" . $status . "'";
-        }
-        $scheduled_actions = $wpdb->get_results("SELECT ID from `" . $wpdb->prefix . "posts` where post_title ='" . $post_title . "' {$where} AND  post_type='scheduled-action'");
-        if (!empty($scheduled_actions)) {
-            foreach ($scheduled_actions as $action) {
-                if (!wp_delete_post($action->ID, true)) {
-                    $res = false;
+        try {
+            $available_action_names = $this->availableScheduledActions();
+            if (!empty($post_title) && !in_array($post_title, $available_action_names)) {
+                return false;
+            }
+            global $wpdb;
+            //when post table is using by scheduler
+            $post_where = (!empty($status)) ? "AND post_status = '{$status}'" : "";
+            $scheduled_actions = $wpdb->get_results("SELECT ID from `{$wpdb->prefix}posts` where post_title ='{$post_title}' {$post_where} AND  post_type='scheduled-action' LIMIT 500");
+            if (!empty($scheduled_actions)) {
+                foreach ($scheduled_actions as $action) {
+                    if (wp_delete_post($action->ID, true)) {
+                        do_action('action_scheduler_deleted_action', $action->ID);
+                    }
                 }
             }
+            //When custom table is being used by scheduler
+            $custom_table_name = $wpdb->base_prefix . 'actionscheduler_actions';
+            $query = $wpdb->prepare('SHOW TABLES LIKE %s', $custom_table_name);
+            $found_table = $wpdb->get_var($query);
+            if ($wpdb->get_var($query) == $custom_table_name) {
+                $custom_table_where = (!empty($status)) ? "AND status = '{$status}'" : "";
+                $scheduled_actions = $wpdb->get_results("SELECT action_id from `{$custom_table_name}` where hook ='{$post_title}' {$custom_table_where} LIMIT 500");
+                if (!empty($scheduled_actions)) {
+                    foreach ($scheduled_actions as $action) {
+                        $deleted = $wpdb->delete($custom_table_name, array('action_id' => $action->action_id), array('%d'));
+                        if (!empty($deleted)) {
+                            do_action('action_scheduler_deleted_action', $action->action_id);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $exception) {
+            return false;
         }
-        return $res;
     }
 
     /**
