@@ -442,10 +442,12 @@ class RestApi
         if (!$order instanceof \WC_Order || $this->isOrderRecovered($order_id)) {
             return;
         }
-        self::$woocommerce->deleteOrderMeta($order_id, $this->pending_recovery_key_for_db);
-        self::$woocommerce->setOrderMeta($order_id, $this->order_recovered_key_for_db, true);
-        self::$woocommerce->setOrderNote($order, __('Order recovered by Retainful.', RNOC_TEXT_DOMAIN));
-        do_action('rnoc_abandoned_order_recovered', $order);
+        if (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by', 0) == 1) {
+            self::$woocommerce->deleteOrderMeta($order_id, $this->pending_recovery_key_for_db);
+            self::$woocommerce->setOrderMeta($order_id, $this->order_recovered_key_for_db, true);
+            self::$woocommerce->setOrderNote($order, __('Order recovered by Retainful.', RNOC_TEXT_DOMAIN));
+            do_action('rnoc_abandoned_order_recovered', $order);
+        }
     }
 
     function changeOrderStatus($order_status)
