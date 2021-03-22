@@ -801,6 +801,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
             RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
             RNOC_PLUGIN_PREFIX . 'enable_referral_widget' => 'yes',
+            RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget' => 'yes',
             RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status' => '0',
             RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status' => '1',
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
@@ -1195,6 +1196,17 @@ class Settings
         $settings = $this->getAdminSettings();
         $need_widget = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'] : 'yes';
         return apply_filters("retainful_enable_referral_program", ($need_widget === "yes"));
+    }
+
+    /**
+     * is embeded referral widget is required in my account page
+     * @return mixed|void
+     */
+    function needEmbededReferralWidget()
+    {
+        $settings = $this->getAdminSettings();
+        $need_widget = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'] : 'yes';
+        return apply_filters("enable_embeded_referral_widget", ($need_widget === "yes"));
     }
 
     /**

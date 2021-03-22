@@ -207,6 +207,10 @@ class Main
                 if ($this->admin->isProPlan() && $need_referral_program) {
                     $referral_program = new ReferralManagement();
                     add_action('wp_footer', array($referral_program, 'printReferralPopup'));
+                    $need_embeded_referral_program = $this->admin->needEmbededReferralWidget();
+                    if($need_embeded_referral_program) {
+                        add_action('woocommerce_account_dashboard', array($referral_program, 'printEmbededReferralPopup'));
+                    }
                 }
                 add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
                 add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
