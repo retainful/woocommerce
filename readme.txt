@@ -3,9 +3,9 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, woocommerce next order coupon, coupon
 Requires at least: 4.0
 Tested up to: 5.6
-WC tested up to: 5.0.0
+WC tested up to: 5.1.0
 Requires PHP: 5.6
-Stable tag: 2.5.8
+Stable tag: 2.5.9
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -465,3 +465,8 @@ No. There is no charges for support.
 * improvement: added option to get the width of add to cart popup input fields from the customer.
 * Filter added to stop loading ATC popup in the checkout page
 * Filter added to change cart and checkout page URL
+
+= 2.5.9 =
+- Fix: Mark order as recovered only when the user clicks the recovery link
+- Improvement: Deleting the scheduled action from the custom table
+- option added to remove embedded referral widget in the accounts page
