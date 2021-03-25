@@ -167,13 +167,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     } elseif ($need_popup_for == "guest" && is_user_logged_in()) {
                         return false;
                     }
-                    $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
-                    $show_popup = false;
-                    if ($run_cart_externally) {
-                        $show_popup = true;
-                    } else {
-                        // Remove
-                    }
+                    $show_popup = apply_filters('rnoc_need_to_show_exit_intent_popup', true);
                     if ($show_popup) {
                         add_action('wp_footer', array($this, 'exitIntentPopup'), 10);
                         add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));

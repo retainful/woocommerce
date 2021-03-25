@@ -164,15 +164,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     if (!empty($is_popup_closed_by_user)) {
                         return false;
                     }
-                    $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
-                    $show_popup = false;
-                    if ($run_cart_externally) {
-                        $email = $this->wc_functions->getCustomerEmail();
-                        if (!empty($email)) {
-                            return false;
-                        }
-                        $show_popup = true;
+                    $email = $this->wc_functions->getCustomerEmail();
+                    if (!empty($email)) {
+                        return false;
                     }
+                    $show_popup = apply_filters('rnoc_need_to_show_atc_popup', true);
                     $is_checkout_page = apply_filters("rnoc_need_atc_popup_in_checkout_page", is_checkout());
                     if ($show_popup && $is_checkout_page == false) {
                         add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
@@ -211,7 +207,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function setGuestEmailSession()
         {
-            $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
             $message = '';
             $error = true;
             $email = sanitize_email($_REQUEST['email']);
@@ -227,12 +222,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $this->wc_functions->setCustomerEmail($email);
             do_action('rnoc_after_atcp_assigning_email_to_customer', $email, $this);
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
-            //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
-            if (!$run_cart_externally) {
-                //remove
-            } else {
-                $error = false;
-            }
             $coupon_details = "";
             $show_coupon_popup = false;
             $coupon_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0] : array();
