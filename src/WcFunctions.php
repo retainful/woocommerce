@@ -51,7 +51,7 @@ class WcFunctions
 
     function getProductImageId($product)
     {
-        if ( $this->isMethodExists($product, 'get_image_id')) {
+        if ($this->isMethodExists($product, 'get_image_id')) {
             return $product->get_image_id();
         }
         return NULL;
@@ -96,7 +96,7 @@ class WcFunctions
             $cart_page_id = wc_get_page_id('cart');
             $cart_page_link = $cart_page_id ? get_permalink($cart_page_id) : '';
         }
-        return $cart_page_link;
+        return apply_filters("rnoc_get_cart_page_url", $cart_page_link);
     }
 
     /**
@@ -1386,10 +1386,11 @@ class WcFunctions
      */
     function getCheckoutUrl()
     {
+        $checkout_url = "";
         if (function_exists('wc_get_checkout_url')) {
-            return wc_get_checkout_url();
+            $checkout_url = wc_get_checkout_url();
         }
-        return NULL;
+        return apply_filters('rnoc_get_checkout_url', $checkout_url);
     }
 
     /**

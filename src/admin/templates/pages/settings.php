@@ -143,6 +143,61 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>"><?php
+                    esc_html_e('Enable Referral program for your store?', RNOC_TEXT_DOMAIN);
+                    ?> <span class="premium-label">Premium</span></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget_yes'; ?>"
+                           value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'] == 'yes') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget_no'; ?>"
+                           value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'] == 'no') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <p class="description">
+                    <?php
+                    esc_html_e('You should also enable and configure the referral program in your Retainful dashboard.', RNOC_TEXT_DOMAIN);
+                    ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'; ?>"><?php
+                    esc_html_e('Show unique referral link in my account page for logged in customers?', RNOC_TEXT_DOMAIN);
+                    ?> <span class="premium-label">Premium</span></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget_yes'; ?>"
+                           value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'] == 'yes') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget_no'; ?>"
+                           value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'] == 'no') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'; ?>"><?php
                     esc_html_e('Enable GDPR Compliance?', RNOC_TEXT_DOMAIN);
                     ?></label>

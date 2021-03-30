@@ -167,8 +167,11 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     } elseif ($need_popup_for == "guest" && is_user_logged_in()) {
                         return false;
                     }
-                    add_action('wp_footer', array($this, 'exitIntentPopup'), 10);
-                    add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
+                    $show_popup = apply_filters('rnoc_need_to_show_exit_intent_popup', true);
+                    if ($show_popup) {
+                        add_action('wp_footer', array($this, 'exitIntentPopup'), 10);
+                        add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
+                    }
                 }
             }
             return true;
@@ -340,18 +343,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'rnoc_gdpr_check_box_message' => $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message', __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN))
             );
             return $this->getTemplateContent($template_path, $final_settings);
-        }
-
-        /**
-         * get the cart url
-         * @return string|null
-         */
-        function getCartUrl()
-        {
-            if (function_exists('wc_get_cart_url')) {
-                return wc_get_cart_url();
-            }
-            return NULL;
         }
 
         /**

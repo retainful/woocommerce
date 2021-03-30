@@ -311,7 +311,8 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     $coupon_code = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon', NULL);
                     $coupon_timer_apply_coupon = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon', 'automatically');
                     $this->wc_functions->setSession('rnoc_is_coupon_timer_time_started', '1');
-                    if ($coupon_timer_apply_coupon == "automatically") {
+                    $need_apply_coupon_code = apply_filters('rnoc_ei_popup_need_apply_coupon', true);
+                    if ($coupon_timer_apply_coupon == "automatically" && $need_apply_coupon_code) {
                         $this->wc_functions->setSession('rnoc_coupon_timer_coupon_code', $coupon_code);
                     }
                 }

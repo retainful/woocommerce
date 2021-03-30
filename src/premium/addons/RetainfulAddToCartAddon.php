@@ -168,8 +168,9 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     if (!empty($email)) {
                         return false;
                     }
+                    $show_popup = apply_filters('rnoc_need_to_show_atc_popup', true);
                     $is_checkout_page = apply_filters("rnoc_need_atc_popup_in_checkout_page", is_checkout());
-                    if ($is_checkout_page == false) {
+                    if ($show_popup && $is_checkout_page == false) {
                         add_action('wp_enqueue_scripts', array($this, 'addSiteScripts'));
                         add_action('wp_footer', array($this, 'addToCartPopup'), 10);
                     }
@@ -220,7 +221,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $this->wc_functions->setCustomerEmail($email);
             do_action('rnoc_after_atcp_assigning_email_to_customer', $email, $this);
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
-            //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
+
             $error = false;
             $coupon_details = "";
             $show_coupon_popup = false;
@@ -233,21 +234,21 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     switch ($show_woo_coupon) {
                         case "auto_apply_and_redirect":
                             $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_checkout_url();
+                            $redirect_url = $this->getCheckoutUrl();
                             break;
                         case "auto_apply_and_redirect_cart":
                             $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_cart_url();
+                            $redirect_url = $this->getCartUrl();
                             break;
                         case "send_mail_auto_apply_and_redirect":
                             $this->sendEmail($email, $coupon_settings);
                             $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_checkout_url();
+                            $redirect_url = $this->getCheckoutUrl();
                             break;
                         case "send_mail_auto_apply_and_redirect_cart":
                             $this->sendEmail($email, $coupon_settings);
                             $this->wc_functions->addDiscount($coupon_code);
-                            $redirect_url = wc_get_cart_url();
+                            $redirect_url = $this->getCartUrl();
                             break;
                         case "instantly":
                             $show_coupon_popup = true;
