@@ -91,6 +91,7 @@ class CouponManagement
                         'expiry_date' => (!empty($ruleParams['ends_at'])) ? $ruleParams['ends_at'] : null,
                         'usage_limit' => $ruleParams['usage_limit'],
                         'usage_limit_per_user' => $ruleParams['usage_limit_per_user'],
+                        'individual_use' => 'yes',
                         'customer_email' => $ruleParams['customer_email'],
                         'product_ids' => array(),
                         'exclude_product_ids' => array(),
