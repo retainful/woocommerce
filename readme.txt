@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.6
 WC tested up to: 5.1.0
 Requires PHP: 5.6
-Stable tag: 2.5.9
+Stable tag: 2.6.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -470,3 +470,6 @@ No. There is no charges for support.
 - Fix: Mark order as recovered only when the user clicks the recovery link
 - Improvement: Deleting the scheduled action from the custom table
 - option added to remove embedded referral widget in the accounts page
+
+= 2.6.0 =
+- Improvement: Indiual use option added to Referral program
