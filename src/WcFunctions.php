@@ -318,6 +318,19 @@ class WcFunctions
      * @param $order
      * @return String|null
      */
+    function getOrderNumber($order)
+    {
+        if ($this->isMethodExists($order, 'get_order_number')) {
+            return $order->get_order_number();
+        }
+        return $this->getOrderId($order);
+    }
+
+    /**
+     * Get Order Id
+     * @param $order
+     * @return String|null
+     */
     function getOrderSubTotal($order)
     {
         if ($this->isMethodExists($order, 'get_subtotal')) {
