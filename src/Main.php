@@ -123,6 +123,7 @@ class Main
             add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
             $coupon_api = new CouponManagement();
             add_filter('views_edit-shop_coupon', array($coupon_api, 'viewsEditShopCoupon'));
+            add_filter('woocommerce_coupon_options', array($coupon_api, 'showCouponOrderDetails'));
             add_filter('request', array($coupon_api, 'requestQuery'));
         }
         //Register deactivation hook

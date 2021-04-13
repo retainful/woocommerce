@@ -1,4 +1,5 @@
 <?php
+
 namespace Rnoc\Retainful\Api\NextOrderCoupon;
 
 use Rnoc\Retainful\Admin\Settings;
@@ -160,6 +161,22 @@ class CouponManagement
             }
         }
         return NULL;
+    }
+
+    /**
+     * show the NOC details
+     * @param $coupon_id
+     */
+    function showCouponOrderDetails($coupon_id)
+    {
+        if (!empty($coupon_id)) {
+            $order_id = intval(get_post_meta($coupon_id, 'order_id', true));
+            if ($order_id && $order_id > 0) {
+                $order = wc_get_order($order_id);
+                $order_url = $order->get_edit_order_url();
+                echo '<p class="form-field expiry_date_field "><label for="expiry_date">Coupon generated for</label><span>Order #' . $order_id . ' | <a target="_blank" href="' . $order_url . '">View Order</a></span> </p>';
+            }
+        }
     }
 
     /**

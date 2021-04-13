@@ -208,7 +208,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         function setGuestEmailSession()
         {
             $message = '';
-            $error = true;
             $email = sanitize_email($_REQUEST['email']);
             $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0] : array();
             $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
@@ -265,7 +264,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     }
                 }
             }
-            wp_send_json(array('error' => $error, 'message' => $message, 'redirect' => $redirect_url, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
+            wp_send_json(array('error' => false, 'message' => $message, 'redirect' => $redirect_url, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
         }
 
         /**
