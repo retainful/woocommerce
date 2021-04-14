@@ -614,7 +614,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'products',
         ));
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to', ['all', 'validate_on_checkout', 'login_users'])->message('This field contains invalid value');
-        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to', ['woocommerce_email_order_details', 'woocommerce_email_order_meta', 'woocommerce_email_customer_details'])->message('This field contains invalid value');
+        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to', ['woocommerce_email_order_details', 'woocommerce_email_order_meta', 'woocommerce_email_customer_details', 'none'])->message('This field contains invalid value');
         $validator->rule('in', array(
             RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon',
             RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
@@ -710,7 +710,8 @@ class Settings
         $display_coupon_after = array(
             'woocommerce_email_order_details' => __('Order details', RNOC_TEXT_DOMAIN),
             'woocommerce_email_order_meta' => __('Order meta', RNOC_TEXT_DOMAIN),
-            'woocommerce_email_customer_details' => __('Customer details', RNOC_TEXT_DOMAIN)
+            'woocommerce_email_customer_details' => __('Customer details', RNOC_TEXT_DOMAIN),
+            'none' => __('Do Not Show - Customers will not get next order coupon in the order confirmation email of WooCommerce', RNOC_TEXT_DOMAIN),
         );
         $order_status = $this->availableOrderStatuses();
         $user_roles = $this->getUserRoles();

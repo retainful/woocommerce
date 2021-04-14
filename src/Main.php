@@ -151,8 +151,9 @@ class Main
             add_action('wp_loaded', array($this->rnoc, 'addCouponToCheckout'), 10);
             //Attach coupon to email
             $hook = $this->admin->couponMessageHook();
-            if (!empty($hook))
+            if (!empty($hook) && $hook != "none") {
                 add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
+            }
             //add action for filter
             add_action('rnoc_show_order_coupon', array($this->rnoc, 'attachOrderCoupon'), 10, 4);
             //Sync the coupon details with retainful
@@ -209,7 +210,7 @@ class Main
                     $referral_program = new ReferralManagement();
                     add_action('wp_footer', array($referral_program, 'printReferralPopup'));
                     $need_embeded_referral_program = $this->admin->needEmbededReferralWidget();
-                    if($need_embeded_referral_program) {
+                    if ($need_embeded_referral_program) {
                         add_action('woocommerce_account_dashboard', array($referral_program, 'printEmbededReferralPopup'));
                     }
                 }
