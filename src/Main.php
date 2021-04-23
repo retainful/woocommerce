@@ -115,6 +115,7 @@ class Main
             add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
             $coupon_api = new CouponManagement();
             add_filter('views_edit-shop_coupon', array($coupon_api, 'viewsEditShopCoupon'));
+            add_filter('woocommerce_coupon_options', array($coupon_api, 'showCouponOrderDetails'));
             add_filter('request', array($coupon_api, 'requestQuery'));
         }
         //Register deactivation hook
@@ -141,8 +142,9 @@ class Main
             add_action('wp_loaded', array($this->rnoc, 'addCouponToCheckout'), 10);
             //Attach coupon to email
             $hook = $this->admin->couponMessageHook();
-            if (!empty($hook))
+            if (!empty($hook) && $hook != "none") {
                 add_action($hook, array($this->rnoc, 'attachOrderCoupon'), 10, 4);
+            }
             //add action for filter
             add_action('rnoc_show_order_coupon', array($this->rnoc, 'attachOrderCoupon'), 10, 4);
             //Sync the coupon details with retainful
@@ -180,84 +182,84 @@ class Main
         //Settings link
         add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
         //If the user is old user then ask user to run abandoned cart to
-        $is_app_connected = $this->admin->isAppConnected();
-        $secret_key = $this->admin->getSecretKey();
-        $app_id = $this->admin->getApiKey();
-        if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
-            if (is_admin()) {
-                add_action('wp_after_admin_bar_render', array($this->admin, 'schedulePlanChecker'));
-            }
-            /*
-            * Retainful abandoned cart api
-            */
-            $cart = new Cart();
-            $checkout = new Checkout();
-            $need_referral_program = $this->admin->needReferralWidget();
-            if ($this->admin->isProPlan() && $need_referral_program) {
-                $referral_program = new ReferralManagement();
-                add_action('wp_footer', array($referral_program, 'printReferralPopup'));
-                $need_embeded_referral_program = $this->admin->needEmbededReferralWidget();
-                if ($need_embeded_referral_program) {
-                    add_action('woocommerce_account_dashboard', array($referral_program, 'printEmbededReferralPopup'));
+            $is_app_connected = $this->admin->isAppConnected();
+            $secret_key = $this->admin->getSecretKey();
+            $app_id = $this->admin->getApiKey();
+            if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
+                if (is_admin()) {
+                    add_action('wp_after_admin_bar_render', array($this->admin, 'schedulePlanChecker'));
                 }
-            }
-            if (!$this->admin->managePremiumFeaturesLocally()) {
-                $pro_addons = new AddOns();
-                add_action('wp_footer', array($pro_addons, 'printProPopupScript'));
-            }
-            add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
-            add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
-            //Sync the order by the scheduled events
-            add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
-            add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
-            add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
-            add_action('wp_ajax_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
-            add_action('wp_ajax_nopriv_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
-            add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
-            //add_action('wp_login', array($cart, 'userLoggedIn'));
-            add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
-            add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
-            //Add tracking message
-            if (is_user_logged_in()) {
-                add_action('woocommerce_after_add_to_cart_button', array($cart, 'userGdprMessage'), 10);
-                add_action('woocommerce_before_shop_loop', array($cart, 'userGdprMessage'), 10);
-            }
-            add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
-            add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
-            add_filter('rnoc_can_track_abandoned_carts', array($cart, 'isZeroValueCart'), 15, 2);
-            $cart_tracking_engine = $this->admin->getCartTrackingEngine();
-            if ($cart_tracking_engine == "php") {
-                //PHP tracking
-                add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
+                /*
+                * Retainful abandoned cart api
+                */
+                $cart = new Cart();
+                $checkout = new Checkout();
+                $need_referral_program = $this->admin->needReferralWidget();
+                if ($this->admin->isProPlan() && $need_referral_program) {
+                    $referral_program = new ReferralManagement();
+                    add_action('wp_footer', array($referral_program, 'printReferralPopup'));
+                    $need_embeded_referral_program = $this->admin->needEmbededReferralWidget();
+                    if($need_embeded_referral_program) {
+                        add_action('woocommerce_account_dashboard', array($referral_program, 'printEmbededReferralPopup'));
+                    }
+                }
+                if (!$this->admin->managePremiumFeaturesLocally()) {
+                    $pro_addons = new AddOns();
+                    add_action('wp_footer', array($pro_addons, 'printProPopupScript'));
+                }
+                add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
+                add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
+                //Sync the order by the scheduled events
+                add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
+                add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
+                add_action('wp_ajax_nopriv_rnoc_track_user_data', array($cart, 'setCustomerData'));
+                add_action('wp_ajax_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
+                add_action('wp_ajax_nopriv_rnoc_ajax_get_encrypted_cart', array($cart, 'ajaxGetEncryptedCart'));
+                add_action('woocommerce_cart_loaded_from_session', array($cart, 'handlePersistentCart'));
+                //add_action('wp_login', array($cart, 'userLoggedIn'));
+                add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
+                add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
+                //Add tracking message
+                if (is_user_logged_in()) {
+                    add_action('woocommerce_after_add_to_cart_button', array($cart, 'userGdprMessage'), 10);
+                    add_action('woocommerce_before_shop_loop', array($cart, 'userGdprMessage'), 10);
+                }
+                add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
+                add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
+                add_filter('rnoc_can_track_abandoned_carts', array($cart, 'isZeroValueCart'), 15, 2);
+                $cart_tracking_engine = $this->admin->getCartTrackingEngine();
+                if ($cart_tracking_engine == "php") {
+                    //PHP tracking
+                    add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
+                } else {
+                    //Js tracking
+                    add_action('wp_footer', array($cart, 'renderAbandonedCartTrackingDiv'));
+                    add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
+                }
+                add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
+                add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
+                add_action('wp_authenticate', array($cart, 'userLoggedOn'));
+                add_action('user_register', array($cart, 'userSignedUp'));
+                add_action('wp_logout', array($cart, 'userLoggedOut'));
+                //Set order as recovered
+                // handle payment complete, from a direct gateway
+                //add_action('woocommerce_new_order', array($checkout, 'purchaseComplete'));
+                add_filter('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
+                add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
+                add_action('woocommerce_checkout_order_processed', array($checkout, 'checkoutOrderProcessed'));
+                add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
+                // handle updating Retainful order data after a successful payment, for certain gateways
+                add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
+                // handle placed orders
+                add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
+                add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
+                //Todo: multi currency and multi lingual
+                #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
             } else {
-                //Js tracking
-                add_action('wp_footer', array($cart, 'renderAbandonedCartTrackingDiv'));
-                add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
+                $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
+                $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
+                $this->showAdminNotice($notice);
             }
-            add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
-            add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
-            add_action('wp_authenticate', array($cart, 'userLoggedOn'));
-            add_action('user_register', array($cart, 'userSignedUp'));
-            add_action('wp_logout', array($cart, 'userLoggedOut'));
-            //Set order as recovered
-            // handle payment complete, from a direct gateway
-            //add_action('woocommerce_new_order', array($checkout, 'purchaseComplete'));
-            add_filter('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
-            add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
-            add_action('woocommerce_checkout_order_processed', array($checkout, 'checkoutOrderProcessed'));
-            add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
-            // handle updating Retainful order data after a successful payment, for certain gateways
-            add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
-            // handle placed orders
-            add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
-            add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
-            //Todo: multi currency and multi lingual
-            #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
-        } else {
-            $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
-            $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
-            $this->showAdminNotice($notice);
-        }
         $is_retainful_v2_0_1_migration_completed = get_option('is_retainful_v2_0_1_migration_completed', 0);
         if (!$is_retainful_v2_0_1_migration_completed) {
             $this->migrationV201();

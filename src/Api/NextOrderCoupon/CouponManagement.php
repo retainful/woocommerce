@@ -1,4 +1,5 @@
 <?php
+
 namespace Rnoc\Retainful\Api\NextOrderCoupon;
 
 use Rnoc\Retainful\Admin\Settings;
@@ -91,6 +92,7 @@ class CouponManagement
                         'expiry_date' => (!empty($ruleParams['ends_at'])) ? $ruleParams['ends_at'] : null,
                         'usage_limit' => $ruleParams['usage_limit'],
                         'usage_limit_per_user' => $ruleParams['usage_limit_per_user'],
+                        'individual_use' => 'yes',
                         'customer_email' => $ruleParams['customer_email'],
                         'product_ids' => array(),
                         'exclude_product_ids' => array(),
@@ -159,6 +161,22 @@ class CouponManagement
             }
         }
         return NULL;
+    }
+
+    /**
+     * show the NOC details
+     * @param $coupon_id
+     */
+    function showCouponOrderDetails($coupon_id)
+    {
+        if (!empty($coupon_id)) {
+            $order_id = intval(get_post_meta($coupon_id, 'order_id', true));
+            if ($order_id && $order_id > 0) {
+                $order = wc_get_order($order_id);
+                $order_url = $order->get_edit_order_url();
+                echo '<p class="form-field "><label>Coupon generated for</label><span>Order #' . $order_id . ' | <a target="_blank" href="' . $order_url . '">View Order</a></span></p>';
+            }
+        }
     }
 
     /**

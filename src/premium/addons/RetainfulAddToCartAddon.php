@@ -266,7 +266,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     }
                 }
             }
-            wp_send_json(array('error' => $error, 'message' => $message, 'redirect' => $redirect_url, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
+            wp_send_json(array('error' => false, 'message' => $message, 'redirect' => $redirect_url, 'coupon_instant_popup_content' => $coupon_details, 'show_coupon_instant_popup' => $show_coupon_popup));
         }
 
         /**
