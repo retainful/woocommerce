@@ -446,7 +446,9 @@ class Settings
         $base_url = admin_url('admin.php?page=' . $page_slug);
         $add_on = self::$input->get('add-on', null);
         $is_migrated_to_cloud = $this->isPremiumFeaturesMigratedToCloud();
+        $is_pro_enabled_for_cloud = $this->isCloudPremiumJsEnabled();
         $need_premium_features_link = $this->needPremiumFeaturesLinks();
+        $is_fresh_installation = $this->isFreshInstallation();
         if (!empty($add_on)) {
             $settings = get_option($page_slug, array());
             $default_settings = $this->getDefaultPremiumAddonsValues();
@@ -797,6 +799,21 @@ class Settings
     }
 
     /**
+     * save the settings
+     */
+    function saveEnablePremiumSettings()
+    {
+        check_ajax_referer('rnoc_save_enable_pro_js', 'security');
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error('security breach');
+        }
+        if (isset($_POST['rnoc_enable_pro_js_for_cloud']) && in_array($_POST['rnoc_enable_pro_js_for_cloud'], array('yes', 'no'))) {
+            update_option('rnoc_is_premium_enabled_for_cloud', sanitize_text_field($_POST['rnoc_enable_pro_js_for_cloud']));
+        }
+        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+    }
+
+    /**
      * retainful ac settings page
      */
     function retainfulSettingsPage()
@@ -852,7 +869,7 @@ class Settings
      */
     function needPremiumFeaturesLinks()
     {
-        return (!$this->isFreshInstallation() && $this->isProPlan());
+        return ($this->isProPlan());
     }
 
     /**
@@ -871,6 +888,15 @@ class Settings
             }
         }
         return (get_option('rnoc_is_premium_migrated_to_cloud', 'no') === 'yes');
+    }
+
+    /**
+     * need premium features in plugin
+     * @return bool
+     */
+    function isCloudPremiumJsEnabled()
+    {
+        return (get_option('rnoc_is_premium_enabled_for_cloud', 'no') === 'yes');
     }
 
     /**
