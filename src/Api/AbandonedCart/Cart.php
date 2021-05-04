@@ -255,7 +255,7 @@ class Cart extends RestApi
     {
         if ($handle === RNOC_PLUGIN_PREFIX . 'track-user-cart') {
             $escapedHandle = esc_attr($handle);
-            $scriptTag = " <script src='{$src}' id='{$escapedHandle}-js' async='async' data-cfasync='false' defer></script>";
+            $scriptTag = "<script src='{$src}' id='{$escapedHandle}-js' async='async' data-cfasync='false' defer></script>";
             return apply_filters('rnoc_add_attr_script', $scriptTag, $handle, $src);
         }
         return $tag;
