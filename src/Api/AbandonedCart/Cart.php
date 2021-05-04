@@ -254,22 +254,11 @@ class Cart extends RestApi
     function addCloudFlareAttrScript($tag, $handle, $src)
     {
         if ($handle === RNOC_PLUGIN_PREFIX . 'track-user-cart') {
-		
-            if (false === stripos($tag, 'async')) {
-			    $tag = str_replace(' src', ' async="async" src', $tag);
-            }
-
-            if (false === stripos($tag, 'data-cfasync')) {
-                $tag = str_replace(' src', ' data-cfasync="false" src', $tag);
-            }
-		
-            if (false === stripos($tag, 'defer')) {
-                $tag = str_replace('<script ', '<script defer ', $tag);
-            }
-            $tag = apply_filters('rnoc_add_attr_script', $tag, $handle, $src);
-		
-    	}
-	    return $tag;
+            $escapedHandle = esc_attr($handle);
+            $scriptTag = " <script src='{$src}' id='{$escapedHandle}-js' async='async' data-cfasync='false' defer></script>";
+            return apply_filters('rnoc_add_attr_script', $scriptTag, $handle, $src);
+        }
+        return $tag;
     }
 
     /**
