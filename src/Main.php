@@ -214,8 +214,8 @@ class Main
                         add_action('woocommerce_account_dashboard', array($referral_program, 'printEmbededReferralPopup'));
                     }
                 }
-                add_filter('script_loader_src', array($cart, 'addCloudFlareAttrScript'), 10, 2);
-                add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
+                add_filter('script_loader_tag', array($cart, 'addCloudFlareAttrScript'), 10, 3);
+                //add_filter('clean_url', array($cart, 'uncleanUrl'), 10, 3);
                 //Sync the order by the scheduled events
                 add_action('retainful_sync_abandoned_cart_order', array($checkout, 'syncOrderByScheduler'), 1);
                 add_action('wp_ajax_rnoc_track_user_data', array($cart, 'setCustomerData'));
