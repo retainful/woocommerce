@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.7
 WC tested up to: 5.2
 Requires PHP: 5.6
-Stable tag: 2.6.0
+Stable tag: 2.6.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -473,3 +473,8 @@ No. There is no charges for support.
 
 = 2.6.0 =
 - Improvement: Indiual use option added to Referral program
+
+= 2.6.1 =
+- Improvement: Getting order number of order improved
+- New Feature: New option added to remove NOC in order transaction emails
+- Fix: script tag optimized
