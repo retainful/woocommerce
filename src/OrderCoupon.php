@@ -51,7 +51,7 @@ class OrderCoupon
         $order_id = $this->wc_functions->getOrderId($order);
         $coupon_code = $this->wc_functions->getPostMeta($order_id, '_rnoc_next_order_coupon');
         if (!empty($coupon_code)) {
-            $coupon_details = $this->getCouponDetails($coupon_code);
+            $coupon_details = $this->getCouponByCouponCode($coupon_code);
             if (!empty($coupon_details)) {
                 $post_id = $coupon_details->ID;
                 $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
@@ -95,7 +95,7 @@ class OrderCoupon
             $short_codes['retainful_coupon_expiry_date'] = '';
             $coupon_code = $this->wc_functions->getOrderMeta($order, '_rnoc_next_order_coupon');
             if (!empty($coupon_code)) {
-                $coupon_details = $this->getCouponDetails($coupon_code);
+                $coupon_details = $this->getCouponByCouponCode($coupon_code);
                 if (!empty($coupon_details)) {
                     $post_id = $coupon_details->ID;
                     $coupon_expiry_date = get_post_meta($post_id, 'coupon_expired_on', true);
@@ -260,7 +260,7 @@ class OrderCoupon
                     $cart_template_path = $override_path;
                 }
                 if (file_exists($cart_template_path)) {
-                    $coupon_details = $this->getCouponDetails($coupon_code);
+                    $coupon_details = $this->getCouponByCouponCode($coupon_code);
                     if (!empty($coupon_details)) {
                         $post_id = $coupon_details->ID;
                         $coupon_amount = get_post_meta($post_id, 'coupon_value', true);
@@ -766,7 +766,7 @@ class OrderCoupon
             $this->addNewCouponToOrder($new_coupon_code, $order_id, $email, $order_date);
         } else {
             $new_coupon_code = strtoupper($coupon);
-            $coupon_details = $this->getCouponDetails($new_coupon_code);
+            $coupon_details = $this->getCouponByCouponCode($coupon);
             if (empty($coupon_details)) {
                 $this->addNewCouponToOrder($new_coupon_code, $order_id, $email, $order_date);
             }
@@ -791,10 +791,12 @@ class OrderCoupon
             foreach ($used_coupons as $used_coupon) {
                 if (empty($used_coupon))
                     continue;
-                $coupon_details = $this->getCouponDetails($used_coupon);
+                $coupon_details = $this->getCouponByCouponCode($used_coupon);
                 if (!empty($coupon_details)) {
-                    update_post_meta($order_id, '_rnoc_next_order_coupon_applied', strtoupper($used_coupon));
-                    update_post_meta($coupon_details->ID, 'applied_for', $order_id);
+                    if (get_post_meta($coupon_details->ID, '_rnoc_shop_coupon_type', true) == 'retainful') {
+                        update_post_meta($order_id, '_rnoc_next_order_coupon_applied', strtoupper($used_coupon));
+                        update_post_meta($coupon_details->ID, 'applied_for', $order_id);
+                    }
                 }
             }
         }
@@ -935,6 +937,7 @@ class OrderCoupon
             $user_id = $this->wc_functions->getOrderUserId($order);
             add_post_meta($id, 'user_id', $user_id);
             add_post_meta($id, 'order_id', $order_id);
+            add_post_meta($id, 'rnoc_order_id', $order_id);
             add_post_meta($id, 'coupon_type', $coupon_type);
             add_post_meta($id, 'coupon_value', $amount);
             if (isset($expired_date['retainful_coupons']) && !empty($expired_date['retainful_coupons'])) {
@@ -952,7 +955,7 @@ class OrderCoupon
     function isCouponFound($order_id)
     {
         if (empty($order_id)) return NULL;
-        $post_args = array('post_type' => array('rnoc_order_coupon', 'shop_coupon'), 'numberposts' => '1', 'post_status' => 'publish', 'meta_key' => 'order_id', 'meta_value' => $order_id);
+        $post_args = array('post_type' => array('rnoc_order_coupon', 'shop_coupon'), 'numberposts' => '1', 'meta_key' => 'order_id', 'meta_value' => $order_id);
         $posts = get_posts($post_args);
         if (!empty($posts)) {
             foreach ($posts as $post) {
