@@ -253,6 +253,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 $position_settings['expired_in_min'] = $expired_on_min;
                 $position_settings['auto_fix_page_reload'] = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload', 0);
                 $position_settings['coupon_timer_expire_message'] = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message', 'Sorry! Instant Offer has expired.');
+                $position_settings['coupon_timer_expired_text'] = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text', 'EXPIRED');
                 $position_settings['coupon_code'] = $coupon_code;
                 $position_settings['woocommerce'] = $this->wc_functions;
                 $override_path = get_theme_file_path('retainful/premium/templates/timer/' . $position . '.php');
@@ -471,6 +472,24 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <p class="description">
                                 <?php
                                 echo __('Display this text when coupon expires.', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text'; ?>"><?php
+                                esc_html_e('Coupon timer expired text', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <input name="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text'; ?>"
+                                   type="text" class="regular-text"
+                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text'; ?>"
+                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text']); ?>">
+                            <p class="description">
+                                <?php
+                                echo __('Display this text when coupon timer gets expired.', RNOC_TEXT_DOMAIN);
                                 ?>
                             </p>
                         </td>

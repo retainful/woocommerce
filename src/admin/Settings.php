@@ -237,6 +237,7 @@ class Settings
         ), ['automatically', 'manually'])->message('This field contains invalid value');
         $validator->rule('basicTags', array(
             RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message',
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format',
@@ -467,6 +468,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages' => array(),
             RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon' => 'automatically',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time' => '15',
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text' => 'EXPIRED',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message' => __('Sorry! Instant Offer has expired.', RNOC_TEXT_DOMAIN),
             RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload' => '0',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings' => array(0 => array(

@@ -39,7 +39,7 @@
         document.getElementById("rnoc-coupon-timer-<?php echo $coupon_timer_position ?>").innerHTML = <?php echo $rnoc_coupon_timer_display_format ?>;
         if (distance < 0) {
             clearInterval(x);
-            document.getElementById("rnoc-coupon-timer-<?php echo $coupon_timer_position ?>").innerHTML = "<?php echo __('EXPIRED', RNOC_TEXT_DOMAIN) ?>";
+            document.getElementById("rnoc-coupon-timer-<?php echo $coupon_timer_position ?>").innerHTML = "<?php echo __($coupon_timer_expired_text, RNOC_TEXT_DOMAIN) ?>";
             <?php
             if(apply_filters('rnoc_coupon_timer_top_position_reload', true)){
             if($auto_fix_page_reload == 0){
