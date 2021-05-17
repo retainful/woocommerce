@@ -108,9 +108,11 @@ class RestApi
     {
         if (!empty($shipping_address)) {
             foreach ($shipping_address as $key => $value) {
-                $method = 'set_' . $key;
-                if (is_callable(array(WC()->customer, $method))) {
-                    WC()->customer->$method($value);
+                if(!empty($value)) {
+                    $method = 'set_' . $key;
+                    if (is_callable(array(WC()->customer, $method))) {
+                        WC()->customer->$method($value);
+                    }
                 }
             }
         }
@@ -149,9 +151,11 @@ class RestApi
     {
         if (!empty($billing_address)) {
             foreach ($billing_address as $key => $value) {
-                $method = 'set_' . $key;
-                if (is_callable(array(WC()->customer, $method))) {
-                    WC()->customer->$method($value);
+                if(!empty($value)) {
+                    $method = 'set_' . $key;
+                    if (is_callable(array(WC()->customer, $method))) {
+                        WC()->customer->$method($value);
+                    }
                 }
             }
         }
