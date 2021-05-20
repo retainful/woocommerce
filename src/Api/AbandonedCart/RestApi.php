@@ -157,6 +157,7 @@ class RestApi
             if (isset($checkout_fields['billing']) && is_array($checkout_fields['billing'])) {
                 foreach ($billing_address as $key => $value) {
                     if (array_key_exists($key, $checkout_fields['billing'])) {
+                        $method = 'set_' . $key;
                         if (is_callable(array(WC()->customer, $method))) {
                             WC()->customer->$method($value);
                         }
