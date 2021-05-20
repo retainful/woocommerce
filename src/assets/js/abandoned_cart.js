@@ -423,6 +423,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                     shipping_country: $('#shipping_country').val(),
                     action: 'rnoc_track_user_data'
                 };
+                Object.keys(guest_data).forEach(key => guest_data[key] === undefined && delete guest_data[key]);
                 if (retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
                     sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "1");
                     $.ajax({
