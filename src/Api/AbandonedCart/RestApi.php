@@ -110,7 +110,7 @@ class RestApi
             $checkout_fields = WC()->checkout()->get_checkout_fields();
             if (isset($checkout_fields['shipping']) && !empty($checkout_fields['shipping'])) {
                 foreach ($shipping_address as $key => $value) {
-                    if (!empty($value) && array_key_exists($key, $checkout_fields['shipping'])) {
+                    if (array_key_exists($key, $checkout_fields['shipping'])) {
                         $method = 'set_' . $key;
                         if (is_callable(array(WC()->customer, $method))) {
                             WC()->customer->$method($value);
@@ -156,7 +156,7 @@ class RestApi
             $checkout_fields = WC()->checkout()->get_checkout_fields();
             if (isset($checkout_fields['billing']) && !empty($checkout_fields['billing'])) {
                 foreach ($billing_address as $key => $value) {
-                    if (!empty($value) && array_key_exists($key, $checkout_fields['billing'])) {
+                    if (array_key_exists($key, $checkout_fields['billing'])) {
                         if (is_callable(array(WC()->customer, $method))) {
                             WC()->customer->$method($value);
                         }
