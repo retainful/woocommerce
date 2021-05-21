@@ -98,42 +98,36 @@ class Cart extends RestApi
     function setCustomerData()
     {
         if (isset($_POST['billing_email'])) {
-
             $billing_address = array();
             $shipping_address = array();
-            
             //billing address fields
             $address_fields = $this->getAddressMapFields();
-            foreach($address_fields as $field ) {
-                $billing_field_name = 'billing_'.$field;
-                if(isset($_POST[$billing_field_name]) && array_key_exists($billing_field_name, $_POST) && $billing_field_name != 'billing_email') {
-                    $billing_address[$billing_field_name] =  sanitize_text_field($_POST[$billing_field_name]);
+            foreach ($address_fields as $field) {
+                $billing_field_name = 'billing_' . $field;
+                if (isset($_POST[$billing_field_name]) && array_key_exists($billing_field_name, $_POST) && $billing_field_name != 'billing_email') {
+                    $billing_address[$billing_field_name] = sanitize_text_field($_POST[$billing_field_name]);
                 }
             }
             self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
             $this->setCustomerBillingDetails($billing_address);
-
-           // $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
-            
+            // $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
             //shipping address fields
-            foreach($address_fields as $field ) {
-                $shipping_field_name = 'shipping_'.$field;
-                if(isset($_POST[$shipping_field_name]) && array_key_exists($shipping_field_name, $_POST))  {
-                    $shipping_address[$shipping_field_name] =  sanitize_text_field($_POST[$shipping_field_name]);
+            foreach ($address_fields as $field) {
+                $shipping_field_name = 'shipping_' . $field;
+                if (isset($_POST[$shipping_field_name]) && array_key_exists($shipping_field_name, $_POST)) {
+                    $shipping_address[$shipping_field_name] = sanitize_text_field($_POST[$shipping_field_name]);
                 }
             }
-
             //Shipping to same billing address
             $ship_to_billing = (isset($_POST['ship_to_billing'])) ? $_POST['ship_to_billing'] : 0;
             if (intval($ship_to_billing) < 1) {
-                foreach($address_fields as $field ) {
-                    $shipping_field_name = 'shipping_'.$field;
-                    $billing_field_name = 'billing_'.$field;
+                foreach ($address_fields as $field) {
+                    $shipping_field_name = 'shipping_' . $field;
+                    $billing_field_name = 'billing_' . $field;
                     $shipping_address[$shipping_field_name] = $billing_address[$billing_field_name];
-                } 
+                }
             }
             $this->setSessionShippingDetails($shipping_address);
-
             //Billing email
             $billing_email = sanitize_email($_POST['billing_email']);
             self::$woocommerce->setCustomerEmail($billing_email);
@@ -912,6 +906,9 @@ class Cart extends RestApi
         $customer_email = isset($data->email) ? $data->email : '';
         //Setting the email
         self::$woocommerce->setCustomerEmail($customer_email);
+        $checkout_fields = WC()->checkout()->get_checkout_fields();
+        $billing_fields = isset($checkout_fields['billing']) ? array_keys($checkout_fields['billing']) : array();
+        $shipping_fields = isset($checkout_fields['shipping']) ? array_keys($checkout_fields['shipping']) : array();
         $billing_details = isset($data->billing_address) ? $data->billing_address : new stdClass();
         $billing_address = array(
             'billing_first_name' => isset($billing_details->first_name) ? $billing_details->first_name : NULL,
@@ -925,7 +922,8 @@ class Cart extends RestApi
             'billing_address_2' => isset($billing_details->address2) ? $billing_details->address2 : NULL,
             'billing_company' => isset($billing_details->company) ? $billing_details->company : NULL
         );
-        $this->setCustomerBillingDetails($billing_address);
+        $valid_billing_fields = array_intersect_key($billing_address, array_flip($billing_fields));
+        $this->setCustomerBillingDetails($valid_billing_fields);
         $shipping_details = isset($data->shipping_address) ? $data->shipping_address : new stdClass();
         $shipping_address = array(
             'shipping_first_name' => isset($shipping_details->first_name) ? $shipping_details->first_name : NULL,
@@ -937,7 +935,8 @@ class Cart extends RestApi
             'shipping_address_1' => isset($shipping_details->address1) ? $shipping_details->address1 : NULL,
             'shipping_address_2' => isset($shipping_details->address2) ? $shipping_details->address2 : NULL
         );
-        $this->setSessionShippingDetails($shipping_address);
+        $valid_shipping_fields = array_intersect_key($shipping_address, array_flip($shipping_fields));
+        $this->setSessionShippingDetails($valid_shipping_fields);
     }
 
     /**

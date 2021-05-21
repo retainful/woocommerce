@@ -107,15 +107,10 @@ class RestApi
     function setSessionShippingDetails($shipping_address)
     {
         if (!empty($shipping_address)) {
-            $checkout_fields = WC()->checkout()->get_checkout_fields();
-            if (isset($checkout_fields['shipping']) && is_array($checkout_fields['shipping'])) {
-                foreach ($shipping_address as $key => $value) {
-                    if (array_key_exists($key, $checkout_fields['shipping'])) {
-                        $method = 'set_' . $key;
-                        if (is_callable(array(WC()->customer, $method))) {
-                            WC()->customer->$method($value);
-                        }
-                    }
+            foreach ($shipping_address as $key => $value) {
+                $method = 'set_' . $key;
+                if (is_callable(array(WC()->customer, $method))) {
+                    WC()->customer->$method($value);
                 }
             }
         }
@@ -153,15 +148,10 @@ class RestApi
     function setCustomerBillingDetails($billing_address)
     {
         if (!empty($billing_address)) {
-            $checkout_fields = WC()->checkout()->get_checkout_fields();
-            if (isset($checkout_fields['billing']) && is_array($checkout_fields['billing'])) {
-                foreach ($billing_address as $key => $value) {
-                    if (array_key_exists($key, $checkout_fields['billing'])) {
-                        $method = 'set_' . $key;
-                        if (is_callable(array(WC()->customer, $method))) {
-                            WC()->customer->$method($value);
-                        }
-                    }
+            foreach ($billing_address as $key => $value) {
+                $method = 'set_' . $key;
+                if (is_callable(array(WC()->customer, $method))) {
+                    WC()->customer->$method($value);
                 }
             }
         }
