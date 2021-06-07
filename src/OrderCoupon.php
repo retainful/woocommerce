@@ -428,6 +428,7 @@ class OrderCoupon
                     'limit_usage_to_x_items' => '',
                     'usage_count' => '',
                     'expiry_date' => $coupon_expiry_date,
+                    'date_expires' => !empty($coupon_expiry_date) ? strtotime($coupon_expiry_date) : $coupon_expiry_date,
                     'apply_before_tax' => 'no',
                     'free_shipping' => false,
                     'product_categories' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'product_categories'] : array(),
@@ -927,6 +928,9 @@ class OrderCoupon
             add_post_meta($id, 'usage_limit_per_user', '1');
             if (isset($expired_date['woo_coupons']) && !empty($expired_date['woo_coupons'])) {
                 add_post_meta($id, 'expiry_date', $expired_date['woo_coupons']);
+                if (!empty($expired_date['woo_coupons'])) {
+                    add_post_meta($id, 'date_expires', strtotime($expired_date['woo_coupons']));
+                }
             }
             add_post_meta($id, 'apply_before_tax', 'yes');
             add_post_meta($id, 'free_shipping', 'no');
