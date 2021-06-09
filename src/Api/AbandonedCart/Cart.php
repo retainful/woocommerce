@@ -98,72 +98,38 @@ class Cart extends RestApi
     function setCustomerData()
     {
         if (isset($_POST['billing_email'])) {
-            //Post details
-            $billing_first_name = (isset($_POST['billing_first_name'])) ? sanitize_text_field($_POST['billing_first_name']) : '';
-            $billing_last_name = (isset($_POST['billing_last_name'])) ? sanitize_text_field($_POST['billing_last_name']) : '';
-            $billing_company = (isset($_POST['billing_company'])) ? sanitize_text_field($_POST['billing_company']) : '';
-            $billing_address_1 = (isset($_POST['billing_address_1'])) ? sanitize_text_field($_POST['billing_address_1']) : '';
-            $billing_address_2 = (isset($_POST['billing_address_2'])) ? sanitize_text_field($_POST['billing_address_2']) : '';
-            $billing_city = (isset($_POST['billing_city'])) ? sanitize_text_field($_POST['billing_city']) : '';
-            $billing_state = (isset($_POST['billing_state'])) ? sanitize_text_field($_POST['billing_state']) : '';
-            $billing_zipcode = (isset($_POST['billing_postcode'])) ? sanitize_text_field($_POST['billing_postcode']) : '';
-            $billing_country = (isset($_POST['billing_country'])) ? sanitize_text_field($_POST['billing_country']) : '';
-            $billing_phone = (isset($_POST['billing_phone'])) ? sanitize_text_field($_POST['billing_phone']) : '';
-            $billing_email = sanitize_email($_POST['billing_email']);
-            $ship_to_billing = (isset($_POST['ship_to_billing'])) ? $_POST['ship_to_billing'] : 0;
-            $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
-            $shipping_first_name = (isset($_POST['shipping_first_name'])) ? sanitize_text_field($_POST['shipping_first_name']) : '';
-            $shipping_last_name = (isset($_POST['shipping_last_name'])) ? sanitize_text_field($_POST['shipping_last_name']) : '';
-            $shipping_company = (isset($_POST['shipping_company'])) ? sanitize_text_field($_POST['shipping_company']) : '';
-            $shipping_address_1 = (isset($_POST['shipping_address_1'])) ? sanitize_text_field($_POST['shipping_address_1']) : '';
-            $shipping_address_2 = (isset($_POST['shipping_address_2'])) ? sanitize_text_field($_POST['shipping_address_2']) : '';
-            $shipping_city = (isset($_POST['shipping_city'])) ? sanitize_text_field($_POST['shipping_city']) : '';
-            $shipping_state = (isset($_POST['shipping_state'])) ? sanitize_text_field($_POST['shipping_state']) : '';
-            $shipping_zipcode = (isset($_POST['shipping_postcode'])) ? sanitize_text_field($_POST['shipping_postcode']) : '';
-            $shipping_country = (isset($_POST['shipping_country'])) ? sanitize_text_field($_POST['shipping_country']) : '';
-            //Billing details
-            $billing_address = array(
-                'billing_first_name' => $billing_first_name,
-                'billing_last_name' => $billing_last_name,
-                'billing_company' => $billing_company,
-                'billing_address_1' => $billing_address_1,
-                'billing_address_2' => $billing_address_2,
-                'billing_city' => $billing_city,
-                'billing_state' => $billing_state,
-                'billing_postcode' => $billing_zipcode,
-                'billing_country' => $billing_country,
-                'billing_phone' => $billing_phone
-            );
+            $billing_address = array();
+            $shipping_address = array();
+            //billing address fields
+            $address_fields = $this->getAddressMapFields();
+            foreach ($address_fields as $field) {
+                $billing_field_name = 'billing_' . $field;
+                if (isset($_POST[$billing_field_name]) && array_key_exists($billing_field_name, $_POST) && $billing_field_name != 'billing_email') {
+                    $billing_address[$billing_field_name] = sanitize_text_field($_POST[$billing_field_name]);
+                }
+            }
             self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
             $this->setCustomerBillingDetails($billing_address);
+            // $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
+            //shipping address fields
+            foreach ($address_fields as $field) {
+                $shipping_field_name = 'shipping_' . $field;
+                if (isset($_POST[$shipping_field_name]) && array_key_exists($shipping_field_name, $_POST)) {
+                    $shipping_address[$shipping_field_name] = sanitize_text_field($_POST[$shipping_field_name]);
+                }
+            }
             //Shipping to same billing address
-            if (!empty($ship_to_billing)) {
-                $shipping_address = array(
-                    'shipping_first_name' => $shipping_first_name,
-                    'shipping_last_name' => $shipping_last_name,
-                    'shipping_company' => $shipping_company,
-                    'shipping_address_1' => $shipping_address_1,
-                    'shipping_address_2' => $shipping_address_2,
-                    'shipping_city' => $shipping_city,
-                    'shipping_state' => $shipping_state,
-                    'shipping_postcode' => $shipping_zipcode,
-                    'shipping_country' => $shipping_country,
-                );
-            } else {
-                $shipping_address = array(
-                    'shipping_first_name' => $billing_address['billing_first_name'],
-                    'shipping_last_name' => $billing_address['billing_last_name'],
-                    'shipping_company' => $billing_address['billing_company'],
-                    'shipping_address_1' => $billing_address['billing_address_1'],
-                    'shipping_address_2' => $billing_address['billing_address_2'],
-                    'shipping_city' => $billing_address['billing_city'],
-                    'shipping_state' => $billing_address['billing_state'],
-                    'shipping_postcode' => $billing_address['billing_postcode'],
-                    'shipping_country' => $billing_address['billing_country'],
-                );
+            $ship_to_billing = (isset($_POST['ship_to_billing'])) ? $_POST['ship_to_billing'] : 0;
+            if (intval($ship_to_billing) < 1) {
+                foreach ($address_fields as $field) {
+                    $shipping_field_name = 'shipping_' . $field;
+                    $billing_field_name = 'billing_' . $field;
+                    $shipping_address[$shipping_field_name] = $billing_address[$billing_field_name];
+                }
             }
             $this->setSessionShippingDetails($shipping_address);
             //Billing email
+            $billing_email = sanitize_email($_POST['billing_email']);
             self::$woocommerce->setCustomerEmail($billing_email);
             //Set update and created date
             $session_created_at = self::$storage->getValue('rnoc_session_created_at');
@@ -255,7 +221,7 @@ class Cart extends RestApi
     {
         if ($handle === RNOC_PLUGIN_PREFIX . 'track-user-cart') {
             $escapedHandle = esc_attr($handle);
-            $scriptTag = "<script src='{$src}' id='{$escapedHandle}-js' async='async' data-cfasync='false' defer></script>";
+            $scriptTag = "<script src='{$src}' id='{$escapedHandle}-js' data-cfasync='false' defer></script>";
             return apply_filters('rnoc_add_attr_script', $scriptTag, $handle, $src);
         }
         return $tag;
@@ -940,6 +906,9 @@ class Cart extends RestApi
         $customer_email = isset($data->email) ? $data->email : '';
         //Setting the email
         self::$woocommerce->setCustomerEmail($customer_email);
+        $checkout_fields = WC()->checkout()->get_checkout_fields();
+        $billing_fields = isset($checkout_fields['billing']) ? array_keys($checkout_fields['billing']) : array();
+        $shipping_fields = isset($checkout_fields['shipping']) ? array_keys($checkout_fields['shipping']) : array();
         $billing_details = isset($data->billing_address) ? $data->billing_address : new stdClass();
         $billing_address = array(
             'billing_first_name' => isset($billing_details->first_name) ? $billing_details->first_name : NULL,
@@ -953,7 +922,8 @@ class Cart extends RestApi
             'billing_address_2' => isset($billing_details->address2) ? $billing_details->address2 : NULL,
             'billing_company' => isset($billing_details->company) ? $billing_details->company : NULL
         );
-        $this->setCustomerBillingDetails($billing_address);
+        $valid_billing_fields = array_intersect_key($billing_address, array_flip($billing_fields));
+        $this->setCustomerBillingDetails($valid_billing_fields);
         $shipping_details = isset($data->shipping_address) ? $data->shipping_address : new stdClass();
         $shipping_address = array(
             'shipping_first_name' => isset($shipping_details->first_name) ? $shipping_details->first_name : NULL,
@@ -965,7 +935,8 @@ class Cart extends RestApi
             'shipping_address_1' => isset($shipping_details->address1) ? $shipping_details->address1 : NULL,
             'shipping_address_2' => isset($shipping_details->address2) ? $shipping_details->address2 : NULL
         );
-        $this->setSessionShippingDetails($shipping_address);
+        $valid_shipping_fields = array_intersect_key($shipping_address, array_flip($shipping_fields));
+        $this->setSessionShippingDetails($valid_shipping_fields);
     }
 
     /**

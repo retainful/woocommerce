@@ -63,7 +63,7 @@ class WcFunctions
         if (empty($image_id)) {
             $image = array("");
         } else {
-            $image = wp_get_attachment_image_src($image_id);
+            $image = wp_get_attachment_image_src($image_id, 'woocommerce_thumbnail');
         }
         list($src) = $image;
         $src = !empty($src) ? $src : wc_placeholder_img_src();

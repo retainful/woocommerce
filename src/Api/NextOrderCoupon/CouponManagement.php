@@ -90,6 +90,7 @@ class CouponManagement
                         'minimum_amount' => (floatval($ruleParams['prerequisite_subtotal_range']['greater_than_or_equal_to']) > 0) ? floatval($ruleParams['prerequisite_subtotal_range']['greater_than_or_equal_to']) : null,
                         'maximum_amount' => 0,
                         'expiry_date' => (!empty($ruleParams['ends_at'])) ? $ruleParams['ends_at'] : null,
+                        'date_expires' => (!empty($ruleParams['ends_at'])) ? strtotime($ruleParams['ends_at']) : null,
                         'usage_limit' => $ruleParams['usage_limit'],
                         'usage_limit_per_user' => $ruleParams['usage_limit_per_user'],
                         'individual_use' => 'yes',
