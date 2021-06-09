@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.7
 WC tested up to: 5.3
 Requires PHP: 5.6
-Stable tag: 2.6.1
+Stable tag: 2.6.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -478,3 +478,7 @@ No. There is no charges for support.
 - Improvement: Getting order number of order improved
 - New Feature: New option added to remove NOC in order transaction emails
 - Fix: script tag optimized
+
+= 2.6.2 =
+- Fix: Billing fields optimized
+- NOC coupons expiry date timestamp added
