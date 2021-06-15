@@ -214,9 +214,9 @@ class RestApi
     function isPendingRecovery($user_id = NULL)
     {
         if ($user_id || ($user_id = get_current_user_id())) {
-            return (bool)get_user_meta($user_id, $this->pending_recovery_key_for_db, true);
+            return (bool) get_user_meta($user_id, $this->pending_recovery_key_for_db, true);
         } else {
-            return (bool)self::$storage->getValue($this->pending_recovery_key);
+            return (bool) self::$storage->getValue($this->pending_recovery_key);
         }
     }
 
@@ -415,7 +415,7 @@ class RestApi
         if (!$order instanceof \WC_Order) {
             return false;
         }
-        return (bool)get_post_meta($order_id, $this->pending_recovery_key_for_db, true);
+        return (bool) get_post_meta($order_id, $this->pending_recovery_key_for_db, true);
     }
 
     /**
@@ -429,7 +429,7 @@ class RestApi
         if (!$order instanceof \WC_Order) {
             return false;
         }
-        return (bool)get_post_meta($order_id, $this->order_recovered_key_for_db, true);
+        return (bool) get_post_meta($order_id, $this->order_recovered_key_for_db, true);
     }
 
     /**
