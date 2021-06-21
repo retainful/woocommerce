@@ -251,7 +251,7 @@ class Main
                 //Set order as recovered
                 // handle payment complete, from a direct gateway
                 //add_action('woocommerce_new_order', array($checkout, 'purchaseComplete'));
-                add_filter('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
+                add_action('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
                 add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
                 add_action('woocommerce_checkout_order_processed', array($checkout, 'checkoutOrderProcessed'));
                 add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
