@@ -118,14 +118,6 @@ class Main
      */
     function activateEvents()
     {
-        //Deactivation survey form
-        if (is_admin()) {
-            add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
-            $coupon_api = new CouponManagement();
-            add_filter('views_edit-shop_coupon', array($coupon_api, 'viewsEditShopCoupon'));
-            add_filter('woocommerce_coupon_options', array($coupon_api, 'showCouponOrderDetails'));
-            add_filter('request', array($coupon_api, 'requestQuery'));
-        }
         //Register deactivation hook
         register_deactivation_hook(RNOC_FILE, array($this, 'onPluginDeactivation'));
         add_action('retainful_plugin_activated', array($this, 'createRequiredTables'));
@@ -138,8 +130,23 @@ class Main
         add_action('rnocp_activation_trigger', array($this, 'checkUserPlan'));
         add_filter('rnoc_need_to_run_ac_in_cloud', array($this, 'needToRunAbandonedCartExternally'));
         if (is_admin()) {
+            //Deactivation survey form
+            add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
+            $coupon_api = new CouponManagement();
+            add_filter('views_edit-shop_coupon', array($coupon_api, 'viewsEditShopCoupon'));
+            add_filter('woocommerce_coupon_options', array($coupon_api, 'showCouponOrderDetails'));
+            add_filter('request', array($coupon_api, 'requestQuery'));
             add_action('admin_menu', array($this->admin, 'registerMenu'));
             $this->admin->initAdminPageStyles();
+            //Validate key
+            add_action('wp_ajax_validate_app_key', array($this->admin, 'validateAppKey'));
+            add_action('wp_ajax_rnoc_get_search_coupon', array($this->admin, 'getSearchedCoupons'));
+            add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
+            add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
+            add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
+            add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
+            //Settings link
+            add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
         }
         //initialise currency helper
         new Currency();
@@ -183,17 +190,6 @@ class Main
          * Ip filtering
          */
         $this->canActivateIPFilter();
-        if (is_admin()) {
-            //Validate key
-            add_action('wp_ajax_validate_app_key', array($this->admin, 'validateAppKey'));
-            add_action('wp_ajax_rnoc_get_search_coupon', array($this->admin, 'getSearchedCoupons'));
-            add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
-            add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
-            add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
-            add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
-            //Settings link
-            add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
-        }
         $run_installation_externally = $this->admin->runAbandonedCartExternally();
         if ($run_installation_externally) {
             //If the user is old user then ask user to run abandoned cart to
@@ -276,16 +272,14 @@ class Main
         } else {
             //remove
         }
+        //Premium check
+        add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
+        do_action('rnoc_initiated');
         if (is_admin()) {
             $is_retainful_v2_0_1_migration_completed = get_option('is_retainful_v2_0_1_migration_completed', 0);
             if (!$is_retainful_v2_0_1_migration_completed) {
                 $this->migrationV201();
             }
-        }
-        //Premium check
-        add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
-        do_action('rnoc_initiated');
-        if (is_admin()) {
             $this->checkApi();
         }
     }
