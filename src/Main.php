@@ -137,9 +137,11 @@ class Main
         add_action('plugins_loaded', array($this, 'checkDependencies'));
         add_action('rnocp_activation_trigger', array($this, 'checkUserPlan'));
         add_filter('rnoc_need_to_run_ac_in_cloud', array($this, 'needToRunAbandonedCartExternally'));
-        //Activate CMB2 functions
-        add_action('admin_menu', array($this->admin, 'registerMenu'));
-        $this->admin->initAdminPageStyles();
+        if (is_admin()) {
+            add_action('admin_menu', array($this->admin, 'registerMenu'));
+            $this->admin->initAdminPageStyles();
+        }
+        //initialise currency helper
         new Currency();
         if ($this->admin->isNextOrderCouponEnabled()) {
             //Get events
@@ -181,15 +183,17 @@ class Main
          * Ip filtering
          */
         $this->canActivateIPFilter();
-        //Validate key
-        add_action('wp_ajax_validate_app_key', array($this->admin, 'validateAppKey'));
-        add_action('wp_ajax_rnoc_get_search_coupon', array($this->admin, 'getSearchedCoupons'));
-        add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
-        add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
-        add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
-        add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
-        //Settings link
-        add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
+        if (is_admin()) {
+            //Validate key
+            add_action('wp_ajax_validate_app_key', array($this->admin, 'validateAppKey'));
+            add_action('wp_ajax_rnoc_get_search_coupon', array($this->admin, 'getSearchedCoupons'));
+            add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
+            add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
+            add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
+            add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
+            //Settings link
+            add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
+        }
         $run_installation_externally = $this->admin->runAbandonedCartExternally();
         if ($run_installation_externally) {
             //If the user is old user then ask user to run abandoned cart to
@@ -263,21 +267,27 @@ class Main
                 //Todo: multi currency and multi lingual
                 #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
             } else {
-                $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
-                $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
-                $this->showAdminNotice($notice);
+                if (is_admin()) {
+                    $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);
+                    $notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN), $connect_txt) . '</p>';
+                    $this->showAdminNotice($notice);
+                }
             }
         } else {
             //remove
         }
-        $is_retainful_v2_0_1_migration_completed = get_option('is_retainful_v2_0_1_migration_completed', 0);
-        if (!$is_retainful_v2_0_1_migration_completed) {
-            $this->migrationV201();
+        if (is_admin()) {
+            $is_retainful_v2_0_1_migration_completed = get_option('is_retainful_v2_0_1_migration_completed', 0);
+            if (!$is_retainful_v2_0_1_migration_completed) {
+                $this->migrationV201();
+            }
         }
         //Premium check
         add_action('rnocp_check_user_plan', array($this, 'checkUserPlan'));
         do_action('rnoc_initiated');
-        $this->checkApi();
+        if (is_admin()) {
+            $this->checkApi();
+        }
     }
 
     function canActivateIPFilter()
@@ -426,7 +436,9 @@ class Main
                 $this->showAdminNotice(__('Your woocommerce version is ', RNOC_TEXT_DOMAIN) . WC_VERSION . __('. Some of the features of Retainful-Woocommerce will not work properly on this woocommerce version.', RNOC_TEXT_DOMAIN));
             }
         }
-        $this->doMigration();
+        if (is_admin()) {
+            $this->doMigration();
+        }
     }
 
     /**

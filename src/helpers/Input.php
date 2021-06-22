@@ -113,11 +113,7 @@ class Input
     protected $security;
     protected $uni;
 
-    /**
-     * Input constructor.
-     */
-    function __construct()
-    {
+    function sanitize_globals(){
         // Sanitize global arrays
         $this->_sanitize_globals();
     }
