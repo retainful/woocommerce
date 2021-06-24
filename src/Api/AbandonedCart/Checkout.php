@@ -85,8 +85,9 @@ class Checkout extends RestApi
      */
     function generateNocCouponForManualOrders()
     {
+        $is_enabled = self::$settings->isNextOrderCouponEnabled();
         $has_backorder_coupon = self::$settings->autoGenerateCouponsForOldOrders();
-        $need_noc_coupon = ($has_backorder_coupon && is_admin());
+        $need_noc_coupon = ($is_enabled && $has_backorder_coupon && is_admin());
         return apply_filters('rnoc_generate_noc_coupon_for_manual_orders', $need_noc_coupon, $this);
     }
 
@@ -180,7 +181,7 @@ class Checkout extends RestApi
         global $wp;
         try {
             // PayPal IPN request
-            if (!empty($wp->query_vars['wc-api']) && 'WC_Gateway_Paypal' === $wp->query_vars['wc-api']) {
+            if (!empty($wp->query_vars['wc-api']) && ('WC_Gateway_Paypal' === $wp->query_vars['wc-api'])) {
                 $order = self::$woocommerce->getOrder($order_id);
                 // PayPal order is completed or authorized: clear any user session
                 // data so that we don't have to rely on the thank-you page rendering

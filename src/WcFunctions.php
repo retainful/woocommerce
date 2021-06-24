@@ -439,7 +439,7 @@ class WcFunctions
     function isOrderPaid($order)
     {
         if ($this->isMethodExists($order, 'is_paid')) {
-            $order->is_paid();
+            return $order->is_paid();
         }
         return false;
     }

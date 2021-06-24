@@ -36,7 +36,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 add_action('woocommerce_init', array($this, 'showTimer'));
                 add_action('woocommerce_coupon_is_valid', array($this, 'ValidateCoupon'), 10, 2);
                 add_filter('woocommerce_coupon_error', array($this, 'modifyInvalidCouponMessage'), 10, 3);
-                add_filter('woocommerce_order_status_changed', array($this, 'orderStatusChanged'), 10, 3);
+                add_action('woocommerce_order_status_changed', array($this, 'orderStatusChanged'), 10, 3);
                 add_action('woocommerce_before_cart', array($this, 'initTimerInCart'));
                 add_action('wp_footer', array($this, 'showCouponTimerOnAjaxCall'));
             }
