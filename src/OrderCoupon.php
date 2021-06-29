@@ -159,7 +159,7 @@ class OrderCoupon
      * @param $plain_text
      * @param $email
      */
-    function attachOrderCoupon($order, $sent_to_admin, $plain_text = '', $email = '')
+    function attachOrderCoupon($order, $sent_to_admin = false, $plain_text = '', $email = '')
     {
         $order_id = $this->wc_functions->getOrderId($order);
         $coupon_code = '';
