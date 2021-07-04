@@ -271,6 +271,16 @@ class Cart extends RestApi
         }
     }
 
+    function recoverCartWithShortLink()
+    {
+        if (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart'])) {
+            $cart_id = sanitize_text_field($_REQUEST['rnoc_cart']);
+            if ($this->isPrefixMatch($cart_id, 'crt_')) {
+                $this->recoverCart(true);
+            }
+        }
+    }
+
     /**
      * Add abandon cart coupon automatically
      */
@@ -728,25 +738,36 @@ class Cart extends RestApi
 
     /**
      * Recover the user cart
+     * @param bool $is_short_link
+     * @return bool
      */
-    function recoverCart()
+    function recoverCart($is_short_link = false)
     {
         global $retainful;
         $checkout_url = $retainful::$woocommerce->getCheckoutUrl();
         try {
-            $this->reCreateCart();
-        } catch (Exception $exception) {
-        }
-        if (!empty($_GET)) {
-            foreach ($_GET as $key => $value) {
-                if (!in_array($key, array("token", "hash", "wc-api"))) {
-                    $checkout_url = add_query_arg($key, $value, $checkout_url);
+            if ($is_short_link) {
+                $cart_data = $this->retrieveCartDataFromAdiWithShortUrl();
+            } else {
+                $cart_data = $this->retrieveCartDataFromAdiWithCartToken();
+            }
+            if (empty($cart_data)) {
+                return false;
+            }
+            $this->reCreateCart($cart_data);
+            if (!empty($_GET)) {
+                foreach ($_GET as $key => $value) {
+                    if (!in_array($key, array("rnoc_cart", "token", "hash", "wc-api", "rnoc_cart"))) {
+                        $checkout_url = add_query_arg($key, $value, $checkout_url);
+                    }
                 }
             }
+            $checkout_url = apply_filters('retainful_recovery_redirect_url', $checkout_url);
+            wp_safe_redirect($checkout_url);
+            exit;
+        } catch (Exception $e) {
         }
-        $checkout_url = apply_filters('retainful_recovery_redirect_url', $checkout_url);
-        wp_safe_redirect($checkout_url);
-        exit;
+        return true;
     }
 
     function printRefreshFragmentScript()
@@ -763,11 +784,10 @@ class Cart extends RestApi
     }
 
     /**
-     * Recreate cart
-     * @return bool
-     * @throws Exception
+     * retrieve cart with cart token
+     * @return array|bool|mixed|object|string|null
      */
-    function reCreateCart()
+    function retrieveCartDataFromAdiWithCartToken()
     {
         global $retainful;
         $data = wc_clean(rawurldecode($_REQUEST['token']));
@@ -777,75 +797,115 @@ class Cart extends RestApi
             $data = json_decode(base64_decode($data));
             // readability
             $cart_token = isset($data->cart_token) ? $data->cart_token : NULL;
-            if (!empty($cart_token)) {
-                if (empty($cart_token)) {
-                    throw new Exception('Cart token missed');
-                }
+            if (empty($cart_token)) {
+                return null;
+            } else {
                 $app_id = $retainful::$plugin_admin->getApiKey();
-                $data = $retainful::$api->retrieveCartDetails($app_id, $cart_token);
+                $cart_data = $retainful::$api->retrieveCartDetails($app_id, $cart_token);
                 //When the cart details from API was empty, then we no need to proceed further
-                if (empty($data)) {
-                    return false;
+                if (!empty($cart_data)) {
+                    return $cart_data;
                 }
-                do_action('rnoc_before_recreate_cart', $data);
-                $order_id = $this->getOrderIdFromCartToken($cart_token);
-                $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
-                if ($order_id && $order = $retainful::$woocommerce->getOrder($order_id)) {
-                    // re-enable a cancelled order for payment
-                    if ($retainful::$woocommerce->hasOrderStatus($order, 'cancelled')) {
-                        $retainful::$woocommerce->setOrderStatus($order, 'pending', $note);
-                    } else {
-                        $retainful::$woocommerce->setOrderNote($order, $note);
-                    }
-                    $redirect = $retainful::$woocommerce->isOrderNeedPayment($order) ? $retainful::$woocommerce->getOrderPaymentURL($order) : $retainful::$woocommerce->getOrderReceivedURL($order);
-                    $retainful::$storage->setValue($this->pending_recovery_key, true);
-                    // set (or refresh, if already set) session
-                    $retainful::$woocommerce->setSessionCookie(true);
-                    wp_safe_redirect($redirect);
-                    exit;
-                }
-                $is_buyer_accept_marketing = (isset($data->buyer_accepts_marketing) && $data->buyer_accepts_marketing) ? 1 : 0;
-                $retainful::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accept_marketing);
-                $user_currency = isset($data->presentment_currency) ? $data->presentment_currency : $retainful::$woocommerce->getDefaultCurrency();
-                apply_filters('rnoc_set_current_currency_code', $user_currency);
-                $retainful::$storage->setValue('rnoc_recovered_at', current_time('timestamp', true));
-                $retainful::$storage->setValue('rnoc_recovered_by_retainful', 1);
-                $retainful::$storage->setValue('rnoc_recovered_cart_token', $cart_token);
-                // check if cart is associated with a registered user / persistent cart
-                $user_id = $this->getUserIdFromCartToken($cart_token);
+                return NULL;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * retrieve cart with cart id
+     * @return array|bool|mixed|object|string|null
+     */
+    function retrieveCartDataFromAdiWithShortUrl()
+    {
+        global $retainful;
+        if (isset($_REQUEST['rnoc_cart']) && !empty($_REQUEST['rnoc_cart'])) {
+            $app_id = $retainful::$plugin_admin->getApiKey();
+            $cart_id = wc_clean(rawurldecode($_REQUEST['rnoc_cart']));
+            $cart_hash = $this->hashTheData($cart_id);
+            $ip = $this->getClientIp();
+            $format_ip = $this->formatUserIP($ip);
+            $cart_data = $retainful::$api->retrieveCartDetailsWithCartId($app_id, $cart_id, $cart_hash, $format_ip);
+            if (!empty($cart_data)) {
+                return $cart_data;
+            }
+            return NULL;
+        }
+        return null;
+    }
+
+    /**
+     * Recreate cart
+     * @param $data
+     * @return bool
+     */
+    function reCreateCart($data)
+    {
+        global $retainful;
+        if (empty($data) || !is_object($data)) {
+            return false;
+        }
+        $cart_token = isset($data->cart_token) ? $data->cart_token : NULL;
+        if (empty($cart_token)) {
+            return false;
+        }
+        do_action('rnoc_before_recreate_cart', $data);
+        $order_id = $this->getOrderIdFromCartToken($cart_token);
+        $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
+        if ($order_id && $order = $retainful::$woocommerce->getOrder($order_id)) {
+            // re-enable a cancelled order for payment
+            if ($retainful::$woocommerce->hasOrderStatus($order, 'cancelled')) {
+                $retainful::$woocommerce->setOrderStatus($order, 'pending', $note);
+            } else {
+                $retainful::$woocommerce->setOrderNote($order, $note);
+            }
+            $redirect = $retainful::$woocommerce->isOrderNeedPayment($order) ? $retainful::$woocommerce->getOrderPaymentURL($order) : $retainful::$woocommerce->getOrderReceivedURL($order);
+            $retainful::$storage->setValue($this->pending_recovery_key, true);
+            // set (or refresh, if already set) session
+            $retainful::$woocommerce->setSessionCookie(true);
+            wp_safe_redirect($redirect);
+            exit;
+        }
+        $is_buyer_accept_marketing = (isset($data->buyer_accepts_marketing) && $data->buyer_accepts_marketing) ? 1 : 0;
+        $retainful::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accept_marketing);
+        $user_currency = isset($data->presentment_currency) ? $data->presentment_currency : $retainful::$woocommerce->getDefaultCurrency();
+        apply_filters('rnoc_set_current_currency_code', $user_currency);
+        $retainful::$storage->setValue('rnoc_recovered_at', current_time('timestamp', true));
+        $retainful::$storage->setValue('rnoc_recovered_by_retainful', 1);
+        $retainful::$storage->setValue('rnoc_recovered_cart_token', $cart_token);
+        // check if cart is associated with a registered user / persistent cart
+        $user_id = $this->getUserIdFromCartToken($cart_token);
+        $cart_recreated = false;
+        // order id is associated with a registered user
+        if ($user_id && $this->loginUser($user_id)) {
+            // save order note to be applied after redirect
+            update_user_meta($user_id, $this->order_note_key_for_db, $note);
+            $current_cart = $retainful::$woocommerce->getCart();
+            if (empty($current_cart)) {
                 $cart_recreated = false;
-                // order id is associated with a registered user
-                if ($user_id && $this->loginUser($user_id)) {
-                    // save order note to be applied after redirect
-                    update_user_meta($user_id, $this->order_note_key_for_db, $note);
-                    $current_cart = $retainful::$woocommerce->getCart();
-                    if (empty($current_cart)) {
-                        $cart_recreated = false;
-                    } else {
-                        $cart_recreated = true;
-                    }
+            } else {
+                $cart_recreated = true;
+            }
+        }
+        $cart_recreated = apply_filters('rnoc_cart_re_created', $cart_recreated, $data);
+        if (!$cart_recreated) {
+            // set customer note in session, if present
+            $retainful::$storage->setValue($this->order_note_key, $note);
+            // guest user
+            $this->reCreateCartForGuestUsers($data);
+        }
+        $this->populateSessionDetails($data);
+        $cart_session = $retainful::$woocommerce->getSession('cart');
+        if (empty($cart_session)) {
+            $client_session = isset($data->client_session) ? $data->client_session : array();
+            if (!empty($client_session)) {
+                $cart = json_decode(wp_json_encode($client_session->cart), true);
+                if (!empty($cart)) {
+                    $retainful::$woocommerce->setSession('cart', $cart);
                 }
-                $cart_recreated = apply_filters('rnoc_cart_re_created', $cart_recreated, $data);
-                if (!$cart_recreated) {
-                    // set customer note in session, if present
-                    $retainful::$storage->setValue($this->order_note_key, $note);
-                    // guest user
-                    $this->reCreateCartForGuestUsers($data);
-                }
-                $this->populateSessionDetails($data);
-                $cart_session = $retainful::$woocommerce->getSession('cart');
-                if (empty($cart_session)) {
-                    $client_session = isset($data->client_session) ? $data->client_session : array();
-                    if (!empty($client_session)) {
-                        $cart = json_decode(wp_json_encode($client_session->cart), true);
-                        if (!empty($cart)) {
-                            $retainful::$woocommerce->setSession('cart', $cart);
-                        }
-                    } else {
-                        $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
-                        $this->recreateCartFromCartContents($cart_contents);
-                    }
-                }
+            } else {
+                $cart_contents = isset($data->cart_contents) ? $data->cart_contents : array();
+                $this->recreateCartFromCartContents($cart_contents);
             }
         }
         return false;

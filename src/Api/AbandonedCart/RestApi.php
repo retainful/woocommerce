@@ -29,6 +29,13 @@ class RestApi
     /** The HMAC hash algorithm to use to sign the encrypted cart data */
     const HMAC_ALGORITHM = 'sha256';
 
+
+    function isPrefixMatch($text, $prefix)
+    {
+        $len = strlen($prefix);
+        return (substr($text, 0, $len) === $prefix);
+    }
+    
     /**
      * Set the cart token for the session
      * @param $cart_token
