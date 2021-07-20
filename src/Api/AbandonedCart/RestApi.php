@@ -452,17 +452,17 @@ class RestApi
 
     function changeOrderStatus($order_status)
     {
+        $changable_order_status = array('checkout-draft');
         if ($this->considerCancelledAsAbandoned() == 1) {
-            if (in_array($order_status, array("cancelled"))) {
-                $order_status = "pending";
-            }
+            $changable_order_status[] = "cancelled";
         }
         if ($this->considerOnHoldAsAbandoned() == 1) {
-            if (in_array($order_status, array("on-hold"))) {
-                $order_status = "pending";
-            }
+            $changable_order_status[] = "on-hold";
         }
-        if (in_array($order_status, array('checkout-draft'))) {
+        if ($this->considerFailedAsAbandoned() == 1) {
+            $changable_order_status[] = "failed";
+        }
+        if (in_array($order_status, $changable_order_status)) {
             $order_status = "pending";
         }
         return $order_status;
@@ -486,6 +486,16 @@ class RestApi
     {
         $settings = self::$settings->getAdminSettings();
         return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'] : 1;
+    }
+
+    /**
+     * Consider failed order as abandoned
+     * @return int
+     */
+    function considerFailedAsAbandoned()
+    {
+        $settings = self::$settings->getAdminSettings();
+        return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'] : 1;
     }
 
     /**

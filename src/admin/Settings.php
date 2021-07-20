@@ -778,6 +778,7 @@ class Settings
         $validator->rule('in', array(
             RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
             RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
+            RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status',
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load',
             RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
             RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
@@ -807,6 +808,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget' => 'yes',
             RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status' => '0',
             RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status' => '1',
+            RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status' => '1',
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
             RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' => '0',
             RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => '',

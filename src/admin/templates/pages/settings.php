@@ -113,6 +113,33 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'; ?>"><?php
+                    esc_html_e('Consider failed order status as abandoned cart?', RNOC_TEXT_DOMAIN);
+                    ?></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'; ?>"
+                           type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status_1'; ?>"
+                           value="1" <?php if (isset($settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status']) && $settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'] == '1') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'; ?>"
+                           type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status_0'; ?>"
+                           value="0" <?php if (isset($settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status']) && $settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'] == '0') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'; ?>"><?php
                     esc_html_e('Fix for Cart sync not working', RNOC_TEXT_DOMAIN);
                     ?></label>
