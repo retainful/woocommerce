@@ -495,7 +495,7 @@ class RestApi
     function considerFailedAsAbandoned()
     {
         $settings = self::$settings->getAdminSettings();
-        return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'] : 1;
+        return isset($settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'] : 0;
     }
 
     /**
