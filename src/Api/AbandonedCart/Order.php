@@ -170,11 +170,14 @@ class Order extends RestApi
     function getOrderData($order)
     {
         $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
-        if (!$this->canTrackAbandonedCarts($user_ip, $order)) {
+        $can_track_cart = $this->canTrackAbandonedCarts($user_ip, $order);
+        self::$settings->logMessage(array('can_track_cart' => $can_track_cart, 'user_ip' => $user_ip), 'can track cart in getOrderData method for ' . $order_id);
+        if (!$can_track_cart) {
             return array();
         }
         $order_id = self::$woocommerce->getOrderId($order);
         $cart_token = $this->getOrderCartToken($order);
+        self::$settings->logMessage($cart_token, 'Cart token in getOrderData method for ' . $order_id);
         if (empty($cart_token)) {
             return array();
         }
@@ -184,7 +187,7 @@ class Order extends RestApi
         $current_currency_code = self::$woocommerce->getOrderCurrency($order);
         $default_currency_code = self::$settings->getBaseCurrency();
         $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
-        self::$settings->logMessage($cart_created_at, 'cart created time');
+        self::$settings->logMessage($cart_created_at, 'cart created time in getOrderData meta' . $order_id);
         $cart_total = $this->formatDecimalPrice(self::$woocommerce->getOrderTotal($order));
         $excluding_tax = (self::$woocommerce->isPriceExcludingTax());
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();

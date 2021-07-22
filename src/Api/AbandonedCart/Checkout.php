@@ -253,10 +253,10 @@ class Checkout extends RestApi
             $order_obj = new Order();
             $cart = $order_obj->getOrderData($order);
             if (!empty($cart)) {
-                self::$settings->logMessage($cart);
                 $cart_hash = $this->encryptData($cart);
                 //Reduce the loading speed
                 $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
+                self::$settings->logMessage(array('cart' => $cart, 'client_ip' => $client_ip), 'success cart data in syncOrderToAPI method for ' . $order_id);
                 if (!empty($cart_hash)) {
                     $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
                     $extra_headers = array(
@@ -267,6 +267,8 @@ class Checkout extends RestApi
                     );
                     $this->syncCart($cart_hash, $extra_headers);
                 }
+            } else {
+                self::$settings->logMessage($cart, 'Failed cart data in syncOrderToAPI method for ' . $order_id);
             }
         } else {
             $this->scheduleCartSync($order_id);
