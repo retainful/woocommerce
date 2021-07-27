@@ -314,6 +314,22 @@ class WcFunctions
     }
 
     /**
+     * Get site's default language
+     * @return string
+     */
+    function getSiteDefaultLang()
+    {
+        $current_lang = 'en_US';
+        if (function_exists('get_locale')) {
+            $current_lang = get_locale();
+            if (empty($current_lang) || $current_lang == 'en') {
+                $current_lang = 'en_US';
+            }
+        }
+        return $current_lang;
+    }
+
+    /**
      * Get Order Id
      * @param $order
      * @return String|null

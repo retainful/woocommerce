@@ -25,9 +25,10 @@ class Order extends RestApi
             $user_id = 0;
             $created_at = $updated_at = current_time('timestamp', true);
         }
+        $email = self::$woocommerce->getBillingEmail($order);
         $user_info = array(
             'id' => $user_id,
-            'email' => self::$woocommerce->getBillingEmail($order),
+            'email' => $email,
             'phone' => self::$woocommerce->getBillingPhone($order),
             'state' => self::$woocommerce->getBillingState($order),
             'currency' => NULL,
@@ -35,8 +36,8 @@ class Order extends RestApi
             'created_at' => $this->formatToIso8601($created_at),
             'first_name' => self::$woocommerce->getBillingLastName($order),
             'updated_at' => $this->formatToIso8601($updated_at),
-            'total_spent' => 0,
-            'orders_count' => 0,
+            'total_spent' => self::$woocommerce->getCustomerTotalSpent($email),
+            'orders_count' => self::$woocommerce->getCustomerTotalOrders($email),
             'last_order_id' => NULL,
             'verified_email' => true,
             'last_order_name' => NULL,
@@ -187,7 +188,7 @@ class Order extends RestApi
         $current_currency_code = self::$woocommerce->getOrderCurrency($order);
         $default_currency_code = self::$settings->getBaseCurrency();
         $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
-        self::$settings->logMessage($cart_created_at, 'cart created time in getOrderData meta' . $order_id);
+        self::$settings->logMessage($cart_created_at, 'cart created time in getOrderData ' . $order_id);
         $cart_total = $this->formatDecimalPrice(self::$woocommerce->getOrderTotal($order));
         $excluding_tax = (self::$woocommerce->isPriceExcludingTax());
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
@@ -226,7 +227,7 @@ class Order extends RestApi
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
             'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
-            'customer_locale' => NULL,
+            'customer_locale' => $this->getOrderLanguage($order),
             'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getOrderDiscount($order, $excluding_tax)),
             'shipping_address' => $this->getCustomerShippingAddressDetails($order),
             'billing_address' => $this->getCustomerBillingAddressDetails($order),
@@ -243,6 +244,38 @@ class Order extends RestApi
             'client_details' => $this->getClientDetails($order)
         );
         return apply_filters('rnoc_api_get_order_data', $order_data, $order);
+    }
+
+    /**
+     * get the language from order
+     * @param $order
+     * @return string
+     */
+    function getOrderLanguage($order)
+    {
+        $selected_language = $language = '';
+        //to get language from WPML language
+        if (!empty($order)) {
+            $order_id = self::$woocommerce->getOrderId($order);
+            if (!empty($order_id)) {
+                $language = get_post_meta($order_id, 'wpml_language', true);
+            }
+        }
+        if ($language !== false && $language != '') {
+            if (function_exists('icl_get_languages')) {
+                $languages = icl_get_languages();
+                if (isset($languages[$language])) {
+                    if (isset($languages[$language]['default_locale'])) {
+                        $selected_language = $languages[$language]['default_locale'];
+                    }
+                }
+            }
+        }
+        //If empty of selected language, then use site's default language as selected language
+        if (empty($selected_language)) {
+            $selected_language = self::$woocommerce->getSiteDefaultLang();
+        }
+        return apply_filters('rnoc_get_order_language', $selected_language);
     }
 
     /**
