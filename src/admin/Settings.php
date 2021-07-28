@@ -369,6 +369,21 @@ class Settings
         }
     }
 
+    function addOrderDetailMetaBoxes($post_type)
+    {
+        if ('shop_order' === $post_type) {
+            add_meta_box('retainful_order_meta', __('Retainful token', RNOC_TEXT_DOMAIN), array($this, 'orderMetaDetails'), $post_type, 'side', 'default');
+        }
+    }
+
+    function orderMetaDetails()
+    {
+        global $post_ID;
+        $order = wc_get_order($post_ID);
+        $order_id = $this->wc_functions->getOrderId($order);
+        echo '<p>' . get_post_meta($order_id, "_rnoc_user_cart_token", true) . '</p>';
+    }
+
     /**
      * save premium addon settings
      */

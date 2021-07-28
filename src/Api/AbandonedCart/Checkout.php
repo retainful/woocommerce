@@ -40,6 +40,10 @@ class Checkout extends RestApi
         }
         //TODO remove carthash from session after success place order
         $cart_token = $this->retrieveCartToken();
+        self::$settings->logMessage(array(
+            "cart_token" => $cart_token,
+            "order_id" => $order_id
+        ), 'On checkout->purchaseComplete method ');
         if (!empty($cart_token)) {
             $cart_created_at = $this->userCartCreatedAt();
             $user_ip = $this->retrieveUserIp();

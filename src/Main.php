@@ -147,6 +147,9 @@ class Main
             add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
             //Settings link
             add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
+            if (apply_filters('rnoc_show_order_token_in_order', false)) {
+                add_action('add_meta_boxes', array($this->admin, 'addOrderDetailMetaBoxes'), 20);
+            }
         }
         //initialise currency helper
         new Currency();
