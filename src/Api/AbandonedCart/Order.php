@@ -172,11 +172,11 @@ class Order extends RestApi
     {
         $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
         $can_track_cart = $this->canTrackAbandonedCarts($user_ip, $order);
+        $order_id = self::$woocommerce->getOrderId($order);
         self::$settings->logMessage(array('can_track_cart' => $can_track_cart, 'user_ip' => $user_ip), 'can track cart in getOrderData method for ' . $order_id);
         if (!$can_track_cart) {
             return array();
         }
-        $order_id = self::$woocommerce->getOrderId($order);
         $cart_token = $this->getOrderCartToken($order);
         self::$settings->logMessage($cart_token, 'Cart token in getOrderData method for ' . $order_id);
         if (empty($cart_token)) {
