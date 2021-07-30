@@ -422,20 +422,6 @@ class Cart extends RestApi
     }
 
     /**
-     * Get the current user's cart token
-     * @return array|string|null
-     */
-    function getCartToken()
-    {
-        $cart_token = $this->retrieveCartToken();
-        if (empty($cart_token)) {
-            $cart_token = $this->generateCartToken();
-            $this->setCartToken($cart_token);
-        }
-        return apply_filters('rnoc_get_cart_token', $cart_token, $this);
-    }
-
-    /**
      * @param null $user_id
      */
     function removeCartToken($user_id = NULL)
