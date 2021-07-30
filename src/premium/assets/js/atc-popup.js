@@ -253,7 +253,8 @@ function initJqueryRetainfulPopupJs() {
                         local_storage: true,
                         email: email,
                         is_buyer_accepting_marketing: (marketing_data.is(':checked')) ? 1 : 0,
-                        action: 'set_rnoc_guest_session'
+                        action: 'set_rnoc_guest_session',
+                        security: retainful_premium_add_to_cart_collection_popup_condition.nonce.set_rnoc_guest_session
                     };
                     localStorage.setItem('rnoc_atcp_data', email);
                     let response = this.request(rnoc_ajax_url, popup_data);

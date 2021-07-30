@@ -97,88 +97,92 @@ class Cart extends RestApi
      */
     function setCustomerData()
     {
-        if (isset($_POST['billing_email'])) {
-            //Post details
-            $billing_first_name = (isset($_POST['billing_first_name'])) ? sanitize_text_field($_POST['billing_first_name']) : '';
-            $billing_last_name = (isset($_POST['billing_last_name'])) ? sanitize_text_field($_POST['billing_last_name']) : '';
-            $billing_company = (isset($_POST['billing_company'])) ? sanitize_text_field($_POST['billing_company']) : '';
-            $billing_address_1 = (isset($_POST['billing_address_1'])) ? sanitize_text_field($_POST['billing_address_1']) : '';
-            $billing_address_2 = (isset($_POST['billing_address_2'])) ? sanitize_text_field($_POST['billing_address_2']) : '';
-            $billing_city = (isset($_POST['billing_city'])) ? sanitize_text_field($_POST['billing_city']) : '';
-            $billing_state = (isset($_POST['billing_state'])) ? sanitize_text_field($_POST['billing_state']) : '';
-            $billing_zipcode = (isset($_POST['billing_postcode'])) ? sanitize_text_field($_POST['billing_postcode']) : '';
-            $billing_country = (isset($_POST['billing_country'])) ? sanitize_text_field($_POST['billing_country']) : '';
-            $billing_phone = (isset($_POST['billing_phone'])) ? sanitize_text_field($_POST['billing_phone']) : '';
-            $billing_email = sanitize_email($_POST['billing_email']);
-            $ship_to_billing = (isset($_POST['ship_to_billing'])) ? $_POST['ship_to_billing'] : 0;
-            $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
-            $shipping_first_name = (isset($_POST['shipping_first_name'])) ? sanitize_text_field($_POST['shipping_first_name']) : '';
-            $shipping_last_name = (isset($_POST['shipping_last_name'])) ? sanitize_text_field($_POST['shipping_last_name']) : '';
-            $shipping_company = (isset($_POST['shipping_company'])) ? sanitize_text_field($_POST['shipping_company']) : '';
-            $shipping_address_1 = (isset($_POST['shipping_address_1'])) ? sanitize_text_field($_POST['shipping_address_1']) : '';
-            $shipping_address_2 = (isset($_POST['shipping_address_2'])) ? sanitize_text_field($_POST['shipping_address_2']) : '';
-            $shipping_city = (isset($_POST['shipping_city'])) ? sanitize_text_field($_POST['shipping_city']) : '';
-            $shipping_state = (isset($_POST['shipping_state'])) ? sanitize_text_field($_POST['shipping_state']) : '';
-            $shipping_zipcode = (isset($_POST['shipping_postcode'])) ? sanitize_text_field($_POST['shipping_postcode']) : '';
-            $shipping_country = (isset($_POST['shipping_country'])) ? sanitize_text_field($_POST['shipping_country']) : '';
-            //Billing details
-            $billing_address = array(
-                'billing_first_name' => $billing_first_name,
-                'billing_last_name' => $billing_last_name,
-                'billing_company' => $billing_company,
-                'billing_address_1' => $billing_address_1,
-                'billing_address_2' => $billing_address_2,
-                'billing_city' => $billing_city,
-                'billing_state' => $billing_state,
-                'billing_postcode' => $billing_zipcode,
-                'billing_country' => $billing_country,
-                'billing_phone' => $billing_phone
-            );
-            self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
-            $this->setCustomerBillingDetails($billing_address);
-            //Shipping to same billing address
-            if (!empty($ship_to_billing)) {
-                $shipping_address = array(
-                    'shipping_first_name' => $shipping_first_name,
-                    'shipping_last_name' => $shipping_last_name,
-                    'shipping_company' => $shipping_company,
-                    'shipping_address_1' => $shipping_address_1,
-                    'shipping_address_2' => $shipping_address_2,
-                    'shipping_city' => $shipping_city,
-                    'shipping_state' => $shipping_state,
-                    'shipping_postcode' => $shipping_zipcode,
-                    'shipping_country' => $shipping_country,
+        if (isset($_POST['security']) && wp_verify_nonce($_POST['security'], 'rnoc_track_user_data')) {
+            if (isset($_POST['billing_email'])) {
+                //Post details
+                $billing_first_name = (isset($_POST['billing_first_name'])) ? sanitize_text_field($_POST['billing_first_name']) : '';
+                $billing_last_name = (isset($_POST['billing_last_name'])) ? sanitize_text_field($_POST['billing_last_name']) : '';
+                $billing_company = (isset($_POST['billing_company'])) ? sanitize_text_field($_POST['billing_company']) : '';
+                $billing_address_1 = (isset($_POST['billing_address_1'])) ? sanitize_text_field($_POST['billing_address_1']) : '';
+                $billing_address_2 = (isset($_POST['billing_address_2'])) ? sanitize_text_field($_POST['billing_address_2']) : '';
+                $billing_city = (isset($_POST['billing_city'])) ? sanitize_text_field($_POST['billing_city']) : '';
+                $billing_state = (isset($_POST['billing_state'])) ? sanitize_text_field($_POST['billing_state']) : '';
+                $billing_zipcode = (isset($_POST['billing_postcode'])) ? sanitize_text_field($_POST['billing_postcode']) : '';
+                $billing_country = (isset($_POST['billing_country'])) ? sanitize_text_field($_POST['billing_country']) : '';
+                $billing_phone = (isset($_POST['billing_phone'])) ? sanitize_text_field($_POST['billing_phone']) : '';
+                $billing_email = sanitize_email($_POST['billing_email']);
+                $ship_to_billing = (isset($_POST['ship_to_billing'])) ? $_POST['ship_to_billing'] : 0;
+                $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
+                $shipping_first_name = (isset($_POST['shipping_first_name'])) ? sanitize_text_field($_POST['shipping_first_name']) : '';
+                $shipping_last_name = (isset($_POST['shipping_last_name'])) ? sanitize_text_field($_POST['shipping_last_name']) : '';
+                $shipping_company = (isset($_POST['shipping_company'])) ? sanitize_text_field($_POST['shipping_company']) : '';
+                $shipping_address_1 = (isset($_POST['shipping_address_1'])) ? sanitize_text_field($_POST['shipping_address_1']) : '';
+                $shipping_address_2 = (isset($_POST['shipping_address_2'])) ? sanitize_text_field($_POST['shipping_address_2']) : '';
+                $shipping_city = (isset($_POST['shipping_city'])) ? sanitize_text_field($_POST['shipping_city']) : '';
+                $shipping_state = (isset($_POST['shipping_state'])) ? sanitize_text_field($_POST['shipping_state']) : '';
+                $shipping_zipcode = (isset($_POST['shipping_postcode'])) ? sanitize_text_field($_POST['shipping_postcode']) : '';
+                $shipping_country = (isset($_POST['shipping_country'])) ? sanitize_text_field($_POST['shipping_country']) : '';
+                //Billing details
+                $billing_address = array(
+                    'billing_first_name' => $billing_first_name,
+                    'billing_last_name' => $billing_last_name,
+                    'billing_company' => $billing_company,
+                    'billing_address_1' => $billing_address_1,
+                    'billing_address_2' => $billing_address_2,
+                    'billing_city' => $billing_city,
+                    'billing_state' => $billing_state,
+                    'billing_postcode' => $billing_zipcode,
+                    'billing_country' => $billing_country,
+                    'billing_phone' => $billing_phone
                 );
+                self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
+                $this->setCustomerBillingDetails($billing_address);
+                //Shipping to same billing address
+                if (!empty($ship_to_billing)) {
+                    $shipping_address = array(
+                        'shipping_first_name' => $shipping_first_name,
+                        'shipping_last_name' => $shipping_last_name,
+                        'shipping_company' => $shipping_company,
+                        'shipping_address_1' => $shipping_address_1,
+                        'shipping_address_2' => $shipping_address_2,
+                        'shipping_city' => $shipping_city,
+                        'shipping_state' => $shipping_state,
+                        'shipping_postcode' => $shipping_zipcode,
+                        'shipping_country' => $shipping_country,
+                    );
+                } else {
+                    $shipping_address = array(
+                        'shipping_first_name' => $billing_address['billing_first_name'],
+                        'shipping_last_name' => $billing_address['billing_last_name'],
+                        'shipping_company' => $billing_address['billing_company'],
+                        'shipping_address_1' => $billing_address['billing_address_1'],
+                        'shipping_address_2' => $billing_address['billing_address_2'],
+                        'shipping_city' => $billing_address['billing_city'],
+                        'shipping_state' => $billing_address['billing_state'],
+                        'shipping_postcode' => $billing_address['billing_postcode'],
+                        'shipping_country' => $billing_address['billing_country'],
+                    );
+                }
+                $this->setSessionShippingDetails($shipping_address);
+                //Billing email
+                self::$woocommerce->setCustomerEmail($billing_email);
+                //Set update and created date
+                $session_created_at = self::$storage->getValue('rnoc_session_created_at');
+                $current_time = current_time('timestamp', true);
+                if (empty($session_created_at)) {
+                    self::$storage->setValue('rnoc_session_created_at', $current_time);
+                }
+            }
+            if ($this->isValidCartToTrack()) {
+                $cart = $this->getUserCart();
+                $encrypted_cart = $this->encryptData($cart);
+                wp_send_json_success($encrypted_cart);
             } else {
-                $shipping_address = array(
-                    'shipping_first_name' => $billing_address['billing_first_name'],
-                    'shipping_last_name' => $billing_address['billing_last_name'],
-                    'shipping_company' => $billing_address['billing_company'],
-                    'shipping_address_1' => $billing_address['billing_address_1'],
-                    'shipping_address_2' => $billing_address['billing_address_2'],
-                    'shipping_city' => $billing_address['billing_city'],
-                    'shipping_state' => $billing_address['billing_state'],
-                    'shipping_postcode' => $billing_address['billing_postcode'],
-                    'shipping_country' => $billing_address['billing_country'],
-                );
+                //dont send anything
+                wp_send_json(array('success' => false));
             }
-            $this->setSessionShippingDetails($shipping_address);
-            //Billing email
-            self::$woocommerce->setCustomerEmail($billing_email);
-            //Set update and created date
-            $session_created_at = self::$storage->getValue('rnoc_session_created_at');
-            $current_time = current_time('timestamp', true);
-            if (empty($session_created_at)) {
-                self::$storage->setValue('rnoc_session_created_at', $current_time);
-            }
-        }
-        if ($this->isValidCartToTrack()) {
-            $cart = $this->getUserCart();
-            $encrypted_cart = $this->encryptData($cart);
-            wp_send_json_success($encrypted_cart);
         } else {
-            //dont send anything
-            wp_send_json(array('success' => false));
+            wp_send_json_success('invalid data');
         }
     }
 
@@ -187,9 +191,13 @@ class Cart extends RestApi
      */
     function ajaxGetEncryptedCart()
     {
-        $cart = $this->getUserCart();
-        $encrypted_cart = $this->encryptData($cart);
-        wp_send_json_success($encrypted_cart);
+        if (isset($_POST['security']) && wp_verify_nonce($_POST['security'], 'rnoc_ajax_get_encrypted_cart')) {
+            $cart = $this->getUserCart();
+            $encrypted_cart = $this->encryptData($cart);
+            wp_send_json_success($encrypted_cart);
+        } else {
+            wp_send_json_error('invalid data');
+        }
     }
 
     /**
@@ -217,6 +225,9 @@ class Cart extends RestApi
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
                 'ip' => $user_ip,
+                'nonce' => array(
+                    'track_user_data' => 'rnoc_track_user_data'
+                ),
                 'version' => RNOC_VERSION,
                 'public_key' => self::$settings->getApiKey(),
                 'api_url' => self::$api->getAbandonedCartEndPoint(),

@@ -270,9 +270,10 @@ function initJqueryRetainfulExitIntentPopupJs() {
             var popup_data = {
                 email: email.val(),
                 is_buyer_accepting_marketing: (is_buyer_accepting_marketing.is(':checked')) ? 1 : 0,
-                action: 'set_rnoc_exit_intent_popup_guest_session'
+                action: 'set_rnoc_exit_intent_popup_guest_session',
+                security: retainful_premium_exit_intent_popup.nonce.set_rnoc_exit_intent_popup_guest_session
             };
-            $.post(rnoc_ajax_url, popup_data, function (response) {
+            $.post(`rnoc_ajax_url`, popup_data, function (response) {
                 if (!response.error) {
                     sessionStorage.setItem('rnocp_is_add_to_cart_popup_email_entered', '1');
                     if (response.message !== '') {

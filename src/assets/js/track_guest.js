@@ -26,7 +26,8 @@
                 shipping_state: $('#shipping_state').val(),
                 shipping_postcode: $('#shipping_postcode').val(),
                 shipping_country: $('#shipping_country').val(),
-                action: 'save_retainful_guest_data'
+                action: 'save_retainful_guest_data',
+                security: retainful_guest_capture_params.nonce
             };
             $.post(retainful_guest_capture_params.ajax_url, guest_data, function (response) {
             });
