@@ -25,8 +25,9 @@ class Checkout extends RestApi
         $draft_order = self::$woocommerce->getSession('store_api_draft_order');
         if (!empty($draft_order) && intval($draft_order) > 0) {
             $cart_token = $this->retrieveCartToken();
-            if(empty($cart_token)) {
-               $cart_token = $this->getCartToken(); 
+            $draft_order_cart_token = self::$woocommerce->getPostMeta(intval($draft_order), $this->cart_token_key_for_db);
+            if (empty($draft_order_cart_token) && empty($cart_token)) {
+                $cart_token = $this->getCartToken();
             }
             $this->purchaseComplete(intval($draft_order));
         }
