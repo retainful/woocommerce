@@ -57,6 +57,20 @@ class RestApi
         }
     }
 
+     /**
+     * Get the current user's cart token
+     * @return array|string|null
+     */
+    function getCartToken()
+    {
+        $cart_token = $this->retrieveCartToken();
+        if (empty($cart_token)) {
+            $cart_token = $this->generateCartToken();
+            $this->setCartToken($cart_token);
+        }
+        return apply_filters('rnoc_get_cart_token', $cart_token, $this);
+    }
+
     /**
      * Set the cart token for the session
      * @param $cart_token
