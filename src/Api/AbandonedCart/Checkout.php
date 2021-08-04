@@ -351,6 +351,7 @@ class Checkout extends RestApi
         //This was set in plugin since 2.0.4
         self::$storage->removeValue('rnoc_force_refresh_cart');
         self::$storage->removeValue('rnoc_recovered_at');
+        self::$storage->removeValue('rnoc_current_cart_hash');
         self::$storage->removeValue('rnoc_recovered_by_retainful');
         self::$storage->removeValue('rnoc_recovered_cart_token');
         if ($user_id || ($user_id = get_current_user_id())) {
