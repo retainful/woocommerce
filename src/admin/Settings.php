@@ -1312,6 +1312,39 @@ class Settings
         }
     }
 
+    function deleteUnusedExpiredCoupons()
+    {
+        check_ajax_referer('rnoc_delete_expired_coupons', 'security');
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error('security breach');
+        }
+        $args = array(
+            'post_type' => 'shop_coupon',
+            'posts_per_page' => 100,
+            'meta_query' => array(
+                array(
+                    'key' => '_rnoc_shop_coupon_type',
+                    'value' => array('retainful', 'retainful-referral'),
+                    'compare' => 'IN'
+                ), array(
+                    'key' => 'date_expires',
+                    'value' => strtotime(date('Y-m-d h:i:s')),
+                    'compare' => '<'
+                ), array(
+                    'key' => 'usage_count',
+                    'compare' => 'NOT EXISTS'
+                )
+            )
+        );
+        $posts = get_posts($args);
+        if ($posts) {
+            foreach ($posts as $post) {
+                wp_delete_post($post->ID, true);
+            }
+        }
+        wp_send_json_success(array('message' => "successfully deleted"));
+    }
+
     /**
      * Make coupon expire date from order date
      * @param $ordered_date

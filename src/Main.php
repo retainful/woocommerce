@@ -145,6 +145,7 @@ class Main
             add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
             add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
             add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
+            add_action('wp_ajax_rnoc_delete_expired_coupons', array($this->admin, 'deleteUnusedExpiredCoupons'));
             //Settings link
             add_filter('plugin_action_links_' . RNOC_BASE_FILE, array($this->rnoc, 'pluginActionLinks'));
             if (apply_filters('rnoc_show_order_token_in_order', false)) {
