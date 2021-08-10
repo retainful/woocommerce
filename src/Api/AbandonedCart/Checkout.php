@@ -53,7 +53,8 @@ class Checkout extends RestApi
             $cart_created_at = $this->userCartCreatedAt();
             $user_ip = $this->retrieveUserIp();
             $is_buyer_accepts_marketing = ($this->isBuyerAcceptsMarketing()) ? 1 : 0;
-            $cart_hash = self::$storage->getValue('rnoc_current_cart_hash');
+            //$cart_hash = self::$storage->getValue('rnoc_current_cart_hash');
+            $cart_hash = $this->generateCartHash();
             $recovered_at = self::$storage->getValue('rnoc_recovered_at');
             $recovered_by = self::$storage->getValue('rnoc_recovered_by_retainful');
             $recovered_cart_token = self::$storage->getValue('rnoc_recovered_cart_token');
