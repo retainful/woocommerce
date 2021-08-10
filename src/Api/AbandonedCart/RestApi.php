@@ -144,16 +144,15 @@ class RestApi
      */
     function generateCartHash()
     {
-        return self::$woocommerce->getCartHash();
-//        $cart = self::$woocommerce->getCart();
-//        $cart_session = array();
-//        if (!empty($cart)) {
-//            foreach ($cart as $key => $values) {
-//                $cart_session[$key] = $values;
-//                unset($cart_session[$key]['data']); // Unset product object.
-//            }
-//        }
-//        return $cart_session ? md5(wp_json_encode($cart_session) . self::$woocommerce->getCartTotalForEdit()) : '';
+        $cart = self::$woocommerce->getCart();
+        $cart_session = array();
+        if (!empty($cart)) {
+            foreach ($cart as $key => $values) {
+                $cart_session[$key] = $values;
+                unset($cart_session[$key]['data']); // Unset product object.
+            }
+        }
+        return $cart_session ? md5(wp_json_encode($cart_session) . self::$woocommerce->getCartTotalForEdit()) : '';
     }
 
     /**
