@@ -13,7 +13,7 @@ Recover abandoned carts, automate order follow up emails, send thank you emails 
 
 == Description ==
 
-[Retainful](https://www.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=visit_site) is a complete Email Marketing Automation tool for WooCommerce. Automate your email marketing effortlessly.
+[Retainful](https://www.retainful.com?utm_source=wp_directory&utm_medium=description&utm_campaign=marketplace&utm_content=visit_site) is a complete Email Marketing Automation and Customer Retention tool for WooCommerce. Automate your email marketing effortlessly.
 
 1. Recover abandoned carts
 2. Send Order Follow up emails
