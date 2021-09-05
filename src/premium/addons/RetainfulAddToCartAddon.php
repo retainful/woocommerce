@@ -402,7 +402,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             }
             $modal_show_popup_until = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1);
             $close_btn_behavior = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close');
-            $modal_show = array(
+            $modal_params = array(
                 'hide_modal_after_show' => $modal_show_popup_until,
                 'close_btn_behavior' => $close_btn_behavior,
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
@@ -411,12 +411,17 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 "no_thanks_action" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
                 "show_popup_until" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
             );
-            wp_localize_script('rnoc-add-to-cart', 'retainful_premium_add_to_cart_collection_popup_condition', $modal_show);
+            $modal_show = 'retainful_premium_add_to_cart_collection_popup_condition = ';
+            $modal_show .= json_encode($modal_params) ;
+
+            wp_add_inline_script('rnoc-add-to-cart', $modal_show, 'before');
             $modal_popup_extra_classes = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class', null);
             $extra_classes = !empty($modal_popup_extra_classes) ? array('add_to_cart_button_classes' => $modal_popup_extra_classes) : array();
             $classes_list = apply_filters('retainful_premium_add_to_cart_collection_button_classes', $extra_classes);
             if (!empty($classes_list)) {
-                wp_localize_script('rnoc-add-to-cart', 'retainful_premium_add_to_cart_collection', $classes_list);
+                $modal_popup_extra_classes_script = 'retainful_premium_add_to_cart_collection = ';
+                $modal_popup_extra_classes_script .= json_encode($classes_list);
+                wp_add_inline_script('rnoc-add-to-cart', $modal_popup_extra_classes_script, 'before');
             }
         }
 
