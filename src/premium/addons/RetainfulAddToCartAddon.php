@@ -412,7 +412,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 "show_popup_until" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
             );
             $modal_show = 'retainful_premium_add_to_cart_collection_popup_condition = ';
-            $modal_show .= json_encode($modal_params) ;
+            $modal_show .= wp_json_encode($modal_params) ;
 
             wp_add_inline_script('rnoc-add-to-cart', $modal_show, 'before');
             $modal_popup_extra_classes = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class', null);
@@ -420,7 +420,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $classes_list = apply_filters('retainful_premium_add_to_cart_collection_button_classes', $extra_classes);
             if (!empty($classes_list)) {
                 $modal_popup_extra_classes_script = 'retainful_premium_add_to_cart_collection = ';
-                $modal_popup_extra_classes_script .= json_encode($classes_list);
+                $modal_popup_extra_classes_script .= wp_json_encode($classes_list);
                 wp_add_inline_script('rnoc-add-to-cart', $modal_popup_extra_classes_script, 'before');
             }
         }
