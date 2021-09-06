@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.7
 WC tested up to: 5.4
 Requires PHP: 5.6
-Stable tag: 2.6.3
+Stable tag: 2.6.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -522,3 +522,10 @@ No. There is no charges for support.
 - Input helper library improved
 - Action and filter optimized
 - WooCommerce tested upto 5.4.1
+
+= 2.6.4 =
+- New option added to consider failed order as abandoned order
+- Debug log improved
+- snippet added to show cart token in order details page
+- Fix for draft orders not getting synched
+- Fix for generating same cart token for draft orders
