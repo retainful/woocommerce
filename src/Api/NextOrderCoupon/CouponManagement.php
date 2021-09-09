@@ -199,10 +199,10 @@ class CouponManagement
      * @param $types
      * @return mixed
      */
-    function viewsEditShopCoupon($types)
+    /*function viewsEditShopCoupon($types)
     {
         // Add NOC link.
-        /*if (current_user_can('manage_woocommerce') ) {
+        if (current_user_can('manage_woocommerce') ) {
             $class = (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == $_GET['filter-by']) ? 'current' : '';
             $admin_url = admin_url('edit.php?post_type=shop_coupon');
             $query_string = add_query_arg(array('filter-by' => rawurlencode('retainful-next-order-coupon')), $admin_url);
@@ -219,9 +219,9 @@ class CouponManagement
                       });
                   })
             </script>';
-        }*/
+        }
         return $types;
-    }
+    }*/
 
     /**
      * query to filter

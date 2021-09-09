@@ -133,7 +133,7 @@ class Main
             //Deactivation survey form
             add_action('admin_init', array($this->admin, 'setupSurveyForm'), 10);
             $coupon_api = new CouponManagement();
-            add_filter('views_edit-shop_coupon', array($coupon_api, 'viewsEditShopCoupon'));
+            //add_filter('views_edit-shop_coupon', array($coupon_api, 'viewsEditShopCoupon'));
             add_filter('manage_posts_extra_tablenav', array($coupon_api, 'showDeleteButton'));
             add_filter('woocommerce_coupon_options', array($coupon_api, 'showCouponOrderDetails'));
             add_filter('request', array($coupon_api, 'requestQuery'));
