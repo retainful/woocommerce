@@ -3,6 +3,7 @@
 namespace Rnoc\Retainful\Api\NextOrderCoupon;
 
 use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Helpers\Input;
 use Valitron\Validator;
 
 class CouponManagement
@@ -180,6 +181,19 @@ class CouponManagement
         }
     }
 
+    function showDeleteButton(){
+        $input = new Input();
+        $post_type = $input->post_get('post_type','');
+        if($post_type === 'shop_coupon'){
+            echo '<a id="delete-expired-rtl-coupons" class="button">'.__('Delete Expired retainful coupons','woocommerce').'</a><script>
+                  jQuery(document).on("click","#delete-expired-rtl-coupons",function (){
+                      jQuery.post( "' . admin_url("admin-ajax.php") . '?action=rnoc_delete_expired_coupons&security=' . wp_create_nonce('rnoc_delete_expired_coupons') . '", function( data ) {
+                          window.location.reload();
+                      });
+                  })
+            </script>';
+        }
+    }
     /**
      * link to view retainful coupon
      * @param $types
@@ -188,7 +202,7 @@ class CouponManagement
     function viewsEditShopCoupon($types)
     {
         // Add NOC link.
-        if (current_user_can('manage_woocommerce')) {
+        if (current_user_can('manage_woocommerce') && false) {
             $class = (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == $_GET['filter-by']) ? 'current' : '';
             $admin_url = admin_url('edit.php?post_type=shop_coupon');
             $query_string = add_query_arg(array('filter-by' => rawurlencode('retainful-next-order-coupon')), $admin_url);
@@ -198,13 +212,7 @@ class CouponManagement
             $referral_query_string = add_query_arg(array('filter-by' => rawurlencode('retainful-referral-coupon')), $admin_url);
             $referral_query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful-referral'));
             $types['retainful_referral'] = '<a href="' . esc_url($referral_query_string) . '" class="' . esc_attr($referral_class) . '">' . __('Retainful - referral coupons', 'woocommerce') . ' (' . $referral_query->found_posts . ')</a>';
-            $types['retainful_referral'] = '<script>
-                  jQuery(document).on("click","#delete-expired-rtl-coupons",function (){
-                      jQuery.post( "' . admin_url("admin-ajax.php") . '?action=rnoc_delete_expired_coupons&security=' . wp_create_nonce('rnoc_delete_expired_coupons') . '", function( data ) {
-                          window.location.reload();
-                      });
-                  })
-            </script><button id="delete-expired-rtl-coupons" class="button">Delete Expired retainful coupons</button>';
+            $types['retainful_referral'] = '';
         }
         return $types;
     }
