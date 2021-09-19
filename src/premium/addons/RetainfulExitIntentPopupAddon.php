@@ -277,7 +277,10 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'coupon_code' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '')
             );
             $settings = apply_filters('rnoc_load_exit_intent_popup_settings', $settings);
-            wp_localize_script('rnoc-exit-intent-popup', 'retainful_premium_exit_intent_popup', $settings);
+            $exit_popup_settings_script = 'retainful_premium_exit_intent_popup = ';
+            $exit_popup_settings_script .= wp_json_encode($settings) ;
+
+            wp_add_inline_script('rnoc-exit-intent-popup', $$exit_popup_settings_script, 'before');
         }
 
         /**

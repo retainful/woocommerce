@@ -283,7 +283,17 @@ function initJqueryRetainfulPopupJs() {
             }
         }
 
-        let add_to_cart_popup = new addToCartPopup().setOptions(retainful_premium_add_to_cart_collection_popup_condition);
+        let default_atc_options = {
+            "enable_add_to_cart_popup": "no",
+        };
+        let rnoc_atc_js_data = {};
+        if (typeof retainful_premium_add_to_cart_collection_popup_condition === "undefined") {
+            rnoc_atc_js_data = {...default_atc_options, ...{}};
+        } else {
+            rnoc_atc_js_data = {...default_atc_options, ...retainful_premium_add_to_cart_collection_popup_condition}
+        }
+
+        let add_to_cart_popup = new addToCartPopup().setOptions(rnoc_atc_js_data);
         $(document).on('adding_to_cart', (eventData, thisButton, postData) => {
             if (add_to_cart_popup.needPopup()) {
                 add_to_cart_popup.displayPopup(thisButton);
