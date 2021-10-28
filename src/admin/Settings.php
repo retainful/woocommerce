@@ -853,7 +853,14 @@ class Settings
         if($can_hide_next_order_coupon !== 'yes'){
             add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'nextOrderCouponPage'));
         }
-        add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
+        $is_premium_addons = get_option('retainful_hide_premium_addons', 'no');
+        if(($is_premium_addons === 'no' || empty($is_premium_addons)) && (empty($settings) || count($settings) < 3)){
+            update_option('retainful_hide_premium_addons', 'yes');
+        }
+        $is_premium_addons = get_option('retainful_hide_premium_addons', 'no');
+        if($is_premium_addons !== 'yes'){
+            add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
+        }
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
     }
 
