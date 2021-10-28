@@ -236,6 +236,7 @@ class OrderCoupon
             //Do not apply coupon until the coupon is valid
             if ($this->checkCouponBeforeCouponApply($coupon_code)) {
                 $this->wc_functions->addDiscount($coupon_code);
+                wp_redirect(wc_get_checkout_url());exit;
             }
         }
     }

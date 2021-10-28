@@ -237,10 +237,10 @@ class Checkout extends RestApi
      */
     function checkoutOrderProcessed($order_id)
     {
-        if ($this->isPendingRecovery()) {
-            $this->markOrderAsPendingRecovery($order_id);
-        }
         try {
+            if ($this->isPendingRecovery()) {
+                $this->markOrderAsPendingRecovery($order_id);
+            }
             $cart_token = $this->retrieveCartToken();
             if (!empty($cart_token)) {
                 $order = self::$woocommerce->getOrder($order_id);
