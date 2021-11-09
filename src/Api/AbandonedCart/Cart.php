@@ -345,7 +345,7 @@ class Cart extends RestApi
         if ($force_sync || $this->needToTrackCart()) {
             $cart = $this->getUserCart();
             if (!empty($cart)) {
-                self::$settings->logMessage($cart, 'cart');
+                self::$settings->logMessage($cart, 'cart:syncCartData');
                 $client_ip = $this->formatUserIP($this->getClientIp());
                 $cart_hash = $this->encryptData($cart);
                 if (!empty($cart_hash)) {
@@ -809,7 +809,7 @@ class Cart extends RestApi
     function getTrackingCartData()
     {
         $cart = $this->getUserCart();
-        self::$settings->logMessage($cart, 'cart');
+        self::$settings->logMessage($cart, 'cart:getTrackingCartData');
         $data = array(
             'cart_token' => $this->getCartToken(),
             'cart_hash' => $this->generateCartHash(),
