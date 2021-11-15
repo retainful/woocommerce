@@ -184,6 +184,7 @@ class Cart extends RestApi
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
                 'ip' => $user_ip,
                 'version' => RNOC_VERSION,
+                'refresh_nonce' => wp_create_nonce('rnoc_refresh_nonce'),
                 'public_key' => self::$settings->getApiKey(),
                 'api_url' => self::$api->getAbandonedCartEndPoint(),
                 'tracking_element_selector' => $this->getTrackingElementId(),
@@ -192,8 +193,8 @@ class Cart extends RestApi
             $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
             wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
         }
-        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'retainful', RNOC_PLUGIN_URL.'src/assets/js/retainful.js', array('jquery'), RNOC_VERSION, false);
-        wp_localize_script(RNOC_PLUGIN_PREFIX . 'retainful','retainful_cart_refresh_data',array('refresh_nonce' => wp_create_nonce('rnoc_refresh_nonce'),'ajax_url' => admin_url('admin-ajax.php')));
+       // wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'retainful', RNOC_PLUGIN_URL.'src/assets/js/retainful.js', array('jquery'), RNOC_VERSION, false);
+       // wp_localize_script(RNOC_PLUGIN_PREFIX . 'retainful','retainful_cart_refresh_data',array('refresh_nonce' => wp_create_nonce('rnoc_refresh_nonce'),'ajax_url' => admin_url('admin-ajax.php')));
     }
 
     /**
