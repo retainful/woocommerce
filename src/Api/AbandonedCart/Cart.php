@@ -192,6 +192,8 @@ class Cart extends RestApi
             $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
             wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
         }
+        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'retainful', RNOC_PLUGIN_URL.'src/assets/js/retainful.js', array('jquery'), RNOC_VERSION, false);
+        wp_localize_script(RNOC_PLUGIN_PREFIX . 'retainful','retainful_cart_refresh_data',array('refresh_nonce' => wp_create_nonce('rnoc_refresh_nonce'),'ajax_url' => admin_url('admin-ajax.php')));
     }
 
     /**
@@ -872,6 +874,31 @@ class Cart extends RestApi
         }
         $fragments[$selector] = $this->getCartTrackingDiv($data);
         return $fragments;
+    }
+
+    function getRefreshToken(){
+        $fragments = array();
+        $selector = 'div#' . $this->getTrackingElementId();
+        $data = array();
+        $cart_created_at = $this->userCartCreatedAt();
+        if (empty($cart_created_at)) {
+            $this->needToTrackCart();
+            $cart_created_at = $this->userCartCreatedAt();
+        }
+        if ($this->isValidCartToTrack()) {
+            if (!empty($cart_created_at)) {
+                $data = $this->getTrackingCartData();
+            } else {
+                $force_refresh = self::$storage->getValue('rnoc_force_refresh_cart');
+                if (empty($force_refresh) && !empty(self::$woocommerce->getCart())) {
+                    self::$storage->setValue('rnoc_force_refresh_cart', 1);
+                    $data = array('force_refresh_carts' => 1);
+                }
+            }
+        }
+        $fragments['cart']['id'] = 'div#' . $this->getTrackingElementId();
+        $fragments['cart']['content'] = esc_html(wp_json_encode($data));
+        wp_send_json($fragments);
     }
 
     /**

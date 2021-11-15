@@ -247,10 +247,12 @@ class Main
                 } else {
                     //Js tracking
                     add_action('wp_footer', array($cart, 'renderAbandonedCartTrackingDiv'));
-                    add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
+                    //add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
                 }
                 add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
                 add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
+                add_action('wp_ajax_rnoc_update_cart_token', array($cart, 'getRefreshToken'));
+                add_action('wp_ajax_nopriv_rnoc_update_cart_token', array($cart, 'getRefreshToken'));
                 add_action('wp_authenticate', array($cart, 'userLoggedOn'));
                 add_action('user_register', array($cart, 'userSignedUp'));
                 add_action('wp_logout', array($cart, 'userLoggedOut'));
