@@ -3,7 +3,6 @@
 namespace Rnoc\Retainful\Api\AbandonedCart;
 
 use Exception;
-use Rnoc\Retainful\Helpers\Input;
 use Rnoc\Retainful\Integrations\MultiLingual;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use stdClass;
