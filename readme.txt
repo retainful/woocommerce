@@ -2,7 +2,7 @@
 Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.0
-Tested up to: 5.7
+Tested up to: 5.8
 WC tested up to: 5.4
 Requires PHP: 5.6
 Stable tag: 2.6.4
