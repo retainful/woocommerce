@@ -5,7 +5,7 @@ class PhpSession extends Base
 {
     function __construct()
     {
-        if (!session_id() && !headers_sent()) {
+        if (!session_id() && !headers_sent() && !is_admin()) {
             session_start();
         }
     }
