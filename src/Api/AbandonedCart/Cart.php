@@ -634,6 +634,12 @@ class Cart extends RestApi
             'recovered_cart_token' => self::$storage->getValue('rnoc_recovered_cart_token'),
             'client_details' => $this->getClientDetails()
         );
+        if(!empty($cart_token)){
+            $referrer_automation_id = self::$woocommerce->getSession($cart_token.'_referrer_automation_id');
+            if(!empty($referrer_automation_id)){
+                $cart['referrer_automation_id'] = $referrer_automation_id;
+            }
+        }
         return apply_filters('rnoc_get_user_cart', $cart);
     }
 
