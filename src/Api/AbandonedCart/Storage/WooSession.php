@@ -20,7 +20,7 @@ class WooSession extends Base
         if (is_object(WC()->session) && method_exists(WC()->session, 'has_session')) {
             if (!WC()->session->has_session() && !defined('DOING_CRON')) {
                 if (method_exists(WC()->session, 'set_customer_session_cookie')) {
-                    WC()->session->set_customer_session_cookie(true);
+                    //WC()->session->set_customer_session_cookie(true);
                 }
             }
         }
