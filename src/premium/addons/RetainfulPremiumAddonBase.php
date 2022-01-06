@@ -106,6 +106,7 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
             if (is_array($to_display_pages)) {
                 $to_display_pages = array_map('intval', $to_display_pages);
             }
+            $to_display_pages = apply_filters('rnocp_before_page_check',$to_display_pages);
             if (is_page($to_display_pages)) {
                 return true;
             }

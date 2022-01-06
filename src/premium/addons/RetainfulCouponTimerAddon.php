@@ -224,7 +224,8 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 if (!is_null($used_code) && strtolower($used_code) != strtolower($coupon_code)) {
                     return false;
                 }
-                $timer_message = $this->getKeyFromArray($position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_message', __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN));
+                $timer_message = $this->getKeyFromArray($position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_message', "Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}");
+                $timer_message = apply_filters('rnoc_coupon_timer_message',$timer_message);
                 $timer_display_format = '"' . $this->getKeyFromArray($position_settings, RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format', __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN)) . '"';
                 $text_to_replace = array(
                     'coupon_code' => '<span class="timer-coupon-code-' . $position . '">' . $coupon_code . '</span>',
