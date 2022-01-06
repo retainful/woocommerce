@@ -211,7 +211,8 @@ class Main
                 $cart = new Cart();
                 $checkout = new Checkout();
                 $need_referral_program = $this->admin->needReferralWidget();
-                if ($this->admin->isProPlan() && $need_referral_program) {
+                $need_popup_widget = $this->admin->needPopupWidget();
+                if ($this->admin->isProPlan() && ($need_referral_program || $need_popup_widget)) {
                     $referral_program = new ReferralManagement();
                     add_action('wp_footer', array($referral_program, 'printReferralPopup'));
                     $need_embeded_referral_program = $this->admin->needEmbededReferralWidget();

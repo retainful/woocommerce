@@ -8,7 +8,7 @@ class WooSession extends Base
         /**
          * Check is woocommerce session was initlized
          */
-        if (!isset(WC()->session) || empty(WC()->session)) {
+        if ((!isset(WC()->session) || empty(WC()->session)) && !is_admin()) {
             if (class_exists('WC_Session_Handler')) {
                 WC()->session = new \WC_Session_Handler();
                 WC()->session->init();

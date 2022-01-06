@@ -67,7 +67,7 @@ class ReferralManagement
      */
     function getReferralUrl()
     {
-        return apply_filters('referral_engine_url', 'https://js.retainful.com/woocommerce/v1/referral-wocommerce.js');
+        return apply_filters('referral_engine_url', 'https://js.retainful.com/woocommerce/v1/widget.js');
     }
     /**
      * echo the embeded referral div
@@ -89,8 +89,10 @@ class ReferralManagement
         $secret = $admin->getSecretKey();
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
-            $total_spent = $wc->getCustomerTotalSpentFromSession($user->user_email);
-            $order_count = $wc->getCustomerTotalOrdersFromSession($user->user_email);
+            if($admin->needReferralWidget()){
+                $total_spent = $wc->getCustomerTotalSpentFromSession($user->user_email);
+                $order_count = $wc->getCustomerTotalOrdersFromSession($user->user_email);
+            }
             $user_arr = array(
                 'api_key' => $api_key,
                 'accepts_marketing' => '1',
