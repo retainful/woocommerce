@@ -1,6 +1,8 @@
 <?php
 
 namespace Rnoc\Retainful\library;
+use Rnoc\Retainful\WcFunctions;
+
 if (!defined('ABSPATH')) exit;
 
 class RetainfulApi
@@ -248,6 +250,12 @@ class RetainfulApi
         );
         $response = $this->request($url, array(), 'get', '', $headers);
         if (isset($response->success) && $response->success) {
+            $referrer_automation_id = wc_clean($_REQUEST['referrer_automation_id']);
+            if(!empty($referrer_automation_id)){
+                $woocommerce = new WcFunctions();
+                $woocommerce->setSession($cart_token.'_referrer_automation_id', $referrer_automation_id);
+                $response->data->referrer_automation_id = $referrer_automation_id;
+            }
             return isset($response->data) ? $response->data : NULL;
         }
         return NULL;

@@ -243,6 +243,12 @@ class Order extends RestApi
             'noc_discount_codes' => $this->getNextOrderCouponDetails($order),
             'client_details' => $this->getClientDetails($order)
         );
+        if(!empty($cart_token)){
+            $referrer_automation_id = self::$woocommerce->getSession($cart_token.'_referrer_automation_id');
+            if(!empty($referrer_automation_id)){
+                $order_data['referrer_automation_id'] = $referrer_automation_id;
+            }
+        }
         return apply_filters('rnoc_api_get_order_data', $order_data, $order);
     }
 
