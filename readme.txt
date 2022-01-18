@@ -1,9 +1,9 @@
-=== Retainful - WooCommerce Abandoned Cart Recovery, Order Follow Up Emails, Next Order Coupons & Referrals ===
+=== Retainful - WooCommerce Abandoned Cart Recovery, Order Follow Up Emails, Email Marketing Automation, Next Order Coupons & Referrals ===
 Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.0
 Tested up to: 5.8
-WC tested up to: 5.9
+WC tested up to: 6.1
 Requires PHP: 5.6
 Stable tag: 2.6.6
 License: GPLv3 or later
