@@ -270,9 +270,6 @@ class Input
            NOTE: In PHP 5.4 get_magic_quotes_gpc() will always return 0 and
                  it will probably not exist in future versions at all.
         */
-        if (!$this->is_php('5.4') && get_magic_quotes_gpc()) {
-            $str = stripslashes($str);
-        }
         // Remove control characters
         $str = $this->remove_invisible_characters($str, FALSE);
         // Standardize newlines if needed
