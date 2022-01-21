@@ -114,6 +114,24 @@ class RestApi
         return number_format($rounded_price, $decimals, '.', '');
     }
 
+
+    /**
+     * Line item total
+     * @param $item_details
+     * @return int
+     */
+    function getLineItemTotal($item_details)
+    {
+        $line_total = (isset($item_details['line_total']) && !empty($item_details['line_total'])) ? $item_details['line_total'] : 0;
+        if (!self::$woocommerce->isPriceExcludingTax()) {
+            $line_total_tax = (isset($item_details['line_tax']) && !empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0;
+        } else {
+            $line_total_tax = 0;
+        }
+        $total = $line_total + $line_total_tax;
+        return apply_filters('retainful_get_line_item_total', $total, $line_total, $line_total_tax, $item_details, $this);
+    }
+
     /**
      * Set the session shipping details
      * @param $shipping_address

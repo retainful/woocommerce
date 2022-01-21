@@ -117,7 +117,7 @@ class Order extends RestApi
                         'user_id' => NULL,
                         'quantity' => $item_quantity,
                         'tax_lines' => $tax_details,
-                        'line_price' => $this->formatDecimalPriceRemoveTrailingZeros((isset($item_details['line_total']) && !empty($item_details['line_total'])) ? $item_details['line_total'] : 0),
+                        'line_price' => $this->formatDecimalPriceRemoveTrailingZeros($this->getLineItemTotal($item_details)),
                         'product_id' => $product_id,
                         'properties' => array(),
                         'variant_id' => $variant_id,
