@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.8
 WC tested up to: 6.1
 Requires PHP: 5.6
-Stable tag: 2.6.6
+Stable tag: 2.6.7
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -534,3 +534,12 @@ No. There is no charges for support.
 - snippet added to show cart token in order details page
 - Fix for draft orders not getting synched
 - Fix for generating same cart token for draft orders
+
+= 2.6.6 =
+- Fix for PHP 8 deprecated code
+- Referrer Automation
+- Filter for v1 - Multi language page and is_page check
+- Changed Popup widget JS url
+
+= 2.6.7 =
+- Fix: Order line price including / excluding tax
