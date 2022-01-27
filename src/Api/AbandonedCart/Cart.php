@@ -448,6 +448,7 @@ class Cart extends RestApi
                 $item_quantity = (isset($item_details['quantity']) && !empty($item_details['quantity'])) ? $item_details['quantity'] : NULL;
                 $variant_id = (isset($item_details['variation_id']) && !empty($item_details['variation_id'])) ? $item_details['variation_id'] : 0;
                 $product_id = (isset($item_details['product_id']) && !empty($item_details['product_id'])) ? $item_details['product_id'] : 0;
+                $cat_ids = !empty($product_id) && $product_id > 0 ? self::$woocommerce->getProductCategoryIds($product_id): array();
                 $is_variable_item = (!empty($variant_id));
                 $item = apply_filters('woocommerce_cart_item_product', $item_details['data'], $item_details, $item_key);
                 if (empty($item)) {
@@ -471,6 +472,7 @@ class Cart extends RestApi
                 }
                 $image_url = self::$woocommerce->getProductImageSrc($item);
                 if (!empty($item) && !empty($item_quantity)) {
+
                     $item_array = array(
                         'key' => $item_key,
                         'sku' => self::$woocommerce->getItemSku($item),
@@ -482,6 +484,7 @@ class Cart extends RestApi
                         'tax_lines' => $tax_details,
                         'line_price' => $this->formatDecimalPriceRemoveTrailingZeros($this->getLineItemTotal($item_details)),
                         'product_id' => $product_id,
+                        'cat_ids' => implode(',',$cat_ids),
                         'variant_id' => $variant_id,
                         'variant_price' => $this->formatDecimalPriceRemoveTrailingZeros(($is_variable_item) ? self::$woocommerce->getCartItemPrice($item) : 0),
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
