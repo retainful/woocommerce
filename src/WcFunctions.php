@@ -1409,6 +1409,21 @@ class WcFunctions
         return array();
     }
 
+    function getProductCategoryName($cat_ids){
+        if(empty($cat_ids)){
+            return '';
+        }
+        $category_names = get_terms(
+            array(
+                'taxonomy' => 'product_cat',
+                'include'  => $cat_ids,
+                'fields'   => 'names',
+            )
+        );
+
+        return implode( ', ', $category_names );
+    }
+
     /**
      * get the checkout url
      * @return string|null
