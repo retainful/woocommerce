@@ -280,7 +280,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $exit_popup_settings_script = 'retainful_premium_exit_intent_popup = ';
             $exit_popup_settings_script .= wp_json_encode($settings) ;
 
-            wp_add_inline_script('rnoc-exit-intent-popup', $$exit_popup_settings_script, 'before');
+            wp_add_inline_script('rnoc-exit-intent-popup', $exit_popup_settings_script, 'before');
         }
 
         /**
