@@ -114,6 +114,7 @@ class Checkout extends RestApi
         $order = self::$woocommerce->getOrder($order_id);
         $order_obj = new Order();
         $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+        $cart_token = apply_filters('rnoc_sync_order_change_order_token',$cart_token,$order_id,$this);
         if (empty($cart_token)) {
             if ($this->generateNocCouponForManualOrders()) {
                 $noc_details = $order_obj->getNextOrderCouponDetails($order);
