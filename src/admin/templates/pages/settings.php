@@ -198,7 +198,7 @@ require_once "tabs.php";
                 </p>
             </td>
         </tr>
-        <tr style="display: none;">
+        <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_popup_widget'; ?>"><?php
                     esc_html_e('Enable Popup for your store?', RNOC_TEXT_DOMAIN);
