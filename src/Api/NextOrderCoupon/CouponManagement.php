@@ -102,6 +102,7 @@ class CouponManagement
                         'exclude_product_categories' => array(),
                         '_rnoc_shop_coupon_type' => 'retainful-referral'
                     );
+                    $data = apply_filters('rnoc_before_create_rest_coupon',$data,$ruleParams,$params);
                     $old_coupon = self::getCouponByCouponCode($data['coupon_code']);
                     if (!empty($old_coupon) && $old_coupon instanceof \WP_Post) {
                         $coupon_id = $old_coupon->ID;
