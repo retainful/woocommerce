@@ -437,7 +437,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 if (!empty($pages)) {
                                     foreach ($pages as $key => $label) {
                                         ?>
-                                        <option value="<?php echo $key ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'modal_display_pages'])) {
+                                        <option value="<?php echo $key ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'])) {
                                             echo "selected";
                                         } ?>><?php echo $label ?></option>
                                         <?php
