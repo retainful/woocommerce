@@ -549,4 +549,6 @@ No. There is no charges for support.
 
 = 2.6.9 =
 - Fix: Enable Popup for your store? option hided
-- Improvement: syncOrder filter event added
+- Improvement: syncOrder and rest coupon filter event added
+- Fix: Pro plan and plan status check for referral popup
+- Fix: save exit intent display page
