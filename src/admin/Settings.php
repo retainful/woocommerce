@@ -1392,7 +1392,7 @@ class Settings
                 $timestamp = strtotime($date);
                 $days_in_seconds = intval($days) * 86400;
                 $last_date_timestamp = $timestamp + $days_in_seconds;
-                echo $last_date = date('Y-m-d H:i:s', $last_date_timestamp);
+                $last_date = date('Y-m-d H:i:s', $last_date_timestamp);
                 return $this->formatDate($last_date, \DateTime::ATOM);
             }
         }
