@@ -1882,6 +1882,23 @@ class WcFunctions
     }
 
     /**
+     * @param $coupon string Coupon code to apply for the order
+     * @param $order \WC_Order Order object
+     * @return bool True or false
+     */
+
+    function applyCouponToOrder($coupon, $order)
+    {
+        if ($this->isValidCoupon($coupon) && $this->isMethodExists($order, "apply_coupon")) {
+            $result = $order->apply_coupon($coupon);
+            if($result === true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * get total orders for billing emails
      * @param $email
      * @return int

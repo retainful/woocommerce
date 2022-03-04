@@ -736,6 +736,14 @@ class Cart extends RestApi
                         } else {
                             self::$woocommerce->setOrderNote($order, $note);
                         }
+
+                        //apply coupon if available to pending orders
+                        $session_coupon = self::$storage->getValue('rnoc_ac_coupon');
+                        if (!empty($session_coupon) && self::$woocommerce->isOrderNeedPayment($order)) {
+                            self::$woocommerce->applyCouponToOrder($session_coupon, $order);
+                            self::$storage->removeValue('rnoc_ac_coupon');
+                        }
+
                         $redirect = self::$woocommerce->isOrderNeedPayment($order) ? self::$woocommerce->getOrderPaymentURL($order) : self::$woocommerce->getOrderReceivedURL($order);
                         self::$storage->setValue($this->pending_recovery_key, true);
                         // set (or refresh, if already set) session
