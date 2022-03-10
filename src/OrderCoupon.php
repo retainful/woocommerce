@@ -947,6 +947,7 @@ class OrderCoupon
             if (isset($expired_date['retainful_coupons']) && !empty($expired_date['retainful_coupons'])) {
                 add_post_meta($id, 'coupon_expired_on', $expired_date['retainful_coupons']);
             }
+            do_action('rnoc_after_create_virtual_coupon',$id,$settings,$order_id,$email);
         }
         return $id;
     }
