@@ -883,9 +883,9 @@ class WcFunctions
     {
         if ($this->isMethodExists(WC()->cart, 'is_empty')) {
             try {
-                WC()->cart->is_empty();
+                return WC()->cart->is_empty();
             } catch (\Exception $e) {
-                return $e->getMessage();
+                return true;
             }
         }
         return true;
