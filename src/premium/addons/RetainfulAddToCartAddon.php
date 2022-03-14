@@ -389,7 +389,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
 
         function getAtcPopupUrl()
         {
-            return apply_filters('retainful_atc_popup_url', RNOCPREMIUM_PLUGIN_URL . 'assets/js/atc-popup.min.js');
+            $suffix = '.min';
+            if (defined('SCRIPT_DEBUG')) {
+                $suffix = SCRIPT_DEBUG ? '' : '.min';
+            }
+            return apply_filters('retainful_atc_popup_url', RNOCPREMIUM_PLUGIN_URL . 'assets/js/atc-popup'.$suffix.'.js');
         }
 
         /**
