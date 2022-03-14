@@ -412,7 +412,7 @@ require_once "tabs.php";
                 <label>
                     <input name="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>" type="radio"
                            id="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>"
-                           value="woocommerce" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'varnish_check'] == 'yes') {
+                           value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'varnish_check'] == 'yes') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
@@ -420,7 +420,7 @@ require_once "tabs.php";
                 <label>
                     <input name="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>" type="radio"
                            id="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>"
-                           value="cookie" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'varnish_check'] == 'no') {
+                           value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'varnish_check'] == 'no') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
