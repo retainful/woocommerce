@@ -403,6 +403,37 @@ require_once "tabs.php";
             </td>
         </tr>
         <tr>
+            <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>"><?php
+                    esc_html_e('Varnish Cache Compatibility', RNOC_TEXT_DOMAIN);
+                    ?></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>"
+                           value="woocommerce" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'varnish_check'] == 'yes') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>"
+                           value="cookie" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'varnish_check'] == 'no') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+
+                <p class="description">
+                    <?php
+                    esc_html_e('DO NOT change this setting unless you are instructed by the Retainful Support team. Use this option only when you are using the server side caching with Varnish. Certain features may not work if enabled. So check with the Support team before enabling this option', RNOC_TEXT_DOMAIN);
+                    ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
             <th>
             </th>
             <td>
