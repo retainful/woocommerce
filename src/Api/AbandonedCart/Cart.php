@@ -251,7 +251,7 @@ class Cart extends RestApi
         if (!empty($session_coupon)) {
             if (self::$woocommerce->isValidCoupon($session_coupon)) {
                 $cart = self::$woocommerce->getCart();
-                if (!empty($cart) && !self::$woocommerce->isCartEmpty() && !self::$woocommerce->hasDiscount($session_coupon)) {
+                if (!empty($cart) && !self::$woocommerce->hasDiscount($session_coupon)) {
                     if (self::$woocommerce->addDiscount($session_coupon)) {
                         self::$storage->removeValue('rnoc_ac_coupon');
                     }
