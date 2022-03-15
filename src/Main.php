@@ -30,9 +30,12 @@ class Main
 
     function includePluginFiles()
     {
-        $woocommerce_functions = new WcFunctions();
-        $woocommerce_functions->initWoocommerceSession();
-        do_action('rnoc_after_including_plugin_files', $woocommerce_functions, $this);
+        $rnoc_varnish_check = $this->admin->getRetainfulSettingValue('rnoc_varnish_check', 'no');
+        if ($rnoc_varnish_check === 'no') {
+            $woocommerce_functions = new WcFunctions();
+            $woocommerce_functions->initWoocommerceSession();
+            do_action('rnoc_after_including_plugin_files', $woocommerce_functions, $this);
+        }
     }
 
     /**

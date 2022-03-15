@@ -815,7 +815,7 @@ class Settings
      */
     function retainfulSettingsPage()
     {
-        $settings = get_option($this->slug . '_settings', array());
+        $settings = $this->getAdminSettings();
         $default_settings = array(
             RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
             RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
@@ -832,11 +832,16 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
             RNOC_PLUGIN_PREFIX . 'enable_debug_log' => '0',
             RNOC_PLUGIN_PREFIX . 'handle_storage_using' => 'woocommerce',
+            RNOC_PLUGIN_PREFIX . 'varnish_check' => 'no',
         );
         $settings = wp_parse_args($settings, $default_settings);
         require_once dirname(__FILE__) . '/templates/pages/settings.php';
     }
 
+    function getRetainfulSettingValue($key, $default = null){
+        $settings = $this->getAdminSettings();
+        return (!empty($key) && isset($settings[$key])) ? $settings[$key]: $default;
+    }
     /**
      * register plugin related menus
      */
