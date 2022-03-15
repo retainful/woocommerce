@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.9
 WC tested up to: 6.1
 Requires PHP: 5.6
-Stable tag: 2.6.9
+Stable tag: 2.6.10
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -552,3 +552,9 @@ No. There is no charges for support.
 - Improvement: syncOrder and rest coupon filter event added
 - Fix: Pro plan and plan status check for referral popup
 - Fix: save exit intent display page
+
+= 2.6.10 =
+- Fix: apply recovery coupon to pending order
+- Fix: add to cart popup error
+- Improvement: action added for virtual coupon
+- Fix: varnish cache compatibility
