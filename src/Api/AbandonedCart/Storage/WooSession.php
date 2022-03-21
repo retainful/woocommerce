@@ -10,16 +10,16 @@ class WooSession extends Base
         /**
          * Check is woocommerce session was initlized
          */
-        if ((!isset(WC()->session) || empty(WC()->session)) && !is_admin()) {
+        /*if ((!isset(WC()->session) || is_null(WC()->session) || empty(WC()->session)) && !is_admin()) {
             if (class_exists('WC_Session_Handler')) {
                 WC()->session = new \WC_Session_Handler();
                 WC()->session->init();
             }
-        }
+        }*/
         /**
          * make sure the session was created
          */
-        if (is_object(WC()->session) && method_exists(WC()->session, 'has_session')) {
+        if (isset(WC()->session) && !is_null(WC()->session) && is_object(WC()->session) && method_exists(WC()->session, 'has_session')) {
             if (!WC()->session->has_session() && !defined('DOING_CRON')) {
                 if (method_exists(WC()->session, 'set_customer_session_cookie')) {
                     $settings = new Settings();
