@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 5.9
 WC tested up to: 6.3
 Requires PHP: 5.6
-Stable tag: 2.6.10
+Stable tag: 2.6.11
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -558,3 +558,7 @@ No. There is no charges for support.
 - Fix: add to cart popup error
 - Improvement: action added for virtual coupon
 - Fix: varnish cache compatibility
+
+= 2.6.11 =
+- Fix: session init check
+- Improvement: No conflict mode
