@@ -667,7 +667,7 @@ class WcFunctions
      */
     function setSessionCookie($value)
     {
-        if ($this->isMethodExists(WC()->session, 'set_customer_session_cookie')) {
+        if (isset(WC()->session) && !is_null(WC()->session) && is_object(WC()->session) && $this->isMethodExists(WC()->session, 'set_customer_session_cookie')) {
             WC()->session->set_customer_session_cookie($value);
         }
         return true;
@@ -722,9 +722,8 @@ class WcFunctions
      */
     function hasSession()
     {
-        if (!isset(\WC()->session) && class_exists('WC_Session_Handler')) {
-            \WC()->session = new \WC_Session_Handler();
-            \WC()->session->init();
+        if ( is_null( WC()->session )) {
+            return false;
         }
         if ($this->isMethodExists(WC()->session, 'has_session')) {
             return WC()->session->has_session();

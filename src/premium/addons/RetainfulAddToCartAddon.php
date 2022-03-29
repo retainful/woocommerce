@@ -414,6 +414,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 "is_email_mandatory" => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1) == 1) ? "yes" : "no",
                 "no_thanks_action" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
                 "show_popup_until" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
+                "no_conflict_mode" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'no_conflict_mode', 'yes'),
             );
             $modal_show = 'retainful_premium_add_to_cart_collection_popup_condition = ';
             $modal_show .= wp_json_encode($modal_params) ;
@@ -675,6 +676,38 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             <p class="description">
                                 <?php
                                 echo __('Very helpful for custom designed Add to cart button.<b>Example:</b> .add-to-cart,.custom-add-to-cart-button', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php  echo RNOC_PLUGIN_PREFIX . 'no_conflict_mode'; ?>"><?php
+                                esc_html_e('Enable no conflict mode ?', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'no_conflict_mode'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'no_conflict_mode_yes'; ?>"
+                                       value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'no_conflict_mode'] == 'yes') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'no_conflict_mode'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'no_conflict_mode_no'; ?>"
+                                       value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'no_conflict_mode'] == 'no') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <p class="description">
+                                <?php
+                                echo __('DO NOT change this option unless recommended by the support team.  By default, the popup javascript is compatible and runs in no-conflict mode with other scripts that bind to the Add to cart button. But if you find any conflicts with other scripts, you can set this to NO and try.', RNOC_TEXT_DOMAIN);
                                 ?>
                             </p>
                         </td>
