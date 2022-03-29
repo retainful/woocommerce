@@ -414,6 +414,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 "is_email_mandatory" => ($this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory', 1) == 1) ? "yes" : "no",
                 "no_thanks_action" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action', 1),
                 "show_popup_until" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1),
+                "stop_other_script" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'stop_other_script', 'yes'),
             );
             $modal_show = 'retainful_premium_add_to_cart_collection_popup_condition = ';
             $modal_show .= wp_json_encode($modal_params) ;
@@ -517,6 +518,33 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                        type="radio"
                                        id="<?php echo RNOC_PLUGIN_PREFIX . 'need_modal_0'; ?>"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_modal'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php  echo RNOC_PLUGIN_PREFIX . 'stop_other_script'; ?>"><?php
+                                esc_html_e('Stop other script action on popup show ?', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'stop_other_script'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'stop_other_script_yes'; ?>"
+                                       value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'stop_other_script'] == 'yes') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'stop_other_script'; ?>"
+                                       type="radio"
+                                       id="<?php echo RNOC_PLUGIN_PREFIX . 'stop_other_script_no'; ?>"
+                                       value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'stop_other_script'] == 'no') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>

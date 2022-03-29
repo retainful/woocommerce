@@ -151,6 +151,10 @@ function initJqueryRetainfulPopupJs() {
                 return (options.enable_add_to_cart_popup === "yes")
             }
 
+            stopOtherScript() {
+                let options = this.getOptions();
+                return (options.stop_other_script === "yes")
+            }
             /**
              * Validate is the entered content is email
              * @param email
@@ -297,7 +301,9 @@ function initJqueryRetainfulPopupJs() {
         $(document).on('adding_to_cart', (eventData, thisButton, postData) => {
             if (add_to_cart_popup.needPopup()) {
                 add_to_cart_popup.displayPopup(thisButton);
-               // throw new Error('Retainful intercepts to show popup!');
+                if(add_to_cart_popup.stopOtherScript()){
+                    throw new Error('Retainful intercepts to show popup!');
+                }
             } else {
                 var email = localStorage.getItem('rnoc_atcp_data');
                 if (email !== null && typeof email !== "undefined" && email !== "") {

@@ -527,6 +527,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action' => '1',
             RNOC_PLUGIN_PREFIX . 'close_btn_behavior' => 'just_close',
             RNOC_PLUGIN_PREFIX . 'modal_show_popup_until' => '1',
+            RNOC_PLUGIN_PREFIX . 'stop_other_script' => 'yes',
             RNOC_PLUGIN_PREFIX . 'modal_display_pages' => array(),
             RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class' => '',
             RNOC_PLUGIN_PREFIX . 'modal_design_settings' => array(0 => array(
