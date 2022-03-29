@@ -151,9 +151,9 @@ function initJqueryRetainfulPopupJs() {
                 return (options.enable_add_to_cart_popup === "yes")
             }
 
-            stopOtherScript() {
+            noConflictMode() {
                 let options = this.getOptions();
-                return (options.stop_other_script === "yes")
+                return (options.no_conflict_mode === "yes")
             }
             /**
              * Validate is the entered content is email
@@ -301,7 +301,7 @@ function initJqueryRetainfulPopupJs() {
         $(document).on('adding_to_cart', (eventData, thisButton, postData) => {
             if (add_to_cart_popup.needPopup()) {
                 add_to_cart_popup.displayPopup(thisButton);
-                if(add_to_cart_popup.stopOtherScript()){
+                if(add_to_cart_popup.noConflictMode()){
                     throw new Error('Retainful intercepts to show popup!');
                 }
             } else {
