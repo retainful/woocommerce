@@ -1546,7 +1546,10 @@ class Settings
             $api_key = $this->getApiKey();
             $secret_key = $this->getSecretKey();
             if (!empty($api_key)) {
-                $this->isApiEnabled($api_key, $secret_key,null,false);
+                $api_obj = new RestApi();
+                $store_data = array(
+                    'secret_key' => $api_obj->encryptData($api_key, $secret_key));
+                $this->isApiEnabled($api_key, $secret_key,$store_data);
             } else {
                 $this->updateUserAsFreeUser();
             }
@@ -1590,7 +1593,7 @@ class Settings
      * @param string $store_data
      * @return bool|array
      */
-    function isApiEnabled($api_key = "", $secret_key = NULL, $store_data = NULL, $add_data_store = true)
+    function isApiEnabled($api_key = "", $secret_key = NULL, $store_data = NULL)
     {
         if (empty($api_key)) {
             $api_key = $this->getApiKey();
@@ -1598,7 +1601,7 @@ class Settings
         if (empty($secret_key)) {
             $secret_key = $this->getSecretKey();
         }
-        if (empty($store_data) && $add_data_store) {
+        if (empty($store_data)) {
             $store_data = $this->storeDetails($api_key, $secret_key);
         }
         if (!empty($api_key)) {
