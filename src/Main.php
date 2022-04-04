@@ -355,7 +355,7 @@ class Main
         $api_key = $this->admin->getApiKey();
         $secret_key = $this->admin->getSecretKey();
         if (!empty($api_key) && !empty($secret_key)) {
-            $this->admin->isApiEnabled($api_key, $secret_key);
+            $this->admin->isApiEnabled($api_key, $secret_key,null,false);
         } else {
             $this->admin->updateUserAsFreeUser();
         }
