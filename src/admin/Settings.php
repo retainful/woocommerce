@@ -1546,7 +1546,10 @@ class Settings
             $api_key = $this->getApiKey();
             $secret_key = $this->getSecretKey();
             if (!empty($api_key)) {
-                $this->isApiEnabled($api_key, $secret_key);
+                $api_obj = new RestApi();
+                $store_data = array(
+                    'secret_key' => $api_obj->encryptData($api_key, $secret_key));
+                $this->isApiEnabled($api_key, $secret_key,$store_data);
             } else {
                 $this->updateUserAsFreeUser();
             }

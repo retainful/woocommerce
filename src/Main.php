@@ -6,6 +6,7 @@ if (!defined('ABSPATH')) exit;
 use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
+use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\Currency;
@@ -355,7 +356,10 @@ class Main
         $api_key = $this->admin->getApiKey();
         $secret_key = $this->admin->getSecretKey();
         if (!empty($api_key) && !empty($secret_key)) {
-            $this->admin->isApiEnabled($api_key, $secret_key);
+            $api_obj = new RestApi();
+            $store_data = array(
+                'secret_key' => $api_obj->encryptData($api_key, $secret_key));
+            $this->admin->isApiEnabled($api_key, $secret_key,$store_data);
         } else {
             $this->admin->updateUserAsFreeUser();
         }
