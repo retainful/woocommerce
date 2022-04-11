@@ -1,0 +1,21 @@
+1. Fetch from server to local
+svn co https://plugins.svn.wordpress.org/retainful-next-order-coupon-for-woocommerce retainful-next-order-coupon-for-woocommerce
+
+2. Add all New Files
+svn add trunk/*
+
+3. Commit code
+svn ci -m 'Adding first version of my plugin'
+or
+svn ci -m 'v2.6.12 release' --username retainful
+
+4. check upto date code
+svn up
+
+5. check stat and different in file
+svn stat
+svn diff
+
+6. Tagging New Version
+svn cp trunk tags/2.6.12
+svn ci -m "tagging version 2.6.12"
