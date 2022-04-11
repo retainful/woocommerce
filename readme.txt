@@ -562,3 +562,6 @@ No. There is no charges for support.
 = 2.6.11 =
 - Fix: session init check
 - Improvement: No conflict mode
+
+= 2.6.12 =
+-Fix: removed unwanted store data
