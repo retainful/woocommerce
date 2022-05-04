@@ -1690,6 +1690,23 @@ class Settings
         return NULL;
     }
 
+    function getWebHookId() {
+        $settings = get_option($this->slug, array());
+        if (isset($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']) && $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] > 0) {
+            $webhook    = new \WC_Webhook( $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] );
+            return method_exists($webhook,'get_id') ? ($webhook->get_id() > 0 ? $settings[RNOC_PLUGIN_PREFIX . 'webhook_id']: 0): 0;
+        }
+        return 0;
+    }
+
+    function saveWebhookId($id){
+        $settings = get_option($this->slug, array());
+        if($id > 0){
+            $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = $id;
+        }
+        update_option($this->slug,$settings);
+    }
+
     /**
      * Check the site has multi currency
      * @return bool

@@ -271,6 +271,7 @@ class Main
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
                 add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
                 add_filter('woocommerce_webhook_http_args',array($checkout,'changeWebHookHeader'),10,3);
+                add_filter('wp_ajax_rnoc_create_order_update_webhook',array($checkout,'saveNewWebhook'),10);
                 //Todo: multi currency and multi lingual
                 #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
             } else {
