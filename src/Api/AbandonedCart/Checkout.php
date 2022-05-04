@@ -101,6 +101,50 @@ class Checkout extends RestApi
         return apply_filters('rnoc_generate_noc_coupon_for_manual_orders', $need_noc_coupon, $this);
     }
 
+    function changeWebHookHeader($http_args, $order_id, $webhook_id){
+        if($webhook_id > 0){
+            $webhook = new \WC_Webhook( $webhook_id );
+            $delivery_url = $webhook->get_delivery_url();
+            $topic = $webhook->get_topic();
+            if($delivery_url === 'https://webhook.site/f813a6ea-36ef-4c68-a188-a709b5ecee92' && $topic == 'order.updated' && $order_id > 0) { //https://api.retainful.com/v1/woocommerce/webhooks/checkout
+                $order = self::$woocommerce->getOrder($order_id);
+                $order_obj = new Order();
+                $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+                $logger = wc_get_logger();
+                if(empty($cart_token)){
+                    //Need to generate cart_token
+                    $cart_token = $this->generateCartToken();
+                    self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
+                    $logger->add('Retainful','Generate toeken: '.$cart_token);
+                }
+                $order_data = $order_obj->getOrderData($order);
+                $logger->add('Retainful','Order Data:'.json_encode($order_data));
+                if(!empty($cart_token) && $order_data){
+                    $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
+                    $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+                    $extra_headers = array(
+                        "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
+                        "X-Retainful-Version" => RNOC_VERSION,
+                        "X-Cart-Token" => $token,
+                        "Cart-Token" => $token
+                    );
+                    foreach ($extra_headers as $key => $value){
+                        $http_args['headers'][$key] = $value;
+                    }
+                    $app_id = self::$settings->getApiKey();
+                    $cart_hash = $this->encryptData($order_data);
+                    $body = array(
+                        'data' => $cart_hash
+                    );
+                    $http_args['body'] = trim( wp_json_encode( $body ) );
+                    $http_args['headers']['app_id'] = $app_id;
+                    $http_args['headers']['Content-Type'] = 'application/json';
+                }
+            }
+        }
+        return $http_args;
+    }
+
     /**
      * Sync the order with API
      * @param $order_id
