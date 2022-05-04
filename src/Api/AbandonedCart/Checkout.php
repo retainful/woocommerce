@@ -3,7 +3,6 @@
 namespace Rnoc\Retainful\Api\AbandonedCart;
 
 use Exception;
-use Rnoc\Retainful\Helpers\Input;
 
 class Checkout extends RestApi
 {
@@ -102,87 +101,52 @@ class Checkout extends RestApi
         return apply_filters('rnoc_generate_noc_coupon_for_manual_orders', $need_noc_coupon, $this);
     }
 
-    function saveNewWebhook(){
-        $new_input = new Input();
-        $nonce = $new_input->post_get('security','');
-        if (wp_verify_nonce($nonce, 'rnoc_create_order_webhook')) {
-            $webhook_id = self::$settings->getWebHookId();
-            if( $webhook_id <= 0 ){
-                $webhook    = new \WC_Webhook( $webhook_id );
-                $name = sanitize_text_field( wp_unslash( 'Retainful Order Update' ) );
-                $webhook->set_name($name);
-                if ( ! $webhook->get_user_id() ) {
-                    $webhook->set_user_id( get_current_user_id() );
-                }
-                //
-                $webhook->set_status('active');
-                $webhook->set_delivery_url( 'https://api.retainful.com/v1/woocommerce/webhooks/checkout' );
-                $secret = wp_generate_password( 50, true, true );
-                $webhook->set_secret( $secret );
-                $topic = 'order.updated';
-                if ( wc_is_webhook_valid_topic( $topic ) ) {
-                    $webhook->set_topic( $topic );
-                }
-                // API version.
-                $rest_api_versions = wc_get_webhook_rest_api_versions();
-                $webhook->set_api_version( end( $rest_api_versions ) ); // WPCS: input var okay, CSRF ok.
-                $webhook_id = $webhook->save();
-                if($webhook_id > 0) {
-                    self::$settings->saveWebhookId($webhook_id);
-                    $response = array('success' => true,'message' => __('Webhook created successfully',RNOC_TEXT_DOMAIN));
-                }else{
-                    $response = array('success' => false,'message' => __('Webhook creation failed',RNOC_TEXT_DOMAIN));
-                }
-            }else{
-                $response = array('success' => true,'message' => __('Webhook already exits',RNOC_TEXT_DOMAIN));
-            }
-        }else{
-            $response = array('success' => true,'message' => __('Invalid nonce',RNOC_TEXT_DOMAIN));
-        }
-        wp_send_json($response);
-    }
     function changeWebHookHeader($http_args, $order_id, $webhook_id){
-        if($webhook_id > 0){
-            $webhook = new \WC_Webhook( $webhook_id );
-            $delivery_url = $webhook->get_delivery_url();
-            $topic = $webhook->get_topic();
-            if($delivery_url === 'https://api.retainful.com/v1/woocommerce/webhooks/checkout' && $topic == 'order.updated' && $order_id > 0) { //https://api.retainful.com/v1/woocommerce/webhooks/checkout
-                $order = self::$woocommerce->getOrder($order_id);
-                $order_obj = new Order();
-                $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
-                //$logger = wc_get_logger();
-                if(empty($cart_token)){
-                    //Need to generate cart_token
-                    $cart_token = $this->generateCartToken();
-                    self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
-                   // $logger->add('Retainful','Generate toeken: '.$cart_token);
-                }
-                $order_data = $order_obj->getOrderData($order);
-               // $logger->add('Retainful','Order Data:'.json_encode($order_data));
-                if(!empty($cart_token) && $order_data){
-                    $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
-                    $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
-                    $app_id = self::$settings->getApiKey();
-                    $extra_headers = array(
-                        "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
-                        "X-Retainful-Version" => RNOC_VERSION,
-                        "X-Cart-Token" => $token,
-                        "Cart-Token" => $token,
-                        "app-id" => $app_id,
-                        "app_id" => $app_id,
-                        "Content-Type" => 'application/json'
-                    );
-                    foreach ($extra_headers as $key => $value){
-                        $http_args['headers'][$key] = $value;
-                    }
-                    //$logger->add('Retainful','App id:'.$app_id);
-                    $cart_hash = $this->encryptData($order_data);
-                    $body = array(
-                        'data' => $cart_hash
-                    );
-                    $http_args['body'] = trim( wp_json_encode( $body ) );
-                }
+        $stored_webhook_id = self::$settings->getWebHookId();
+        if( $stored_webhook_id <= 0 || $webhook_id <= 0 || ($stored_webhook_id != $webhook_id)){
+            return $http_args;
+        }
+        $webhook = new \WC_Webhook( $webhook_id );
+        $delivery_url = $webhook->get_delivery_url();
+        $topic = $webhook->get_topic();
+        if($delivery_url != 'https://api.retainful.com/v1/woocommerce/webhooks/checkout' || $topic != 'order.updated' || $order_id <= 0){
+            return $http_args;
+        }
+
+        $order = self::$woocommerce->getOrder($order_id);
+        $order_obj = new Order();
+        $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+        //$logger = wc_get_logger();
+        if(empty($cart_token)){
+            //Need to generate cart_token
+            $cart_token = $this->generateCartToken();
+            self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
+            // $logger->add('Retainful','Generate toeken: '.$cart_token);
+        }
+        $order_data = $order_obj->getOrderData($order);
+        // $logger->add('Retainful','Order Data:'.json_encode($order_data));
+        if(!empty($cart_token) && $order_data){
+            $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
+            $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+            $app_id = self::$settings->getApiKey();
+            $extra_headers = array(
+                "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
+                "X-Retainful-Version" => RNOC_VERSION,
+                "X-Cart-Token" => $token,
+                "Cart-Token" => $token,
+                "app-id" => $app_id,
+                "app_id" => $app_id,
+                "Content-Type" => 'application/json'
+            );
+            foreach ($extra_headers as $key => $value){
+                $http_args['headers'][$key] = $value;
             }
+            //$logger->add('Retainful','App id:'.$app_id);
+            $cart_hash = $this->encryptData($order_data);
+            $body = array(
+                'data' => $cart_hash
+            );
+            $http_args['body'] = trim( wp_json_encode( $body ) );
         }
         return $http_args;
     }

@@ -810,7 +810,44 @@ class Settings
         update_option($this->slug . '_settings', $data);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
-
+    function saveNewWebhook(){
+        $nonce = self::$input->post_get('security','');
+        if (wp_verify_nonce($nonce, 'rnoc_create_order_webhook')) {
+            $webhook_id = $this->getWebHookId();
+            if( $webhook_id <= 0 ){
+                $webhook    = new \WC_Webhook( $webhook_id );
+                $name = sanitize_text_field( wp_unslash( 'Retainful Order Update' ) );
+                $webhook->set_name($name);
+                if ( ! $webhook->get_user_id() ) {
+                    $webhook->set_user_id( get_current_user_id() );
+                }
+                //
+                $webhook->set_status('active');
+                $webhook->set_delivery_url( 'https://api.retainful.com/v1/woocommerce/webhooks/checkout' );
+                $secret = wp_generate_password( 50, true, true );
+                $webhook->set_secret( $secret );
+                $topic = 'order.updated';
+                if ( wc_is_webhook_valid_topic( $topic ) ) {
+                    $webhook->set_topic( $topic );
+                }
+                // API version.
+                $rest_api_versions = wc_get_webhook_rest_api_versions();
+                $webhook->set_api_version( end( $rest_api_versions ) ); // WPCS: input var okay, CSRF ok.
+                $webhook_id = $webhook->save();
+                if($webhook_id > 0) {
+                    $this->saveWebhookId($webhook_id);
+                    $response = array('success' => true,'message' => __('Webhook created successfully',RNOC_TEXT_DOMAIN));
+                }else{
+                    $response = array('success' => false,'message' => __('Webhook creation failed',RNOC_TEXT_DOMAIN));
+                }
+            }else{
+                $response = array('success' => true,'message' => __('Webhook already exits',RNOC_TEXT_DOMAIN));
+            }
+        }else{
+            $response = array('success' => true,'message' => __('Invalid nonce',RNOC_TEXT_DOMAIN));
+        }
+        wp_send_json($response);
+    }
     /**
      * retainful ac settings page
      */
