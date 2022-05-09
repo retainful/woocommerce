@@ -236,6 +236,7 @@ class Main
                 //add_action('wp_login', array($cart, 'userLoggedIn'));
                 add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
                 add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
+                add_action('woocommerce_removed_coupon', array($cart, 'removeNextOrderCouponFromCart'));
                 //Add tracking message
                 if (is_user_logged_in()) {
                     add_action('woocommerce_after_add_to_cart_button', array($cart, 'userGdprMessage'), 10);

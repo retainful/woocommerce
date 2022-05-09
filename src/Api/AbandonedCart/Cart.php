@@ -256,9 +256,16 @@ class Cart extends RestApi
                         self::$storage->removeValue('rnoc_ac_coupon');
                     }
                 }
-            } else {
+            } /*else {
                 self::$storage->removeValue('rnoc_ac_coupon');
-            }
+            }*/
+        }
+    }
+
+    function removeNextOrderCouponFromCart($remove_coupon){
+        $coupon_code = self::$storage->getValue('rnoc_ac_coupon');
+        if (strtoupper($remove_coupon) == strtoupper($coupon_code)) {
+            self::$storage->removeValue('rnoc_ac_coupon');
         }
     }
 
