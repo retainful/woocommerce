@@ -114,6 +114,7 @@ function initJqueryRetainfulPopupJs() {
                     } else {
                         if (this.getCloseButtonBehaviour() !== "just_close") {
                             sessionStorage.setItem('retainful_add_to_cart_popup_temporary_silent', "1");
+                            popup_btn.data('close_action','yes');
                             popup_btn.click();
                         }
                     }
@@ -300,6 +301,10 @@ function initJqueryRetainfulPopupJs() {
         let add_to_cart_popup = new addToCartPopup().setOptions(rnoc_atc_js_data);
         $(document).on('adding_to_cart', (eventData, thisButton, postData) => {
             if (add_to_cart_popup.needPopup()) {
+                if(postData['is_from_other_plugin'] === true && postData['close_action'] ==='yes' ){
+                    $(thisButton).data('close_action','no');
+                    return;
+                }
                 add_to_cart_popup.displayPopup(thisButton);
                 if(add_to_cart_popup.noConflictMode()){
                     throw new Error('Retainful intercepts to show popup!');
