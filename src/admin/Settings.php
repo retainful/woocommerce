@@ -464,7 +464,7 @@ class Settings
         if (!empty($add_on)) {
             $settings = get_option($page_slug, array());
             $default_settings = $this->getDefaultPremiumAddonsValues();
-            $settings = wp_parse_args($settings, $default_settings);
+            $settings = wp_parse_args( $default_settings,$settings);
             $add_on_slug = sanitize_text_field($add_on);
             require_once dirname(__FILE__) . '/templates/pages/premium-addon-settings.php';
         } else {
