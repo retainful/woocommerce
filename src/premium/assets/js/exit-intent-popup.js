@@ -183,6 +183,7 @@ function initJqueryRetainfulExitIntentPopupJs() {
             distance: parseInt(retainful_premium_exit_intent_popup.distance),
             cookieLife: parseInt(retainful_premium_exit_intent_popup.cookieLife),
             storeName: retainful_premium_exit_intent_popup.storeName,
+            method: retainful_premium_exit_intent_popup.bounce_method,
             aggressive: true,
             scrollDelay: 500,
             onBounce: function () {

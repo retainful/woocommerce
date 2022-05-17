@@ -271,6 +271,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal',
             RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger',
         ), ['0', '1'])->message('This field contains invalid value');
@@ -585,6 +586,7 @@ class Settings
             )),
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'enable_mobile_support' => '0',
+                RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click' => '0',
                 RNOC_PLUGIN_PREFIX . 'enable_delay_trigger' => '0',
                 RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec' => '0',
                 RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger' => '0',
