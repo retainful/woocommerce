@@ -448,6 +448,7 @@ class Settings
                 break;
         }
         $data_to_save = wp_parse_args($data, $settings);
+        //$data_to_save[RNOC_PLUGIN_PREFIX.'exit_intent_popup_mobile_settings'][0]= array();
         update_option($page_slug, $data_to_save);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
@@ -464,7 +465,25 @@ class Settings
         if (!empty($add_on)) {
             $settings = get_option($page_slug, array());
             $default_settings = $this->getDefaultPremiumAddonsValues();
-            $settings = wp_parse_args( $default_settings,$settings);
+            $multi_array_check_default_value = array(
+                'coupon_timer_top_position_settings',
+                'coupon_timer_above_cart_position_settings',
+                'coupon_timer_below_discount_position_settings',
+                'modal_design_settings',
+                'add_to_cart_popup_gdpr_compliance',
+                'modal_coupon_settings',
+                'exit_intent_popup_gdpr_compliance',
+                'exit_intent_popup_form_design',
+                'exit_intent_popup_mobile_settings'
+
+            );
+            foreach ($multi_array_check_default_value as $key){
+                if(isset($settings[RNOC_PLUGIN_PREFIX . $key]) && isset($settings[RNOC_PLUGIN_PREFIX . $key][0]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key][0])
+                    && is_array($settings[RNOC_PLUGIN_PREFIX . $key][0]) && is_array($default_settings[RNOC_PLUGIN_PREFIX . $key][0])){
+                    $settings[RNOC_PLUGIN_PREFIX . $key][0] = array_merge($default_settings[RNOC_PLUGIN_PREFIX . $key][0],$settings[RNOC_PLUGIN_PREFIX . $key][0]);
+                }
+            }
+            $settings = wp_parse_args( $settings, $default_settings);
             $add_on_slug = sanitize_text_field($add_on);
             require_once dirname(__FILE__) . '/templates/pages/premium-addon-settings.php';
         } else {
