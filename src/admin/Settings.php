@@ -448,7 +448,6 @@ class Settings
                 break;
         }
         $data_to_save = wp_parse_args($data, $settings);
-        //$data_to_save[RNOC_PLUGIN_PREFIX.'exit_intent_popup_mobile_settings'][0]= array();
         update_option($page_slug, $data_to_save);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }

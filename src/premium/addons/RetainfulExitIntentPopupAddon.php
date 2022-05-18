@@ -643,7 +643,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tr>
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_mobile_support'; ?>"><?php
-                                esc_html_e('Enable mobile device support', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Trigger popup when the back button is clicked in the mobile browser (default: No)', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
                         <td>
