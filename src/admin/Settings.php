@@ -465,7 +465,7 @@ class Settings
         if (!empty($add_on)) {
             $settings = get_option($page_slug, array());
             $default_settings = $this->getDefaultPremiumAddonsValues();
-            $multi_array_check_default_value = array(
+            $check_default_value_of_multi_dim_array = array(
                 'coupon_timer_top_position_settings',
                 'coupon_timer_above_cart_position_settings',
                 'coupon_timer_below_discount_position_settings',
@@ -477,7 +477,7 @@ class Settings
                 'exit_intent_popup_mobile_settings'
 
             );
-            foreach ($multi_array_check_default_value as $key){
+            foreach ($check_default_value_of_multi_dim_array as $key){
                 if(isset($settings[RNOC_PLUGIN_PREFIX . $key]) && isset($settings[RNOC_PLUGIN_PREFIX . $key][0]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key][0])
                     && is_array($settings[RNOC_PLUGIN_PREFIX . $key][0]) && is_array($default_settings[RNOC_PLUGIN_PREFIX . $key][0])){
                     $settings[RNOC_PLUGIN_PREFIX . $key][0] = array_merge($default_settings[RNOC_PLUGIN_PREFIX . $key][0],$settings[RNOC_PLUGIN_PREFIX . $key][0]);
