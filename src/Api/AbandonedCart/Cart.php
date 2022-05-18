@@ -124,7 +124,7 @@ class Cart extends RestApi
                 foreach ($address_fields as $field) {
                     $shipping_field_name = 'shipping_' . $field;
                     $billing_field_name = 'billing_' . $field;
-                    $shipping_address[$shipping_field_name] = $billing_address[$billing_field_name];
+                    $shipping_address[$shipping_field_name] = isset($billing_address[$billing_field_name]) && !empty($billing_address[$billing_field_name]) ? $billing_address[$billing_field_name]: '';
                 }
             }
             $this->setSessionShippingDetails($shipping_address);
