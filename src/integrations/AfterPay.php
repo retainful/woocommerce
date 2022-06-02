@@ -3,6 +3,7 @@
 namespace Rnoc\Retainful\Integrations;
 
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
+use Rnoc\Retainful\WcFunctions;
 
 class AfterPay
 {
@@ -14,36 +15,37 @@ class AfterPay
 
     function __construct()
     {
-        if ($this->isPluginActive()) {
-            add_action('save_post_afterpay_quote', array($this, 'saveAfterPayData'), 10, 3);
-            add_action('before_delete_post', array($this, 'captureRetainfulDataFromQuote'));
-            add_action('woocommerce_new_order', array($this, 'saveRetainfulDataToOrder'));
-        }
+        add_action('save_post_afterpay_quote', array($this, 'saveAfterPayData'), 10, 3);
+        add_action('before_delete_post', array($this, 'captureRetainfulDataFromQuote'));
+        add_action('woocommerce_new_order', array($this, 'saveRetainfulDataToOrder'));
     }
 
     function saveAfterPayData($post_id, $post, $update)
     {
-        if ($update) {
+        if ($update || !$this->isPluginActive()) {
             return;
         }
-        $api = new Checkout();
-        if ($api->isPendingRecovery()) {
-            $api->markOrderAsPendingRecovery();
+        $checkout = new Checkout();
+        if ($checkout->isPendingRecovery()) {
+            $checkout->markOrderAsPendingRecovery();
         }
-        $cart_token = $api->getCartToken();
+        $cart_token = $checkout->getCartToken();
         if ($cart_token) {
-            $api->setOrderCartToken($cart_token, $post_id);
+            $checkout->setOrderCartToken($cart_token, $post_id);
         }
     }
 
     function captureRetainfulDataFromQuote($post_id)
     {
+        if(!$this->isPluginActive()){
+            return;
+        }
         $post = get_post($post_id);
-        if ('afterpay_quote' === $post->post_type) {
+        if (isset($post->post_type) && 'afterpay_quote' === $post->post_type) {
             $this->quote_id = (int)$post_id;
             $post_meta = get_post_meta($post_id, '', true);
             foreach ($post_meta as $key => $value) {
-                if (0 === strpos($key, '_rnoc_user_cart_token')) {
+                if (0 === strpos($key, '_rnoc')) {
                     $this->retainful_meta[$key] = isset($value[0]) && !empty($value[0]) ? $value[0]: '';
                 }
             }
@@ -51,10 +53,13 @@ class AfterPay
     }
 
     function saveRetainfulDataToOrder($order_id){
+        if(!$this->isPluginActive()){
+            return;
+        }
         if ( $order_id > 0 &&  (int)$order_id === $this->quote_id ) {
-            $api = new Checkout();
+            $wc_function = new WcFunctions();
             foreach ( $this->retainful_meta as $key => $value ) {
-                $api->setOrderCartToken($value, $order_id);
+                $wc_function->setOrderMeta($order_id,$key,$value);
             }
         }
     }
