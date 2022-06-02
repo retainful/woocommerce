@@ -271,6 +271,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal',
             RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support',
+            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger',
         ), ['0', '1'])->message('This field contains invalid value');
@@ -463,7 +464,25 @@ class Settings
         if (!empty($add_on)) {
             $settings = get_option($page_slug, array());
             $default_settings = $this->getDefaultPremiumAddonsValues();
-            $settings = wp_parse_args($settings, $default_settings);
+            $check_default_value_of_multi_dim_array = array(
+                'coupon_timer_top_position_settings',
+                'coupon_timer_above_cart_position_settings',
+                'coupon_timer_below_discount_position_settings',
+                'modal_design_settings',
+                'add_to_cart_popup_gdpr_compliance',
+                'modal_coupon_settings',
+                'exit_intent_popup_gdpr_compliance',
+                'exit_intent_popup_form_design',
+                'exit_intent_popup_mobile_settings'
+
+            );
+            foreach ($check_default_value_of_multi_dim_array as $key){
+                if(isset($settings[RNOC_PLUGIN_PREFIX . $key]) && isset($settings[RNOC_PLUGIN_PREFIX . $key][0]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key][0])
+                    && is_array($settings[RNOC_PLUGIN_PREFIX . $key][0]) && is_array($default_settings[RNOC_PLUGIN_PREFIX . $key][0])){
+                    $settings[RNOC_PLUGIN_PREFIX . $key][0] = array_merge($default_settings[RNOC_PLUGIN_PREFIX . $key][0],$settings[RNOC_PLUGIN_PREFIX . $key][0]);
+                }
+            }
+            $settings = wp_parse_args( $settings, $default_settings);
             $add_on_slug = sanitize_text_field($add_on);
             require_once dirname(__FILE__) . '/templates/pages/premium-addon-settings.php';
         } else {
@@ -585,6 +604,7 @@ class Settings
             )),
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'enable_mobile_support' => '0',
+                RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click' => '0',
                 RNOC_PLUGIN_PREFIX . 'enable_delay_trigger' => '0',
                 RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec' => '0',
                 RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger' => '0',

@@ -254,12 +254,16 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $show_count = isset($show_settings['show_count']) ? $show_settings['show_count'] : 1;
             $mobile_popup_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0] : array();
             $delay = $scroll_distance = 0;
+            $bounce_method = 'mouse';
             if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_mobile_support', 0) == 1) {
                 if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_delay_trigger', 0) == 1) {
                     $delay = (int)$this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec', 0);
                 }
                 if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger', 0) == 1) {
                     $scroll_distance = (int)$this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance', 0);
+                }
+                if ($this->getKeyFromArray($mobile_popup_settings, RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click', 0) == 1) {
+                    $bounce_method = 'auto';
                 }
             }
             $settings = array(
@@ -274,7 +278,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 'show_only_for' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to', "all"),
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
                 'show_when_its_coupon_applied' => (int)$this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 1),
-                'coupon_code' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', '')
+                'coupon_code' => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon', ''),
+                'bounce_method' => $bounce_method
             );
             $settings = apply_filters('rnoc_load_exit_intent_popup_settings', $settings);
             $exit_popup_settings_script = 'retainful_premium_exit_intent_popup = ';
@@ -638,7 +643,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tr>
                         <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_mobile_support'; ?>"><?php
-                                esc_html_e('Enable mobile device support', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Trigger popup when the back button is clicked in the mobile browser (default: No)', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
                         <td>
@@ -664,6 +669,31 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 showing the popup either based on time delay (time spent by the customer in the site) or
                                 scrolling (the distance the customer scrolled a page)
                             </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click'; ?>"><?php
+                                esc_html_e('Enable mobile back button trigger', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click]'; ?>"
+                                       type="radio"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click'] == '1') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                            </label>
+                            <label>
+                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click]'; ?>"
+                                       type="radio"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click'] == '0') {
+                                    echo "checked";
+                                } ?>>
+                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                            </label>
                         </td>
                     </tr>
                     <tr>
@@ -709,7 +739,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </td>
                     </tr>
                     <tr>
-                        <th scope=" row">
+                        <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'; ?>"><?php
                                 esc_html_e('Enable Scroll based trigger', RNOC_TEXT_DOMAIN);
                                 ?></label>
