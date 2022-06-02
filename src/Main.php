@@ -9,6 +9,7 @@ use Rnoc\Retainful\Api\AbandonedCart\Checkout;
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Referral\ReferralManagement;
+use Rnoc\Retainful\Integrations\AfterPay;
 use Rnoc\Retainful\Integrations\Currency;
 
 class Main
@@ -159,6 +160,7 @@ class Main
         }
         //initialise currency helper
         new Currency();
+
         if ($this->admin->isNextOrderCouponEnabled()) {
             //Get events
             add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
@@ -273,6 +275,10 @@ class Main
                 add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
                 //Todo: multi currency and multi lingual
                 #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
+                if($this->admin->isAfterPayEnabled()){
+                    new AfterPay();
+                }
+
             } else {
                 if (is_admin()) {
                     $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);

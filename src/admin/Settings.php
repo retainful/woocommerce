@@ -833,6 +833,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
             RNOC_PLUGIN_PREFIX . 'enable_debug_log' => '0',
             RNOC_PLUGIN_PREFIX . 'handle_storage_using' => 'woocommerce',
+            RNOC_PLUGIN_PREFIX . 'enable_afterpay_action' => 'no',
             RNOC_PLUGIN_PREFIX . 'varnish_check' => 'no',
         );
         $settings = wp_parse_args($settings, $default_settings);
@@ -1250,6 +1251,12 @@ class Settings
         $settings = $this->getAdminSettings();
         $need_widget = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'] : 'yes';
         return apply_filters("enable_embeded_referral_widget", ($need_widget === "yes"));
+    }
+
+    function isAfterPayEnabled(){
+        $settings = $this->getAdminSettings();
+        $need_afterpay = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'] : 'no';
+        return apply_filters("retainful_enable_afterpay_action", ($need_afterpay === "yes"));
     }
 
     /**
