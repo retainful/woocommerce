@@ -314,6 +314,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     'cart_url_without_coupon' => $cart_url,
                     'cart_url' => $cart_url . $coupon_data
                 );
+                $content = apply_filters("rnoc_exit_intent_popup_full_content", $content,$to_replace);
                 $to_replace = apply_filters("rnoc_exit_intent_popup_short_codes", $to_replace, $content);
                 foreach ($to_replace as $find => $replace) {
                     $content = str_replace('{{' . $find . '}}', $replace, $content);
