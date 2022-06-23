@@ -174,6 +174,31 @@
             });
             $(this).attr('disabled', false);
         });
+        $(document).on('click', '#generate-webhook-btn', function (event){
+            event.preventDefault();
+            var action = $(this).data('action');
+            var security = $(this).data('security');
+            var url = retainful_admin.ajax_endpoint.replace("{{action}}", action).replace("{{security}}", security);
+            $(this).attr('disabled', true);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                async: false,
+                dataType: "json",
+                data: {},
+                success: function (response) {
+                    if(response.success) {
+                        alert(response.message);
+                    }else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('Please try again later.');
+                }
+            });
+            $(this).attr('disabled', false);
+        });
         $(document).on('submit', '#retainful-settings-form', function (event) {
             event.preventDefault();
             let submit = $(this).find(':submit');
