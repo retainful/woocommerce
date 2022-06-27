@@ -20,6 +20,14 @@ class RetainfulApi
         return $this->app_url . '?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
     }
 
+    function getDomain(){
+        return apply_filters('retainful_domain_url',$this->domain);
+    }
+
+    function getAbandonedCartApiUrl(){
+        return apply_filters('retainful_abandoned_cart_api_url',$this->abandoned_cart_api_url);
+    }
+
     /**
      * Validate API Key
      * @param $api_key
@@ -28,7 +36,7 @@ class RetainfulApi
      */
     function validateApi($api_key, $body)
     {
-        $url = $this->domain . 'app/' . $api_key;
+        $url = $this->getDomain() . 'app/' . $api_key;
         $body = array(
             'shop' => $body
         );
@@ -165,7 +173,7 @@ class RetainfulApi
             $url = rtrim($url, '/');
             $url .= '?' . http_build_query($fields);
         }
-        return $this->domain . $url;
+        return $this->getDomain() . $url;
     }
 
     /**
@@ -174,7 +182,7 @@ class RetainfulApi
      */
     function getAbandonedCartEndPoint()
     {
-        $url = rtrim($this->abandoned_cart_api_url, '/');
+        $url = rtrim($this->get, '/');
         $url .= '/webhooks/checkout';
         return $url;
     }
@@ -243,7 +251,7 @@ class RetainfulApi
      */
     function retrieveCartDetails($app_id, $cart_token)
     {
-        $url = rtrim($this->abandoned_cart_api_url, '/');
+        $url = rtrim($this->getAbandonedCartApiUrl(), '/');
         $url .= '/abandoned_checkouts/' . $cart_token;
         $headers = array(
             'app_id' => $app_id
