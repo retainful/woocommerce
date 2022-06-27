@@ -182,7 +182,7 @@ class RetainfulApi
      */
     function getAbandonedCartEndPoint()
     {
-        $url = rtrim($this->get, '/');
+        $url = rtrim($this->getAbandonedCartApiUrl(), '/');
         $url .= '/webhooks/checkout';
         return $url;
     }
