@@ -1881,10 +1881,13 @@ class WcFunctions
     }
 
     function canApplyCoupon($coupon_code,$order){
-        if(empty($coupon_code) || empty($order)){
+        if(empty($coupon_code) || !$this->isMethodExists($order, "get_items")){
             return false;
         }
         $new_coupon = new \WC_Coupon( $coupon_code );
+        if ($this->isMethodExists($new_coupon, "get_individual_use")) {
+            return false;
+        }
         $applied_coupons = $order->get_items( 'coupon' );
         if($new_coupon->get_individual_use() && count($applied_coupons)) {
             return false;
