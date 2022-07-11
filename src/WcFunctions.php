@@ -1880,6 +1880,18 @@ class WcFunctions
         return false;
     }
 
+    function canApplyCoupon($coupon_code,$order){
+        if(empty($coupon_code) || empty($order)){
+            return false;
+        }
+        $new_coupon = new \WC_Coupon( $coupon_code );
+        $applied_coupons = $order->get_items( 'coupon' );
+        if($new_coupon->get_individual_use() && count($applied_coupons)) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * @param $coupon string Coupon code to apply for the order
      * @param $order \WC_Order Order object
@@ -1888,7 +1900,7 @@ class WcFunctions
 
     function applyCouponToOrder($coupon, $order)
     {
-        if ($this->isValidCoupon($coupon) && $this->isMethodExists($order, "apply_coupon")) {
+        if ($this->isValidCoupon($coupon) && $this->isMethodExists($order, "apply_coupon") && $this->canApplyCoupon($coupon,$order)) {
             $result = $order->apply_coupon($coupon);
             if($result === true) {
                 return true;
