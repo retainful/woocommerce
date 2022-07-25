@@ -177,10 +177,13 @@ class CouponManagement
     {
         if (!empty($coupon_id)) {
             $order_id = intval(get_post_meta($coupon_id, 'order_id', true));
+
             if ($order_id && $order_id > 0) {
                 $order = wc_get_order($order_id);
-                $order_url = $order->get_edit_order_url();
-                echo '<p class="form-field "><label>Coupon generated for</label><span>Order #' . $order_id . ' | <a target="_blank" href="' . $order_url . '">View Order</a></span></p>';
+                if(is_object($order) && method_exists($order,'get_edit_order_url')){
+                    $order_url = $order->get_edit_order_url();
+                    echo '<p class="form-field "><label>Coupon generated for</label><span>Order #' . $order_id . ' | <a target="_blank" href="' . $order_url . '">View Order</a></span></p>';
+                }
             }
         }
     }
