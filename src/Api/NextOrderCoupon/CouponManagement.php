@@ -102,6 +102,9 @@ class CouponManagement
                         'exclude_product_categories' => array(),
                         '_rnoc_shop_coupon_type' => 'retainful-referral'
                     );
+                    if(isset($data['free_shipping']) && $data['free_shipping'] === 'yes'){
+                        $data['coupon_amount'] = 0;
+                    }
                     $data = apply_filters('rnoc_before_create_rest_coupon',$data,$ruleParams,$params);
                     $old_coupon = self::getCouponByCouponCode($data['coupon_code']);
                     if (!empty($old_coupon) && $old_coupon instanceof \WP_Post) {
