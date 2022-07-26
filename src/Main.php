@@ -9,6 +9,7 @@ use Rnoc\Retainful\Api\AbandonedCart\Checkout;
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Referral\ReferralManagement;
+use Rnoc\Retainful\Integrations\AfterPay;
 use Rnoc\Retainful\Integrations\Currency;
 
 class Main
@@ -148,6 +149,7 @@ class Main
             add_action('wp_ajax_rnoc_get_search_coupon', array($this->admin, 'getSearchedCoupons'));
             add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
             add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
+            add_filter('wp_ajax_rnoc_create_order_update_webhook',array($this->admin,'saveNewWebhook'),10);
             add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
             add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
             add_action('wp_ajax_rnoc_delete_expired_coupons', array($this->admin, 'deleteUnusedExpiredCoupons'));
@@ -159,6 +161,7 @@ class Main
         }
         //initialise currency helper
         new Currency();
+
         if ($this->admin->isNextOrderCouponEnabled()) {
             //Get events
             add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
@@ -271,8 +274,13 @@ class Main
                 // handle placed orders
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
                 add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
+                add_filter('woocommerce_webhook_http_args',array($checkout,'changeWebHookHeader'),10,3);
                 //Todo: multi currency and multi lingual
                 #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
+                if($this->admin->isAfterPayEnabled()){
+                    new AfterPay();
+                }
+
             } else {
                 if (is_admin()) {
                     $connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', RNOC_TEXT_DOMAIN) : __('re-connect', RNOC_TEXT_DOMAIN);

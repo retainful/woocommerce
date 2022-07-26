@@ -404,6 +404,31 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'; ?>"><?php
+                    esc_html_e('Enable AfterPay Payment Action ?', RNOC_TEXT_DOMAIN);
+                    ?></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_afterpay_action_yes'; ?>"
+                           value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'] == 'yes') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_afterpay_action_no'; ?>"
+                           value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'] == 'no') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'varnish_check'; ?>"><?php
                     esc_html_e('Varnish Cache Compatibility', RNOC_TEXT_DOMAIN);
                     ?></label>
@@ -431,6 +456,18 @@ require_once "tabs.php";
                     esc_html_e('DO NOT change this setting unless you are instructed by the Retainful Support team. Use this option only when you are using the server side caching with Varnish. Certain features may not work if enabled. So check with the Support team before enabling this option', RNOC_TEXT_DOMAIN);
                     ?>
                 </p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'webhook_id'; ?>"><?php
+                    esc_html_e('Order Update Webhook', RNOC_TEXT_DOMAIN);
+                    ?></label>
+            </th>
+            <td>
+                <button type="button" id="generate-webhook-btn" data-action="rnoc_create_order_update_webhook"
+                        data-security="<?php echo wp_create_nonce('rnoc_create_order_webhook') ?>"
+                        class="button"><?= __('Create WebHook', RNOC_TEXT_DOMAIN) ?></button>
             </td>
         </tr>
         <tr>
