@@ -851,7 +851,8 @@ class Settings
             }
             //
             $webhook->set_status('active');
-            $webhook->set_delivery_url( 'https://api.retainful.com/v1/woocommerce/webhooks/checkout' );
+            $delivery_url = $this->api->getDomain().'woocommerce/webhooks/checkout';
+            $webhook->set_delivery_url( $delivery_url );
             $secret = wp_generate_password( 50, true, true );
             $webhook->set_secret( $secret );
             $topic = 'order.updated';
