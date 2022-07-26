@@ -2,10 +2,10 @@
 Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.0
-Tested up to: 5.9
-WC tested up to: 6.3
+Tested up to: 6.0
+WC tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 2.6.12
+Stable tag: 2.6.13
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -564,4 +564,10 @@ No. There is no charges for support.
 - Improvement: No conflict mode
 
 = 2.6.12 =
--Fix: removed unwanted store data
+- Fix: removed unwanted store data
+
+= 2.6.13 =
+- Fix: individual and free shipping coupon
+- Fix: exit-intent after email success popup content
+- Fix: fatal error, when order is not available
+- Fix: same as billing notice
