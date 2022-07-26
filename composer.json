@@ -2,7 +2,7 @@
   "name": "retainful/woocommerce",
   "description": "Simple plugin to give coupons for users next order",
   "require": {
-    "jaybizzle/laravel-crawler-detect": "1.*",
+    "jaybizzle/crawler-detect": "1.*",
     "ext-openssl": "*",
     "vlucas/valitron": "*",
     "ext-json": "*"
