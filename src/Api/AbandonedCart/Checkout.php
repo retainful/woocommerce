@@ -110,7 +110,8 @@ class Checkout extends RestApi
             $webhook = new \WC_Webhook( $webhook_id );
             $delivery_url = $webhook->get_delivery_url();
             $topic = $webhook->get_topic();
-            if($delivery_url != 'https://api.retainful.com/v1/woocommerce/webhooks/checkout' || $topic != 'order.updated' || $order_id <= 0){
+            $site_delivery_url = self::$api->getDomain().'woocommerce/webhooks/checkout';
+            if($delivery_url != $site_delivery_url || $topic != 'order.updated' || $order_id <= 0){
                 return $http_args;
             }
 
