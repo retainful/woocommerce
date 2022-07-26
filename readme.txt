@@ -571,3 +571,6 @@ No. There is no charges for support.
 - Fix: exit-intent after email success popup content
 - Fix: fatal error, when order is not available
 - Fix: same as billing notice
+
+= 2.6.14 =
+- Fix: composer autoload
