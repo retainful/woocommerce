@@ -5,7 +5,7 @@ Requires at least: 4.0
 Tested up to: 6.0
 WC tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 2.6.13
+Stable tag: 2.6.15
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -574,3 +574,6 @@ No. There is no charges for support.
 
 = 2.6.14 =
 - Fix: composer autoload
+
+= 2.6.15 =
+- Added: Order update via Webhook
