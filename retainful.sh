@@ -32,6 +32,20 @@ copy_folder(){
       done
   fi
 }
+
+remove_files(){
+  remove_path="vendor/jaybizzle/crawler-detect/";
+  remove_folder=("export.php")
+  if [ -d "$pack_compress_folder" ]
+  then
+    # shellcheck disable=SC2068
+    for dir in ${remove_folder[@]}
+    do
+      rm -r "$pack_compress_folder/$remove_path$dir"
+    done
+  fi
+}
+
 zip_folder(){
   pack_folder_name="retainful-wordpress"
   rm "$pack_folder_name".zip
@@ -41,6 +55,7 @@ zip_folder(){
 }
 composer_run
 copy_folder
+remove_files
 zip_folder
 
 echo "End"
