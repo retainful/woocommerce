@@ -1409,19 +1409,13 @@ class WcFunctions
         return array();
     }
 
-    function getProductCategoryName($cat_ids){
-        if(empty($cat_ids)){
+    function getProductCategoryName($product_id){
+        if(empty($product_id)){
             return '';
         }
-        $category_names = get_terms(
-            array(
-                'taxonomy' => 'product_cat',
-                'include'  => $cat_ids,
-                'fields'   => 'names',
-            )
-        );
-
-        return implode( ', ', $category_names );
+        $terms = get_the_terms( $product_id, 'product_cat' );
+        $cat_names =  ( empty( $terms ) || is_wp_error( $terms ) ) ? array() : wp_list_pluck( $terms, 'name' );
+        return (!empty($cat_names) && is_array($cat_names)) ? implode(',',$cat_names): '';
     }
 
     /**

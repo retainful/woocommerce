@@ -121,7 +121,7 @@ class Order extends RestApi
                         'line_price' => $this->formatDecimalPriceRemoveTrailingZeros($this->getLineItemTotal($item_details)),
                         'product_id' => $product_id,
                         'cat_ids' => implode(',',$cat_ids),
-                        'cat_names' => self::$woocommerce->getProductCategoryName($cat_ids),
+                        'cat_names' => self::$woocommerce->getProductCategoryName($product_id),
                         'properties' => array(),
                         'variant_id' => $variant_id,
                         'variant_price' => $this->formatDecimalPriceRemoveTrailingZeros(($is_variable_item) ? self::$woocommerce->getItemPrice($item) : 0),
