@@ -1414,8 +1414,7 @@ class WcFunctions
             return '';
         }
         $terms = get_the_terms( $product_id, 'product_cat' );
-        $cat_names =  ( empty( $terms ) || is_wp_error( $terms ) ) ? array() : wp_list_pluck( $terms, 'name' );
-        return (!empty($cat_names) && is_array($cat_names)) ? implode(',',$cat_names): '';
+        return ( empty( $terms ) || is_wp_error( $terms ) ) ? array() : wp_list_pluck( $terms, 'name' );
     }
 
     /**
