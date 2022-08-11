@@ -1225,7 +1225,7 @@ class Cart extends RestApi
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,
-            'user_role' => self::$woocommerce->getUserRoles($billing_email)
+            'user_roles' => self::$woocommerce->getUserRoles($billing_email)
         );
 
     }

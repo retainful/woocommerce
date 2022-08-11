@@ -720,9 +720,13 @@ class WcFunctions
         if(empty($email)){
             return array();
         }
-        $user = get_user_by( 'email', sanitize_email($email) );
-        if($user && isset($user->roles)){
-            return ( array ) $user->roles;
+        try {
+            $user = get_user_by( 'email', sanitize_email($email) );
+            if($user && is_object($user) && isset($user->roles)){
+                return ( array ) $user->roles;
+            }
+        }catch (\Exception $e){
+
         }
         return array();
     }
