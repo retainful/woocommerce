@@ -716,6 +716,17 @@ class WcFunctions
         }
     }
 
+    function getUserRoles($email) {
+        if(empty($email)){
+            return array();
+        }
+        $user = get_user_by( 'email', sanitize_email($email) );
+        if($user && isset($user->roles)){
+            return ( array ) $user->roles;
+        }
+        return array();
+    }
+
     /**
      * check woocommerce session has started
      * @return bool
