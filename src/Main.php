@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) exit;
 use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
-use Rnoc\Retainful\Api\AbandonedCart\RestApi;
+use Rnoc\Retainful\Api\AbandonedCart\RestApi;;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\AfterPay;
@@ -60,6 +60,16 @@ class Main
             'methods' => 'GET',
             'permission_callback' => '__return_true',
             'callback' => 'Rnoc\Retainful\Api\Referral\ReferralManagement::getCustomer'
+        ));
+        register_rest_route('retainful-api/v1', '/customers', array(
+            'methods' => 'GET',
+            'permission_callback' => '__return_true',
+            'callback' => '\Rnoc\Retainful\Api\Imports\Imports::getCustomers'
+        ));
+        register_rest_route('retainful-api/v1', '/orders', array(
+            'methods' => 'GET',
+            'permission_callback' => '__return_true',
+            'callback' => '\Rnoc\Retainful\Api\Imports\Imports::getOrders'
         ));
     }
 
