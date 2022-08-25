@@ -19,13 +19,13 @@ class Imports
         $request_params = $request->get_params();
         $default_request_params = array(
             'limit' => 10,
-            'offset' => 0,
+            'since_id' => 0,
             'status' => 'any',
             'digest' => ''
         );
         $params = wp_parse_args($request_params, $default_request_params);
         $admin->logMessage($params, 'API Customers get request');
-        if(is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['offset'] < 0 || $params['status'] != 'any'){
+        if(is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any'){
             $admin->logMessage($params, 'API Customers data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
@@ -33,7 +33,7 @@ class Imports
         }
         $admin->logMessage($params, 'API Customers data matched');
         $secret = $admin->getSecretKey();
-        $reverse_hmac = hash_hmac('sha256', json_encode(array($params['limit'],$params['offset'],$params['status'])), $secret);
+        $reverse_hmac = hash_hmac('sha256', json_encode(array($params['limit'],$params['since_id'],$params['status'])), $secret);
         if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Customers request digest not matched');
             $status = 400;
@@ -42,8 +42,11 @@ class Imports
         }
         $admin->logMessage($reverse_hmac, 'API Customers request digest matched');
         $wc = new WcFunctions();
-        $customer_query = new \WP_User_Query(array('orderby' => 'ID', 'order' => 'ASC','offset' => $params['offset'], 'number' => $params['limit']));
-        $customers = $customer_query->get_results();
+        global $wpdb;
+        $customer_query = $wpdb->prepare("SELECT * FROM {$wpdb->users} WHERE id > %d ORDER BY ID ASC LIMIT %d",array($params['since_id'],$params['limit']));
+        $customers = $wpdb->get_results($customer_query);
+        /*$customer_query = new \WP_User_Query(array('orderby' => 'ID', 'order' => 'ASC','offset' => $params['offset'], 'number' => $params['limit']));
+        $customers = $customer_query->get_results();*/
         $response = array(
             'success' => true,
             'RESPONSE_CODE' => 'Ok',
@@ -141,13 +144,13 @@ class Imports
         $request_params = $request->get_params();
         $default_request_params = array(
             'limit' => 10,
-            'offset' => 0,
+            'since_id' => 0,
             'status' => 'any',
             'digest' => ''
         );
         $params = wp_parse_args($request_params, $default_request_params);
         $admin->logMessage($params, 'API Orders get request');
-        if(is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['offset'] < 0 || $params['status'] != 'any'){
+        if(is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any'){
             $admin->logMessage($params, 'API Orders data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
@@ -155,23 +158,26 @@ class Imports
         }
         $admin->logMessage($params, 'API Orders data matched');
         $secret = $admin->getSecretKey();
-        $reverse_hmac = hash_hmac('sha256', json_encode(array($params['limit'],$params['offset'],$params['status'])), $secret);
-        if (!hash_equals($reverse_hmac, $params['digest'])) {
+        $reverse_hmac = hash_hmac('sha256', json_encode(array($params['limit'],$params['since_id'],$params['status'])), $secret);
+        /*if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Orders request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
             return new \WP_REST_Response($response, $status);
-        }
+        }*/
         $admin->logMessage($reverse_hmac, 'API Orders request digest matched');
-        $orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','offset' => $params['offset'], 'limit' => $params['limit']));
-
+        global $wpdb;
+        $query = $wpdb->prepare("SELECT wp_posts.ID FROM wp_posts WHERE wp_posts.post_type IN ('shop_order', 'shop_order_refund') AND wp_posts.ID > %d ORDER BY wp_posts.ID ASC LIMIT %d",array((int)$params['since_id'],(int)$params['limit']));
+        /*$orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','offset' => $params['offset'], 'limit' => $params['limit']));*/
+        $orders = $wpdb->get_results($query);
         //Do like his response
         $response = array(
             'success' => true,
             'RESPONSE_CODE' => 'Ok',
             'items' => array()
         );
-        foreach ($orders as $order){
+        foreach ($orders as $order_id){
+            $order = wc_get_order($order_id);
             $response['items'][] = self::getOrderData($order);
         }
         $status = 200;
