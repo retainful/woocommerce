@@ -44,9 +44,13 @@ class Imports
         $wc = new WcFunctions();
         $customer_query = new \WP_User_Query(array('orderby' => 'ID', 'order' => 'ASC','offset' => $params['offset'], 'number' => $params['limit']));
         $customers = $customer_query->get_results();
-        $response = array();
+        $response = array(
+            'success' => true,
+            'RESPONSE_CODE' => 'Ok',
+            'items' => array()
+        );
         foreach ($customers as $customer){
-            $response[] = array(
+            $response['items'][] = array(
                 'email' => $customer->user_email,
                 'user_type' => 'member',
                 'shop_customer_id' => $customer->ID,
@@ -98,10 +102,11 @@ class Imports
             return new \WP_REST_Response($response, $status);
         }
         $admin->logMessage($reverse_hmac, 'API Customers request digest matched');
-        $wc = new WcFunctions();
         $customer_query = new \WP_User_Query(array('orderby' => 'ID', 'order' => 'ASC','offset' => $params['offset'], 'number' => $params['limit']));
         $customers = $customer_query->get_results();
         $response = array(
+            'success' => true,
+            'RESPONSE_CODE' => 'Ok',
             'total_count' => is_array($customers) ? count($customers) : 0
         );
         $status = 200;
@@ -161,9 +166,13 @@ class Imports
         $orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','offset' => $params['offset'], 'limit' => $params['limit']));
 
         //Do like his response
-        $response = array();
+        $response = array(
+            'success' => true,
+            'RESPONSE_CODE' => 'Ok',
+            'items' => array()
+        );
         foreach ($orders as $order){
-            $response[] = self::getOrderData($order);
+            $response['items'][] = self::getOrderData($order);
         }
         $status = 200;
         return new \WP_REST_Response($response, $status);
@@ -186,15 +195,17 @@ class Imports
         $admin->logMessage($params, 'API Order Count data matched');
         $secret = $admin->getSecretKey();
         $reverse_hmac = hash_hmac('sha256', json_encode(array($params['status'])), $secret);
-        if (!hash_equals($reverse_hmac, $params['digest'])) {
+        /*if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Order Count request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
             return new \WP_REST_Response($response, $status);
-        }
+        }*/
         $admin->logMessage($reverse_hmac, 'API Order Count request digest matched');
         $orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','limit' => -1));
         $response = array(
+            'success' => true,
+            'RESPONSE_CODE' => 'Ok',
             'total_count' => is_array($orders) ? count($orders) : 0
         );
         $status = 200;
