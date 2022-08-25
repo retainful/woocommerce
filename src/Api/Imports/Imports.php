@@ -159,12 +159,12 @@ class Imports
         $admin->logMessage($params, 'API Orders data matched');
         $secret = $admin->getSecretKey();
         $reverse_hmac = hash_hmac('sha256', json_encode(array($params['limit'],$params['since_id'],$params['status'])), $secret);
-        /*if (!hash_equals($reverse_hmac, $params['digest'])) {
+        if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Orders request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
             return new \WP_REST_Response($response, $status);
-        }*/
+        }
         $admin->logMessage($reverse_hmac, 'API Orders request digest matched');
         global $wpdb;
         $query = $wpdb->prepare("SELECT wp_posts.ID FROM wp_posts WHERE wp_posts.post_type IN ('shop_order', 'shop_order_refund') AND wp_posts.ID > %d ORDER BY wp_posts.ID ASC LIMIT %d",array((int)$params['since_id'],(int)$params['limit']));
