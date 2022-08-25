@@ -94,7 +94,7 @@ class Imports
         }
         $admin->logMessage($params, 'API Customers data matched');
         $secret = $admin->getSecretKey();
-        $reverse_hmac = hash_hmac('sha256', json_encode(array($params['limit'],$params['offset'],$params['status'])), $secret);
+        $reverse_hmac = hash_hmac('sha256', json_encode(array($params['status'])), $secret);
         if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Customers request digest not matched');
             $status = 400;
@@ -102,7 +102,7 @@ class Imports
             return new \WP_REST_Response($response, $status);
         }
         $admin->logMessage($reverse_hmac, 'API Customers request digest matched');
-        $customer_query = new \WP_User_Query(array('orderby' => 'ID', 'order' => 'ASC','offset' => $params['offset'], 'number' => $params['limit']));
+        $customer_query = new \WP_User_Query(array('orderby' => 'ID', 'order' => 'ASC', 'number' => -1));
         $customers = $customer_query->get_results();
         $response = array(
             'success' => true,
@@ -195,12 +195,12 @@ class Imports
         $admin->logMessage($params, 'API Order Count data matched');
         $secret = $admin->getSecretKey();
         $reverse_hmac = hash_hmac('sha256', json_encode(array($params['status'])), $secret);
-        /*if (!hash_equals($reverse_hmac, $params['digest'])) {
+        if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Order Count request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
             return new \WP_REST_Response($response, $status);
-        }*/
+        }
         $admin->logMessage($reverse_hmac, 'API Order Count request digest matched');
         $orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','limit' => -1));
         $response = array(
