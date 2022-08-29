@@ -25,7 +25,7 @@ class Imports
         );
         $params = wp_parse_args($request_params, $default_request_params);
         $admin->logMessage($params, 'API Customers get request');
-        if(is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any'){
+        if (is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any') {
             $admin->logMessage($params, 'API Customers data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
@@ -33,7 +33,7 @@ class Imports
         }
         $admin->logMessage($params, 'API Customers data matched');
         $secret = $admin->getSecretKey();
-        $reverse_hmac = hash_hmac('sha256', json_encode(array('limit' => (int)$params['limit'],'since_id' => (int)$params['since_id'],'status' => (string)$params['status'])), $secret);
+        $reverse_hmac = hash_hmac('sha256', json_encode(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status'])), $secret);
         if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Customers request digest not matched');
             $status = 400;
@@ -43,7 +43,7 @@ class Imports
         $admin->logMessage($reverse_hmac, 'API Customers request digest matched');
         $wc = new WcFunctions();
         global $wpdb;
-        $customer_query = $wpdb->prepare("SELECT * FROM {$wpdb->users} WHERE id > %d ORDER BY ID ASC LIMIT %d",array($params['since_id'],$params['limit']));
+        $customer_query = $wpdb->prepare("SELECT * FROM {$wpdb->users} WHERE id > %d ORDER BY ID ASC LIMIT %d", array($params['since_id'], $params['limit']));
         $customers = $wpdb->get_results($customer_query);
         /*$customer_query = new \WP_User_Query(array('orderby' => 'ID', 'order' => 'ASC','offset' => $params['offset'], 'number' => $params['limit']));
         $customers = $customer_query->get_results();*/
@@ -52,13 +52,13 @@ class Imports
             'RESPONSE_CODE' => 'Ok',
             'items' => array()
         );
-        foreach ($customers as $customer){
+        foreach ($customers as $customer) {
             $response['items'][] = array(
                 'email' => $customer->user_email,
                 'user_type' => 'member',
                 'shop_customer_id' => $customer->ID,
-                'last_name' => self::getCustomerName($customer,'last_name'),
-                'first_name' => self::getCustomerName($customer,'first_name'),
+                'last_name' => self::getCustomerName($customer, 'last_name'),
+                'first_name' => self::getCustomerName($customer, 'first_name'),
                 'orders_count' => strval($wc->getCustomerTotalOrders($customer->user_email)),
                 'phone_number' => get_user_meta($customer->ID, 'billing_phone', true),
                 'last_order_id' => '',
@@ -80,7 +80,9 @@ class Imports
         $status = 200;
         return new \WP_REST_Response($response, $status);
     }
-    public static function getCustomerCount(\WP_REST_Request $request){
+
+    public static function getCustomerCount(\WP_REST_Request $request)
+    {
         $admin = new Settings();
         $request_params = $request->get_params();
         $default_request_params = array(
@@ -89,7 +91,7 @@ class Imports
         );
         $params = wp_parse_args($request_params, $default_request_params);
         $admin->logMessage($params, 'API Customers get request');
-        if(empty($params['digest']) || !is_string($params['digest']) || $params['status'] != 'any'){
+        if (empty($params['digest']) || !is_string($params['digest']) || $params['status'] != 'any') {
             $admin->logMessage($params, 'API Customers data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
@@ -115,24 +117,27 @@ class Imports
         $status = 200;
         return new \WP_REST_Response($response, $status);
     }
-    public static function getCustomerName($user,$name = 'first_name'){
-        if(is_object($user) && isset($user->last_name) && !empty($user->last_name)){
+
+    public static function getCustomerName($user, $name = 'first_name')
+    {
+        if (is_object($user) && isset($user->last_name) && !empty($user->last_name)) {
             return $user->last_name;
         }
         $result_name = get_user_meta($user->ID, $name, true);
         if (!empty($result_name) && is_string($result_name)) {
             return $result_name;
         }
-        $result_name = get_user_meta($user->ID, 'shipping_'.$name, true);
+        $result_name = get_user_meta($user->ID, 'shipping_' . $name, true);
         if (!empty($result_name) && is_string($result_name)) {
             return $result_name;
         }
-        $result_name = get_user_meta($user->ID, 'billing_'.$name, true);
+        $result_name = get_user_meta($user->ID, 'billing_' . $name, true);
         if (!empty($result_name) && is_string($result_name)) {
             return $result_name;
         }
         return '';
     }
+
     /**
      * create coupons
      * @param \WP_REST_Request $request
@@ -150,7 +155,7 @@ class Imports
         );
         $params = wp_parse_args($request_params, $default_request_params);
         $admin->logMessage($params, 'API Orders get request');
-        if(is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any'){
+        if (is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any') {
             $admin->logMessage($params, 'API Orders data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
@@ -158,7 +163,7 @@ class Imports
         }
         $admin->logMessage($params, 'API Orders data matched');
         $secret = $admin->getSecretKey();
-        $reverse_hmac = hash_hmac('sha256', json_encode(array('limit' => (int)$params['limit'],'since_id' => (int)$params['since_id'],'status' => (string)$params['status'])), $secret);
+        $reverse_hmac = hash_hmac('sha256', json_encode(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status'])), $secret);
         if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Orders request digest not matched');
             $status = 400;
@@ -167,7 +172,7 @@ class Imports
         }
         $admin->logMessage($reverse_hmac, 'API Orders request digest matched');
         global $wpdb;
-        $query = $wpdb->prepare("SELECT wp_posts.ID FROM wp_posts WHERE wp_posts.post_type IN ('shop_order', 'shop_order_refund') AND wp_posts.ID > %d ORDER BY wp_posts.ID ASC LIMIT %d",array((int)$params['since_id'],(int)$params['limit']));
+        $query = $wpdb->prepare("SELECT wp_posts.ID FROM wp_posts WHERE wp_posts.post_type IN ('shop_order', 'shop_order_refund') AND wp_posts.ID > %d ORDER BY wp_posts.ID ASC LIMIT %d", array((int)$params['since_id'], (int)$params['limit']));
         /*$orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','offset' => $params['offset'], 'limit' => $params['limit']));*/
         $orders = $wpdb->get_results($query);
         //Do like his response
@@ -176,14 +181,16 @@ class Imports
             'RESPONSE_CODE' => 'Ok',
             'items' => array()
         );
-        foreach ($orders as $order_id){
+        foreach ($orders as $order_id) {
             $order = wc_get_order($order_id);
             $response['items'][] = self::getOrderData($order);
         }
         $status = 200;
         return new \WP_REST_Response($response, $status);
     }
-    public static function getOrderCount(\WP_REST_Request $request){
+
+    public static function getOrderCount(\WP_REST_Request $request)
+    {
         $admin = new Settings();
         $request_params = $request->get_params();
         $default_request_params = array(
@@ -192,7 +199,7 @@ class Imports
         );
         $params = wp_parse_args($request_params, $default_request_params);
         $admin->logMessage($params, 'API Orders get request');
-        if(empty($params['digest']) || !is_string($params['digest']) || $params['status'] != 'any'){
+        if (empty($params['digest']) || !is_string($params['digest']) || $params['status'] != 'any') {
             $admin->logMessage($params, 'API Order Count data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
@@ -208,7 +215,7 @@ class Imports
             return new \WP_REST_Response($response, $status);
         }
         $admin->logMessage($reverse_hmac, 'API Order Count request digest matched');
-        $orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','limit' => -1));
+        $orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC', 'limit' => -1));
         $response = array(
             'success' => true,
             'RESPONSE_CODE' => 'Ok',
@@ -217,7 +224,9 @@ class Imports
         $status = 200;
         return new \WP_REST_Response($response, $status);
     }
-    public static function getOrderData($order){
+
+    public static function getOrderData($order)
+    {
         $abandoned_order = new Order();
         $woocommerce_helper = new WcFunctions();
         $settings = new Settings();
@@ -289,9 +298,9 @@ class Imports
             'noc_discount_codes' => $abandoned_order->getNextOrderCouponDetails($order),
             'client_details' => $abandoned_order->getClientDetails($order)
         );
-        if(!empty($cart_token)){
-            $referrer_automation_id = $woocommerce_helper->getSession($cart_token.'_referrer_automation_id');
-            if(!empty($referrer_automation_id)){
+        if (!empty($cart_token)) {
+            $referrer_automation_id = $woocommerce_helper->getSession($cart_token . '_referrer_automation_id');
+            if (!empty($referrer_automation_id)) {
                 $order_data['referrer_automation_id'] = $referrer_automation_id;
             }
         }
