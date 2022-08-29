@@ -33,7 +33,7 @@ class Imports
         }
         $admin->logMessage($params, 'API Customers data matched');
         $secret = $admin->getSecretKey();
-        $reverse_hmac = hash_hmac('sha256', json_encode(array('limit' => $params['limit'],'since_id' => $params['since_id'],'status' => $params['status'])), $secret);
+        $reverse_hmac = hash_hmac('sha256', json_encode(array('limit' => (int)$params['limit'],'since_id' => (int)$params['since_id'],'status' => (string)$params['status'])), $secret);
         if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Customers request digest not matched');
             $status = 400;
@@ -158,7 +158,7 @@ class Imports
         }
         $admin->logMessage($params, 'API Orders data matched');
         $secret = $admin->getSecretKey();
-        $reverse_hmac = hash_hmac('sha256', json_encode(array('limit' => $params['limit'],'since_id' => $params['since_id'],'status' => $params['status'])), $secret);
+        $reverse_hmac = hash_hmac('sha256', json_encode(array('limit' => (int)$params['limit'],'since_id' => (int)$params['since_id'],'status' => (string)$params['status'])), $secret);
         if (!hash_equals($reverse_hmac, $params['digest'])) {
             $admin->logMessage($reverse_hmac, 'API Orders request digest not matched');
             $status = 400;
