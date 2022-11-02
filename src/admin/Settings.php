@@ -476,13 +476,13 @@ class Settings
                 'exit_intent_popup_mobile_settings'
 
             );
-            foreach ($check_default_value_of_multi_dim_array as $key){
-                if(isset($settings[RNOC_PLUGIN_PREFIX . $key]) && isset($settings[RNOC_PLUGIN_PREFIX . $key][0]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key][0])
-                    && is_array($settings[RNOC_PLUGIN_PREFIX . $key][0]) && is_array($default_settings[RNOC_PLUGIN_PREFIX . $key][0])){
-                    $settings[RNOC_PLUGIN_PREFIX . $key][0] = array_merge($default_settings[RNOC_PLUGIN_PREFIX . $key][0],$settings[RNOC_PLUGIN_PREFIX . $key][0]);
+            foreach ($check_default_value_of_multi_dim_array as $key) {
+                if (isset($settings[RNOC_PLUGIN_PREFIX . $key]) && isset($settings[RNOC_PLUGIN_PREFIX . $key][0]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key][0])
+                    && is_array($settings[RNOC_PLUGIN_PREFIX . $key][0]) && is_array($default_settings[RNOC_PLUGIN_PREFIX . $key][0])) {
+                    $settings[RNOC_PLUGIN_PREFIX . $key][0] = array_merge($default_settings[RNOC_PLUGIN_PREFIX . $key][0], $settings[RNOC_PLUGIN_PREFIX . $key][0]);
                 }
             }
-            $settings = wp_parse_args( $settings, $default_settings);
+            $settings = wp_parse_args($settings, $default_settings);
             $add_on_slug = sanitize_text_field($add_on);
             require_once dirname(__FILE__) . '/templates/pages/premium-addon-settings.php';
         } else {
@@ -830,50 +830,53 @@ class Settings
         update_option($this->slug . '_settings', $data);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
-    function saveNewWebhook(){
-        $nonce = self::$input->post_get('security','');
+
+    function saveNewWebhook()
+    {
+        $nonce = self::$input->post_get('security', '');
         if (!wp_verify_nonce($nonce, 'rnoc_create_order_webhook')) {
-            wp_send_json(array('success' => false,'message' => __('Invalid nonce',RNOC_TEXT_DOMAIN)));
+            wp_send_json(array('success' => false, 'message' => __('Invalid nonce', RNOC_TEXT_DOMAIN)));
         }
         $webhook_id = $this->getWebHookId();
-        if( $webhook_id > 0 ){
-            wp_send_json(array('success' => true,'message' => __('Webhook already exits',RNOC_TEXT_DOMAIN)));
+        if ($webhook_id > 0) {
+            wp_send_json(array('success' => true, 'message' => __('Webhook already exits', RNOC_TEXT_DOMAIN)));
         }
-        if(!class_exists('WC_Webhook')) {
-            wp_send_json(array('success' => false,'message' => __('Webhook class not found',RNOC_TEXT_DOMAIN)));
+        if (!class_exists('WC_Webhook')) {
+            wp_send_json(array('success' => false, 'message' => __('Webhook class not found', RNOC_TEXT_DOMAIN)));
         }
         try {
-            $webhook    = new \WC_Webhook( $webhook_id );
-            $name = sanitize_text_field( wp_unslash( 'Retainful Order Update' ) );
+            $webhook = new \WC_Webhook($webhook_id);
+            $name = sanitize_text_field(wp_unslash('Retainful Order Update'));
             $webhook->set_name($name);
-            if ( ! $webhook->get_user_id() ) {
-                $webhook->set_user_id( get_current_user_id() );
+            if (!$webhook->get_user_id()) {
+                $webhook->set_user_id(get_current_user_id());
             }
             //
             $webhook->set_status('active');
-            $delivery_url = $this->api->getDomain().'woocommerce/webhooks/checkout';
-            $webhook->set_delivery_url( $delivery_url );
-            $secret = wp_generate_password( 50, true, true );
-            $webhook->set_secret( $secret );
+            $delivery_url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
+            $webhook->set_delivery_url($delivery_url);
+            $secret = wp_generate_password(50, true, true);
+            $webhook->set_secret($secret);
             $topic = 'order.updated';
-            if ( wc_is_webhook_valid_topic( $topic ) ) {
-                $webhook->set_topic( $topic );
+            if (wc_is_webhook_valid_topic($topic)) {
+                $webhook->set_topic($topic);
             }
             // API version.
             $rest_api_versions = wc_get_webhook_rest_api_versions();
-            $webhook->set_api_version( end( $rest_api_versions ) ); // WPCS: input var okay, CSRF ok.
+            $webhook->set_api_version(end($rest_api_versions)); // WPCS: input var okay, CSRF ok.
             $webhook_id = $webhook->save();
-            if($webhook_id > 0) {
+            if ($webhook_id > 0) {
                 $this->saveWebhookId($webhook_id);
-                $response = array('success' => true,'message' => __('Webhook created successfully',RNOC_TEXT_DOMAIN));
-            }else{
-                $response = array('success' => false,'message' => __('Webhook creation failed',RNOC_TEXT_DOMAIN));
+                $response = array('success' => true, 'message' => __('Webhook created successfully', RNOC_TEXT_DOMAIN));
+            } else {
+                $response = array('success' => false, 'message' => __('Webhook creation failed', RNOC_TEXT_DOMAIN));
             }
             wp_send_json($response);
-        }catch (\Exception $e){
-            wp_send_json(array('success' => false,'message' => __('Webhook creation failed',RNOC_TEXT_DOMAIN)));
+        } catch (\Exception $e) {
+            wp_send_json(array('success' => false, 'message' => __('Webhook creation failed', RNOC_TEXT_DOMAIN)));
         }
     }
+
     /**
      * retainful ac settings page
      */
@@ -903,10 +906,12 @@ class Settings
         require_once dirname(__FILE__) . '/templates/pages/settings.php';
     }
 
-    function getRetainfulSettingValue($key, $default = null){
+    function getRetainfulSettingValue($key, $default = null)
+    {
         $settings = $this->getAdminSettings();
-        return (!empty($key) && isset($settings[$key])) ? $settings[$key]: $default;
+        return (!empty($key) && isset($settings[$key])) ? $settings[$key] : $default;
     }
+
     /**
      * register plugin related menus
      */
@@ -917,11 +922,11 @@ class Settings
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
         $settings = get_option($this->slug . '_settings', array());
         $is_next_order_disable = get_option('retainful_hide_next_order_coupon', 'no');
-        if(($is_next_order_disable === 'no' || empty($is_next_order_disable)) && (empty($settings) || count($settings) < 3)){
+        if (($is_next_order_disable === 'no' || empty($is_next_order_disable)) && (empty($settings) || count($settings) < 3)) {
             update_option('retainful_hide_next_order_coupon', 'yes');
         }
-        $can_hide_next_order_coupon = get_option('retainful_hide_next_order_coupon','no');
-        if($can_hide_next_order_coupon !== 'yes'){
+        $can_hide_next_order_coupon = get_option('retainful_hide_next_order_coupon', 'no');
+        if ($can_hide_next_order_coupon !== 'yes') {
             add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'nextOrderCouponPage'));
         }
         add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
@@ -1316,7 +1321,8 @@ class Settings
         return apply_filters("enable_embeded_referral_widget", ($need_widget === "yes"));
     }
 
-    function isAfterPayEnabled(){
+    function isAfterPayEnabled()
+    {
         $settings = $this->getAdminSettings();
         $need_afterpay = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'] : 'no';
         return apply_filters("retainful_enable_afterpay_action", ($need_afterpay === "yes"));
@@ -1619,7 +1625,7 @@ class Settings
                 $api_obj = new RestApi();
                 $store_data = array(
                     'secret_key' => $api_obj->encryptData($api_key, $secret_key));
-                $this->isApiEnabled($api_key, $secret_key,$store_data);
+                $this->isApiEnabled($api_key, $secret_key, $store_data);
             } else {
                 $this->updateUserAsFreeUser();
             }
@@ -1644,7 +1650,7 @@ class Settings
         $plan = $this->getUserActivePlan();
         $status = $this->getUserPlanStatus();
         $plan = strtolower($plan);
-        return (in_array($plan, array('pro', 'business', 'professional')) && in_array($status, array('active','trialing')));
+        return (in_array($plan, array('pro', 'business', 'professional')) && in_array($status, array('active', 'trialing')));
     }
 
     /**
@@ -1760,21 +1766,23 @@ class Settings
         return NULL;
     }
 
-    function getWebHookId() {
+    function getWebHookId()
+    {
         $settings = get_option($this->slug, array());
         if (isset($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']) && $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] > 0) {
-            $webhook    = new \WC_Webhook( $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] );
-            return method_exists($webhook,'get_id') ? ($webhook->get_id() > 0 ? $settings[RNOC_PLUGIN_PREFIX . 'webhook_id']: 0): 0;
+            $webhook = new \WC_Webhook($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']);
+            return method_exists($webhook, 'get_id') ? ($webhook->get_id() > 0 ? $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] : 0) : 0;
         }
         return 0;
     }
 
-    function saveWebhookId($id){
+    function saveWebhookId($id)
+    {
         $settings = get_option($this->slug, array());
-        if($id > 0){
+        if ($id > 0) {
             $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = $id;
         }
-        update_option($this->slug,$settings);
+        update_option($this->slug, $settings);
     }
 
     /**
@@ -2060,8 +2068,8 @@ class Settings
     {
         $hook = 'woocommerce_email_customer_details';
         $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            $hook = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
+        if (!empty($settings) && is_array($settings)) {
+            $hook = (isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) && $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
         }
         return $hook;
     }
