@@ -1,6 +1,7 @@
 <?php
 
 namespace Rnoc\Retainful\library;
+
 use Rnoc\Retainful\WcFunctions;
 
 if (!defined('ABSPATH')) exit;
@@ -20,13 +21,16 @@ class RetainfulApi
         return $this->app_url . '?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
     }
 
-    function getDomain(){
-        return apply_filters('retainful_domain_url',$this->domain);
+    function getDomain()
+    {
+        return apply_filters('retainful_domain_url', $this->domain);
     }
 
-    function getAbandonedCartApiUrl(){
-        return apply_filters('retainful_abandoned_cart_api_url',$this->abandoned_cart_api_url);
+    function getAbandonedCartApiUrl()
+    {
+        return apply_filters('retainful_abandoned_cart_api_url', $this->abandoned_cart_api_url);
     }
+
     /**
      * Validate API Key
      * @param $api_key
@@ -257,10 +261,10 @@ class RetainfulApi
         );
         $response = $this->request($url, array(), 'get', '', $headers);
         if (isset($response->success) && $response->success) {
-            $referrer_automation_id = wc_clean($_REQUEST['referrer_automation_id']);
-            if(!empty($referrer_automation_id)){
+            $referrer_automation_id = isset($_REQUEST['referrer_automation_id']) && !empty($_REQUEST['referrer_automation_id']) ? wc_clean($_REQUEST['referrer_automation_id']) : 0;
+            if (!empty($referrer_automation_id)) {
                 $woocommerce = new WcFunctions();
-                $woocommerce->setSession($cart_token.'_referrer_automation_id', $referrer_automation_id);
+                $woocommerce->setSession($cart_token . '_referrer_automation_id', $referrer_automation_id);
                 $response->data->referrer_automation_id = $referrer_automation_id;
             }
             return isset($response->data) ? $response->data : NULL;
