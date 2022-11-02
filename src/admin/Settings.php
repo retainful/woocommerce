@@ -2068,8 +2068,8 @@ class Settings
     {
         $hook = 'woocommerce_email_customer_details';
         $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            $hook = ($settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
+        if (!empty($settings) && is_array($settings)) {
+            $hook = (isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) && $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
         }
         return $hook;
     }
