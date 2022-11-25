@@ -267,7 +267,7 @@ class Main
                 //add_action('woocommerce_new_order', array($checkout, 'purchaseComplete'));
                 add_action('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
                 add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
-                add_action('woocommerce_checkout_order_processed', array($checkout, 'checkoutOrderProcessed'));
+                add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
                 add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
                 // handle updating Retainful order data after a successful payment, for certain gateways
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
