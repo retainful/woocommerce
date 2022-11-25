@@ -247,7 +247,7 @@ class Checkout extends RestApi
         global $wp;
         try {
             // PayPal IPN request
-            if (!empty($wp->query_vars['wc-api']) && ('WC_Gateway_Paypal' === $wp->query_vars['wc-api'])) {
+            if (isset($wp->query_vars['wc-api']) && !empty($wp->query_vars['wc-api']) && ('WC_Gateway_Paypal' === $wp->query_vars['wc-api'])) {
                 $order = self::$woocommerce->getOrder($order_id);
                 // PayPal order is completed or authorized: clear any user session
                 // data so that we don't have to rely on the thank-you page rendering
