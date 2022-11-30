@@ -580,3 +580,8 @@ No. There is no charges for support.
 
 = 2.6.16 =
 - Fix: AfterPay file included
+
+= 2.6.17 =
+- Fix: Listen order create hook
+- Fix: Settings fatal error
+- Fix: automation id validation
