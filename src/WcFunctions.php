@@ -565,8 +565,8 @@ class WcFunctions
      */
     function getOrderPlacedDate($order, $format = NULL)
     {
-        if ($this->isMethodExists($order, 'get_date_completed')) {
-            $date = $order->get_date_completed();
+        if ($this->isMethodExists($order, 'get_date_paid')) {
+            $date = $order->get_date_paid();
             if (!is_null($format)) {
                 $date = $date->format($format);
             }
