@@ -565,10 +565,14 @@ class WcFunctions
      */
     function getOrderPlacedDate($order, $format = NULL)
     {
+        $date = null;
         if ($this->isMethodExists($order, 'get_date_paid')) {
-            $date = $order->get_date_paid();
+            $dateObject = $order->get_date_paid();
+            if(is_object($dateObject) && $dateObject instanceof \WC_DateTime) {
+                $date = $dateObject->getTimestamp();
+            }
             if (!is_null($format)) {
-                $date = $date->format($format);
+                $date = $dateObject->format($format);
             }
             return $date;
         }

@@ -550,6 +550,10 @@ class RestApi
         if (empty($timestamp)) {
             $timestamp = current_time('timestamp', true);
         }
+        if(is_object($timestamp) && $timestamp instanceof \WC_DateTime) {
+            $timestamp = $timestamp->getTimestamp();
+        }
+
         try {
             $date = date('Y-m-d H:i:s', $timestamp);
             $date_time = new DateTime($date);
