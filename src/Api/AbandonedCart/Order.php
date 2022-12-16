@@ -147,7 +147,7 @@ class Order extends RestApi
         $order_placed_at = self::$woocommerce->getOrderMeta($order, $this->order_placed_date_key_for_db);
         $order_status = self::$woocommerce->getStatus($order);
         if (!$order_placed_at && $this->isOrderHasValidOrderStatus($order_status)) {
-            $order_placed_at = current_time('timestamp', true);
+            $order_placed_at = self::$woocommerce->getOrderPlacedDate($order);
             self::$woocommerce->setOrderMeta($order_id, $this->order_placed_date_key_for_db, $order_placed_at);
             if ($this->isOrderInPendingRecovery($order_id)) {
                 $this->markOrderAsRecovered($order_id);
@@ -204,6 +204,7 @@ class Order extends RestApi
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
             'r_order_id' => $order_id,
             'order_number' => $order_id,
+            'order_date' => $this->formatToIso8601(self::$woocommerce->getOrderDate($order)),
             'woo_r_order_number' => self::$woocommerce->getOrderNumber($order),
             'plugin_version' => RNOC_VERSION,
             'cart_hash' => $cart_hash,

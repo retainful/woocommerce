@@ -556,6 +556,25 @@ class WcFunctions
         return NULL;
     }
 
+
+    /**
+     * get Ordered Date
+     * @param $order
+     * @param $format
+     * @return null
+     */
+    function getOrderPlacedDate($order, $format = NULL)
+    {
+        if ($this->isMethodExists($order, 'get_date_completed')) {
+            $date = $order->get_date_completed();
+            if (!is_null($format)) {
+                $date = $date->format($format);
+            }
+            return $date;
+        }
+        return NULL;
+    }
+
     /**
      * get Order User Id
      * @param $order
