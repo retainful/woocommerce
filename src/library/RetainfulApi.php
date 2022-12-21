@@ -20,7 +20,10 @@ class RetainfulApi
     {
         return $this->app_url . '?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
     }
-
+    function getCheckoutUrl(){
+        $checkout = $this->getDomain().'woocommerce/webhooks/checkout';
+        return apply_filters('retainful_api_checkout_url', $checkout);
+    }
     function getDomain()
     {
         return apply_filters('retainful_domain_url', $this->domain);
@@ -187,7 +190,7 @@ class RetainfulApi
     {
         $url = rtrim($this->getAbandonedCartApiUrl(), '/');
         $url .= '/webhooks/checkout';
-        return $url;
+        return apply_filters('retainful_api_abandoned_cart_end_point',$url);
     }
 
     /**

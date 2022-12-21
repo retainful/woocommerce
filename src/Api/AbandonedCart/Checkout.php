@@ -110,7 +110,8 @@ class Checkout extends RestApi
             $webhook = new \WC_Webhook( $webhook_id );
             $delivery_url = $webhook->get_delivery_url();
             $topic = $webhook->get_topic();
-            $site_delivery_url = self::$api->getDomain().'woocommerce/webhooks/checkout';
+            $site_delivery_url = self::$api->getCheckoutUrl();
+
             if($delivery_url != $site_delivery_url || $topic != 'order.updated' || $order_id <= 0){
                 return $http_args;
             }
@@ -195,6 +196,7 @@ class Checkout extends RestApi
             $this->unsetOrderTempData();
         }
         $order_data = $order_obj->getOrderData($order);
+
         if (empty($order_data)) {
             return null;
         }
@@ -318,6 +320,9 @@ class Checkout extends RestApi
         if ($this->needInstantOrderSync()) {
             $order_obj = new Order();
             $cart = $order_obj->getOrderData($order);
+            $logger = wc_get_logger();
+            $logger->add('Retainful','Cart Data');
+            $logger->add('Retainful',json_encode($cart));
             if (!empty($cart)) {
                 $cart_hash = $this->encryptData($cart);
                 //Reduce the loading speed
@@ -331,6 +336,10 @@ class Checkout extends RestApi
                         "X-Cart-Token" => $token,
                         "Cart-Token" => $token
                     );
+                    $logger->add('Retainful','Cart hash');
+                    $logger->add('Retainful',$cart_hash);
+                    $logger->add('Retainful','Cart header');
+                    $logger->add('Retainful',json_encode($extra_headers));
                     $this->syncCart($cart_hash, $extra_headers);
                 }
             } else {
