@@ -109,6 +109,7 @@ class RestApi
      */
     function formatDecimalPriceRemoveTrailingZeros($price)
     {
+        $price = (float)$price;
         $decimals = self::$woocommerce->priceDecimals();
         $rounded_price = round($price, $decimals);
         return number_format($rounded_price, $decimals, '.', '');
