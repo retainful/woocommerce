@@ -920,7 +920,7 @@ class Settings
         add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat', 56);
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
-        $settings = get_option($this->slug . '_settings', array());
+        $settings = $this->getAdminSettings();
         $is_next_order_disable = get_option('retainful_hide_next_order_coupon', 'no');
         if (($is_next_order_disable === 'no' || empty($is_next_order_disable)) && (empty($settings) || count($settings) < 3)) {
             update_option('retainful_hide_next_order_coupon', 'yes');
@@ -1878,11 +1878,7 @@ class Settings
     function isNextOrderCouponEnabled()
     {
         $settings = get_option($this->slug, array());
-        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']) && empty($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon'])) {
-            return false;
-        } else {
-            return true;
-        }
+        return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']);
     }
 
     /**
