@@ -162,8 +162,9 @@ class Main
         //initialise currency helper
         new Currency();
         $can_hide_next_order_coupon = get_option('retainful_hide_next_order_coupon', 'no');
-        if (is_admin() && $this->admin->isNextOrderCouponEnabled() && $can_hide_next_order_coupon == 'no') {
-            $notice = '<p>' .__("The \"Next Order Coupon\" tab/menu will soon be removed from the Retainful plugin. Migrate your Next Order Coupon campaign to the Automations now. You can find the guide <a href='https://help.retainful.com/migration#next-order-coupon' target='_blank'>here</a>", RNOC_TEXT_DOMAIN) . '</p>';
+        $show_deprecate_message = isset($_REQUEST['page']) && in_array($_REQUEST['page'],array('retainful_license','retainful_settings','retainful','retainful_premium'));
+        if (is_admin() && $show_deprecate_message && $this->admin->isNextOrderCouponEnabled() && $can_hide_next_order_coupon == 'no') {
+            $notice = '<p>' .__("The Next Order Coupon feature inside the plugin and its tab/menu will soon be removed from the Retainful plugin. Migrate your Next Order Coupon campaign to the Automations now. A detailed guide <a href='https://help.retainful.com/migration#next-order-coupon' target='_blank'>here</a>", RNOC_TEXT_DOMAIN) . '</p>';
             $this->showAdminNotice($notice);
         }
         if ($this->admin->isNextOrderCouponEnabled()) {
