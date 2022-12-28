@@ -1878,11 +1878,7 @@ class Settings
     function isNextOrderCouponEnabled()
     {
         $settings = get_option($this->slug, array());
-        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']) && empty($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon'])) {
-            return false;
-        } else {
-            return true;
-        }
+        return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']);
     }
 
     /**

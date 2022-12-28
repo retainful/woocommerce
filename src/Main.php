@@ -161,7 +161,11 @@ class Main
         }
         //initialise currency helper
         new Currency();
-
+        $can_hide_next_order_coupon = get_option('retainful_hide_next_order_coupon', 'no');
+        if (is_admin() && $this->admin->isNextOrderCouponEnabled() && $can_hide_next_order_coupon == 'no') {
+            $notice = "We will deprecate next order coupon settings, This settings available in retainful server";
+            $this->showAdminNotice($notice);
+        }
         if ($this->admin->isNextOrderCouponEnabled()) {
             //Get events
             add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
