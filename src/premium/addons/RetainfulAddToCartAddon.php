@@ -457,13 +457,11 @@ if (!class_exists('RetainfulAddToCartAddon')) {
 
         function eligibleAddToCartPopup()
         {
+            global $wp_query;
             $modal_hide_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_hide_pages', array());
             $status = true;
-            if(!empty($modal_hide_pages) && is_array($modal_hide_pages)){
-                global $wp_query;
-                if(isset($wp_query->post) && isset($wp_query->post->ID) && $wp_query->post->ID > 0){
-                    $status = !in_array($wp_query->post->ID,$modal_hide_pages);
-                }
+            if(!empty($modal_hide_pages) && is_array($modal_hide_pages) && isset($wp_query->post) && isset($wp_query->post->ID) && $wp_query->post->ID > 0){
+                $status = !in_array($wp_query->post->ID,$modal_hide_pages);
             }
             return apply_filters('retainful_is_add_to_cart_popup_eligible', $status);
         }
