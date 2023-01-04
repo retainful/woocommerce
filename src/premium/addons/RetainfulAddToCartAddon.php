@@ -457,7 +457,15 @@ if (!class_exists('RetainfulAddToCartAddon')) {
 
         function eligibleAddToCartPopup()
         {
-            return apply_filters('retainful_is_add_to_cart_popup_eligible', true);
+            $modal_hide_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_hide_pages', array());
+            $status = true;
+            if(!empty($modal_hide_pages) && is_array($modal_hide_pages)){
+                global $wp_query;
+                if(isset($wp_query->post) && isset($wp_query->post->ID) && $wp_query->post->ID > 0){
+                    $status = !in_array($wp_query->post->ID,$modal_hide_pages);
+                }
+            }
+            return apply_filters('retainful_is_add_to_cart_popup_eligible', $status);
         }
 
         /**
@@ -671,6 +679,36 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             <p class="description">
                                 <?php
                                 echo __('The add to cart popup would be displayed only on the selected pages.If you wish to display the popup in all pages, leave this option empty.', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_hide_pages'; ?>"><?php
+                                esc_html_e('Custom pages to hide the pop-up modal on (Optional)', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <select multiple="multiple"
+                                    name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_hide_pages[]'; ?>"
+                                    class="rnoc-multi-select"
+                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_hide_pages'; ?>">
+                                <?php
+                                if (!empty($pages)) {
+                                    foreach ($pages as $key => $label) {
+                                        ?>
+                                        <option value="<?php echo $key ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'modal_hide_pages'])) {
+                                            echo "selected";
+                                        } ?>><?php echo $label ?></option>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <p class="description">
+                                <?php
+                                echo __('The add to cart popup would be hide only on the selected pages.If you wish to display the popup in all pages, leave this option empty.', RNOC_TEXT_DOMAIN);
                                 ?>
                             </p>
                         </td>
