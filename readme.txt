@@ -3,9 +3,9 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.0
 Tested up to: 6.1
-WC tested up to: 7.1
+WC tested up to: 7.2
 Requires PHP: 5.6
-Stable tag: 2.6.17
+Stable tag: 2.6.18
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -585,3 +585,7 @@ No. There is no charges for support.
 - Fix: Listen order create hook
 - Fix: Settings fatal error
 - Fix: automation id validation
+
+= 2.6.18 =
+- Fix: Type Casting
+- Added: Deprecation notice
