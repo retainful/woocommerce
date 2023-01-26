@@ -430,6 +430,7 @@ class RestApi
         if ($consider_cancelled_order_as_ac == 1) {
             $invalid_order_status[] = 'cancelled';
         }
+
         $invalid_order_status = array_unique($invalid_order_status);
         return (!in_array($order_status, $invalid_order_status));
     }
