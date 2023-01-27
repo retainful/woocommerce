@@ -166,6 +166,7 @@ class Order extends RestApi
         if(is_object($order_placed_at)){
             $order_placed_at = $this->formatToIso8601($order_placed_at);
         }
+        // 2. When reach this place, $order_placed_at must be null or empty value
         if(empty($order_placed_at) || is_null($order_placed_at)){
             $order_placed_at = current_time('timestamp', true);
         }
