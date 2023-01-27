@@ -148,7 +148,7 @@ class Order extends RestApi
         $order_status = self::$woocommerce->getStatus($order);
         if (!$order_placed_at && $this->isOrderHasValidOrderStatus($order_status)) {
             $order_placed_at = self::$woocommerce->getOrderPlacedDate($order);
-
+            $order_placed_at = $this->processOrderPlaceDate($order_placed_at);
             //Just in case the order placed at returns empty, this will be our fall back
             if(empty($order_placed_at)) {
                 $order_placed_at = current_time('timestamp', true);
@@ -161,7 +161,16 @@ class Order extends RestApi
         $completed_at = (!empty($order_placed_at)) ? $this->formatToIso8601($order_placed_at) : NULL;
         return apply_filters('rnoc_order_completed_at', $completed_at, $order);
     }
-
+    function processOrderPlaceDate($order_placed_at = ''){
+        //1. if $order_placed_at is Object
+        if(is_object($order_placed_at)){
+            $order_placed_at = $this->formatToIso8601($order_placed_at);
+        }
+        if(empty($order_placed_at) || is_null($order_placed_at)){
+            $order_placed_at = current_time('timestamp', true);
+        }
+        return $order_placed_at;
+    }
     /**
      * get the cart token from the order object
      * @param $order
