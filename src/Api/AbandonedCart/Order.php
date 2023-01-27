@@ -149,10 +149,6 @@ class Order extends RestApi
         if (!$order_placed_at && $this->isOrderHasValidOrderStatus($order_status)) {
             $order_placed_at = self::$woocommerce->getOrderPlacedDate($order);
             $order_placed_at = $this->processOrderPlaceDate($order_placed_at);
-            //Just in case the order placed at returns empty, this will be our fall back
-            if(empty($order_placed_at)) {
-                $order_placed_at = current_time('timestamp', true);
-            }
             self::$woocommerce->setOrderMeta($order_id, $this->order_placed_date_key_for_db, $order_placed_at);
             if ($this->isOrderInPendingRecovery($order_id)) {
                 $this->markOrderAsRecovered($order_id);
