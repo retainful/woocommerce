@@ -148,11 +148,7 @@ class Order extends RestApi
         $order_status = self::$woocommerce->getStatus($order);
         if (!$order_placed_at && $this->isOrderHasValidOrderStatus($order_status)) {
             $order_placed_at = self::$woocommerce->getOrderPlacedDate($order);
-
-            //Just in case the order placed at returns empty, this will be our fall back
-            if(empty($order_placed_at)) {
-                $order_placed_at = current_time('timestamp', true);
-            }
+            $order_placed_at = $this->processOrderPlaceDate($order_placed_at);
             self::$woocommerce->setOrderMeta($order_id, $this->order_placed_date_key_for_db, $order_placed_at);
             if ($this->isOrderInPendingRecovery($order_id)) {
                 $this->markOrderAsRecovered($order_id);
@@ -161,7 +157,17 @@ class Order extends RestApi
         $completed_at = (!empty($order_placed_at)) ? $this->formatToIso8601($order_placed_at) : NULL;
         return apply_filters('rnoc_order_completed_at', $completed_at, $order);
     }
-
+    function processOrderPlaceDate($order_placed_at = ''){
+        //1. if $order_placed_at is Object
+        if(is_object($order_placed_at)){
+            $order_placed_at = $this->formatToIso8601($order_placed_at);
+        }
+        // 2. When reach this place, $order_placed_at must be null or empty value
+        if(empty($order_placed_at) || is_null($order_placed_at)){
+            $order_placed_at = current_time('timestamp', true);
+        }
+        return $order_placed_at;
+    }
     /**
      * get the cart token from the order object
      * @param $order
