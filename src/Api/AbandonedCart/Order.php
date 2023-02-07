@@ -198,6 +198,9 @@ class Order extends RestApi
             return array();
         }
         $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
+        if(empty($cart_hash)){
+            return array();
+        }
         $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
         $customer_details = $this->getCustomerDetails($order);
         $current_currency_code = self::$woocommerce->getOrderCurrency($order);
