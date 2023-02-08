@@ -1,11 +1,11 @@
 === Retainful - WooCommerce Abandoned Cart Recovery, Order Follow Up Emails, Email Marketing Automation, Next Order Coupons & Referrals ===
 Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
-Requires at least: 4.0
+Requires at least: 4.6.1
 Tested up to: 6.1
-WC tested up to: 7.2
+WC tested up to: 7.3
 Requires PHP: 5.6
-Stable tag: 2.6.18
+Stable tag: 2.6.19
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -589,3 +589,8 @@ No. There is no charges for support.
 = 2.6.18 =
 - Fix: Type Casting
 - Added: Deprecation notice
+
+= 2.6.19 =
+- Fix: Duplicate cart creation
+- Fix: Handle completed_at value
+- Fix: Order hash validation implemented
