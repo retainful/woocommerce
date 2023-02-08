@@ -591,6 +591,4 @@ No. There is no charges for support.
 - Added: Deprecation notice
 
 = 2.6.19 =
-- Fix: Duplicate cart creation
-- Fix: Handle completed_at value
-- Fix: Order hash validation implemented
+- Fix: Handling completed_at value
