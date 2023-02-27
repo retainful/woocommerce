@@ -31,6 +31,16 @@ class RetainfulApi
         return apply_filters('retainful_abandoned_cart_api_url', $this->abandoned_cart_api_url);
     }
 
+    function getAbandonedCartRecoveryApiUrl()
+    {
+        return apply_filters('retainful_abandoned_cart_recovery_api_url', $this->abandoned_cart_api_url);
+    }
+
+    function getCheckoutUrl(){
+        $checkout = $this->getDomain().'woocommerce/webhooks/checkout';
+        return apply_filters('retainful_api_checkout_url', $checkout);
+    }
+
     /**
      * Validate API Key
      * @param $api_key
@@ -187,7 +197,7 @@ class RetainfulApi
     {
         $url = rtrim($this->getAbandonedCartApiUrl(), '/');
         $url .= '/webhooks/checkout';
-        return $url;
+        return apply_filters('retainful_api_abandoned_cart_end_point', $url);
     }
 
     /**
@@ -254,7 +264,7 @@ class RetainfulApi
      */
     function retrieveCartDetails($app_id, $cart_token)
     {
-        $url = rtrim($this->getAbandonedCartApiUrl(), '/');
+        $url = rtrim($this->getAbandonedCartRecoveryApiUrl(), '/');
         $url .= '/abandoned_checkouts/' . $cart_token;
         $headers = array(
             'app_id' => $app_id
