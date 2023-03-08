@@ -885,6 +885,8 @@ class Settings
         $settings = $this->getAdminSettings();
         $default_settings = array(
             RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
+            RNOC_PLUGIN_PREFIX . 'single_opt_in' => '0',
+            RNOC_PLUGIN_PREFIX . 'buyer_accept_market_default_value' => '1',
             RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
             RNOC_PLUGIN_PREFIX . 'enable_referral_widget' => 'no',
             RNOC_PLUGIN_PREFIX . 'enable_popup_widget' => 'no',

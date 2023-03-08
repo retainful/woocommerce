@@ -78,6 +78,28 @@ class Cart extends RestApi
         return $fields;
     }
 
+    function displaySingleOptIn($checkout){
+        $single_opt_in = self::$settings->getRetainfulSettingValue(RNOC_PLUGIN_PREFIX .'single_opt_in',0);
+        if($single_opt_in){
+            $key = "retainful_single_opt_in";
+            $field =  array(
+                'type'         => 'checkbox',
+                'label'        => __( 'Accept marketing analysis?', RNOC_TEXT_DOMAIN ),
+            );
+            woocommerce_form_field( $key, $field, $checkout->get_value( $key ) );
+        }
+    }
+    function handleSingleOptIn($post_data){
+        $single_opt_in = self::$settings->getRetainfulSettingValue(RNOC_PLUGIN_PREFIX .'single_opt_in',0);
+        if($single_opt_in){
+            $query_strings = array();
+            if(is_string($post_data)){
+                parse_str($post_data,$query_strings);
+            }
+            $buyer_marketing = isset($query_strings['retainful_single_opt_in']) && $query_strings['retainful_single_opt_in'] == 1 ? 1:0;
+            self::$woocommerce->setSession('is_buyer_accepting_marketing',$buyer_marketing);
+        }
+    }
     /**
      * Show GDPR message to logged in users
      */
@@ -108,7 +130,7 @@ class Cart extends RestApi
                     $billing_address[$billing_field_name] = sanitize_text_field($_POST[$billing_field_name]);
                 }
             }
-            self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
+            //self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
             $this->setCustomerBillingDetails($billing_address);
             // $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
             //shipping address fields

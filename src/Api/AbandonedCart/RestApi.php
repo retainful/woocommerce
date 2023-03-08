@@ -689,7 +689,17 @@ class RestApi
      */
     function isBuyerAcceptsMarketing()
     {
-        if (is_user_logged_in()) {
+        $single_opt_in = self::$settings->getRetainfulSettingValue(RNOC_PLUGIN_PREFIX .'single_opt_in',0);
+        if($single_opt_in){
+            $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
+            if ($is_buyer_accepts_marketing == 1) {
+                return true;
+            }
+            return false;
+        }
+        $buyer_accept_market_default_value = self::$settings->getRetainfulSettingValue(RNOC_PLUGIN_PREFIX .'buyer_accept_market_default_value',1);
+        return $buyer_accept_market_default_value == 1;
+        /*if (is_user_logged_in()) {
             return true;
         } else {
             $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
@@ -697,7 +707,7 @@ class RestApi
                 return true;
             }
         }
-        return false;
+        return false;*/
     }
 
     /**

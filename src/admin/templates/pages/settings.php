@@ -280,6 +280,56 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'single_opt_in'; ?>"><?php
+                    esc_html_e('Enable Opt-in?', RNOC_TEXT_DOMAIN);
+                    ?></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'single_opt_in'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'single_opt_in_1'; ?>"
+                           value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'single_opt_in'] == '1') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'single_opt_in'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'single_opt_in'; ?>"
+                           value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'single_opt_in'] == '0') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'buyer_accept_market_default_value'; ?>"><?php
+                    esc_html_e('Accept Marking default', RNOC_TEXT_DOMAIN);
+                    ?></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'buyer_accept_market_default_value'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'buyer_accept_market_default_value_1'; ?>"
+                           value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'buyer_accept_market_default_value'] == '1') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'buyer_accept_market_default_value'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'buyer_accept_market_default_value'; ?>"
+                           value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'buyer_accept_market_default_value'] == '0') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'cart_capture_msg'; ?>"><?php
                     esc_html_e('Compliance Message', RNOC_TEXT_DOMAIN);
                     ?></label>
