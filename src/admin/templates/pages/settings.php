@@ -306,7 +306,7 @@ require_once "tabs.php";
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'buyer_accept_market_default_value'; ?>"><?php
-                    esc_html_e('Accept Marking default', RNOC_TEXT_DOMAIN);
+                    esc_html_e('Allow accept marking default ?', RNOC_TEXT_DOMAIN);
                     ?></label>
             </th>
             <td>
