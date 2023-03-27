@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     let default_retainful_cart_data = {
         "ajax_url": "",
-        "jquery_url": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+        "jquery_url": "https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js",
         "ip": "",
         "version": "",
         "public_key": "",
