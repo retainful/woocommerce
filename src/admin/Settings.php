@@ -922,9 +922,12 @@ class Settings
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
         $settings = $this->getAdminSettings();
         $is_next_order_disable = get_option('retainful_hide_next_order_coupon', 'no');
-        if (($is_next_order_disable === 'no' || empty($is_next_order_disable)) && (empty($settings) || count($settings) < 3)) {
-            update_option('retainful_hide_next_order_coupon', 'yes');
+        if(!$this->isNextOrderCouponEnabled()){
+            if (($is_next_order_disable === 'no' || empty($is_next_order_disable)) && (empty($settings) || count($settings) < 3)) {
+                update_option('retainful_hide_next_order_coupon', 'yes');
+            }
         }
+
         $can_hide_next_order_coupon = get_option('retainful_hide_next_order_coupon', 'no');
         if ($can_hide_next_order_coupon !== 'yes') {
             add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'nextOrderCouponPage'));
