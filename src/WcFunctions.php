@@ -1966,14 +1966,30 @@ class WcFunctions
     function getCustomerTotalOrders($email)
     {
         if (!empty($email) && is_email($email)) {
-            $customer_orders = $this->getCustomerOrdersByEmail($email);
+            /*$customer_orders = $this->getCustomerOrdersByEmail($email);
             if (is_array($customer_orders)) {
                 return count($customer_orders);
+            }*/
+            $user = get_user_by('email',$email);
+            if( is_object($user) && isset($user->ID) && $user->ID > 0 ) {
+                $customer = new \WC_Customer($user->ID); // Get WC_Customer Object
+                return $customer->get_order_count();
             }
         }
         return 0;
     }
 
+    function getCustomerLastOrderId($email){
+        if (!empty($email) && is_email($email)) {
+            $user = get_user_by('email',$email);
+            if( is_object($user) && isset($user->ID) && $user->ID > 0 ) {
+                $customer = new \WC_Customer($user->ID); // Get WC_Customer Object
+                $order = $customer->get_last_order();
+                return is_object($order) && method_exists($order,'get_id') ? $order->get_id(): null;
+            }
+        }
+        return null;
+    }
     /**
      * get the total orders from session
      * @param $email
@@ -2009,14 +2025,21 @@ class WcFunctions
     {
         $sum = 0;
         if (!empty($email) && is_email($email)) {
-            $customer_orders = $this->getCustomerOrdersByEmail($email);
-            if (is_array($customer_orders)) {
-                foreach ($customer_orders as $order) {
-                    if ($order instanceof \WC_Order) {
-                        $sum = $sum + $this->getOrderTotal($order);
+            $user = get_user_by('email',$email);
+            if( is_object($user) && isset($user->ID) && $user->ID > 0 ) {
+                $customer = new \WC_Customer($user->ID); // Get WC_Customer Object
+                $sum = $customer->get_total_spent();
+            }
+            /*if(empty($sum)){
+                $customer_orders = $this->getCustomerOrdersByEmail($email);
+                if (is_array($customer_orders)) {
+                    foreach ($customer_orders as $order) {
+                        if ($order instanceof \WC_Order) {
+                            $sum = $sum + $this->getOrderTotal($order);
+                        }
                     }
                 }
-            }
+            }*/
         }
         return floatval($sum);
     }
