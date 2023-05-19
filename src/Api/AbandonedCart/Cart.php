@@ -1236,9 +1236,9 @@ class Cart extends RestApi
             'currency' => self::$settings->getBaseCurrency(),
             'created_at' => $this->formatToIso8601($created_at),
             'updated_at' => $this->formatToIso8601($updated_at),
-            'total_spent' => self::$woocommerce->getCustomerTotalSpent($billing_email),
+            /*'total_spent' => self::$woocommerce->getCustomerTotalSpent($billing_email),
             'orders_count' => self::$woocommerce->getCustomerTotalOrders($billing_email),
-            'last_order_id' => self::$woocommerce->getCustomerLastOrderId($billing_email),
+            'last_order_id' => self::$woocommerce->getCustomerLastOrderId($billing_email),*/
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,
