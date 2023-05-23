@@ -1974,6 +1974,15 @@ class WcFunctions
         return 0;
     }
 
+    function getCustomerLastOrderId($email){
+        if (!empty($email) && is_email($email)) {
+            $customer_orders = $this->getCustomerOrdersByEmail($email,1);
+            if(!empty($customer_orders)){
+                return isset($customer_orders[0]) && !empty($customer_orders[0]) && is_object($customer_orders[0]) && method_exists($customer_orders[0],'get_id') ? $customer_orders[0]->get_id() : null;
+            }
+        }
+        return null;
+    }
     /**
      * get the total orders from session
      * @param $email
@@ -2008,7 +2017,7 @@ class WcFunctions
     function getCustomerTotalSpent($email)
     {
         $sum = 0;
-        if (!empty($email) && is_email($email)) {
+        if (!empty($email) && is_email($email) && empty($sum)) {
             $customer_orders = $this->getCustomerOrdersByEmail($email);
             if (is_array($customer_orders)) {
                 foreach ($customer_orders as $order) {
@@ -2042,11 +2051,14 @@ class WcFunctions
      * @param $email
      * @return array[]
      */
-    function getCustomerOrdersByEmail($email)
+    function getCustomerOrdersByEmail($email,$limit = -1)
     {
         if (!empty($email) && is_email($email)) {
             $args = array(
-                'customer' => $email,
+                'billing_email' => $email,
+                'orderby' => 'ID',
+                'order' => 'DESC',
+                'limit' => $limit
             );
             $orders = $this->getOrdersList($args);
             return apply_filters('rnoc_get_customer_orders_by_email', $orders);
