@@ -1931,7 +1931,7 @@ class WcFunctions
             return false;
         }
         $new_coupon = new \WC_Coupon( $coupon_code );
-        if ($this->isMethodExists($new_coupon, "get_individual_use")) {
+        if (!$this->isMethodExists($new_coupon, "get_individual_use")) {
             return false;
         }
         $applied_coupons = $order->get_items( 'coupon' );
