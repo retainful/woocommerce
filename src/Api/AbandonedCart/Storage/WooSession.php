@@ -19,7 +19,7 @@ class WooSession extends Base
         /**
          * make sure the session was created
          */
-        if (isset(WC()->session) && !is_null(WC()->session) && is_object(WC()->session) && method_exists(WC()->session, 'has_session')) {
+        if (function_exists('WC') && is_object(WC()) && isset(WC()->session) && !is_null(WC()->session) && is_object(WC()->session) && method_exists(WC()->session, 'has_session')) {
             if (!WC()->session->has_session() && !defined('DOING_CRON')) {
                 if (method_exists(WC()->session, 'set_customer_session_cookie')) {
                     $settings = new Settings();
