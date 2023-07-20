@@ -399,7 +399,7 @@ class RestApi
                 mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
             );
         }
-        return md5($token);
+        return md5($token.time());
     }
 
     /**

@@ -10,7 +10,7 @@
  * Text Domain: retainful-next-order-coupon-for-woocommerce
  * Domain Path: /i18n/languages/
  * Plugin URI: https://www.retainful.com
- * Requires at least: 4.6.1
+ * Requires at least: 4.7.0
  * Contributers: Sathyaseelan
  * WC requires at least: 3.0.9
  * WC tested up to: 6.7
@@ -86,7 +86,7 @@ if (!defined('RNOC_MINIMUM_WC_VERSION')) {
     define('RNOC_MINIMUM_WC_VERSION', '3.0.9');
 }
 if (!defined('RNOC_MINIMUM_WP_VERSION')) {
-    define('RNOC_MINIMUM_WP_VERSION', '4.4');
+    define('RNOC_MINIMUM_WP_VERSION', '4.7.0');
 }
 if (!defined('RNOC_MINIMUM_PHP_VERSION')) {
     define('RNOC_MINIMUM_PHP_VERSION', '5.6.0');
