@@ -188,7 +188,15 @@ class Imports
         $status = 200;
         return new \WP_REST_Response($response, $status);
     }
-
+    public static function isHPOSEnabled(){
+        if(!class_exists('\Automattic\WooCommerce\Utilities\OrderUtil')){
+            return false;
+        }
+        if(\Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled()){
+            return true;
+        }
+        return false;
+    }
     public static function getOrderCount(\WP_REST_Request $request)
     {
         $admin = new Settings();
@@ -215,11 +223,18 @@ class Imports
             return new \WP_REST_Response($response, $status);
         }
         $admin->logMessage($reverse_hmac, 'API Order Count request digest matched');
-        $orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC', 'limit' => -1));
+        global $wpdb;
+        if(self::isHPOSEnabled()){
+            $query = $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}wc_orders WHERE type = %s",array('shop_order'));
+        }else{
+            $query = $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}posts WHERE post_type = %s",array('shop_order'));
+        }
+        //$orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC', 'limit' => -1));
         $response = array(
             'success' => true,
             'RESPONSE_CODE' => 'Ok',
-            'total_count' => is_array($orders) ? count($orders) : 0
+            'total_count' => $wpdb->get_var($query)
+            //'total_count' => is_array($orders) ? count($orders) : 0
         );
         $status = 200;
         return new \WP_REST_Response($response, $status);
