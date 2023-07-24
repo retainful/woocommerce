@@ -3,9 +3,9 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.6.1
 Tested up to: 6.2
-WC tested up to: 7.6
+WC tested up to: 7.9
 Requires PHP: 5.6
-Stable tag: 2.6.20
+Stable tag: 2.6.21
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -595,3 +595,9 @@ No. There is no charges for support.
 
 = 2.6.20 =
 - Fix: Additional check for next order coupon
+
+= 2.6.21 =
+- Fix: Customer total spend, total order count
+- Fix: Order coupon apply in abandon cart recovery
+- Fix: session init fatal error
+- added: Essential plan check
