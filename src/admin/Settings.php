@@ -1653,7 +1653,7 @@ class Settings
         $plan = $this->getUserActivePlan();
         $status = $this->getUserPlanStatus();
         $plan = strtolower($plan);
-        return (in_array($plan, array('pro', 'business', 'professional')) && in_array($status, array('active', 'trialing')));
+        return (in_array($plan, array('pro', 'business', 'professional','essential')) && in_array($status, array('active','trialing')));
     }
 
     /**
