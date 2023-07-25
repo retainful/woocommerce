@@ -181,7 +181,12 @@ class Main
         }
         //initialise currency helper
         new Currency();
-
+        $can_hide_next_order_coupon = get_option('retainful_hide_next_order_coupon', 'no');
+        $show_deprecate_message = isset($_REQUEST['page']) && in_array($_REQUEST['page'],array('retainful_license','retainful_settings','retainful','retainful_premium'));
+        if (is_admin() && $show_deprecate_message && $this->admin->isNextOrderCouponEnabled() && $can_hide_next_order_coupon == 'no') {
+            $notice = '<p>' .__("The Next Order Coupon feature inside the plugin and its tab/menu will soon be removed from the Retainful plugin. Migrate your Next Order Coupon campaign to the Automations now. A detailed guide <a href='https://help.retainful.com/migration#next-order-coupon' target='_blank'>here</a>", RNOC_TEXT_DOMAIN) . '</p>';
+            $this->showAdminNotice($notice);
+        }
         if ($this->admin->isNextOrderCouponEnabled()) {
             //Get events
             add_action('woocommerce_checkout_update_order_meta', array($this->rnoc, 'createNewCoupon'), 10, 2);
@@ -287,7 +292,7 @@ class Main
                 //add_action('woocommerce_new_order', array($checkout, 'purchaseComplete'));
                 add_action('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
                 add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
-                add_action('woocommerce_checkout_order_processed', array($checkout, 'checkoutOrderProcessed'));
+                add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
                 add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
                 // handle updating Retainful order data after a successful payment, for certain gateways
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);

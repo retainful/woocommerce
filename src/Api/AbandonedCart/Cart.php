@@ -1190,16 +1190,29 @@ class Cart extends RestApi
                 $billing_email = $user_data->user_email;
             }
             $created_at = $updated_at = strtotime($user_data->user_registered);
+            $billing_details = $this->getCustomerCheckoutDetails('billing');
             $billing_first_name = get_user_meta($user_id, 'billing_first_name', true);
             if (empty($billing_first_name)) {
                 $billing_first_name = $user_data->first_name;
+            }
+            if (empty($billing_first_name)) {
+                $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
             }
             $billing_last_name = get_user_meta($user_id, 'billing_last_name', true);
             if (empty($billing_last_name)) {
                 $billing_last_name = $user_data->last_name;
             }
+            if (empty($billing_last_name)) {
+                $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
+            }
             $billing_state = get_user_meta($user_id, 'billing_state', true);
+            if(empty($billing_state)){
+                $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
+            }
             $billing_phone = get_user_meta($user_id, 'billing_phone', true);
+            if(empty($billing_phone)){
+                $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
+            }
         } else {
             $user_id = 0;
             $created_at = self::$storage->getValue('rnoc_session_created_at');
@@ -1220,12 +1233,12 @@ class Cart extends RestApi
             'state' => $billing_state,
             'last_name' => $billing_last_name,
             'first_name' => $billing_first_name,
-            'currency' => NULL,
+            'currency' => self::$settings->getBaseCurrency(),
             'created_at' => $this->formatToIso8601($created_at),
             'updated_at' => $this->formatToIso8601($updated_at),
-            'total_spent' => NULL,
-            'orders_count' => NULL,
-            'last_order_id' => NULL,
+            /*'total_spent' => self::$woocommerce->getCustomerTotalSpent($billing_email),
+            'orders_count' => self::$woocommerce->getCustomerTotalOrders($billing_email),
+            'last_order_id' => self::$woocommerce->getCustomerLastOrderId($billing_email),*/
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,

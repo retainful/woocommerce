@@ -405,7 +405,7 @@ require_once "tabs.php";
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'; ?>"><?php
-                    esc_html_e('Enable AfterPay Payment Action ?', RNOC_TEXT_DOMAIN);
+                    esc_html_e('Enable AfterPay payment gateway support (only enable this option if you installed AfterPay plugin) ?', RNOC_TEXT_DOMAIN);
                     ?></label>
             </th>
             <td>

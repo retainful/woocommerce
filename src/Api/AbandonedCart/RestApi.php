@@ -109,6 +109,7 @@ class RestApi
      */
     function formatDecimalPriceRemoveTrailingZeros($price)
     {
+        $price = (float)$price;
         $decimals = self::$woocommerce->priceDecimals();
         $rounded_price = round($price, $decimals);
         return number_format($rounded_price, $decimals, '.', '');
@@ -420,15 +421,12 @@ class RestApi
      */
     function isOrderHasValidOrderStatus($order_status)
     {
-        $invalid_order_status = apply_filters('rnoc_abandoned_cart_invalid_order_statuses', array('pending', 'failed', 'checkout-draft'));
+        $invalid_order_status = apply_filters('rnoc_abandoned_cart_invalid_order_statuses', array('pending', 'failed', 'checkout-draft', 'trash', 'cancelled', 'refunded'));
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
         if ($consider_on_hold_order_as_ac == 1) {
             $invalid_order_status[] = 'on-hold';
         }
-        $consider_cancelled_order_as_ac = $this->considerCancelledAsAbandoned();
-        if ($consider_cancelled_order_as_ac == 1) {
-            $invalid_order_status[] = 'cancelled';
-        }
+
         $invalid_order_status = array_unique($invalid_order_status);
         return (!in_array($order_status, $invalid_order_status));
     }
@@ -550,6 +548,10 @@ class RestApi
         if (empty($timestamp)) {
             $timestamp = current_time('timestamp', true);
         }
+        if(is_object($timestamp) && $timestamp instanceof \WC_DateTime) {
+            $timestamp = $timestamp->getTimestamp();
+        }
+
         try {
             $date = date('Y-m-d H:i:s', $timestamp);
             $date_time = new DateTime($date);
