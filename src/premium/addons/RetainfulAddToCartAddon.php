@@ -492,7 +492,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         {
             if ($this->slug() == $add_on_slug) {
                 $pages = $this->getPageLists();
-                $coupon_codes = $this->getWooCouponCodes();
                 ?>
                 <input type="hidden" name="addon" value="atcp">
                 <table class="form-table" role="presentation">
@@ -975,7 +974,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 <table class="form-table" role="presentation">
                     <?php
                     $modal_coupon_settings_name = RNOC_PLUGIN_PREFIX . 'modal_coupon_settings[0]';
-                    $coupon_codes = $this->getWooCouponCodes();
                     ?>
                     <tbody>
                     <tr>
