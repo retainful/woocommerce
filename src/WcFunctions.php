@@ -9,6 +9,10 @@ class WcFunctions
 
     function __construct()
     {
+        add_action('init', array($this, 'init'));
+    }
+
+    function init(){
         $path = 'woocommerce/woocommerce.php';
         if (!function_exists('get_plugins'))
             require_once(ABSPATH . 'wp-admin/includes/plugin.php');
