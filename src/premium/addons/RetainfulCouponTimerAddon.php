@@ -339,7 +339,6 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
         {
             if ($this->slug() == $add_on_slug) {
                 $pages = $this->getPageLists();
-                $coupon_codes = $this->getWooCouponCodes();
                 ?>
                 <input type="hidden" name="addon" value="ct">
                 <table class="form-table" role="presentation">
