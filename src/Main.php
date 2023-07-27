@@ -61,6 +61,9 @@ class Main
             'permission_callback' => '__return_true',
             'callback' => 'Rnoc\Retainful\Api\Referral\ReferralManagement::getCustomer'
         ));
+    }
+
+    function registerSyncEndPoints(){
         register_rest_route('retainful-api/v1', '/customers', array(
             'methods' => 'GET',
             'permission_callback' => '__return_true',
@@ -227,12 +230,19 @@ class Main
          * Ip filtering
          */
         $this->canActivateIPFilter();
+        $is_app_connected = $this->admin->isAppConnected();
+        $secret_key = $this->admin->getSecretKey();
+        $app_id = $this->admin->getApiKey();
+        if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
+            add_action('rest_api_init', array($this, 'registerSyncEndPoints'));
+        }
+
         $run_installation_externally = $this->admin->runAbandonedCartExternally();
         if ($run_installation_externally) {
             //If the user is old user then ask user to run abandoned cart to
-            $is_app_connected = $this->admin->isAppConnected();
+            /*$is_app_connected = $this->admin->isAppConnected();
             $secret_key = $this->admin->getSecretKey();
-            $app_id = $this->admin->getApiKey();
+            $app_id = $this->admin->getApiKey();*/
             if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
                 if (is_admin()) {
                     add_action('wp_after_admin_bar_render', array($this->admin, 'schedulePlanChecker'));
