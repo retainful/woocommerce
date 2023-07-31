@@ -172,7 +172,12 @@ class Imports
         }
         $admin->logMessage($reverse_hmac, 'API Orders request digest matched');
         global $wpdb;
-        $query = $wpdb->prepare("SELECT wp_posts.ID FROM wp_posts WHERE wp_posts.post_type IN ('shop_order', 'shop_order_refund') AND wp_posts.ID > %d ORDER BY wp_posts.ID ASC LIMIT %d", array((int)$params['since_id'], (int)$params['limit']));
+        if(self::isHPOSEnabled()){
+            $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}wc_orders WHERE type = %s AND id > %s ORDER BY id ASC LIMIT %d",array('shop_order',(int)$params['since_id'], (int)$params['limit']));
+        }else{
+            $query = $wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts WHERE post_type IN ('shop_order') AND ID > %d ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], (int)$params['limit']));
+        }
+
         /*$orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','offset' => $params['offset'], 'limit' => $params['limit']));*/
         $orders = $wpdb->get_results($query);
         //Do like his response
