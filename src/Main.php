@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) exit;
 use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
-use Rnoc\Retainful\Api\AbandonedCart\RestApi;;
+use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\AfterPay;
