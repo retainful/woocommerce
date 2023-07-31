@@ -5,21 +5,6 @@ if (!defined('ABSPATH')) exit;
 
 class WcFunctions
 {
-    static $wc_version = NULL;
-
-    function __construct()
-    {
-        $path = 'woocommerce/woocommerce.php';
-        if (!function_exists('get_plugins'))
-            require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        $plugins = get_plugins();
-        $wc_installed_version = NULL;
-        if (isset($plugins[$path]['Version'])) {
-            $wc_installed_version = $plugins[$path]['Version'];
-        }
-        self::$wc_version = $wc_installed_version;
-    }
-
     /**
      * Get order object
      * @param $order_id
@@ -209,7 +194,7 @@ class WcFunctions
      */
     function getUsedCoupons($order)
     {
-        if (version_compare(self::$wc_version, '3.7.0', '<')) {
+        if (defined('WC_VERSION') && version_compare(WC_VERSION, '3.7.0', '<')) {
             if ($this->isMethodExists($order, 'get_used_coupons')) {
                 return $order->get_used_coupons();
             }

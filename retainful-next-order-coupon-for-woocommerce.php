@@ -12,7 +12,7 @@
  * Plugin URI: https://www.retainful.com
  * Requires at least: 4.7.0
  * Contributers: Sathyaseelan
- * WC requires at least: 3.0.9
+ * WC requires at least: 6.0.0
  * WC tested up to: 7.9
  */
 if (!defined('ABSPATH')) exit;
@@ -83,7 +83,7 @@ if (!defined('RNOC_LOG_FILE_PATH')) {
  * Setup plugin compatable versions
  */
 if (!defined('RNOC_MINIMUM_WC_VERSION')) {
-    define('RNOC_MINIMUM_WC_VERSION', '3.0.9');
+    define('RNOC_MINIMUM_WC_VERSION', '6.0.0');
 }
 if (!defined('RNOC_MINIMUM_WP_VERSION')) {
     define('RNOC_MINIMUM_WP_VERSION', '4.7.0');
