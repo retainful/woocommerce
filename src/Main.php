@@ -64,16 +64,6 @@ class Main
     }
 
     function registerSyncEndPoints(){
-        register_rest_route('retainful-api/v1', '/customers', array(
-            'methods' => 'GET',
-            'permission_callback' => '__return_true',
-            'callback' => '\Rnoc\Retainful\Api\Imports\Imports::getCustomers'
-        ));
-        register_rest_route('retainful-api/v1', '/customers/count', array(
-            'methods' => 'GET',
-            'permission_callback' => '__return_true',
-            'callback' => '\Rnoc\Retainful\Api\Imports\Imports::getCustomerCount'
-        ));
         register_rest_route('retainful-api/v1', '/orders', array(
             'methods' => 'GET',
             'permission_callback' => '__return_true',
