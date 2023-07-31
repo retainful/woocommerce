@@ -10,7 +10,7 @@
  * Text Domain: retainful-next-order-coupon-for-woocommerce
  * Domain Path: /i18n/languages/
  * Plugin URI: https://www.retainful.com
- * Requires at least: 4.6.1
+ * Requires at least: 4.7.0
  * Contributers: Sathyaseelan
  * WC requires at least: 6.0.0
  * WC tested up to: 7.9
@@ -86,6 +86,7 @@ if (!defined('RNOC_MINIMUM_WC_VERSION')) {
     define('RNOC_MINIMUM_WC_VERSION', '6.0.0');
 }
 if (!defined('RNOC_MINIMUM_WP_VERSION')) {
+    define('RNOC_MINIMUM_WP_VERSION', '4.7.0');
     define('RNOC_MINIMUM_WP_VERSION', '4.6.1');
 }
 if (!defined('RNOC_MINIMUM_PHP_VERSION')) {
@@ -115,6 +116,11 @@ if (!function_exists('rnocPluginActivation')) {
         return true;
     }
 }
+add_action('before_woocommerce_init', function () {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+    }
+});
 /**
  * Check the woocommerce is active or not
  * @return bool
