@@ -5,7 +5,7 @@ Requires at least: 4.6.1
 Tested up to: 6.2
 WC tested up to: 7.9
 Requires PHP: 5.6
-Stable tag: 2.6.22
+Stable tag: 2.6.23
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -249,6 +249,9 @@ No. There is no charges for support.
 == Screenshots ==
 
 == Changelog ==
+= 2.6.23 =
+- Fix: Notice about duplicate constant
+
 = 2.6.22 =
 - Added: order synchronize
 
