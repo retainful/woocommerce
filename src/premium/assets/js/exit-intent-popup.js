@@ -190,6 +190,11 @@ function initJqueryRetainfulExitIntentPopupJs() {
                 showRetainfulExitIntentPopup();
             }
         });
+        function getCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) return match[2];
+            return 0;
+        }
 
         function showRetainfulExitIntentPopup() {
             let cart_hash;
@@ -205,7 +210,10 @@ function initJqueryRetainfulExitIntentPopupJs() {
             if (checkout_form.is('.processing')) {
                 return false;
             }
-            if (cart_hash !== "" && cart_hash !== undefined && cart_hash !== null) {
+
+            let cart_item = getCookie('woocommerce_items_in_cart');
+            let cookie_has_items = parseInt(cart_item) > 0;
+            if (cart_hash !== "" && cart_hash !== undefined && cart_hash !== null && cookie_has_items) {
                 let number_of_times_showed = (typeof window.rnocp_exit_intent_popup_showed_count !== "undefined") ? window.rnocp_exit_intent_popup_showed_count : 0;
                 let show_popup = true;
                 if (parseInt(retainful_premium_exit_intent_popup.show_when_its_coupon_applied) === 1) {
