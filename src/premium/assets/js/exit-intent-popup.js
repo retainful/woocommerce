@@ -211,7 +211,7 @@ function initJqueryRetainfulExitIntentPopupJs() {
                 return false;
             }
 
-            let cart_item = getCookie('woocommerce_items_in_cart')
+            let cart_item = getCookie('woocommerce_items_in_cart');
             let cookie_has_items = parseInt(cart_item) > 0;
             if (cart_hash !== "" && cart_hash !== undefined && cart_hash !== null && cookie_has_items) {
                 let number_of_times_showed = (typeof window.rnocp_exit_intent_popup_showed_count !== "undefined") ? window.rnocp_exit_intent_popup_showed_count : 0;
