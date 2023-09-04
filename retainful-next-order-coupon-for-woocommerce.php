@@ -91,6 +91,9 @@ if (!defined('RNOC_MINIMUM_WP_VERSION')) {
 if (!defined('RNOC_MINIMUM_PHP_VERSION')) {
     define('RNOC_MINIMUM_PHP_VERSION', '5.6.0');
 }
+if ( ! defined( 'REQUESTS_SILENCE_PSR0_DEPRECATIONS' ) ) {
+    define( 'REQUESTS_SILENCE_PSR0_DEPRECATIONS', true );
+}
 //Create and alter the tables for abandoned carts and also check for woocommerce installed
 register_activation_hook(RNOC_FILE, 'rnocPluginActivation');
 if (!function_exists('rnocPluginActivation')) {
