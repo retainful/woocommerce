@@ -1950,13 +1950,24 @@ class WcFunctions
      */
     function getCustomerTotalOrders($email)
     {
+        $count = 0;
         if (!empty($email) && is_email($email)) {
-            $customer_orders = $this->getCustomerOrdersByEmail($email);
+            global $wpdb;
+            if(!$this->isHPOSEnabled()){
+                $query = $wpdb->prepare("SELECT COUNT(*) as total FROM {$wpdb->prefix}posts as p 
+                LEFT JOIN {$wpdb->prefix}postmeta as pm ON pm.post_id = p.id 
+                WHERE pm.meta_key=%s AND pm.meta_value=%s AND p.post_type=%s",array('_billing_email',$email.'shop_order'));
+            }else{
+                $query =  $wpdb->prepare("SELECT COUNT(*) as total FROM {$wpdb->prefix}wc_orders 
+                         WHERE billing_email = %s",array($email));
+            }
+            $count = $wpdb->get_var($query);
+            /*$customer_orders = $this->getCustomerOrdersByEmail($email);
             if (is_array($customer_orders)) {
                 return count($customer_orders);
-            }
+            }*/
         }
-        return 0;
+        return $count;
     }
 
     function getCustomerLastOrderId($email){
@@ -2003,16 +2014,37 @@ class WcFunctions
     {
         $sum = 0;
         if (!empty($email) && is_email($email) && empty($sum)) {
-            $customer_orders = $this->getCustomerOrdersByEmail($email);
+            global $wpdb;
+            if(!$this->isHPOSEnabled()){
+                $query = $wpdb->prepare("SELECT SUM(pm1.meta_value) as total FROM {$wpdb->prefix}posts as p 
+    LEFT JOIN {$wpdb->prefix}postmeta as pm ON pm.post_id = p.id
+         LEFT JOIN {$wpdb->prefix}postmeta as pm1 ON pm1.post_id = p.id
+         WHERE pm.meta_key=%s AND pm.meta_value=%s AND pm1.meta_key = %s AND p.post_type=%s",array('_billing_email',$email,'_order_total','shop_order'));
+            }else{
+                $query =  $wpdb->prepare("SELECT SUM(total_amount) as total FROM {$wpdb->prefix}wc_orders WHERE billing_email = %s",array($email));
+            }
+            $sum = $wpdb->get_var($query);
+            /*$customer_orders = $this->getCustomerOrdersByEmail($email);
             if (is_array($customer_orders)) {
                 foreach ($customer_orders as $order) {
                     if ($order instanceof \WC_Order) {
                         $sum = $sum + $this->getOrderTotal($order);
                     }
                 }
-            }
+            }*/
         }
         return floatval($sum);
+    }
+
+    function isHPOSEnabled()
+    {
+        if (!class_exists('\Automattic\WooCommerce\Utilities\OrderUtil')) {
+            return false;
+        }
+        if (\Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled()) {
+            return true;
+        }
+        return false;
     }
 
     /**

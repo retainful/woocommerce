@@ -47,9 +47,8 @@ class Imports
         }else{
             $query = $wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts WHERE post_type IN ('shop_order') AND ID > %d ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], (int)$params['limit']));
         }
-
         /*$orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','offset' => $params['offset'], 'limit' => $params['limit']));*/
-        $orders = $wpdb->get_results($query);
+        $orders = $wpdb->get_col($query);
         //Do like his response
         $response = array(
             'success' => true,
