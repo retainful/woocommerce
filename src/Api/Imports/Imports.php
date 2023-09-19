@@ -43,9 +43,11 @@ class Imports
         $admin->logMessage($reverse_hmac, 'API Orders request digest matched');
         global $wpdb;
         if(self::isHPOSEnabled()){
-            $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}wc_orders WHERE type = %s AND id > %s ORDER BY id ASC LIMIT %d",array('shop_order',(int)$params['since_id'], (int)$params['limit']));
+            $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}wc_orders LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}wc_orders.id = {$wpdb->prefix}woocommerce_order_items.order_id
+          WHERE type = %s AND id > %s AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 GROUP BY id ORDER BY id ASC LIMIT %d",array('shop_order',(int)$params['since_id'], (int)$params['limit']));
         }else{
-            $query = $wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts WHERE post_type IN ('shop_order') AND ID > %d ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], (int)$params['limit']));
+            $query = $wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}posts.ID = {$wpdb->prefix}woocommerce_order_items.order_id 
+          WHERE post_type IN ('shop_order') AND ID > %d AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 GROUP BY ID ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], (int)$params['limit']));
         }
         /*$orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','offset' => $params['offset'], 'limit' => $params['limit']));*/
         $orders = $wpdb->get_col($query);
