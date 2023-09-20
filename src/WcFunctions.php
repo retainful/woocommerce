@@ -1967,7 +1967,7 @@ class WcFunctions
                 return count($customer_orders);
             }*/
         }
-        return $count;
+        return (int)$count;
     }
 
     function getCustomerLastOrderId($email){

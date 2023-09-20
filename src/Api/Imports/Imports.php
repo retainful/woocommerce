@@ -43,9 +43,11 @@ class Imports
         $admin->logMessage($reverse_hmac, 'API Orders request digest matched');
         global $wpdb;
         if(self::isHPOSEnabled()){
-            $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}wc_orders WHERE type = %s AND id > %s ORDER BY id ASC LIMIT %d",array('shop_order',(int)$params['since_id'], (int)$params['limit']));
+            $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}wc_orders LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}wc_orders.id = {$wpdb->prefix}woocommerce_order_items.order_id
+          WHERE type = %s AND id > %s AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 GROUP BY id ORDER BY id ASC LIMIT %d",array('shop_order',(int)$params['since_id'], (int)$params['limit']));
         }else{
-            $query = $wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts WHERE post_type IN ('shop_order') AND ID > %d ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], (int)$params['limit']));
+            $query = $wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}posts.ID = {$wpdb->prefix}woocommerce_order_items.order_id 
+          WHERE post_type IN ('shop_order') AND ID > %d AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 GROUP BY ID ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], (int)$params['limit']));
         }
         /*$orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC','offset' => $params['offset'], 'limit' => $params['limit']));*/
         $orders = $wpdb->get_col($query);
@@ -99,15 +101,24 @@ class Imports
         $admin->logMessage($reverse_hmac, 'API Order Count request digest matched');
         global $wpdb;
         if(self::isHPOSEnabled()){
-            $query = $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}wc_orders WHERE type = %s",array('shop_order'));
+            //$query = $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}wc_orders WHERE type = %s",array('shop_order'));
+            //
+            $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}wc_orders.id) FROM {$wpdb->prefix}wc_orders LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}wc_orders.id = {$wpdb->prefix}woocommerce_order_items.order_id
+          WHERE type = %s AND id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_id > 0",array('shop_order'));
         }else{
-            $query = $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}posts WHERE post_type = %s",array('shop_order'));
+            //$query = $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}posts WHERE post_type = %s",array('shop_order'));
+            //SELECT COUNT(DISTINCT wp_posts.ID) as total
+            //FROM wp_posts
+            //LEFT JOIN wp_woocommerce_order_items ON wp_posts.ID = wp_woocommerce_order_items.order_id
+            //WHERE wp_posts.post_type = 'shop_order' AND wp_posts.ID > 0 AND wp_woocommerce_order_items.order_id > 0;
+            $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}posts.ID = {$wpdb->prefix}woocommerce_order_items.order_id 
+          WHERE post_type = %s AND ID > 0 AND {$wpdb->prefix}woocommerce_order_items.order_id > 0", array('shop_order'));
         }
         //$orders = wc_get_orders(array('orderby' => 'id', 'order' => 'ASC', 'limit' => -1));
         $response = array(
             'success' => true,
             'RESPONSE_CODE' => 'Ok',
-            'total_count' => $wpdb->get_var($query)
+            'total_count' => (int)$wpdb->get_var($query)
             //'total_count' => is_array($orders) ? count($orders) : 0
         );
         $status = 200;
