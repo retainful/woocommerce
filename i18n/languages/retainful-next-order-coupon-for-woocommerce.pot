@@ -1,7 +1,8 @@
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: retainful\n"
-"POT-Creation-Date: 2019-12-16 11:05+0530\n"
+"POT-Creation-Date: 2023-09-25 10:20+0530\n"
 "PO-Revision-Date: 2019-12-16 11:05+0530\n"
 "Last-Translator: \n"
 "Language-Team: retainful\n"
@@ -9,709 +10,253 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2.4\n"
-"X-Poedit-Basepath: ../plugins/retainful/src\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.3.2\n"
+"X-Poedit-Basepath: ../../src\n"
 "X-Poedit-KeywordsList: __;_e;esc_html__;esc_html_e;esc_attr__;esc_attr_e\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: AbandonedCart.php:30
-msgid "Yesterday"
-msgstr ""
-
-#: AbandonedCart.php:31
-msgid "Today"
-msgstr ""
-
-#: AbandonedCart.php:32
-msgid "Last 7 days"
-msgstr ""
-
-#: AbandonedCart.php:33
-msgid "Last 15 days"
-msgstr ""
-
-#: AbandonedCart.php:34
-msgid "Last 30 days"
-msgstr ""
-
-#: AbandonedCart.php:35
-msgid "Last 90 days"
-msgstr ""
-
-#: AbandonedCart.php:36
-msgid "Last 365 days"
-msgstr ""
-
-#: AbandonedCart.php:37
-msgid "Custom"
-msgstr ""
-
-#: AbandonedCart.php:463 AbandonedCart.php:1182
-msgid " All rights reserved."
-msgstr ""
-
-#: AbandonedCart.php:667
-msgid "It seems, your cart has expired!"
-msgstr ""
-
-#: AbandonedCart.php:771 AbandonedCart.php:772
-msgid "New Customer Order - Recovered"
-msgstr ""
-
-#: AbandonedCart.php:1092
-msgid "Template saved successfully!"
-msgstr ""
-
-#: AbandonedCart.php:1109
-msgid "Template activated successfully!"
-msgstr ""
-
-#: AbandonedCart.php:1111
-msgid "Template de-activated successfully!"
-msgstr ""
-
-#: AbandonedCart.php:1115 AbandonedCart.php:1119 AbandonedCart.php:1138
-#: AbandonedCart.php:1142
-msgid "Invalid Request"
-msgstr ""
-
-#: AbandonedCart.php:1208
-msgid "Email address and Email body required"
-msgstr ""
-
-#: AbandonedCart.php:1230 AbandonedCart.php:1238
-#: premium/addons/RetainfulExitIntentPopupAddon.php:66
-msgid "Sorry, Template not found"
-msgstr ""
-
-#: Api/AbandonedCart/Cart.php:801
+#: Api/AbandonedCart/Cart.php:736
 msgid "Customer visited Retainful order recovery URL."
 msgstr ""
 
-#: Api/AbandonedCart/Cart.php:1041 Api/AbandonedCart/Cart.php:1057
+#: Api/AbandonedCart/Cart.php:1092 Api/AbandonedCart/Cart.php:1108
 msgid ""
 "Note: Auto-login disabled when recreating cart for WordPress Admin account. "
 "Checking out as guest."
 msgstr ""
 
-#: Api/AbandonedCart/Order.php:303
+#: Api/AbandonedCart/Order.php:393
 msgid "Fee"
 msgstr ""
 
-#: Api/AbandonedCart/RestApi.php:311
+#: Api/AbandonedCart/RestApi.php:478
 msgid "Order recovered by Retainful."
 msgstr ""
 
-#: Main.php:219
+#: Api/NextOrderCoupon/CouponManagement.php:195
+msgid "Delete Expired retainful coupons"
+msgstr ""
+
+#: Api/NextOrderCoupon/CouponManagement.php:218
+msgid "Retainful - Next order coupons"
+msgstr ""
+
+#: Api/NextOrderCoupon/CouponManagement.php:222
+msgid "Retainful - coupons"
+msgstr ""
+
+#: Main.php:180
+msgid ""
+"The Next Order Coupon feature inside the plugin and its tab/menu will soon "
+"be removed from the Retainful plugin. Migrate your Next Order Coupon "
+"campaign to the Automations now. A detailed guide <a href='https://help."
+"retainful.com/migration#next-order-coupon' target='_blank'>here</a>"
+msgstr ""
+
+#: Main.php:311
 msgid "connect"
 msgstr ""
 
-#: Main.php:219
+#: Main.php:311
 msgid "re-connect"
 msgstr ""
 
-#: Main.php:220
+#: Main.php:312
 msgid "Please <a href='"
 msgstr ""
 
-#: Main.php:600
+#: Main.php:474
 msgid "Woocommerce must be activated for Retainful-Woocommerce to work"
 msgstr ""
 
-#: Main.php:603
+#: Main.php:477
 msgid "Your woocommerce version is "
 msgstr ""
 
-#: Main.php:603
+#: Main.php:477
 msgid ""
 ". Some of the features of Retainful-Woocommerce will not work properly on "
 "this woocommerce version."
 msgstr ""
 
-#: OrderCoupon.php:42
-msgid "Please enter App-Id"
-msgstr ""
-
-#: OrderCoupon.php:45
-msgid "Please enter App-Secret"
-msgstr ""
-
-#: OrderCoupon.php:57
-msgid "Please check the entered details"
-msgstr ""
-
-#: OrderCoupon.php:80 admin/Settings.php:925
+#: OrderCoupon.php:28 admin/templates/pages/tabs.php:6
 msgid "Connection"
 msgstr ""
 
-#: OrderCoupon.php:81 OrderCoupon.php:86
+#: OrderCoupon.php:29 OrderCoupon.php:34
 msgid "Add-ons"
 msgstr ""
 
-#: OrderCoupon.php:85
+#: OrderCoupon.php:33
 msgid "Abandoned carts"
 msgstr ""
 
-#: OrderCoupon.php:87 admin/Settings.php:211 admin/Settings.php:218
+#: OrderCoupon.php:35 admin/templates/pages/tabs.php:7
 msgid "Settings"
 msgstr ""
 
-#: OrderCoupon.php:88 admin/Settings.php:923 admin/Settings.php:925
+#: OrderCoupon.php:36
 msgid "License"
 msgstr ""
 
-#: admin/Settings.php:33
+#: admin/Settings.php:38
 msgid ""
 "Manage your abandoned carts effectively in Retainful Dashboard & get more "
 "features "
 msgstr ""
 
-#: admin/Settings.php:33
+#: admin/Settings.php:38
 msgid "Learn more"
 msgstr ""
 
-#: admin/Settings.php:46
+#: admin/Settings.php:129
+msgid "Please check the entered details"
+msgstr ""
+
+#: admin/Settings.php:147
+msgid "App disconnected successfully!"
+msgstr ""
+
+#: admin/Settings.php:376
+msgid "Retainful token"
+msgstr ""
+
+#: admin/Settings.php:452 admin/Settings.php:695 admin/Settings.php:831
+msgid "Settings successfully saved!"
+msgstr ""
+
+#: admin/Settings.php:506
+msgid "Sorry! Instant Offer has expired."
+msgstr ""
+
+#: admin/Settings.php:511 admin/Settings.php:524 admin/Settings.php:537
+#: premium/addons/RetainfulCouponTimerAddon.php:163
 msgid ""
-"Premium addons now availale in the Retainful Core plugin itself. So a "
-"separate Premium add-ons plugin is not necessary. You can de-activate the "
-"plugin."
+"Make purchase quickly, your {{coupon_code}} will expire within "
+"{{coupon_timer}}"
 msgstr ""
 
-#: admin/Settings.php:46
-msgid "De-activate"
+#: admin/Settings.php:512 admin/Settings.php:525 admin/Settings.php:538
+#: premium/addons/RetainfulCouponTimerAddon.php:229
+msgid " {{minutes}}M {{seconds}}S"
 msgstr ""
 
-#: admin/Settings.php:103 admin/Settings.php:360 admin/Settings.php:923
-msgid "Retainful - Abandoned Carts"
+#: admin/Settings.php:519 admin/Settings.php:532
+#: premium/addons/RetainfulCouponTimerAddon.php:171
+msgid "Checkout Now"
 msgstr ""
 
-#: admin/Settings.php:109
-msgid "Abandoned / Recovered Carts"
+#: admin/Settings.php:553 premium/addons/RetainfulAddToCartAddon.php:107
+msgid "Enter your email to add this item to cart"
 msgstr ""
 
-#: admin/Settings.php:110 admin/Settings.php:146 admin/Settings.php:197
-#: admin/Settings.php:219 admin/Settings.php:367 admin/Settings.php:379
-#: admin/Settings.php:725 admin/Settings.php:926
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:229
-msgid "Save"
+#: admin/Settings.php:555 premium/addons/RetainfulAddToCartAddon.php:111
+msgid "Email address"
 msgstr ""
 
-#: admin/Settings.php:115
-msgid "Select date range"
+#: admin/Settings.php:557 premium/addons/RetainfulAddToCartAddon.php:112
+msgid "Add to Cart"
 msgstr ""
 
-#: admin/Settings.php:139
-msgid "Retainful Abandoned Cart Email Templates"
+#: admin/Settings.php:563 premium/addons/RetainfulAddToCartAddon.php:121
+msgid "No thanks! Add item to cart"
 msgstr ""
 
-#: admin/Settings.php:145
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:47
-msgid "Email Templates"
-msgstr ""
-
-#: admin/Settings.php:150
-msgid "\"From\" Name"
-msgstr ""
-
-#: admin/Settings.php:153
-msgid "Abandoned Cart Email Templates"
-msgstr ""
-
-#: admin/Settings.php:154
-msgid "Enter the name that should appear in the email sent."
-msgstr ""
-
-#: admin/Settings.php:159
-msgid "\"From\" Address"
-msgstr ""
-
-#: admin/Settings.php:162
-msgid "Email address from which the reminder emails should be sent."
-msgstr ""
-
-#: admin/Settings.php:166
-msgid "\"Reply To \" Address"
-msgstr ""
-
-#: admin/Settings.php:169 admin/Settings.php:176
+#: admin/Settings.php:565 premium/addons/RetainfulAddToCartAddon.php:122
 msgid ""
-"When a contact receives your email and clicks reply, which email address "
-"should that reply be sent to?"
+"*By completing this, you are signing up to receive our emails. You can "
+"unsubscribe at any time."
 msgstr ""
 
-#: admin/Settings.php:190
-msgid "Abandoned cart sent E-mails"
+#: admin/Settings.php:569 admin/Settings.php:593
+#: premium/addons/RetainfulAddToCartAddon.php:129
+#: premium/addons/RetainfulExitIntentPopupAddon.php:358
+msgid "I accept the <a href=\"#\">Terms and conditions</a>"
 msgstr ""
 
-#: admin/Settings.php:196
-msgid "Sent E-Mails"
+#: admin/Settings.php:574
+msgid "Get a discount in your email!"
 msgstr ""
 
-#: admin/Settings.php:223
-msgid "When to consider a cart as abandoned?"
+#: admin/Settings.php:578
+msgid "Your coupon code"
 msgstr ""
 
-#: admin/Settings.php:226
-msgid ""
-"In minutes. Example: You can consider a cart as abandoned 15 minutes after "
-"it was added"
+#: admin/Settings.php:596 premium/addons/RetainfulExitIntentPopupAddon.php:349
+msgid "Enter E-mail address"
 msgstr ""
 
-#: admin/Settings.php:236
-msgid "How many days to wait before automatically deleting the cart"
+#: admin/Settings.php:599
+msgid "Complete checkout"
 msgstr ""
 
-#: admin/Settings.php:239
-msgid ""
-"Useful when you wanted the abandoned carts be removed after certain days"
-msgstr ""
-
-#: admin/Settings.php:248
-msgid ""
-"Should the store administrator get a notification when a cart is recovered"
-msgstr ""
-
-#: admin/Settings.php:252 admin/Settings.php:263 admin/Settings.php:274
-#: admin/Settings.php:297 admin/Settings.php:306 admin/Settings.php:317
-#: admin/Settings.php:334 admin/Settings.php:352 admin/Settings.php:375
-#: admin/Settings.php:420 admin/Settings.php:431 admin/Settings.php:676
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:131
-#: premium/addons/RetainfulAddToCartAddon.php:502
-#: premium/addons/RetainfulAddToCartAddon.php:513
-#: premium/addons/RetainfulAddToCartAddon.php:595
-#: premium/addons/RetainfulCouponTimerAddon.php:354
-#: premium/addons/RetainfulCouponTimerAddon.php:426
-#: premium/addons/RetainfulCouponTimerAddon.php:474
-#: premium/addons/RetainfulCouponTimerAddon.php:514
-#: premium/addons/RetainfulCouponTimerAddon.php:562
-#: premium/addons/RetainfulCouponTimerAddon.php:602
-#: premium/addons/RetainfulExitIntentPopupAddon.php:526
-msgid "No"
-msgstr ""
-
-#: admin/Settings.php:253 admin/Settings.php:264 admin/Settings.php:275
-#: admin/Settings.php:296 admin/Settings.php:307 admin/Settings.php:318
-#: admin/Settings.php:335 admin/Settings.php:353 admin/Settings.php:376
-#: admin/Settings.php:421 admin/Settings.php:432 admin/Settings.php:677
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:130
-#: premium/addons/RetainfulAddToCartAddon.php:503
-#: premium/addons/RetainfulAddToCartAddon.php:514
-#: premium/addons/RetainfulAddToCartAddon.php:596
-#: premium/addons/RetainfulCouponTimerAddon.php:355
-#: premium/addons/RetainfulCouponTimerAddon.php:427
-#: premium/addons/RetainfulCouponTimerAddon.php:475
-#: premium/addons/RetainfulCouponTimerAddon.php:515
-#: premium/addons/RetainfulCouponTimerAddon.php:563
-#: premium/addons/RetainfulCouponTimerAddon.php:603
-#: premium/addons/RetainfulExitIntentPopupAddon.php:527
-msgid "Yes"
-msgstr ""
-
-#: admin/Settings.php:255
-msgid "Useful if you wanted to get notified when a cart is recovered."
-msgstr ""
-
-#: admin/Settings.php:259
-msgid "Track real-time carts?"
-msgstr ""
-
-#: admin/Settings.php:266
-msgid ""
-"If not enabled, only carts that are abandoned gets tracked (i.e, after "
-"customer leaves the site)"
-msgstr ""
-
-#: admin/Settings.php:270
-msgid "Show guest cart?"
-msgstr ""
-
-#: admin/Settings.php:277
-msgid ""
-"If not enabled, Guest carts will not shown in your Abandoned cart dashboard."
-msgstr ""
-
-#: admin/Settings.php:282
-msgid "Cart tracking engine?"
-msgstr ""
-
-#: admin/Settings.php:286
-msgid "JavaScript (Default,Recommended)"
-msgstr ""
-
-#: admin/Settings.php:287
-msgid "PHP"
-msgstr ""
-
-#: admin/Settings.php:292
-msgid "Track Zero value carts / orders"
-msgstr ""
-
-#: admin/Settings.php:302
-msgid "Consider On-Hold order status as abandoned cart?"
-msgstr ""
-
-#: admin/Settings.php:313
-msgid "Enable GDPR Compliance?"
-msgstr ""
-
-#: admin/Settings.php:323
-msgid "Compliance Message"
-msgstr ""
-
-#: admin/Settings.php:326
-msgid ""
-"Under GDPR, it is mandatory to inform the users when we track their cart "
-"activity in real-time."
-msgstr ""
-
-#: admin/Settings.php:329
-msgid "Enable IP filter?"
-msgstr ""
-
-#: admin/Settings.php:340
-msgid "Exclude capturing carts from these IP's"
-msgstr ""
-
-#: admin/Settings.php:344
-msgid ""
-"The plugin will not track carts from these IP's. Enter IP in comma seperated "
-"format.Example 192.168.1.10,192.168.1.11. Alternatively you can also use "
-"192.168.* , 192.168.10.*, 192.168.1.1-192.168.1.255"
-msgstr ""
-
-#: admin/Settings.php:347
-msgid "Enable debug log?"
-msgstr ""
-
-#: admin/Settings.php:366
-msgid "Next order coupon"
-msgstr ""
-
-#: admin/Settings.php:370
-msgid "Enable next order coupon?"
-msgstr ""
-
-#: admin/Settings.php:382
-msgid "Coupon type"
-msgstr ""
-
-#: admin/Settings.php:387
-msgid "Percentage"
-msgstr ""
-
-#: admin/Settings.php:388
-msgid "Flat"
-msgstr ""
-
-#: admin/Settings.php:393
-msgid "Coupon value"
-msgstr ""
-
-#: admin/Settings.php:398
-msgid "Note: If this field is empty, No coupon codes will generate!"
-msgstr ""
-
-#: admin/Settings.php:404
-msgid "Apply coupon to"
-msgstr ""
-
-#: admin/Settings.php:409
+#: admin/Settings.php:744
 msgid "Allow any one to apply coupon"
 msgstr ""
 
-#: admin/Settings.php:410
+#: admin/Settings.php:745
 msgid "Allow the customer to apply coupon, but validate at checkout"
 msgstr ""
 
-#: admin/Settings.php:411
-msgid "Allow customer to apply coupon only after login"
+#: admin/Settings.php:746
+msgid "Allow customer to apply coupon only after login (Not Recommended)"
 msgstr ""
 
-#: admin/Settings.php:416
-msgid ""
-"Allow next order coupons for orders created in the backend and also for old "
-"orders (when resending the email notification)"
-msgstr ""
-
-#: admin/Settings.php:424
-msgid ""
-"The unique code will be generated when you try re-sending the email "
-"notification for an order in the backend"
-msgstr ""
-
-#: admin/Settings.php:427
-msgid "Show next order coupon in order \"Thank you\" page?"
-msgstr ""
-
-#: admin/Settings.php:437
-msgid "Display coupon message after"
-msgstr ""
-
-#: admin/Settings.php:442
+#: admin/Settings.php:749
 msgid "Order details"
 msgstr ""
 
-#: admin/Settings.php:443
+#: admin/Settings.php:750
 msgid "Order meta"
 msgstr ""
 
-#: admin/Settings.php:444
+#: admin/Settings.php:751
 msgid "Customer details"
 msgstr ""
 
-#: admin/Settings.php:448
+#: admin/Settings.php:752
 msgid ""
-"This message will attached to the Order Email.<br>Please use the below short "
-"codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - "
-"Coupon code<br><b>{{coupon_amount}}</b> - Coupon amount<br><b>{{coupon_url}}"
-"</b> - Url to apply coupon automatically"
+"Do Not Show - Customers will not get next order coupon in the order "
+"confirmation email of WooCommerce"
 msgstr ""
 
-#: admin/Settings.php:449
-msgid ""
-"<br><b>{{coupon_expiry_date}}</b> - Coupon expiry date(If coupon does not "
-"have any expiry days,then this will not attach to the message).<br>"
+#: admin/Settings.php:838
+msgid "Invalid nonce"
 msgstr ""
 
-#: admin/Settings.php:454
-msgid "Custom coupon message"
+#: admin/Settings.php:842
+msgid "Webhook already exits"
 msgstr ""
 
-#: admin/Settings.php:460
-msgid "Coupon Generation Restriction"
+#: admin/Settings.php:845
+msgid "Webhook class not found"
 msgstr ""
 
-#: admin/Settings.php:460
-msgid ""
-"(You can control the generation of a coupon based on the these settings.)"
+#: admin/Settings.php:870
+msgid "Webhook created successfully"
 msgstr ""
 
-#: admin/Settings.php:463
-msgid "Order Status"
+#: admin/Settings.php:872 admin/Settings.php:876
+msgid "Webhook creation failed"
 msgstr ""
 
-#: admin/Settings.php:468
-msgid ""
-"<b>Note</b>: Coupon code will not generate until the order meet the choosed "
-"order status."
+#: admin/Settings.php:1520
+msgid "Please wait..."
 msgstr ""
 
-#: admin/Settings.php:472 admin/Settings.php:484
-msgid "User Role"
-msgstr ""
-
-#: admin/Settings.php:477
-msgid "Select User Roles"
-msgstr ""
-
-#: admin/Settings.php:480
-msgid ""
-"Coupon codes will generate only for the selected user roles. By default "
-"coupon code will generate for all user roles."
-msgstr ""
-
-#: admin/Settings.php:492 admin/Settings.php:504
-msgid "Limit"
-msgstr ""
-
-#: admin/Settings.php:500
-msgid ""
-"Limit the number of next order coupons per customer. Set to 0 for un-limited "
-"coupons per customer."
-msgstr ""
-
-#: admin/Settings.php:512 admin/Settings.php:527
-msgid "Do not generate if the following products found in the order"
-msgstr ""
-
-#: admin/Settings.php:516
-msgid ""
-"Coupon code will not be generated when these products were found in the "
-"order!"
-msgstr ""
-
-#: admin/Settings.php:518 admin/Settings.php:620 admin/Settings.php:634
-msgid "Choose products.."
-msgstr ""
-
-#: admin/Settings.php:535 admin/Settings.php:547
-msgid "Do not generate if the following categories found in the order"
-msgstr ""
-
-#: admin/Settings.php:540 admin/Settings.php:647 admin/Settings.php:657
-msgid "Select categories"
-msgstr ""
-
-#: admin/Settings.php:542
-msgid ""
-"Next order coupon will NOT be generated if an order has products from the "
-"selected categories."
-msgstr ""
-
-#: admin/Settings.php:543 admin/Settings.php:551
-msgid "Coupon Usage Restriction"
-msgstr ""
-
-#: admin/Settings.php:557
-msgid "Minimum spend"
-msgstr ""
-
-#: admin/Settings.php:560
-msgid "Set the minimum spend(subtotal) allowed to use the coupon."
-msgstr ""
-
-#: admin/Settings.php:569
-msgid "Maximum spend"
-msgstr ""
-
-#: admin/Settings.php:572
-msgid "Set the maximum spend(subtotal) allowed to use the coupon."
-msgstr ""
-
-#: admin/Settings.php:581
-msgid "Coupon expires in "
-msgstr ""
-
-#: admin/Settings.php:584
-msgid ""
-"After the entered number of days coupon will automatically expired."
-"<br><b>Note: Please leave empty or put 0 to never expire.</b>"
-msgstr ""
-
-#: admin/Settings.php:585
-msgid " Day(s)"
-msgstr ""
-
-#: admin/Settings.php:595
-msgid "Coupon expire date format "
-msgstr ""
-
-#: admin/Settings.php:602
-msgid "Individual use only"
-msgstr ""
-
-#: admin/Settings.php:605
-msgid ""
-"Check this box if the coupon cannot be used in conjunction with other "
-"coupons."
-msgstr ""
-
-#: admin/Settings.php:608
-msgid "Exclude sale items"
-msgstr ""
-
-#: admin/Settings.php:611
-msgid ""
-"Check this box if the coupon should not apply to items on sale. Per-item "
-"coupons will only work if the item is not on sale. Per-cart coupons will "
-"only work if there are items in the cart that are not on sale."
-msgstr ""
-
-#: admin/Settings.php:614
-msgid "Products"
-msgstr ""
-
-#: admin/Settings.php:618
-msgid ""
-"Product that the coupon code will be applied to, or that need to be in the "
-"cart in order for the \"Fixed cart discount\" to be applied."
-msgstr ""
-
-#: admin/Settings.php:628
-msgid "Exclude products"
-msgstr ""
-
-#: admin/Settings.php:632
-msgid ""
-"Product that the coupon code will not applied to, or cannot be in the cart "
-"in order for the \"Fixed cart discount\" to be applied."
-msgstr ""
-
-#: admin/Settings.php:642
-msgid "Product Categories"
-msgstr ""
-
-#: admin/Settings.php:649
-msgid ""
-"Product categories that the coupon code will be applied to, or that need to "
-"be in the cart in order for the \"Fixed cart discount\" to be applied."
-msgstr ""
-
-#: admin/Settings.php:652
-msgid "Exclude Categories"
-msgstr ""
-
-#: admin/Settings.php:659
-msgid ""
-"Product categories that the coupon code will not applied to, or cannot be in "
-"the cart in order for the \"Fixed cart discount\" to be applied."
-msgstr ""
-
-#: admin/Settings.php:660 admin/Settings.php:667
-msgid "Coupon applied response"
-msgstr ""
-
-#: admin/Settings.php:671
-msgid "Enable response popup"
-msgstr ""
-
-#: admin/Settings.php:680
-msgid ""
-"Please use the below short codes to show the Coupon details in the popup."
-"<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_amount}}</b> - "
-"Coupon amount<br><b>{{shop_url}}</b> - Shop URL<br><b>{{cart_url}}</b> - "
-"Cart URL<br><b>{{checkout_url}}</b> - Checkout URL"
-msgstr ""
-
-#: admin/Settings.php:682
-msgid "Popup contents"
-msgstr ""
-
-#: admin/Settings.php:693
-msgid "Add-ons List"
-msgstr ""
-
-#: admin/Settings.php:717 admin/Settings.php:724
-msgid "Premium Features"
-msgstr ""
-
-#: admin/Settings.php:913
-msgid ""
-"If you would like to switch back and manage the abandoned carts via the "
-"plugin"
-msgstr ""
-
-#: admin/Settings.php:932
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:72
-msgid "App ID"
-msgstr ""
-
-#: admin/Settings.php:937
-msgid "Get your App-id <a target=\"_blank\" href=\""
-msgstr ""
-
-#: admin/Settings.php:941
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:84
-msgid "Secret Key"
-msgstr ""
-
-#: admin/Settings.php:945
-msgid "Get your Secret key <a target=\"_blank\" href=\""
-msgstr ""
-
-#: admin/Settings.php:1068 admin/Settings.php:1265
+#: admin/Settings.php:1608
 msgid "All"
 msgstr ""
 
-#: admin/Settings.php:1319
+#: admin/Settings.php:1665
 msgid "Unlock this feature by upgrading to Premium"
 msgstr ""
 
-#: admin/Settings.php:1508
+#: admin/Settings.php:1873
 msgid ""
-"<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 style="
-"\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"
+"<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 "
+"style=\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"
 "\">{{coupon_amount}} Off On Your Next Purchase</h3><p style=\"font-size: "
 "16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;"
 "\">To thank you for being a loyal customer we want to offer you an exclusive "
@@ -782,500 +327,652 @@ msgid "Quick Feedback"
 msgstr ""
 
 #: admin/Survey.php:288
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:234
 msgid "Close"
 msgstr ""
 
-#: admin/Survey.php:296
+#: admin/Survey.php:295
 #, php-format
 msgid "If you have a moment, please share why you are deactivating %s:"
 msgstr ""
 
-#: admin/Survey.php:297
+#: admin/Survey.php:296
 msgid "Retainful - Next order coupon for Woocommerce"
 msgstr ""
 
-#: admin/Survey.php:325
+#: admin/Survey.php:324
 msgid "Submit & Deactivate"
 msgstr ""
 
-#: admin/Survey.php:327
+#: admin/Survey.php:326
 msgid "Skip & Deactivate"
 msgstr ""
 
-#: admin/templates/abandoned_cart.php:6
-msgid "Item"
+#: admin/templates/pages/connection.php:16
+msgid "App ID"
 msgstr ""
 
-#: admin/templates/abandoned_cart.php:9
-msgid "Qty"
+#: admin/templates/pages/connection.php:26
+#, php-format
+msgid "Get your App-id %s"
 msgstr ""
 
-#: admin/templates/abandoned_cart.php:12
-msgid "Price"
+#: admin/templates/pages/connection.php:34
+msgid "App Secret"
 msgstr ""
 
-#: admin/templates/abandoned_cart.php:15
-msgid "Total"
+#: admin/templates/pages/connection.php:45
+#, php-format
+msgid "Get your secret key %s"
 msgstr ""
 
-#: admin/templates/abandoned_cart.php:54
-msgid "Cart Total"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:51
-msgid "Recovered Revenue"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:65
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:66
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:87
-msgid "Recovered Carts"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:83
-msgid ""
-"Get more features like Email collection popup, Countdown timer & coupons"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:88
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:145
-msgid "Upgrade to Premium"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:101
-msgid "Abandoned Revenue"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:115
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:64
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:85
-msgid "All abandoned Carts"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:130
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:65
-msgid "Recoverable Carts"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-dashboard/cmb-field-abandoned-cart-dashboard.php:130
-msgid "Carts with known email"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:70
-msgid "Id"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:71
-msgid "Cart Status"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:72
-#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:49
-msgid "Date"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:73
-msgid "Customer / IP"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:74
-#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:50
-msgid "Email"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:75
-msgid "Cart Value"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:76
-msgid "Action"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:105
-msgid "Recovered"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:111
-msgid "In Progress"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:117
-msgid "Abandoned"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:160
-msgid "Registered"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:164
-msgid "Guest"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:183
-msgid "This is a guest cart. No email left by customer"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-lists/cmb-field-abandoned-cart-lists.php:249
-msgid "No carts found!"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:48
-msgid "Abandoned cart ID"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:51
-msgid "Subject"
-msgstr ""
-
-#: fields/cmb-field-abandoned-cart-sent-emails/cmb-field-abandoned-cart-sent-emails.php:79
-msgid "No E-Mails sent!"
-msgstr ""
-
-#: fields/cmb-field-cart-filter/cmb-field-cart-filter.php:51
-msgid "Choose date"
-msgstr ""
-
-#: fields/cmb-field-cart-filter/js/moment.min.js:1
-msgid ": "
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:51
-msgid "Bulk Actions"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:52
-msgid "Delete Selected"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:53
-msgid "Empty abandoned cart history"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:55
-msgid "Empty E-mail queue"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:58
-msgid "Apply"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:61
-msgid "Filter by"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:63
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:83
-msgid "All Carts"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:72
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:94
-msgid "In-Progress Carts"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:76
-msgid "Guest Carts"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:77
-msgid "Registered Carts"
-msgstr ""
-
-#: fields/cmb-field-cart-table-filter/cmb-field-cart-table-filter.php:80
-msgid "Quick Filter"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:26
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:27
-msgid "Please enter email Id!"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:26
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:27
-msgid "Are you sure?"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:62
-msgid "Add Or Edit Email Template"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:69
-msgid "Template Name"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:83
-msgid "Template Subject"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:90
-msgid "Use <b>{{customer_name}}</b> - To display Customer name"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:95
-msgid "Coupon code for recovery email"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:103
-msgid "Select"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:117
-#: premium/addons/RetainfulAddToCartAddon.php:622
-#: premium/addons/RetainfulCouponTimerAddon.php:369
-#: premium/addons/RetainfulExitIntentPopupAddon.php:562
-msgid ""
-"<b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If "
-"none found, please create the coupon code in WooCommerce -> Coupons"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:127
-msgid "Enabled?"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:136
-msgid "Email Body"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:147
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:178
-#: premium/addons/RetainfulExitIntentPopupAddon.php:89
-#: premium/addons/RetainfulExitIntentPopupAddon.php:97
-msgid "Insert template"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:159
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:175
-msgid "Premium"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:163
-msgid "Upgrade to Premium to Unlock"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:187
-msgid ""
-"You can use following short codes in your email template:<br> "
-"<b>{{customer_name}}</b> - To display Customer name<br><b>{{site_url}}</b> - "
-"Site link<br> <b>{{cart_recovery_link}}</b> - Link to recover user "
-"cart<br><b>{{user_cart}}</b> - Cart details<br>"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:189
-msgid ""
-"<b>{{recovery_coupon}}</b> - Coupon code to send along with recovery mail,"
-"Please choose the coupon above."
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:196
-msgid "Send this email in"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:203
-msgid "Hour(s)"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:204
-msgid "Day(s)"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:206
-msgid "after cart is abandoned."
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:211
-msgid "Send a test email to"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:216
-msgid "Send a test Email"
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:218
-msgid "Sending..."
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:220
-msgid "Enter email id to receive an test email."
-msgstr ""
-
-#: fields/cmb-field-edit-email-templete/cmb-field-edit-email-templete.php:232
-msgid "Save and close"
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:48
-msgid ""
-"Add email templates at different intervals to maximize the possibility of "
-"recovering your abandoned carts."
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:81
-msgid "Send "
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:81
-msgid "After Abandonment"
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:87
-msgid "Subject: "
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:91
-msgid "Sent Emails"
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:95
-msgid "Enabled"
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:95
-#: premium/addons/RetainfulPremiumAddonBase.php:183
-msgid "Disabled"
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:106
-msgid "Edit"
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:109
-msgid "Delete"
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:120
-msgid "No email templates found! So, No emails were sent!"
-msgstr ""
-
-#: fields/cmb-field-email-templates/cmb-field-email-templates.php:130
-msgid "Create New Email Template"
-msgstr ""
-
-#: fields/cmb-field-post-search-ajax/cmb-field-post-search-ajax.php:153
-msgid "Error : Unauthorized action"
-msgstr ""
-
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:50
-msgid "Go to Configuration"
-msgstr ""
-
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:62
-msgid "Add-to-Cart Email Collection Popup (Premium)"
-msgstr ""
-
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:63
-msgid ""
-"Collect customer email at the time of adding to cart. This will help you "
-"recover the cart even if they abandon before checkout."
-msgstr ""
-
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:67
-msgid "Countdown Timer (Premium)"
-msgstr ""
-
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:68
-#: premium/addons/RetainfulCouponTimerAddon.php:17
-msgid ""
-"Give a clear deadline to grab the offer and create a sense of urgency using "
-"Countdown Timer"
-msgstr ""
-
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:72
-msgid "Exit Intent Popup (Premium)"
-msgstr ""
-
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:73
-#: premium/addons/RetainfulExitIntentPopupAddon.php:17
-msgid ""
-"When customers try to leave your store, stop them by showing a coupon code "
-"or just collect their email and catch them later."
-msgstr ""
-
-#: fields/cmb-field-premium-addon-list/cmb-field-premium-addon-list.php:96
-msgid "Upgrade to a Paid Plan"
-msgstr ""
-
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:43
-msgid "It seems <b>\"OpenSSL\"</b> extensions was not found!"
-msgstr ""
-
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:51
+#: admin/templates/pages/connection.php:56
 msgid "Connect"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:51
+#: admin/templates/pages/connection.php:56
 msgid "Re-Connect"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:58
+#: admin/templates/pages/connection.php:62
 msgid "Dis-connect"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:63
+#: admin/templates/pages/connection.php:64
+#: admin/templates/pages/connection.php:91
+msgid "Visit Your Dashboard"
+msgstr ""
+
+#: admin/templates/pages/connection.php:70
 msgid "Successfully connected to Retainful"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:64
-msgid "You have disconnected from Retainful!"
+#: admin/templates/pages/connection.php:88
+msgid "Manage abandoned carts, emails & next order coupons"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:76
-msgid "Get your App-id "
-msgstr ""
-
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:77
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:89
-msgid "here."
-msgstr ""
-
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:88
-msgid "Get your Secret key "
-msgstr ""
-
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:95
+#: admin/templates/pages/connection.php:98
 msgid ""
-"Since this is a demo site, You would not be able to edit the App-id and "
-"Secret key! However, you could edit these keys on your store."
+"Upgrade to Premium and get more features like Email Collection during add to "
+"cart and Coupon for email entry."
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:107
+#: admin/templates/pages/connection.php:102
+msgid "Upgrade to Premium"
+msgstr ""
+
+#: admin/templates/pages/connection.php:118
 msgid "Recover abandoned carts and drive repeat purchases."
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:109
+#: admin/templates/pages/connection.php:120
 msgid ""
 "Stop cart abandonment and recover the lost revenue with Retainful. Increase "
 "sales by 10x. Capture emails and automatically send a series of recovery "
 "emails."
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:112
+#: admin/templates/pages/connection.php:123
 msgid "Get unlimited emails, drag and drop email editor, exit popups and more"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:116
+#: admin/templates/pages/connection.php:127
 msgid "Get started for FREE"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:131
-msgid "Manage abandoned carts, emails & next order coupons"
+#: admin/templates/pages/next-order-coupon.php:23
+msgid "Enable next order coupon?"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:134
-msgid "Visit Your Dashboard"
+#: admin/templates/pages/next-order-coupon.php:33
+#: admin/templates/pages/next-order-coupon.php:191
+#: admin/templates/pages/next-order-coupon.php:222
+#: admin/templates/pages/next-order-coupon.php:737
+#: admin/templates/pages/settings.php:48 admin/templates/pages/settings.php:74
+#: admin/templates/pages/settings.php:101
+#: admin/templates/pages/settings.php:128
+#: admin/templates/pages/settings.php:154
+#: admin/templates/pages/settings.php:184
+#: admin/templates/pages/settings.php:214
+#: admin/templates/pages/settings.php:244
+#: admin/templates/pages/settings.php:269
+#: admin/templates/pages/settings.php:312
+#: admin/templates/pages/settings.php:355
+#: admin/templates/pages/settings.php:418
+#: admin/templates/pages/settings.php:443
+#: premium/addons/RetainfulAddToCartAddon.php:513
+#: premium/addons/RetainfulAddToCartAddon.php:539
+#: premium/addons/RetainfulAddToCartAddon.php:696
+#: premium/addons/RetainfulAddToCartAddon.php:992
+#: premium/addons/RetainfulCouponTimerAddon.php:360
+#: premium/addons/RetainfulCouponTimerAddon.php:511
+#: premium/addons/RetainfulCouponTimerAddon.php:549
+#: premium/addons/RetainfulCouponTimerAddon.php:691
+#: premium/addons/RetainfulCouponTimerAddon.php:769
+#: premium/addons/RetainfulCouponTimerAddon.php:886
+#: premium/addons/RetainfulCouponTimerAddon.php:964
+#: premium/addons/RetainfulExitIntentPopupAddon.php:413
+#: premium/addons/RetainfulExitIntentPopupAddon.php:656
+#: premium/addons/RetainfulExitIntentPopupAddon.php:687
+#: premium/addons/RetainfulExitIntentPopupAddon.php:712
+#: premium/addons/RetainfulExitIntentPopupAddon.php:754
+msgid "Yes"
 msgstr ""
 
-#: fields/cmb-field-retainful-app/cmb-field-retainful-app.php:141
+#: admin/templates/pages/next-order-coupon.php:41
+#: admin/templates/pages/next-order-coupon.php:199
+#: admin/templates/pages/next-order-coupon.php:231
+#: admin/templates/pages/next-order-coupon.php:745
+#: admin/templates/pages/settings.php:56 admin/templates/pages/settings.php:83
+#: admin/templates/pages/settings.php:110
+#: admin/templates/pages/settings.php:137
+#: admin/templates/pages/settings.php:162
+#: admin/templates/pages/settings.php:192
+#: admin/templates/pages/settings.php:222
+#: admin/templates/pages/settings.php:252
+#: admin/templates/pages/settings.php:277
+#: admin/templates/pages/settings.php:320
+#: admin/templates/pages/settings.php:363
+#: admin/templates/pages/settings.php:426
+#: admin/templates/pages/settings.php:451
+#: premium/addons/RetainfulAddToCartAddon.php:522
+#: premium/addons/RetainfulAddToCartAddon.php:547
+#: premium/addons/RetainfulAddToCartAddon.php:705
+#: premium/addons/RetainfulAddToCartAddon.php:1000
+#: premium/addons/RetainfulCouponTimerAddon.php:369
+#: premium/addons/RetainfulCouponTimerAddon.php:520
+#: premium/addons/RetainfulCouponTimerAddon.php:557
+#: premium/addons/RetainfulCouponTimerAddon.php:699
+#: premium/addons/RetainfulCouponTimerAddon.php:777
+#: premium/addons/RetainfulCouponTimerAddon.php:894
+#: premium/addons/RetainfulCouponTimerAddon.php:972
+#: premium/addons/RetainfulExitIntentPopupAddon.php:421
+#: premium/addons/RetainfulExitIntentPopupAddon.php:664
+#: premium/addons/RetainfulExitIntentPopupAddon.php:695
+#: premium/addons/RetainfulExitIntentPopupAddon.php:720
+#: premium/addons/RetainfulExitIntentPopupAddon.php:762
+msgid "No"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:45
+#, php-format
 msgid ""
-"Upgrade to Premium and get more features like Email Collection during add to "
-"cart and Coupon for email entry."
+"A single-use, unique coupon code will be generated by Retainful "
+"automatically for the next purchase when the customer places a successful "
+"order. You can view these coupon codes at %s"
 msgstr ""
 
-#: fields/cmb-field-unlock-features/cmb-field-unlock-features.php:30
-msgid "Sign up to unlock coupon rules for FREE!"
+#: admin/templates/pages/next-order-coupon.php:53
+msgid "Coupon type"
 msgstr ""
 
-#: fields/cmb-field-unlock-features/cmb-field-unlock-features.php:84
-msgid "Click Here!"
+#: admin/templates/pages/next-order-coupon.php:63
+msgid "Percentage"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:71
+msgid "Flat"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:78
+msgid "Enter the coupon amount (percentage or flat)"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:89
+msgid ""
+"Enter the percenage or flat value of the coupon. Example: 10 (for 10 "
+"percentage). Note: If this field is empty, No coupon codes will generate!"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:100
+msgid "Coupon expires in "
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:109
+msgid " Day(s)"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:112
+msgid ""
+"How many days the coupon is valid? After the entered number of days coupon "
+"will automatically expire."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:116
+msgid "Note: Please leave empty or put 0 to never expire."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:121
+msgid ""
+"Send automatic email follow-ups to the customers before the coupon expires."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:130
+msgid "Coupon expiry date format "
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:157
+msgid "Apply coupon to "
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:181
+msgid ""
+"Allow next order coupons for orders created in the backend and also for old "
+"orders (when resending the email notification)"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:203
+msgid ""
+"The unique code will be generated when you try re-sending the email "
+"notification for an order in the backend"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:211
+msgid "Show next order coupon in order \"Thank you\" page?"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:238
+msgid "Display coupon message after "
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:262
+msgid ""
+"Coupon message to be included in the order confirmation emails to the "
+"customer "
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:271
+msgid ""
+"This message will attached to the Order Email.<br>Please use the below short "
+"codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - "
+"Coupon code<br><b>{{coupon_amount}}</b> - Coupon amount<br><b>{{coupon_url}}"
+"</b> - Url to apply coupon automatically"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:273
+msgid ""
+"<br><b>{{coupon_expiry_date}}</b> - Coupon expiry date(If coupon does not "
+"have any expiry days,then this will not attach to the message).<br>"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:285
+#: admin/templates/pages/next-order-coupon.php:503
+#: admin/templates/pages/next-order-coupon.php:714
+#: admin/templates/pages/next-order-coupon.php:772
+#: admin/templates/pages/next-order-coupon.php:781
+#: admin/templates/pages/premium-addon-settings.php:51
+#: admin/templates/pages/premium-addon-settings.php:64
+#: admin/templates/pages/settings.php:479
+#: admin/templates/pages/settings.php:487
+msgid "save"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:291
+msgid "Coupon Generation Restriction"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:298
+msgid "Order status"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:319
+msgid ""
+"Coupon code will not generate until the order meet the choosed order status."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:327
+msgid "User Role"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:330
+#: admin/templates/pages/next-order-coupon.php:462
+msgid "Premium"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:355
+msgid ""
+"Coupon codes will generate only for the selected user roles. By default "
+"coupon code will generate for all user roles."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:368
+msgid "How many coupons a customer can get in his lifetime?"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:382
+msgid ""
+"In order to maximize repeat purchases, you should send one unique coupon "
+"with every purchase for the next order. However, if you only want the "
+"customer to get next order coupons for 5 times in his life, you can set it "
+"to 5. In this case, the customer will receive the coupon only for 5 of his "
+"orders. starting 6th order, he will not receive the coupon"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:395
+msgid "Minimum order total"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:409
+msgid ""
+"Coupon will generate only if the order total greater then or equal to the "
+"given value. Leave empty or put 0 for no restriction."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:422
+msgid "Do not generate if the following products found in the order"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:432
+#: admin/templates/pages/next-order-coupon.php:600
+#: admin/templates/pages/next-order-coupon.php:629
+msgid "Search for a product&hellip;"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:446
+msgid ""
+"Coupon code will not be generated when these products were found in the "
+"order!"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:459
+msgid "Do not generate if the following categories found in the order"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:487
+msgid ""
+"Next order coupon will NOT be generated if an order has products from the "
+"selected categories."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:509
+msgid "Coupon Usage Restriction"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:516
+msgid "Minimum spend"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:527
+msgid "Set the minimum spend(subtotal) allowed to use the coupon."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:535
+msgid "Maximum spend"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:546
+msgid "Set the maximum spend(subtotal) allowed to use the coupon."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:554
+msgid "Individual use only"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:566
+msgid ""
+"Check this box if the coupon cannot be used in conjunction with other "
+"coupons."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:574
+msgid "Exclude sale items"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:585
+msgid ""
+"Check this box if the coupon should not apply to items on sale. Per-item "
+"coupons will only work if the item is not on sale. Per-cart coupons will "
+"only work if there are items in the cart that are not on sale."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:593
+msgid "Products"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:614
+msgid ""
+"Product that the coupon code will be applied to, or that need to be in the "
+"cart in order for the \"Fixed cart discount\" to be applied."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:622
+msgid "Exclude products"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:643
+msgid ""
+"Product that the coupon code will not applied to, or cannot be in the cart "
+"in order for the \"Fixed cart discount\" to be applied."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:651
+msgid "Product Categories"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:673
+msgid ""
+"Product categories that the coupon code will be applied to, or that need to "
+"be in the cart in order for the \"Fixed cart discount\" to be applied."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:681
+msgid "Exclude product Categories"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:703
+msgid ""
+"Product categories that the coupon code will not applied to, or cannot be in "
+"the cart in order for the \"Fixed cart discount\" to be applied."
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:720
+msgid "Coupon applied response"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:727
+msgid "Enable response popup"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:752
+msgid "Popup contents"
+msgstr ""
+
+#: admin/templates/pages/next-order-coupon.php:761
+msgid ""
+"Please use the below short codes to show the Coupon details in the popup."
+"<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_amount}}</b> - "
+"Coupon amount<br><b>{{shop_url}}</b> - Shop URL<br><b>{{cart_url}}</b> - "
+"Cart URL<br><b>{{checkout_url}}</b> - Checkout URL"
+msgstr ""
+
+#: admin/templates/pages/premium-addons.php:33
+msgid "Go to Configuration"
+msgstr ""
+
+#: admin/templates/pages/premium-addons.php:45
+msgid "Add-to-Cart Email Collection Popup (Premium)"
+msgstr ""
+
+#: admin/templates/pages/premium-addons.php:46
+msgid ""
+"Collect customer email at the time of adding to cart. This will help you "
+"recover the cart even if they abandon before checkout."
+msgstr ""
+
+#: admin/templates/pages/premium-addons.php:50
+msgid "Countdown Timer (Premium)"
+msgstr ""
+
+#: admin/templates/pages/premium-addons.php:51
+#: premium/addons/RetainfulCouponTimerAddon.php:17
+msgid ""
+"Give a clear deadline to grab the offer and create a sense of urgency using "
+"Countdown Timer"
+msgstr ""
+
+#: admin/templates/pages/premium-addons.php:55
+msgid "Exit Intent Popup (Premium)"
+msgstr ""
+
+#: admin/templates/pages/premium-addons.php:56
+#: premium/addons/RetainfulExitIntentPopupAddon.php:17
+msgid ""
+"When customers try to leave your store, stop them by showing a coupon code "
+"or just collect their email and catch them later."
+msgstr ""
+
+#: admin/templates/pages/premium-addons.php:79
+msgid "Upgrade to a Paid Plan"
+msgstr ""
+
+#: admin/templates/pages/settings.php:13
+msgid "Cart tracking engine?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:23
+msgid "JavaScript (Default,Recommended)"
+msgstr ""
+
+#: admin/templates/pages/settings.php:31
+msgid "PHP"
+msgstr ""
+
+#: admin/templates/pages/settings.php:38
+msgid "Track Zero value carts / orders"
+msgstr ""
+
+#: admin/templates/pages/settings.php:63
+msgid "Consider On-Hold order status as abandoned cart?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:90
+msgid "Consider Canceled order status as abandoned cart?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:117
+msgid "Consider failed order status as abandoned cart?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:144
+msgid "Fix for Cart sync not working"
+msgstr ""
+
+#: admin/templates/pages/settings.php:166
+msgid ""
+"Enable this option only when you dont see your carts in Retainful dashboard "
+msgstr ""
+
+#: admin/templates/pages/settings.php:174
+msgid "Enable Referral program for your store?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:196
+msgid ""
+"You should also enable and configure the referral program in your Retainful "
+"dashboard."
+msgstr ""
+
+#: admin/templates/pages/settings.php:204
+msgid "Enable Popup for your store?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:226
+msgid ""
+"You should also enable and configure the popup widget in your Retainful "
+"dashboard."
+msgstr ""
+
+#: admin/templates/pages/settings.php:234
+msgid "Show unique referral link in my account page for logged in customers?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:259
+msgid "Enable GDPR Compliance?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:284
+msgid "Compliance Message"
+msgstr ""
+
+#: admin/templates/pages/settings.php:294
+msgid ""
+"Under GDPR, it is mandatory to inform the users when we track their cart "
+"activity in real-time."
+msgstr ""
+
+#: admin/templates/pages/settings.php:302
+msgid "Enable IP filter?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:327
+msgid "Exclude capturing carts from these IP's"
+msgstr ""
+
+#: admin/templates/pages/settings.php:337
+msgid ""
+"The plugin will not track carts from these IP's . Enter IP in comma "
+"seperated format . Example 192.168.1.10,192.168.1.11 . Alternatively you can "
+"also use 192.168 .* , 192.168.10 .*, 192.168.1.1 - 192.168.1.255"
+msgstr ""
+
+#: admin/templates/pages/settings.php:345
+msgid "Enable debug log?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:370
+msgid "Session handler"
+msgstr ""
+
+#: admin/templates/pages/settings.php:380
+msgid "WooCommerce session (Default)"
+msgstr ""
+
+#: admin/templates/pages/settings.php:388
+msgid "Cookie"
+msgstr ""
+
+#: admin/templates/pages/settings.php:396
+msgid "PHP Session"
+msgstr ""
+
+#: admin/templates/pages/settings.php:400
+#, no-php-format
+msgid ""
+"DO NOT change this setting unless you are instructed by the Retainful "
+"Support team. WooCommerce session will work for 99% of the shops."
+msgstr ""
+
+#: admin/templates/pages/settings.php:408
+msgid ""
+"Enable AfterPay payment gateway support (only enable this option if you "
+"installed AfterPay plugin) ?"
+msgstr ""
+
+#: admin/templates/pages/settings.php:433
+msgid "Varnish Cache Compatibility"
+msgstr ""
+
+#: admin/templates/pages/settings.php:456
+msgid ""
+"DO NOT change this setting unless you are instructed by the Retainful "
+"Support team. Use this option only when you are using the server side "
+"caching with Varnish. Certain features may not work if enabled. So check "
+"with the Support team before enabling this option"
+msgstr ""
+
+#: admin/templates/pages/settings.php:464
+msgid "Order Update Webhook"
+msgstr ""
+
+#: admin/templates/pages/settings.php:470
+msgid "Create WebHook"
+msgstr ""
+
+#: admin/templates/pages/tabs.php:9
+msgid "Next order coupon"
+msgstr ""
+
+#: admin/templates/pages/tabs.php:11
+msgid "Premium Features"
 msgstr ""
 
 #: premium/addons/RetainfulAddToCartAddon.php:16
@@ -1288,51 +985,11 @@ msgid ""
 "the cart even if the customer abandon it before checkout"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:80
-#: premium/addons/RetainfulAddToCartAddon.php:693
-msgid "Enter your email to add this item to cart"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:84
-#: premium/addons/RetainfulAddToCartAddon.php:706
-msgid "Email address"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:85
-#: premium/addons/RetainfulAddToCartAddon.php:713
-msgid "Add to Cart"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:91
-#: premium/addons/RetainfulAddToCartAddon.php:744
-msgid "No thanks! Add item to cart"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:92
-#: premium/addons/RetainfulAddToCartAddon.php:757
-msgid ""
-"*By completing this, you are signing up to receive our emails. You can "
-"unsubscribe at any time."
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:99
-#: premium/addons/RetainfulAddToCartAddon.php:577
-#: premium/addons/RetainfulExitIntentPopupAddon.php:443
-#: premium/addons/RetainfulExitIntentPopupAddon.php:637
-msgid "I accept the <a href=\"#\">Terms and conditions</a>"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:237
-#: premium/addons/RetainfulExitIntentPopupAddon.php:325
-msgid "Sorry invalid request!"
-msgstr ""
-
 #: premium/addons/RetainfulAddToCartAddon.php:278
 msgid "Thanks for providing Email."
 msgstr ""
 
 #: premium/addons/RetainfulAddToCartAddon.php:283
-#: premium/addons/RetainfulAddToCartAddon.php:654
 msgid "You got a new coupon code, Grab it now!"
 msgstr ""
 
@@ -1344,574 +1001,605 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:447
+#: premium/addons/RetainfulAddToCartAddon.php:474
 msgid ""
-"<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 style="
-"\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;\">You "
-"have new Discount code</h3><p style=\"font-size: 16px; font-weight: 500; "
-"color: #555; line-height: 1.6; margin: 15px 0 20px;\">We want to offer you "
-"an exclusive voucher for your order!</p><p style=\"text-align: center;"
-"\"><span style=\"line-height: 1.6; font-size: 18px; font-weight: 500; "
-"background: #ffffff; padding: 10px 20px; border: 2px dashed #f27052; color: "
-"#f27052; text-decoration: none;\">{{coupon_code}}</span></p><p style=\"text-"
-"align: center; margin: 0;\"><a style=\"line-height: 1.8; font-size: 16px; "
-"font-weight: 500; background: #f27052; width: fit-content; padding: 10px; "
-"border: 1px solid #f27052; color: #ffffff; text-decoration: none;\" href="
-"\"{{coupon_url}}\">Go! </a></p></div></div>"
+"<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 "
+"style=\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"
+"\">Your coupon code</h3><p style=\"font-size: 16px; font-weight: 500; color: "
+"#555; line-height: 1.6; margin: 15px 0 20px;\">Thank you for shopping with "
+"us! We want to offer you an exclusive coupon for your order!</p><p "
+"style=\"text-align: center;\"><span style=\"line-height: 1.6; font-size: "
+"18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px "
+"dashed #f27052; color: #f27052; text-decoration: none;\">{{coupon_code}}</"
+"span></p><p style=\"text-align: center; margin: 0;\"><a style=\"line-height: "
+"1.8; font-size: 16px; font-weight: 500; background: #f27052; width: fit-"
+"content; padding: 10px; border: 1px solid #f27052; color: #ffffff; text-"
+"decoration: none;\" href=\"{{coupon_url}}\">Shop Now! </a></p></div></div>"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:456
+#: premium/addons/RetainfulAddToCartAddon.php:483
 msgid ""
-"<div style=\"padding: 20px; background: #F8F0F0; border-radius: 15px;\"><div "
-"style=\"padding: 20px; text-align: center;\"><div style=\"padding: 0px 12px; "
-"margin-bottom: 0; font-size: 35px; color: #1f1e1f; font-weight: 600; line-"
-"height: 45px;\">You have new Discount code</div><p style=\"font-size: 20px; "
-"padding: 0px 15px; line-height: 20px; margin-bottom: 15px; margin-top: 28px;"
-"\">Get 15% off on any item when you buy today</p><div style=\"padding: 0px; "
-"color: #2f2e35;\"><div style=\"text-align: center; padding: 20px 30px;\"><a "
-"style=\"width: 60%; padding: 12px 20%; background: #ffffff; border-radius: "
-"4px; font-size: 16px; font-weight: 600; color: #2f2e35; text-align: center; "
-"line-height: 1.33333; margin-top: 0px; margin-bottom: 5px; border: 1px "
-"dashed #2f2e35; text-decoration: none;\" href="
-"\"{{coupon_url}}\">{{coupon_code}}</a> <a style=\"padding: 12px 20px; "
-"background: #f27052; border: none; border-radius: 4px; font-size: 18px; font-"
-"weight: 600; color: white; text-align: center; line-height: 1.33333; text-"
-"decoration: none;\" href=\"{{coupon_url}}\">Use a coupon</a></div><a style="
-"\"text-decoration: none; font-size: 16px; line-height: 24px; color: #6c6b70 !"
-"important; font-weight: 500!important; margin-bottom: -15px;\" href=\"#"
-"\">*Not valid with other discount codes</a></div></div></div>"
+"<div class=\"rnoc-ip-container\" style=\"padding: 20px; background: #F8F0F0; "
+"border-radius: 15px;\"><div class=\"rnoc-ip-inner\" style=\"padding: 20px; "
+"text-align: center;\"><div class=\"rnoc-ip-heading\" style=\"padding: 0px "
+"12px; margin-bottom: 0; font-size: 35px; color: #1f1e1f; font-weight: 600; "
+"line-height: 45px;\"> Your coupon code</div><p class=\"rnoc-ip-sub-heading\" "
+"style=\"font-size: 20px; padding: 0px 15px; line-height: 20px; margin-"
+"bottom: 15px; margin-top: 28px;\">Get 10% off on any item when you buy "
+"today</p><div class=\"rnoc-ip-coupon\" style=\"padding: 0px; color: #2f2e35;"
+"\"><div class=\"rnoc-ip-coupon-inner\" style=\"text-align: center; padding: "
+"20px 30px;\"><a class=\"rnoc-ip-coupon-code\" style=\"width: 60%; padding: "
+"12px 20%; background: #ffffff; border-radius: 4px; font-size: 16px; font-"
+"weight: 600; color: #2f2e35; text-align: center; line-height: 1.33333; "
+"margin-top: 0px; margin-bottom: 5px; border: 1px dashed #2f2e35; text-"
+"decoration: none;display:inline-block;\" "
+"href=\"{{coupon_url}}\">{{coupon_code}}</a> <a class=\"rnoc-ip-coupon-apply-"
+"btn\" style=\"padding: 12px 20px; background: #f27052; border: none; border-"
+"radius: 4px; font-size: 18px; font-weight: 600; color: white; text-align: "
+"center; line-height: 1.33333; text-decoration: none;display:inline-block;\" "
+"href=\"{{coupon_url}}\">Apply coupon</a></div> <a class=\"rnoc-ip-coupon-"
+"description\" style=\"text-decoration: none; font-size: 16px; line-height: "
+"24px; color: #6c6b70 !important; font-weight: 500!important; margin-bottom: "
+"-15px;\" href=\"#\">*Not valid with other coupon codes</a></div></div></div>"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:469
-msgid "Add to cart Popup"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:498
-msgid "Enable Add to cart popup modal"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:508
-msgid "Email address is mandatory ?"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:519
-msgid "No thanks action"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:523
-msgid "Do not allow adding the item to cart and Do not show \"No thanks\" link"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:524
-msgid "Allow adding item to cart (Show \"No thanks\" link)"
+#: premium/addons/RetainfulAddToCartAddon.php:502
+msgid "Enable Add to cart popup modal?"
 msgstr ""
 
 #: premium/addons/RetainfulAddToCartAddon.php:529
+msgid "Email address is mandatory?"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:554
+msgid "No thanks action"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:564
+msgid "Allow adding item to cart (Show \"No thanks\" link)"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:572
+msgid "Do not allow adding the item to cart and Do not show \"No thanks\" link"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:579
+msgid "Close button behavior"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:589
+msgid "Add item to cart and close"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:597
+msgid "Just close the popup"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:604
 msgid "Show E-mail collection popup"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:533
+#: premium/addons/RetainfulAddToCartAddon.php:614
 msgid "Until user provides an E-Mail address"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:534
+#: premium/addons/RetainfulAddToCartAddon.php:622
 msgid ""
 "Until user clicks \"No thanks\" link (It will stop showing once user clicked "
 "no thanks)"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:535
+#: premium/addons/RetainfulAddToCartAddon.php:630
 msgid ""
 "Until user clicks close button of the popup (It will stop when user clicks "
 "the close button once)"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:540
-#: premium/addons/RetainfulExitIntentPopupAddon.php:533
+#: premium/addons/RetainfulAddToCartAddon.php:637
+#: premium/addons/RetainfulExitIntentPopupAddon.php:433
 msgid "Custom pages to display the pop-up modal on (Optional)"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:545
-#: premium/addons/RetainfulCouponTimerAddon.php:377
-#: premium/addons/RetainfulExitIntentPopupAddon.php:538
-msgid "Select Pages"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:547
+#: premium/addons/RetainfulAddToCartAddon.php:659
 msgid ""
 "The add to cart popup would be displayed only on the selected pages.If you "
 "wish to display the popup in all pages, leave this option empty."
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:550
+#: premium/addons/RetainfulAddToCartAddon.php:667
 msgid "Custom classes"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:554
+#: premium/addons/RetainfulAddToCartAddon.php:677
 msgid ""
 "Very helpful for custom designed Add to cart button.<b>Example:</b> .add-to-"
 "cart,.custom-add-to-cart-button"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:562
-#: premium/addons/RetainfulExitIntentPopupAddon.php:622
-msgid "GDPR Compliance for collecting E-Mail"
+#: premium/addons/RetainfulAddToCartAddon.php:685
+msgid "Enable no conflict mode ?"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:567
-#: premium/addons/RetainfulExitIntentPopupAddon.php:627
-msgid "Show GDPR Compliance checkbox "
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:574
-#: premium/addons/RetainfulExitIntentPopupAddon.php:634
-msgid "GDPR Compliance message"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:578
-#: premium/addons/RetainfulExitIntentPopupAddon.php:638
-msgid "You can also use HTML content as well in the message."
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:586
-msgid "Coupon settings - Incentivize the customers for entering their email"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:591
-msgid "Enable Coupon "
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:599
+#: premium/addons/RetainfulAddToCartAddon.php:709
 msgid ""
-"Please enable the add to cart popup for email collection. Only then the "
-"users would be able to avail the coupons you set here."
+"DO NOT change this option unless recommended by the support team.  By "
+"default, the popup javascript is compatible and runs in no-conflict mode "
+"with other scripts that bind to the Add to cart button. But if you find any "
+"conflicts with other scripts, you can set this to NO and try."
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:602
-msgid "Coupon message on popup"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:605
-msgid "Get a discount in your email!"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:606
-msgid "<b>Note:</b> You need to enable coupon."
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:609
-msgid "Coupon message color"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:615
-#: premium/addons/RetainfulCouponTimerAddon.php:367
-#: premium/addons/RetainfulExitIntentPopupAddon.php:560
-msgid "Choose the coupon code"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:620
-msgid "Select Coupon"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:625
-msgid "Show coupon code"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:629
-msgid "Instantly using a popup"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:630
-msgid "Send an email"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:631
-msgid "Show instantly and also send an email"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:634
-msgid "Choose coupon settings"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:637
-msgid "How to show the coupon to customers"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:640
-#: premium/addons/RetainfulExitIntentPopupAddon.php:642
-msgid "Popup template"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:644
-#: premium/addons/RetainfulAddToCartAddon.php:666
-msgid ""
-"Please use the below short codes to show the Coupon details in the message."
-"<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{coupon_url}}</b> - Url to "
-"apply coupon automatically"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:651
-msgid "Email subject"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:655
-msgid "Email subject for sending the coupon mail."
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:662
-msgid ""
-"Email template (Used for the email that is sent when customer enters his "
-"email in the Add to Cart Popup)"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:678
+#: premium/addons/RetainfulAddToCartAddon.php:718
 msgid "Popup Design"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:686
-msgid "Please enter your email"
-msgstr ""
-
-#: premium/addons/RetainfulAddToCartAddon.php:690
+#: premium/addons/RetainfulAddToCartAddon.php:739
 msgid "Modal heading"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:697
+#: premium/addons/RetainfulAddToCartAddon.php:752
 msgid "Modal heading color"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:703
+#: premium/addons/RetainfulAddToCartAddon.php:765
 msgid "Email placeholder"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:710
-#: premium/addons/RetainfulCouponTimerAddon.php:480
-#: premium/addons/RetainfulCouponTimerAddon.php:568
+#: premium/addons/RetainfulAddToCartAddon.php:778
+msgid "Email field width(%)"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:792
 msgid "Add to cart button text"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:717
-#: premium/addons/RetainfulCouponTimerAddon.php:487
-#: premium/addons/RetainfulCouponTimerAddon.php:575
+#: premium/addons/RetainfulAddToCartAddon.php:805
+msgid "Add to cart button width(%)"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:819
 msgid "Add to cart button color"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:723
-#: premium/addons/RetainfulCouponTimerAddon.php:493
-#: premium/addons/RetainfulCouponTimerAddon.php:581
+#: premium/addons/RetainfulAddToCartAddon.php:833
 msgid "Add to cart button background color"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:729
+#: premium/addons/RetainfulAddToCartAddon.php:847
 msgid "Popup top border color"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:735
+#: premium/addons/RetainfulAddToCartAddon.php:861
 msgid "Add to cart popup background color"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:741
+#: premium/addons/RetainfulAddToCartAddon.php:875
 msgid "Not mandatory text"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:748
+#: premium/addons/RetainfulAddToCartAddon.php:888
 msgid "No thanks link color"
 msgstr ""
 
-#: premium/addons/RetainfulAddToCartAddon.php:754
+#: premium/addons/RetainfulAddToCartAddon.php:902
 msgid "Terms"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:916
+#: premium/addons/RetainfulExitIntentPopupAddon.php:966
+msgid "GDPR Compliance for collecting E-Mail"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:927
+#: premium/addons/RetainfulExitIntentPopupAddon.php:977
+msgid "Show GDPR Compliance checkbox"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:949
+#: premium/addons/RetainfulExitIntentPopupAddon.php:999
+msgid "GDPR Compliance message"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:962
+#: premium/addons/RetainfulExitIntentPopupAddon.php:1012
+msgid "You can also use HTML content as well in the message."
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:971
+msgid ""
+"Coupon settings - Reward customers with a coupon for providing their email "
+"address"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:982
+msgid "Enable coupon reward for providing email address"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1004
+msgid ""
+"You can reward your visitors with a coupon code when they provide their "
+"email address via the Add-to-cart popup."
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1012
+msgid "Choose the coupon code for the reward"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1021
+#: premium/addons/RetainfulCouponTimerAddon.php:382
+#: premium/addons/RetainfulExitIntentPopupAddon.php:505
+msgid "Search for a coupon code"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1032
+msgid "Reward message to show on the popup"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1049
+msgid "Message text color"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1063
+msgid "Choose how to reveal the reward coupon"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1071
+msgid "Instantly using a popup"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1072
+msgid "Send an email"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1073
+msgid "Show instantly using a popup and also send an email"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1074
+msgid "Auto apply coupon and redirect to checkout"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1075
+msgid "Auto apply coupon and redirect to cart"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1076
+msgid "Send email, auto apply and redirect to checkout"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1077
+msgid "Send email, auto apply and redirect to cart"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1096
+msgid "Response Popup template"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1116
+msgid "Email subject"
+msgstr ""
+
+#: premium/addons/RetainfulAddToCartAddon.php:1130
+msgid ""
+"Email template (Used for the email that is sent when customer enters his "
+"email in the Add to Cart Popup)"
 msgstr ""
 
 #: premium/addons/RetainfulCouponTimerAddon.php:16
 msgid "Countdown Timer"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:163
-#: premium/addons/RetainfulCouponTimerAddon.php:226
-#: premium/addons/RetainfulCouponTimerAddon.php:436
-#: premium/addons/RetainfulCouponTimerAddon.php:524
-#: premium/addons/RetainfulCouponTimerAddon.php:612
-msgid ""
-"Make purchase quickly, your {{coupon_code}} will expire within "
-"{{coupon_timer}}"
-msgstr ""
-
-#: premium/addons/RetainfulCouponTimerAddon.php:171
-#: premium/addons/RetainfulCouponTimerAddon.php:483
-#: premium/addons/RetainfulCouponTimerAddon.php:571
-msgid "Checkout Now"
-msgstr ""
-
-#: premium/addons/RetainfulCouponTimerAddon.php:227
-#: premium/addons/RetainfulCouponTimerAddon.php:443
-#: premium/addons/RetainfulCouponTimerAddon.php:531
-#: premium/addons/RetainfulCouponTimerAddon.php:619
-msgid " {{minutes}}M {{seconds}}S"
-msgstr ""
-
-#: premium/addons/RetainfulCouponTimerAddon.php:325
-msgid "Coupon Timer"
-msgstr ""
-
 #: premium/addons/RetainfulCouponTimerAddon.php:349
 msgid "Enable Coupon timer?"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:364
-#: premium/addons/RetainfulExitIntentPopupAddon.php:557
-msgid "Search and select Coupons.."
+#: premium/addons/RetainfulCouponTimerAddon.php:376
+#: premium/addons/RetainfulExitIntentPopupAddon.php:496
+msgid "Choose the coupon code"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:372
+#: premium/addons/RetainfulCouponTimerAddon.php:394
 msgid "Custom pages to display the coupon timer"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:381
+#: premium/addons/RetainfulCouponTimerAddon.php:419
 msgid "Apply coupon"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:386
+#: premium/addons/RetainfulCouponTimerAddon.php:430
 msgid "Automatically"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:387
+#: premium/addons/RetainfulCouponTimerAddon.php:439
 msgid "Manually"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:392
+#: premium/addons/RetainfulCouponTimerAddon.php:446
 msgid "Time"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:395
+#: premium/addons/RetainfulCouponTimerAddon.php:456
 msgid "In minutes"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:404
+#: premium/addons/RetainfulCouponTimerAddon.php:464
 msgid "Coupon expiry message"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:407
+#: premium/addons/RetainfulCouponTimerAddon.php:474
 msgid "Display this text when coupon expires."
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:408
-msgid "Sorry! Instant Offer has expired."
+#: premium/addons/RetainfulCouponTimerAddon.php:482
+msgid "Coupon timer expired text"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:416
-msgid "Top position display settings"
+#: premium/addons/RetainfulCouponTimerAddon.php:492
+msgid "Display this text when coupon timer gets expired."
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:421
-msgid "Enable \"Top\" position"
+#: premium/addons/RetainfulCouponTimerAddon.php:500
+msgid "Fix repeat reloading of page when coupon expires?"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:432
-#: premium/addons/RetainfulCouponTimerAddon.php:520
-#: premium/addons/RetainfulCouponTimerAddon.php:608
+#: premium/addons/RetainfulCouponTimerAddon.php:528
+msgid "Top / bottom position display settings"
+msgstr ""
+
+#: premium/addons/RetainfulCouponTimerAddon.php:539
+msgid "Enable Top / bottom position"
+msgstr ""
+
+#: premium/addons/RetainfulCouponTimerAddon.php:564
+msgid "Position"
+msgstr ""
+
+#: premium/addons/RetainfulCouponTimerAddon.php:574
+msgid "Top"
+msgstr ""
+
+#: premium/addons/RetainfulCouponTimerAddon.php:582
+msgid "Bottom"
+msgstr ""
+
+#: premium/addons/RetainfulCouponTimerAddon.php:589
+#: premium/addons/RetainfulCouponTimerAddon.php:784
+#: premium/addons/RetainfulCouponTimerAddon.php:979
 msgid "Message"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:435
-#: premium/addons/RetainfulCouponTimerAddon.php:523
-#: premium/addons/RetainfulCouponTimerAddon.php:611
+#: premium/addons/RetainfulCouponTimerAddon.php:599
+#: premium/addons/RetainfulCouponTimerAddon.php:794
+#: premium/addons/RetainfulCouponTimerAddon.php:989
 msgid ""
 "Use below short codes<br>{{coupon_code}} => to show coupon "
 "code<br>{{coupon_timer}} => remaining time timer"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:439
-#: premium/addons/RetainfulCouponTimerAddon.php:527
-#: premium/addons/RetainfulCouponTimerAddon.php:615
-msgid "Timer format"
+#: premium/addons/RetainfulCouponTimerAddon.php:607
+#: premium/addons/RetainfulCouponTimerAddon.php:802
+#: premium/addons/RetainfulCouponTimerAddon.php:997
+msgid "Timer display format"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:442
-#: premium/addons/RetainfulCouponTimerAddon.php:530
-#: premium/addons/RetainfulCouponTimerAddon.php:618
+#: premium/addons/RetainfulCouponTimerAddon.php:617
+#: premium/addons/RetainfulCouponTimerAddon.php:812
+#: premium/addons/RetainfulCouponTimerAddon.php:1007
 msgid ""
 "Use below short codes<br>{{days}} => to show remaining days<br>{{hours}} => "
 "to show remaining hours<br>{{minutes}} - to show remaining "
 "minutes<br>{{seconds}} - to display remaining seconds"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:446
-#: premium/addons/RetainfulCouponTimerAddon.php:534
-#: premium/addons/RetainfulCouponTimerAddon.php:622
+#: premium/addons/RetainfulCouponTimerAddon.php:625
+#: premium/addons/RetainfulCouponTimerAddon.php:820
+#: premium/addons/RetainfulCouponTimerAddon.php:1015
 msgid "Background color"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:452
-#: premium/addons/RetainfulCouponTimerAddon.php:540
-#: premium/addons/RetainfulCouponTimerAddon.php:628
+#: premium/addons/RetainfulCouponTimerAddon.php:639
+#: premium/addons/RetainfulCouponTimerAddon.php:834
+#: premium/addons/RetainfulCouponTimerAddon.php:1029
 msgid "Color"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:458
-#: premium/addons/RetainfulCouponTimerAddon.php:546
-#: premium/addons/RetainfulCouponTimerAddon.php:634
+#: premium/addons/RetainfulCouponTimerAddon.php:653
+#: premium/addons/RetainfulCouponTimerAddon.php:848
+#: premium/addons/RetainfulCouponTimerAddon.php:1043
 msgid "Coupon code color"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:464
-#: premium/addons/RetainfulCouponTimerAddon.php:552
-#: premium/addons/RetainfulCouponTimerAddon.php:640
-msgid "Coupon Timer color"
+#: premium/addons/RetainfulCouponTimerAddon.php:667
+#: premium/addons/RetainfulCouponTimerAddon.php:862
+#: premium/addons/RetainfulCouponTimerAddon.php:1057
+msgid "Coupon timer color"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:470
-#: premium/addons/RetainfulCouponTimerAddon.php:558
+#: premium/addons/RetainfulCouponTimerAddon.php:681
+#: premium/addons/RetainfulCouponTimerAddon.php:876
 msgid "Enable checkout button"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:504
+#: premium/addons/RetainfulCouponTimerAddon.php:706
+#: premium/addons/RetainfulCouponTimerAddon.php:901
+msgid "Call to action button text"
+msgstr ""
+
+#: premium/addons/RetainfulCouponTimerAddon.php:719
+#: premium/addons/RetainfulCouponTimerAddon.php:914
+msgid "Call to action button color"
+msgstr ""
+
+#: premium/addons/RetainfulCouponTimerAddon.php:733
+#: premium/addons/RetainfulCouponTimerAddon.php:928
+msgid "Call to action button background color"
+msgstr ""
+
+#: premium/addons/RetainfulCouponTimerAddon.php:748
 msgid "Above cart display settings"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:509
-msgid "Enable \"Above cart\" position"
+#: premium/addons/RetainfulCouponTimerAddon.php:759
+msgid "Enable above cart position"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:592
+#: premium/addons/RetainfulCouponTimerAddon.php:943
 msgid "Below applied coupon display settings"
 msgstr ""
 
-#: premium/addons/RetainfulCouponTimerAddon.php:597
-msgid "Enable \"Below applied coupon\" position"
+#: premium/addons/RetainfulCouponTimerAddon.php:954
+msgid "Enable below applied coupon position"
 msgstr ""
 
 #: premium/addons/RetainfulExitIntentPopupAddon.php:16
 msgid "Exit Intent Popup"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:124
-msgid "Only once per page"
+#: premium/addons/RetainfulExitIntentPopupAddon.php:72
+msgid "Sorry, Template not found"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:127
-msgid "Every time customer tries to exit"
+#: premium/addons/RetainfulExitIntentPopupAddon.php:95
+#: premium/addons/RetainfulExitIntentPopupAddon.php:103
+msgid "Insert template"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:130
-msgid "X number of times per page on exit"
-msgstr ""
-
-#: premium/addons/RetainfulExitIntentPopupAddon.php:133
-msgid "Only once per session"
-msgstr ""
-
-#: premium/addons/RetainfulExitIntentPopupAddon.php:141
-msgid "Number of times"
-msgstr ""
-
-#: premium/addons/RetainfulExitIntentPopupAddon.php:434
-#: premium/addons/RetainfulExitIntentPopupAddon.php:670
-msgid "Enter E-mail address"
-msgstr ""
-
-#: premium/addons/RetainfulExitIntentPopupAddon.php:437
+#: premium/addons/RetainfulExitIntentPopupAddon.php:352
 msgid "Complete Checkout"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:480
-msgid "Exit intent Popup"
+#: premium/addons/RetainfulExitIntentPopupAddon.php:403
+msgid "Enable exit intent popup?"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:522
-msgid "Enable exit intent popup"
-msgstr ""
-
-#: premium/addons/RetainfulExitIntentPopupAddon.php:530
+#: premium/addons/RetainfulExitIntentPopupAddon.php:425
 msgid ""
 "Exit intent popup will show when, cart contains some items and user tries to "
 "leave the site."
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:540
+#: premium/addons/RetainfulExitIntentPopupAddon.php:455
 msgid ""
 "The exit intent popup would be displayed only on the selected pages.If you "
 "wish to display the popup in all pages, leave this option empty."
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:543
+#: premium/addons/RetainfulExitIntentPopupAddon.php:463
 msgid "Show exit intent popup"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:547
+#: premium/addons/RetainfulExitIntentPopupAddon.php:473
 msgid "Only for guest"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:548
+#: premium/addons/RetainfulExitIntentPopupAddon.php:481
 msgid "Everyone"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:565
+#: premium/addons/RetainfulExitIntentPopupAddon.php:489
+msgid "When a customer has not yet provided an email address"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:516
 msgid "Don't show exit intent popup once its coupon applied?"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:569
-msgid "No, keep showing"
-msgstr ""
-
-#: premium/addons/RetainfulExitIntentPopupAddon.php:570
+#: premium/addons/RetainfulExitIntentPopupAddon.php:526
 msgid "Yes, hide"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:575
+#: premium/addons/RetainfulExitIntentPopupAddon.php:534
+msgid "No, keep showing"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:541
 msgid "Show exit popup"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:579
-msgid ""
-"The maximum number of times the dialog may be shown on a page, or 0 for "
-"unlimited. Only applicable on desktop browsers."
+#: premium/addons/RetainfulExitIntentPopupAddon.php:554
+msgid "Only once per page"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:585
-msgid "Distance"
+#: premium/addons/RetainfulExitIntentPopupAddon.php:557
+msgid "Every time customer tries to exit"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:589
-msgid ""
-"The minimum distance in pixels from the top of the page to consider "
-"triggering for."
+#: premium/addons/RetainfulExitIntentPopupAddon.php:560
+msgid "X number of times per page on exit"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:595
+#: premium/addons/RetainfulExitIntentPopupAddon.php:563
+msgid "Only once per session"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:566
+msgid "Number of times"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:583
 msgid "Cookie expiry days"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:599
-msgid "The cookie (when localStorage isn't available) expiry age, in days."
+#: premium/addons/RetainfulExitIntentPopupAddon.php:596
+msgid "Where to redirect after entering email?"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:605
-msgid "Button redirects to"
-msgstr ""
-
-#: premium/addons/RetainfulExitIntentPopupAddon.php:609
+#: premium/addons/RetainfulExitIntentPopupAddon.php:606
 msgid "Cart page"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:610
+#: premium/addons/RetainfulExitIntentPopupAddon.php:614
 msgid "Checkout page"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:611
-msgid "Stay on same page"
+#: premium/addons/RetainfulExitIntentPopupAddon.php:622
+msgid "Same page"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:614
+#: premium/addons/RetainfulExitIntentPopupAddon.php:626
 msgid ""
 "This controls whether or not the bounce dialog should be shown on every page "
 "view or only on the user's first."
 msgstr ""
 
+#: premium/addons/RetainfulExitIntentPopupAddon.php:635
+msgid "Mobile popup settings"
+msgstr ""
+
 #: premium/addons/RetainfulExitIntentPopupAddon.php:646
+msgid ""
+"Trigger popup when the back button is clicked in the mobile browser "
+"(default: No)"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:677
+msgid "Enable mobile back button trigger"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:702
+msgid "Enable time delay based trigger"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:727
+msgid "Delay seconds"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:744
+msgid "Enable Scroll based trigger"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:769
+msgid "Scroll distance"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:788
+msgid "Popup design"
+msgstr ""
+
+#: premium/addons/RetainfulExitIntentPopupAddon.php:812
 msgid "Preview"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:648
+#: premium/addons/RetainfulExitIntentPopupAddon.php:819
 msgid ""
 "Please use the below short codes to show the Coupon details in the message."
 "<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{cart_url}}</b> - Url to "
@@ -1924,59 +1612,59 @@ msgid ""
 "only show to Guest and Administrator."
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:651
+#: premium/addons/RetainfulExitIntentPopupAddon.php:827
 msgid "Custom CSS styles"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:662
+#: premium/addons/RetainfulExitIntentPopupAddon.php:844
 msgid "Email collection form design"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:667
+#: premium/addons/RetainfulExitIntentPopupAddon.php:855
 msgid "Email input placeholder"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:674
+#: premium/addons/RetainfulExitIntentPopupAddon.php:868
 msgid "Email input height"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:681
+#: premium/addons/RetainfulExitIntentPopupAddon.php:882
 msgid "Email input width"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:688
+#: premium/addons/RetainfulExitIntentPopupAddon.php:896
 msgid "Button text"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:691
-msgid "Complete checkout"
-msgstr ""
-
-#: premium/addons/RetainfulExitIntentPopupAddon.php:695
+#: premium/addons/RetainfulExitIntentPopupAddon.php:909
 msgid "Button color"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:701
+#: premium/addons/RetainfulExitIntentPopupAddon.php:923
 msgid "Button background color"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:707
+#: premium/addons/RetainfulExitIntentPopupAddon.php:937
 msgid "Button height"
 msgstr ""
 
-#: premium/addons/RetainfulExitIntentPopupAddon.php:714
+#: premium/addons/RetainfulExitIntentPopupAddon.php:951
 msgid "Button width"
 msgstr ""
 
-#: premium/addons/RetainfulPremiumAddonBase.php:184
+#: premium/addons/RetainfulPremiumAddonBase.php:198
+msgid "Disabled"
+msgstr ""
+
+#: premium/addons/RetainfulPremiumAddonBase.php:199
 msgid "Don't show checkbox, but show GDPR compliance message"
 msgstr ""
 
-#: premium/addons/RetainfulPremiumAddonBase.php:185
+#: premium/addons/RetainfulPremiumAddonBase.php:200
 msgid "Show checkbox - default un checked"
 msgstr ""
 
-#: premium/addons/RetainfulPremiumAddonBase.php:186
+#: premium/addons/RetainfulPremiumAddonBase.php:201
 msgid "Show checkbox - default checked"
 msgstr ""
 
@@ -1985,10 +1673,4 @@ msgstr ""
 msgid ""
 "Please enter the valid\n"
 "            email."
-msgstr ""
-
-#: premium/templates/timer/above_cart.php:22
-#: premium/templates/timer/below_discount.php:14
-#: premium/templates/timer/top.php:22
-msgid "EXPIRED"
 msgstr ""
