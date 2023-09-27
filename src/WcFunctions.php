@@ -1956,7 +1956,7 @@ class WcFunctions
             if(!$this->isHPOSEnabled()){
                 $query = $wpdb->prepare("SELECT COUNT(*) as total FROM {$wpdb->prefix}posts as p 
                 LEFT JOIN {$wpdb->prefix}postmeta as pm ON pm.post_id = p.id 
-                WHERE pm.meta_key=%s AND pm.meta_value=%s AND p.post_type=%s",array('_billing_email',$email.'shop_order'));
+                WHERE pm.meta_key=%s AND pm.meta_value=%s AND p.post_type=%s",array('_billing_email',$email,'shop_order'));
             }else{
                 $query =  $wpdb->prepare("SELECT COUNT(*) as total FROM {$wpdb->prefix}wc_orders 
                          WHERE billing_email = %s",array($email));
