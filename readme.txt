@@ -5,7 +5,7 @@ Requires at least: 4.6.1
 Tested up to: 6.3
 WC tested up to: 8.1
 Requires PHP: 5.6
-Stable tag: 2.6.24
+Stable tag: 2.6.25
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -249,6 +249,9 @@ No. There is no charges for support.
 == Screenshots ==
 
 == Changelog ==
+= 2.6.25 =
+- Fix: customer order total query
+
 = 2.6.24 =
 - Fix: order synchronize query improvement
 - Fix: handle Request class deprecation

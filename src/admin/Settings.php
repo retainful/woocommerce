@@ -132,6 +132,7 @@ class Settings
         wp_send_json($response);
     }
 
+
     /**
      * disconnect the app
      */
@@ -142,9 +143,12 @@ class Settings
             wp_send_json_error('security breach');
         }
         $license_details = get_option($this->slug . '_license', array());
-        $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
-        update_option($this->slug . '_license', $license_details);
-        wp_send_json_success(__('App disconnected successfully!', RNOC_TEXT_DOMAIN));
+        if($this->discountApi()){
+            $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
+            update_option($this->slug . '_license', $license_details);
+            wp_send_json_success(__('App disconnected successfully!', RNOC_TEXT_DOMAIN));
+        }
+        wp_send_json_error(__('App disconnected failed!', RNOC_TEXT_DOMAIN));
     }
 
     /**
@@ -1672,7 +1676,7 @@ class Settings
      * @param string $store_data
      * @return bool|array
      */
-    function isApiEnabled($api_key = "", $secret_key = NULL, $store_data = NULL)
+    function isApiEnabled($api_key = "", $secret_key = NULL, $store_data = NULL, $connection_type = 'enable')
     {
         if (empty($api_key)) {
             $api_key = $this->getApiKey();
@@ -1684,7 +1688,7 @@ class Settings
             $store_data = $this->storeDetails($api_key, $secret_key);
         }
         if (!empty($api_key)) {
-            if ($details = $this->api->validateApi($api_key, $store_data)) {
+            if ($details = $this->api->validateApi($api_key, $store_data,$connection_type)) {
                 if (empty($details) || is_string($details)) {
                     $this->updateUserAsFreeUser();
                     return array('error' => $details);
@@ -1700,6 +1704,28 @@ class Settings
             $this->updateUserAsFreeUser();
             return false;
         }
+    }
+
+    function discountApi($api_key = "", $secret_key = NULL)
+    {
+        if (empty($api_key)) {
+            $api_key = $this->getApiKey();
+        }
+        if (empty($secret_key)) {
+            $secret_key = $this->getSecretKey();
+        }
+        if (empty($store_data)) {
+            $store_data = $this->storeDetails($api_key, $secret_key);
+        }
+        if (!empty($api_key)) {
+            if ($details = $this->api->validateApi($api_key, $store_data,'disable')) {
+                if (!empty($details) && !is_string($details)) {
+                    $this->updateUserAsFreeUser();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
