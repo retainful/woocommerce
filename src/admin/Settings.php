@@ -1676,7 +1676,7 @@ class Settings
      * @param string $store_data
      * @return bool|array
      */
-    function isApiEnabled($api_key = "", $secret_key = NULL, $store_data = NULL, $connection_type = 'enable')
+    function isApiEnabled($api_key = "", $secret_key = NULL, $store_data = NULL)
     {
         if (empty($api_key)) {
             $api_key = $this->getApiKey();
@@ -1688,7 +1688,7 @@ class Settings
             $store_data = $this->storeDetails($api_key, $secret_key);
         }
         if (!empty($api_key)) {
-            if ($details = $this->api->validateApi($api_key, $store_data,$connection_type)) {
+            if ($details = $this->api->validateApi($api_key, $store_data)) {
                 if (empty($details) || is_string($details)) {
                     $this->updateUserAsFreeUser();
                     return array('error' => $details);
