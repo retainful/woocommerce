@@ -261,7 +261,11 @@ class Order extends RestApi
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
             'noc_discount_codes' => $this->getNextOrderCouponDetails($order),
             'client_details' => $this->getClientDetails($order),
-            'payment_method' => $order->get_payment_method(),
+            'payment_method' => array(
+                'value' => $order->get_payment_method(),
+                'name' => $order->get_payment_method_title(),
+            )
+
         );
         if(!empty($cart_token)){
             $referrer_automation_id = self::$woocommerce->getSession($cart_token.'_referrer_automation_id');
