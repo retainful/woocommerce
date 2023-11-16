@@ -150,7 +150,7 @@ class Imports
         }
         $cart_hash = $woocommerce_helper->getOrderMeta($order, $cart_hash_key_for_db);
         if(empty($cart_hash)){
-            $cart_hash = $retainful_api->generateCartHash();
+            $cart_hash = $woocommerce_helper->getOrderMeta($order,'_cart_hash');
             $woocommerce_helper->setOrderMeta($order_id, $cart_hash_key_for_db, $cart_hash);
         }
         $is_buyer_accepts_marketing = $woocommerce_helper->getOrderMeta($order, $accepts_marketing_key_for_db);
