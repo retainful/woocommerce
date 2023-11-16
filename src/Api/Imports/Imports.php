@@ -129,21 +129,44 @@ class Imports
     {
         $abandoned_order = new Order();
         $woocommerce_helper = new WcFunctions();
+        $retainful_api = new \Rnoc\Retainful\Api\AbandonedCart\RestApi();
         $settings = new Settings();
         $user_ip_key_for_db = '_rnoc_user_ip_address';
         $cart_hash_key_for_db = '_rnoc_cart_hash';
         $accepts_marketing_key_for_db = '_rnoc_is_buyer_accepts_marketing';
         $cart_tracking_started_key_for_db = '_rnoc_cart_tracking_started_at';
         $order_cancelled_date_key_for_db = '_rnoc_order_cancelled_at';
+        $cart_token_key_for_db = "_rnoc_user_cart_token";
         $user_ip = $woocommerce_helper->getOrderMeta($order, $user_ip_key_for_db);
         $order_id = $woocommerce_helper->getOrderId($order);
+        if(empty($user_ip)){
+            $user_ip = $retainful_api->retrieveUserIp();
+            $woocommerce_helper->setOrderMeta($order_id, $user_ip_key_for_db, $user_ip);
+        }
         $cart_token = $abandoned_order->getOrderCartToken($order);
+        if(empty($cart_token)){
+            $cart_token = $retainful_api->generateCartToken();
+            $woocommerce_helper->setOrderMeta($order_id, $cart_token_key_for_db, $cart_token);
+        }
         $cart_hash = $woocommerce_helper->getOrderMeta($order, $cart_hash_key_for_db);
+        if(empty($cart_hash)){
+            $cart_hash = $retainful_api->generateCartHash();
+            $woocommerce_helper->setOrderMeta($order_id, $cart_hash_key_for_db, $cart_hash);
+        }
         $is_buyer_accepts_marketing = $woocommerce_helper->getOrderMeta($order, $accepts_marketing_key_for_db);
+        if(empty($is_buyer_accepts_marketing)){
+            $is_buyer_accepts_marketing = ($retainful_api->isBuyerAcceptsMarketing()) ? 1 : 0;
+            $woocommerce_helper->setOrderMeta($order_id, $accepts_marketing_key_for_db, $is_buyer_accepts_marketing);
+        }
+        $cart_created_at = $woocommerce_helper->getOrderMeta($order, $cart_tracking_started_key_for_db);
+        if(empty($cart_created_at)){
+            $cart_created_at = $retainful_api->userCartCreatedAt();
+            $woocommerce_helper->setOrderMeta($order_id, $cart_tracking_started_key_for_db, $cart_created_at);
+        }
         $customer_details = $abandoned_order->getCustomerDetails($order);
         $current_currency_code = $woocommerce_helper->getOrderCurrency($order);
         $default_currency_code = $settings->getBaseCurrency();
-        $cart_created_at = $woocommerce_helper->getOrderMeta($order, $cart_tracking_started_key_for_db);
+
         //$settings->logMessage($cart_created_at, 'cart created time in getOrderData ' . $order_id);
         $cart_total = $abandoned_order->formatDecimalPrice($woocommerce_helper->getOrderTotal($order));
         $excluding_tax = ($woocommerce_helper->isPriceExcludingTax());

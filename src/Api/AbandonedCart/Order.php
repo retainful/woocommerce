@@ -175,7 +175,7 @@ class Order extends RestApi
      */
     function getOrderCartToken($order)
     {
-        return self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+        return apply_filters('rnoc_get_order_cart_token', self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db), $order);
     }
 
     /**
