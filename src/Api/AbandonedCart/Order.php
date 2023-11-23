@@ -93,6 +93,9 @@ class Order extends RestApi
                 } else {
                     $item = (isset($item_details['data']) && !empty($item_details['data'])) ? $item_details['data'] : NULL;
                 }
+                if(empty($item)){
+                    $item = $item_details;
+                }
                 $line_tax = $this->formatDecimalPriceRemoveTrailingZeros((isset($item_details['line_tax']) && !empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0);
                 if ($line_tax > 0) {
                     $tax_details[] = array(
