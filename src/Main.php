@@ -7,6 +7,7 @@ use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
+use Rnoc\Retainful\Api\Imports\Imports;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\AfterPay;
@@ -64,15 +65,16 @@ class Main
     }
 
     function registerSyncEndPoints(){
+        $import = new Imports();
         register_rest_route('retainful-api/v1', '/orders', array(
             'methods' => 'GET',
             'permission_callback' => '__return_true',
-            'callback' => '\Rnoc\Retainful\Api\Imports\Imports::getOrders'
+            'callback' => array($import,'getOrders')
         ));
         register_rest_route('retainful-api/v1', '/orders/count', array(
             'methods' => 'GET',
             'permission_callback' => '__return_true',
-            'callback' => '\Rnoc\Retainful\Api\Imports\Imports::getOrderCount'
+            'callback' => array($import,'getOrderCount')
         ));
     }
 

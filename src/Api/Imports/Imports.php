@@ -6,16 +6,15 @@ use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Order;
 use Rnoc\Retainful\WcFunctions;
 
-class Imports
+class Imports extends Order
 {
     /**
      * create coupons
      * @param \WP_REST_Request $request
      * @return \WP_REST_Response
      */
-    static function getOrders(\WP_REST_Request $request)
+    function getOrders(\WP_REST_Request $request)
     {
-        $admin = new Settings();
         $request_params = $request->get_params();
         $default_request_params = array(
             'limit' => 10,
@@ -24,23 +23,23 @@ class Imports
             'digest' => ''
         );
         $params = wp_parse_args($request_params, $default_request_params);
-        $admin->logMessage($params, 'API Orders get request');
+        self::$settings->logMessage($params, 'API Orders get request');
         if (is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any') {
-            $admin->logMessage($params, 'API Orders data missing');
+            self::$settings->logMessage($params, 'API Orders data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
             return new \WP_REST_Response($response, $status);
         }
-        $admin->logMessage($params, 'API Orders data matched');
-        $secret = $admin->getSecretKey();
+        self::$settings->logMessage($params, 'API Orders data matched');
+        $secret = self::$settings->getSecretKey();
         $reverse_hmac = hash_hmac('sha256', json_encode(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status'])), $secret);
         if (!hash_equals($reverse_hmac, $params['digest'])) {
-            $admin->logMessage($reverse_hmac, 'API Orders request digest not matched');
+            self::$settings->logMessage($reverse_hmac, 'API Orders request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
             return new \WP_REST_Response($response, $status);
         }
-        $admin->logMessage($reverse_hmac, 'API Orders request digest matched');
+        self::$settings->logMessage($reverse_hmac, 'API Orders request digest matched');
         global $wpdb;
         if(self::isHPOSEnabled()){
             $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}wc_orders LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}wc_orders.id = {$wpdb->prefix}woocommerce_order_items.order_id
@@ -59,7 +58,7 @@ class Imports
         );
         foreach ($orders as $order_id) {
             $order = wc_get_order($order_id);
-            $response['items'][] = self::getOrderData($order);
+            $response['items'][] = $this->getOrderData($order);
         }
         $status = 200;
         return new \WP_REST_Response($response, $status);
@@ -75,30 +74,29 @@ class Imports
     }
     public static function getOrderCount(\WP_REST_Request $request)
     {
-        $admin = new Settings();
         $request_params = $request->get_params();
         $default_request_params = array(
             'status' => 'any',
             'digest' => ''
         );
         $params = wp_parse_args($request_params, $default_request_params);
-        $admin->logMessage($params, 'API Orders get request');
+        self::$settings->logMessage($params, 'API Orders get request');
         if (empty($params['digest']) || !is_string($params['digest']) || $params['status'] != 'any') {
-            $admin->logMessage($params, 'API Order Count data missing');
+            self::$settings->logMessage($params, 'API Order Count data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
             return new \WP_REST_Response($response, $status);
         }
-        $admin->logMessage($params, 'API Order Count data matched');
-        $secret = $admin->getSecretKey();
+        self::$settings->logMessage($params, 'API Order Count data matched');
+        $secret = self::$settings->getSecretKey();
         $reverse_hmac = hash_hmac('sha256', json_encode(array('status' => $params['status'])), $secret);
         if (!hash_equals($reverse_hmac, $params['digest'])) {
-            $admin->logMessage($reverse_hmac, 'API Order Count request digest not matched');
+            self::$settings->logMessage($reverse_hmac, 'API Order Count request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
             return new \WP_REST_Response($response, $status);
         }
-        $admin->logMessage($reverse_hmac, 'API Order Count request digest matched');
+        self::$settings->logMessage($reverse_hmac, 'API Order Count request digest matched');
         global $wpdb;
         if(self::isHPOSEnabled()){
             //$query = $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}wc_orders WHERE type = %s",array('shop_order'));
@@ -125,9 +123,87 @@ class Imports
         return new \WP_REST_Response($response, $status);
     }
 
-    public static function getOrderData($order)
+    public function getOrderData($order)
     {
-        $abandoned_order = new Order();
+        if(!is_object($order)){ // bool|WC_Order|WC_Order_Refund
+            return array();
+        }
+        $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+        if(empty($cart_token)) $cart_token = $this->generateCartToken();
+        $order_id = self::$woocommerce->getOrderId($order);
+        //still Cart token empty
+        if(empty($cart_token) || empty($order_id)){
+            return array();
+        }
+        $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
+        if(empty($user_ip)) $user_ip = $order->get_customer_ip_address();
+        $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
+        if(empty($cart_hash)) $cart_hash = $order->get_cart_hash();
+        $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
+        if(!in_array($is_buyer_accepts_marketing,array(0,1))) $is_buyer_accepts_marketing = $order->get_customer_id() > 0 ? 1: 0;
+        $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
+        if(empty($cart_created_at)) $cart_created_at = $order->get_date_created();
+        //completed_at if available need to do
+        $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
+        $customer_details = $this->getCustomerDetails($order);
+        $default_currency_code = self::$settings->getBaseCurrency();
+        $cart_total = $this->formatDecimalPrice(self::$woocommerce->getOrderTotal($order));
+        $order_placed_at = self::$woocommerce->getOrderPlacedDate($order);
+        $order_status = self::$woocommerce->getStatus($order);
+        $order_status = $this->changeOrderStatus($order_status);
+        $current_currency_code = self::$woocommerce->getOrderCurrency($order);
+        $excluding_tax = self::$woocommerce->isPriceExcludingTax();
+        $recovered_at = self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_at');
+        $order_data = array(
+            'cart_type' => 'order',
+            'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
+            'r_order_id' => $order_id,
+            'order_number' => $order_id,
+            'woo_r_order_number' => self::$woocommerce->getOrderNumber($order),
+            'plugin_version' => RNOC_VERSION,
+            'cart_hash' => $cart_hash,
+            'ip' => $user_ip,
+            'id' => $cart_token,
+            'name' => '#' . $cart_token,
+            'email' => (isset($customer_details['email'])) ? $customer_details['email'] : NULL,
+            'token' => $cart_token,
+            'user_id' => NULL,
+            'currency' => $default_currency_code,
+            'customer' => $customer_details,
+            'tax_lines' => $this->getOrderTaxDetails(),
+            'total_tax' => $this->formatDecimalPrice(self::$woocommerce->getOrderTotalTax($order)),
+            'cart_token' => $cart_token,
+            'created_at' => $this->formatToIso8601($cart_created_at),
+            'line_items' => $this->getOrderLineItemsDetails($order),
+            'updated_at' => $this->formatToIso8601(''),
+            'source_name' => 'web',
+            'total_price' => $cart_total,
+            'completed_at' => !empty($order_placed_at) ? $this->formatToIso8601($order_placed_at) : NULL,
+            'total_weight' => 0,
+            'discount_codes' => self::$woocommerce->getAppliedDiscounts($order),
+            'order_status' => apply_filters('rnoc_abandoned_cart_order_status', $order_status, $order),
+            'shipping_lines' => array(),
+            'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
+            'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
+            'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
+            'customer_locale' => $this->getOrderLanguage($order),
+            'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getOrderDiscount($order, $excluding_tax)),
+            'shipping_address' => $this->getCustomerShippingAddressDetails($order),
+            'billing_address' => $this->getCustomerBillingAddressDetails($order),
+            'presentment_currency' => $current_currency_code,
+            'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
+            'total_line_items_price' => $this->formatDecimalPrice($this->getOrderItemsTotal($order)),
+            'buyer_accepts_marketing' => ($is_buyer_accepts_marketing == 1),
+            'cancelled_at' => self::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db),//check with developer
+            'woocommerce_totals' => $this->getOrderTotals($order, $excluding_tax),
+            'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
+            'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
+            'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
+            'noc_discount_codes' => array(),
+            'client_details' => array()
+        );
+
+        /*$abandoned_order = new Order();
         $woocommerce_helper = new WcFunctions();
         $retainful_api = new \Rnoc\Retainful\Api\AbandonedCart\RestApi();
         $settings = new Settings();
@@ -226,7 +302,7 @@ class Imports
             if (!empty($referrer_automation_id)) {
                 $order_data['referrer_automation_id'] = $referrer_automation_id;
             }
-        }
+        }*/
         return $order_data;
     }
 }
