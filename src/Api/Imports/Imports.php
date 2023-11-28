@@ -162,11 +162,12 @@ class Imports extends Order
         if(!is_object($order)){ // bool|WC_Order|WC_Order_Refund
             return array();
         }
+        $order_id = self::$woocommerce->getOrderId($order);
+        if(empty($order_id)) return array();
         $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
         if(empty($cart_token)) $cart_token = $this->generateCartToken();
-        $order_id = self::$woocommerce->getOrderId($order);
         //still Cart token empty
-        if(empty($cart_token) || empty($order_id)){
+        if(empty($cart_token)){
             return array();
         }
         $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
@@ -177,6 +178,10 @@ class Imports extends Order
         if(!in_array($is_buyer_accepts_marketing,array(0,1))) $is_buyer_accepts_marketing = $order->get_customer_id() > 0 ? 1: 0;
         $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
         if(empty($cart_created_at)) $cart_created_at = $order->get_date_created();
+        $updated_at = $order->get_date_modified();
+        if(is_null($updated_at)){
+            $updated_at = current_time('timestamp',true);
+        }
         //completed_at if available need to do
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
         $customer_details = $this->getCustomerDetails($order);
@@ -188,7 +193,10 @@ class Imports extends Order
         $current_currency_code = self::$woocommerce->getOrderCurrency($order);
         $excluding_tax = self::$woocommerce->isPriceExcludingTax();
         $recovered_at = self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_at');
-        return array(
+        $user_agent = $this->getUserAgent($order);
+        if(empty($user_agent)) $user_agent = $order->get_customer_user_agent();
+        $customer_language = $this->getOrderLanguage($order);
+        $order_data = array(
             'cart_type' => 'order',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
             'r_order_id' => $order_id,
@@ -209,7 +217,7 @@ class Imports extends Order
             'cart_token' => $cart_token,
             'created_at' => $this->formatToIso8601($cart_created_at),
             'line_items' => $this->getOrderLineItemsDetails($order),
-            'updated_at' => $this->formatToIso8601(''),
+            'updated_at' => $this->formatToIso8601($updated_at),
             'source_name' => 'web',
             'total_price' => $cart_total,
             'completed_at' => !empty($order_placed_at) ? $this->formatToIso8601($order_placed_at) : NULL,
@@ -220,7 +228,7 @@ class Imports extends Order
             'subtotal_price' => $this->formatDecimalPrice(self::$woocommerce->getOrderSubTotal($order)),
             'total_price_set' => $this->getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
             'taxes_included' => (!self::$woocommerce->isPriceExcludingTax()),
-            'customer_locale' => $this->getOrderLanguage($order),
+            'customer_locale' => $customer_language,
             'total_discounts' => $this->formatDecimalPrice(self::$woocommerce->getOrderDiscount($order, $excluding_tax)),
             'shipping_address' => $this->getCustomerShippingAddressDetails($order),
             'billing_address' => $this->getCustomerBillingAddressDetails($order),
@@ -228,16 +236,17 @@ class Imports extends Order
             'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
             'total_line_items_price' => $this->formatDecimalPrice($this->getOrderItemsTotal($order)),
             'buyer_accepts_marketing' => ($is_buyer_accepts_marketing == 1),
-            'cancelled_at' => self::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db),//check with developer
+            'cancelled_at' => self::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db),
             'woocommerce_totals' => $this->getOrderTotals($order, $excluding_tax),
-            'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
+            'recovered_by_retainful' => (bool)self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by'),
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
             'noc_discount_codes' => array(),
             'client_details' => array(
-                'user_agent' => $this->getUserAgent($order), // we passed order object, if available it will send or not. (it will not get from server)
-                'accept_language' => $this->getUserAcceptLanguage($order),// we passed order object, if available it will send or not (it will not get from server)
+                'user_agent' => $user_agent,
+                'accept_language' => $customer_language,
             )
         );
+        return apply_filters('rnoc_import_order_data',$order_data,$order);
     }
 }
