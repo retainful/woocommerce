@@ -69,12 +69,12 @@ class Main
         register_rest_route('retainful-api/v1', '/orders', array(
             'methods' => 'GET',
             'permission_callback' => '__return_true',
-            'callback' => array($import,'getOrders')
+            'callback' => array($import,'getSyncOrders')
         ));
         register_rest_route('retainful-api/v1', '/orders/count', array(
             'methods' => 'GET',
             'permission_callback' => '__return_true',
-            'callback' => array($import,'getOrderCount')
+            'callback' => array($import,'getSyncOrderCount')
         ));
     }
 
