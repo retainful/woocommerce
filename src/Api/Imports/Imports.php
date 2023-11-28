@@ -234,7 +234,10 @@ class Imports extends Order
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
             'noc_discount_codes' => array(),
-            'client_details' => array()
+            'client_details' => array(
+                'user_agent' => $this->getUserAgent($order), // we passed order object, if available it will send or not. (it will not get from server)
+                'accept_language' => $this->getUserAcceptLanguage($order),// we passed order object, if available it will send or not (it will not get from server)
+            )
         );
     }
 }
