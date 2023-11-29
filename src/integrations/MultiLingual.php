@@ -49,7 +49,7 @@ class MultiLingual
         if (defined('ICL_LANGUAGE_CODE')) {
             return ICL_LANGUAGE_CODE;
         }
-        if(function_exists(pll_current_language())){
+        if(function_exists('pll_current_language')){
             return pll_current_language();
         }
         if ($default_lang = $this->getDefaultLanguage()) {
