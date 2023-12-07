@@ -83,7 +83,7 @@ class Imports extends Order
         if(!$this->hashVerification(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status']),$params['digest'])){
             self::$settings->logMessage($params, 'API Orders request digest not matched');
             $status = 400;
-            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
+            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed');
             return new \WP_REST_Response($response, $status);
         }
         $orders = $this->getOrders($params);
@@ -139,7 +139,7 @@ class Imports extends Order
         if(!$this->hashVerification(array('status' => $params['status']),$params['digest'])){
             self::$settings->logMessage($params, 'API Order Count request digest not matched');
             $status = 400;
-            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
+            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed!');
             return new \WP_REST_Response($response, $status);
         }
         $response = array(

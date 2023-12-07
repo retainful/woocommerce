@@ -140,7 +140,7 @@ class CouponManagement
             } else {
                 $admin->logMessage($reverse_hmac, 'API request digest not matched');
                 $status = 400;
-                $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security breached!');
+                $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed!');
             }
         } else {
             $status = 400;

@@ -88,10 +88,7 @@ class Settings
      */
     function validateAppKey()
     {
-        check_ajax_referer('validate_app_key', 'security');
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error('security breach');
-        }
+        WcFunctions::checkSecuritykey('validate_app_key');
         $post = self::$input->post();
         $validator = new Validator($post);
         $validator->rule('required', ['app_id', 'secret_key']);
@@ -137,10 +134,7 @@ class Settings
      */
     function disconnectLicense()
     {
-        check_ajax_referer('rnoc_disconnect_license', 'security');
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error('security breach');
-        }
+        WcFunctions::checkSecuritykey('rnoc_disconnect_license');
         $license_details = get_option($this->slug . '_license', array());
         $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
         update_option($this->slug . '_license', $license_details);
@@ -390,10 +384,7 @@ class Settings
      */
     function savePremiumAddOnSettings()
     {
-        check_ajax_referer('rnoc_save_premium_addon_settings', 'security');
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error('security breach');
-        }
+        WcFunctions::checkSecuritykey('rnoc_save_premium_addon_settings');
         $post = self::$input->post();
         $validator = new Validator($post);
         Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
@@ -633,10 +624,7 @@ class Settings
      */
     function saveNocSettings()
     {
-        check_ajax_referer('rnoc_save_noc_settings', 'security');
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error('security breach');
-        }
+        WcFunctions::checkSecuritykey('rnoc_save_noc_settings');
         $post = self::$input->post();
         $validator = new Validator($post);
         Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
@@ -802,10 +790,7 @@ class Settings
      */
     function saveAcSettings()
     {
-        check_ajax_referer('rnoc_save_settings', 'security');
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error('security breach');
-        }
+        WcFunctions::checkSecuritykey('rnoc_save_settings');
         $post = self::$input->post();
         $validator = new Validator($post);
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', ['js', 'php'])->message('This field contains invalid value');
@@ -1416,10 +1401,18 @@ class Settings
 
     function deleteUnusedExpiredCoupons()
     {
-        check_ajax_referer('rnoc_delete_expired_coupons', 'security');
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error('security breach');
+        WcFunctions::checkSecuritykey('rnoc_delete_expired_coupons');
+        for($i = 0; $i < 10; $i++) {
+            $posts = $this->getDiscountData();
+            if(empty($posts)) break;
+            foreach ($posts as $post) {
+                wp_delete_post($post->ID, true);
+            }
         }
+        wp_send_json_success(array('message' => "successfully deleted"));
+    }
+
+    function getDiscountData(){
         $args = array(
             'post_type' => 'shop_coupon',
             'posts_per_page' => 100,
@@ -1438,13 +1431,7 @@ class Settings
                 )
             )
         );
-        $posts = get_posts($args);
-        if ($posts) {
-            foreach ($posts as $post) {
-                wp_delete_post($post->ID, true);
-            }
-        }
-        wp_send_json_success(array('message' => "successfully deleted"));
+        return get_posts($args);
     }
 
     /**
