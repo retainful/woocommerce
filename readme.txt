@@ -3,9 +3,9 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.6.1
 Tested up to: 6.3
-WC tested up to: 8.1
+WC tested up to: 8.3
 Requires PHP: 5.6
-Stable tag: 2.6.24
+Stable tag: 2.6.26
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -249,6 +249,13 @@ No. There is no charges for support.
 == Screenshots ==
 
 == Changelog ==
+= 2.6.26 =
+- Fix: Improved Order synchronize
+- Fix: stop empty item order synchronize
+
+= 2.6.25 =
+- Fix: Customer total order count query
+
 = 2.6.24 =
 - Fix: order synchronize query improvement
 - Fix: handle Request class deprecation
