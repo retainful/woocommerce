@@ -20,7 +20,11 @@ class Order extends RestApi
     {
         if ($user_id = self::$woocommerce->getOrderUserId($order)) {
             $user_data = self::$woocommerce->getOrderUser($order);
-            $created_at = $updated_at = strtotime($user_data->user_registered);
+            if(is_object($user_data) && !empty($user_data->user_registered) && $user_data->user_registered != '0000-00-00 00:00:00'){
+                $created_at = $updated_at = strtotime($user_data->user_registered);
+            }else{
+                $created_at = $updated_at = current_time('timestamp', true);
+            }
         } else {
             $user_id = 0;
             $created_at = $updated_at = current_time('timestamp', true);

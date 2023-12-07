@@ -34,10 +34,10 @@ class Imports extends Order
         global $wpdb;
         if(self::isHPOSEnabled()){
             $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}wc_orders LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}wc_orders.id = {$wpdb->prefix}woocommerce_order_items.order_id
-          WHERE type = %s AND id > %s AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 GROUP BY id ORDER BY id ASC LIMIT %d",array('shop_order',(int)$params['since_id'], (int)$params['limit']));
+          WHERE type = %s AND id > %s AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s GROUP BY id ORDER BY id ASC LIMIT %d",array('shop_order',(int)$params['since_id'],'line_item', (int)$params['limit']));
         }else{
             $query = $wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}posts.ID = {$wpdb->prefix}woocommerce_order_items.order_id 
-          WHERE post_type IN ('shop_order') AND ID > %d AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 GROUP BY ID ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], (int)$params['limit']));
+          WHERE post_type IN ('shop_order') AND ID > %d AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s GROUP BY ID ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], 'line_item',(int)$params['limit']));
         }
         return $wpdb->get_col($query);
     }
@@ -50,10 +50,10 @@ class Imports extends Order
         global $wpdb;
         if(self::isHPOSEnabled()){
             $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}wc_orders.id) FROM {$wpdb->prefix}wc_orders LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}wc_orders.id = {$wpdb->prefix}woocommerce_order_items.order_id
-          WHERE type = %s AND id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_id > 0",array('shop_order'));
+          WHERE type = %s AND id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s",array('shop_order','line_item'));
         }else{
             $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}posts.ID = {$wpdb->prefix}woocommerce_order_items.order_id 
-          WHERE post_type = %s AND ID > 0 AND {$wpdb->prefix}woocommerce_order_items.order_id > 0", array('shop_order'));
+          WHERE post_type = %s AND ID > 0 AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s", array('shop_order','line_item'));
         }
         return $wpdb->get_var($query);
     }
@@ -178,6 +178,9 @@ class Imports extends Order
         if(!in_array($is_buyer_accepts_marketing,array(0,1))) $is_buyer_accepts_marketing = $order->get_customer_id() > 0 ? 1: 0;
         $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
         if(empty($cart_created_at)) $cart_created_at = $order->get_date_created();
+        if(is_null($cart_created_at)){
+            $cart_created_at = current_time('timestamp',true);
+        }
         $updated_at = $order->get_date_modified();
         if(is_null($updated_at)){
             $updated_at = current_time('timestamp',true);
