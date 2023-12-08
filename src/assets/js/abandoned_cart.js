@@ -300,7 +300,8 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                         "X-Client-Referrer-IP": this.getIp(),
                         "X-Retainful-Version": this.getVersion(),
                         "X-Cart-Token": this.getCartToken(),
-                        "Cart-Token": this.getCartToken()
+                        "Cart-Token": this.getCartToken(),
+                        "User-TimeZone": Intl.DateTimeFormat().resolvedOptions().timeZone
                     };
                     let body = {"data": cart_data};
                     this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
