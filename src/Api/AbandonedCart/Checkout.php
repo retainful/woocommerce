@@ -229,6 +229,9 @@ class Checkout extends RestApi
      */
     function scheduleCartSync($order_id)
     {
+        if(!apply_filters('rnoc_schedule_cart_sync',true)){
+            return;
+        }
         $hook = 'retainful_sync_abandoned_cart_order';
         $meta_key = '_rnoc_order_id';
         if (self::$settings->hasAnyActiveScheduleExists($hook, $order_id, $meta_key) == false) {
