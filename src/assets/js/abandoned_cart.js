@@ -244,6 +244,10 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 return this.cart_token;
             }
 
+            getTimeZone() {
+                return new Date().getTimezoneOffset();
+            }
+
             /**
              * set the cart token
              * @param cart_token
@@ -300,7 +304,8 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                         "X-Client-Referrer-IP": this.getIp(),
                         "X-Retainful-Version": this.getVersion(),
                         "X-Cart-Token": this.getCartToken(),
-                        "Cart-Token": this.getCartToken()
+                        "Cart-Token": this.getCartToken(),
+                        "User-TimeZone": this.getTimeZone(),
                     };
                     let body = {"data": cart_data};
                     this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
