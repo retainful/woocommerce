@@ -20,7 +20,11 @@ class Order extends RestApi
     {
         if ($user_id = self::$woocommerce->getOrderUserId($order)) {
             $user_data = self::$woocommerce->getOrderUser($order);
-            $created_at = $updated_at = strtotime($user_data->user_registered);
+            if(is_object($user_data) && !empty($user_data->user_registered) && $user_data->user_registered != '0000-00-00 00:00:00'){
+                $created_at = $updated_at = strtotime($user_data->user_registered);
+            }else{
+                $created_at = $updated_at = current_time('timestamp', true);
+            }
         } else {
             $user_id = 0;
             $created_at = $updated_at = current_time('timestamp', true);
@@ -92,6 +96,9 @@ class Order extends RestApi
                     $item = self::$woocommerce->getProduct($product_id);
                 } else {
                     $item = (isset($item_details['data']) && !empty($item_details['data'])) ? $item_details['data'] : NULL;
+                }
+                if(empty($item)){
+                    $item = $item_details;
                 }
                 $line_tax = $this->formatDecimalPriceRemoveTrailingZeros((isset($item_details['line_tax']) && !empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0);
                 if ($line_tax > 0) {
@@ -175,7 +182,7 @@ class Order extends RestApi
      */
     function getOrderCartToken($order)
     {
-        return self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+        return apply_filters('rnoc_get_order_cart_token', self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db), $order);
     }
 
     /**
@@ -199,7 +206,7 @@ class Order extends RestApi
         }
         $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
         if(empty($cart_hash)){
-            return array();
+            $cart_hash = $order->get_cart_hash();
         }
         $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
         $customer_details = $this->getCustomerDetails($order);
@@ -260,7 +267,12 @@ class Order extends RestApi
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
             'noc_discount_codes' => $this->getNextOrderCouponDetails($order),
-            'client_details' => $this->getClientDetails($order)
+            'client_details' => $this->getClientDetails($order),
+            'payment_method' => array(
+                'value' => $order->get_payment_method(),
+                'name' => $order->get_payment_method_title(),
+            )
+
         );
         if(!empty($cart_token)){
             $referrer_automation_id = self::$woocommerce->getSession($cart_token.'_referrer_automation_id');

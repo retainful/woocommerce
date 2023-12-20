@@ -2083,4 +2083,13 @@ class WcFunctions
             return array();
         }
     }
+
+    public static function checkSecuritykey($security_name){
+        $message = __('Security check failed', RNOC_TEXT_DOMAIN);
+        if(empty($security_name)) wp_send_json_error($message);
+        check_ajax_referer($security_name, 'security');
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error($message);
+        }
+    }
 }
