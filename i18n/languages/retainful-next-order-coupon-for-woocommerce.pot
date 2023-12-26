@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: retainful\n"
-"POT-Creation-Date: 2023-09-25 10:20+0530\n"
+"POT-Creation-Date: 2023-12-12 13:00+0530\n"
 "PO-Revision-Date: 2019-12-16 11:05+0530\n"
 "Last-Translator: \n"
 "Language-Team: retainful\n"
@@ -26,7 +26,7 @@ msgid ""
 "Checking out as guest."
 msgstr ""
 
-#: Api/AbandonedCart/Order.php:393
+#: Api/AbandonedCart/Order.php:405
 msgid "Fee"
 msgstr ""
 
@@ -46,7 +46,7 @@ msgstr ""
 msgid "Retainful - coupons"
 msgstr ""
 
-#: Main.php:180
+#: Main.php:182
 msgid ""
 "The Next Order Coupon feature inside the plugin and its tab/menu will soon "
 "be removed from the Retainful plugin. Migrate your Next Order Coupon "
@@ -54,27 +54,27 @@ msgid ""
 "retainful.com/migration#next-order-coupon' target='_blank'>here</a>"
 msgstr ""
 
-#: Main.php:311
+#: Main.php:313
 msgid "connect"
 msgstr ""
 
-#: Main.php:311
+#: Main.php:313
 msgid "re-connect"
 msgstr ""
 
-#: Main.php:312
+#: Main.php:314
 msgid "Please <a href='"
 msgstr ""
 
-#: Main.php:474
+#: Main.php:476
 msgid "Woocommerce must be activated for Retainful-Woocommerce to work"
 msgstr ""
 
-#: Main.php:477
+#: Main.php:479
 msgid "Your woocommerce version is "
 msgstr ""
 
-#: Main.php:477
+#: Main.php:479
 msgid ""
 ". Some of the features of Retainful-Woocommerce will not work properly on "
 "this woocommerce version."
@@ -100,6 +100,10 @@ msgstr ""
 msgid "License"
 msgstr ""
 
+#: WcFunctions.php:2088
+msgid "Security check failed"
+msgstr ""
+
 #: admin/Settings.php:38
 msgid ""
 "Manage your abandoned carts effectively in Retainful Dashboard & get more "
@@ -110,150 +114,150 @@ msgstr ""
 msgid "Learn more"
 msgstr ""
 
-#: admin/Settings.php:129
+#: admin/Settings.php:126
 msgid "Please check the entered details"
 msgstr ""
 
-#: admin/Settings.php:147
+#: admin/Settings.php:141
 msgid "App disconnected successfully!"
 msgstr ""
 
-#: admin/Settings.php:376
+#: admin/Settings.php:370
 msgid "Retainful token"
 msgstr ""
 
-#: admin/Settings.php:452 admin/Settings.php:695 admin/Settings.php:831
+#: admin/Settings.php:443 admin/Settings.php:683 admin/Settings.php:816
 msgid "Settings successfully saved!"
 msgstr ""
 
-#: admin/Settings.php:506
+#: admin/Settings.php:497
 msgid "Sorry! Instant Offer has expired."
 msgstr ""
 
-#: admin/Settings.php:511 admin/Settings.php:524 admin/Settings.php:537
+#: admin/Settings.php:502 admin/Settings.php:515 admin/Settings.php:528
 #: premium/addons/RetainfulCouponTimerAddon.php:163
 msgid ""
 "Make purchase quickly, your {{coupon_code}} will expire within "
 "{{coupon_timer}}"
 msgstr ""
 
-#: admin/Settings.php:512 admin/Settings.php:525 admin/Settings.php:538
+#: admin/Settings.php:503 admin/Settings.php:516 admin/Settings.php:529
 #: premium/addons/RetainfulCouponTimerAddon.php:229
 msgid " {{minutes}}M {{seconds}}S"
 msgstr ""
 
-#: admin/Settings.php:519 admin/Settings.php:532
+#: admin/Settings.php:510 admin/Settings.php:523
 #: premium/addons/RetainfulCouponTimerAddon.php:171
 msgid "Checkout Now"
 msgstr ""
 
-#: admin/Settings.php:553 premium/addons/RetainfulAddToCartAddon.php:107
+#: admin/Settings.php:544 premium/addons/RetainfulAddToCartAddon.php:107
 msgid "Enter your email to add this item to cart"
 msgstr ""
 
-#: admin/Settings.php:555 premium/addons/RetainfulAddToCartAddon.php:111
+#: admin/Settings.php:546 premium/addons/RetainfulAddToCartAddon.php:111
 msgid "Email address"
 msgstr ""
 
-#: admin/Settings.php:557 premium/addons/RetainfulAddToCartAddon.php:112
+#: admin/Settings.php:548 premium/addons/RetainfulAddToCartAddon.php:112
 msgid "Add to Cart"
 msgstr ""
 
-#: admin/Settings.php:563 premium/addons/RetainfulAddToCartAddon.php:121
+#: admin/Settings.php:554 premium/addons/RetainfulAddToCartAddon.php:121
 msgid "No thanks! Add item to cart"
 msgstr ""
 
-#: admin/Settings.php:565 premium/addons/RetainfulAddToCartAddon.php:122
+#: admin/Settings.php:556 premium/addons/RetainfulAddToCartAddon.php:122
 msgid ""
 "*By completing this, you are signing up to receive our emails. You can "
 "unsubscribe at any time."
 msgstr ""
 
-#: admin/Settings.php:569 admin/Settings.php:593
+#: admin/Settings.php:560 admin/Settings.php:584
 #: premium/addons/RetainfulAddToCartAddon.php:129
 #: premium/addons/RetainfulExitIntentPopupAddon.php:358
 msgid "I accept the <a href=\"#\">Terms and conditions</a>"
 msgstr ""
 
-#: admin/Settings.php:574
+#: admin/Settings.php:565
 msgid "Get a discount in your email!"
 msgstr ""
 
-#: admin/Settings.php:578
+#: admin/Settings.php:569
 msgid "Your coupon code"
 msgstr ""
 
-#: admin/Settings.php:596 premium/addons/RetainfulExitIntentPopupAddon.php:349
+#: admin/Settings.php:587 premium/addons/RetainfulExitIntentPopupAddon.php:349
 msgid "Enter E-mail address"
 msgstr ""
 
-#: admin/Settings.php:599
+#: admin/Settings.php:590
 msgid "Complete checkout"
 msgstr ""
 
-#: admin/Settings.php:744
+#: admin/Settings.php:732
 msgid "Allow any one to apply coupon"
 msgstr ""
 
-#: admin/Settings.php:745
+#: admin/Settings.php:733
 msgid "Allow the customer to apply coupon, but validate at checkout"
 msgstr ""
 
-#: admin/Settings.php:746
+#: admin/Settings.php:734
 msgid "Allow customer to apply coupon only after login (Not Recommended)"
 msgstr ""
 
-#: admin/Settings.php:749
+#: admin/Settings.php:737
 msgid "Order details"
 msgstr ""
 
-#: admin/Settings.php:750
+#: admin/Settings.php:738
 msgid "Order meta"
 msgstr ""
 
-#: admin/Settings.php:751
+#: admin/Settings.php:739
 msgid "Customer details"
 msgstr ""
 
-#: admin/Settings.php:752
+#: admin/Settings.php:740
 msgid ""
 "Do Not Show - Customers will not get next order coupon in the order "
 "confirmation email of WooCommerce"
 msgstr ""
 
-#: admin/Settings.php:838
+#: admin/Settings.php:823
 msgid "Invalid nonce"
 msgstr ""
 
-#: admin/Settings.php:842
+#: admin/Settings.php:827
 msgid "Webhook already exits"
 msgstr ""
 
-#: admin/Settings.php:845
+#: admin/Settings.php:830
 msgid "Webhook class not found"
 msgstr ""
 
-#: admin/Settings.php:870
+#: admin/Settings.php:855
 msgid "Webhook created successfully"
 msgstr ""
 
-#: admin/Settings.php:872 admin/Settings.php:876
+#: admin/Settings.php:857 admin/Settings.php:861
 msgid "Webhook creation failed"
 msgstr ""
 
-#: admin/Settings.php:1520
+#: admin/Settings.php:1507
 msgid "Please wait..."
 msgstr ""
 
-#: admin/Settings.php:1608
+#: admin/Settings.php:1595
 msgid "All"
 msgstr ""
 
-#: admin/Settings.php:1665
+#: admin/Settings.php:1652
 msgid "Unlock this feature by upgrading to Premium"
 msgstr ""
 
-#: admin/Settings.php:1873
+#: admin/Settings.php:1860
 msgid ""
 "<div style=\"text-align: center;\"><div class=\"coupon-block\"><h3 "
 "style=\"font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;"
