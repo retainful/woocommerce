@@ -51,7 +51,7 @@ class RetainfulApi
                 'address1' => get_option('woocommerce_store_address', NULL),
                 'address2' => get_option('woocommerce_store_address_2', NULL),
                 'currency' => '',
-                'timezone' => '',
+                'timezone' => !empty(get_option('timezone_string')) ? get_option('timezone_string') : get_option('gmt_offset'),
                 'force_ssl' => (get_option('woocommerce_force_ssl_checkout', 'no') == 'yes'),
                 'weight_unit' => get_option('woocommerce_weight_unit'),
                 'country_code' => '',
