@@ -632,12 +632,12 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row">
+                        <th scope="row" style="display: none;">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages'; ?>"><?php
                                 esc_html_e('Custom pages to display the pop-up modal on (Optional)', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
-                        <td>
+                        <td style="display: none;">
                             <select multiple="multiple"
                                     name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages[]'; ?>"
                                     class="rnoc-multi-select"
