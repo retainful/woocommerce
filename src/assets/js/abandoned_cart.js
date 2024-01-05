@@ -382,7 +382,8 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             let tracking_content = '<div id="' + rnoc_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(rnoc_cart_js_data.cart) + '</div>';
             $(tracking_content).appendTo('body');
         }
-        $('input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone').on('change', function () {
+        $(document).on('change','input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone', function () {
+        //$('input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone').on('change', function () {
             var rnoc_phone = $("#billing_phone").val();
             var rnoc_email = $("#billing_email").val();
             var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
@@ -413,7 +414,8 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             };
             updateCheckout(rnoc_email, rnoc_phone, guest_data);
         });
-        $('.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone').on('change', function () {
+        $(document).on('change','.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone', function () {
+        //$('.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone').on('change', function () {
             var rnoc_email = $(".wp-block-woocommerce-checkout input#email").val();
             var rnoc_phone = $(".wp-block-woocommerce-checkout input#phone").val();
             var guest_data = {
