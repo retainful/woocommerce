@@ -685,7 +685,14 @@ class RestApi
      */
     function isBuyerAcceptsMarketing()
     {
-        if (is_user_logged_in()) {
+        $settings = self::$settings->getAdminSettings();
+        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
+        if($enable_gdpr_compliance){
+            var_dump(self::$woocommerce->getSession('is_buyer_accepting_marketing'));
+            return in_array(self::$woocommerce->getSession('is_buyer_accepting_marketing'), array(1,'true'));
+        }
+        return true;
+        /*if (is_user_logged_in()) {
             return true;
         } else {
             $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
@@ -693,7 +700,7 @@ class RestApi
                 return true;
             }
         }
-        return false;
+        return false;*/
     }
 
     /**
