@@ -154,8 +154,6 @@ class Cart extends RestApi
         }
         if ($this->isValidCartToTrack()) {
             $cart = $this->getUserCart();
-            $logger = wc_get_logger();
-            $logger->add('Retainful',"Js Cart:".json_encode($cart));
             $encrypted_cart = $this->encryptData($cart);
             wp_send_json_success($encrypted_cart);
         } else {
@@ -833,8 +831,6 @@ class Cart extends RestApi
     function getTrackingCartData()
     {
         $cart = $this->getUserCart();
-        $logger = wc_get_logger();
-        $logger->add('Retainful',"Cart:".json_encode($cart));
         self::$settings->logMessage($cart, 'cart');
         $data = array(
             'cart_token' => $this->getCartToken(),

@@ -688,7 +688,6 @@ class RestApi
         $settings = self::$settings->getAdminSettings();
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
         if($enable_gdpr_compliance){
-            var_dump(self::$woocommerce->getSession('is_buyer_accepting_marketing'));
             return in_array(self::$woocommerce->getSession('is_buyer_accepting_marketing'), array(1,'true'));
         }
         return true;
