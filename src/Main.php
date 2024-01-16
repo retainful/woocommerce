@@ -304,7 +304,7 @@ class Main
                 add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
                 add_filter('woocommerce_webhook_http_args',array($checkout,'changeWebHookHeader'),10,3);
                 //Todo: multi currency and multi lingual
-                #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
+                //add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
                 if($this->admin->isAfterPayEnabled()){
                     new AfterPay();
                 }
