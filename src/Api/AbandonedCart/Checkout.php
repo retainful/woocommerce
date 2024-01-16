@@ -102,16 +102,17 @@ class Checkout extends RestApi
     }
 
     function changeWebHookHeader($http_args, $order_id, $webhook_id){
-        $stored_webhook_id = self::$settings->getWebHookId();
-        if( $stored_webhook_id <= 0 || $webhook_id <= 0 || ($stored_webhook_id != $webhook_id) || !class_exists('WC_Webhook')){
-            return $http_args;
-        }
+        if($webhook_id <= 0 || !class_exists('WC_Webhook')) return $http_args;
         try {
             $webhook = new \WC_Webhook( $webhook_id );
-            $delivery_url = $webhook->get_delivery_url();
             $topic = $webhook->get_topic();
+            $stored_webhook_id = self::$settings->getWebHookId($topic);
+            if( $stored_webhook_id <= 0 || ($stored_webhook_id != $webhook_id)){
+                return $http_args;
+            }
+            $delivery_url = $webhook->get_delivery_url();
             $site_delivery_url = self::$api->getDomain().'woocommerce/webhooks/checkout';
-            if($delivery_url != $site_delivery_url || $topic != 'order.updated' || $order_id <= 0){
+            if($delivery_url != $site_delivery_url ||  $order_id <= 0){
                 return $http_args;
             }
 
@@ -163,7 +164,7 @@ class Checkout extends RestApi
      */
     function syncOrder($order_id)
     {
-        if (empty($order_id)) {
+        if (empty($order_id) || self::$settings->isBackgroundOrderSyncEnabled()) {
             return null;
         }
         $order = self::$woocommerce->getOrder($order_id);
@@ -318,6 +319,9 @@ class Checkout extends RestApi
      */
     function syncOrderToAPI($order, $order_id)
     {
+        if(self::$settings->isBackgroundOrderSyncEnabled()){
+            return;
+        }
         if ($this->needInstantOrderSync()) {
             $order_obj = new Order();
             $cart = $order_obj->getOrderData($order);
