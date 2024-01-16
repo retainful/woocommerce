@@ -878,26 +878,6 @@ class Settings
         return false;
     }
 
-    function saveNewWebhook()
-    {
-        $nonce = self::$input->post_get('security', '');
-        if (!wp_verify_nonce($nonce, 'rnoc_create_order_webhook')) {
-            wp_send_json(array('success' => false, 'message' => __('Invalid nonce', RNOC_TEXT_DOMAIN)));
-        }
-        $webhook_id = $this->getWebHookId();
-        if ($webhook_id > 0) {
-            wp_send_json(array('success' => true, 'message' => __('Webhook already exits', RNOC_TEXT_DOMAIN)));
-        }
-        if (!class_exists('WC_Webhook')) {
-            wp_send_json(array('success' => false, 'message' => __('Webhook class not found', RNOC_TEXT_DOMAIN)));
-        }
-        $response = array('success' => false, 'message' => __('Webhook creation failed', RNOC_TEXT_DOMAIN));
-        if($this->addNewWebHook()){
-            $response = array('success' => true, 'message' => __('Webhook created successfully', RNOC_TEXT_DOMAIN));
-        }
-        wp_send_json($response);
-    }
-
     /**
      * retainful ac settings page
      */

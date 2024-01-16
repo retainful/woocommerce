@@ -165,7 +165,7 @@ class Main
             add_action('wp_ajax_rnoc_get_search_coupon', array($this->admin, 'getSearchedCoupons'));
             add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
             add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
-            add_filter('wp_ajax_rnoc_create_order_update_webhook',array($this->admin,'saveNewWebhook'),10);
+            //add_filter('wp_ajax_rnoc_create_order_update_webhook',array($this->admin,'saveNewWebhook'),10);
             add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
             add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
             add_action('wp_ajax_rnoc_delete_expired_coupons', array($this->admin, 'deleteUnusedExpiredCoupons'));

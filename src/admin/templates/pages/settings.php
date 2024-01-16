@@ -484,18 +484,6 @@ require_once "tabs.php";
             </td>
         </tr>
         <tr>
-            <th scope="row">
-                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'webhook_id'; ?>"><?php
-                    esc_html_e('Order Update Webhook', RNOC_TEXT_DOMAIN);
-                    ?></label>
-            </th>
-            <td>
-                <button type="button" id="generate-webhook-btn" data-action="rnoc_create_order_update_webhook"
-                        data-security="<?php echo wp_create_nonce('rnoc_create_order_webhook') ?>"
-                        class="button"><?= __('Create WebHook', RNOC_TEXT_DOMAIN) ?></button>
-            </td>
-        </tr>
-        <tr>
             <th>
             </th>
             <td>
