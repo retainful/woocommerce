@@ -383,7 +383,6 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             $(tracking_content).appendTo('body');
         }
         $(document).on('change','input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone,input#rnoc_allow_gdpr', function () {
-        //$('input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone').on('change', function () {
             var rnoc_phone = $("#billing_phone").val();
             var rnoc_email = $("#billing_email").val();
             var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
@@ -416,7 +415,6 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             updateCheckout(rnoc_email, rnoc_phone, guest_data);
         });
         $(document).on('change','.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
-        //$('.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone').on('change', function () {
             var rnoc_email = $(".wp-block-woocommerce-checkout input#email").val();
             var rnoc_phone = $(".wp-block-woocommerce-checkout input#phone").val();
             var guest_data = {
