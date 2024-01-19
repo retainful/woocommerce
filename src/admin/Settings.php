@@ -794,7 +794,10 @@ class Settings
         $post = self::$input->post();
         $validator = new Validator($post);
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', ['js', 'php'])->message('This field contains invalid value');
-        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'track_zero_value_carts', ['yes', 'no'])->message('This field contains invalid value');
+        $validator->rule('in', array(
+            RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
+            RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'
+        ), ['yes', 'no'])->message('This field contains invalid value');
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'handle_storage_using', ['woocommerce', 'cookie', 'php'])->message('This field contains invalid value');
         $validator->rule('in', array(
             RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
@@ -816,21 +819,37 @@ class Settings
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
 
-    function saveNewWebhook()
+    /**
+     * Create order sync webhook.
+     *
+     * @return void
+     */
+    function createWebhook()
     {
-        $nonce = self::$input->post_get('security', '');
-        if (!wp_verify_nonce($nonce, 'rnoc_create_order_webhook')) {
-            wp_send_json(array('success' => false, 'message' => __('Invalid nonce', RNOC_TEXT_DOMAIN)));
+        if(!self::isBackgroundOrderSyncEnabled()){
+            return;
         }
-        $webhook_id = $this->getWebHookId();
-        if ($webhook_id > 0) {
-            wp_send_json(array('success' => true, 'message' => __('Webhook already exits', RNOC_TEXT_DOMAIN)));
+        if ($this->getWebHookId() <= 0) {
+            $this->addNewWebhook();
         }
-        if (!class_exists('WC_Webhook')) {
-            wp_send_json(array('success' => false, 'message' => __('Webhook class not found', RNOC_TEXT_DOMAIN)));
+        if($this->getWebHookId('order.created') <= 0){
+            $this->addNewWebHook('order.created');
+        }
+    }
+
+    /**
+     * Add new webhook.
+     *
+     * @param $topic
+     * @return bool
+     */
+    protected function addNewWebHook($topic = 'order.updated')
+    {
+        if(!in_array($topic,array('order.updated','order.created'))){
+            return false;
         }
         try {
-            $webhook = new \WC_Webhook($webhook_id);
+            $webhook = new \WC_Webhook();
             $name = sanitize_text_field(wp_unslash('Retainful Order Update'));
             $webhook->set_name($name);
             if (!$webhook->get_user_id()) {
@@ -842,7 +861,6 @@ class Settings
             $webhook->set_delivery_url($delivery_url);
             $secret = wp_generate_password(50, true, true);
             $webhook->set_secret($secret);
-            $topic = 'order.updated';
             if (wc_is_webhook_valid_topic($topic)) {
                 $webhook->set_topic($topic);
             }
@@ -851,15 +869,13 @@ class Settings
             $webhook->set_api_version(end($rest_api_versions)); // WPCS: input var okay, CSRF ok.
             $webhook_id = $webhook->save();
             if ($webhook_id > 0) {
-                $this->saveWebhookId($webhook_id);
-                $response = array('success' => true, 'message' => __('Webhook created successfully', RNOC_TEXT_DOMAIN));
-            } else {
-                $response = array('success' => false, 'message' => __('Webhook creation failed', RNOC_TEXT_DOMAIN));
+                $this->saveWebhookId($webhook_id,$topic);
+                return true;
             }
-            wp_send_json($response);
         } catch (\Exception $e) {
-            wp_send_json(array('success' => false, 'message' => __('Webhook creation failed', RNOC_TEXT_DOMAIN)));
+            return false;
         }
+        return false;
     }
 
     /**
@@ -868,8 +884,11 @@ class Settings
     function retainfulSettingsPage()
     {
         $settings = $this->getAdminSettings();
+
+        
         $default_settings = array(
             RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
+            RNOC_PLUGIN_PREFIX . 'enable_background_order_sync' => 'no',
             RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
             RNOC_PLUGIN_PREFIX . 'enable_referral_widget' => 'no',
             RNOC_PLUGIN_PREFIX . 'enable_popup_widget' => 'no',
@@ -1756,21 +1775,35 @@ class Settings
         return NULL;
     }
 
-    function getWebHookId()
+    function getWebHookId($type = 'order.updated')
     {
         $settings = get_option($this->slug, array());
-        if (isset($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']) && $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] > 0) {
+        if ($type == 'order.updated' && isset($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']) && $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] > 0) {
             $webhook = new \WC_Webhook($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']);
+            if(method_exists($webhook, 'get_id') && $webhook->get_id() <= 0){
+                $this->saveWebhookId(0,$type);
+            }
             return method_exists($webhook, 'get_id') ? ($webhook->get_id() > 0 ? $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] : 0) : 0;
+        }
+        if ($type == 'order.created' && isset($settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id']) && $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] > 0) {
+            $webhook = new \WC_Webhook($settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id']);
+            if(method_exists($webhook, 'get_id') && $webhook->get_id() <= 0){
+                $this->saveWebhookId(0,$type);
+            }
+            return method_exists($webhook, 'get_id') ? ($webhook->get_id() > 0 ? $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] : 0) : 0;
         }
         return 0;
     }
 
-    function saveWebhookId($id)
+    function saveWebhookId($id,$type = 'order.updated')
     {
         $settings = get_option($this->slug, array());
         if ($id > 0) {
-            $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = $id;
+            if($type == 'order.updated'){
+                $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = $id;
+            }elseif($type == 'order.created'){
+                $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] = $id;
+            }
         }
         update_option($this->slug, $settings);
     }
@@ -2090,5 +2123,15 @@ class Settings
         if (!apply_filters('rnoc_need_survey_form', true)) return false;
         $survey = new Survey();
         $survey->init(RNOC_PLUGIN_SLUG, 'Retainful - next order coupon for woocommerce', RNOC_TEXT_DOMAIN);
+    }
+
+    /**
+     * Check is background order sync enabled
+     * @return bool
+     */
+    function isBackgroundOrderSyncEnabled()
+    {
+        $settings = $this->getAdminSettings();
+        return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync']) && $settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'] == 'yes';
     }
 }

@@ -27,6 +27,7 @@ class Main
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
+        add_action('woocommerce_init',array($this->admin,'createWebhook'));
         //init the retainful premium
         new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
     }
@@ -140,7 +141,7 @@ class Main
     {
         //Register deactivation hook
         register_deactivation_hook(RNOC_FILE, array($this, 'onPluginDeactivation'));
-        add_action('retainful_plugin_activated', array($this, 'createRequiredTables'));
+        //add_action('retainful_plugin_activated', array($this, 'createRequiredTables'));
         //add end points
         add_action('rest_api_init', array($this, 'registerEndPoints'));
         //Detect woocommerce plugin deactivation
@@ -164,7 +165,7 @@ class Main
             add_action('wp_ajax_rnoc_get_search_coupon', array($this->admin, 'getSearchedCoupons'));
             add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
             add_action('wp_ajax_rnoc_save_settings', array($this->admin, 'saveAcSettings'));
-            add_filter('wp_ajax_rnoc_create_order_update_webhook',array($this->admin,'saveNewWebhook'),10);
+            //add_filter('wp_ajax_rnoc_create_order_update_webhook',array($this->admin,'saveNewWebhook'),10);
             add_action('wp_ajax_rnoc_save_noc_settings', array($this->admin, 'saveNocSettings'));
             add_action('wp_ajax_rnoc_save_premium_addon_settings', array($this->admin, 'savePremiumAddOnSettings'));
             add_action('wp_ajax_rnoc_delete_expired_coupons', array($this->admin, 'deleteUnusedExpiredCoupons'));
@@ -303,7 +304,7 @@ class Main
                 add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
                 add_filter('woocommerce_webhook_http_args',array($checkout,'changeWebHookHeader'),10,3);
                 //Todo: multi currency and multi lingual
-                #add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
+                //add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
                 if($this->admin->isAfterPayEnabled()){
                     new AfterPay();
                 }
