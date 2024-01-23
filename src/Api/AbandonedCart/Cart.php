@@ -70,9 +70,18 @@ class Cart extends RestApi
         $settings = self::$settings->getAdminSettings();
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
         if ($enable_gdpr_compliance) {
-            if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
+            /*if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
                 $existing_label = $fields['billing']['billing_email']['label'];
                 $fields['billing']['billing_email']['label'] = $existing_label . "<br><small>" . $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] . "</small>";
+            }*/
+            if(isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])
+                && isset($fields['billing']['billing_email'])){
+                $fields['billing'][RNOC_PLUGIN_PREFIX.'allow_gdpr'] = [
+                        'label' => __($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'],RNOC_TEXT_DOMAIN),
+                        'type' => 'checkbox',
+                        'priority' => $fields['billing']['billing_email']['priority'],
+                        'default' => (int)$this->isBuyerAcceptsMarketing()
+                ];
             }
         }
         return $fields;
@@ -108,7 +117,12 @@ class Cart extends RestApi
                     $billing_address[$billing_field_name] = sanitize_text_field($_POST[$billing_field_name]);
                 }
             }
-            self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
+            $settings = self::$settings->getAdminSettings();
+            $is_buyer_accepting_marketing = true;
+            if(isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance']) && $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] ){
+                $is_buyer_accepting_marketing = (isset($_POST['allow_gdpr']) && $_POST['allow_gdpr'] == 'true');
+            }
+            self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             $this->setCustomerBillingDetails($billing_address);
             // $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
             //shipping address fields

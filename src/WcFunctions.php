@@ -659,8 +659,7 @@ class WcFunctions
      */
     function setSession($key, $value)
     {
-        if (empty($key) || empty($value))
-            return false;
+        if (empty($key)) return false;
         $this->initWoocommerceSession();
         if ($this->isMethodExists(WC()->session, 'set')) {
             WC()->session->set($key, $value);
