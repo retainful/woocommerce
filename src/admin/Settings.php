@@ -814,7 +814,7 @@ class Settings
         $cart_capture_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '');
         $post = self::$input->post();
         $data = $this->clean($post);
-        $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = $this->sanitizeBasicHtml($cart_capture_msg);
+        $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = trim($this->sanitizeBasicHtml($cart_capture_msg));
         update_option($this->slug . '_settings', $data);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
@@ -898,7 +898,9 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status' => '0',
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
             RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' => '0',
-            RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => '',
+            RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => 'Keep me up to date on news and exclusive offers',
+            RNOC_PLUGIN_PREFIX . 'gdpr_checkbox_behaviour' => 'unchecked',
+            RNOC_PLUGIN_PREFIX . 'gdpr_display_position' => 'after_billing_email',
             RNOC_PLUGIN_PREFIX . 'enable_ip_filter' => '0',
             RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
             RNOC_PLUGIN_PREFIX . 'enable_debug_log' => '0',
@@ -907,6 +909,10 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'varnish_check' => 'no',
         );
         $settings = wp_parse_args($settings, $default_settings);
+
+        if(empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])){
+            $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = 'Keep me up to date on news and exclusive offers';
+        }
         require_once dirname(__FILE__) . '/templates/pages/settings.php';
     }
 
