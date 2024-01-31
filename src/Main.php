@@ -374,6 +374,9 @@ class Main
      */
     function removeWebhook()
     {
+        if(!class_exists('WC_Data_Store') || !class_exists('\Rnoc\Retainful\library\RetainfulApi') || !function_exists('wc_get_webhook')){
+            return;
+        }
         try {
             $data_store  = \WC_Data_Store::load( 'webhook' );
             $args = array(

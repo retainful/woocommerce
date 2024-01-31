@@ -57,9 +57,9 @@ require_once "tabs.php";
                 </label>
                 <p class="description">
                     <?php
-                    $scheduled_action = admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks');
-                    _e("Enable this option to use WooCommerce's Webhooks feature to send order details to the Retainful API.<br>
-Remember: WooCommerce uses the <a target='_blank' href='$scheduled_action'>Scheduled Actions</a> to work in the background for this. So, make sure your cron setup is correct. If cron isn't working, order details won't reach Retainful API, and your workflow triggers won't work right.", RNOC_TEXT_DOMAIN);
+                    $scheduled_action = admin_url('tools.php?page=action-scheduler');
+                    echo sprintf(__("Enable this option to use WooCommerce's Webhooks feature to send order details to the Retainful API.<br>
+Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a> to execute webhooks in the background for this. So, make sure your cron setup is correct. If cron isn't working, order details won't reach Retainful API, and your workflow triggers won't work right.", RNOC_TEXT_DOMAIN),$scheduled_action);
                     ?>
                 </p>
             </td>
