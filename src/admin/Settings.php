@@ -850,7 +850,7 @@ class Settings
         }
         try {
             $webhook = new \WC_Webhook();
-            $name = sanitize_text_field(wp_unslash('Retainful Order Update'));
+            $name = $topic == 'order.updated' ? sanitize_text_field(wp_unslash('Retainful Order Update')): sanitize_text_field(wp_unslash('Retainful Order Create'));
             $webhook->set_name($name);
             if (!$webhook->get_user_id()) {
                 $webhook->set_user_id(get_current_user_id());
@@ -945,6 +945,63 @@ class Settings
         add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
 
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
+        if(in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()){
+            $message = sprintf(__('Webhooks is not configured or de-activated. Please configure <a href="%s" target="_blank">webhook</a>.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
+            add_action('admin_notices', function () use ($message) {
+                echo '<div class="error notice"><p>' . $message . '</p></div>';
+            });
+        }
+    }
+
+    /**
+     * Is need to show webhook notice.
+     *
+     * @return bool
+     */
+    function isWebhookNoticeShow(){
+
+        if(!$this->isAppConnected() || !$this->isBackgroundOrderSyncEnabled()){
+            return false;
+        }
+        if(!class_exists('WC_Data_Store') || !function_exists('wc_get_webhook')){
+            return false;
+        }
+        $webhook_status = array(
+            'order_created' => false,
+            'order_updated' => false
+        );
+        try {
+            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $args = array(
+                'limit'  => -1,
+                'offset' => 0,
+            );
+
+            $webhooks    = $data_store->search_webhooks( $args );
+            foreach ($webhooks as $webhook_id) {
+                $webhook = wc_get_webhook($webhook_id);
+                if (empty($webhook)) {
+                    continue;
+                }
+                $delivery_url = $webhook->get_delivery_url();
+                $site_delivery_url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
+                if ($delivery_url != $site_delivery_url) {
+                    continue;
+                }
+                $topic = $webhook->get_topic();
+                $status = $webhook->get_status();
+                if($status == 'active' && $topic == 'order.created'){
+                    $webhook_status['order_created'] = true;
+                }
+                if($status == 'active' && $topic == 'order.updated'){
+                    $webhook_status['order_updated'] = true;
+                }
+            }
+        }catch (\Exception $e){
+
+        }
+
+        return in_array(false,$webhook_status);
     }
 
     /**
