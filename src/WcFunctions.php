@@ -2065,7 +2065,8 @@ class WcFunctions
 
     /**
      * @param $email
-     * @return array[]
+     * @param int $limit
+     * @return array
      */
     function getCustomerOrdersByEmail($email,$limit = -1)
     {
