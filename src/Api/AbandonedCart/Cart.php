@@ -201,6 +201,11 @@ class Cart extends RestApi
         return apply_filters('rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION);
     }
 
+    function getPopupJs()
+    {
+        return apply_filters('rnoc_popup_js','https://js.retainful.com/shopify/v1/popup-widget-beta.js');
+    }
+
     /**
      * Adding the script to track user cart
      */
@@ -208,6 +213,10 @@ class Cart extends RestApi
     {
         if (!wp_script_is('wc-cart-fragments', 'enqueued')) {
             wp_enqueue_script('wc-cart-fragments');
+        }
+        $need_referral_program = self::$settings->needReferralWidget();
+        if($need_referral_program){
+            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popups', $this->getPopupJs(), array('jquery'), RNOC_VERSION, false);
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
