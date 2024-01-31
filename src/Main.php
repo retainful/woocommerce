@@ -12,6 +12,7 @@ use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\AfterPay;
 use Rnoc\Retainful\Integrations\Currency;
+use Rnoc\Retainful\library\RetainfulApi;
 
 class Main
 {
@@ -363,6 +364,41 @@ class Main
     function onPluginDeactivation()
     {
         $this->removeAllScheduledActions();
+        $this->removeWebhook();
+    }
+
+    /**
+     * Remove retainful webhook.
+     *
+     * @return void
+     */
+    function removeWebhook()
+    {
+        try {
+            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $args = array(
+                'limit'  => -1,
+                'offset' => 0,
+            );
+            $webhooks    = $data_store->search_webhooks( $args );
+            foreach ($webhooks as $webhook_id){
+                $webhook = wc_get_webhook($webhook_id);
+                if(empty($webhook)){
+                    continue;
+                }
+                $delivery_url = $webhook->get_delivery_url();
+                $retainful_api = new RetainfulApi();
+                $site_delivery_url = $retainful_api->getDomain().'woocommerce/webhooks/checkout';
+                if($delivery_url != $site_delivery_url){
+                    continue;
+                }
+                $webhook->delete();
+            }
+            $this->admin->saveWebhookId(0);
+            $this->admin->saveWebhookId(0,'order.created');
+        }catch (\Exception $e){
+
+        }
     }
 
     /**

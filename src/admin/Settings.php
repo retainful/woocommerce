@@ -1804,12 +1804,10 @@ class Settings
     function saveWebhookId($id,$type = 'order.updated')
     {
         $settings = get_option($this->slug, array());
-        if ($id > 0) {
-            if($type == 'order.updated'){
-                $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = $id;
-            }elseif($type == 'order.created'){
-                $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] = $id;
-            }
+        if($type == 'order.updated'){
+            $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = (int)$id;
+        }elseif($type == 'order.created'){
+            $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] = (int)$id;
         }
         update_option($this->slug, $settings);
     }
