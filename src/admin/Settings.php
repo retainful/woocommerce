@@ -946,7 +946,7 @@ class Settings
 
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         if(in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()){
-            $message = sprintf(__('Webhooks is not configured or de-activated. Please configure <a href="%s" target="_blank">webhook</a>.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
+            $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
             add_action('admin_notices', function () use ($message) {
                 echo '<div class="error notice"><p>' . $message . '</p></div>';
             });
