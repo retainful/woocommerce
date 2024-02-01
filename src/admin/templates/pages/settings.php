@@ -332,21 +332,6 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_checkbox_behaviour'; ?>"><?php
-                    esc_html_e('Consent check behaviour:', RNOC_TEXT_DOMAIN);
-                    ?></label>
-            </th>
-            <td>
-                <select name="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_checkbox_behaviour'; ?>">
-                    <option value="checked" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'gdpr_checkbox_behaviour'] == 'checked') ? "selected='selected'":''; ?>>
-                        <?php esc_html_e('Checked', RNOC_TEXT_DOMAIN); ?></option>
-                    <option value="unchecked" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'gdpr_checkbox_behaviour'] == 'unchecked') ? "selected='selected'":''; ?>>
-                        <?php esc_html_e('Unchecked', RNOC_TEXT_DOMAIN); ?></option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'cart_capture_msg'; ?>"><?php
                     esc_html_e('Text for the opt-in checkbox', RNOC_TEXT_DOMAIN);
                     ?></label>

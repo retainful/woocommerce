@@ -76,23 +76,10 @@ class Cart extends RestApi
                 'label' => __($message,RNOC_TEXT_DOMAIN),
                 'type' => 'checkbox',
                 'priority' => $fields['billing']['billing_email']['priority'],
-                'default' => (int)$this->isNeedCheck()
+                'default' => (int)$this->isBuyerAcceptsMarketing()
             ];
         }
         return $fields;
-    }
-
-    function isNeedCheck()
-    {
-        $settings = self::$settings->getAdminSettings();
-        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
-        if($enable_gdpr_compliance){
-            if(in_array(self::$woocommerce->getSession('is_buyer_accepting_marketing'), array(1,'true'))){
-               return true;
-            }
-            return  isset($settings[RNOC_PLUGIN_PREFIX . 'gdpr_checkbox_behaviour']) && $settings[RNOC_PLUGIN_PREFIX . 'gdpr_checkbox_behaviour'] == 'checked';
-        }
-        return false;
     }
 
     function guestTermGdprMessage()
@@ -103,7 +90,7 @@ class Cart extends RestApi
         $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
         if($enable_gdpr_compliance && $field_name == 'after_term_and_condition' && $message){
             echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
-            name="'.RNOC_PLUGIN_PREFIX.'allow_gdpr'.'" id="'.RNOC_PLUGIN_PREFIX.'allow_gdpr'.'" '.($this->isNeedCheck() ? 'checked="checked"' : '').' />
+            name="'.RNOC_PLUGIN_PREFIX.'allow_gdpr'.'" id="'.RNOC_PLUGIN_PREFIX.'allow_gdpr'.'" '.($this->isBuyerAcceptsMarketing() ? 'checked="checked"' : '').' />
 					<span class="woocommerce-terms-and-conditions-checkbox-text">' .  __($message,RNOC_TEXT_DOMAIN) .' '. __('(optional)',RNOC_TEXT_DOMAIN).'</span>';
         }
     }

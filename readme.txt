@@ -5,7 +5,7 @@ Requires at least: 4.6.1
 Tested up to: 6.4
 WC tested up to: 8.5
 Requires PHP: 5.6
-Stable tag: 2.6.27
+Stable tag: 2.6.28
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -249,6 +249,12 @@ No. There is no charges for support.
 == Screenshots ==
 
 == Changelog ==
+= 2.6.28 =
+- Improved: Buyer accept marketing
+- Added: Background webhook synchronize
+- Added: GDPR extra fields
+- Removed: Checkbox behaviour
+
 = 2.6.27 =
 - Improved: Buyer accept marketing
 - Added: Background webhook synchronize
