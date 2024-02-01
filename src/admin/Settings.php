@@ -899,7 +899,6 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
             RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' => '0',
             RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => 'Keep me up to date on news and exclusive offers',
-            //RNOC_PLUGIN_PREFIX . 'gdpr_checkbox_behaviour' => 'unchecked',
             RNOC_PLUGIN_PREFIX . 'gdpr_display_position' => 'after_billing_email',
             RNOC_PLUGIN_PREFIX . 'enable_ip_filter' => '0',
             RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
