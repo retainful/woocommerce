@@ -252,7 +252,6 @@ No. There is no charges for support.
 = 2.6.27 =
 - Improved: Buyer accept marketing
 - Added: Background webhook synchronize
-- Improved: order total, count and last order query
 - Added: GDPR extra fields
 
 = 2.6.26 =
