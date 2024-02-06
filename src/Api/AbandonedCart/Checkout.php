@@ -119,13 +119,22 @@ class Checkout extends RestApi
             $order = self::$woocommerce->getOrder($order_id);
             $order_obj = new Order();
             $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
-            //$logger = wc_get_logger();
-            if(empty($cart_token)){
-                //Need to generate cart_token
+
+            //Usually we should not force generate the cart token as this would sync all the old orders otherwise, if their status changes.
+            $force_generate_cart_token = apply_filters('rnoc_force_generate_cart_token', false, $http_args, $order_id, $webhook_id);
+
+            if($force_generate_cart_token === true) {
+                //Let's generate a token and set to the order meta
                 $cart_token = $this->generateCartToken();
                 self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
                 // $logger->add('Retainful','Generate toeken: '.$cart_token);
             }
+
+            if(empty($cart_token)) {
+                //bail on empty cart token
+                return $http_args;
+            }
+
             $order_data = $order_obj->getOrderData($order);
             // $logger->add('Retainful','Order Data:'.json_encode($order_data));
             if(!empty($cart_token) && $order_data){
@@ -171,19 +180,6 @@ class Checkout extends RestApi
         $order_obj = new Order();
         $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
         $cart_token = apply_filters('rnoc_sync_order_change_order_token',$cart_token,$order_id,$this);
-        if (empty($cart_token)) {
-            if ($this->generateNocCouponForManualOrders()) {
-                $noc_details = $order_obj->getNextOrderCouponDetails($order);
-                if (is_array($noc_details) && !empty($noc_details) && isset($noc_details[0]['code']) && !empty($noc_details[0]['code'])) {
-                    $cart_token = $this->generateCartToken();
-                    self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
-                } else {
-                    return;
-                }
-            } else {
-                return;
-            }
-        }
         if (empty($cart_token)) {
             return;
         }
