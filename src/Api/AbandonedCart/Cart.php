@@ -506,7 +506,6 @@ class Cart extends RestApi
                         'sku' => self::$woocommerce->getItemSku($item),
                         'price' => $this->formatDecimalPriceRemoveTrailingZeros(self::$woocommerce->getCartItemPrice($item)),
                         'title' => self::$woocommerce->getItemName($item),
-                        'vendor' => 'woocommerce',
                         'taxable' => ($line_tax != 0),
                         'quantity' => $item_quantity,
                         'tax_lines' => $tax_details,
@@ -519,7 +518,6 @@ class Cart extends RestApi
                         'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
                         'image_url' => $image_url,
                         'product_url' => self::$woocommerce->getProductUrl($item),
-                        'user_id' => NULL,
                         'properties' => array()
                     );
                     $items[] = apply_filters('rnoc_get_cart_line_item_details', $item_array, $cart, $item_key, $item, $item_details);
@@ -611,11 +609,9 @@ class Cart extends RestApi
         $cart = array(
             'cart_type' => 'cart',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
-            'plugin_version' => RNOC_VERSION,
             'cart_hash' => $cart_hash,
             'ip' => $this->getUserIPDetails(),
             'id' => $cart_token,
-            'name' => '#' . $cart_token,
             'email' => (isset($customer_details['email'])) ? $customer_details['email'] : NULL,
             'token' => $cart_token,
             'currency' => $default_currency_code,
@@ -1375,10 +1371,8 @@ class Cart extends RestApi
             'country' => $billing_fields['billing_country'],
             'address1' => $billing_fields['billing_address_1'],
             'address2' => $billing_fields['billing_address_2'],
-            'latitude' => '',
             'province' => $billing_fields['billing_state'],
             'last_name' => $billing_last_name,
-            'longitude' => '',
             'first_name' => $billing_first_name,
             'country_code' => $billing_fields['billing_country'],
             'province_code' => $billing_fields['billing_state'],

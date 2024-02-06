@@ -134,9 +134,7 @@ class Order extends RestApi
                         'sku' => self::$woocommerce->getItemSku($item),
                         'price' => $this->formatDecimalPriceRemoveTrailingZeros(self::$woocommerce->getItemPrice($item)),
                         'title' => self::$woocommerce->getItemName($item),
-                        'vendor' => 'woocommerce',
                         'taxable' => ($line_tax != 0),
-                        'user_id' => NULL,
                         'quantity' => $item_quantity,
                         'tax_lines' => $tax_details,
                         'line_price' => $this->formatDecimalPriceRemoveTrailingZeros($this->getLineItemTotal($item_details)),
@@ -146,8 +144,7 @@ class Order extends RestApi
                         'properties' => array(),
                         'variant_id' => $variant_id,
                         'variant_price' => $this->formatDecimalPriceRemoveTrailingZeros(($is_variable_item) ? self::$woocommerce->getItemPrice($item) : 0),
-                        'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0,
-                        'requires_shipping' => true
+                        'variant_title' => ($is_variable_item) ? self::$woocommerce->getItemName($item) : 0
                     );
                     $items[] = apply_filters('rnoc_get_order_line_item_details', $item_array, $cart, $item_key, $item);
                 }
@@ -240,14 +237,11 @@ class Order extends RestApi
             'order_number' => $order_id,
             'order_date' => $this->formatToIso8601(self::$woocommerce->getOrderDate($order)),
             'woo_r_order_number' => self::$woocommerce->getOrderNumber($order),
-            'plugin_version' => RNOC_VERSION,
             'cart_hash' => $cart_hash,
             'ip' => $user_ip,
             'id' => $cart_token,
-            'name' => '#' . $cart_token,
             'email' => (isset($customer_details['email'])) ? $customer_details['email'] : NULL,
             'token' => $cart_token,
-            'user_id' => NULL,
             'currency' => $default_currency_code,
             'customer' => $customer_details,
             'tax_lines' => $this->getOrderTaxDetails(),

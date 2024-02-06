@@ -724,8 +724,7 @@ class RestApi
     function getClientDetails($order = null)
     {
         $client_details = array(
-            'user_agent' => $this->getUserAgent($order),
-            'accept_language' => $this->getUserAcceptLanguage($order),
+            'accept_language' => $this->getUserAcceptLanguage($order)
         );
         return apply_filters('rnoc_get_client_details', $client_details, $order);
     }
