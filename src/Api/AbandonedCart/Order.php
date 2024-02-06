@@ -279,7 +279,6 @@ class Order extends RestApi
             'recovered_by_retainful' => (self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by')) ? true : false,
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
-            'noc_discount_codes' => $this->getNextOrderCouponDetails($order),
             'client_details' => $this->getClientDetails($order),
             'payment_method' => array(
                 'value' => $order->get_payment_method(),

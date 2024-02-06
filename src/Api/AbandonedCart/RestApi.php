@@ -673,7 +673,7 @@ class RestApi
         $app_id = self::$settings->getApiKey();
         $response = false;
         if (!empty($cart_details)) {
-            self::$settings->logMessage('cart synced with PHP', 'synced by');
+            self::$settings->logMessage('PHP', 'synced by');
             $response = self::$api->syncCartDetails($app_id, $cart_details, $extra_headers);
         }
         return $response;

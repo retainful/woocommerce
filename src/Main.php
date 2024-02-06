@@ -298,12 +298,15 @@ class Main
                 add_action('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
                 add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
                 add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
-                add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
+          //      add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
                 // handle updating Retainful order data after a successful payment, for certain gateways
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
                 // handle placed orders
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
-                add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
+                //triggers when admin pdate the order
+                add_action('woocommerce_process_shop_order_meta', array($checkout, 'OrderUpdatedShopBackend'), 50, 2);
+
+                //add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
                 add_filter('woocommerce_webhook_http_args',array($checkout,'changeWebHookHeader'),10,3);
                 //Todo: multi currency and multi lingual
                 //add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
