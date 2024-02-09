@@ -103,6 +103,10 @@ class Settings
         }
         $app_id = isset($_REQUEST['app_id']) ? sanitize_text_field($_REQUEST['app_id']) : '';
         $secret_key = isset($_REQUEST['secret_key']) ? sanitize_text_field($_REQUEST['secret_key']) : '';
+        $old_app_id = $this->getApiKey();
+        if(!empty($old_app_id) && !empty($app_id) && $old_app_id != $app_id){
+            $this->disconnectApi();
+        }
         $options_data = array(
             RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => '0',
             RNOC_PLUGIN_PREFIX . 'retainful_app_id' => $app_id,
@@ -129,6 +133,7 @@ class Settings
         wp_send_json($response);
     }
 
+
     /**
      * disconnect the app
      */
@@ -136,9 +141,12 @@ class Settings
     {
         WcFunctions::checkSecuritykey('rnoc_disconnect_license');
         $license_details = get_option($this->slug . '_license', array());
-        $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
-        update_option($this->slug . '_license', $license_details);
-        wp_send_json_success(__('App disconnected successfully!', RNOC_TEXT_DOMAIN));
+        if($this->disconnectApi()){
+            $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
+            update_option($this->slug . '_license', $license_details);
+            wp_send_json_success(__('App disconnected successfully!', RNOC_TEXT_DOMAIN));
+        }
+        wp_send_json_error(__('App disconnected failed!', RNOC_TEXT_DOMAIN));
     }
 
     /**
@@ -1769,6 +1777,28 @@ class Settings
             $this->updateUserAsFreeUser();
             return false;
         }
+    }
+
+    function disconnectApi($api_key = "", $secret_key = NULL)
+    {
+        if (empty($api_key)) {
+            $api_key = $this->getApiKey();
+        }
+        if (empty($secret_key)) {
+            $secret_key = $this->getSecretKey();
+        }
+        if (empty($store_data)) {
+            $store_data = $this->storeDetails($api_key, $secret_key);
+        }
+        if (!empty($api_key)) {
+            if ($details = $this->api->validateApi($api_key, $store_data,'disable')) {
+                if (!empty($details) && !is_string($details)) {
+                    $this->updateUserAsFreeUser();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
