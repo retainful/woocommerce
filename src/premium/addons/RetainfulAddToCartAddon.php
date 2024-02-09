@@ -393,7 +393,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             if (defined('SCRIPT_DEBUG')) {
                 $suffix = SCRIPT_DEBUG ? '' : '.min';
             }
-            return apply_filters('retainful_atc_popup_url', RNOCPREMIUM_PLUGIN_URL . 'assets/js/atc-popup'.$suffix.'.js');
+            return apply_filters('retainful_atc_popup_url', RNOCPREMIUM_PLUGIN_URL . 'assets/js/atc-popup' . $suffix . '.js');
         }
 
         /**
@@ -411,6 +411,10 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function addSiteScripts()
         {
+            $show_add_to_cart_popup = $this->eligibleAddToCartPopup();
+            if (!$show_add_to_cart_popup) {
+                return;
+            }
             if (!wp_script_is('rnoc-add-to-cart')) {
                 wp_enqueue_script('rnoc-add-to-cart', $this->getAtcPopupUrl(), $this->getATCDependencies(), RNOC_VERSION);
             }
@@ -427,7 +431,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 "no_conflict_mode" => $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'no_conflict_mode', 'yes'),
             );
             $modal_show = 'retainful_premium_add_to_cart_collection_popup_condition = ';
-            $modal_show .= wp_json_encode($modal_params) ;
+            $modal_show .= wp_json_encode($modal_params);
 
             wp_add_inline_script('rnoc-add-to-cart', $modal_show, 'before');
             $modal_popup_extra_classes = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class', null);
@@ -446,6 +450,10 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         function addSiteInstantCouponScripts()
         {
             if (!wp_script_is('rnoc-add-to-cart')) {
+                $show_add_to_cart_popup = $this->eligibleAddToCartPopup();
+                if (!$show_add_to_cart_popup) {
+                    return;
+                }
                 wp_enqueue_script('rnoc-add-to-cart', $this->getAtcPopupUrl(), $this->getATCDependencies(), RNOC_VERSION);
                 $modal_show = array(
                     'jquery_url' => includes_url('js/jquery/jquery.js')
@@ -455,6 +463,17 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             if (!wp_style_is('rnoc-popup')) {
                 wp_enqueue_style('rnoc-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
             }
+        }
+
+        function eligibleAddToCartPopup()
+        {
+            global $wp_query;
+            $modal_hide_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_hide_pages', array());
+            $status = true;
+            if(!empty($modal_hide_pages) && is_array($modal_hide_pages) && isset($wp_query->post) && isset($wp_query->post->ID) && $wp_query->post->ID > 0){
+                $status = !in_array($wp_query->post->ID,$modal_hide_pages);
+            }
+            return apply_filters('retainful_is_add_to_cart_popup_eligible', $status);
         }
 
         /**
@@ -673,6 +692,36 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_hide_pages'; ?>"><?php
+                                esc_html_e('Custom pages to hide the pop-up modal on (Optional)', RNOC_TEXT_DOMAIN);
+                                ?></label>
+                        </th>
+                        <td>
+                            <select multiple="multiple"
+                                    name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_hide_pages[]'; ?>"
+                                    class="rnoc-multi-select"
+                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'modal_hide_pages'; ?>">
+                                <?php
+                                if (!empty($pages)) {
+                                    foreach ($pages as $key => $label) {
+                                        ?>
+                                        <option value="<?php echo $key ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'modal_hide_pages'])) {
+                                            echo "selected";
+                                        } ?>><?php echo $label ?></option>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <p class="description">
+                                <?php
+                                echo __('The add to cart popup would be hide only on the selected pages.If you wish to display the popup in all pages, leave this option empty.', RNOC_TEXT_DOMAIN);
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'; ?>"><?php
                                 esc_html_e('Custom classes', RNOC_TEXT_DOMAIN);
                                 ?></label>
@@ -691,7 +740,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php  echo RNOC_PLUGIN_PREFIX . 'no_conflict_mode'; ?>"><?php
+                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'no_conflict_mode'; ?>"><?php
                                 esc_html_e('Enable no conflict mode ?', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>

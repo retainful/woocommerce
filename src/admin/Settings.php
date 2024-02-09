@@ -539,6 +539,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'modal_show_popup_until' => '1',
             RNOC_PLUGIN_PREFIX . 'no_conflict_mode' => 'yes',
             RNOC_PLUGIN_PREFIX . 'modal_display_pages' => array(),
+            RNOC_PLUGIN_PREFIX . 'modal_hide_pages' => array(),
             RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class' => '',
             RNOC_PLUGIN_PREFIX . 'modal_design_settings' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
