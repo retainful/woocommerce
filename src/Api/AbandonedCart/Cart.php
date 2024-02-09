@@ -200,8 +200,7 @@ class Cart extends RestApi
         if (!wp_script_is('wc-cart-fragments', 'enqueued')) {
             wp_enqueue_script('wc-cart-fragments');
         }
-        $need_referral_program = self::$settings->needReferralWidget();
-        if($need_referral_program){
+        if(self::$settings->needPopupWidget()){
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popups', $this->getPopupJs(), array('jquery'), RNOC_VERSION, false);
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
