@@ -35,7 +35,7 @@ copy_folder(){
 
 remove_files(){
   remove_path="vendor/jaybizzle/crawler-detect/";
-  remove_folder=("export.php")
+  remove_folder=("export.php", ".github",".php_cs.dist","composer.json")
   if [ -d "$pack_compress_folder" ]
   then
     # shellcheck disable=SC2068

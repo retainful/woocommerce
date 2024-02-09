@@ -34,6 +34,38 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'; ?>"><?php
+                    esc_html_e('Use webhooks for tracking order events', RNOC_TEXT_DOMAIN);
+                    ?></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_background_order_sync_yes'; ?>"
+                           value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'] == 'yes') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_background_order_sync_no'; ?>"
+                           value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'] == 'no') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <p class="description">
+                    <?php
+                    $scheduled_action = admin_url('tools.php?page=action-scheduler');
+                    echo sprintf(__("Enable this option to use WooCommerce's Webhooks feature to send order details to the Retainful API.<br>
+Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a> to execute webhooks in the background for this. So, make sure your cron setup is correct. If cron isn't working, order details won't reach Retainful API, and your workflow triggers won't work right.", RNOC_TEXT_DOMAIN),$scheduled_action);
+                    ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'; ?>"><?php
                     esc_html_e('Track Zero value carts / orders', RNOC_TEXT_DOMAIN);
                     ?></label>
@@ -256,7 +288,7 @@ require_once "tabs.php";
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'; ?>"><?php
-                    esc_html_e('Enable GDPR Compliance?', RNOC_TEXT_DOMAIN);
+                    esc_html_e('Enable Marketing Consent', RNOC_TEXT_DOMAIN);
                     ?></label>
             </th>
             <td>
@@ -276,12 +308,32 @@ require_once "tabs.php";
                     } ?>>
                     <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
                 </label>
+                <p class="description">
+                    <?php
+                    esc_html_e('This adds an opt-in checkbox at the checkout to capture the consent', RNOC_TEXT_DOMAIN);
+                    ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_display_position'; ?>"><?php
+                    esc_html_e('Consent field position:', RNOC_TEXT_DOMAIN);
+                    ?></label>
+            </th>
+            <td>
+                <select name="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_display_position'; ?>">
+                    <option value="after_billing_email" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] == 'after_billing_email') ? "selected='selected'":''; ?>>
+                        <?php esc_html_e('Below Email Address field', RNOC_TEXT_DOMAIN); ?></option>
+                    <option value="after_term_and_condition" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] == 'after_term_and_condition') ? "selected='selected'":''; ?>>
+                        <?php esc_html_e('Below Terms and Conditions section', RNOC_TEXT_DOMAIN); ?></option>
+                </select>
             </td>
         </tr>
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'cart_capture_msg'; ?>"><?php
-                    esc_html_e('Compliance Message', RNOC_TEXT_DOMAIN);
+                    esc_html_e('Text for the opt-in checkbox', RNOC_TEXT_DOMAIN);
                     ?></label>
             </th>
             <td>
@@ -456,18 +508,6 @@ require_once "tabs.php";
                     esc_html_e('DO NOT change this setting unless you are instructed by the Retainful Support team. Use this option only when you are using the server side caching with Varnish. Certain features may not work if enabled. So check with the Support team before enabling this option', RNOC_TEXT_DOMAIN);
                     ?>
                 </p>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
-                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'webhook_id'; ?>"><?php
-                    esc_html_e('Order Update Webhook', RNOC_TEXT_DOMAIN);
-                    ?></label>
-            </th>
-            <td>
-                <button type="button" id="generate-webhook-btn" data-action="rnoc_create_order_update_webhook"
-                        data-security="<?php echo wp_create_nonce('rnoc_create_order_webhook') ?>"
-                        class="button"><?= __('Create WebHook', RNOC_TEXT_DOMAIN) ?></button>
             </td>
         </tr>
         <tr>

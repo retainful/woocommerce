@@ -109,6 +109,7 @@ class RestApi
      */
     function formatDecimalPriceRemoveTrailingZeros($price)
     {
+        $price = (float)$price;
         $decimals = self::$woocommerce->priceDecimals();
         $rounded_price = round($price, $decimals);
         return number_format($rounded_price, $decimals, '.', '');
@@ -399,7 +400,7 @@ class RestApi
                 mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
             );
         }
-        return md5($token);
+        return md5($token.time());
     }
 
     /**
@@ -420,15 +421,12 @@ class RestApi
      */
     function isOrderHasValidOrderStatus($order_status)
     {
-        $invalid_order_status = apply_filters('rnoc_abandoned_cart_invalid_order_statuses', array('pending', 'failed', 'checkout-draft', 'trash'));
+        $invalid_order_status = apply_filters('rnoc_abandoned_cart_invalid_order_statuses', array('pending', 'failed', 'checkout-draft', 'trash', 'cancelled', 'refunded'));
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
         if ($consider_on_hold_order_as_ac == 1) {
             $invalid_order_status[] = 'on-hold';
         }
-        $consider_cancelled_order_as_ac = $this->considerCancelledAsAbandoned();
-        if ($consider_cancelled_order_as_ac == 1) {
-            $invalid_order_status[] = 'cancelled';
-        }
+
         $invalid_order_status = array_unique($invalid_order_status);
         return (!in_array($order_status, $invalid_order_status));
     }
@@ -550,6 +548,10 @@ class RestApi
         if (empty($timestamp)) {
             $timestamp = current_time('timestamp', true);
         }
+        if(is_object($timestamp) && $timestamp instanceof \WC_DateTime) {
+            $timestamp = $timestamp->getTimestamp();
+        }
+
         try {
             $date = date('Y-m-d H:i:s', $timestamp);
             $date_time = new DateTime($date);
@@ -683,7 +685,13 @@ class RestApi
      */
     function isBuyerAcceptsMarketing()
     {
-        if (is_user_logged_in()) {
+        $settings = self::$settings->getAdminSettings();
+        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
+        if($enable_gdpr_compliance){
+            return in_array(self::$woocommerce->getSession('is_buyer_accepting_marketing'), array(1,'true'));
+        }
+        return true;
+        /*if (is_user_logged_in()) {
             return true;
         } else {
             $is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
@@ -691,7 +699,7 @@ class RestApi
                 return true;
             }
         }
-        return false;
+        return false;*/
     }
 
     /**

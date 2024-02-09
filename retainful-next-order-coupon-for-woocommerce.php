@@ -5,15 +5,15 @@
  * Description: Recover abandoned carts and drive repeat purchases by sending single-use, unique coupon codes to customers for their next purchase
  * Author: Retainful
  * Author URI: https://www.retainful.com
- * Version: 2.6.17
+ * Version: 2.6.28
  * Slug: retainful-next-order-coupon-for-woocommerce
  * Text Domain: retainful-next-order-coupon-for-woocommerce
  * Domain Path: /i18n/languages/
  * Plugin URI: https://www.retainful.com
- * Requires at least: 4.6.1
+ * Requires at least: 4.7.0
  * Contributers: Sathyaseelan
- * WC requires at least: 3.0.9
- * WC tested up to: 7.1
+ * WC requires at least: 6.0.0
+ * WC tested up to: 8.5
  */
 if (!defined('ABSPATH')) exit;
 /**
@@ -30,7 +30,7 @@ if (!defined('RNOC_PLUGIN_SLUG'))
  * Current version of our app
  */
 if (!defined('RNOC_VERSION'))
-    define('RNOC_VERSION', '2.6.17');
+    define('RNOC_VERSION', '2.6.28');
 /**
  * Set base file URL
  */
@@ -83,13 +83,16 @@ if (!defined('RNOC_LOG_FILE_PATH')) {
  * Setup plugin compatable versions
  */
 if (!defined('RNOC_MINIMUM_WC_VERSION')) {
-    define('RNOC_MINIMUM_WC_VERSION', '3.0.9');
+    define('RNOC_MINIMUM_WC_VERSION', '6.0.0');
 }
 if (!defined('RNOC_MINIMUM_WP_VERSION')) {
-    define('RNOC_MINIMUM_WP_VERSION', '4.4');
+    define('RNOC_MINIMUM_WP_VERSION', '4.7.0');
 }
 if (!defined('RNOC_MINIMUM_PHP_VERSION')) {
     define('RNOC_MINIMUM_PHP_VERSION', '5.6.0');
+}
+if ( ! defined( 'REQUESTS_SILENCE_PSR0_DEPRECATIONS' ) ) {
+    define( 'REQUESTS_SILENCE_PSR0_DEPRECATIONS', true );
 }
 //Create and alter the tables for abandoned carts and also check for woocommerce installed
 register_activation_hook(RNOC_FILE, 'rnocPluginActivation');
@@ -115,6 +118,11 @@ if (!function_exists('rnocPluginActivation')) {
         return true;
     }
 }
+add_action('before_woocommerce_init', function () {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+    }
+});
 /**
  * Check the woocommerce is active or not
  * @return bool

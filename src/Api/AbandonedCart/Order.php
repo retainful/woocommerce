@@ -20,25 +20,42 @@ class Order extends RestApi
     {
         if ($user_id = self::$woocommerce->getOrderUserId($order)) {
             $user_data = self::$woocommerce->getOrderUser($order);
-            $created_at = $updated_at = strtotime($user_data->user_registered);
+            if(is_object($user_data) && !empty($user_data->user_registered) && $user_data->user_registered != '0000-00-00 00:00:00'){
+                $created_at = $updated_at = strtotime($user_data->user_registered);
+            }else{
+                $created_at = $updated_at = current_time('timestamp', true);
+            }
         } else {
             $user_id = 0;
             $created_at = $updated_at = current_time('timestamp', true);
         }
         $email = self::$woocommerce->getBillingEmail($order);
+        $customer_orders = self::$woocommerce->getCustomerOrdersByEmail($email);
+        $total_spent = 0;
+        if (is_array($customer_orders)) {
+            foreach ($customer_orders as $customer_order) {
+                if ($customer_order instanceof \WC_Order) {
+                    $total_spent = $total_spent + self::$woocommerce->getOrderTotal($customer_order);
+                }
+            }
+        }
+        $last_order_id = null;
+        if(!empty($customer_orders)){
+            $last_order_id = !empty($customer_orders[0]) && is_object($customer_orders[0]) && method_exists($customer_orders[0],'get_id') ? $customer_orders[0]->get_id() : null;
+        }
         $user_info = array(
             'id' => $user_id,
             'email' => $email,
             'phone' => self::$woocommerce->getBillingPhone($order),
             'state' => self::$woocommerce->getBillingState($order),
-            'currency' => NULL,
+            'currency' => self::$woocommerce->getOrderCurrency($order),
             'last_name' => self::$woocommerce->getBillingFirstName($order),
             'created_at' => $this->formatToIso8601($created_at),
             'first_name' => self::$woocommerce->getBillingLastName($order),
             'updated_at' => $this->formatToIso8601($updated_at),
-            'total_spent' => self::$woocommerce->getCustomerTotalSpent($email),
-            'orders_count' => self::$woocommerce->getCustomerTotalOrders($email),
-            'last_order_id' => NULL,
+            'total_spent' => $total_spent,//self::$woocommerce->getCustomerTotalSpent($email),
+            'orders_count' => is_array($customer_orders) ? count($customer_orders) : 0,//self::$woocommerce->getCustomerTotalOrders($email),
+            'last_order_id' => $last_order_id,//self::$woocommerce->getCustomerLastOrderId($email),
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,
@@ -92,6 +109,9 @@ class Order extends RestApi
                     $item = self::$woocommerce->getProduct($product_id);
                 } else {
                     $item = (isset($item_details['data']) && !empty($item_details['data'])) ? $item_details['data'] : NULL;
+                }
+                if(empty($item)){
+                    $item = $item_details;
                 }
                 $line_tax = $this->formatDecimalPriceRemoveTrailingZeros((isset($item_details['line_tax']) && !empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0);
                 if ($line_tax > 0) {
@@ -147,7 +167,8 @@ class Order extends RestApi
         $order_placed_at = self::$woocommerce->getOrderMeta($order, $this->order_placed_date_key_for_db);
         $order_status = self::$woocommerce->getStatus($order);
         if (!$order_placed_at && $this->isOrderHasValidOrderStatus($order_status)) {
-            $order_placed_at = current_time('timestamp', true);
+            $order_placed_at = self::$woocommerce->getOrderPlacedDate($order);
+            $order_placed_at = $this->processOrderPlaceDate($order_placed_at);
             self::$woocommerce->setOrderMeta($order_id, $this->order_placed_date_key_for_db, $order_placed_at);
             if ($this->isOrderInPendingRecovery($order_id)) {
                 $this->markOrderAsRecovered($order_id);
@@ -156,7 +177,17 @@ class Order extends RestApi
         $completed_at = (!empty($order_placed_at)) ? $this->formatToIso8601($order_placed_at) : NULL;
         return apply_filters('rnoc_order_completed_at', $completed_at, $order);
     }
-
+    function processOrderPlaceDate($order_placed_at = ''){
+        //1. if $order_placed_at is Object
+        if(is_object($order_placed_at)){
+            $order_placed_at = $this->formatToIso8601($order_placed_at);
+        }
+        // 2. When reach this place, $order_placed_at must be null or empty value
+        if(empty($order_placed_at) || is_null($order_placed_at)){
+            $order_placed_at = current_time('timestamp', true);
+        }
+        return $order_placed_at;
+    }
     /**
      * get the cart token from the order object
      * @param $order
@@ -164,7 +195,7 @@ class Order extends RestApi
      */
     function getOrderCartToken($order)
     {
-        return self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+        return apply_filters('rnoc_get_order_cart_token', self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db), $order);
     }
 
     /**
@@ -187,6 +218,9 @@ class Order extends RestApi
             return array();
         }
         $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
+        if(empty($cart_hash)){
+            $cart_hash = $order->get_cart_hash();
+        }
         $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
         $customer_details = $this->getCustomerDetails($order);
         $current_currency_code = self::$woocommerce->getOrderCurrency($order);
@@ -204,6 +238,7 @@ class Order extends RestApi
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
             'r_order_id' => $order_id,
             'order_number' => $order_id,
+            'order_date' => $this->formatToIso8601(self::$woocommerce->getOrderDate($order)),
             'woo_r_order_number' => self::$woocommerce->getOrderNumber($order),
             'plugin_version' => RNOC_VERSION,
             'cart_hash' => $cart_hash,
@@ -245,7 +280,12 @@ class Order extends RestApi
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
             'noc_discount_codes' => $this->getNextOrderCouponDetails($order),
-            'client_details' => $this->getClientDetails($order)
+            'client_details' => $this->getClientDetails($order),
+            'payment_method' => array(
+                'value' => $order->get_payment_method(),
+                'name' => $order->get_payment_method_title(),
+            )
+
         );
         if(!empty($cart_token)){
             $referrer_automation_id = self::$woocommerce->getSession($cart_token.'_referrer_automation_id');

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     let default_retainful_cart_data = {
         "ajax_url": "",
-        "jquery_url": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+        "jquery_url": "https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js",
         "ip": "",
         "version": "",
         "public_key": "",
@@ -244,6 +244,10 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 return this.cart_token;
             }
 
+            getTimeZone() {
+                return new Date().getTimezoneOffset();
+            }
+
             /**
              * set the cart token
              * @param cart_token
@@ -300,7 +304,8 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                         "X-Client-Referrer-IP": this.getIp(),
                         "X-Retainful-Version": this.getVersion(),
                         "X-Cart-Token": this.getCartToken(),
-                        "Cart-Token": this.getCartToken()
+                        "Cart-Token": this.getCartToken(),
+                        "User-TimeZone": this.getTimeZone(),
                     };
                     let body = {"data": cart_data};
                     this.request(this.getEndPoint(), JSON.stringify(body), headers, 'json', 'POST', this.async_request);
@@ -377,7 +382,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             let tracking_content = '<div id="' + rnoc_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(rnoc_cart_js_data.cart) + '</div>';
             $(tracking_content).appendTo('body');
         }
-        $('input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone').on('change', function () {
+        $(document).on('change','input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone,input#rnoc_allow_gdpr', function () {
             var rnoc_phone = $("#billing_phone").val();
             var rnoc_email = $("#billing_email").val();
             var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
@@ -404,11 +409,12 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 shipping_state: $('#shipping_state').val(),
                 shipping_postcode: $('#shipping_postcode').val(),
                 shipping_country: $('#shipping_country').val(),
+                allow_gdpr: $('input#rnoc_allow_gdpr').is(':checked'),
                 action: 'rnoc_track_user_data'
             };
             updateCheckout(rnoc_email, rnoc_phone, guest_data);
         });
-        $('.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone').on('change', function () {
+        $(document).on('change','.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
             var rnoc_email = $(".wp-block-woocommerce-checkout input#email").val();
             var rnoc_phone = $(".wp-block-woocommerce-checkout input#phone").val();
             var guest_data = {
@@ -420,6 +426,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 billing_postcode: $('.wp-block-woocommerce-checkout #billing-postcode').val(),
                 billing_phone: rnoc_phone,
                 billing_email: rnoc_email,
+                allow_gdpr: $('.wp-block-woocommerce-checkout #rnoc_allow_gdpr').is(':checked'),
                 ship_to_billing: 1,
                 action: 'rnoc_track_user_data'
             };

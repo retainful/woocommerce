@@ -397,6 +397,16 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         }
 
         /**
+         * Atc popup dependencies.
+         *
+         * @return array
+         */
+        function getATCDependencies()
+        {
+            return apply_filters('retainful_atc_popup_dependencies', array('wc-add-to-cart', 'wc-add-to-cart-variation'));
+        }
+
+        /**
          * Add the site scripts needed for addon
          */
         function addSiteScripts()
@@ -406,7 +416,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 return;
             }
             if (!wp_script_is('rnoc-add-to-cart')) {
-                wp_enqueue_script('rnoc-add-to-cart', $this->getAtcPopupUrl(), array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
+                wp_enqueue_script('rnoc-add-to-cart', $this->getAtcPopupUrl(), $this->getATCDependencies(), RNOC_VERSION);
             }
             $modal_show_popup_until = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_show_popup_until', 1);
             $close_btn_behavior = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'close_btn_behavior', 'just_close');
@@ -444,7 +454,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 if (!$show_add_to_cart_popup) {
                     return;
                 }
-                wp_enqueue_script('rnoc-add-to-cart', $this->getAtcPopupUrl(), array('wc-add-to-cart', 'wc-add-to-cart-variation'), RNOC_VERSION);
+                wp_enqueue_script('rnoc-add-to-cart', $this->getAtcPopupUrl(), $this->getATCDependencies(), RNOC_VERSION);
                 $modal_show = array(
                     'jquery_url' => includes_url('js/jquery/jquery.js')
                 );
@@ -511,7 +521,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
         {
             if ($this->slug() == $add_on_slug) {
                 $pages = $this->getPageLists();
-                $coupon_codes = $this->getWooCouponCodes();
                 ?>
                 <input type="hidden" name="addon" value="atcp">
                 <table class="form-table" role="presentation">
@@ -652,12 +661,12 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row">
+                        <th scope="row" style="display: none;">
                             <label for="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages'; ?>"><?php
                                 esc_html_e('Custom pages to display the pop-up modal on (Optional)', RNOC_TEXT_DOMAIN);
                                 ?></label>
                         </th>
-                        <td>
+                        <td style="display: none;">
                             <select multiple="multiple"
                                     name="<?php echo RNOC_PLUGIN_PREFIX . 'modal_display_pages[]'; ?>"
                                     class="rnoc-multi-select"
@@ -1024,7 +1033,6 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 <table class="form-table" role="presentation">
                     <?php
                     $modal_coupon_settings_name = RNOC_PLUGIN_PREFIX . 'modal_coupon_settings[0]';
-                    $coupon_codes = $this->getWooCouponCodes();
                     ?>
                     <tbody>
                     <tr>

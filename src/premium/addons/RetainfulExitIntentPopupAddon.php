@@ -393,7 +393,6 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         {
             if ($this->slug() == $add_on_slug) {
                 $pages = $this->getPageLists();
-                $coupon_codes = $this->getWooCouponCodes();
                 ?>
                 <input type="hidden" name="addon" value="eip">
                 <table class="form-table" role="presentation">

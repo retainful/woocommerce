@@ -69,13 +69,30 @@ class Cart extends RestApi
     {
         $settings = self::$settings->getAdminSettings();
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
-        if ($enable_gdpr_compliance) {
-            if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
-                $existing_label = $fields['billing']['billing_email']['label'];
-                $fields['billing']['billing_email']['label'] = $existing_label . "<br><small>" . $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] . "</small>";
-            }
+        $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
+        $field_name = isset($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) ? $settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] : 'after_billing_email';
+        if ($enable_gdpr_compliance && $field_name == 'after_billing_email' && $message && isset($fields['billing']['billing_email'])) {
+            $fields['billing'][RNOC_PLUGIN_PREFIX.'allow_gdpr'] = [
+                'label' => __($message,RNOC_TEXT_DOMAIN),
+                'type' => 'checkbox',
+                'priority' => $fields['billing']['billing_email']['priority'],
+                'default' => (int)$this->isBuyerAcceptsMarketing()
+            ];
         }
         return $fields;
+    }
+
+    function guestTermGdprMessage()
+    {
+        $settings = self::$settings->getAdminSettings();
+        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
+        $field_name = isset($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) ? $settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] : 'after_billing_email';
+        $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
+        if($enable_gdpr_compliance && $field_name == 'after_term_and_condition' && $message){
+            echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
+            name="'.RNOC_PLUGIN_PREFIX.'allow_gdpr'.'" id="'.RNOC_PLUGIN_PREFIX.'allow_gdpr'.'" '.($this->isBuyerAcceptsMarketing() ? 'checked="checked"' : '').' />
+					<span class="woocommerce-terms-and-conditions-checkbox-text">' .  __($message,RNOC_TEXT_DOMAIN) .' '. __('(optional)',RNOC_TEXT_DOMAIN).'</span>';
+        }
     }
 
     /**
@@ -85,10 +102,9 @@ class Cart extends RestApi
     {
         $settings = self::$settings->getAdminSettings();
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
-        if ($enable_gdpr_compliance) {
-            if (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
-                echo "<p><small>" . __($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'], RNOC_TEXT_DOMAIN) . "</small></p>";
-            }
+        $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
+        if ($enable_gdpr_compliance && $message) {
+            echo "<p><small>" . __($message, RNOC_TEXT_DOMAIN) . "</small></p>";
         }
     }
 
@@ -108,7 +124,12 @@ class Cart extends RestApi
                     $billing_address[$billing_field_name] = sanitize_text_field($_POST[$billing_field_name]);
                 }
             }
-            self::$woocommerce->setSession('is_buyer_accepting_marketing', 1);
+            $settings = self::$settings->getAdminSettings();
+            $is_buyer_accepting_marketing = true;
+            if(isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance']) && $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] ){
+                $is_buyer_accepting_marketing = (isset($_POST['allow_gdpr']) && $_POST['allow_gdpr'] == 'true');
+            }
+            self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             $this->setCustomerBillingDetails($billing_address);
             // $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
             //shipping address fields
@@ -1190,16 +1211,29 @@ class Cart extends RestApi
                 $billing_email = $user_data->user_email;
             }
             $created_at = $updated_at = strtotime($user_data->user_registered);
+            $billing_details = $this->getCustomerCheckoutDetails('billing');
             $billing_first_name = get_user_meta($user_id, 'billing_first_name', true);
             if (empty($billing_first_name)) {
                 $billing_first_name = $user_data->first_name;
+            }
+            if (empty($billing_first_name)) {
+                $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
             }
             $billing_last_name = get_user_meta($user_id, 'billing_last_name', true);
             if (empty($billing_last_name)) {
                 $billing_last_name = $user_data->last_name;
             }
+            if (empty($billing_last_name)) {
+                $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
+            }
             $billing_state = get_user_meta($user_id, 'billing_state', true);
+            if(empty($billing_state)){
+                $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
+            }
             $billing_phone = get_user_meta($user_id, 'billing_phone', true);
+            if(empty($billing_phone)){
+                $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
+            }
         } else {
             $user_id = 0;
             $created_at = self::$storage->getValue('rnoc_session_created_at');
@@ -1220,12 +1254,12 @@ class Cart extends RestApi
             'state' => $billing_state,
             'last_name' => $billing_last_name,
             'first_name' => $billing_first_name,
-            'currency' => NULL,
+            'currency' => self::$settings->getBaseCurrency(),
             'created_at' => $this->formatToIso8601($created_at),
             'updated_at' => $this->formatToIso8601($updated_at),
-            'total_spent' => NULL,
-            'orders_count' => NULL,
-            'last_order_id' => NULL,
+            /*'total_spent' => self::$woocommerce->getCustomerTotalSpent($billing_email),
+            'orders_count' => self::$woocommerce->getCustomerTotalOrders($billing_email),
+            'last_order_id' => self::$woocommerce->getCustomerLastOrderId($billing_email),*/
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,
@@ -1240,45 +1274,46 @@ class Cart extends RestApi
      */
     function getCustomerShippingAddressDetails()
     {
-        if ($user_id = get_current_user_id()) {
-            $shipping_first_name = get_user_meta($user_id, 'shipping_first_name', true);
-            $shipping_last_name = get_user_meta($user_id, 'shipping_last_name', true);
-            $shipping_address_1 = get_user_meta($user_id, 'shipping_address_1', true);
-            $shipping_city = get_user_meta($user_id, 'shipping_city', true);
-            $shipping_state = get_user_meta($user_id, 'shipping_state', true);
-            $shipping_postcode = get_user_meta($user_id, 'shipping_postcode', true);
-            $shipping_country = get_user_meta($user_id, 'shipping_country', true);
-            $shipping_address_2 = '';
-        } else {
-            $shipping_details = $this->getCustomerCheckoutDetails('shipping');
-            if (empty($shipping_details)) {
-                $shipping_details = array();
+        $shipping_details = $this->getCustomerCheckoutDetails('shipping');
+        if (empty($shipping_details)) {
+            $shipping_details = array();
+        }
+        $user_id = get_current_user_id();
+        $shipping_fields = array(
+            'shipping_first_name' => '',
+            'shipping_last_name' => '',
+            'shipping_address_1' => '',
+            'shipping_city' => '',
+            'shipping_state' => '',
+            'shipping_postcode' => '',
+            'shipping_country' => '',
+            'shipping_address_2' => '',
+        );
+        foreach ($shipping_fields as $shipping_key => $shipping_value){
+            if(isset($user_id) && $user_id > 0){
+                $shipping_value = get_user_meta($user_id, $shipping_key, true);
             }
-            $shipping_postcode = isset($shipping_details['shipping_postcode']) ? $shipping_details['shipping_postcode'] : NULL;
-            $shipping_city = isset($shipping_details['shipping_city']) ? $shipping_details['shipping_city'] : NULL;
-            $shipping_first_name = isset($shipping_details['shipping_first_name']) ? $shipping_details['shipping_first_name'] : NULL;
-            $shipping_last_name = isset($shipping_details['shipping_last_name']) ? $shipping_details['shipping_last_name'] : NULL;
-            $shipping_country = isset($shipping_details['shipping_country']) ? $shipping_details['shipping_country'] : NULL;
-            $shipping_state = isset($shipping_details['shipping_state']) ? $shipping_details['shipping_state'] : NULL;
-            $shipping_address_1 = isset($shipping_details['shipping_address_1']) ? $shipping_details['shipping_address_1'] : NULL;
-            $shipping_address_2 = isset($shipping_details['shipping_address_2']) ? $shipping_details['shipping_address_2'] : NULL;
+            if(empty($shipping_value)){
+                $shipping_value = isset($shipping_details[$shipping_key]) ? $shipping_details[$shipping_key] : $shipping_value;
+            }
+            $shipping_fields[$shipping_key] = $shipping_value;
         }
         return array(
-            'zip' => $shipping_postcode,
-            'city' => $shipping_city,
-            'name' => $shipping_first_name . ' ' . $shipping_last_name,
+            'zip' => $shipping_fields['shipping_postcode'],
+            'city' => $shipping_fields['shipping_city'],
+            'name' => $shipping_fields['shipping_first_name'] . ' ' . $shipping_fields['shipping_last_name'],
             'phone' => NULL,
             'company' => NULL,
-            'country' => $shipping_country,
-            'address1' => $shipping_address_1,
-            'address2' => $shipping_address_2,
+            'country' => $shipping_fields['shipping_country'],
+            'address1' => $shipping_fields['shipping_address_1'],
+            'address2' => $shipping_fields['shipping_address_2'],
             'latitude' => '',
-            'province' => $shipping_state,
-            'last_name' => $shipping_last_name,
+            'province' => $shipping_fields['shipping_state'],
+            'last_name' => $shipping_fields['shipping_last_name'],
             'longitude' => '',
-            'first_name' => $shipping_first_name,
-            'country_code' => $shipping_country,
-            'province_code' => $shipping_state,
+            'first_name' => $shipping_fields['shipping_first_name'],
+            'country_code' => $shipping_fields['shipping_country'],
+            'province_code' => $shipping_fields['shipping_state'],
         );
     }
 
@@ -1288,49 +1323,65 @@ class Cart extends RestApi
      */
     function getCustomerBillingAddressDetails()
     {
+        $billing_details = $this->getCustomerCheckoutDetails('billing');
+        if (empty($billing_details)) {
+            $billing_details = array();
+        }
         if ($user_id = get_current_user_id()) {
+            $user_data = wp_get_current_user();
             $billing_first_name = get_user_meta($user_id, 'billing_first_name', true);
-            $billing_last_name = get_user_meta($user_id, 'billing_last_name', true);
-            $billing_address_1 = get_user_meta($user_id, 'billing_address_1', true);
-            $billing_city = get_user_meta($user_id, 'billing_city', true);
-            $billing_state = get_user_meta($user_id, 'billing_state', true);
-            $billing_postcode = get_user_meta($user_id, 'billing_postcode', true);
-            $billing_country = get_user_meta($user_id, 'billing_country', true);
-            $billing_phone = get_user_meta($user_id, 'billing_phone', true);
-            $billing_address_2 = '';
-            $billing_company = '';
-        } else {
-            $billing_details = $this->getCustomerCheckoutDetails('billing');
-            if (empty($billing_details)) {
-                $billing_details = array();
+            if (empty($billing_first_name)) {
+                $billing_first_name = is_object($user_data) && isset($user_data->first_name) ? $user_data->first_name: $billing_first_name;
             }
-            $billing_postcode = isset($billing_details['billing_postcode']) ? $billing_details['billing_postcode'] : NULL;
-            $billing_city = isset($billing_details['billing_city']) ? $billing_details['billing_city'] : NULL;
+            if (empty($billing_first_name)) {
+                $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
+            }
+            $billing_last_name = get_user_meta($user_id, 'billing_last_name', true);
+            if (empty($billing_last_name)) {
+                $billing_last_name = is_object($user_data) && isset($user_data->last_name) ? $user_data->last_name: $billing_last_name;
+            }
+            if (empty($billing_last_name)) {
+                $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
+            }
+        } else {
             $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
             $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
-            $billing_country = isset($billing_details['billing_country']) ? $billing_details['billing_country'] : NULL;
-            $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
-            $billing_address_1 = isset($billing_details['billing_address_1']) ? $billing_details['billing_address_1'] : NULL;
-            $billing_address_2 = isset($billing_details['billing_address_2']) ? $billing_details['billing_address_2'] : NULL;
-            $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
-            $billing_company = isset($billing_details['billing_company']) ? $billing_details['billing_company'] : NULL;
+        }
+        $billing_fields = array(
+            'billing_address_1' => '',
+            'billing_city' => '',
+            'billing_state' => '',
+            'billing_postcode' => '',
+            'billing_country' => '',
+            'billing_phone' => '',
+            'billing_address_2' => '',
+            'billing_company' => ''
+        );
+        foreach ($billing_fields as $billing_key => $billing_value){
+            if(isset($user_id) && $user_id > 0){
+                $billing_value = get_user_meta($user_id, $billing_key, true);
+            }
+            if(empty($billing_value)){
+                $billing_value = isset($billing_details[$billing_key]) ? $billing_details[$billing_key] : $billing_value;
+            }
+            $billing_fields[$billing_key] = $billing_value;
         }
         return array(
-            'zip' => $billing_postcode,
-            'city' => $billing_city,
+            'zip' => $billing_fields['billing_postcode'],
+            'city' => $billing_fields['billing_city'],
             'name' => $billing_first_name . ' ' . $billing_last_name,
-            'phone' => $billing_phone,
-            'company' => $billing_company,
-            'country' => $billing_country,
-            'address1' => $billing_address_1,
-            'address2' => $billing_address_2,
+            'phone' => $billing_fields['billing_phone'],
+            'company' => $billing_fields['billing_company'],
+            'country' => $billing_fields['billing_country'],
+            'address1' => $billing_fields['billing_address_1'],
+            'address2' => $billing_fields['billing_address_2'],
             'latitude' => '',
-            'province' => $billing_state,
+            'province' => $billing_fields['billing_state'],
             'last_name' => $billing_last_name,
             'longitude' => '',
             'first_name' => $billing_first_name,
-            'country_code' => $billing_country,
-            'province_code' => $billing_state,
+            'country_code' => $billing_fields['billing_country'],
+            'province_code' => $billing_fields['billing_state'],
         );
     }
 }

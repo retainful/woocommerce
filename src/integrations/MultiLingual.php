@@ -28,6 +28,9 @@ class MultiLingual
         if (!empty($wpml_options)) {
             return (isset($wpml_options['default_language'])) ? $wpml_options['default_language'] : NULL;
         }
+        if(function_exists('pll_default_language')){
+            return pll_default_language();
+        }
         if (function_exists('get_locale')) {
             $current_lang = get_locale();
             if (empty($current_lang)) {
@@ -45,6 +48,9 @@ class MultiLingual
     {
         if (defined('ICL_LANGUAGE_CODE')) {
             return ICL_LANGUAGE_CODE;
+        }
+        if(function_exists('pll_current_language')){
+            return pll_current_language();
         }
         if ($default_lang = $this->getDefaultLanguage()) {
             return $default_lang;
