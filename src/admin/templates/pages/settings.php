@@ -310,7 +310,7 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
                 </label>
                 <p class="description">
                     <?php
-                    esc_html_e('If set to Explicity, it will add an opt-in checkbox at the checkout to capture the consent', RNOC_TEXT_DOMAIN);
+                    esc_html_e('If set to Explicit, it will add an opt-in checkbox at the checkout to capture the consent', RNOC_TEXT_DOMAIN);
                     ?>
                 </p>
             </td>
