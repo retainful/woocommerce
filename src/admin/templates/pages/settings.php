@@ -288,29 +288,29 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'; ?>"><?php
-                    esc_html_e('Enable Marketing Consent', RNOC_TEXT_DOMAIN);
+                    esc_html_e('Marketing Consent', RNOC_TEXT_DOMAIN);
                     ?></label>
             </th>
             <td>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance_1'; ?>"
-                           value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] == '1') {
-                        echo "checked";
-                    } ?>>
-                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
-                </label>
                 <label>
                     <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'; ?>" type="radio"
                            id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance_0'; ?>"
                            value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] == '0') {
                         echo "checked";
                     } ?>>
-                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                    <?php esc_html_e('Implicit', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance_1'; ?>"
+                           value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] == '1') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Explicit', RNOC_TEXT_DOMAIN); ?>
                 </label>
                 <p class="description">
                     <?php
-                    esc_html_e('This adds an opt-in checkbox at the checkout to capture the consent', RNOC_TEXT_DOMAIN);
+                    esc_html_e('This adds an opt-in checkbox at the checkout to capture the consent => If set to Explicity, it will add an opt-in checkbox at the checkout to capture the consent', RNOC_TEXT_DOMAIN);
                     ?>
                 </p>
             </td>
