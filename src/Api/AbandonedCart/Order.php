@@ -30,6 +30,19 @@ class Order extends RestApi
             $created_at = $updated_at = current_time('timestamp', true);
         }
         $email = self::$woocommerce->getBillingEmail($order);
+        $customer_orders = self::$woocommerce->getCustomerOrdersByEmail($email);
+        $total_spent = 0;
+        if (is_array($customer_orders)) {
+            foreach ($customer_orders as $customer_order) {
+                if ($customer_order instanceof \WC_Order) {
+                    $total_spent = $total_spent + self::$woocommerce->getOrderTotal($customer_order);
+                }
+            }
+        }
+        $last_order_id = null;
+        if(!empty($customer_orders)){
+            $last_order_id = !empty($customer_orders[0]) && is_object($customer_orders[0]) && method_exists($customer_orders[0],'get_id') ? $customer_orders[0]->get_id() : null;
+        }
         $user_info = array(
             'id' => $user_id,
             'email' => $email,
@@ -40,9 +53,9 @@ class Order extends RestApi
             'created_at' => $this->formatToIso8601($created_at),
             'first_name' => self::$woocommerce->getBillingLastName($order),
             'updated_at' => $this->formatToIso8601($updated_at),
-            'total_spent' => self::$woocommerce->getCustomerTotalSpent($email),
-            'orders_count' => self::$woocommerce->getCustomerTotalOrders($email),
-            'last_order_id' => self::$woocommerce->getCustomerLastOrderId($email),
+            'total_spent' => $total_spent,//self::$woocommerce->getCustomerTotalSpent($email),
+            'orders_count' => is_array($customer_orders) ? count($customer_orders) : 0,//self::$woocommerce->getCustomerTotalOrders($email),
+            'last_order_id' => $last_order_id,//self::$woocommerce->getCustomerLastOrderId($email),
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,

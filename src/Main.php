@@ -12,6 +12,7 @@ use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\AfterPay;
 use Rnoc\Retainful\Integrations\Currency;
+use Rnoc\Retainful\library\RetainfulApi;
 
 class Main
 {
@@ -274,6 +275,7 @@ class Main
                     add_action('woocommerce_before_shop_loop', array($cart, 'userGdprMessage'), 10);
                 }
                 add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
+                add_action('woocommerce_checkout_after_terms_and_conditions',array($cart,'guestTermGdprMessage'));
                 add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
                 add_filter('rnoc_can_track_abandoned_carts', array($cart, 'isZeroValueCart'), 15, 2);
                 $cart_tracking_engine = $this->admin->getCartTrackingEngine();
@@ -362,6 +364,44 @@ class Main
     function onPluginDeactivation()
     {
         $this->removeAllScheduledActions();
+        $this->removeWebhook();
+    }
+
+    /**
+     * Remove retainful webhook.
+     *
+     * @return void
+     */
+    function removeWebhook()
+    {
+        if(!class_exists('WC_Data_Store') || !class_exists('\Rnoc\Retainful\library\RetainfulApi') || !function_exists('wc_get_webhook')){
+            return;
+        }
+        try {
+            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $args = array(
+                'limit'  => -1,
+                'offset' => 0,
+            );
+            $webhooks    = $data_store->search_webhooks( $args );
+            foreach ($webhooks as $webhook_id){
+                $webhook = wc_get_webhook($webhook_id);
+                if(empty($webhook)){
+                    continue;
+                }
+                $delivery_url = $webhook->get_delivery_url();
+                $retainful_api = new RetainfulApi();
+                $site_delivery_url = $retainful_api->getDomain().'woocommerce/webhooks/checkout';
+                if($delivery_url != $site_delivery_url){
+                    continue;
+                }
+                $webhook->delete();
+            }
+            $this->admin->saveWebhookId(0);
+            $this->admin->saveWebhookId(0,'order.created');
+        }catch (\Exception $e){
+
+        }
     }
 
     /**

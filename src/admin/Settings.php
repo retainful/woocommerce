@@ -539,6 +539,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'modal_show_popup_until' => '1',
             RNOC_PLUGIN_PREFIX . 'no_conflict_mode' => 'yes',
             RNOC_PLUGIN_PREFIX . 'modal_display_pages' => array(),
+            RNOC_PLUGIN_PREFIX . 'modal_hide_pages' => array(),
             RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class' => '',
             RNOC_PLUGIN_PREFIX . 'modal_design_settings' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
@@ -814,7 +815,7 @@ class Settings
         $cart_capture_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '');
         $post = self::$input->post();
         $data = $this->clean($post);
-        $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = $this->sanitizeBasicHtml($cart_capture_msg);
+        $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = trim($this->sanitizeBasicHtml($cart_capture_msg));
         update_option($this->slug . '_settings', $data);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
@@ -850,7 +851,7 @@ class Settings
         }
         try {
             $webhook = new \WC_Webhook();
-            $name = sanitize_text_field(wp_unslash('Retainful Order Update'));
+            $name = $topic == 'order.updated' ? sanitize_text_field(wp_unslash('Retainful Order Update')): sanitize_text_field(wp_unslash('Retainful Order Create'));
             $webhook->set_name($name);
             if (!$webhook->get_user_id()) {
                 $webhook->set_user_id(get_current_user_id());
@@ -898,7 +899,8 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status' => '0',
             RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
             RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' => '0',
-            RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => '',
+            RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => 'Keep me up to date on news and exclusive offers',
+            RNOC_PLUGIN_PREFIX . 'gdpr_display_position' => 'after_billing_email',
             RNOC_PLUGIN_PREFIX . 'enable_ip_filter' => '0',
             RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
             RNOC_PLUGIN_PREFIX . 'enable_debug_log' => '0',
@@ -907,6 +909,10 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'varnish_check' => 'no',
         );
         $settings = wp_parse_args($settings, $default_settings);
+
+        if(empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])){
+            $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = 'Keep me up to date on news and exclusive offers';
+        }
         require_once dirname(__FILE__) . '/templates/pages/settings.php';
     }
 
@@ -939,6 +945,63 @@ class Settings
         add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
 
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
+        if(isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()){
+            $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
+            add_action('admin_notices', function () use ($message) {
+                echo '<div class="error notice"><p>' . $message . '</p></div>';
+            });
+        }
+    }
+
+    /**
+     * Is need to show webhook notice.
+     *
+     * @return bool
+     */
+    function isWebhookNoticeShow(){
+
+        if(!$this->isAppConnected() || !$this->isBackgroundOrderSyncEnabled()){
+            return false;
+        }
+        if(!class_exists('WC_Data_Store') || !function_exists('wc_get_webhook')){
+            return false;
+        }
+        $webhook_status = array(
+            'order_created' => false,
+            'order_updated' => false
+        );
+        try {
+            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $args = array(
+                'limit'  => -1,
+                'offset' => 0,
+            );
+
+            $webhooks    = $data_store->search_webhooks( $args );
+            foreach ($webhooks as $webhook_id) {
+                $webhook = wc_get_webhook($webhook_id);
+                if (empty($webhook)) {
+                    continue;
+                }
+                $delivery_url = $webhook->get_delivery_url();
+                $site_delivery_url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
+                if ($delivery_url != $site_delivery_url) {
+                    continue;
+                }
+                $topic = $webhook->get_topic();
+                $status = $webhook->get_status();
+                if($status == 'active' && $topic == 'order.created'){
+                    $webhook_status['order_created'] = true;
+                }
+                if($status == 'active' && $topic == 'order.updated'){
+                    $webhook_status['order_updated'] = true;
+                }
+            }
+        }catch (\Exception $e){
+
+        }
+
+        return in_array(false,$webhook_status);
     }
 
     /**
@@ -1798,12 +1861,10 @@ class Settings
     function saveWebhookId($id,$type = 'order.updated')
     {
         $settings = get_option($this->slug, array());
-        if ($id > 0) {
-            if($type == 'order.updated'){
-                $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = $id;
-            }elseif($type == 'order.created'){
-                $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] = $id;
-            }
+        if($type == 'order.updated'){
+            $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = (int)$id;
+        }elseif($type == 'order.created'){
+            $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] = (int)$id;
         }
         update_option($this->slug, $settings);
     }
