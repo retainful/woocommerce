@@ -426,6 +426,9 @@ class Settings
                 if (!isset($data[RNOC_PLUGIN_PREFIX . 'modal_display_pages'])) {
                     $data[RNOC_PLUGIN_PREFIX . 'modal_display_pages'] = array();
                 }
+                if (!isset($data[RNOC_PLUGIN_PREFIX . 'modal_hide_pages'])) {
+                    $data[RNOC_PLUGIN_PREFIX . 'modal_hide_pages'] = array();
+                }
                 break;
             case "ct":
                 if (!isset($data[RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'])) {
