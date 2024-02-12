@@ -201,7 +201,7 @@ class Cart extends RestApi
             wp_enqueue_script('wc-cart-fragments');
         }
         if(self::$settings->needPopupWidget()){
-            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popups', $this->getPopupJs(), array('jquery'), RNOC_VERSION, false);
+            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popups', $this->getPopupJs(), array('jquery'), RNOC_VERSION, true);
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
