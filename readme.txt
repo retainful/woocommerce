@@ -249,11 +249,9 @@ No. There is no charges for support.
 == Screenshots ==
 
 == Changelog ==
-= 2.6.29 =
+= 2.6.28 =
 - Fix: Marketing Consent: Default value Implicit
 - Fix: Add to cart popup hide on particular page
-
-= 2.6.28 =
 - Improved: Buyer accept marketing
 - Added: Background webhook synchronize
 - Added: GDPR extra fields
