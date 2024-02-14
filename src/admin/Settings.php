@@ -2197,7 +2197,7 @@ class Settings
         return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync']) && $settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'] == 'yes';
     }
 
-    function setEmailCookie($value = '')
+    function setIdentity($value = '')
     {
         if(empty($value)) return;
         $cookie = new Cookie();
@@ -2206,7 +2206,7 @@ class Settings
         $cookie->setCookieValue('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
     }
 
-    function getCookie($key,$default_value = '')
+    function getIdentity($key, $default_value = '')
     {
         $cookie = new Cookie();
         if($cookie->hasKey($key)){
@@ -2217,12 +2217,12 @@ class Settings
 
     function setCookieData()
     {
-        if (is_user_logged_in()) {
+        if (!is_admin() && is_user_logged_in()) {
             $user = wp_get_current_user();
             if(is_object($user) && !empty($user->user_email)){
-                $cookie_email = $this->getCookie('_wc_rnoc_tk_session');
+                $cookie_email = $this->getIdentity('_wc_rnoc_tk_session');
                 if(empty($cookie_email)){
-                    $this->setEmailCookie($user->user_email);
+                    $this->setIdentity($user->user_email);
                 }
             }
 
