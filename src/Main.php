@@ -265,6 +265,7 @@ class Main
                         add_action('wp_login', array($popup, 'userLogin'), 10, 2);
                         add_action('wp_enqueue_scripts', array($popup, 'addPopupScripts'));
                         add_action('wp_footer', array($popup, 'printPopup'));
+                        add_filter('woocommerce_set_cookie_options',array($popup,'changeIdentityPath'),10,3);
                     }
                 }
                 add_filter('script_loader_tag', array($cart, 'addCloudFlareAttrScript'), 10, 3);

@@ -2206,6 +2206,12 @@ class Settings
         $cookie->setCookieValue('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
     }
 
+    function getIdentityPath()
+    {
+        $path = preg_replace( '|https?://[^/]+|i', '', get_option( 'home' )  );
+     return !empty($path) ? $path: '/';
+    }
+
     function getIdentity($key, $default_value = '')
     {
         $cookie = new Cookie();

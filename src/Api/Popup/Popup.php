@@ -50,6 +50,15 @@ class Popup
         }
     }
 
+    function changeIdentityPath($option,$name,$value)
+    {
+        if(!is_admin() && !empty($option['path']) && $name == '_wc_rnoc_tk_session'){
+            $settings = new Settings();
+            $option['path'] = $settings->getIdentityPath();
+        }
+        return $option;
+    }
+
     /**
      * Print popup.
      *
@@ -79,7 +88,9 @@ class Popup
         $default_params = array(
             'digest' => $digest,
             'email' => '',
-            'api_key' => ''
+            'api_key' => '',
+            'path' => $admin->getIdentityPath(),
+            'domain' => COOKIE_DOMAIN
         );
         $params = wp_parse_args($user_arr, $default_params);
         include_once plugin_dir_path(RNOC_FILE) . 'src/templates/popup.php';
