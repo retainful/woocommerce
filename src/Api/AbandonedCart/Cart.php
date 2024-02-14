@@ -152,6 +152,7 @@ class Cart extends RestApi
             //Billing email
             $billing_email = sanitize_email($_POST['billing_email']);
             self::$woocommerce->setCustomerEmail($billing_email);
+            self::$settings->setCookie('_wc_rnoc_tk_session',base64_encode($billing_email));
             //Set update and created date
             $session_created_at = self::$storage->getValue('rnoc_session_created_at');
             $current_time = current_time('timestamp', true);
@@ -917,6 +918,7 @@ class Cart extends RestApi
         $customer_email = isset($data->email) ? $data->email : '';
         //Setting the email
         self::$woocommerce->setCustomerEmail($customer_email);
+        self::$settings->setCookie('_wc_rnoc_tk_session',!empty($customer_email) ? base64_encode($customer_email):'');
         $checkout_fields = WC()->checkout()->get_checkout_fields();
         $billing_fields = isset($checkout_fields['billing']) ? array_keys($checkout_fields['billing']) : array();
         $shipping_fields = isset($checkout_fields['shipping']) ? array_keys($checkout_fields['shipping']) : array();

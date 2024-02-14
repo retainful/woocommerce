@@ -17,9 +17,7 @@
      data-customer-first-name="<?php echo $params['first_name']; ?>"
      data-customer-id="<?php echo $params['id']; ?>"
      data-customer-last-name="<?php echo $params['last_name']; ?>"
-     data-customer-orders-count="<?php echo $params['order_count'] ?>"
      data-customer-tags="<?php echo $params['tags']; ?>"
-     data-customer-total-spent="<?php echo $params['total_spent'] ?>"
      data-digest="<?php echo $params['digest']; ?>"
 >
 </div>

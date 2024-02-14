@@ -43,6 +43,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             if (isset($_POST['rnoc_email_popup']) && !empty($_POST['rnoc_email_popup'])) {
                 $email = sanitize_text_field($_POST['rnoc_email_popup']);
                 $this->wc_functions->setCustomerEmail($email);
+                $this->admin->setCookie('_wc_rnoc_tk_session',base64_encode($email));
             }
         }
 
@@ -219,6 +220,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $this->wc_functions->initWoocommerceSession();
             $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             $this->wc_functions->setCustomerEmail($email);
+            $this->admin->setCookie('_wc_rnoc_tk_session',base64_encode($email));
             do_action('rnoc_after_atcp_assigning_email_to_customer', $email, $this);
             $this->admin->logMessage($email, 'Add to cart email collection popup email entered');
             $coupon_details = "";
