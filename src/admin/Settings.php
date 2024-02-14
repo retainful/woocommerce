@@ -830,9 +830,6 @@ class Settings
      */
     function createWebhook()
     {
-        if(!self::isBackgroundOrderSyncEnabled()){
-            return;
-        }
         if ($this->getWebHookId() <= 0) {
             $this->addNewWebhook();
         }
