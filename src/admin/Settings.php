@@ -81,6 +81,7 @@ class Settings
         );
         $settings = wp_parse_args($settings, $default_settings);
         require_once dirname(__FILE__) . '/templates/pages/connection.php';
+        $this->createWebhook();
     }
 
     /**
@@ -830,11 +831,16 @@ class Settings
      */
     function createWebhook()
     {
-        if ($this->getWebHookId() <= 0) {
-            $this->addNewWebhook();
-        }
-        if($this->getWebHookId('order.created') <= 0){
-            $this->addNewWebHook('order.created');
+        $is_app_connected = $this->isAppConnected();
+        $secret_key = $this->getSecretKey();
+        $app_id = $this->getApiKey();
+        if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
+            if ($this->getWebHookId() <= 0) {
+                $this->addNewWebhook();
+            }
+            if($this->getWebHookId('order.created') <= 0){
+                $this->addNewWebHook('order.created');
+            }
         }
     }
 
@@ -884,9 +890,9 @@ class Settings
      */
     function retainfulSettingsPage()
     {
+        $this->createWebhook();
         $settings = $this->getAdminSettings();
 
-        
         $default_settings = array(
             RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
             RNOC_PLUGIN_PREFIX . 'enable_background_order_sync' => 'no',

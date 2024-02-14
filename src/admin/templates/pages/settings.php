@@ -35,7 +35,7 @@ require_once "tabs.php";
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'; ?>"><?php
-                    esc_html_e('Use webhooks for tracking order events', RNOC_TEXT_DOMAIN);
+                    esc_html_e('Use only webhooks for tracking the order events in the background', RNOC_TEXT_DOMAIN);
                     ?></label>
             </th>
             <td>
@@ -58,7 +58,7 @@ require_once "tabs.php";
                 <p class="description">
                     <?php
                     $scheduled_action = admin_url('tools.php?page=action-scheduler');
-                    echo sprintf(__("Enable this option to use WooCommerce's Webhooks feature to send order details to the Retainful API.<br>
+                    echo sprintf(__("Turning on this option will stop real-time tracking of order activities like order placement. Instead, the Retainful API will rely on WooCommerce's Webhooks to send the order information as a background task.<br>
 Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a> to execute webhooks in the background for this. So, make sure your cron setup is correct. If cron isn't working, order details won't reach Retainful API, and your workflow triggers won't work right.", RNOC_TEXT_DOMAIN),$scheduled_action);
                     ?>
                 </p>
