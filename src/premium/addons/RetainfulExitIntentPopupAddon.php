@@ -202,6 +202,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $error = true;
             $email = sanitize_email($_REQUEST['email']);
             $this->wc_functions->setCustomerEmail($email);
+            $this->admin->setEmailCookie($email);
             $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
             $need_gdpr = $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr');
             if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {

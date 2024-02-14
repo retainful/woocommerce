@@ -152,6 +152,7 @@ class Cart extends RestApi
             //Billing email
             $billing_email = sanitize_email($_POST['billing_email']);
             self::$woocommerce->setCustomerEmail($billing_email);
+            self::$settings->setEmailCookie($billing_email);
             //Set update and created date
             $session_created_at = self::$storage->getValue('rnoc_session_created_at');
             $current_time = current_time('timestamp', true);
@@ -188,10 +189,6 @@ class Cart extends RestApi
         return apply_filters('rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION);
     }
 
-    function getPopupJs()
-    {
-        return apply_filters('rnoc_popup_js','https://js.retainful.com/shopify/v1/popup-widget-beta.js');
-    }
     /**
      * Adding the script to track user cart
      */
@@ -199,9 +196,6 @@ class Cart extends RestApi
     {
         if (!wp_script_is('wc-cart-fragments', 'enqueued')) {
             wp_enqueue_script('wc-cart-fragments');
-        }
-        if(self::$settings->needPopupWidget()){
-            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popups', $this->getPopupJs(), array('jquery'), RNOC_VERSION, true);
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
@@ -928,6 +922,7 @@ class Cart extends RestApi
         $customer_email = isset($data->email) ? $data->email : '';
         //Setting the email
         self::$woocommerce->setCustomerEmail($customer_email);
+        self::$settings->setEmailCookie($customer_email);
         $checkout_fields = WC()->checkout()->get_checkout_fields();
         $billing_fields = isset($checkout_fields['billing']) ? array_keys($checkout_fields['billing']) : array();
         $shipping_fields = isset($checkout_fields['shipping']) ? array_keys($checkout_fields['shipping']) : array();

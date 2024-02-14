@@ -9,6 +9,7 @@ use Rnoc\Retainful\Api\AbandonedCart\Checkout;
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Api\Imports\Imports;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
+use Rnoc\Retainful\Api\Popup\Popup;
 use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\AfterPay;
 use Rnoc\Retainful\Integrations\Currency;
@@ -29,6 +30,7 @@ class Main
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
         add_action('woocommerce_init',array($this->admin,'createWebhook'));
+        add_action('woocommerce_init',array($this->admin,'setCookieData'));
         //init the retainful premium
         new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
     }
@@ -246,12 +248,21 @@ class Main
                 */
                 $cart = new Cart();
                 $checkout = new Checkout();
-                if ($this->admin->isProPlan() && $this->admin->needReferralWidget()) {
-                    $referral_program = new ReferralManagement();
-                    add_action('wp_footer', array($referral_program, 'printReferralPopup'));
-                    $need_embeded_referral_program = $this->admin->needEmbededReferralWidget();
-                    if ($need_embeded_referral_program) {
-                        add_action('woocommerce_account_dashboard', array($referral_program, 'printEmbededReferralPopup'));
+                $need_referral_program = $this->admin->needReferralWidget();
+                $need_popup_widget = $this->admin->needPopupWidget();
+                if ($this->admin->isProPlan() && ($need_referral_program || $need_popup_widget)) {
+                    if($need_referral_program){
+                        $referral_program = new ReferralManagement();
+                        add_action('wp_footer', array($referral_program, 'printReferralPopup'));
+                        $need_embeded_referral_program = $this->admin->needEmbededReferralWidget();
+                        if ($need_embeded_referral_program) {
+                            add_action('woocommerce_account_dashboard', array($referral_program, 'printEmbededReferralPopup'));
+                        }
+                    }
+                    if($need_popup_widget){
+                        $popup = new Popup();
+                        add_action('wp_enqueue_scripts', array($popup, 'addPopupScripts'));
+                        add_action('wp_footer', array($popup, 'printPopup'));
                     }
                 }
                 add_filter('script_loader_tag', array($cart, 'addCloudFlareAttrScript'), 10, 3);
