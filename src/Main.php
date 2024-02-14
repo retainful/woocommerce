@@ -261,6 +261,8 @@ class Main
                     }
                     if($need_popup_widget){
                         $popup = new Popup();
+                        add_action('user_register', array($popup, 'userRegister'));
+                        add_action('wp_login', array($popup, 'userLogin'), 10, 2);
                         add_action('wp_enqueue_scripts', array($popup, 'addPopupScripts'));
                         add_action('wp_footer', array($popup, 'printPopup'));
                     }

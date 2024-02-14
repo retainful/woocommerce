@@ -31,6 +31,25 @@ class Popup
         }
     }
 
+    function userRegister($user_id)
+    {
+        if(!empty($user_id)){
+            $user = get_user_by('id',$user_id);
+            if(is_object($user) && !empty($user->user_email)){
+                $settings = new Settings();
+                $settings->setIdentity($user->user_email);
+            }
+        }
+    }
+
+    function userLogin($user_name, $user)
+    {
+        if(is_object($user) && !empty($user->user_email)){
+            $settings = new Settings();
+            $settings->setIdentity($user->user_email);
+        }
+    }
+
     /**
      * Print popup.
      *
