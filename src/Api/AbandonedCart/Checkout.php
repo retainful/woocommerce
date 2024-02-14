@@ -119,7 +119,7 @@ class Checkout extends RestApi
     }
 
     function changeWebHookHeader($http_args, $order_id, $webhook_id){
-        if($webhook_id <= 0 || !class_exists('WC_Webhook')) return $http_args;
+        if($webhook_id <= 0 || !class_exists('WC_Webhook') || !self::$settings->isConnectionActive()) return $http_args;
         try {
             $webhook = new \WC_Webhook( $webhook_id );
             $topic = $webhook->get_topic();

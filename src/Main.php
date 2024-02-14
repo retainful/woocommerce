@@ -28,7 +28,7 @@ class Main
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
-        //add_action('woocommerce_init',array($this->admin,'createWebhook'));
+        add_action('woocommerce_init',array($this->admin,'createWebhook'));
         //init the retainful premium
         new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
     }
@@ -367,45 +367,10 @@ class Main
     function onPluginDeactivation()
     {
         $this->removeAllScheduledActions();
-        $this->removeWebhook();
+        $this->admin->removeWebhook();
     }
 
-    /**
-     * Remove retainful webhook.
-     *
-     * @return void
-     */
-    function removeWebhook()
-    {
-        if(!class_exists('WC_Data_Store') || !class_exists('\Rnoc\Retainful\library\RetainfulApi') || !function_exists('wc_get_webhook')){
-            return;
-        }
-        try {
-            $data_store  = \WC_Data_Store::load( 'webhook' );
-            $args = array(
-                'limit'  => -1,
-                'offset' => 0,
-            );
-            $webhooks    = $data_store->search_webhooks( $args );
-            foreach ($webhooks as $webhook_id){
-                $webhook = wc_get_webhook($webhook_id);
-                if(empty($webhook)){
-                    continue;
-                }
-                $delivery_url = $webhook->get_delivery_url();
-                $retainful_api = new RetainfulApi();
-                $site_delivery_url = $retainful_api->getDomain().'woocommerce/webhooks/checkout';
-                if($delivery_url != $site_delivery_url){
-                    continue;
-                }
-                $webhook->delete();
-            }
-            $this->admin->saveWebhookId(0);
-            $this->admin->saveWebhookId(0,'order.created');
-        }catch (\Exception $e){
 
-        }
-    }
 
     /**
      * Remove all actions without any knowledge

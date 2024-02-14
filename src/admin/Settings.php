@@ -831,16 +831,53 @@ class Settings
      */
     function createWebhook()
     {
-        $is_app_connected = $this->isAppConnected();
-        $secret_key = $this->getSecretKey();
-        $app_id = $this->getApiKey();
-        if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
-            if ($this->getWebHookId() <= 0) {
-                $this->addNewWebhook();
+        if (is_admin()){
+            if($this->isConnectionActive()) {
+                if ($this->getWebHookId() <= 0) {
+                    $this->addNewWebhook();
+                }
+                if($this->getWebHookId('order.created') <= 0){
+                    $this->addNewWebHook('order.created');
+                }
+            }else{
+                $this->removeWebhook();
             }
-            if($this->getWebHookId('order.created') <= 0){
-                $this->addNewWebHook('order.created');
+        }
+    }
+
+    /**
+     * Remove retainful webhook.
+     *
+     * @return void
+     */
+    function removeWebhook()
+    {
+        if(!class_exists('WC_Data_Store') || !class_exists('\Rnoc\Retainful\library\RetainfulApi') || !function_exists('wc_get_webhook')){
+            return;
+        }
+        try {
+            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $args = array(
+                'limit'  => -1,
+                'offset' => 0,
+            );
+            $webhooks    = $data_store->search_webhooks( $args );
+            foreach ($webhooks as $webhook_id){
+                $webhook = wc_get_webhook($webhook_id);
+                if(empty($webhook)){
+                    continue;
+                }
+                $delivery_url = $webhook->get_delivery_url();
+                $site_delivery_url = $this->api->getDomain().'woocommerce/webhooks/checkout';
+                if($delivery_url != $site_delivery_url){
+                    continue;
+                }
+                $webhook->delete();
             }
+            $this->saveWebhookId(0);
+            $this->saveWebhookId(0,'order.created');
+        }catch (\Exception $e){
+
         }
     }
 
@@ -966,7 +1003,7 @@ class Settings
      */
     function isWebhookNoticeShow(){
 
-        if(!$this->isAppConnected() || !$this->isBackgroundOrderSyncEnabled()){
+        if(!$this->isConnectionActive()){
             return false;
         }
         if(!class_exists('WC_Data_Store') || !function_exists('wc_get_webhook')){
@@ -1805,6 +1842,20 @@ class Settings
         return get_option($this->slug . '_license', array());
     }
 
+    /**
+     * Check connection is active or not.
+     *
+     * @return bool
+     */
+    function isConnectionActive()
+    {
+        $secret_key = $this->getSecretKey();
+        $app_id = $this->getApiKey();
+        if ($this->isAppConnected() && !empty($secret_key) && !empty($app_id)) {
+            return true;
+        }
+        return false;
+    }
     /**
      * Check fo entered API key is valid or not
      * @return bool
