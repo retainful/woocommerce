@@ -2203,7 +2203,11 @@ class Settings
         $cookie = new Cookie();
         $cookie_data = ['email' => trim($value)];
         $cookie->removeValue('_wc_rnoc_tk_session');
-        $cookie->setCookieValue('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
+        if(function_exists('wc_setcookie')){
+            wc_setcookie('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
+        }
+
+        //$cookie->setCookieValue('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
     }
 
     function getIdentityPath()

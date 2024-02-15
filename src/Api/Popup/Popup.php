@@ -52,7 +52,7 @@ class Popup
 
     function changeIdentityPath($option,$name,$value)
     {
-        if(!is_admin() && !empty($option['path']) && $name == '_wc_rnoc_tk_session'){
+        if(!empty($option['path']) && $name == '_wc_rnoc_tk_session'){
             $settings = new Settings();
             $option['path'] = $settings->getIdentityPath();
         }
