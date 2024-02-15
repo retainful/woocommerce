@@ -2209,7 +2209,7 @@ class Settings
     function getIdentityPath()
     {
         $path = preg_replace( '|https?://[^/]+|i', '', get_option( 'home' )  );
-     return !empty($path) ? $path: '/';
+        return !empty($path) ? $path: '/';
     }
 
     function getIdentity($key, $default_value = '')
