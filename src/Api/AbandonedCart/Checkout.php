@@ -119,7 +119,9 @@ class Checkout extends RestApi
     }
 
     function changeWebHookHeader($http_args, $order_id, $webhook_id){
+
         if($webhook_id <= 0 || !class_exists('WC_Webhook') || !self::$settings->isConnectionActive()) return $http_args;
+
         try {
             $webhook = new \WC_Webhook( $webhook_id );
             $topic = $webhook->get_topic();
@@ -136,22 +138,26 @@ class Checkout extends RestApi
             $order = self::$woocommerce->getOrder($order_id);
             $order_obj = new Order();
             $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+            self::$settings->logMessage(array("cart_token" => $cart_token), 'Cart Token');
 
-            //Usually we should not force generate the cart token as this would sync all the old orders otherwise, if their status changes.
-            $force_generate_cart_token = apply_filters('rnoc_force_generate_cart_token', false, $http_args, $order_id, $webhook_id);
+            if(empty($cart_token)) {
+                //Usually we should not force generate the cart token as this would sync all the old orders otherwise, if their status changes.
+                $force_generate_cart_token = apply_filters('rnoc_force_generate_cart_token', false, $http_args, $order_id, $webhook_id);
 
-            if($force_generate_cart_token === true) {
-                //Let's generate a token and set to the order meta
-                $cart_token = $this->generateCartToken();
-                self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
-                // $logger->add('Retainful','Generate toeken: '.$cart_token);
+                if ($force_generate_cart_token === true) {
+                    //Let's generate a token and set to the order meta
+                    $cart_token = $this->generateCartToken();
+                    self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
+                    self::$settings->logMessage(array("cart_token" => $cart_token), 'Force Generated Cart Token');
+                }
             }
 
             if(empty($cart_token)) {
                 //bail on empty cart token
                 return $http_args;
             }
-            self::$settings->logMessage(array("order_id" => $order_id), 'Webhook'.$stored_webhook_id);
+
+            self::$settings->logMessage(array("order_id" => $order_id), 'Triggering Webhook ID:'.$stored_webhook_id);
             $order_data = $order_obj->getOrderData($order);
             // $logger->add('Retainful','Order Data:'.json_encode($order_data));
             if(!empty($cart_token) && $order_data){
