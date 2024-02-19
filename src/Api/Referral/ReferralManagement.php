@@ -89,10 +89,7 @@ class ReferralManagement
         $secret = $admin->getSecretKey();
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
-            if($admin->needReferralWidget()){
-                $total_spent = $wc->getCustomerTotalSpentFromSession($user->user_email);
-                $order_count = $wc->getCustomerTotalOrdersFromSession($user->user_email);
-            }
+
             $user_arr = array(
                 'api_key' => $api_key,
                 'accepts_marketing' => '1',
@@ -100,9 +97,7 @@ class ReferralManagement
                 'first_name' => strval($user->first_name),
                 'id' => strval($user->ID),
                 'last_name' => strval($user->last_name),
-                'order_count' => strval($order_count),
                 'tags' => '',
-                'total_spent' => strval($total_spent),
             );
         } else {
             $user_arr = array(
@@ -112,9 +107,7 @@ class ReferralManagement
                 'first_name' => '',
                 'id' => '',
                 'last_name' => '',
-                'order_count' => '',
                 'tags' => '',
-                'total_spent' => '',
             );
         }
         $data = implode('', $user_arr);
