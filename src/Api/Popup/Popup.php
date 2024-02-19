@@ -26,14 +26,14 @@ class Popup
     function addPopupScripts()
     {
         $settings = new Settings();
-        if($settings->needPopupWidget()){
+        if(!is_admin() && $settings->needPopupWidget()){
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popups', $this->getPopupJs(), array('jquery'), RNOC_VERSION, true);
         }
     }
 
     function userRegister($user_id)
     {
-        if(!empty($user_id)){
+        if(!is_admin() && !empty($user_id)){
             $user = get_user_by('id',$user_id);
             if(is_object($user) && !empty($user->user_email)){
                 $settings = new Settings();
@@ -44,7 +44,7 @@ class Popup
 
     function userLogin($user_name, $user)
     {
-        if(is_object($user) && !empty($user->user_email)){
+        if(!is_admin() && is_object($user) && !empty($user->user_email)){
             $settings = new Settings();
             $settings->setIdentity($user->user_email);
         }
@@ -66,6 +66,7 @@ class Popup
      */
     function printPopup()
     {
+        if(is_admin()) return;
         $admin = new Settings();
         $wc = new WcFunctions();
         $api_key = $admin->getApiKey();
