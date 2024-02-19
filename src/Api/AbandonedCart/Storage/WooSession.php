@@ -70,7 +70,7 @@ class WooSession extends Base
         if (empty($key)) {
             return NULL;
         }
-        if (is_object(WC()->session) && method_exists(WC()->session, 'get')) {
+        if (function_exists('WC') && is_object(WC()) && is_object(WC()->session) && method_exists(WC()->session, 'get')) {
             return WC()->session->get($key);
         }
         return NULL;

@@ -265,6 +265,8 @@ class Cart extends RestApi
      */
     function applyAbandonedCartCoupon()
     {
+        if(is_admin()) return;
+
         if (isset($_REQUEST['retainful_ac_coupon']) && !empty($_REQUEST['retainful_ac_coupon'])) {
             $coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
             self::$storage->setValue('rnoc_ac_coupon', $coupon_code);
