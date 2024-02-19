@@ -936,7 +936,7 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'enable_background_order_sync' => 'no',
             RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
             RNOC_PLUGIN_PREFIX . 'enable_referral_widget' => 'no',
-            RNOC_PLUGIN_PREFIX . 'enable_popup_widget' => 'no',
+            RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup' => 'no',
             RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget' => 'yes',
             RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status' => '0',
             RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status' => '1',
@@ -1420,7 +1420,7 @@ class Settings
     function needPopupWidget()
     {
         $settings = $this->getAdminSettings();
-        $need_widget = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_popup_widget']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_popup_widget'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_popup_widget'] : 'no';
+        $need_widget = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'] : 'no';
         return apply_filters("retainful_enable_popup_widget", ($need_widget === "yes"));
     }
 
@@ -2256,7 +2256,7 @@ class Settings
 
     function setIdentity($value = '')
     {
-        if(empty($value)) return;
+        if(!is_admin() || empty($value) || !$this->needPopupWidget()) return;
         $cookie = new Cookie();
         $cookie_data = ['email' => trim($value)];
         $cookie->removeValue('_wc_rnoc_tk_session');
