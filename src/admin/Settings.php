@@ -2202,7 +2202,7 @@ class Settings
 
     function setIdentity($value = '')
     {
-        if(empty($value) || !$this->needPopupWidget()) return;
+        if(!is_admin() || empty($value) || !$this->needPopupWidget()) return;
         $cookie = new Cookie();
         $cookie_data = ['email' => trim($value)];
         $cookie->removeValue('_wc_rnoc_tk_session');
