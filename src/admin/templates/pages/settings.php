@@ -230,36 +230,7 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
                 </p>
             </td>
         </tr>
-        <tr >
-            <th scope="row">
-                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_popup_widget'; ?>"><?php
-                    esc_html_e('Enable Popup for your store?', RNOC_TEXT_DOMAIN);
-                    ?> <span class="premium-label">Premium</span></label>
-            </th>
-            <td>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_popup_widget'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_popup_widget_yes'; ?>"
-                           value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_popup_widget'] == 'yes') {
-                        echo "checked";
-                    } ?>>
-                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
-                </label>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_popup_widget'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_popup_widget_no'; ?>"
-                           value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_popup_widget'] == 'no') {
-                        echo "checked";
-                    } ?>>
-                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
-                </label>
-                <p class="description">
-                    <?php
-                    esc_html_e('You should also enable and configure the popup widget in your Retainful dashboard.', RNOC_TEXT_DOMAIN);
-                    ?>
-                </p>
-            </td>
-        </tr>
+
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'; ?>"><?php
@@ -283,6 +254,36 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
                     } ?>>
                     <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
                 </label>
+            </td>
+        </tr>
+        <tr >
+            <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'; ?>"><?php
+                    esc_html_e('Enable Signup Forms / Popups', RNOC_TEXT_DOMAIN);
+                    ?> <span class="premium-label">Premium</span></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup_no'; ?>"
+                           value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'] == 'no') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup_yes'; ?>"
+                           value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'] == 'yes') {
+                        echo "checked";
+                    } ?>>
+                    <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <p class="description">
+                    <?php
+                    esc_html_e('Enable this option if you are using the signup forms / popups in Retainful to build your audience list.', RNOC_TEXT_DOMAIN);
+                    ?>
+                </p>
             </td>
         </tr>
         <tr>
