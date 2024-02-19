@@ -5,7 +5,7 @@ Requires at least: 4.6.1
 Tested up to: 6.4
 WC tested up to: 8.5
 Requires PHP: 5.6
-Stable tag: 2.6.28
+Stable tag: 2.6.29
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -250,6 +250,8 @@ No. There is no charges for support.
 
 == Changelog ==
 = 2.6.28 =
+- Fix: Marketing Consent: Default value Implicit
+- Fix: Add to cart popup hide on particular page
 - Improved: Buyer accept marketing
 - Added: Background webhook synchronize
 - Added: GDPR extra fields

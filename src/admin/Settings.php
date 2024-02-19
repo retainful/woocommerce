@@ -4,6 +4,7 @@ namespace Rnoc\Retainful\Admin;
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
+use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
 use Rnoc\Retainful\Helpers\Input;
 use Rnoc\Retainful\Integrations\MultiLingual;
 use Rnoc\Retainful\library\RetainfulApi;
@@ -2251,5 +2252,47 @@ class Settings
     {
         $settings = $this->getAdminSettings();
         return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync']) && $settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'] == 'yes';
+    }
+
+    function setIdentity($value = '')
+    {
+        if(empty($value)) return;
+        $cookie = new Cookie();
+        $cookie_data = ['email' => trim($value)];
+        $cookie->removeValue('_wc_rnoc_tk_session');
+        if(function_exists('wc_setcookie')){
+            wc_setcookie('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
+        }
+
+        //$cookie->setCookieValue('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
+    }
+
+    function getIdentityPath()
+    {
+        $path = preg_replace( '|https?://[^/]+|i', '', get_option( 'home' )  );
+        return !empty($path) ? $path: '/';
+    }
+
+    function getIdentity($key, $default_value = '')
+    {
+        $cookie = new Cookie();
+        if($cookie->hasKey($key)){
+            return $cookie->getValue($key);
+        }
+        return $default_value;
+    }
+
+    function setCookieData()
+    {
+        if (!is_admin() && is_user_logged_in()) {
+            $user = wp_get_current_user();
+            if(is_object($user) && !empty($user->user_email)){
+                $cookie_email = $this->getIdentity('_wc_rnoc_tk_session');
+                if(empty($cookie_email)){
+                    $this->setIdentity($user->user_email);
+                }
+            }
+
+        }
     }
 }
