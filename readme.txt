@@ -3,9 +3,9 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.6.1
 Tested up to: 6.4
-WC tested up to: 8.5
+WC tested up to: 8.6
 Requires PHP: 5.6
-Stable tag: 2.6.29
+Stable tag: 2.6.30
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -249,6 +249,9 @@ No. There is no charges for support.
 == Screenshots ==
 
 == Changelog ==
+= 2.6.30 =
+- Fix: user identity update for popup
+
 = 2.6.29 =
 - Added: Signup Forms / Popups
 
