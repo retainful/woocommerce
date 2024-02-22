@@ -2200,9 +2200,15 @@ class Settings
         return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync']) && $settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'] == 'yes';
     }
 
+    /**
+     * Set identity.
+     *
+     * @param $value
+     * @return void
+     */
     function setIdentity($value = '')
     {
-        if(!is_admin() || empty($value) || !$this->needPopupWidget()) return;
+        if(!$this->isCustomerPage() || empty($value) || !$this->needPopupWidget()) return;
         $cookie = new Cookie();
         $cookie_data = ['email' => trim($value)];
         $cookie->removeValue('_wc_rnoc_tk_session');
@@ -2213,12 +2219,24 @@ class Settings
         //$cookie->setCookieValue('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
     }
 
+    /**
+     * Get identity path.
+     *
+     * @return string
+     */
     function getIdentityPath()
     {
         $path = preg_replace( '|https?://[^/]+|i', '', get_option( 'home' )  );
         return !empty($path) ? $path: '/';
     }
 
+    /**
+     * Get identity.
+     *
+     * @param $key
+     * @param $default_value
+     * @return mixed|string|null
+     */
     function getIdentity($key, $default_value = '')
     {
         $cookie = new Cookie();
@@ -2228,9 +2246,14 @@ class Settings
         return $default_value;
     }
 
-    function setCookieData()
+    /**
+     * Set login identity data.
+     *
+     * @return void
+     */
+    function setIdentityData()
     {
-        if (!is_admin() && is_user_logged_in()) {
+        if ($this->isCustomerPage() && is_user_logged_in()) {
             $user = wp_get_current_user();
             if(is_object($user) && !empty($user->user_email)){
                 $cookie_email = $this->getIdentity('_wc_rnoc_tk_session');
@@ -2240,5 +2263,18 @@ class Settings
             }
 
         }
+    }
+
+    /**
+     * Is customer page.
+     *
+     * @return bool
+     */
+    function isCustomerPage()
+    {
+        if(is_ajax()){
+            return true;
+        }
+        return !is_admin();
     }
 }

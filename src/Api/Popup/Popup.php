@@ -26,26 +26,39 @@ class Popup
     function addPopupScripts()
     {
         $settings = new Settings();
-        if(!is_admin() && $settings->needPopupWidget()){
+        if($settings->isCustomerPage() && $settings->needPopupWidget()){
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popups', $this->getPopupJs(), array('jquery'), RNOC_VERSION, true);
         }
     }
 
+    /**
+     * Register identity update.
+     *
+     * @param $user_id
+     * @return void
+     */
     function userRegister($user_id)
     {
-        if(!is_admin() && !empty($user_id)){
+        $settings = new Settings();
+        if($settings->isCustomerPage() && !empty($user_id)){
             $user = get_user_by('id',$user_id);
             if(is_object($user) && !empty($user->user_email)){
-                $settings = new Settings();
                 $settings->setIdentity($user->user_email);
             }
         }
     }
 
+    /**
+     * Login identity update.
+     *
+     * @param $user_name
+     * @param $user
+     * @return void
+     */
     function userLogin($user_name, $user)
     {
-        if(!is_admin() && is_object($user) && !empty($user->user_email)){
-            $settings = new Settings();
+        $settings = new Settings();
+        if($settings->isCustomerPage() && is_object($user) && !empty($user->user_email)){
             $settings->setIdentity($user->user_email);
         }
     }
@@ -66,11 +79,13 @@ class Popup
      */
     function printPopup()
     {
-        if(is_admin()) return;
         $admin = new Settings();
+        if(!$admin->isCustomerPage()) return;
+
         $wc = new WcFunctions();
         $api_key = $admin->getApiKey();
         $secret = $admin->getSecretKey();
+
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
             $user_arr = array(
