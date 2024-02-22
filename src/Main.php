@@ -30,7 +30,7 @@ class Main
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
         add_action('woocommerce_init',array($this->admin,'createWebhook'));
-        add_action('woocommerce_init',array($this->admin,'setCookieData'));
+        add_action('woocommerce_init',array($this->admin,'setIdentityData'));
         //init the retainful premium
         new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
     }
