@@ -106,7 +106,8 @@ class Popup
             'email' => '',
             'api_key' => '',
             'path' => $admin->getIdentityPath(),
-            'domain' => COOKIE_DOMAIN
+            'domain' => COOKIE_DOMAIN,
+            'currency_code' => $wc->getDefaultWoocommerceCurrency()
         );
         $params = wp_parse_args($user_arr, $default_params);
         include_once plugin_dir_path(RNOC_FILE) . 'src/templates/popup.php';
