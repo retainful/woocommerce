@@ -280,10 +280,10 @@ class Main
                 add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
                 add_action('woocommerce_removed_coupon', array($cart, 'removeNextOrderCouponFromCart'));
                 //Add tracking message
-                if (is_user_logged_in()) {
+                /*if (is_user_logged_in()) {
                     add_action('woocommerce_after_add_to_cart_button', array($cart, 'userGdprMessage'), 10);
                     add_action('woocommerce_before_shop_loop', array($cart, 'userGdprMessage'), 10);
-                }
+                }*/
                 add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
                 add_action('woocommerce_checkout_after_terms_and_conditions',array($cart,'guestTermGdprMessage'));
                 add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));

@@ -98,7 +98,7 @@ class Cart extends RestApi
     /**
      * Show GDPR message to logged in users
      */
-    function userGdprMessage()
+    /*function userGdprMessage()
     {
         $settings = self::$settings->getAdminSettings();
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
@@ -106,7 +106,7 @@ class Cart extends RestApi
         if ($enable_gdpr_compliance && $message) {
             echo "<p><small>" . __($message, RNOC_TEXT_DOMAIN) . "</small></p>";
         }
-    }
+    }*/
 
     /**
      * Track the customer, and set details to session
