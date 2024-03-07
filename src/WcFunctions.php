@@ -2092,4 +2092,18 @@ class WcFunctions
             wp_send_json_error($message);
         }
     }
+
+    /**
+     * Get currency.
+     *
+     * @param $currency
+     * @return mixed|null
+     */
+    function getDefaultWoocommerceCurrency($currency = '')
+    {
+        if (empty($currency)) {
+            $currency = get_woocommerce_currency();
+        }
+        return apply_filters('rnoc_custom_default_currency', $currency);
+    }
 }
