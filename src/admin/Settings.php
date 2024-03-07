@@ -987,7 +987,12 @@ class Settings
             add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'nextOrderCouponPage'));
         }
         add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
-
+        if(isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium'))){
+            $legacy_notice = 'Unlock the power of fully customizable email capture forms, including Add to Cart and Exit Intent popups, right from your Retainful dashboard. Head over to the Signup Forms section to configure and activate them. Tailor each popup to your brand, track sign-ups efficiently, and entice subscribers with unique coupons. <br/><b>Please note: Legacy popups will be phased out by April 15. Need help transitioning to the new Sign Up forms? Reach out to us at <a href="mailto:support@retainful.com">support@retainful.com</a> for assistance.</b>';
+            add_action('admin_notices', function () use ($legacy_notice) {
+                echo '<div class="error notice"><p>' . $legacy_notice . '</p></div>';
+            });
+        }
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         if(isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()){
             $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
@@ -2331,4 +2336,5 @@ class Settings
         }
         return !is_admin();
     }
+
 }
