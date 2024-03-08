@@ -2313,15 +2313,21 @@ class Settings
      */
     function setIdentityData()
     {
-        if ($this->isCustomerPage() && is_user_logged_in()) {
-            $user = wp_get_current_user();
-            if(is_object($user) && !empty($user->user_email)){
+        $customer_billing_email = $this->wc_functions->getCustomerBillingEmail();
+        if ($this->isCustomerPage() && empty($customer_billing_email)) {
+            if(is_user_logged_in()){
+                $user = wp_get_current_user();
                 $cookie_email = $this->getIdentity('_wc_rnoc_tk_session');
-                if(empty($cookie_email)){
+                if(is_object($user) && !empty($user->user_email) && empty($cookie_email)){
                     $this->setIdentity($user->user_email);
                 }
             }
-
+            $cookie_email = $this->getIdentity('_wc_rnoc_tk_session');
+            if(!empty($cookie_email)){
+                $cookie_email = json_decode(base64_decode($cookie_email),true);
+                if(is_array($cookie_email) && !empty($cookie_email['email']))
+                $this->wc_functions->setCustomerEmail($cookie_email['email']);
+            }
         }
     }
 
