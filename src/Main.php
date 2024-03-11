@@ -27,12 +27,29 @@ class Main
     {
         $this->rnoc = ($this->rnoc == NULL) ? new OrderCoupon() : $this->rnoc;
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
+        add_filter('woocommerce_set_cookie_options',array($this,'changeIdentityPath'),10,3);
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
-        add_action('woocommerce_init',array($this->admin,'createWebhook'));
+        //add_action('woocommerce_init',array($this->admin,'createWebhook'));
         add_action('woocommerce_init',array($this->admin,'setIdentityData'));
         //init the retainful premium
         new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
+    }
+
+    /**
+     * Change identity path.
+     *
+     * @param $option
+     * @param $name
+     * @param $value
+     * @return mixed
+     */
+    function changeIdentityPath($option,$name,$value)
+    {
+        if($name == '_wc_rnoc_tk_session'){
+            $option['path'] = $this->admin->getIdentityPath();
+        }
+        return $option;
     }
 
     function includePluginFiles()
@@ -229,9 +246,6 @@ class Main
         $is_app_connected = $this->admin->isAppConnected();
         $secret_key = $this->admin->getSecretKey();
         $app_id = $this->admin->getApiKey();
-        if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
-            add_action('rest_api_init', array($this, 'registerSyncEndPoints'));
-        }
 
         $run_installation_externally = $this->admin->runAbandonedCartExternally();
         if ($run_installation_externally) {
@@ -240,6 +254,7 @@ class Main
             $secret_key = $this->admin->getSecretKey();
             $app_id = $this->admin->getApiKey();*/
             if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
+                add_action('rest_api_init', array($this, 'registerSyncEndPoints'));
                 if (is_admin()) {
                     add_action('wp_after_admin_bar_render', array($this->admin, 'schedulePlanChecker'));
                 }
@@ -265,7 +280,6 @@ class Main
                         add_action('wp_login', array($popup, 'userLogin'), 10, 2);
                         add_action('wp_enqueue_scripts', array($popup, 'addPopupScripts'));
                         add_action('wp_footer', array($popup, 'printPopup'));
-                        add_filter('woocommerce_set_cookie_options',array($popup,'changeIdentityPath'),10,3);
                     }
                 }
                 add_filter('script_loader_tag', array($cart, 'addCloudFlareAttrScript'), 10, 3);
@@ -310,12 +324,15 @@ class Main
                 add_action('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
                 add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
                 add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
-                add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
+          //      add_filter('woocommerce_payment_successful_result', array($checkout, 'maybeUpdateOrderOnSuccessfulPayment'), 10, 2);
                 // handle updating Retainful order data after a successful payment, for certain gateways
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
                 // handle placed orders
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
-                add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
+                //triggers when admin pdate the order
+                add_action('woocommerce_process_shop_order_meta', array($checkout, 'OrderUpdatedShopBackend'), 50, 2);
+
+                //add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
                 add_filter('woocommerce_webhook_http_args',array($checkout,'changeWebHookHeader'),10,3);
                 //Todo: multi currency and multi lingual
                 //add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
@@ -376,45 +393,10 @@ class Main
     function onPluginDeactivation()
     {
         $this->removeAllScheduledActions();
-        $this->removeWebhook();
+        $this->admin->removeWebhook();
     }
 
-    /**
-     * Remove retainful webhook.
-     *
-     * @return void
-     */
-    function removeWebhook()
-    {
-        if(!class_exists('WC_Data_Store') || !class_exists('\Rnoc\Retainful\library\RetainfulApi') || !function_exists('wc_get_webhook')){
-            return;
-        }
-        try {
-            $data_store  = \WC_Data_Store::load( 'webhook' );
-            $args = array(
-                'limit'  => -1,
-                'offset' => 0,
-            );
-            $webhooks    = $data_store->search_webhooks( $args );
-            foreach ($webhooks as $webhook_id){
-                $webhook = wc_get_webhook($webhook_id);
-                if(empty($webhook)){
-                    continue;
-                }
-                $delivery_url = $webhook->get_delivery_url();
-                $retainful_api = new RetainfulApi();
-                $site_delivery_url = $retainful_api->getDomain().'woocommerce/webhooks/checkout';
-                if($delivery_url != $site_delivery_url){
-                    continue;
-                }
-                $webhook->delete();
-            }
-            $this->admin->saveWebhookId(0);
-            $this->admin->saveWebhookId(0,'order.created');
-        }catch (\Exception $e){
 
-        }
-    }
 
     /**
      * Remove all actions without any knowledge

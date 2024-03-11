@@ -231,6 +231,8 @@ class OrderCoupon
      */
     public function addCouponToCheckout()
     {
+        if(is_admin()) return;
+
         $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
         if (!empty($coupon_code) && !empty($this->wc_functions->getCart()) && !$this->wc_functions->hasDiscount($coupon_code)) {
             //Do not apply coupon until the coupon is valid

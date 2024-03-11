@@ -82,6 +82,7 @@ class Settings
         );
         $settings = wp_parse_args($settings, $default_settings);
         require_once dirname(__FILE__) . '/templates/pages/connection.php';
+        $this->createWebhook();
     }
 
     /**
@@ -824,6 +825,7 @@ class Settings
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
 
+
     /**
      * Create order sync webhook.
      *
@@ -831,15 +833,96 @@ class Settings
      */
     function createWebhook()
     {
-        if(!self::isBackgroundOrderSyncEnabled()){
+        if (is_admin()){
+            if($this->isConnectionActive()) {
+                $hook_status = $this->getWebHookStatus();
+                if (isset($hook_status['order.updated']) && !$hook_status['order.updated']) {
+                    $this->addNewWebhook();
+                }
+                if (isset($hook_status['order.created']) && !$hook_status['order.created']) {
+                    $this->addNewWebHook('order.created');
+                }
+            }else{
+                $this->removeWebhook();
+            }
+        }
+    }
+
+    /**
+     * Remove retainful webhook.
+     *
+     * @return void
+     */
+    function removeWebhook()
+    {
+        if(!class_exists('WC_Data_Store') || !class_exists('\Rnoc\Retainful\library\RetainfulApi') || !function_exists('wc_get_webhook')){
             return;
         }
-        if ($this->getWebHookId() <= 0) {
-            $this->addNewWebhook();
+        try {
+            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $args = array(
+                'limit'  => -1,
+                'offset' => 0,
+            );
+            $webhooks    = $data_store->search_webhooks( $args );
+            foreach ($webhooks as $webhook_id){
+                $webhook = wc_get_webhook($webhook_id);
+                if(empty($webhook)){
+                    continue;
+                }
+                $delivery_url = $webhook->get_delivery_url();
+                $site_delivery_url = $this->getDeliveryUrl();
+                if($delivery_url != $site_delivery_url){
+                    continue;
+                }
+                $webhook->delete();
+            }
+        }catch (\Exception $e){
+
         }
-        if($this->getWebHookId('order.created') <= 0){
-            $this->addNewWebHook('order.created');
+    }
+
+    /**
+     * Get Webhooks status.
+     * @return array
+     */
+    function getWebHookStatus()
+    {
+        $topics = [
+            'order.updated' => false,
+            'order.created' => false
+        ];
+        try {
+            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $args = array(
+                'limit'  => -1,
+                'offset' => 0,
+            );
+            $webhooks    = $data_store->search_webhooks( $args );
+
+            foreach ($webhooks as $webhook_id){
+                $webhook = wc_get_webhook($webhook_id);
+                if(empty($webhook)){
+                    continue;
+                }
+                $delivery_url = $webhook->get_delivery_url();
+                $site_delivery_url = $this->getDeliveryUrl();
+                if($delivery_url != $site_delivery_url){
+                    continue;
+                }
+                if(isset($topics[$webhook->get_topic()])){
+                    $topics[$webhook->get_topic()] = true;
+                }
+            }
+        }catch (\Exception $e){
+
         }
+        return $topics;
+    }
+
+    function getDeliveryUrl()
+    {
+        return $this->api->getDomain() . 'woocommerce/webhooks/checkout';
     }
 
     /**
@@ -862,7 +945,7 @@ class Settings
             }
             //
             $webhook->set_status('active');
-            $delivery_url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
+            $delivery_url = $this->getDeliveryUrl();
             $webhook->set_delivery_url($delivery_url);
             $secret = wp_generate_password(50, true, true);
             $webhook->set_secret($secret);
@@ -874,7 +957,6 @@ class Settings
             $webhook->set_api_version(end($rest_api_versions)); // WPCS: input var okay, CSRF ok.
             $webhook_id = $webhook->save();
             if ($webhook_id > 0) {
-                $this->saveWebhookId($webhook_id,$topic);
                 return true;
             }
         } catch (\Exception $e) {
@@ -888,9 +970,9 @@ class Settings
      */
     function retainfulSettingsPage()
     {
+        $this->createWebhook();
         $settings = $this->getAdminSettings();
 
-        
         $default_settings = array(
             RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
             RNOC_PLUGIN_PREFIX . 'enable_background_order_sync' => 'no',
@@ -948,6 +1030,12 @@ class Settings
         }
         add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
 
+        if(isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium'))){
+            $legacy_notice = '<div style="padding: 10px 46px 10px 22px;font-size: 15px;line-height: 1.4;margin-left: -20px;">Unlock the power of fully customizable email capture forms, including Add to Cart and Exit Intent popups, right from your Retainful dashboard. Head over to the Signup Forms section to configure and activate them. Tailor each popup to your brand, track sign-ups efficiently, and entice subscribers with unique coupons. <br/><b style="font-size: 15px;">Please note: Legacy popups will be phased out by April 15. Need help transitioning to the new Sign Up forms? Reach out to us at <a href="mailto:support@retainful.com">support@retainful.com</a> for assistance.</b></div>';
+            add_action('admin_notices', function () use ($legacy_notice) {
+                echo '<div class="error notice"><p>' . $legacy_notice . '</p></div>';
+            });
+        }
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         if(isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()){
             $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
@@ -964,7 +1052,7 @@ class Settings
      */
     function isWebhookNoticeShow(){
 
-        if(!$this->isAppConnected() || !$this->isBackgroundOrderSyncEnabled()){
+        if(!$this->isConnectionActive()){
             return false;
         }
         if(!class_exists('WC_Data_Store') || !function_exists('wc_get_webhook')){
@@ -1804,6 +1892,20 @@ class Settings
     }
 
     /**
+     * Check connection is active or not.
+     *
+     * @return bool
+     */
+    function isConnectionActive()
+    {
+        $secret_key = $this->getSecretKey();
+        $app_id = $this->getApiKey();
+        if ($this->isAppConnected() && !empty($secret_key) && !empty($app_id)) {
+            return true;
+        }
+        return false;
+    }
+    /**
      * Check fo entered API key is valid or not
      * @return bool
      */
@@ -1840,37 +1942,6 @@ class Settings
             return $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret'];
         }
         return NULL;
-    }
-
-    function getWebHookId($type = 'order.updated')
-    {
-        $settings = get_option($this->slug, array());
-        if ($type == 'order.updated' && isset($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']) && $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] > 0) {
-            $webhook = new \WC_Webhook($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']);
-            if(method_exists($webhook, 'get_id') && $webhook->get_id() <= 0){
-                $this->saveWebhookId(0,$type);
-            }
-            return method_exists($webhook, 'get_id') ? ($webhook->get_id() > 0 ? $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] : 0) : 0;
-        }
-        if ($type == 'order.created' && isset($settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id']) && $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] > 0) {
-            $webhook = new \WC_Webhook($settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id']);
-            if(method_exists($webhook, 'get_id') && $webhook->get_id() <= 0){
-                $this->saveWebhookId(0,$type);
-            }
-            return method_exists($webhook, 'get_id') ? ($webhook->get_id() > 0 ? $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] : 0) : 0;
-        }
-        return 0;
-    }
-
-    function saveWebhookId($id,$type = 'order.updated')
-    {
-        $settings = get_option($this->slug, array());
-        if($type == 'order.updated'){
-            $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = (int)$id;
-        }elseif($type == 'order.created'){
-            $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] = (int)$id;
-        }
-        update_option($this->slug, $settings);
     }
 
     /**
@@ -2253,15 +2324,21 @@ class Settings
      */
     function setIdentityData()
     {
-        if ($this->isCustomerPage() && is_user_logged_in()) {
-            $user = wp_get_current_user();
-            if(is_object($user) && !empty($user->user_email)){
+        $customer_billing_email = $this->wc_functions->getCustomerBillingEmail();
+        if ($this->isCustomerPage() && empty($customer_billing_email)) {
+            if(is_user_logged_in()){
+                $user = wp_get_current_user();
                 $cookie_email = $this->getIdentity('_wc_rnoc_tk_session');
-                if(empty($cookie_email)){
+                if(is_object($user) && !empty($user->user_email) && empty($cookie_email)){
                     $this->setIdentity($user->user_email);
                 }
             }
-
+            $cookie_email = $this->getIdentity('_wc_rnoc_tk_session');
+            if(!empty($cookie_email)){
+                $cookie_email = json_decode(base64_decode($cookie_email),true);
+                if(is_array($cookie_email) && !empty($cookie_email['email']))
+                $this->wc_functions->setCustomerEmail($cookie_email['email']);
+            }
         }
     }
 
@@ -2277,4 +2354,5 @@ class Settings
         }
         return !is_admin();
     }
+
 }

@@ -45,10 +45,7 @@ class Checkout extends RestApi
         }
         //TODO remove carthash from session after success place order
         $cart_token = $this->retrieveCartToken();
-        self::$settings->logMessage(array(
-            "cart_token" => $cart_token,
-            "order_id" => $order_id
-        ), 'On checkout->purchaseComplete method ');
+        self::$settings->logMessage(array("cart_token" => $cart_token, "order_id" => $order_id), 'purchaseComplete');
         if (!empty($cart_token)) {
             $cart_created_at = $this->userCartCreatedAt();
             $user_ip = $this->retrieveUserIp();
@@ -83,10 +80,30 @@ class Checkout extends RestApi
      */
     function orderUpdated($order_id)
     {
+        self::$settings->logMessage(array("order_id" => $order_id), 'OrderUpdated ');
+
         if ($this->needInstantOrderSync()) {
             $this->syncOrder($order_id);
         } else {
             $this->scheduleCartSync($order_id);
+        }
+    }
+
+
+    /**
+     * Order has been updated from the shop backend.
+     * @param $order_id
+     * @return void|null
+     */
+    function OrderUpdatedShopBackend($order_id)
+    {
+        self::$settings->logMessage(array("order_id" => $order_id), 'OrderUpdatedShopBackend ');
+        if (is_admin()) {
+            if ($this->needInstantOrderSync()) {
+                $this->syncOrder($order_id);
+            } else {
+                $this->scheduleCartSync($order_id);
+            }
         }
     }
 
@@ -102,16 +119,18 @@ class Checkout extends RestApi
     }
 
     function changeWebHookHeader($http_args, $order_id, $webhook_id){
-        if($webhook_id <= 0 || !class_exists('WC_Webhook')) return $http_args;
+
+        if($webhook_id <= 0 || !class_exists('WC_Webhook') || !self::$settings->isConnectionActive()) return $http_args;
+
         try {
             $webhook = new \WC_Webhook( $webhook_id );
             $topic = $webhook->get_topic();
-            $stored_webhook_id = self::$settings->getWebHookId($topic);
-            if( $stored_webhook_id <= 0 || ($stored_webhook_id != $webhook_id)){
+            $topic_status = self::$settings->getWebHookStatus();
+            if( !isset($topic_status[$topic]) || !$topic_status[$topic]){
                 return $http_args;
             }
             $delivery_url = $webhook->get_delivery_url();
-            $site_delivery_url = self::$api->getDomain().'woocommerce/webhooks/checkout';
+            $site_delivery_url =  self::$settings->getDeliveryUrl();
             if($delivery_url != $site_delivery_url ||  $order_id <= 0){
                 return $http_args;
             }
@@ -119,13 +138,26 @@ class Checkout extends RestApi
             $order = self::$woocommerce->getOrder($order_id);
             $order_obj = new Order();
             $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
-            //$logger = wc_get_logger();
-            if(empty($cart_token)){
-                //Need to generate cart_token
-                $cart_token = $this->generateCartToken();
-                self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
-                // $logger->add('Retainful','Generate toeken: '.$cart_token);
+            self::$settings->logMessage(array("cart_token" => $cart_token), 'Cart Token');
+
+            if(empty($cart_token)) {
+                //Usually we should not force generate the cart token as this would sync all the old orders otherwise, if their status changes.
+                $force_generate_cart_token = apply_filters('rnoc_force_generate_cart_token', false, $http_args, $order_id, $webhook_id);
+
+                if ($force_generate_cart_token === true) {
+                    //Let's generate a token and set to the order meta
+                    $cart_token = $this->generateCartToken();
+                    self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
+                    self::$settings->logMessage(array("cart_token" => $cart_token), 'Force Generated Cart Token');
+                }
             }
+
+            if(empty($cart_token)) {
+                //bail on empty cart token
+                return $http_args;
+            }
+
+            self::$settings->logMessage(array("order_id" => $order_id), 'Triggering Webhook ID:'.$stored_webhook_id);
             $order_data = $order_obj->getOrderData($order);
             // $logger->add('Retainful','Order Data:'.json_encode($order_data));
             if(!empty($cart_token) && $order_data){
@@ -172,19 +204,6 @@ class Checkout extends RestApi
         $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
         $cart_token = apply_filters('rnoc_sync_order_change_order_token',$cart_token,$order_id,$this);
         if (empty($cart_token)) {
-            if ($this->generateNocCouponForManualOrders()) {
-                $noc_details = $order_obj->getNextOrderCouponDetails($order);
-                if (is_array($noc_details) && !empty($noc_details) && isset($noc_details[0]['code']) && !empty($noc_details[0]['code'])) {
-                    $cart_token = $this->generateCartToken();
-                    self::$woocommerce->setOrderMeta($order_id, $this->cart_token_key_for_db, $cart_token);
-                } else {
-                    return;
-                }
-            } else {
-                return;
-            }
-        }
-        if (empty($cart_token)) {
             return;
         }
         $order_status = self::$woocommerce->getStatus($order);
@@ -200,7 +219,7 @@ class Checkout extends RestApi
             return null;
         }
         $order_data['cancelled_at'] = (!empty($order_cancelled_at)) ? $this->formatToIso8601($order_cancelled_at) : NULL;
-        self::$settings->logMessage($order_data);
+        self::$settings->logMessage(array("order_id" => $order_id), 'syncOrder');
         $cart_hash = $this->encryptData($order_data);
         $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
         if (!empty($cart_hash)) {
@@ -249,6 +268,7 @@ class Checkout extends RestApi
     public function orderStatusChanged($order_id, $old_status, $new_status)
     {
         global $wp;
+        self::$settings->logMessage(array("order_id" => $order_id), 'orderStatusChanged');
         try {
             // PayPal IPN request
             if (isset($wp->query_vars['wc-api']) && !empty($wp->query_vars['wc-api']) && ('WC_Gateway_Paypal' === $wp->query_vars['wc-api'])) {
@@ -297,6 +317,7 @@ class Checkout extends RestApi
      */
     function checkoutOrderProcessed($order_id)
     {
+        self::$settings->logMessage(array("order_id" => $order_id), 'checkoutOrderProcessed');
         if ($this->isPendingRecovery()) {
             $this->markOrderAsPendingRecovery($order_id);
         }
@@ -329,9 +350,10 @@ class Checkout extends RestApi
                 $cart_hash = $this->encryptData($cart);
                 //Reduce the loading speed
                 $client_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
-                self::$settings->logMessage(array('cart' => $cart, 'client_ip' => $client_ip), 'success cart data in syncOrderToAPI method for ' . $order_id);
+                $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+                self::$settings->logMessage(array('order_id'=>$order_id, 'token' => $token, 'client_ip' => $client_ip), 'syncOrderToAPI');
                 if (!empty($cart_hash)) {
-                    $token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
+
                     $extra_headers = array(
                         "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
                         "X-Retainful-Version" => RNOC_VERSION,
@@ -341,7 +363,7 @@ class Checkout extends RestApi
                     $this->syncCart($cart_hash, $extra_headers);
                 }
             } else {
-                self::$settings->logMessage($cart, 'Failed cart data in syncOrderToAPI method for ' . $order_id);
+                self::$settings->logMessage(array('order_id'=>$order_id), 'Failed syncOrderToAPI');
             }
         } else {
             $this->scheduleCartSync($order_id);
@@ -378,6 +400,7 @@ class Checkout extends RestApi
      */
     function maybeUpdateOrderOnSuccessfulPayment($result, $order_id)
     {
+        self::$settings->logMessage(array("order_id" => $order_id), 'maybeUpdateOrderOnSuccessfulPayment');
         $order = self::$woocommerce->getOrder($order_id);
         if (!$cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db)) {
             return $result;
@@ -393,6 +416,7 @@ class Checkout extends RestApi
      */
     function paymentCompleted($order_id)
     {
+        self::$settings->logMessage(array("order_id" => $order_id), 'paymentCompleted');
         if (self::$woocommerce->getOrder($order_id)) {
             self::$woocommerce->setCustomerPayingForOrder($order_id);
         }
@@ -441,6 +465,7 @@ class Checkout extends RestApi
      */
     function markOrderAsPendingRecovery($order_id)
     {
+        self::$settings->logMessage(array("order_id" => $order_id), 'markOrderAsPendingRecovery');
         /*$order = self::$woocommerce->getOrder($order_id);
         if (!$order instanceof \WC_Order) {
             return;

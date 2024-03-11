@@ -148,7 +148,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 if (version_compare(RNOC_VERSION, '1.1.5', '>')) {
                     $this->admin = new Rnoc\Retainful\Admin\Settings();
                     $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
-                    $this->applyCouponAutomatically();
+
                     if (is_admin()) {
                         add_action('wp_footer', array($this, 'addPopupEditor'));
                     }
@@ -156,6 +156,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     if ($need_popup == 0) {
                         return false;
                     }
+                    $this->applyCouponAutomatically();
                     add_action('wp_enqueue_scripts', array($this, 'addSiteInstantCouponScripts'));
                     $modal_display_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_display_pages', array());
                     if (!$this->isValidPagesToDisplay($modal_display_pages)) {
@@ -185,7 +186,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
          */
         function applyCouponAutomatically()
         {
-            if (isset($_REQUEST['retainful_email_coupon_code'])) {
+            if (isset($_REQUEST['retainful_email_coupon_code']) && !is_admin()) {
                 $coupon_code = sanitize_text_field($_REQUEST['retainful_email_coupon_code']);
                 if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
                     $this->wc_functions->addDiscount($coupon_code);

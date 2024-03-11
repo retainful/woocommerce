@@ -142,11 +142,12 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 if (version_compare(RNOC_VERSION, '1.1.5', '>')) {
                     $this->admin = new Rnoc\Retainful\Admin\Settings();
                     $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
-                    $this->applyCouponAutomatically();
+
                     $need_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 0);
                     if ($need_popup == 0) {
                         return false;
                     }
+                    $this->applyCouponAutomatically();
                     $need_exit_intent_modal_after_coupon_applied = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied', 1);
                     if ($need_exit_intent_modal_after_coupon_applied == 1) {
                         $is_coupon_applied = $this->wc_functions->getSession('rnoc_exit_intent_coupon_code_applied');
@@ -182,7 +183,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function applyCouponAutomatically()
         {
-            if (isset($_REQUEST['rnoc_on_exit_coupon_code'])) {
+            if (isset($_REQUEST['rnoc_on_exit_coupon_code']) && !is_admin()) {
                 $coupon_code = sanitize_text_field($_REQUEST['rnoc_on_exit_coupon_code']);
                 $coupon_code = apply_filters("rnoc_exit_intent_before_applying_coupon_code", $coupon_code);
                 if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {

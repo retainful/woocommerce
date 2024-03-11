@@ -8,5 +8,7 @@
      data-digest="<?php echo $params['digest']; ?>"
      data-path="<?php echo $params['path']; ?>"
      data-domain="<?php echo $params['domain']; ?>"
+     data-currency="<?php echo $params['currency_code']; ?>"
+     data-lang="<?php echo $params['lang']; ?>"
 >
 </div>
