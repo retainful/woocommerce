@@ -237,9 +237,9 @@ class Main
             $secret_key = $this->admin->getSecretKey();
             $app_id = $this->admin->getApiKey();*/
             if ($is_app_connected && !empty($secret_key) && !empty($app_id)) {
+                add_action('rest_api_init', array($this, 'registerSyncEndPoints'));
                 if (is_admin()) {
                     add_action('wp_after_admin_bar_render', array($this->admin, 'schedulePlanChecker'));
-                    add_action('rest_api_init', array($this, 'registerSyncEndPoints'));
                 }
                 /*
                 * Retainful abandoned cart api

@@ -65,7 +65,7 @@ class Popup
 
     function changeIdentityPath($option,$name,$value)
     {
-        if(!empty($option['path']) && $name == '_wc_rnoc_tk_session'){
+        if($name == '_wc_rnoc_tk_session'){
             $settings = new Settings();
             $option['path'] = $settings->getIdentityPath();
         }
@@ -107,7 +107,8 @@ class Popup
             'api_key' => '',
             'path' => $admin->getIdentityPath(),
             'domain' => COOKIE_DOMAIN,
-            'currency_code' => $wc->getDefaultWoocommerceCurrency()
+            'currency_code' => $wc->getDefaultWoocommerceCurrency(),
+            'lang' => $wc->getLanguage()
         );
         $params = wp_parse_args($user_arr, $default_params);
         include_once plugin_dir_path(RNOC_FILE) . 'src/templates/popup.php';

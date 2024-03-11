@@ -23,7 +23,7 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
                 <p class="error" id="error_app_id" style="color: red;"></p>
                 <p class="description">
                     <?php
-                    echo sprintf(esc_html__('Get your App-id %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $this->api->app_url . 'settings">here</a>');
+                    echo sprintf(esc_html__('Get your App-id %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $this->api->app_url . 'app/settings/general">here</a>');
                     ?>
                 </p>
             </td>
@@ -42,7 +42,7 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
                 <p class="error" id="error_secret_key" style="color: red;"></p>
                 <p class="description">
                     <?php
-                    echo sprintf(esc_html__('Get your secret key %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $this->api->app_url . 'settings">here</a>');
+                    echo sprintf(esc_html__('Get your secret key %s', RNOC_TEXT_DOMAIN), '<a target="_blank" href="' . $this->api->app_url . 'app/settings/general">here</a>');
                     ?>
                 </p>
             </td>
