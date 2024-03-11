@@ -825,6 +825,7 @@ class Settings
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
 
+
     /**
      * Create order sync webhook.
      *
@@ -834,10 +835,11 @@ class Settings
     {
         if (is_admin()){
             if($this->isConnectionActive()) {
-                if ($this->getWebHookId() <= 0) {
+                $hook_status = $this->getWebHookStatus();
+                if (isset($hook_status['order.updated']) && !$hook_status['order.updated']) {
                     $this->addNewWebhook();
                 }
-                if($this->getWebHookId('order.created') <= 0){
+                if (isset($hook_status['order.created']) && !$hook_status['order.created']) {
                     $this->addNewWebHook('order.created');
                 }
             }else{
@@ -869,17 +871,58 @@ class Settings
                     continue;
                 }
                 $delivery_url = $webhook->get_delivery_url();
-                $site_delivery_url = $this->api->getDomain().'woocommerce/webhooks/checkout';
+                $site_delivery_url = $this->getDeliveryUrl();
                 if($delivery_url != $site_delivery_url){
                     continue;
                 }
                 $webhook->delete();
             }
-            $this->saveWebhookId(0);
-            $this->saveWebhookId(0,'order.created');
         }catch (\Exception $e){
 
         }
+    }
+
+    /**
+     * Get Webhooks status.
+     * @return array
+     */
+    function getWebHookStatus()
+    {
+        $topics = [
+            'order.updated' => false,
+            'order.created' => false
+        ];
+        try {
+            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $args = array(
+                'limit'  => -1,
+                'offset' => 0,
+            );
+            $webhooks    = $data_store->search_webhooks( $args );
+
+            foreach ($webhooks as $webhook_id){
+                $webhook = wc_get_webhook($webhook_id);
+                if(empty($webhook)){
+                    continue;
+                }
+                $delivery_url = $webhook->get_delivery_url();
+                $site_delivery_url = $this->getDeliveryUrl();
+                if($delivery_url != $site_delivery_url){
+                    continue;
+                }
+                if(isset($topics[$webhook->get_topic()])){
+                    $topics[$webhook->get_topic()] = true;
+                }
+            }
+        }catch (\Exception $e){
+
+        }
+        return $topics;
+    }
+
+    function getDeliveryUrl()
+    {
+        return $this->api->getDomain() . 'woocommerce/webhooks/checkout';
     }
 
     /**
@@ -902,7 +945,7 @@ class Settings
             }
             //
             $webhook->set_status('active');
-            $delivery_url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
+            $delivery_url = $this->getDeliveryUrl();
             $webhook->set_delivery_url($delivery_url);
             $secret = wp_generate_password(50, true, true);
             $webhook->set_secret($secret);
@@ -914,7 +957,6 @@ class Settings
             $webhook->set_api_version(end($rest_api_versions)); // WPCS: input var okay, CSRF ok.
             $webhook_id = $webhook->save();
             if ($webhook_id > 0) {
-                $this->saveWebhookId($webhook_id,$topic);
                 return true;
             }
         } catch (\Exception $e) {
@@ -1900,37 +1942,6 @@ class Settings
             return $settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret'];
         }
         return NULL;
-    }
-
-    function getWebHookId($type = 'order.updated')
-    {
-        $settings = get_option($this->slug, array());
-        if ($type == 'order.updated' && isset($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']) && $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] > 0) {
-            $webhook = new \WC_Webhook($settings[RNOC_PLUGIN_PREFIX . 'webhook_id']);
-            if(method_exists($webhook, 'get_id') && $webhook->get_id() <= 0){
-                $this->saveWebhookId(0,$type);
-            }
-            return method_exists($webhook, 'get_id') ? ($webhook->get_id() > 0 ? $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] : 0) : 0;
-        }
-        if ($type == 'order.created' && isset($settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id']) && $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] > 0) {
-            $webhook = new \WC_Webhook($settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id']);
-            if(method_exists($webhook, 'get_id') && $webhook->get_id() <= 0){
-                $this->saveWebhookId(0,$type);
-            }
-            return method_exists($webhook, 'get_id') ? ($webhook->get_id() > 0 ? $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] : 0) : 0;
-        }
-        return 0;
-    }
-
-    function saveWebhookId($id,$type = 'order.updated')
-    {
-        $settings = get_option($this->slug, array());
-        if($type == 'order.updated'){
-            $settings[RNOC_PLUGIN_PREFIX . 'webhook_id'] = (int)$id;
-        }elseif($type == 'order.created'){
-            $settings[RNOC_PLUGIN_PREFIX . 'create_webhook_id'] = (int)$id;
-        }
-        update_option($this->slug, $settings);
     }
 
     /**

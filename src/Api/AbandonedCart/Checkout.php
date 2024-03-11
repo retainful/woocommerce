@@ -125,12 +125,12 @@ class Checkout extends RestApi
         try {
             $webhook = new \WC_Webhook( $webhook_id );
             $topic = $webhook->get_topic();
-            $stored_webhook_id = self::$settings->getWebHookId($topic);
-            if( $stored_webhook_id <= 0 || ($stored_webhook_id != $webhook_id)){
+            $topic_status = self::$settings->getWebHookStatus();
+            if( !isset($topic_status[$topic]) || !$topic_status[$topic]){
                 return $http_args;
             }
             $delivery_url = $webhook->get_delivery_url();
-            $site_delivery_url = self::$api->getDomain().'woocommerce/webhooks/checkout';
+            $site_delivery_url =  self::$settings->getDeliveryUrl();
             if($delivery_url != $site_delivery_url ||  $order_id <= 0){
                 return $http_args;
             }
