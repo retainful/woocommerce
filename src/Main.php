@@ -27,12 +27,29 @@ class Main
     {
         $this->rnoc = ($this->rnoc == NULL) ? new OrderCoupon() : $this->rnoc;
         $this->admin = ($this->admin == NULL) ? new Settings() : $this->admin;
+        add_filter('woocommerce_set_cookie_options',array($this,'changeIdentityPath'),10,3);
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
         //add_action('woocommerce_init',array($this->admin,'createWebhook'));
         add_action('woocommerce_init',array($this->admin,'setIdentityData'));
         //init the retainful premium
         new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
+    }
+
+    /**
+     * Change identity path.
+     *
+     * @param $option
+     * @param $name
+     * @param $value
+     * @return mixed
+     */
+    function changeIdentityPath($option,$name,$value)
+    {
+        if($name == '_wc_rnoc_tk_session'){
+            $option['path'] = $this->admin->getIdentityPath();
+        }
+        return $option;
     }
 
     function includePluginFiles()
@@ -263,7 +280,6 @@ class Main
                         add_action('wp_login', array($popup, 'userLogin'), 10, 2);
                         add_action('wp_enqueue_scripts', array($popup, 'addPopupScripts'));
                         add_action('wp_footer', array($popup, 'printPopup'));
-                        add_filter('woocommerce_set_cookie_options',array($popup,'changeIdentityPath'),10,3);
                     }
                 }
                 add_filter('script_loader_tag', array($cart, 'addCloudFlareAttrScript'), 10, 3);
