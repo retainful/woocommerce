@@ -2107,11 +2107,4 @@ class WcFunctions
         return apply_filters('rnoc_custom_default_currency', $currency);
     }
 
-    /**
-     * @return mixed|null
-     */
-    function getLanguage()
-    {
-        return apply_filters('rnoc_custom_default_language', get_locale());
-    }
 }
