@@ -108,7 +108,7 @@ class Popup
             'path' => $admin->getIdentityPath(),
             'domain' => COOKIE_DOMAIN,
             'currency_code' => $wc->getDefaultWoocommerceCurrency(),
-            'lang' => $wc->getLanguage()
+            'lang' => $wc->getSiteDefaultLang()
         );
         $params = wp_parse_args($user_arr, $default_params);
         include_once plugin_dir_path(RNOC_FILE) . 'src/templates/popup.php';

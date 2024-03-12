@@ -5,7 +5,7 @@ Requires at least: 4.6.1
 Tested up to: 6.4
 WC tested up to: 8.6
 Requires PHP: 5.6
-Stable tag: 2.6.30
+Stable tag: 2.6.31
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -249,6 +249,11 @@ No. There is no charges for support.
 == Screenshots ==
 
 == Changelog ==
+= 2.6.31 =
+- Fix: Removed product page marketing consent
+- Added: Currency code for popup
+- Improved: Webhook creation workflow
+
 = 2.6.30 =
 - Fix: user identity update for popup
 
