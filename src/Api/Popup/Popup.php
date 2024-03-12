@@ -15,7 +15,7 @@ class Popup
     function getPopupJs()
     {
         //https://js.retainful.com/woocommerce/v2/popup/beta/poup-widget.beta.js
-        return apply_filters('rnoc_popup_js','https://js.retainful.com/woocommerce/v2/popup/production/poup-widget.js?t='.time());
+        return apply_filters('rnoc_popup_js','https://js.retainful.com/woocommerce/v2/popup/production/poup-widget.js');
     }
 
     /**
