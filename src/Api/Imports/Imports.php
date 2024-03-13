@@ -204,15 +204,13 @@ class Imports extends Order
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
             'r_order_id' => $order_id,
             'order_number' => $order_id,
+            'order_date' => $this->formatToIso8601(self::$woocommerce->getOrderDate($order)),
             'woo_r_order_number' => self::$woocommerce->getOrderNumber($order),
-            'plugin_version' => RNOC_VERSION,
             'cart_hash' => $cart_hash,
             'ip' => $user_ip,
             'id' => $cart_token,
-            'name' => '#' . $cart_token,
             'email' => (isset($customer_details['email'])) ? $customer_details['email'] : NULL,
             'token' => $cart_token,
-            'user_id' => NULL,
             'currency' => $default_currency_code,
             'customer' => $customer_details,
             'tax_lines' => $this->getOrderTaxDetails(),
@@ -244,10 +242,10 @@ class Imports extends Order
             'recovered_by_retainful' => (bool)self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by'),
             'recovered_cart_token' => self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_cart_token'),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
-            'noc_discount_codes' => array(),
-            'client_details' => array(
-                'user_agent' => $user_agent,
-                'accept_language' => $customer_language,
+            'client_details' => $this->getClientDetails($order),
+            'payment_method' => array(
+                'value' => $order->get_payment_method(),
+                'name' => $order->get_payment_method_title(),
             )
         );
         return apply_filters('rnoc_import_order_data',$order_data,$order);
