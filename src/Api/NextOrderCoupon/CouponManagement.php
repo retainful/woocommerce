@@ -94,13 +94,13 @@ class CouponManagement
                         'date_expires' => (!empty($ruleParams['ends_at'])) ? strtotime($ruleParams['ends_at']) : null,
                         'usage_limit' => $ruleParams['usage_limit'],
                         'usage_limit_per_user' => $ruleParams['usage_limit_per_user'],
-                        'individual_use' => true,
+                        'individual_use' => 'yes',
                         'customer_email' => $ruleParams['customer_email'],
                         'product_ids' => array(),
                         'exclude_product_ids' => array(),
                         'product_categories' => array(),
                         'exclude_product_categories' => array(),
-                        'exclude_sale_items' => isset($params['exclude_sale_items']) && $params['exclude_sale_items'] == 'yes',
+                        'exclude_sale_items' => isset($ruleParams['exclude_sale_items']) && $ruleParams['exclude_sale_items'] == 'yes' ? $ruleParams['exclude_sale_items'] : 'no',
                         '_rnoc_shop_coupon_type' => 'retainful-referral'
                     );
                     if (isset($data['free_shipping']) && $data['free_shipping'] === 'yes') {
