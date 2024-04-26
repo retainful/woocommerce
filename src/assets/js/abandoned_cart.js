@@ -377,7 +377,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             /*$(document).ready(function () {
                 retainful.syncCart();
             });*/
-            $(window).load(function (){
+            $(window).on('load',function (){
                 retainful.syncCart();
             });
         }
