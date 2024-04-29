@@ -1,12 +1,35 @@
 <?php
 
-namespace Rnoc\Retainful;
+namespace Rnoc\Retainful\Controllers\Site;
+
+use Rnoc\Retainful\Admin\Settings;
 
 class IpFiltering
 {
     protected $black_list_ip = "";
 
-    function __construct($ip_address)
+
+    public function canActivateIPFilter()
+    {
+
+        $rnoc_setting = new Settings();
+        $settings = $rnoc_setting->getAdminSettings();
+
+        if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter']) && isset($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])) {
+            $ip = $settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'];
+
+            if (!empty($ip)) {
+                $this->setIpFiltering($ip);
+                add_filter('rnoc_is_cart_has_valid_ip', array($this, 'trackAbandonedCart'), 10, 2);
+            }
+        }
+    }
+
+    /**
+     * @param $ip_address
+     * @return void
+     */
+    function setIpFiltering($ip_address)
     {
         $this->black_list_ip = $ip_address;
     }
@@ -102,6 +125,7 @@ class IpFiltering
      */
     function trackAbandonedCart($need_tracking, $ip_address = NULL)
     {
+
         $ignored_ip_addresses = trim($this->black_list_ip);
         if (empty($ignored_ip_addresses)) {
             return true;

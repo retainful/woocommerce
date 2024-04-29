@@ -147,7 +147,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             if (defined('RNOC_VERSION') && $this->isValidUserToShow()) {
                 if (version_compare(RNOC_VERSION, '1.1.5', '>')) {
                     $this->admin = new Rnoc\Retainful\Admin\Settings();
-                    $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
+                    $this->wc_functions = new Rnoc\Retainful\Helpers\WcFunctions;
 
                     if (is_admin()) {
                         add_action('wp_footer', array($this, 'addPopupEditor'));
@@ -474,16 +474,16 @@ if (!class_exists('RetainfulAddToCartAddon')) {
             $modal_hide_pages = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'modal_hide_pages', array());
 
             $status = true;
-            if(!empty($modal_hide_pages) && is_array($modal_hide_pages) && isset($wp_query->post) && isset($wp_query->post->ID) && $wp_query->post->ID > 0){
-                $status = !in_array($wp_query->post->ID,$modal_hide_pages);
+            if (!empty($modal_hide_pages) && is_array($modal_hide_pages) && isset($wp_query->post) && isset($wp_query->post->ID) && $wp_query->post->ID > 0) {
+                $status = !in_array($wp_query->post->ID, $modal_hide_pages);
             }
 
-            if(is_shop() && wc_get_page_id('shop') && !empty($modal_hide_pages) && is_array($modal_hide_pages)){
-                $status = !in_array(wc_get_page_id('shop'),$modal_hide_pages);
+            if (is_shop() && wc_get_page_id('shop') && !empty($modal_hide_pages) && is_array($modal_hide_pages)) {
+                $status = !in_array(wc_get_page_id('shop'), $modal_hide_pages);
             }
 
-            if($status && is_account_page() && wc_get_page_id('myaccount') && !empty($modal_hide_pages) && is_array($modal_hide_pages)){
-                $status = !in_array(wc_get_page_id('myaccount'),$modal_hide_pages);
+            if ($status && is_account_page() && wc_get_page_id('myaccount') && !empty($modal_hide_pages) && is_array($modal_hide_pages)) {
+                $status = !in_array(wc_get_page_id('myaccount'), $modal_hide_pages);
             }
 
             return apply_filters('retainful_is_add_to_cart_popup_eligible', $status);

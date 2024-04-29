@@ -1,9 +1,10 @@
 <?php
 
-namespace Rnoc\Retainful;
+namespace Rnoc\Retainful\Controllers\Site;
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Helpers\WcFunctions;
 
 class OrderCoupon
 {
@@ -231,7 +232,7 @@ class OrderCoupon
      */
     public function addCouponToCheckout()
     {
-        if(is_admin()) return;
+        if (is_admin()) return;
 
         $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
         if (!empty($coupon_code) && !empty($this->wc_functions->getCart()) && !$this->wc_functions->hasDiscount($coupon_code)) {
@@ -949,7 +950,7 @@ class OrderCoupon
             if (isset($expired_date['retainful_coupons']) && !empty($expired_date['retainful_coupons'])) {
                 add_post_meta($id, 'coupon_expired_on', $expired_date['retainful_coupons']);
             }
-            do_action('rnoc_after_create_virtual_coupon',$id,$settings,$order_id,$email);
+            do_action('rnoc_after_create_virtual_coupon', $id, $settings, $order_id, $email);
         }
         return $id;
     }

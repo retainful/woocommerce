@@ -3,7 +3,7 @@
 namespace Rnoc\Retainful\Api\Referral;
 
 use Rnoc\Retainful\Admin\Settings;
-use Rnoc\Retainful\WcFunctions;
+use Rnoc\Retainful\Helpers\WcFunctions;
 
 class ReferralManagement
 {
@@ -69,6 +69,7 @@ class ReferralManagement
     {
         return apply_filters('referral_engine_url', 'https://js.retainful.com/woocommerce/v1/widget.js');
     }
+
     /**
      * echo the embeded referral div
      */

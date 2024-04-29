@@ -1,6 +1,6 @@
 <?php
 
-namespace Rnoc\Retainful;
+namespace Rnoc\Retainful\Helpers;
 if (!defined('ABSPATH')) exit;
 
 class WcFunctions

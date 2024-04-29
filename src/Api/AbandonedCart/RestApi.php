@@ -9,7 +9,7 @@ use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
 use Rnoc\Retainful\Api\AbandonedCart\Storage\PhpSession;
 use Rnoc\Retainful\Api\AbandonedCart\Storage\WooSession;
 use Rnoc\Retainful\library\RetainfulApi;
-use Rnoc\Retainful\WcFunctions;
+use Rnoc\Retainful\Helpers\WcFunctions;
 
 class RestApi
 {
@@ -57,7 +57,7 @@ class RestApi
         }
     }
 
-     /**
+    /**
      * Get the current user's cart token
      * @return array|string|null
      */
@@ -247,9 +247,9 @@ class RestApi
     function isPendingRecovery($user_id = NULL)
     {
         if ($user_id || ($user_id = get_current_user_id())) {
-            return (bool) get_user_meta($user_id, $this->pending_recovery_key_for_db, true);
+            return (bool)get_user_meta($user_id, $this->pending_recovery_key_for_db, true);
         } else {
-            return (bool) self::$storage->getValue($this->pending_recovery_key);
+            return (bool)self::$storage->getValue($this->pending_recovery_key);
         }
     }
 
@@ -400,7 +400,7 @@ class RestApi
                 mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
             );
         }
-        return md5($token.time());
+        return md5($token . time());
     }
 
     /**
@@ -445,7 +445,7 @@ class RestApi
         if (!$order instanceof \WC_Order) {
             return false;
         }
-        return (bool) self::$woocommerce->getOrderMeta($order, $this->pending_recovery_key_for_db);
+        return (bool)self::$woocommerce->getOrderMeta($order, $this->pending_recovery_key_for_db);
     }
 
     /**
@@ -459,7 +459,7 @@ class RestApi
         if (!$order instanceof \WC_Order) {
             return false;
         }
-        return (bool) self::$woocommerce->getOrderMeta($order, $this->order_recovered_key_for_db);
+        return (bool)self::$woocommerce->getOrderMeta($order, $this->order_recovered_key_for_db);
     }
 
     /**
@@ -548,7 +548,7 @@ class RestApi
         if (empty($timestamp)) {
             $timestamp = current_time('timestamp', true);
         }
-        if(is_object($timestamp) && $timestamp instanceof \WC_DateTime) {
+        if (is_object($timestamp) && $timestamp instanceof \WC_DateTime) {
             $timestamp = $timestamp->getTimestamp();
         }
 
@@ -687,8 +687,8 @@ class RestApi
     {
         $settings = self::$settings->getAdminSettings();
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
-        if($enable_gdpr_compliance){
-            return in_array(self::$woocommerce->getSession('is_buyer_accepting_marketing'), array(1,'true'));
+        if ($enable_gdpr_compliance) {
+            return in_array(self::$woocommerce->getSession('is_buyer_accepting_marketing'), array(1, 'true'));
         }
         return true;
         /*if (is_user_logged_in()) {

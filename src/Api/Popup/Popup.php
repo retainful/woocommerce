@@ -3,7 +3,7 @@
 namespace Rnoc\Retainful\Api\Popup;
 
 use Rnoc\Retainful\Admin\Settings;
-use Rnoc\Retainful\WcFunctions;
+use Rnoc\Retainful\Helpers\WcFunctions;
 
 class Popup
 {
@@ -15,7 +15,7 @@ class Popup
     function getPopupJs()
     {
         //https://js.retainful.com/woocommerce/v2/popup/beta/poup-widget.beta.js
-        return apply_filters('rnoc_popup_js','https://js.retainful.com/woocommerce/v2/popup/production/poup-widget.js');
+        return apply_filters('rnoc_popup_js', 'https://js.retainful.com/woocommerce/v2/popup/production/poup-widget.js');
     }
 
     /**
@@ -26,7 +26,7 @@ class Popup
     function addPopupScripts()
     {
         $settings = new Settings();
-        if($settings->isCustomerPage() && $settings->needPopupWidget()){
+        if ($settings->isCustomerPage() && $settings->needPopupWidget()) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popups', $this->getPopupJs(), array('jquery'), RNOC_VERSION, true);
         }
     }
@@ -40,9 +40,9 @@ class Popup
     function userRegister($user_id)
     {
         $settings = new Settings();
-        if($settings->isCustomerPage() && !empty($user_id)){
-            $user = get_user_by('id',$user_id);
-            if(is_object($user) && !empty($user->user_email)){
+        if ($settings->isCustomerPage() && !empty($user_id)) {
+            $user = get_user_by('id', $user_id);
+            if (is_object($user) && !empty($user->user_email)) {
                 $settings->setIdentity($user->user_email);
             }
         }
@@ -58,14 +58,14 @@ class Popup
     function userLogin($user_name, $user)
     {
         $settings = new Settings();
-        if($settings->isCustomerPage() && is_object($user) && !empty($user->user_email)){
+        if ($settings->isCustomerPage() && is_object($user) && !empty($user->user_email)) {
             $settings->setIdentity($user->user_email);
         }
     }
 
-    function changeIdentityPath($option,$name,$value)
+    function changeIdentityPath($option, $name, $value)
     {
-        if($name == '_wc_rnoc_tk_session'){
+        if ($name == '_wc_rnoc_tk_session') {
             $settings = new Settings();
             $option['path'] = $settings->getIdentityPath();
         }
@@ -80,7 +80,7 @@ class Popup
     function printPopup()
     {
         $admin = new Settings();
-        if(!$admin->isCustomerPage()) return;
+        if (!$admin->isCustomerPage()) return;
 
         $wc = new WcFunctions();
         $api_key = $admin->getApiKey();

@@ -141,7 +141,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             if (defined('RNOC_VERSION')) {
                 if (version_compare(RNOC_VERSION, '1.1.5', '>')) {
                     $this->admin = new Rnoc\Retainful\Admin\Settings();
-                    $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
+                    $this->wc_functions = new Rnoc\Retainful\Helpers\WcFunctions;
 
                     $need_popup = $this->getKeyFromArray($this->premium_addon_settings, RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal', 0);
                     if ($need_popup == 0) {
@@ -285,7 +285,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             );
             $settings = apply_filters('rnoc_load_exit_intent_popup_settings', $settings);
             $exit_popup_settings_script = 'retainful_premium_exit_intent_popup = ';
-            $exit_popup_settings_script .= wp_json_encode($settings) ;
+            $exit_popup_settings_script .= wp_json_encode($settings);
 
             wp_add_inline_script('rnoc-exit-intent-popup', $exit_popup_settings_script, 'before');
         }
@@ -316,7 +316,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     'cart_url_without_coupon' => $cart_url,
                     'cart_url' => $cart_url . $coupon_data
                 );
-                $content = apply_filters("rnoc_exit_intent_popup_full_content", $content,$to_replace);
+                $content = apply_filters("rnoc_exit_intent_popup_full_content", $content, $to_replace);
                 $to_replace = apply_filters("rnoc_exit_intent_popup_short_codes", $to_replace, $content);
                 foreach ($to_replace as $find => $replace) {
                     $content = str_replace('{{' . $find . '}}', $replace, $content);

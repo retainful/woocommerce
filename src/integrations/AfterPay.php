@@ -3,7 +3,7 @@
 namespace Rnoc\Retainful\Integrations;
 
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
-use Rnoc\Retainful\WcFunctions;
+use Rnoc\Retainful\Helpers\WcFunctions;
 
 class AfterPay
 {
@@ -37,7 +37,7 @@ class AfterPay
 
     function captureRetainfulDataFromQuote($post_id)
     {
-        if(!$this->isPluginActive()){
+        if (!$this->isPluginActive()) {
             return;
         }
         $post = get_post($post_id);
@@ -46,22 +46,23 @@ class AfterPay
             $post_meta = get_post_meta($post_id, '', true);
             foreach ($post_meta as $key => $value) {
                 if (0 === strpos($key, '_rnoc')) {
-                    $this->retainful_meta[$key] = isset($value[0]) && !empty($value[0]) ? $value[0]: '';
+                    $this->retainful_meta[$key] = isset($value[0]) && !empty($value[0]) ? $value[0] : '';
                 }
             }
         }
     }
 
-    function saveRetainfulDataToOrder($order_id){
-        if(!$this->isPluginActive()){
+    function saveRetainfulDataToOrder($order_id)
+    {
+        if (!$this->isPluginActive()) {
             return;
         }
-        if ( $order_id > 0 &&  (int)$order_id === $this->quote_id ) {
+        if ($order_id > 0 && (int)$order_id === $this->quote_id) {
             $wc_function = new WcFunctions();
             $order_object = $wc_function->getOrder($order_id);
-            if(is_object($order_object) && !empty($order_object)) {
+            if (is_object($order_object) && !empty($order_object)) {
                 foreach ($this->retainful_meta as $key => $value) {
-                    $wc_function->setOrderMeta($order_id,$key,$value);
+                    $wc_function->setOrderMeta($order_id, $key, $value);
                 }
             }
         }

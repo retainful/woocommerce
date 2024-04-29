@@ -2,7 +2,7 @@
 
 namespace Rnoc\Retainful\library;
 
-use Rnoc\Retainful\WcFunctions;
+use Rnoc\Retainful\Helpers\WcFunctions;
 
 if (!defined('ABSPATH')) exit;
 

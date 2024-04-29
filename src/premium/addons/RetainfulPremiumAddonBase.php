@@ -14,7 +14,7 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
         {
             $this->admin = new Rnoc\Retainful\Admin\Settings();
             $this->plan = array('pro', 'business', 'professional', 'essential');
-            $this->wc_functions = new \Rnoc\Retainful\WcFunctions();
+            $this->wc_functions = new Rnoc\Retainful\Helpers\WcFunctions;
             $this->premium_addon_settings = $this->admin->getPremiumAddonSettings();
         }
 
@@ -106,7 +106,7 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
             if (is_array($to_display_pages)) {
                 $to_display_pages = array_map('intval', $to_display_pages);
             }
-            $to_display_pages = apply_filters('rnocp_before_page_check',$to_display_pages);
+            $to_display_pages = apply_filters('rnocp_before_page_check', $to_display_pages);
             if (is_page($to_display_pages)) {
                 return true;
             }
