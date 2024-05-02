@@ -12,8 +12,9 @@ class Imports extends Order
      * @param $hash_value
      * @return bool
      */
-    protected function hashVerification($data,$hash_value){
-        if(!is_array($data) || !is_string($hash_value)){
+    protected function hashVerification($data, $hash_value)
+    {
+        if (!is_array($data) || !is_string($hash_value)) {
             return false;
         }
         $data = json_encode($data);
@@ -27,17 +28,18 @@ class Imports extends Order
      * @param $params
      * @return array
      */
-    protected function getOrders($params){
-        if(!is_array($params) || !isset($params['since_id']) || !isset($params['limit'])){
+    protected function getOrders($params)
+    {
+        if (!is_array($params) || !isset($params['since_id']) || !isset($params['limit'])) {
             return array();
         }
         global $wpdb;
-        if(self::isHPOSEnabled()){
+        if (self::isHPOSEnabled()) {
             $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}wc_orders LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}wc_orders.id = {$wpdb->prefix}woocommerce_order_items.order_id
-          WHERE type = %s AND id > %s AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s GROUP BY id ORDER BY id ASC LIMIT %d",array('shop_order',(int)$params['since_id'],'line_item', (int)$params['limit']));
-        }else{
+          WHERE type = %s AND id > %s AND status != %s AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s GROUP BY id ORDER BY id ASC LIMIT %d", array('shop_order', (int)$params['since_id'], 'trash', 'line_item', (int)$params['limit']));
+        } else {
             $query = $wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}posts.ID = {$wpdb->prefix}woocommerce_order_items.order_id 
-          WHERE post_type IN ('shop_order') AND ID > %d AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s GROUP BY ID ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], 'line_item',(int)$params['limit']));
+          WHERE post_type IN ('shop_order') AND ID > %d AND post_status != %s AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s GROUP BY ID ORDER BY ID ASC LIMIT %d", array((int)$params['since_id'], 'trash', 'line_item', (int)$params['limit']));
         }
         return $wpdb->get_col($query);
     }
@@ -46,17 +48,19 @@ class Imports extends Order
      * get order count
      * @return string|null
      */
-    protected function getOrderCount(){
+    protected function getOrderCount()
+    {
         global $wpdb;
-        if(self::isHPOSEnabled()){
+        if (self::isHPOSEnabled()) {
             $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}wc_orders.id) FROM {$wpdb->prefix}wc_orders LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}wc_orders.id = {$wpdb->prefix}woocommerce_order_items.order_id
-          WHERE type = %s AND id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s",array('shop_order','line_item'));
-        }else{
+          WHERE type = %s AND id > 0 AND status != %s AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s", array('shop_order', 'trash', 'line_item'));
+        } else {
             $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts LEFT JOIN {$wpdb->prefix}woocommerce_order_items ON {$wpdb->prefix}posts.ID = {$wpdb->prefix}woocommerce_order_items.order_id 
-          WHERE post_type = %s AND ID > 0 AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s", array('shop_order','line_item'));
+          WHERE post_type = %s AND ID > 0 AND post_status != %s AND {$wpdb->prefix}woocommerce_order_items.order_id > 0 AND {$wpdb->prefix}woocommerce_order_items.order_item_type = %s", array('shop_order', 'trash', 'line_item'));
         }
         return $wpdb->get_var($query);
     }
+
     /**
      * create coupons
      * @param \WP_REST_Request $request
@@ -80,7 +84,7 @@ class Imports extends Order
             return new \WP_REST_Response($response, $status);
         }
         self::$settings->logMessage($params, 'API Orders data matched');
-        if(!$this->hashVerification(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status']),$params['digest'])){
+        if (!$this->hashVerification(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status']), $params['digest'])) {
             self::$settings->logMessage($params, 'API Orders request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed');
@@ -105,11 +109,12 @@ class Imports extends Order
      * check is HPOS enabled
      * @return bool
      */
-    public static function isHPOSEnabled(){
-        if(!class_exists('\Automattic\WooCommerce\Utilities\OrderUtil')){
+    public static function isHPOSEnabled()
+    {
+        if (!class_exists('\Automattic\WooCommerce\Utilities\OrderUtil')) {
             return false;
         }
-        if(\Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled()){
+        if (\Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled()) {
             return true;
         }
         return false;
@@ -136,7 +141,7 @@ class Imports extends Order
             return new \WP_REST_Response($response, $status);
         }
         self::$settings->logMessage($params, 'API Order Count data matched');
-        if(!$this->hashVerification(array('status' => $params['status']),$params['digest'])){
+        if (!$this->hashVerification(array('status' => $params['status']), $params['digest'])) {
             self::$settings->logMessage($params, 'API Order Count request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed!');
@@ -159,31 +164,31 @@ class Imports extends Order
      */
     public function getOrderData($order)
     {
-        if(!is_object($order)){ // bool|WC_Order|WC_Order_Refund
+        if (!is_object($order)) { // bool|WC_Order|WC_Order_Refund
             return array();
         }
         $order_id = self::$woocommerce->getOrderId($order);
-        if(empty($order_id)) return array();
+        if (empty($order_id)) return array();
         $cart_token = self::$woocommerce->getOrderMeta($order, $this->cart_token_key_for_db);
-        if(empty($cart_token)) $cart_token = $this->generateCartToken();
+        if (empty($cart_token)) $cart_token = $this->generateCartToken();
         //still Cart token empty
-        if(empty($cart_token)){
+        if (empty($cart_token)) {
             return array();
         }
         $user_ip = self::$woocommerce->getOrderMeta($order, $this->user_ip_key_for_db);
-        if(empty($user_ip)) $user_ip = $order->get_customer_ip_address();
+        if (empty($user_ip)) $user_ip = $order->get_customer_ip_address();
         $cart_hash = self::$woocommerce->getOrderMeta($order, $this->cart_hash_key_for_db);
-        if(empty($cart_hash)) $cart_hash = $order->get_cart_hash();
+        if (empty($cart_hash)) $cart_hash = $order->get_cart_hash();
         $is_buyer_accepts_marketing = self::$woocommerce->getOrderMeta($order, $this->accepts_marketing_key_for_db);
-        if(!in_array($is_buyer_accepts_marketing,array(0,1))) $is_buyer_accepts_marketing = $order->get_customer_id() > 0 ? 1: 0;
+        if (!in_array($is_buyer_accepts_marketing, array(0, 1))) $is_buyer_accepts_marketing = $order->get_customer_id() > 0 ? 1 : 0;
         $cart_created_at = self::$woocommerce->getOrderMeta($order, $this->cart_tracking_started_key_for_db);
-        if(empty($cart_created_at)) $cart_created_at = $order->get_date_created();
-        if(is_null($cart_created_at)){
-            $cart_created_at = current_time('timestamp',true);
+        if (empty($cart_created_at)) $cart_created_at = $order->get_date_created();
+        if (is_null($cart_created_at)) {
+            $cart_created_at = current_time('timestamp', true);
         }
         $updated_at = $order->get_date_modified();
-        if(is_null($updated_at)){
-            $updated_at = current_time('timestamp',true);
+        if (is_null($updated_at)) {
+            $updated_at = current_time('timestamp', true);
         }
         //completed_at if available need to do
         $consider_on_hold_order_as_ac = $this->considerOnHoldAsAbandoned();
@@ -197,7 +202,7 @@ class Imports extends Order
         $excluding_tax = self::$woocommerce->isPriceExcludingTax();
         $recovered_at = self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_at');
         $user_agent = $this->getUserAgent($order);
-        if(empty($user_agent)) $user_agent = $order->get_customer_user_agent();
+        if (empty($user_agent)) $user_agent = $order->get_customer_user_agent();
         $customer_language = $this->getOrderLanguage($order);
         $order_data = array(
             'cart_type' => 'order',
@@ -248,6 +253,6 @@ class Imports extends Order
                 'name' => $order->get_payment_method_title(),
             )
         );
-        return apply_filters('rnoc_import_order_data',$order_data,$order);
+        return apply_filters('rnoc_import_order_data', $order_data, $order);
     }
 }

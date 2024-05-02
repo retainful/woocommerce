@@ -100,12 +100,13 @@ class CouponManagement
                         'exclude_product_ids' => array(),
                         'product_categories' => array(),
                         'exclude_product_categories' => array(),
+                        'exclude_sale_items' => isset($ruleParams['exclude_sale_items']) && $ruleParams['exclude_sale_items'] == 'yes' ? $ruleParams['exclude_sale_items'] : 'no',
                         '_rnoc_shop_coupon_type' => 'retainful-referral'
                     );
-                    if(isset($data['free_shipping']) && $data['free_shipping'] === 'yes'){
+                    if (isset($data['free_shipping']) && $data['free_shipping'] === 'yes') {
                         $data['coupon_amount'] = 0;
                     }
-                    $data = apply_filters('rnoc_before_create_rest_coupon',$data,$ruleParams,$params);
+                    $data = apply_filters('rnoc_before_create_rest_coupon', $data, $ruleParams, $params);
                     $old_coupon = self::getCouponByCouponCode($data['coupon_code']);
                     if (!empty($old_coupon) && $old_coupon instanceof \WP_Post) {
                         $coupon_id = $old_coupon->ID;
@@ -180,7 +181,7 @@ class CouponManagement
 
             if ($order_id && $order_id > 0) {
                 $order = wc_get_order($order_id);
-                if(is_object($order) && method_exists($order,'get_edit_order_url')){
+                if (is_object($order) && method_exists($order, 'get_edit_order_url')) {
                     $order_url = $order->get_edit_order_url();
                     echo '<p class="form-field "><label>Coupon generated for</label><span>Order #' . $order_id . ' | <a target="_blank" href="' . $order_url . '">View Order</a></span></p>';
                 }
@@ -188,11 +189,12 @@ class CouponManagement
         }
     }
 
-    function showDeleteButton($which){
+    function showDeleteButton($which)
+    {
         $input = new Input();
-        $post_type = $input->post_get('post_type','');
-        if($post_type === 'shop_coupon' && $which === 'top'){
-            echo '<a id="delete-expired-rtl-coupons"  class="button" style="margin-left: 10%;">'.__('Delete Expired retainful coupons','woocommerce').'</a><script>
+        $post_type = $input->post_get('post_type', '');
+        if ($post_type === 'shop_coupon' && $which === 'top') {
+            echo '<a id="delete-expired-rtl-coupons"  class="button" style="margin-left: 10%;">' . __('Delete Expired retainful coupons', 'woocommerce') . '</a><script>
                   jQuery(document).on("click","#delete-expired-rtl-coupons",function (){
                       jQuery.post( "' . admin_url("admin-ajax.php") . '?action=rnoc_delete_expired_coupons&security=' . wp_create_nonce('rnoc_delete_expired_coupons') . '", function( data ) {
                           window.location.reload();

@@ -833,8 +833,8 @@ class Settings
      */
     function createWebhook()
     {
-        if (is_admin()){
-            if($this->isConnectionActive()) {
+        if (is_admin()) {
+            if ($this->isConnectionActive()) {
                 $hook_status = $this->getWebHookStatus();
                 if (isset($hook_status['order.updated']) && !$hook_status['order.updated']) {
                     $this->addNewWebhook();
@@ -842,7 +842,7 @@ class Settings
                 if (isset($hook_status['order.created']) && !$hook_status['order.created']) {
                     $this->addNewWebHook('order.created');
                 }
-            }else{
+            } else {
                 $this->removeWebhook();
             }
         }
@@ -855,29 +855,29 @@ class Settings
      */
     function removeWebhook()
     {
-        if(!class_exists('WC_Data_Store') || !class_exists('\Rnoc\Retainful\library\RetainfulApi') || !function_exists('wc_get_webhook')){
+        if (!class_exists('WC_Data_Store') || !class_exists('\Rnoc\Retainful\library\RetainfulApi') || !function_exists('wc_get_webhook')) {
             return;
         }
         try {
-            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $data_store = \WC_Data_Store::load('webhook');
             $args = array(
-                'limit'  => -1,
+                'limit' => -1,
                 'offset' => 0,
             );
-            $webhooks    = $data_store->search_webhooks( $args );
-            foreach ($webhooks as $webhook_id){
+            $webhooks = $data_store->search_webhooks($args);
+            foreach ($webhooks as $webhook_id) {
                 $webhook = wc_get_webhook($webhook_id);
-                if(empty($webhook)){
+                if (empty($webhook)) {
                     continue;
                 }
                 $delivery_url = $webhook->get_delivery_url();
                 $site_delivery_url = $this->getDeliveryUrl();
-                if($delivery_url != $site_delivery_url){
+                if ($delivery_url != $site_delivery_url) {
                     continue;
                 }
                 $webhook->delete();
             }
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
 
         }
     }
@@ -893,28 +893,28 @@ class Settings
             'order.created' => false
         ];
         try {
-            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $data_store = \WC_Data_Store::load('webhook');
             $args = array(
-                'limit'  => -1,
+                'limit' => -1,
                 'offset' => 0,
             );
-            $webhooks    = $data_store->search_webhooks( $args );
+            $webhooks = $data_store->search_webhooks($args);
 
-            foreach ($webhooks as $webhook_id){
+            foreach ($webhooks as $webhook_id) {
                 $webhook = wc_get_webhook($webhook_id);
-                if(empty($webhook)){
+                if (empty($webhook)) {
                     continue;
                 }
                 $delivery_url = $webhook->get_delivery_url();
                 $site_delivery_url = $this->getDeliveryUrl();
-                if($delivery_url != $site_delivery_url){
+                if ($delivery_url != $site_delivery_url) {
                     continue;
                 }
-                if(isset($topics[$webhook->get_topic()])){
+                if (isset($topics[$webhook->get_topic()])) {
                     $topics[$webhook->get_topic()] = true;
                 }
             }
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
 
         }
         return $topics;
@@ -933,12 +933,12 @@ class Settings
      */
     protected function addNewWebHook($topic = 'order.updated')
     {
-        if(!in_array($topic,array('order.updated','order.created'))){
+        if (!in_array($topic, array('order.updated', 'order.created'))) {
             return false;
         }
         try {
             $webhook = new \WC_Webhook();
-            $name = $topic == 'order.updated' ? sanitize_text_field(wp_unslash('Retainful Order Update')): sanitize_text_field(wp_unslash('Retainful Order Create'));
+            $name = $topic == 'order.updated' ? sanitize_text_field(wp_unslash('Retainful Order Update')) : sanitize_text_field(wp_unslash('Retainful Order Create'));
             $webhook->set_name($name);
             if (!$webhook->get_user_id()) {
                 $webhook->set_user_id(get_current_user_id());
@@ -996,7 +996,7 @@ class Settings
         );
         $settings = wp_parse_args($settings, $default_settings);
 
-        if(empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])){
+        if (empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
             $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = 'Keep me up to date on news and exclusive offers';
         }
         require_once dirname(__FILE__) . '/templates/pages/settings.php';
@@ -1017,27 +1017,39 @@ class Settings
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
         $settings = $this->getAdminSettings();
+
         $is_next_order_disable = get_option('retainful_hide_next_order_coupon', 'no');
-        if(!$this->isNextOrderCouponEnabled()){
+        if (!$this->isNextOrderCouponEnabled()) {
             if (($is_next_order_disable === 'no' || empty($is_next_order_disable)) && (empty($settings) || count($settings) < 3)) {
                 update_option('retainful_hide_next_order_coupon', 'yes');
             }
+        }
+
+        $page_slug = $this->slug . '_premium';
+        $permium_page_settings = get_option($page_slug, array());
+        $is_premium_feature_disable = get_option('retainful_hide_premium_feature', 'no');
+        if (($is_premium_feature_disable === 'no' || empty($is_premium_feature_disable)) && empty($permium_page_settings)) {
+            update_option('retainful_hide_premium_feature', 'yes');
         }
 
         $can_hide_next_order_coupon = get_option('retainful_hide_next_order_coupon', 'no');
         if ($can_hide_next_order_coupon !== 'yes') {
             add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'nextOrderCouponPage'));
         }
-        add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
 
-        if(isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium'))){
+        $can_hide_premium_feature = get_option('retainful_hide_premium_feature', 'no');
+        if ($can_hide_premium_feature !== 'yes') {
+            add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
+        }
+
+        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium'))) {
             $legacy_notice = '<div style="padding: 10px 46px 10px 22px;font-size: 15px;line-height: 1.4;margin-left: -20px;">Unlock the power of fully customizable email capture forms, including Add to Cart and Exit Intent popups, right from your Retainful dashboard. Head over to the Signup Forms section to configure and activate them. Tailor each popup to your brand, track sign-ups efficiently, and entice subscribers with unique coupons. <br/><b style="font-size: 15px;">Please note: Legacy popups will be phased out by April 15. Need help transitioning to the new Sign Up forms? Reach out to us at <a href="mailto:support@retainful.com">support@retainful.com</a> for assistance.</b></div>';
             add_action('admin_notices', function () use ($legacy_notice) {
                 echo '<div class="error notice"><p>' . $legacy_notice . '</p></div>';
             });
         }
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
-        if(isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()){
+        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()) {
             $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
             add_action('admin_notices', function () use ($message) {
                 echo '<div class="error notice"><p>' . $message . '</p></div>';
@@ -1050,12 +1062,13 @@ class Settings
      *
      * @return bool
      */
-    function isWebhookNoticeShow(){
+    function isWebhookNoticeShow()
+    {
 
-        if(!$this->isConnectionActive()){
+        if (!$this->isConnectionActive()) {
             return false;
         }
-        if(!class_exists('WC_Data_Store') || !function_exists('wc_get_webhook')){
+        if (!class_exists('WC_Data_Store') || !function_exists('wc_get_webhook')) {
             return false;
         }
         $webhook_status = array(
@@ -1063,13 +1076,13 @@ class Settings
             'order_updated' => false
         );
         try {
-            $data_store  = \WC_Data_Store::load( 'webhook' );
+            $data_store = \WC_Data_Store::load('webhook');
             $args = array(
-                'limit'  => -1,
+                'limit' => -1,
                 'offset' => 0,
             );
 
-            $webhooks    = $data_store->search_webhooks( $args );
+            $webhooks = $data_store->search_webhooks($args);
             foreach ($webhooks as $webhook_id) {
                 $webhook = wc_get_webhook($webhook_id);
                 if (empty($webhook)) {
@@ -1082,18 +1095,18 @@ class Settings
                 }
                 $topic = $webhook->get_topic();
                 $status = $webhook->get_status();
-                if($status == 'active' && $topic == 'order.created'){
+                if ($status == 'active' && $topic == 'order.created') {
                     $webhook_status['order_created'] = true;
                 }
-                if($status == 'active' && $topic == 'order.updated'){
+                if ($status == 'active' && $topic == 'order.updated') {
                     $webhook_status['order_updated'] = true;
                 }
             }
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
 
         }
 
-        return in_array(false,$webhook_status);
+        return in_array(false, $webhook_status);
     }
 
     /**
@@ -1576,9 +1589,9 @@ class Settings
     function deleteUnusedExpiredCoupons()
     {
         WcFunctions::checkSecuritykey('rnoc_delete_expired_coupons');
-        for($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $posts = $this->getDiscountData();
-            if(empty($posts)) break;
+            if (empty($posts)) break;
             foreach ($posts as $post) {
                 wp_delete_post($post->ID, true);
             }
@@ -1586,7 +1599,8 @@ class Settings
         wp_send_json_success(array('message' => "successfully deleted"));
     }
 
-    function getDiscountData(){
+    function getDiscountData()
+    {
         $args = array(
             'post_type' => 'shop_coupon',
             'posts_per_page' => 100,
@@ -1814,7 +1828,7 @@ class Settings
         $plan = $this->getUserActivePlan();
         $status = $this->getUserPlanStatus();
         $plan = strtolower($plan);
-        return (in_array($plan, array('pro', 'business', 'professional','essential')) && in_array($status, array('active','trialing')));
+        return (in_array($plan, array('pro', 'business', 'professional', 'essential')) && in_array($status, array('active', 'trialing')));
     }
 
     /**
@@ -1905,6 +1919,7 @@ class Settings
         }
         return false;
     }
+
     /**
      * Check fo entered API key is valid or not
      * @return bool
@@ -2279,11 +2294,11 @@ class Settings
      */
     function setIdentity($value = '')
     {
-        if(!$this->isCustomerPage() || empty($value) || !$this->needPopupWidget()) return;
+        if (!$this->isCustomerPage() || empty($value) || !$this->needPopupWidget()) return;
         $cookie = new Cookie();
         $cookie_data = ['email' => trim($value)];
         $cookie->removeValue('_wc_rnoc_tk_session');
-        if(function_exists('wc_setcookie')){
+        if (function_exists('wc_setcookie')) {
             wc_setcookie('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
         }
 
@@ -2297,8 +2312,8 @@ class Settings
      */
     function getIdentityPath()
     {
-        $path = preg_replace( '|https?://[^/]+|i', '', get_option( 'home' )  );
-        return !empty($path) ? $path: '/';
+        $path = preg_replace('|https?://[^/]+|i', '', get_option('home'));
+        return !empty($path) ? $path : '/';
     }
 
     /**
@@ -2311,7 +2326,7 @@ class Settings
     function getIdentity($key, $default_value = '')
     {
         $cookie = new Cookie();
-        if($cookie->hasKey($key)){
+        if ($cookie->hasKey($key)) {
             return $cookie->getValue($key);
         }
         return $default_value;
@@ -2326,18 +2341,18 @@ class Settings
     {
         $customer_billing_email = $this->wc_functions->getCustomerBillingEmail();
         if ($this->isCustomerPage() && empty($customer_billing_email)) {
-            if(is_user_logged_in()){
+            if (is_user_logged_in()) {
                 $user = wp_get_current_user();
                 $cookie_email = $this->getIdentity('_wc_rnoc_tk_session');
-                if(is_object($user) && !empty($user->user_email) && empty($cookie_email)){
+                if (is_object($user) && !empty($user->user_email) && empty($cookie_email)) {
                     $this->setIdentity($user->user_email);
                 }
             }
             $cookie_email = $this->getIdentity('_wc_rnoc_tk_session');
-            if(!empty($cookie_email)){
-                $cookie_email = json_decode(base64_decode($cookie_email),true);
-                if(is_array($cookie_email) && !empty($cookie_email['email']))
-                $this->wc_functions->setCustomerEmail($cookie_email['email']);
+            if (!empty($cookie_email)) {
+                $cookie_email = json_decode(base64_decode($cookie_email), true);
+                if (is_array($cookie_email) && !empty($cookie_email['email']))
+                    $this->wc_functions->setCustomerEmail($cookie_email['email']);
             }
         }
     }
@@ -2349,7 +2364,7 @@ class Settings
      */
     function isCustomerPage()
     {
-        if(is_ajax()){
+        if (is_ajax()) {
             return true;
         }
         return !is_admin();
