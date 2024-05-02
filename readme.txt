@@ -250,8 +250,8 @@ No. There is no charges for support.
 
 == Changelog ==
 = 2.6.33 =
-- Fix: Stop trash order synchronize
-- Added: Exclude sale item in coupon
+- Fix: Exclude trash order in synchronization
+- Support: Exclude sale item as a params in coupon
 
 = 2.6.32 =
 - Fix: Avoid duplicate cart instances for guest carts proactively
