@@ -31,6 +31,8 @@ class Main
         add_filter('woocommerce_set_cookie_options', array($this, 'changeIdentityPath'), 10, 3);
         add_action('init', array($this, 'activateEvents'));
         add_action('woocommerce_init', array($this, 'includePluginFiles'));
+
+        // add_action('init', array($product, 'changeWebHookHeaderProduct'));
         //add_action('woocommerce_init',array($this->admin,'createWebhook'));
         add_action('woocommerce_init', array($this->admin, 'setIdentityData'));
         //init the retainful premium
@@ -348,9 +350,11 @@ class Main
                 add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
                 //triggers when admin pdate the order
                 add_action('woocommerce_process_shop_order_meta', array($checkout, 'OrderUpdatedShopBackend'), 50, 2);
-
+                $product = new products();
                 //add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
                 add_filter('woocommerce_webhook_http_args', array($checkout, 'changeWebHookHeader'), 10, 3);
+                add_filter('woocommerce_webhook_http_args', array($product, 'changeWebHookHeaderProduct'), 10, 3);
+
                 //Todo: multi currency and multi lingual
                 //add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
                 if ($this->admin->isAfterPayEnabled()) {
