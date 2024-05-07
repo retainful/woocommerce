@@ -213,13 +213,22 @@ class products extends Order
                     'display_name' => $variation_obj->get_name(),
                     'description' => $variation_obj->get_description(),
                     'price' => $variation_obj->get_price(),
-                    'variation_sku' => $variation_obj->get_sku(),
-                    'variation_stock_quantity' => $variation_obj->get_stock_quantity(),
-                    'variation_image' => $variation_obj->get_image(),
-                    'variation_total_sales' => $variation_obj->get_total_sales(),
+                    'sku' => $variation_obj->get_sku(),
+                    'variant_stock_quantity' => $variation_obj->get_stock_quantity(),
+                    'variant_full_image_url' => function_exists('wp_get_attachment_url') ? wp_get_attachment_url($variation_obj->get_image_id()) : '',
+                    'variant_total_sales' => $variation_obj->get_total_sales(),
                 ];
             }
         }
+        $product_category = function_exists('wp_get_post_terms') ? wp_get_post_terms($product->get_id(), 'product_cat') : array();
+        $category = array_map(function ($product_cat) {
+            return $product_cat->name;
+        }, $product_category);
+        $product_tag = function_exists('wp_get_post_terms') ? wp_get_post_terms($product->get_id(), 'product_tag') : array();
+        $tags = array_map(function ($tag) {
+            return $tag->name;
+        }, $product_tag);
+
         $product_data = [
             'id' => $product->get_id(),
             'title' => $product->get_name(),
@@ -235,11 +244,11 @@ class products extends Order
             'product_sku' => $product->get_sku(),
             'product_stock_quantity' => $product->get_stock_quantity(),
             'image_id' => $product->get_image_id(),
-            'product_image_url' => $product->get_image(),
-            'product_category' => wp_get_post_terms($product->get_id(), 'product_cat'),
-            'product_tag' => wp_get_post_terms($product->get_id(), 'product_tag'),
+            'product_image_url' => function_exists('wp_get_attachment_url') ? wp_get_attachment_url($product->get_image_id()) : '',
+            'product_category' => !empty($category) ? $category : array(),
+            'product_tag' => !empty($tags) ? $tags : array(),
             'total_sales' => $product->get_total_sales(),
-            'variant' => $product_variation,
+            'variants' => $product_variation,
             'images' => $images,
         ];
 
