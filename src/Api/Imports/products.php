@@ -86,12 +86,12 @@ class products extends Order
         }
         self::$settings->logMessage($params, 'API Product data matched');
 
-//        if (!$this->hashVerification(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status']), $params['digest'])) {
-//            self::$settings->logMessage($params, 'API Product request digest not matched');
-//            $status = 400;
-//            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed');
-//            return new \WP_REST_Response($response, $status);
-//        }
+        if (!$this->hashVerification(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status']), $params['digest'])) {
+            self::$settings->logMessage($params, 'API Product request digest not matched');
+            $status = 400;
+            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed');
+            return new \WP_REST_Response($response, $status);
+        }
 
 
         $products = $this->getProducts($params);
@@ -203,7 +203,6 @@ class products extends Order
         if ($product->is_type('variable')) {
             $variations = $product->get_available_variations();
             foreach ($variations as $variation) {
-
                 $variation_id = $variation['variation_id'];
                 $variation_obj = wc_get_product($variation_id);
                 $attribute = $variation_obj->get_attributes();
@@ -216,8 +215,11 @@ class products extends Order
                     'sku' => $variation_obj->get_sku(),
                     'variant_stock_quantity' => $variation_obj->get_stock_quantity(),
                     'variant_url' => function_exists('get_permalink') ? get_permalink($variation_id) : '',
+                    'variant_image_id' => $variation_obj->get_image_id(),
                     'variant_image_url' => function_exists('wp_get_attachment_url') ? wp_get_attachment_url($variation_obj->get_image_id()) : '',
                     'variant_total_sales' => $variation_obj->get_total_sales(),
+                    'created_at' => $variation_obj->get_date_created()->date('Y-m-d H:i:s'),
+                    'updated_at' => $variation_obj->get_date_modified()->date('Y-m-d H:i:s'),
                 ];
             }
         }
@@ -236,8 +238,6 @@ class products extends Order
             'description' => $product->get_description(),
             'price' => $product->get_price(),
             'currency' => self::$woocommerce->getDefaultCurrency(),
-            'regular_price' => $product->get_regular_price(),
-            'sale_price' => $product->get_sale_price(),
             'product_url' => function_exists('get_permalink') ? get_permalink($product_id) : '',
             'product_type' => $product->get_type(),
             'created_at' => $product->get_date_created()->date('Y-m-d H:i:s'),
