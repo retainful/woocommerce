@@ -86,7 +86,7 @@ class products extends Order
         }
         self::$settings->logMessage($params, 'API Product data matched');
 
-        if (!$this->hashVerification(array('status' => (string)$params['status'], 'limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id']), $params['digest'])) {
+        if (!$this->hashVerification(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status']), $params['digest'])) {
             self::$settings->logMessage($params, 'API Product request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed');
@@ -119,7 +119,7 @@ class products extends Order
         $default_request_params = array(
             'status' => 'any',
             'digest' => '',
-            'last_days' => 0
+            // 'last_days' => 0
 
         );
         $params = wp_parse_args($request_params, $default_request_params);
