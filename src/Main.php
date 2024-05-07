@@ -103,12 +103,12 @@ class Main
         ));
 
         $product = new products();
-        register_rest_route('retainful-api/v1', '/product', array(
+        register_rest_route('retainful-api/v1', '/products', array(
             'methods' => 'GET',
             'permission_callback' => '__return_true',
             'callback' => array($product, 'getSyncProducts')
         ));
-        register_rest_route('retainful-api/v1', '/product/count', array(
+        register_rest_route('retainful-api/v1', '/products/count', array(
             'methods' => 'GET',
             'permission_callback' => '__return_true',
             'callback' => array($product, 'getSyncProductCount')

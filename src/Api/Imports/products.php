@@ -23,6 +23,7 @@ class products extends Order
         $data = json_encode($data);
         $secret = self::$settings->getSecretKey();
         $reverse_hmac = hash_hmac('sha256', $data, $secret);
+
         return hash_equals($reverse_hmac, $hash_value);
     }
 
@@ -34,10 +35,9 @@ class products extends Order
     protected function getProducts($params)
     {
         if (empty($params)) return array();
-        $start_date = !empty($params['start_date']) ? $params['start_date'] : '0000-00-00 00:00:00';
-        $end_date = !empty($params['end_date']) ? $params['end_date'] : date('Y-m-d H:i:s');
+        $start_date = !empty($params['last_days']) ? date('Y-m-d H:i:s', strtotime('-90 days')) : '0000-00-00 00:00:00';
         global $wpdb;
-        $query = $wpdb->prepare("SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s AND post_date between %s AND %s ORDER BY ID ASC LIMIT %d", array(0, 'trash', $start_date, $end_date, (int)$params['limit']));
+        $query = $wpdb->prepare("SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s AND post_date between %s AND %s ORDER BY ID ASC LIMIT %d", array(0, 'trash', $start_date, date('Y-m-d H:i:s'), (int)$params['limit']));
         return $wpdb->get_results($query);
 
     }
@@ -50,10 +50,9 @@ class products extends Order
     protected function getProductCount($params)
     {
         if (empty($params)) return null;
-        $start_date = !empty($params['start_date']) ? $params['start_date'] : '0000-00-00 00:00:00';
-        $end_date = !empty($params['end_date']) ? $params['end_date'] : date('Y-m-d H:i:s');
+        $start_date = !empty($params['last_days']) ? date('Y-m-d H:i:s', strtotime('-90 days')) : '0000-00-00 00:00:00';
         global $wpdb;
-        $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s AND post_date between %s AND %s", array(0, 'trash', $start_date, $end_date));
+        $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s AND post_date between %s AND %s", array(0, 'trash', $start_date, date('Y-m-d H:i:s')));
         return $wpdb->get_var($query);
     }
 
@@ -65,27 +64,33 @@ class products extends Order
     function getSyncProducts(\WP_REST_Request $request)
     {
         $request_params = $request->get_params();
+
         $default_request_params = array(
             'limit' => 10,
             'id' => 0,
             'status' => 'any',
+            'last_days' => 0,
             'digest' => ''
         );
         $params = wp_parse_args($request_params, $default_request_params);
-        self::$settings->logMessage($params, 'API Orders get request');
-//        if (is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any') {
-//            self::$settings->logMessage($params, 'API Orders data missing');
-//            $status = 400;
-//            $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
-//            return new \WP_REST_Response($response, $status);
-//        }
-//        self::$settings->logMessage($params, 'API Orders data matched');
-//        if (!$this->hashVerification(array('limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'status' => (string)$params['status']), $params['digest'])) {
-//            self::$settings->logMessage($params, 'API Orders request digest not matched');
-//            $status = 400;
-//            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed');
-//            return new \WP_REST_Response($response, $status);
-//        }
+
+        self::$settings->logMessage($params, 'API Product get request');
+        if (is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any' || empty($params['last_days'])) {
+            self::$settings->logMessage($params, 'API Product data missing');
+            $status = 400;
+            $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
+            return new \WP_REST_Response($response, $status);
+        }
+        self::$settings->logMessage($params, 'API Product data matched');
+
+        if (!$this->hashVerification(array('status' => (string)$params['status'], 'limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'last_days' => (int)$params['last_days']), $params['digest'])) {
+            self::$settings->logMessage($params, 'API Product request digest not matched');
+            $status = 400;
+            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed');
+            return new \WP_REST_Response($response, $status);
+        }
+
+
         $products = $this->getProducts($params);
         //Do like his response
         $response = array(
@@ -110,28 +115,29 @@ class products extends Order
         $request_params = $request->get_params();
         $default_request_params = array(
             'status' => 'any',
-            'digest' => ''
+            'digest' => '',
+            'last_days' => 0
+
         );
         $params = wp_parse_args($request_params, $default_request_params);
-//        self::$settings->logMessage($params, 'API Orders get request');
-//        if (empty($params['digest']) || !is_string($params['digest']) || $params['status'] != 'any') {
-//            self::$settings->logMessage($params, 'API Order Count data missing');
-//            $status = 400;
-//            $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
-//            return new \WP_REST_Response($response, $status);
-//        }
-//        self::$settings->logMessage($params, 'API Order Count data matched');
-//        if (!$this->hashVerification(array('status' => $params['status']), $params['digest'])) {
-//            self::$settings->logMessage($params, 'API Order Count request digest not matched');
-//            $status = 400;
-//            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed!');
-//            return new \WP_REST_Response($response, $status);
-//        }
+        self::$settings->logMessage($params, 'API Product get request');
+        if (empty($params['digest']) || !is_string($params['digest']) || $params['status'] != 'any' || empty($params['last_days'])) {
+            self::$settings->logMessage($params, 'API Product Count data missing');
+            $status = 400;
+            $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
+            return new \WP_REST_Response($response, $status);
+        }
+        self::$settings->logMessage($params, 'API Product Count data matched');
+        if (!$this->hashVerification(array('status' => $params['status'], 'last_days' => (int)$params['last_days']), $params['digest'])) {
+            self::$settings->logMessage($params, 'API Product Count request digest not matched');
+            $status = 400;
+            $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed!');
+            return new \WP_REST_Response($response, $status);
+        }
         $response = array(
             'success' => true,
             'RESPONSE_CODE' => 'Ok',
             'total_count' => (int)$this->getProductCount($params)
-            //'total_count' => is_array($orders) ? count($orders) : 0
         );
         $status = 200;
         return new \WP_REST_Response($response, $status);
@@ -155,8 +161,7 @@ class products extends Order
                 return $http_args;
             }
             $product_data = $this->getProductData($product_id);
-
-//            self::$settings->logMessage($product_data, 'import product data');
+//          self::$settings->logMessage($product_data, 'import product data');
             if (!empty($product_data)) {
                 $app_id = self::$settings->getApiKey();
                 $extra_headers = array(
@@ -172,7 +177,7 @@ class products extends Order
                     'data' => $cart_hash
                 );
                 $http_args['body'] = trim(wp_json_encode($body));
-//                self::$settings->logMessage($http_args, 'http import product data');
+//              self::$settings->logMessage($http_args, 'http import product data');
             }
         } catch (Exception $e) {
 
@@ -186,17 +191,26 @@ class products extends Order
         $product = self::$woocommerce->getProduct($product_id);
         $product_variation = array();
         $gallery_image_ids = $product->get_gallery_image_ids();
-        $gallery_image = !empty($gallery_image_ids) ? array_map('wp_get_attachment_url', $gallery_image_ids) : [];
+        $images = array_map(function ($image_id) {
+            return [
+                'id' => $image_id,
+                'url' => function_exists('wp_get_attachment_url') ? wp_get_attachment_url($image_id) : ''
+            ];
+        }, $gallery_image_ids);
+
         if ($product->is_type('variable')) {
             $variations = $product->get_available_variations();
             foreach ($variations as $variation) {
+
                 $variation_id = $variation['variation_id'];
                 $variation_obj = wc_get_product($variation_id);
+                $attribute = $variation_obj->get_attributes();
                 $product_variation[] = [
-                    'variation_id' => $variation_id,
-                    'variation_name' => $variation_obj->get_name(),
-                    'variation_description' => $variation_obj->get_description(),
-                    'variation_price' => $variation_obj->get_price(),
+                    'id' => $variation_id,
+                    'title' => !empty($attribute['pa_color']) ? $attribute['pa_color'] : '',
+                    'display_name' => $variation_obj->get_name(),
+                    'description' => $variation_obj->get_description(),
+                    'price' => $variation_obj->get_price(),
                     'variation_sku' => $variation_obj->get_sku(),
                     'variation_stock_quantity' => $variation_obj->get_stock_quantity(),
                     'variation_image' => $variation_obj->get_image(),
@@ -205,21 +219,26 @@ class products extends Order
             }
         }
         $product_data = [
-            'product_id' => $product->get_id(),
-            'product_name' => $product->get_name(),
-            'product_description' => $product->get_description(),
-            'product_price' => $product->get_price(),
+            'id' => $product->get_id(),
+            'title' => $product->get_name(),
+            'description' => $product->get_description(),
+            'price' => $product->get_price(),
+            'currency' => self::$woocommerce->getDefaultCurrency(),
             'regular_price' => $product->get_regular_price(),
             'sale_price' => $product->get_sale_price(),
+            'product_type' => $product->get_type(),
+            'created_at' => $product->get_date_created(),
+            'updated_at' => $product->get_date_modified(),
             'status' => $product->get_status(),
             'product_sku' => $product->get_sku(),
             'product_stock_quantity' => $product->get_stock_quantity(),
-            'product_image' => $product->get_image(),
+            'image_id' => $product->get_image_id(),
+            'product_image_url' => $product->get_image(),
             'product_category' => wp_get_post_terms($product->get_id(), 'product_cat'),
             'product_tag' => wp_get_post_terms($product->get_id(), 'product_tag'),
             'total_sales' => $product->get_total_sales(),
             'variant' => $product_variation,
-            'gallery_image' => $gallery_image,
+            'images' => $images,
         ];
 
         return $product_data;
