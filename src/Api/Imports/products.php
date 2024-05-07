@@ -35,9 +35,11 @@ class products extends Order
     protected function getProducts($params)
     {
         if (empty($params)) return array();
-        $start_date = !empty($params['last_days']) ? date('Y-m-d H:i:s', strtotime('-90 days')) : '0000-00-00 00:00:00';
+        $limit = !empty($params['limit']) ? $params['limit'] : 10;
+        // $start_date = !empty($params['last_days']) ? date('Y-m-d H:i:s', strtotime('-90 days')) : '0000-00-00 00:00:00';
         global $wpdb;
-        $query = $wpdb->prepare("SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s AND post_date between %s AND %s ORDER BY ID ASC LIMIT %d", array(0, 'trash', $start_date, date('Y-m-d H:i:s'), (int)$params['limit']));
+        //$query = $wpdb->prepare("SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s AND post_date between %s AND %s ORDER BY ID ASC LIMIT %d", array(0, 'trash', $start_date, date('Y-m-d H:i:s'), (int)$params['limit']));
+        $query = $wpdb->prepare("SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s ORDER BY ID ASC LIMIT %d", array(0, 'trash', (int)$limit));
         return $wpdb->get_results($query);
 
     }
@@ -49,10 +51,11 @@ class products extends Order
      */
     protected function getProductCount($params)
     {
-        if (empty($params)) return null;
-        $start_date = !empty($params['last_days']) ? date('Y-m-d H:i:s', strtotime('-90 days')) : '0000-00-00 00:00:00';
+        // if (empty($params)) return null;
+        // $start_date = !empty($params['last_days']) ? date('Y-m-d H:i:s', strtotime('-90 days')) : '0000-00-00 00:00:00';
         global $wpdb;
-        $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s AND post_date between %s AND %s", array(0, 'trash', $start_date, date('Y-m-d H:i:s')));
+        //$query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s AND post_date between %s AND %s", array(0, 'trash', $start_date, date('Y-m-d H:i:s')));
+        $query = $wpdb->prepare("SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s", array(0, 'trash'));
         return $wpdb->get_var($query);
     }
 
@@ -69,13 +72,13 @@ class products extends Order
             'limit' => 10,
             'id' => 0,
             'status' => 'any',
-            'last_days' => 0,
+            //'last_days' => 0,
             'digest' => ''
         );
         $params = wp_parse_args($request_params, $default_request_params);
 
         self::$settings->logMessage($params, 'API Product get request');
-        if (is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any' || empty($params['last_days'])) {
+        if (is_array($params['limit']) || empty($params['digest']) || !is_string($params['digest']) || empty($params['limit']) || $params['since_id'] < 0 || $params['status'] != 'any') {
             self::$settings->logMessage($params, 'API Product data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
@@ -83,7 +86,7 @@ class products extends Order
         }
         self::$settings->logMessage($params, 'API Product data matched');
 
-        if (!$this->hashVerification(array('status' => (string)$params['status'], 'limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id'], 'last_days' => (int)$params['last_days']), $params['digest'])) {
+        if (!$this->hashVerification(array('status' => (string)$params['status'], 'limit' => (int)$params['limit'], 'since_id' => (int)$params['since_id']), $params['digest'])) {
             self::$settings->logMessage($params, 'API Product request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed');
@@ -121,14 +124,14 @@ class products extends Order
         );
         $params = wp_parse_args($request_params, $default_request_params);
         self::$settings->logMessage($params, 'API Product get request');
-        if (empty($params['digest']) || !is_string($params['digest']) || $params['status'] != 'any' || empty($params['last_days'])) {
+        if (empty($params['digest']) || !is_string($params['digest']) || $params['status'] != 'any') {
             self::$settings->logMessage($params, 'API Product Count data missing');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
             return new \WP_REST_Response($response, $status);
         }
         self::$settings->logMessage($params, 'API Product Count data matched');
-        if (!$this->hashVerification(array('status' => $params['status'], 'last_days' => (int)$params['last_days']), $params['digest'])) {
+        if (!$this->hashVerification(array('status' => $params['status']), $params['digest'])) {
             self::$settings->logMessage($params, 'API Product Count request digest not matched');
             $status = 400;
             $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed!');
@@ -197,7 +200,6 @@ class products extends Order
                 'url' => function_exists('wp_get_attachment_url') ? wp_get_attachment_url($image_id) : ''
             ];
         }, $gallery_image_ids);
-
         if ($product->is_type('variable')) {
             $variations = $product->get_available_variations();
             foreach ($variations as $variation) {
@@ -227,8 +229,8 @@ class products extends Order
             'regular_price' => $product->get_regular_price(),
             'sale_price' => $product->get_sale_price(),
             'product_type' => $product->get_type(),
-            'created_at' => $product->get_date_created(),
-            'updated_at' => $product->get_date_modified(),
+            'created_at' => $product->get_date_created()->date('Y-m-d H:i:s'),
+            'updated_at' => $product->get_date_modified()->date('Y-m-d H:i:s'),
             'status' => $product->get_status(),
             'product_sku' => $product->get_sku(),
             'product_stock_quantity' => $product->get_stock_quantity(),
