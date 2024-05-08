@@ -218,8 +218,8 @@ class products extends Order
                     'variant_image_id' => $variation_obj->get_image_id(),
                     'variant_image_url' => function_exists('wp_get_attachment_url') ? wp_get_attachment_url($variation_obj->get_image_id()) : '',
                     'variant_total_sales' => $variation_obj->get_total_sales(),
-                    'created_at' => $variation_obj->get_date_created()->date('Y-m-d H:i:s'),
-                    'updated_at' => $variation_obj->get_date_modified()->date('Y-m-d H:i:s'),
+                    'created_at' => $this->formatToIso8601($variation_obj->get_date_created()),
+                    'updated_at' => $this->formatToIso8601($variation_obj->get_date_modified()),
                 ];
             }
         }
@@ -240,8 +240,8 @@ class products extends Order
             'currency' => self::$woocommerce->getDefaultCurrency(),
             'product_url' => function_exists('get_permalink') ? get_permalink($product_id) : '',
             'product_type' => $product->get_type(),
-            'created_at' => $product->get_date_created()->date('Y-m-d H:i:s'),
-            'updated_at' => $product->get_date_modified()->date('Y-m-d H:i:s'),
+            'created_at' => $this->formatToIso8601($product->get_date_created()),
+            'updated_at' => $this->formatToIso8601($product->get_date_modified()),
             'status' => $product->get_status(),
             'product_sku' => $product->get_sku(),
             'product_stock_quantity' => $product->get_stock_quantity(),
