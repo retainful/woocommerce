@@ -946,8 +946,7 @@ class Settings
         if (in_array($topic, array('order.created', 'order.updated'))) {
             $url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
         } elseif (in_array($topic, array('product.created', 'product.updated', 'product.deleted'))) {
-            $type = in_array($topic, array('product.created', 'product.updated')) ? 'upsert' : 'delete';
-            $url = 'https://webhook-event-pusher.ngrok.io/development/v3/event/woocommerce/product/' . $type;
+            $url = 'https://webhook-event-pusher.ngrok.io/development/v3/event/woocommerce/products';
         }
         return $url;
     }
