@@ -103,6 +103,7 @@ class RetainfulApi
                 $use_wp_requests = false;
                 \Requests::register_autoloader();
             }
+
             switch ($method) {
                 case 'post':
                     if ($use_wp_requests) {
@@ -116,6 +117,7 @@ class RetainfulApi
                         $result = wp_remote_post($url, $args);
                     } else {
                         $result = \Requests::post($url, $headers, $body);
+
                     }
                     break;
                 default:
@@ -200,9 +202,11 @@ class RetainfulApi
     function syncCartDetails($app_id, $body = '', $extra_headers = array())
     {
         $url = $this->getAbandonedCartEndPoint();
+
         $body = array(
             'data' => $body
         );
+
         if (is_array($body) || is_object($body)) {
             $body = json_encode($body);
         }
@@ -214,6 +218,7 @@ class RetainfulApi
         if (is_array($extra_headers) && !empty($extra_headers)) {
             $headers = array_merge($headers, $extra_headers);
         }
+
         $this->request($url, array(), 'post', $body, $headers, false);
         return true;
     }

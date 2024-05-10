@@ -223,6 +223,7 @@ class Checkout extends RestApi
             $this->unsetOrderTempData();
         }
         $order_data = $order_obj->getOrderData($order);
+
         if (empty($order_data)) {
             return null;
         }

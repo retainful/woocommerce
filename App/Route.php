@@ -20,14 +20,17 @@ class Route
 
     public static function init()
     {
+
         self::$settings = empty(self::$settings) ? new Settings() : self::$settings;
         self::$base_controller = empty(self::$base_controller) ? new BaseController() : self::$base_controller;
         //ini plugin hooks
         do_action('rnoc_before_init');
+
         self::addCommonHooks();
         if (is_admin()) {
             self::addAdminHooks();
         } else {
+
             self::addSiteHooks();
         }
         do_action('rnoc_after_init');
@@ -36,12 +39,12 @@ class Route
 
     public static function addAdminHooks()
     {
+
         add_action('admin_menu', array(self::$settings, 'registerMenu'));
         add_action('admin_enqueue_scripts', array(self::$settings, 'initAdminPageStyles'));
         add_action('wp_ajax_rnoc_save_settings', array(self::$settings, 'saveAcSettings'));
         add_action('wp_ajax_rnoc_save_settings', array(self::$settings, 'saveAcSettings'));
         add_action('wp_ajax_rnoc_disconnect_license', array(self::$settings, 'disconnectLicense'));
-
         //add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
         //Validate key
         // add_action('wp_ajax_validate_app_key', array(self::$base_controller, 'validateAppKey'));
@@ -58,6 +61,7 @@ class Route
         */
         $cart = new Cart();
         $checkout = new Checkout();
+
         add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
         add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
         add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));

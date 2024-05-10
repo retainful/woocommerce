@@ -26,6 +26,7 @@ class Settings extends BaseController
      */
     function registerMenu()
     {
+
         $webhook = new Webhooks();
         add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat', 56);
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
@@ -130,6 +131,7 @@ class Settings extends BaseController
      */
     function retainfulLicensePage()
     {
+
         $webhook = new Webhooks();
         $settings = get_option($this->slug . '_license', array());
         $default_settings = array(
@@ -246,6 +248,57 @@ class Settings extends BaseController
         } else {
             return "woocommerce";
         }
+    }
+
+    /**
+     * Get the user current plan
+     * @return mixed|string
+     */
+    function getUserActivePlan()
+    {
+        $plan_details = $this->getPlanDetails();
+        return strtolower(trim(isset($plan_details['plan']) ? $plan_details['plan'] : 'free'));
+    }
+
+
+    /**
+     * Check the user plan is pro
+     * @return bool
+     */
+    function isProPlan()
+    {
+        $plan = $this->getUserActivePlan();
+        $status = $this->getUserPlanStatus();
+        $plan = strtolower($plan);
+        return (in_array($plan, array('pro', 'business', 'professional', 'essential')) && in_array($status, array('active', 'trialing')));
+    }
+
+    /**
+     * Get the user current plan
+     * @return mixed|string
+     */
+    function getUserPlanStatus()
+    {
+        $plan_details = $this->getPlanDetails();
+        return strtolower(trim(isset($plan_details['status']) ? $plan_details['status'] : 'inactive'));
+    }
+
+    /**
+     * @param string $response
+     * @return array
+     */
+    function getPlanDetails($response = \stdClass::class)
+    {
+        $plan = isset($response->plan) ? strtolower($response->plan) : 'free';
+        $status = isset($response->status) ? strtolower($response->status) : 'active';
+        $period_end = isset($response->period_end) ? strtolower($response->period_end) : 'never';
+        $message = isset($response->message) ? strtolower($response->message) : 'App connected successfully';
+        return array(
+            'plan' => (empty($plan)) ? 'free' : $plan,
+            'status' => (empty($status)) ? 'active' : $status,
+            'expired_on' => (empty($period_end)) ? 'never' : $period_end,
+            'message' => $message,
+        );
     }
 
 }

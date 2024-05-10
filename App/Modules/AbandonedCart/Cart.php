@@ -14,317 +14,6 @@ class Cart extends RestApi
         parent::__construct();
     }
 
-    /**
-     * User logged in the store
-     * @param $user_name
-     */
-    function userLoggedOn($user_name)
-    {
-        if ($user_name) {
-            $user = get_user_by('login', $user_name);
-            if (!empty($user)) {
-                $this->userSignedUp($user->ID);
-            } else {
-                $user = get_user_by('email', $user_name);
-                if ($user) {
-                    $this->userSignedUp($user->ID);
-                }
-            }
-        }
-    }
-
-    /**
-     * Remove cart token on success logout
-     */
-    function userLoggedOut()
-    {
-        self::$storage->removeValue($this->cart_token_key);
-        self::$storage->removeValue($this->cart_tracking_started_key);
-        //$this->removeSessionBillingDetails();
-        //$this->removeSessionShippingDetails();
-    }
-
-    /**
-     * When user signed up
-     * @param $user_id
-     */
-    function userSignedUp($user_id)
-    {
-        $cart_token = self::$storage->getValue($this->cart_token_key);
-        if (!empty($cart_token)) {
-            update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
-        }
-        $cart_created_at = self::$storage->getValue($this->cart_tracking_started_key);
-        if (!empty($cart_created_at)) {
-            update_user_meta($user_id, $this->cart_tracking_started_key_for_db, $cart_created_at);
-        }
-    }
-
-    /**
-     * Show GDPR message to guest user
-     * @param $fields
-     * @return mixed
-     */
-    function guestGdprMessage($fields)
-    {
-        $settings = self::$settings->getAdminSettings();
-        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
-        $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
-        $field_name = isset($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) ? $settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] : 'after_billing_email';
-        if ($enable_gdpr_compliance && $field_name == 'after_billing_email' && $message && isset($fields['billing']['billing_email'])) {
-            $fields['billing'][RNOC_PLUGIN_PREFIX . 'allow_gdpr'] = [
-                'label' => __($message, RNOC_TEXT_DOMAIN),
-                'type' => 'checkbox',
-                'priority' => $fields['billing']['billing_email']['priority'],
-                'default' => (int)$this->isBuyerAcceptsMarketing()
-            ];
-        }
-        return $fields;
-    }
-
-    function guestTermGdprMessage()
-    {
-        $settings = self::$settings->getAdminSettings();
-        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
-        $field_name = isset($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) ? $settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] : 'after_billing_email';
-        $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
-        if ($enable_gdpr_compliance && $field_name == 'after_term_and_condition' && $message) {
-            echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
-            name="' . RNOC_PLUGIN_PREFIX . 'allow_gdpr' . '" id="' . RNOC_PLUGIN_PREFIX . 'allow_gdpr' . '" ' . ($this->isBuyerAcceptsMarketing() ? 'checked="checked"' : '') . ' />
-					<span class="woocommerce-terms-and-conditions-checkbox-text">' . __($message, RNOC_TEXT_DOMAIN) . ' ' . __('(optional)', RNOC_TEXT_DOMAIN) . '</span>';
-        }
-    }
-
-    /**
-     * Show GDPR message to logged in users
-     */
-    /*function userGdprMessage()
-    {
-        $settings = self::$settings->getAdminSettings();
-        $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
-        $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
-        if ($enable_gdpr_compliance && $message) {
-            echo "<p><small>" . __($message, RNOC_TEXT_DOMAIN) . "</small></p>";
-        }
-    }*/
-
-    /**
-     * Track the customer, and set details to session
-     */
-    function setCustomerData()
-    {
-        if (isset($_POST['billing_email'])) {
-            $billing_address = array();
-            $shipping_address = array();
-            //billing address fields
-            $address_fields = $this->getAddressMapFields();
-            foreach ($address_fields as $field) {
-                $billing_field_name = 'billing_' . $field;
-                if (isset($_POST[$billing_field_name]) && array_key_exists($billing_field_name, $_POST) && $billing_field_name != 'billing_email') {
-                    $billing_address[$billing_field_name] = sanitize_text_field($_POST[$billing_field_name]);
-                }
-            }
-            $settings = self::$settings->getAdminSettings();
-            $is_buyer_accepting_marketing = true;
-            if (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance']) && $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance']) {
-                $is_buyer_accepting_marketing = (isset($_POST['allow_gdpr']) && $_POST['allow_gdpr'] == 'true');
-            }
-            self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
-            $this->setCustomerBillingDetails($billing_address);
-            // $order_notes = (isset($_POST['order_notes'])) ? sanitize_text_field($_POST['order_notes']) : '';
-            //shipping address fields
-            foreach ($address_fields as $field) {
-                $shipping_field_name = 'shipping_' . $field;
-                if (isset($_POST[$shipping_field_name]) && array_key_exists($shipping_field_name, $_POST)) {
-                    $shipping_address[$shipping_field_name] = sanitize_text_field($_POST[$shipping_field_name]);
-                }
-            }
-            //Shipping to same billing address
-            $ship_to_billing = (isset($_POST['ship_to_billing'])) ? $_POST['ship_to_billing'] : 0;
-            if (intval($ship_to_billing) < 1) {
-                foreach ($address_fields as $field) {
-                    $shipping_field_name = 'shipping_' . $field;
-                    $billing_field_name = 'billing_' . $field;
-                    $shipping_address[$shipping_field_name] = isset($billing_address[$billing_field_name]) && !empty($billing_address[$billing_field_name]) ? $billing_address[$billing_field_name] : '';
-                }
-            }
-            $this->setSessionShippingDetails($shipping_address);
-            //Billing email
-            $billing_email = sanitize_email($_POST['billing_email']);
-            self::$woocommerce->setCustomerEmail($billing_email);
-            self::$settings->setIdentity($billing_email);
-            //Set update and created date
-            $session_created_at = self::$storage->getValue('rnoc_session_created_at');
-            $current_time = current_time('timestamp', true);
-            if (empty($session_created_at)) {
-                self::$storage->setValue('rnoc_session_created_at', $current_time);
-            }
-        }
-        if ($this->isValidCartToTrack()) {
-            $cart_token = $this->retrieveCartToken();
-            if (empty($cart_token) && !empty($_POST['cart_token'])) {
-                $this->setCartToken($_POST['cart_token']);
-            }
-            $cart = $this->getUserCart();
-            $encrypted_cart = $this->encryptData($cart);
-            wp_send_json_success($encrypted_cart);
-        } else {
-            //dont send anything
-            wp_send_json(array('success' => false));
-        }
-    }
-
-    /**
-     * send the ajax encrypted cart
-     */
-    function ajaxGetEncryptedCart()
-    {
-        $cart = $this->getUserCart();
-        $encrypted_cart = $this->encryptData($cart);
-        wp_send_json_success($encrypted_cart);
-    }
-
-    /**
-     * get the AC Js tracking engine
-     * @return mixed|void
-     */
-    function getAbandonedCartJsEngineUrl()
-    {
-        return apply_filters('rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION);
-    }
-
-    /**
-     * Adding the script to track user cart
-     */
-    function addCartTrackingScripts()
-    {
-        if (!wp_script_is('wc-cart-fragments', 'enqueued')) {
-            wp_enqueue_script('wc-cart-fragments');
-        }
-        if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
-            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
-            $user_ip = $this->getClientIp();
-            $user_ip = $this->formatUserIP($user_ip);
-            $data = array(
-                'ajax_url' => admin_url('admin-ajax.php'),
-                'jquery_url' => includes_url('js/jquery/jquery.js'),
-                'ip' => $user_ip,
-                'version' => RNOC_VERSION,
-                'public_key' => self::$settings->getApiKey(),
-                'api_url' => self::$api->getAbandonedCartEndPoint(),
-                'tracking_element_selector' => $this->getTrackingElementId(),
-                'cart_tracking_engine' => self::$settings->getCartTrackingEngine()
-            );
-            $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
-            wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
-        }
-    }
-
-    /**
-     * Clean the url
-     * @param $good_protocol_url
-     * @param $original_url
-     * @param $_context
-     * @return string
-     */
-    function uncleanUrl($good_protocol_url, $original_url, $_context)
-    {
-        if (false !== strpos($original_url, 'data-cfasync')) {
-            remove_filter('clean_url', 'unclean_url', 10);
-            $url_parts = parse_url($good_protocol_url);
-            return $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'] . "' data-cfasync='false";
-        }
-        return $good_protocol_url;
-    }
-
-    /**
-     * Adding script ID attribute
-     * @param $src
-     * @param $handle
-     * @return string
-     */
-    function addCloudFlareAttrScript($tag, $handle, $src)
-    {
-        if ($handle === RNOC_PLUGIN_PREFIX . 'track-user-cart') {
-            $escapedHandle = esc_attr($handle);
-            $scriptTag = "<script src='{$src}' id='{$escapedHandle}-js' data-cfasync='false' defer></script>";
-            return apply_filters('rnoc_add_attr_script', $scriptTag, $handle, $src);
-        }
-        return $tag;
-    }
-
-    /**
-     * Recover user cart
-     */
-    function recoverUserCart()
-    {
-        // recovery URL
-        if (!empty($_REQUEST['token']) && !empty($_REQUEST['hash'])) {
-            $this->recoverCart();
-        }
-    }
-
-    /**
-     * Add abandon cart coupon automatically
-     */
-    function applyAbandonedCartCoupon()
-    {
-        if (is_admin()) return;
-
-        if (isset($_REQUEST['retainful_ac_coupon']) && !empty($_REQUEST['retainful_ac_coupon'])) {
-            $coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
-            self::$storage->setValue('rnoc_ac_coupon', $coupon_code);
-        }
-        $session_coupon = self::$storage->getValue('rnoc_ac_coupon');
-        if (!empty($session_coupon)) {
-            if (self::$woocommerce->isValidCoupon($session_coupon)) {
-                $cart = self::$woocommerce->getCart();
-                if (!empty($cart) && !self::$woocommerce->hasDiscount($session_coupon)) {
-                    if (self::$woocommerce->addDiscount($session_coupon)) {
-                        self::$storage->removeValue('rnoc_ac_coupon');
-                    }
-                }
-            } /*else {
-                self::$storage->removeValue('rnoc_ac_coupon');
-            }*/
-        }
-    }
-
-    function removeNextOrderCouponFromCart($remove_coupon)
-    {
-        $coupon_code = self::$storage->getValue('rnoc_ac_coupon');
-        if (strtoupper($remove_coupon) == strtoupper($coupon_code)) {
-            self::$storage->removeValue('rnoc_ac_coupon');
-        }
-    }
-
-    /**
-     * User cart updated
-     */
-    function cartUpdated()
-    {
-        $cart_token = $this->getCartToken();
-        if ($cart_token) {
-            try {
-                $this->syncCartData();
-            } catch (Exception $exception) {
-                // clear session so a new Retainful order can be created
-                if (404 == $exception->getCode()) {
-                    $this->removeCartToken();
-                    // try to create the order below
-                    $cart_token = null;
-                }
-                //log exception
-            }
-        }
-        if (!$cart_token && !self::$woocommerce->isCartEmpty()) {
-            try {
-                $this->syncCartData();
-            } catch (Exception $exception) {
-                //log exception
-            }
-        }
-    }
 
     /**
      * Check weather Retainful needs to track the cart or not
@@ -589,12 +278,7 @@ class Cart extends RestApi
      */
     function getUserIPDetails()
     {
-        $user_ip = $this->retrieveUserIp();
-        if (empty($user_ip)) {
-            $user_ip = $this->getClientIp();
-            $user_ip = $this->formatUserIP($user_ip);
-        }
-        return $user_ip;
+        return empty($user_ip) ? $this->formatUserIP($this->getClientIp()) : $this->retrieveUserIp();
     }
 
     /**
@@ -1210,47 +894,32 @@ class Cart extends RestApi
     function getCustomerDetails()
     {
         $billing_email = self::$woocommerce->getCustomerEmail();
-        if ($user_id = get_current_user_id()) {
-            $user_data = wp_get_current_user();
-            if (empty($billing_email)) {
-                $billing_email = $user_data->user_email;
-            }
+        $user_id = self::$woocommerce->getCurrentUserId();
+        $created_at = self::$storage->getValue('rnoc_session_created_at');
+        $updated_at = current_time('timestamp', true);
+        $billing_details = $this->getCustomerCheckoutDetails('billing');
+        if (empty($billing_details)) {
+            $billing_details = array();
+        }
+        $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
+        $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
+        $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
+        $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
+        $user_data = self::$woocommerce->getCurrentUser();
+        if ($user_id && !empty($user_data)) {
+            $billing_email = empty($billing_email) ? $user_data->user_email : $billing_email;
             $created_at = $updated_at = strtotime($user_data->user_registered);
             $billing_details = $this->getCustomerCheckoutDetails('billing');
-            $billing_first_name = get_user_meta($user_id, 'billing_first_name', true);
-            if (empty($billing_first_name)) {
-                $billing_first_name = $user_data->first_name;
-            }
-            if (empty($billing_first_name)) {
-                $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
-            }
-            $billing_last_name = get_user_meta($user_id, 'billing_last_name', true);
-            if (empty($billing_last_name)) {
-                $billing_last_name = $user_data->last_name;
-            }
-            if (empty($billing_last_name)) {
-                $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
-            }
-            $billing_state = get_user_meta($user_id, 'billing_state', true);
-            if (empty($billing_state)) {
-                $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
-            }
-            $billing_phone = get_user_meta($user_id, 'billing_phone', true);
-            if (empty($billing_phone)) {
-                $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
-            }
-        } else {
-            $user_id = 0;
-            $created_at = self::$storage->getValue('rnoc_session_created_at');
-            $updated_at = current_time('timestamp', true);
-            $billing_details = $this->getCustomerCheckoutDetails('billing');
-            if (empty($billing_details)) {
-                $billing_details = array();
-            }
-            $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
-            $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
-            $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
-            $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
+            $billing_first_name = self::$woocommerce->getUserMeta($user_id, 'billing_first_name', true);
+            $billing_first_name = empty($billing_first_name) ? $user_data->first_name : $billing_first_name;
+            $billing_first_name = empty($billing_first_name) ? (isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL) : $billing_first_name;
+            $billing_last_name = self::$woocommerce->getUserMeta($user_id, 'billing_last_name', true);
+            $billing_last_name = empty($billing_last_name) ? $user_data->last_name : $billing_last_name;
+            $billing_last_name = empty($billing_last_name) ? (isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL) : $billing_last_name;
+            $billing_state = self::$woocommerce->getUserMeta($user_id, 'billing_state', true);
+            $billing_state = empty($billing_state) ? (isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL) : $billing_state;
+            $billing_phone = self::$woocommerce->getUserMeta($user_id, 'billing_phone', true);
+            $billing_phone = empty($billing_phone) ? (isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL) : $billing_phone;
         }
         return array(
             'id' => $user_id,
@@ -1262,9 +931,6 @@ class Cart extends RestApi
             'currency' => self::$settings->getBaseCurrency(),
             'created_at' => $this->formatToIso8601($created_at),
             'updated_at' => $this->formatToIso8601($updated_at),
-            /*'total_spent' => self::$woocommerce->getCustomerTotalSpent($billing_email),
-            'orders_count' => self::$woocommerce->getCustomerTotalOrders($billing_email),
-            'last_order_id' => self::$woocommerce->getCustomerLastOrderId($billing_email),*/
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,

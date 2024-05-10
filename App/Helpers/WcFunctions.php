@@ -2117,4 +2117,27 @@ class WcFunctions
         return apply_filters('rnoc_custom_default_currency', $currency);
     }
 
+    /**
+     * @return int|null
+     */
+    function getCurrentUserId()
+    {
+        return function_exists('get_current_user_id') ? get_current_user_id() : NULL;
+    }
+
+    /**
+     * @return \WP_User|null
+     */
+    function getCurrentUser()
+    {
+        return function_exists('wp_get_current_user') ? wp_get_current_user() : NULL;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    function getUserMeta($user_id, $key, $single)
+    {
+        return function_exists('get_user_meta') ? get_user_meta($user_id, $key, $single) : NULL;
+    }
 }

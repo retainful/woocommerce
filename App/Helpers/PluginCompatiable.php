@@ -1,9 +1,10 @@
 <?php
 
-namespace Rnoc\Retainful\Helpers;
+namespace Rnoc\App\Helpers;
+
 defined('ABSPATH') || exit; // Exit if accessed directly
 
-class plugin
+class PluginCompatiable
 {
     /**
      * Check the plugin are active or not.

@@ -352,11 +352,7 @@ class RestApi
      */
     function retrieveUserIp($user_id = NULL)
     {
-        if ($user_id) {
-            $ip = get_user_meta($user_id, $this->user_ip_key_for_db);
-        } else {
-            $ip = $this->getClientIp();
-        }
+        $ip = !empty($user_id) ? get_user_meta($user_id, $this->user_ip_key_for_db) : $this->getClientIp();
         return $this->formatUserIP($ip);
     }
 
@@ -640,7 +636,7 @@ class RestApi
     function userCartCreatedAt($user_id = NULL)
     {
         if ($user_id || $user_id = get_current_user_id()) {
-            $cart_created_at = get_user_meta($user_id, $this->cart_tracking_started_key_for_db, true);
+            $cart_created_at = self::$woocommerce->getUserMeta($user_id, $this->cart_tracking_started_key_for_db, true);
         } else {
             $cart_created_at = self::$storage->getValue($this->cart_tracking_started_key);
         }

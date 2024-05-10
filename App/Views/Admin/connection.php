@@ -4,8 +4,8 @@
  */
 require_once "tabs.php";
 $is_app_connected = ($settings[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] == 1);
-$api = new \Rnoc\Retainful\library\RetainfulApi();
-$admin_settings = new Rnoc\Retainful\Admin\Settings();
+$api = new \Rnoc\App\library\RetainfulApi();
+$admin_settings = new \Rnoc\App\Controller\Admin\Settings();
 ?>
 <form id="retainful-license-form" class="card">
     <table class="form-table" role="presentation">
@@ -19,7 +19,8 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
             <td>
                 <input name="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>" type="text"
                        id="<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>"
-                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']); ?>" class="regular-text">
+                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']); ?>"
+                       class="regular-text">
                 <p class="error" id="error_app_id" style="color: red;"></p>
                 <p class="description">
                     <?php

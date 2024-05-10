@@ -5,9 +5,9 @@ namespace Rnoc\App\Controller\Admin;
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\App\Helpers\Input;
-use Rnoc\Retainful\Api\AbandonedCart\RestApi;
-use Rnoc\Retainful\Integrations\MultiLingual;
-use Rnoc\Retainful\library\RetainfulApi;
+use Rnoc\App\Modules\AbandonedCart\RestApi;
+use Rnoc\App\Modules\Integrations\MultiLingual;
+use Rnoc\App\library\RetainfulApi;
 use Rnoc\App\Helpers\WcFunctions;
 
 class BaseController

@@ -67,9 +67,10 @@ if (!file_exists(RNOC_PLUGIN_PATH . '/vendor/autoload.php')) {
     return;
 }
 
+
 require __DIR__ . '/vendor/autoload.php';
-if (class_exists('Rnoc\Retainful\Route')) {
-    if (Rnoc\Retainful\Helpers\plugin::checkDependencies()) {
-        Rnoc\App\Route::init(); // init plugin hooks
+if (class_exists('Rnoc\App\Route')) {
+    if (\Rnoc\App\Helpers\PluginCompatiable::checkDependencies()) {
+        \Rnoc\App\Route::init(); // init plugin hooks
     }
 }
