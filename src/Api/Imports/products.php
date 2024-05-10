@@ -16,15 +16,23 @@ class products extends Order
      */
     protected function hashVerification($data, $hash_value)
     {
+        $reverse_hmac = $this->hashToken($data);
+        return hash_equals($reverse_hmac, $hash_value);
+    }
 
-        if (!is_array($data) || !is_string($hash_value)) {
+    /**
+     * Hash token
+     * @param $data
+     * @return string
+     */
+    protected function hashToken($data)
+    {
+        if (!is_array($data)) {
             return false;
         }
         $data = json_encode($data);
         $secret = self::$settings->getSecretKey();
-        $reverse_hmac = hash_hmac('sha256', $data, $secret);
-
-        return hash_equals($reverse_hmac, $hash_value);
+        return hash_hmac('sha256', $data, $secret);
     }
 
     /**
@@ -164,7 +172,14 @@ class products extends Order
                 return $http_args;
             }
             $product_data = $this->getProductData($product_id);
-//          self::$settings->logMessage($product_data, 'import product data');
+
+            if (is_array($product_data['id']) || empty($product_data['created_at'])) {
+                self::$settings->logMessage($product_data, 'API Product data missing');
+                $status = 400;
+                $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
+                return new \WP_REST_Response($response, $status);
+            }
+            $product_data['digest'] = $this->hashToken(array($product_data['id'], $product_data['created_at']));
             if (!empty($product_data)) {
                 $app_id = self::$settings->getApiKey();
                 $extra_headers = array(
@@ -175,9 +190,9 @@ class products extends Order
                 foreach ($extra_headers as $key => $value) {
                     $http_args['headers'][$key] = $value;
                 }
-                $cart_hash = $this->encryptData($product_data);
+                //$cart_hash = $this->encryptData($product_data);
                 $body = array(
-                    'data' => $cart_hash
+                    'data' => $product_data
                 );
                 $http_args['body'] = trim(wp_json_encode($body));
 //              self::$settings->logMessage($http_args, 'http import product data');
