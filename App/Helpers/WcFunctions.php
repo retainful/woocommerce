@@ -1022,10 +1022,7 @@ class WcFunctions
      */
     function getCart()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_cart')) {
-            return WC()->cart->get_cart();
-        }
-        return array();
+        return $this->isMethodExists(WC()->cart, 'get_cart') ? WC()->cart->get_cart() : array();
     }
 
     /**
@@ -1170,10 +1167,7 @@ class WcFunctions
      */
     function getCartTotalPrice()
     {
-        if (isset(WC()->cart->total)) {
-            return WC()->cart->total;
-        }
-        return 0;
+        return isset(WC()->cart->total) && !empty(WC()->cart->total) ? WC()->cart->total : 0;
     }
 
     /**
@@ -1193,10 +1187,7 @@ class WcFunctions
      */
     function getCartTaxes()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_tax_totals')) {
-            return WC()->cart->get_tax_totals();
-        }
-        return array();
+        return $this->isMethodExists(WC()->cart, 'get_tax_totals') ? WC()->cart->get_tax_totals() : array();
     }
 
     /**

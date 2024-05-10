@@ -202,11 +202,9 @@ class RetainfulApi
     function syncCartDetails($app_id, $body = '', $extra_headers = array())
     {
         $url = $this->getAbandonedCartEndPoint();
-
         $body = array(
             'data' => $body
         );
-
         if (is_array($body) || is_object($body)) {
             $body = json_encode($body);
         }

@@ -629,12 +629,8 @@ class RestApi
      */
     function userCartCreatedAt($user_id = NULL)
     {
-        if ($user_id || $user_id = get_current_user_id()) {
-            $cart_created_at = self::$woocommerce->getUserMeta($user_id, $this->cart_tracking_started_key_for_db, true);
-        } else {
-            $cart_created_at = self::$storage->getValue($this->cart_tracking_started_key);
-        }
-        return $cart_created_at;
+        $user_id = self::$woocommerce->getCurrentUserId();
+        return empty($user_id) ? self::$storage->getValue($this->cart_tracking_started_key) : self::$woocommerce->getUserMeta($user_id, $this->cart_tracking_started_key_for_db, true);
     }
 
     /**
