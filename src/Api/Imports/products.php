@@ -180,6 +180,7 @@ class products extends Order
                 return new \WP_REST_Response($response, $status);
             }
             $product_data['digest'] = $this->hashToken(array($product_data['id'], $product_data['created_at']));
+            $product_data['event_type'] = $topic;
             if (!empty($product_data)) {
                 $app_id = self::$settings->getApiKey();
                 $extra_headers = array(
