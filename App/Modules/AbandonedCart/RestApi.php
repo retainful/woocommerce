@@ -262,14 +262,8 @@ class RestApi
      */
     function retrieveCartToken($user_id = null)
     {
-        if ($user_id == null) {
-            $user_id = get_current_user_id();
-        }
-        if (!empty($user_id)) {
-            $token = get_user_meta($user_id, $this->cart_token_key_for_db, true);
-        } else {
-            $token = self::$storage->getValue($this->cart_token_key);
-        }
+        $user_id = ($user_id == NULL) ? self::$woocommerce->getCurrentUserId() : 0;
+        $token = !empty($user_id) ? get_user_meta($user_id, $this->cart_token_key_for_db, true) : self::$storage->getValue($this->cart_token_key);
         return apply_filters('rnoc_retrieve_cart_token', $token, $user_id, $this);
     }
 

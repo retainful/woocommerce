@@ -711,20 +711,15 @@ class WcFunctions
 
     /**
      * get customer billing Email
-     * @return bool
+     * @return string
      */
     function getCustomerEmail()
     {
         $email = $this->getCustomerBillingEmail();
-        if (empty($email)) {
-            if ($this->isMethodExists(WC()->customer, 'get_email')) {
-                return WC()->customer->get_email();
-            } else {
-                return false;
-            }
-        } else {
-            return $email;
+        if (empty($mail)) {
+            $email = $this->isMethodExists(WC()->customer, 'get_email') ? WC()->customer->get_email() : '';
         }
+        return $email;
     }
 
     function getUserRoles($email)
@@ -2122,7 +2117,7 @@ class WcFunctions
      */
     function getCurrentUserId()
     {
-        return function_exists('get_current_user_id') ? get_current_user_id() : NULL;
+        return function_exists('get_current_user_id') ? get_current_user_id() : 0;
     }
 
     /**

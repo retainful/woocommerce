@@ -64,49 +64,28 @@ class Cart extends RestApi
      */
     function syncCartData($force_sync = false)
     {
-        if (!$this->isValidCartToTrack()) {
-            return;
-        }
-        if ($force_sync || $this->needToTrackCart()) {
-            $cart = $this->getUserCart();
-            if (!empty($cart)) {
-                self::$settings->logMessage($cart, 'cart');
-                $client_ip = $this->formatUserIP($this->getClientIp());
-                $cart_hash = $this->encryptData($cart);
-                if (!empty($cart_hash)) {
-                    $token = $this->getCartToken();
-                    $extra_headers = array(
-                        "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
-                        "X-Retainful-Version" => RNOC_VERSION,
-                        "X-Cart-Token" => $token,
-                        "Cart-Token" => $token,
-                    );
-                    $this->syncCart($cart_hash, $extra_headers);
-                }
-            }
-        }
-    }
+//        if (!$this->isValidCartToTrack()) {
+//            return;
+//        }
+//        if ($force_sync || $this->needToTrackCart()) {
+        $cart = $this->getUserCart();
+        if (!empty($cart)) {
+            self::$settings->logMessage($cart, 'cart');
+            $client_ip = $this->formatUserIP($this->getClientIp());
+            $cart_hash = $this->encryptData($cart);
+            if (!empty($cart_hash)) {
+                $token = $this->getCartToken();
+                $extra_headers = array(
+                    "X-Client-Referrer-IP" => (!empty($client_ip)) ? $client_ip : null,
+                    "X-Retainful-Version" => RNOC_VERSION,
+                    "X-Cart-Token" => $token,
+                    "Cart-Token" => $token,
+                );
+                $this->syncCart($cart_hash, $extra_headers);
 
-    /**
-     * Need to track zero value carts or not
-     * @param $return
-     * @param $order
-     * @return mixed
-     */
-    function isZeroValueCart($return, $order = false)
-    {
-        if (self::$settings->trackZeroValueCarts() == "no") {
-            if (is_object($order) && $order instanceof \WC_Order) {
-                if (!empty(self::$woocommerce->getOrderItems($order)) && self::$woocommerce->getOrderSubTotal($order) <= 0 && self::$woocommerce->getOrderTotal($order) <= 0) {
-                    $return = false;
-                }
-            } else {
-                if (!empty(self::$woocommerce->getCart()) && self::$woocommerce->getCartSubTotal() <= 0 && self::$woocommerce->getCartTotalPrice() <= 0) {
-                    $return = false;
-                }
             }
         }
-        return $return;
+        //    }
     }
 
     /**
@@ -125,38 +104,6 @@ class Cart extends RestApi
         return true;
     }
 
-    /**
-     * Handle loading/setting Retainful data for the persistent cart.
-     */
-    function handlePersistentCart()
-    {
-        // bail for guest users, when the cart is empty, or when doing a WP cron request
-        if (!is_user_logged_in() || self::$woocommerce->isCartEmpty() || defined('DOING_CRON')) {
-            return NULL;
-        }
-        $user_id = get_current_user_id();
-        $cart_token = get_user_meta($user_id, $this->cart_token_key_for_db, true);
-        if ($cart_token && !$this->retrieveCartToken()) {
-            // for a logged in user with a persistent cart, set the cart token to the session
-            $this->setCartToken($cart_token);
-        } elseif (!$cart_token && $this->retrieveCartToken()) {
-            // when a guest user with an existing cart logs in, save the cart token to user meta
-            $cart_token = $this->retrieveCartToken();
-            update_user_meta($user_id, $this->cart_token_key_for_db, $cart_token);
-        }
-    }
-
-    /**
-     * @param null $user_id
-     */
-    function removeCartToken($user_id = NULL)
-    {
-        self::$storage->removeValue($this->cart_token_key);
-        if ($user_id || ($user_id = get_current_user_id())) {
-            delete_user_meta($user_id, $this->cart_token_key_for_db);
-            delete_user_meta($user_id, $this->pending_recovery_key_for_db);
-        }
-    }
 
     /**
      * Get the line items details
@@ -381,27 +328,6 @@ class Cart extends RestApi
         return $fee_items;
     }
 
-    /**
-     * Recover the user cart
-     */
-    function recoverCart()
-    {
-        $checkout_url = self::$woocommerce->getCheckoutUrl();
-        try {
-            $this->reCreateCart();
-        } catch (Exception $exception) {
-        }
-        if (!empty($_GET)) {
-            foreach ($_GET as $key => $value) {
-                if (!in_array($key, array("token", "hash", "wc-api"))) {
-                    $checkout_url = add_query_arg($key, $value, $checkout_url);
-                }
-            }
-        }
-        $checkout_url = apply_filters('retainful_recovery_redirect_url', $checkout_url);
-        wp_safe_redirect($checkout_url);
-        exit;
-    }
 
     function printRefreshFragmentScript()
     {
@@ -562,34 +488,6 @@ class Cart extends RestApi
         return apply_filters('rnoc_get_cart_tracking_div', $tracking_div, $cart_data);
     }
 
-    /**
-     * Add to
-     * @param $fragments
-     * @return mixed
-     */
-    function addToCartFragments($fragments)
-    {
-        $selector = 'div#' . $this->getTrackingElementId();
-        $data = array();
-        $cart_created_at = $this->userCartCreatedAt();
-        if (empty($cart_created_at)) {
-            $this->needToTrackCart();
-            $cart_created_at = $this->userCartCreatedAt();
-        }
-        if ($this->isValidCartToTrack()) {
-            if (!empty($cart_created_at)) {
-                $data = $this->getTrackingCartData();
-            } else {
-                $force_refresh = self::$storage->getValue('rnoc_force_refresh_cart');
-                if (empty($force_refresh) && !empty(self::$woocommerce->getCart())) {
-                    self::$storage->setValue('rnoc_force_refresh_cart', 1);
-                    $data = array('force_refresh_carts' => 1);
-                }
-            }
-        }
-        $fragments[$selector] = $this->getCartTrackingDiv($data);
-        return $fragments;
-    }
 
     /**
      * Gets the tracking element ID.
@@ -893,33 +791,21 @@ class Cart extends RestApi
      */
     function getCustomerDetails()
     {
-        $billing_email = self::$woocommerce->getCustomerEmail();
         $user_id = self::$woocommerce->getCurrentUserId();
+        $billing_email = self::$woocommerce->getCustomerEmail();
+        $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
+        $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
+        $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
+        $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
         $created_at = self::$storage->getValue('rnoc_session_created_at');
         $updated_at = current_time('timestamp', true);
-        $billing_details = $this->getCustomerCheckoutDetails('billing');
-        if (empty($billing_details)) {
-            $billing_details = array();
-        }
-        $billing_phone = isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
-        $billing_first_name = isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
-        $billing_last_name = isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
-        $billing_state = isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
-        $user_data = self::$woocommerce->getCurrentUser();
-        if ($user_id && !empty($user_data)) {
-            $billing_email = empty($billing_email) ? $user_data->user_email : $billing_email;
-            $created_at = $updated_at = strtotime($user_data->user_registered);
-            $billing_details = $this->getCustomerCheckoutDetails('billing');
-            $billing_first_name = self::$woocommerce->getUserMeta($user_id, 'billing_first_name', true);
-            $billing_first_name = empty($billing_first_name) ? $user_data->first_name : $billing_first_name;
-            $billing_first_name = empty($billing_first_name) ? (isset($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL) : $billing_first_name;
-            $billing_last_name = self::$woocommerce->getUserMeta($user_id, 'billing_last_name', true);
-            $billing_last_name = empty($billing_last_name) ? $user_data->last_name : $billing_last_name;
-            $billing_last_name = empty($billing_last_name) ? (isset($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL) : $billing_last_name;
-            $billing_state = self::$woocommerce->getUserMeta($user_id, 'billing_state', true);
-            $billing_state = empty($billing_state) ? (isset($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL) : $billing_state;
-            $billing_phone = self::$woocommerce->getUserMeta($user_id, 'billing_phone', true);
-            $billing_phone = empty($billing_phone) ? (isset($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL) : $billing_phone;
+        if (!empty($user_id)) {
+            $user_data = self::$woocommerce->getCurrentUser();
+            $billing_email = !empty($billing_email) ? $billing_email : $user_data->user_email;
+            $billing_phone = empty($user_data->billing_phone) ? $billing_phone : $user_data->billing_phone;
+            $billing_state = empty($user_data->billing_state) ? $billing_state : $user_data->billing_state;
+            $billing_last_name = empty($user_data->billing_last_name) ? $billing_last_name : $user_data->billing_last_name;
+            $billing_first_name = empty($user_data->billing_first_name) ? $billing_first_name : $user_data->billing_first_name;
         }
         return array(
             'id' => $user_id,
@@ -936,7 +822,6 @@ class Cart extends RestApi
             'accepts_marketing' => true,
             'user_roles' => self::$woocommerce->getUserRoles($billing_email)
         );
-
     }
 
     /**
