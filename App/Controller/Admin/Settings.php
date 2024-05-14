@@ -4,7 +4,9 @@ namespace Rnoc\App\Controller\Admin;
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\App\Controller\Admin\Webhooks;
+use Rnoc\App\Helpers\Input;
 use Rnoc\App\Helpers\WcFunctions;
+use Rnoc\App\Helpers\Settings as SettingHelper;
 use Valitron\Validator;
 
 class Settings extends BaseController
@@ -13,9 +15,9 @@ class Settings extends BaseController
      * Get the abandoned cart settings
      * @return array|mixed
      */
-    function getAdminSettings()
+    public static function getAdminSettings()
     {
-        $abandoned_cart = get_option($this->slug . '_settings', array());
+        $abandoned_cart = get_option(self::$slug . '_settings', array());
         if (empty($abandoned_cart))
             $abandoned_cart = array();
         return $abandoned_cart;
@@ -24,20 +26,19 @@ class Settings extends BaseController
     /**
      * register plugin related menus
      */
-    function registerMenu()
+    public static function registerMenu()
     {
 
-        $webhook = new Webhooks();
-        add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat', 56);
-        add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
-        add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
+        add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array(self::class, 'retainfulLicensePage'), 'dashicons-controls-repeat', 56);
+        add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array(self::class, 'retainfulLicensePage'));
+        add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array(self::class, 'retainfulSettingsPage'));
         if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings'))) {
             $legacy_notice = '<div style="padding: 10px 46px 10px 22px;font-size: 15px;line-height: 1.4;margin-left: -20px;">Unlock the power of fully customizable email capture forms, including Add to Cart and Exit Intent popups, right from your Retainful dashboard. Head over to the Signup Forms section to configure and activate them. Tailor each popup to your brand, track sign-ups efficiently, and entice subscribers with unique coupons. <br/><b style="font-size: 15px;">Please note: Legacy popups will be phased out by April 15. Need help transitioning to the new Sign Up forms? Reach out to us at <a href="mailto:support@retainful.com">support@retainful.com</a> for assistance.</b></div>';
             add_action('admin_notices', function () use ($legacy_notice) {
                 echo '<div class="error notice"><p>' . $legacy_notice . '</p></div>';
             });
         }
-        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings')) && $webhook->isWebhookNoticeShow()) {
+        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings')) && Webhooks::isWebhookNoticeShow()) {
             $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
             add_action('admin_notices', function () use ($message) {
                 echo '<div class="error notice"><p>' . $message . '</p></div>';
@@ -48,25 +49,26 @@ class Settings extends BaseController
     /**
      * page styles
      */
-    function initAdminPageStyles()
+    public static function initAdminPageStyles()
     {
-        $page = self::$input->get('page', null);
+        $page = Input::get('page', null);
         if (is_admin() && in_array($page, array('retainful', 'retainful_settings', 'retainful_premium', 'retainful_license'))) {
-            $this->addScript();
+            self::addScript();
         }
     }
 
-    function addScript()
+    public static function addScript()
     {
         $page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : "";
         $prefix = substr($page, 0, 9);
         if ($prefix != "retainful") {
             return;
         }
+        $plugin_url = WcFunctions::getWooPluginUrl();
         $asset_path = RNOC_PLUGIN_URL . 'assets/admin';
         //product search select
-        wp_enqueue_script('rnoc-select2-js', $this->getWooPluginUrl() . '/assets/js/select2/select2.full.min.js', array('jquery'));
-        wp_enqueue_style('rnoc-select2-css', $this->getWooPluginUrl() . '/assets/css/select2.css');
+        wp_enqueue_script('rnoc-select2-js', $plugin_url . '/assets/js/select2/select2.full.min.js', array('jquery'));
+        wp_enqueue_style('rnoc-select2-css', $plugin_url . '/assets/css/select2.css');
         wp_enqueue_script('woocommerce_admin');
         wp_enqueue_script('retainful-app-main', $asset_path . '/js/app.js', array(), RNOC_VERSION);
         wp_localize_script('retainful-app-main', 'retainful_admin', array(
@@ -90,35 +92,12 @@ class Settings extends BaseController
     /**
      * retainful ac settings page
      */
-    function retainfulSettingsPage()
+    public static function retainfulSettingsPage()
     {
-        $webhook = new Webhooks();
-        $webhook->createWebhook();
-        $settings = $this->getAdminSettings();
-
-        $default_settings = array(
-            RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' => 'js',
-            RNOC_PLUGIN_PREFIX . 'enable_background_order_sync' => 'no',
-            RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => 'no',
-            RNOC_PLUGIN_PREFIX . 'enable_referral_widget' => 'no',
-            RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup' => 'no',
-            RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget' => 'yes',
-            RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status' => '0',
-            RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status' => '1',
-            RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status' => '0',
-            RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load' => '0',
-            RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' => '0',
-            RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => 'Keep me up to date on news and exclusive offers',
-            RNOC_PLUGIN_PREFIX . 'gdpr_display_position' => 'after_billing_email',
-            RNOC_PLUGIN_PREFIX . 'enable_ip_filter' => '0',
-            RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
-            RNOC_PLUGIN_PREFIX . 'enable_debug_log' => '0',
-            RNOC_PLUGIN_PREFIX . 'handle_storage_using' => 'woocommerce',
-            RNOC_PLUGIN_PREFIX . 'enable_afterpay_action' => 'no',
-            RNOC_PLUGIN_PREFIX . 'varnish_check' => 'no',
-        );
+        Webhooks::createWebhook();
+        $settings = self::getAdminSettings();
+        $default_settings = SettingHelper::getDefaultData();
         $settings = wp_parse_args($settings, $default_settings);
-
         if (empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
             $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = 'Keep me up to date on news and exclusive offers';
         }
@@ -129,11 +108,9 @@ class Settings extends BaseController
     /**
      * render retainful license page
      */
-    function retainfulLicensePage()
+    public static function retainfulLicensePage()
     {
-
-        $webhook = new Webhooks();
-        $settings = get_option($this->slug . '_license', array());
+        $settings = get_option(self::$slug . '_license', array());
         $default_settings = array(
             RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => 0,
             RNOC_PLUGIN_PREFIX . 'retainful_app_id' => '',
@@ -141,16 +118,16 @@ class Settings extends BaseController
         );
         $settings = wp_parse_args($settings, $default_settings);
         require_once RNOC_PLUGIN_PATH . 'App/Views/Admin/connection.php';
-        $webhook->createWebhook();
+        Webhooks::createWebhook();
     }
 
     /**
      * save the settings
      */
-    function saveAcSettings()
+    public static function saveAcSettings()
     {
         WcFunctions::checkSecuritykey('rnoc_save_settings');
-        $post = self::$input->post();
+        $post = Input::post();
         $validator = new Validator($post);
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', ['js', 'php'])->message('This field contains invalid value');
         $validator->rule('in', array(
@@ -170,33 +147,33 @@ class Settings extends BaseController
         if (!$validator->validate()) {
             wp_send_json_error($validator->errors());
         }
-        $cart_capture_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '');
-        $post = self::$input->post();
-        $data = self::$input->clean($post);
-        $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = trim(self::$input->sanitizeBasicHtml($cart_capture_msg));
-        update_option($this->slug . '_settings', $data);
+        $cart_capture_msg = Input::post(RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '');
+        $post = Input::post();
+        $data = Input::clean($post);
+        $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = trim(Input::sanitizeBasicHtml($cart_capture_msg));
+        update_option(self::$slug . '_settings', $data);
         wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
     }
 
     /**
      * disconnect the app
      */
-    function disconnectLicense()
+    public static function disconnectLicense()
     {
         WcFunctions::checkSecuritykey('rnoc_disconnect_license');
-        $license_details = get_option($this->slug . '_license', array());
+        $license_details = get_option(self::$slug . '_license', array());
         $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
-        update_option($this->slug . '_license', $license_details);
+        update_option(self::$slug . '_license', $license_details);
         wp_send_json_success(__('App disconnected successfully!', RNOC_TEXT_DOMAIN));
     }
 
     /**
      * Validate app Id
      */
-    function validateAppKey()
+    public static function validateAppKey()
     {
         WcFunctions::checkSecuritykey('validate_app_key');
-        $post = self::$input->post();
+        $post = Input::post();
         $validator = new Validator($post);
         $validator->rule('required', ['app_id', 'secret_key']);
         $validator->rule('slug', ['app_id', 'secret_key']);
@@ -215,13 +192,13 @@ class Settings extends BaseController
             RNOC_PLUGIN_PREFIX . 'retainful_app_id' => $app_id,
             RNOC_PLUGIN_PREFIX . 'retainful_app_secret' => $secret_key
         );
-        $slug = $this->slug;
+        $slug = self::$slug;
         //Save app id before validate key
         update_option($slug . '_license', $options_data);
         $response = array();
-        $this->updateUserAsFreeUser();
+        self::updateUserAsFreeUser();
         if (empty($response)) {
-            $api_response = $this->isApiEnabled($app_id, $secret_key);
+            $api_response = self::isApiEnabled($app_id, $secret_key);
             if (isset($api_response['success'])) {
                 //Change app id status
                 $options_data[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 1;
@@ -240,9 +217,9 @@ class Settings extends BaseController
      * get where to save the temp data
      * @return mixed|string
      */
-    function getStorageHandler()
+    public static function getStorageHandler()
     {
-        $admin_settings = $this->getAdminSettings();
+        $admin_settings = self::getAdminSettings();
         if (isset($admin_settings[RNOC_PLUGIN_PREFIX . 'handle_storage_using']) && !empty($admin_settings[RNOC_PLUGIN_PREFIX . 'handle_storage_using'])) {
             return $admin_settings[RNOC_PLUGIN_PREFIX . 'handle_storage_using'];
         } else {
@@ -254,9 +231,9 @@ class Settings extends BaseController
      * Get the user current plan
      * @return mixed|string
      */
-    function getUserActivePlan()
+    public static function getUserActivePlan()
     {
-        $plan_details = $this->getPlanDetails();
+        $plan_details = self::getPlanDetails();
         return strtolower(trim(isset($plan_details['plan']) ? $plan_details['plan'] : 'free'));
     }
 
@@ -265,10 +242,10 @@ class Settings extends BaseController
      * Check the user plan is pro
      * @return bool
      */
-    function isProPlan()
+    public static function isProPlan()
     {
-        $plan = $this->getUserActivePlan();
-        $status = $this->getUserPlanStatus();
+        $plan = self::getUserActivePlan();
+        $status = self::getUserPlanStatus();
         $plan = strtolower($plan);
         return (in_array($plan, array('pro', 'business', 'professional', 'essential')) && in_array($status, array('active', 'trialing')));
     }
@@ -277,9 +254,9 @@ class Settings extends BaseController
      * Get the user current plan
      * @return mixed|string
      */
-    function getUserPlanStatus()
+    public static function getUserPlanStatus()
     {
-        $plan_details = $this->getPlanDetails();
+        $plan_details = self::getPlanDetails();
         return strtolower(trim(isset($plan_details['status']) ? $plan_details['status'] : 'inactive'));
     }
 
@@ -287,7 +264,7 @@ class Settings extends BaseController
      * @param string $response
      * @return array
      */
-    function getPlanDetails($response = \stdClass::class)
+    public static function getPlanDetails($response = \stdClass::class)
     {
         $plan = isset($response->plan) ? strtolower($response->plan) : 'free';
         $status = isset($response->status) ? strtolower($response->status) : 'active';

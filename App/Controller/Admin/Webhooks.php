@@ -11,19 +11,19 @@ class Webhooks extends BaseController
      *
      * @return void
      */
-    function createWebhook()
+    public static function createWebhook()
     {
         if (is_admin()) {
-            if ($this->isConnectionActive()) {
-                $hook_status = $this->getWebHookStatus();
+            if (self::isConnectionActive()) {
+                $hook_status = self::getWebHookStatus();
                 if (isset($hook_status['order.updated']) && !$hook_status['order.updated']) {
-                    $this->addNewWebhook();
+                    self::addNewWebhook();
                 }
                 if (isset($hook_status['order.created']) && !$hook_status['order.created']) {
-                    $this->addNewWebHook('order.created');
+                    self::addNewWebHook('order.created');
                 }
             } else {
-                $this->removeWebhook();
+                self::removeWebhook();
             }
         }
     }
@@ -33,7 +33,7 @@ class Webhooks extends BaseController
      * Get Webhooks status.
      * @return array
      */
-    function getWebHookStatus()
+    public static function getWebHookStatus()
     {
         $topics = [
             'order.updated' => false,
@@ -46,14 +46,13 @@ class Webhooks extends BaseController
                 'offset' => 0,
             );
             $webhooks = $data_store->search_webhooks($args);
-
             foreach ($webhooks as $webhook_id) {
                 $webhook = wc_get_webhook($webhook_id);
                 if (empty($webhook)) {
                     continue;
                 }
                 $delivery_url = $webhook->get_delivery_url();
-                $site_delivery_url = $this->getDeliveryUrl();
+                $site_delivery_url = self::getDeliveryUrl();
                 if ($delivery_url != $site_delivery_url) {
                     continue;
                 }
@@ -112,7 +111,7 @@ class Webhooks extends BaseController
      *
      * @return void
      */
-    function removeWebhook()
+    public static function removeWebhook()
     {
         if (!class_exists('WC_Data_Store') || !class_exists('\Rnoc\Retainful\library\RetainfulApi') || !function_exists('wc_get_webhook')) {
             return;
@@ -130,7 +129,7 @@ class Webhooks extends BaseController
                     continue;
                 }
                 $delivery_url = $webhook->get_delivery_url();
-                $site_delivery_url = $this->getDeliveryUrl();
+                $site_delivery_url = self::getDeliveryUrl();
                 if ($delivery_url != $site_delivery_url) {
                     continue;
                 }
@@ -146,10 +145,10 @@ class Webhooks extends BaseController
      *
      * @return bool
      */
-    function isWebhookNoticeShow()
+    public static function isWebhookNoticeShow()
     {
 
-        if (!$this->isConnectionActive()) {
+        if (!self::isConnectionActive()) {
             return false;
         }
         if (!class_exists('WC_Data_Store') || !function_exists('wc_get_webhook')) {
@@ -173,7 +172,7 @@ class Webhooks extends BaseController
                     continue;
                 }
                 $delivery_url = $webhook->get_delivery_url();
-                $site_delivery_url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
+                $site_delivery_url = self::getDeliveryUrl();
                 if ($delivery_url != $site_delivery_url) {
                     continue;
                 }

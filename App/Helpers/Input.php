@@ -11,13 +11,13 @@ class Input
      *
      * @var    string
      */
-    public $charset = 'UTF-8';
+    public static $charset = 'UTF-8';
     /**
      * IP address of the current user
      *
      * @var    string
      */
-    protected $ip_address = FALSE;
+    protected static $ip_address = FALSE;
     /**
      * Allow GET array flag
      *
@@ -25,7 +25,7 @@ class Input
      *
      * @var    bool
      */
-    protected $_allow_get_array = TRUE;
+    protected static $_allow_get_array = TRUE;
     /**
      * Standardize new lines flag
      *
@@ -33,7 +33,7 @@ class Input
      *
      * @var    bool
      */
-    protected $_standardize_newlines;
+    protected static $_standardize_newlines;
     /**
      * Enable XSS flag
      *
@@ -43,13 +43,13 @@ class Input
      *
      * @var    bool
      */
-    protected $_enable_xss = TRUE;
+    protected static $_enable_xss = TRUE;
     /**
      * List of all HTTP request headers
      *
      * @var array
      */
-    protected $headers = array();
+    protected static $headers = array();
     /**
      * Raw input stream data
      *
@@ -57,13 +57,13 @@ class Input
      *
      * @var    string
      */
-    protected $_raw_input_stream;
+    protected static $_raw_input_stream;
     /**
      * List of never allowed strings
      *
      * @var    array
      */
-    protected $_never_allowed_str = array(
+    protected static $_never_allowed_str = array(
         'document.cookie' => '[removed]',
         '(document).cookie' => '[removed]',
         'document.write' => '[removed]',
@@ -82,7 +82,7 @@ class Input
      *
      * @var    array
      */
-    protected $_never_allowed_regex = array(
+    protected static $_never_allowed_regex = array(
         'javascript\s*:',
         '(\(?document\)?|\(?window\)?(\.document)?)\.(location|on\w*)',
         'expression\s*(\(|&\#40;)', // CSS and IE
@@ -100,7 +100,7 @@ class Input
      *
      * @var    string
      */
-    protected $_xss_hash;
+    protected static $_xss_hash;
     /**
      * Parsed input stream data
      *
@@ -109,33 +109,33 @@ class Input
      * @see    CI_Input::input_stream()
      * @var    array
      */
-    protected $_input_stream;
-    protected $security;
-    protected $uni;
+    protected static $_input_stream;
+    protected static $security;
+    protected static $uni;
 
-    function sanitize_globals()
+    public static function sanitize_globals()
     {
         // Sanitize global arrays
-        $this->_sanitize_globals();
+        self::_sanitize_globals();
     }
 
     /**
      * Sanitize Globals
      */
-    protected function _sanitize_globals()
+    protected static function _sanitize_globals()
     {
         // Is $_GET data allowed? If not we'll set the $_GET to an empty array
-        if ($this->_allow_get_array === FALSE) {
+        if (self::$_allow_get_array === FALSE) {
             $_GET = array();
         } elseif (is_array($_GET)) {
             foreach ($_GET as $key => $val) {
-                $_GET[$this->_clean_input_keys($key)] = $this->_clean_input_data($val);
+                $_GET[self::_clean_input_keys($key)] = self::_clean_input_data($val);
             }
         }
         // Clean $_POST Data
         if (is_array($_POST)) {
             foreach ($_POST as $key => $val) {
-                $_POST[$this->_clean_input_keys($key)] = $this->_clean_input_data($val);
+                $_POST[self::_clean_input_keys($key)] = self::_clean_input_data($val);
             }
         }
         // Clean $_COOKIE Data
@@ -151,8 +151,8 @@ class Input
                 $_COOKIE['$Domain']
             );
             foreach ($_COOKIE as $key => $val) {
-                if (($cookie_key = $this->_clean_input_keys($key)) !== FALSE) {
-                    $_COOKIE[$cookie_key] = $this->_clean_input_data($val);
+                if (($cookie_key = self::_clean_input_keys($key)) !== FALSE) {
+                    $_COOKIE[$cookie_key] = self::_clean_input_data($val);
                 } else {
                     unset($_COOKIE[$key]);
                 }
@@ -168,7 +168,7 @@ class Input
      * @param bool $fatal
      * @return bool
      */
-    protected function _clean_input_keys($str, $fatal = TRUE)
+    protected static function _clean_input_keys($str, $fatal = TRUE)
     {
         /* Commented this as it sanitize all request values which making conflict with other plugins */
         /*if (!preg_match('/^[a-z0-9:_\/|-]+$/i', $str)) {
@@ -254,7 +254,7 @@ class Input
      * @param $str
      * @return array|string|string[]|null
      */
-    protected function _clean_input_data($str)
+    protected static function _clean_input_data($str)
     {
         if (is_object($str)) {
             return $str;
@@ -262,7 +262,7 @@ class Input
         if (is_array($str)) {
             $new_array = array();
             foreach (array_keys($str) as $key) {
-                $new_array[$this->_clean_input_keys($key)] = $this->_clean_input_data($str[$key]);
+                $new_array[self::_clean_input_keys($key)] = self::_clean_input_data($str[$key]);
             }
             return $new_array;
         }
@@ -272,9 +272,9 @@ class Input
                  it will probably not exist in future versions at all.
         */
         // Remove control characters
-        $str = $this->remove_invisible_characters($str, FALSE);
+        $str = self::remove_invisible_characters($str, FALSE);
         // Standardize newlines if needed
-        if ($this->_standardize_newlines === TRUE) {
+        if (self::$_standardize_newlines === TRUE) {
             return preg_replace('/(?:\r\n|[\r\n])/', PHP_EOL, $str);
         }
         return $str;
@@ -285,7 +285,7 @@ class Input
      * @param $version
      * @return mixed
      */
-    function is_php($version)
+    public static function is_php($version)
     {
         static $_is_php;
         $version = (string)$version;
@@ -301,7 +301,7 @@ class Input
      * @param bool $url_encoded
      * @return string|string[]|null
      */
-    function remove_invisible_characters($str, $url_encoded = TRUE)
+    public static function remove_invisible_characters($str, $url_encoded = TRUE)
     {
         return $str;
         $non_displayables = array();
@@ -326,11 +326,11 @@ class Input
      * @param null $default
      * @return mixed
      */
-    function post_get($index, $default = NULL, $xss_clean = NULL)
+    public static function post_get($index, $default = NULL, $xss_clean = NULL)
     {
         return isset($_POST[$index])
-            ? $this->post($index, $default, $xss_clean)
-            : $this->get($index, $default, $xss_clean);
+            ? self::post($index, $default, $xss_clean)
+            : self::get($index, $default, $xss_clean);
     }
 
     /**
@@ -340,9 +340,9 @@ class Input
      * @param null $xss_clean
      * @return mixed
      */
-    function post($index = NULL, $default = NULL, $xss_clean = NULL)
+    public static function post($index = NULL, $default = NULL, $xss_clean = NULL)
     {
-        return $this->_fetch_from_array($_POST, $index, $default, $xss_clean);
+        return self::_fetch_from_array($_POST, $index, $default, $xss_clean);
     }
 
     /**
@@ -350,7 +350,7 @@ class Input
      * @param null $index
      * @return mixed
      */
-    function has_post($index = NULL)
+    public static function has_post($index = NULL)
     {
         return isset($_POST[$index]);
     }
@@ -363,16 +363,16 @@ class Input
      * @param null $xss_clean
      * @return array|string|null
      */
-    protected function _fetch_from_array(&$array, $index = NULL, $default = NULL, $xss_clean = NULL)
+    protected static function _fetch_from_array(&$array, $index = NULL, $default = NULL, $xss_clean = NULL)
     {
-        is_bool($xss_clean) or $xss_clean = $this->_enable_xss;
+        is_bool($xss_clean) or $xss_clean = self::$_enable_xss;
         // If $index is NULL, it means that the whole $array is requested
         $index = (!isset($index) || is_null($index)) ? array_keys($array) : $index;
         // allow fetching multiple keys at once
         if (is_array($index)) {
             $output = array();
             foreach ($index as $key) {
-                $output[$key] = $this->_fetch_from_array($array, $key, $default, $xss_clean);
+                $output[$key] = self::_fetch_from_array($array, $key, $default, $xss_clean);
             }
             return $output;
         }
@@ -396,7 +396,7 @@ class Input
         } else {
             return $default;
         }
-        return ($xss_clean === TRUE) ? $this->xss_clean($value) : $value;
+        return ($xss_clean === TRUE) ? self::xss_clean($value) : $value;
     }
 
     /**
@@ -405,7 +405,7 @@ class Input
      * @param bool $is_image
      * @return array|bool|string|string[]|null
      */
-    function xss_clean($str, $is_image = FALSE)
+    public static function xss_clean($str, $is_image = FALSE)
     {
         if (is_object($str)) {
             return $str;
@@ -413,12 +413,12 @@ class Input
         // Is the string an array?
         if (is_array($str)) {
             foreach ($str as $key => &$value) {
-                $str[$key] = $this->xss_clean($value);
+                $str[$key] = self::xss_clean($value);
             }
             return $str;
         }
         // Remove Invisible Characters
-        $str = $this->remove_invisible_characters($str);
+        $str = self::remove_invisible_characters($str);
         /*
          * URL Decode
          *
@@ -432,7 +432,7 @@ class Input
             do {
                 $oldstr = $str;
                 $str = rawurldecode($str);
-                $str = preg_replace_callback('#%(?:\s*[0-9a-f]){2,}#i', array($this, '_urldecodespaces'), $str);
+                $str = preg_replace_callback('#%(?:\s*[0-9a-f]){2,}#i', array(self::class, '_urldecodespaces'), $str);
             } while ($oldstr !== $str);
             unset($oldstr);
         }
@@ -443,10 +443,10 @@ class Input
          * We only convert entities that are within tags since
          * these are the ones that will pose security problems.
          */
-        $str = preg_replace_callback("/[^a-z0-9>]+[a-z0-9]+=([\'\"]).*?\\1/si", array($this, '_convert_attribute'), $str);
-        $str = preg_replace_callback('/<\w+.*/si', array($this, '_decode_entity'), $str);
+        $str = preg_replace_callback("/[^a-z0-9>]+[a-z0-9]+=([\'\"]).*?\\1/si", array(self::class, '_convert_attribute'), $str);
+        $str = preg_replace_callback('/<\w+.*/si', array(self::class, '_decode_entity'), $str);
         // Remove Invisible Characters Again!
-        $str = $this->remove_invisible_characters($str);
+        $str = self::remove_invisible_characters($str);
         /*
          * Convert all tabs to spaces
          *
@@ -459,7 +459,7 @@ class Input
         // Capture converted string for later comparison
         $converted_string = $str;
         // Remove Strings that are never allowed
-        $str = $this->_do_never_allowed($str);
+        $str = self::_do_never_allowed($str);
         /*
          * Makes PHP tags safe
          *
@@ -492,7 +492,7 @@ class Input
             $word = implode('\s*', str_split($word)) . '\s*';
             // We only want to do this when it is followed by a non-word character
             // That way valid stuff like "dealer to" does not become "dealerto"
-            $str = preg_replace_callback('#(' . substr($word, 0, -3) . ')(\W)#is', array($this, '_compact_exploded_words'), $str);
+            $str = preg_replace_callback('#(' . substr($word, 0, -3) . ')(\W)#is', array(self::class, '_compact_exploded_words'), $str);
         }
         /*
          * Remove disallowed Javascript in links or img tags
@@ -509,10 +509,10 @@ class Input
         do {
             $original = $str;
             if (preg_match('/<a/i', $str)) {
-                $str = preg_replace_callback('#<a(?:rea)?[^a-z0-9>]+([^>]*?)(?:>|$)#si', array($this, '_js_link_removal'), $str);
+                $str = preg_replace_callback('#<a(?:rea)?[^a-z0-9>]+([^>]*?)(?:>|$)#si', array(self::class, '_js_link_removal'), $str);
             }
             if (preg_match('/<img/i', $str)) {
-                $str = preg_replace_callback('#<img[^a-z0-9]+([^>]*?)(?:\s?/?>|$)#si', array($this, '_js_img_removal'), $str);
+                $str = preg_replace_callback('#<img[^a-z0-9]+([^>]*?)(?:\s?/?>|$)#si', array(self::class, '_js_img_removal'), $str);
             }
             if (preg_match('/script|xss/i', $str)) {
                 $str = preg_replace('#</*(?:script|xss).*?>#si', '[removed]', $str);
@@ -545,7 +545,7 @@ class Input
         //       false positives and in turn - vulnerabilities!
         do {
             $old_str = $str;
-            $str = preg_replace_callback($pattern, array($this, '_sanitize_naughty_html'), $str);
+            $str = preg_replace_callback($pattern, array(self::class, '_sanitize_naughty_html'), $str);
         } while ($old_str !== $str);
         unset($old_str);
         /*
@@ -575,7 +575,7 @@ class Input
         // Final clean up
         // This adds a bit of extra precaution in case
         // something got through the above filters
-        $str = $this->_do_never_allowed($str);
+        $str = self::_do_never_allowed($str);
         /*
          * Images are Handled in a Special Way
          * - Essentially, we want to know that after all of the character
@@ -596,11 +596,10 @@ class Input
      * @param $str
      * @return mixed|string|string[]|null
      */
-    protected
-    function _do_never_allowed($str)
+    protected static function _do_never_allowed($str)
     {
-        $str = str_replace(array_keys($this->_never_allowed_str), $this->_never_allowed_str, $str);
-        foreach ($this->_never_allowed_regex as $regex) {
+        $str = str_replace(array_keys(self::$_never_allowed_str), self::$_never_allowed_str, $str);
+        foreach (self::$_never_allowed_regex as $regex) {
             $str = preg_replace('#' . $regex . '#is', '[removed]', $str);
         }
         return $str;
@@ -613,9 +612,9 @@ class Input
      * @param null $xss_clean
      * @return mixed
      */
-    function get($index = NULL, $default = NULL, $xss_clean = NULL)
+    public static function get($index = NULL, $default = NULL, $xss_clean = NULL)
     {
-        return $this->_fetch_from_array($_GET, $index, $default, $xss_clean);
+        return self::_fetch_from_array($_GET, $index, $default, $xss_clean);
     }
 
     /**
@@ -779,8 +778,7 @@ class Input
      * @param $matches
      * @return string
      */
-    protected
-    function _urldecodespaces($matches)
+    protected static function _urldecodespaces($matches)
     {
         $input = $matches[0];
         $nospaces = preg_replace('#\s+#', '', $input);
@@ -795,17 +793,16 @@ class Input
      * @return mixed
      * @throws \Exception
      */
-    protected
-    function _decode_entity($match)
+    protected static function _decode_entity($match)
     {
         // Protect GET variables in URLs
         // 901119URL5918AMP18930PROTECT8198
-        $match = preg_replace('|\&([a-z\_0-9\-]+)\=([a-z\_0-9\-/]+)|i', $this->xss_hash() . '\\1=\\2', $match[0]);
+        $match = preg_replace('|\&([a-z\_0-9\-]+)\=([a-z\_0-9\-/]+)|i', self::xss_hash() . '\\1=\\2', $match[0]);
         // Decode, then un-protect URL GET vars
         return str_replace(
-            $this->xss_hash(),
+            self::xss_hash(),
             '&',
-            $this->entity_decode($match, $this->charset)
+            self::entity_decode($match, self::$charset)
         );
     }
 
@@ -814,15 +811,15 @@ class Input
      * @return mixed|string
      * @throws \Exception
      */
-    function xss_hash()
+    public static function xss_hash()
     {
-        if ($this->_xss_hash === NULL) {
-            $rand = $this->get_random_bytes(16);
-            $this->_xss_hash = ($rand === FALSE)
+        if (self::$_xss_hash === NULL) {
+            $rand = self::get_random_bytes(16);
+            self::$_xss_hash = ($rand === FALSE)
                 ? md5(uniqid(mt_rand(), TRUE))
                 : bin2hex($rand);
         }
-        return $this->_xss_hash;
+        return self::$_xss_hash;
     }
 
     /**
@@ -831,7 +828,7 @@ class Input
      * @return bool|string|void
      * @throws \Exception
      */
-    function get_random_bytes($length)
+    public static function get_random_bytes($length)
     {
         if (empty($length) or !ctype_digit((string)$length)) {
             return FALSE;
@@ -849,7 +846,7 @@ class Input
         }
         if (is_readable('/dev/urandom') && ($fp = fopen('/dev/urandom', 'rb')) !== FALSE) {
             // Try not to waste entropy ...
-            $this->is_php('5.4') && stream_set_chunk_size($fp, $length);
+            self::is_php('5.4') && stream_set_chunk_size($fp, $length);
             $output = fread($fp, $length);
             fclose($fp);
             if ($output !== FALSE) {
@@ -868,14 +865,14 @@ class Input
      * @param null $charset
      * @return mixed|string
      */
-    function entity_decode($str, $charset = NULL)
+    public static function entity_decode($str, $charset = NULL)
     {
         if (strpos($str, '&') === FALSE) {
             return $str;
         }
         static $_entities;
-        isset($charset) or $charset = $this->charset;
-        $flag = $this->is_php('5.4')
+        isset($charset) or $charset = self::$charset;
+        $flag = self::is_php('5.4')
             ? ENT_COMPAT | ENT_HTML5
             : ENT_COMPAT;
         if (!isset($_entities)) {
@@ -921,7 +918,7 @@ class Input
      * @param $matches
      * @return string
      */
-    protected function _compact_exploded_words($matches)
+    protected static function _compact_exploded_words($matches)
     {
         return preg_replace('/\s+/s', '', $matches[1]) . $matches[2];
     }
@@ -937,14 +934,14 @@ class Input
      * @param array
      * @return  string
      */
-    protected function _js_link_removal($match)
+    protected static function _js_link_removal($match)
     {
         return str_replace(
             $match[1],
             preg_replace(
                 '#href=.*?(alert\(|alert&\#40;|javascript\:|livescript\:|mocha\:|charset\=|window\.|document\.|\.cookie|<script|<xss|data\s*:)#si',
                 '',
-                $this->_filter_attributes(str_replace(array('<', '>'), '', $match[1]))
+                self::_filter_attributes(str_replace(array('<', '>'), '', $match[1]))
             ),
             $match[0]
         );
@@ -961,14 +958,14 @@ class Input
      * @param array
      * @return  string
      */
-    protected function _js_img_removal($match)
+    protected static function _js_img_removal($match)
     {
         return str_replace(
             $match[1],
             preg_replace(
                 '#src=.*?(alert\(|alert&\#40;|javascript\:|livescript\:|mocha\:|charset\=|window\.|document\.|\.cookie|<script|<xss|base64\s*,)#si',
                 '',
-                $this->_filter_attributes(str_replace(array('<', '>'), '', $match[1]))
+                self::_filter_attributes(str_replace(array('<', '>'), '', $match[1]))
             ),
             $match[0]
         );
@@ -982,7 +979,7 @@ class Input
      * @param string
      * @return  string
      */
-    protected function _filter_attributes($str)
+    protected static function _filter_attributes($str)
     {
         $out = '';
         if (preg_match_all('#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches)) {
@@ -998,7 +995,7 @@ class Input
      * @param $matches
      * @return string
      */
-    protected function _sanitize_naughty_html($matches)
+    protected static function _sanitize_naughty_html($matches)
     {
         static $naughty_tags = array(
             'alert', 'area', 'prompt', 'confirm', 'applet', 'audio', 'basefont', 'base', 'behavior', 'bgsound',
@@ -1062,7 +1059,7 @@ class Input
      * @param $match
      * @return mixed
      */
-    protected function _convert_attribute($match)
+    protected static function _convert_attribute($match)
     {
         return str_replace(array('>', '<', '\\'), array('&gt;', '&lt;', '\\\\'), $match[0]);
     }
@@ -1072,10 +1069,10 @@ class Input
      * @param $var
      * @return array|string
      */
-    function clean($var)
+    public static function clean($var)
     {
         if (is_array($var)) {
-            return array_map(array($this, 'clean'), $var);
+            return array_map(array(self::class, 'clean'), $var);
         } else {
             return is_scalar($var) ? sanitize_text_field($var) : $var;
         }
@@ -1087,7 +1084,7 @@ class Input
      * @param $html
      * @return mixed|void
      */
-    function sanitizeBasicHtml($html)
+    public static function sanitizeBasicHtml($html)
     {
         try {
             $html = stripslashes($html);

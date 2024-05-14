@@ -8,27 +8,27 @@ use Rnoc\App\Helpers\WcFunctions;
 
 class RetainfulApi
 {
-    public $app_url = "https://app.retainful.com/";
-    public $domain = "https://api.retainful.com/v1/";
-    public $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
+    public static $app_url = "https://app.retainful.com/";
+    public static $domain = "https://api.retainful.com/v1/";
+    public static $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
 
     /**
      * Upgrade premium URL
      * @return string
      */
-    function upgradePremiumUrl()
+    public static function upgradePremiumUrl()
     {
-        return $this->app_url . '?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
+        return self::$app_url . '?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
     }
 
-    function getDomain()
+    public static function getDomain()
     {
-        return apply_filters('retainful_domain_url', $this->domain);
+        return apply_filters('retainful_domain_url', self::$domain);
     }
 
-    function getAbandonedCartApiUrl()
+    public static function getAbandonedCartApiUrl()
     {
-        return apply_filters('retainful_abandoned_cart_api_url', $this->abandoned_cart_api_url);
+        return apply_filters('retainful_abandoned_cart_api_url', self::$abandoned_cart_api_url);
     }
 
     /**
@@ -37,9 +37,9 @@ class RetainfulApi
      * @param $body
      * @return bool|array
      */
-    function validateApi($api_key, $body)
+    public static function validateApi($api_key, $body)
     {
-        $url = $this->getDomain() . 'app/' . $api_key;
+        $url = self::getDomain() . 'app/' . $api_key;
         $body = array(
             'shop' => $body
         );
@@ -50,10 +50,10 @@ class RetainfulApi
             'app_id' => $api_key,
             'Content-Type' => 'application/json'
         );
-        $response = $this->request($url, array(), 'post', $body, $headers);
+        $response = self::request($url, array(), 'post', $body, $headers);
         //$response = $this->request($this->domain . 'app/' . $api_key);
         if (isset($response->success) && $response->success) {
-            return $this->getPlanDetails($response);
+            return self::getPlanDetails($response);
         } else {
             return isset($response->message) ? $response->message : NULL;
         }
@@ -63,7 +63,7 @@ class RetainfulApi
      * @param string $response
      * @return array
      */
-    function getPlanDetails($response = \stdClass::class)
+    public static function getPlanDetails($response = \stdClass::class)
     {
         $plan = isset($response->plan) ? strtolower($response->plan) : 'free';
         $status = isset($response->status) ? strtolower($response->status) : 'active';
@@ -87,7 +87,7 @@ class RetainfulApi
      * @param bool $blocking
      * @return array|bool|mixed|object|string
      */
-    function request($url, $fields = array(), $method = 'get', $body = '', $headers = array(), $blocking = true)
+    public static function request($url, $fields = array(), $method = 'get', $body = '', $headers = array(), $blocking = true)
     {
         $response = '';
         try {
@@ -96,7 +96,7 @@ class RetainfulApi
                 $url .= '?' . http_build_query($fields);
             }
             if (empty($headers) || !is_array($headers)) {
-                $headers = array('Origin' => $this->siteURL());
+                $headers = array('Origin' => self::siteURL());
             }
             $use_wp_requests = true;
             if (class_exists('Requests')) {
@@ -159,7 +159,7 @@ class RetainfulApi
      * get site url
      * @return string
      */
-    function siteURL()
+    public static function siteURL()
     {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
         $domainName = $_SERVER['SERVER_NAME'] . '/';
@@ -185,9 +185,9 @@ class RetainfulApi
      * abandoned_cart api url
      * @return string
      */
-    function getAbandonedCartEndPoint()
+    public static function getAbandonedCartEndPoint()
     {
-        $url = rtrim($this->getAbandonedCartApiUrl(), '/');
+        $url = rtrim(self::getAbandonedCartApiUrl(), '/');
         $url .= '/webhooks/checkout';
         return $url;
     }
@@ -199,9 +199,9 @@ class RetainfulApi
      * @param array $extra_headers
      * @return array|bool|mixed|object|string
      */
-    function syncCartDetails($app_id, $body = '', $extra_headers = array())
+    public static function syncCartDetails($app_id, $body = '', $extra_headers = array())
     {
-        $url = $this->getAbandonedCartEndPoint();
+        $url = self::getAbandonedCartEndPoint();
         $body = array(
             'data' => $body
         );
@@ -217,7 +217,7 @@ class RetainfulApi
             $headers = array_merge($headers, $extra_headers);
         }
 
-        $this->request($url, array(), 'post', $body, $headers, false);
+        self::request($url, array(), 'post', $body, $headers, false);
         return true;
     }
 

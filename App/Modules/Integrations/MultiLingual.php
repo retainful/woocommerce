@@ -8,7 +8,7 @@ class MultiLingual
      * Get all available languages
      * @return mixed|void
      */
-    function getAvailableLanguages()
+    public static function getAvailableLanguages()
     {
         $languages = apply_filters('wpml_active_languages', NULL, 'orderby=id&order=desc');
         if (empty($languages) && function_exists('icl_get_languages')) {
@@ -21,7 +21,7 @@ class MultiLingual
      * Get the default language of the site
      * @return String|null
      */
-    function getDefaultLanguage()
+    public static function getDefaultLanguage()
     {
         $current_lang = NULL;
         $wpml_options = get_option('icl_sitepress_settings');
@@ -44,7 +44,7 @@ class MultiLingual
      * Get the default language of the site
      * @return String|null
      */
-    function getCurrentLanguage()
+    public static function getCurrentLanguage()
     {
         if (defined('ICL_LANGUAGE_CODE')) {
             return ICL_LANGUAGE_CODE;
@@ -52,7 +52,7 @@ class MultiLingual
         if (function_exists('pll_current_language')) {
             return pll_current_language();
         }
-        if ($default_lang = $this->getDefaultLanguage()) {
+        if ($default_lang = self::getDefaultLanguage()) {
             return $default_lang;
         }
         return NULL;
