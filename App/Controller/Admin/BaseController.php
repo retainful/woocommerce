@@ -8,7 +8,7 @@ use Rnoc\App\Helpers\Input;
 use Rnoc\App\Modules\AbandonedCart\RestApi;
 use Rnoc\App\Modules\Integrations\MultiLingual;
 use Rnoc\App\library\RetainfulApi;
-use Rnoc\App\Helpers\WcFunctions;
+use Rnoc\App\Helpers\WC;
 use Rnoc\App\Helpers\Settings as SettingHelper;
 
 class BaseController
@@ -147,8 +147,8 @@ class BaseController
     public static function storeDetails($api_key, $secret_key)
     {
         $scheme = wc_site_is_https() ? 'https' : 'http';
-        $country_code = WcFunctions::getStoreCountry();
-        $state_code = WcFunctions::getStoreState();
+        $country_code = WC::getStoreCountry();
+        $state_code = WC::getStoreState();
         $default_language = MultiLingual::getDefaultLanguage();
         $details = array(
             'woocommerce_app_id' => $api_key,
@@ -180,7 +180,7 @@ class BaseController
      */
     public static function getBaseCurrency()
     {
-        $base_currency = WcFunctions::getDefaultCurrency();
+        $base_currency = WC::getDefaultCurrency();
         return apply_filters('rnoc_get_default_currency_code', $base_currency);
     }
 
@@ -205,7 +205,7 @@ class BaseController
      */
     public static function getAllAvailableCurrencies()
     {
-        $base_currency = WcFunctions::getDefaultCurrency();
+        $base_currency = WC::getDefaultCurrency();
         $currencies = array($base_currency);
         return apply_filters('rnoc_get_available_currencies', $currencies);
     }

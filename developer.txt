@@ -41,3 +41,10 @@ Release Checklist:
 10. Copy command for "trunk" folder to New tag folder using svn command
 11. Commit tag folder using svn command
 ===== All process done ========
+
+
+Task:
+=====
+1. Text domain change to all place.
+2. rnocEscAttr -> Move to helper
+3. Re-write : PluginCompatibility

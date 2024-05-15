@@ -5,9 +5,8 @@ if (!defined('ABSPATH')) exit;
 
 use Rnoc\App\Helpers\Settings as SettingHelper;
 
-class WcFunctions
+class WC
 {
-
 
     public static function getProduct($product_id)
     {
@@ -159,7 +158,8 @@ class WcFunctions
     }
 
     /**
-     * Get cart items subtotal
+     * Get cart items subtotal.
+     *
      * @return array
      */
     public static function getCartSubTotal()
@@ -376,7 +376,8 @@ class WcFunctions
     }
 
     /**
-     * get price excluding tax
+     * Get price excluding tax.
+     *
      * @param $product
      * @return float|int
      */

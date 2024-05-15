@@ -10,12 +10,12 @@ use Rnoc\App\Storage\Cookie;
 use Rnoc\App\Storage\PhpSession;
 use Rnoc\App\Storage\WooSession;
 use Rnoc\App\library\RetainfulApi;
-use Rnoc\App\Helpers\WcFunctions;
+use Rnoc\App\Helpers\WC;
 use Rnoc\App\Helpers\Settings as SettingHelper;
 
 class RestApi
 {
-    public static $cart, $checkout, $settings, $api, $woocommerce, $storage, $base_constroller;
+    public static $storage;
     protected static $cart_token_key = "rnoc_user_cart_token", $cart_token_key_for_db = "_rnoc_user_cart_token";
     protected static $user_ip_key = "rnoc_user_ip_address", $user_ip_key_for_db = "_rnoc_user_ip_address";
     protected static $cart_tracking_started_key = "rnoc_cart_created_at", $cart_tracking_started_key_for_db = "_rnoc_cart_tracking_started_at";
@@ -92,7 +92,7 @@ class RestApi
      */
     public static function formatDecimalPrice($price)
     {
-        $decimals = WcFunctions::priceDecimals();
+        $decimals = WC::priceDecimals();
         $price = floatval($price);
         return round($price, $decimals);
     }
@@ -104,7 +104,7 @@ class RestApi
     public static function formatDecimalPriceRemoveTrailingZeros($price)
     {
         $price = (float)$price;
-        $decimals = WcFunctions::priceDecimals();
+        $decimals = WC::priceDecimals();
         $rounded_price = round($price, $decimals);
         return number_format($rounded_price, $decimals, '.', '');
     }
@@ -119,7 +119,7 @@ class RestApi
     {
         $line_total = !empty($item_details['line_total']) ? $item_details['line_total'] : 0;
         $line_total_tax = 0;
-        if (!WcFunctions::isPriceExcludingTax()) {
+        if (!WC::isPriceExcludingTax()) {
             $line_total_tax = !empty($item_details['line_tax']) ? $item_details['line_tax'] : 0;
         }
         $total = $line_total + $line_total_tax;
@@ -156,7 +156,7 @@ class RestApi
      */
     public static function generateCartHash()
     {
-        $cart = WcFunctions::getCart();
+        $cart = WC::getCart();
         $cart_session = array();
         if (!empty($cart)) {
             foreach ($cart as $key => $values) {
@@ -164,7 +164,7 @@ class RestApi
                 unset($cart_session[$key]['data']); // Unset product object.
             }
         }
-        return $cart_session ? md5(wp_json_encode($cart_session) . WcFunctions::getCartTotalForEdit()) : '';
+        return $cart_session ? md5(wp_json_encode($cart_session) . WC::getCartTotalForEdit()) : '';
     }
 
     /**
@@ -216,7 +216,7 @@ class RestApi
      */
     public static function retrieveCartToken($user_id = null)
     {
-        $user_id = ($user_id == NULL) ? WcFunctions::getCurrentUserId() : 0;
+        $user_id = ($user_id == NULL) ? WC::getCurrentUserId() : 0;
         $token = !empty($user_id) ? get_user_meta($user_id, self::$cart_token_key_for_db, true) : self::$storage->getValue(self::$cart_token_key);
         return apply_filters('rnoc_retrieve_cart_token', $token, $user_id, self::class);
     }
@@ -360,7 +360,7 @@ class RestApi
         if (!$order instanceof \WC_Order) {
             return false;
         }
-        return (bool)WcFunctions::getOrderMeta($order, $this->order_recovered_key_for_db);
+        return (bool)WC::getOrderMeta($order, $this->order_recovered_key_for_db);
     }
 
 
@@ -447,8 +447,8 @@ class RestApi
      */
     public static function userCartCreatedAt($user_id = NULL)
     {
-        $user_id = WcFunctions::getCurrentUserId();
-        return empty($user_id) ? self::$storage->getValue(self::$cart_tracking_started_key) : WcFunctions::getUserMeta($user_id, self::$cart_tracking_started_key_for_db, true);
+        $user_id = WC::getCurrentUserId();
+        return empty($user_id) ? self::$storage->getValue(self::$cart_tracking_started_key) : WC::getUserMeta($user_id, self::$cart_tracking_started_key_for_db, true);
     }
 
     /**
@@ -493,7 +493,7 @@ class RestApi
     {
         $enable_gdpr_compliance = SettingHelper::get(RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 'retainful_settings');
         if ($enable_gdpr_compliance) {
-            return in_array(WcFunctions::getSession('is_buyer_accepting_marketing'), array(1, 'true'));
+            return in_array(WC::getSession('is_buyer_accepting_marketing'), array(1, 'true'));
         }
         return true;
     }
@@ -521,7 +521,7 @@ class RestApi
     public static function getUserAcceptLanguage($order = null)
     {
         if (!empty($order)) {
-            return WcFunctions::getOrderMeta($order, '_rnoc_get_http_accept_language');
+            return WC::getOrderMeta($order, '_rnoc_get_http_accept_language');
         }
         $lang = !empty($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? trim($_SERVER['HTTP_ACCEPT_LANGUAGE']) : '';
         return !empty($lang) ? substr($lang, 0, 2) : '';

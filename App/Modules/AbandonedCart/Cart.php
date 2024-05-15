@@ -4,7 +4,7 @@ namespace Rnoc\App\Modules\AbandonedCart;
 
 use Exception;
 use Rnoc\App\Controller\Admin\Settings;
-use Rnoc\App\Helpers\WcFunctions;
+use Rnoc\App\Helpers\WC;
 use Rnoc\App\Helpers\Settings as SettingsHelper;
 use Rnoc\App\Modules\Integrations\MultiLingual;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
@@ -42,7 +42,6 @@ class Cart extends RestApi
                         "Cart-Token" => $token,
                     );
                     self::syncCart($cart_hash, $extra_headers);
-
                 }
             }
         }
@@ -56,7 +55,7 @@ class Cart extends RestApi
     public static function getCartLineItemsDetails()
     {
         $items = array();
-        $cart = WcFunctions::getCart();
+        $cart = WC::getCart();
         if (!empty($cart)) {
             foreach ($cart as $item_key => $item_details) {
                 //Deceleration
@@ -64,13 +63,13 @@ class Cart extends RestApi
                 $item_quantity = !empty($item_details['quantity']) ? $item_details['quantity'] : NULL;
                 $variant_id = !empty($item_details['variation_id']) ? $item_details['variation_id'] : 0;
                 $product_id = !empty($item_details['product_id']) ? $item_details['product_id'] : 0;
-                $cat_ids = !empty($product_id) && $product_id > 0 ? WcFunctions::getProductCategoryIds($product_id) : array();
+                $cat_ids = !empty($product_id) && $product_id > 0 ? WC::getProductCategoryIds($product_id) : array();
                 $item = apply_filters('woocommerce_cart_item_product', $item_details['data'], $item_details, $item_key);
                 if (empty($item)) {
                     if (!empty($variant_id)) {
-                        $item = WcFunctions::getProduct($variant_id);
+                        $item = WC::getProduct($variant_id);
                     } elseif (!empty($product_id)) {
-                        $item = WcFunctions::getProduct($product_id);
+                        $item = WC::getProduct($product_id);
                     }
                 }
                 $line_tax = (!empty($item_details['line_tax'])) ? $item_details['line_tax'] : 0;
@@ -85,25 +84,25 @@ class Cart extends RestApi
                         'compare_at' => 0,
                     );
                 }
-                $image_url = WcFunctions::getProductImageSrc($item);
+                $image_url = WC::getProductImageSrc($item);
                 if (!empty($item) && !empty($item_quantity)) {
                     $item_array = array(
                         'key' => $item_key,
-                        'sku' => WcFunctions::getItemSku($item),
-                        'price' => self::formatDecimalPriceRemoveTrailingZeros(WcFunctions::getCartItemPrice($item)),
-                        'title' => WcFunctions::getItemName($item),
+                        'sku' => WC::getItemSku($item),
+                        'price' => self::formatDecimalPriceRemoveTrailingZeros(WC::getCartItemPrice($item)),
+                        'title' => WC::getItemName($item),
                         'taxable' => ($line_tax != 0),
                         'quantity' => $item_quantity,
                         'tax_lines' => $tax_details,
                         'line_price' => self::formatDecimalPriceRemoveTrailingZeros(self::getLineItemTotal($item_details)),
                         'product_id' => $product_id,
                         'cat_ids' => implode(',', $cat_ids),
-                        'cat_names' => WcFunctions::getProductCategoryName($product_id),
+                        'cat_names' => WC::getProductCategoryName($product_id),
                         'variant_id' => $variant_id,
-                        'variant_price' => self::formatDecimalPriceRemoveTrailingZeros(!empty($variant_id) ? WcFunctions::getCartItemPrice($item) : 0),
-                        'variant_title' => !empty($variant_id) ? WcFunctions::getItemName($item) : '',
+                        'variant_price' => self::formatDecimalPriceRemoveTrailingZeros(!empty($variant_id) ? WC::getCartItemPrice($item) : 0),
+                        'variant_title' => !empty($variant_id) ? WC::getItemName($item) : '',
                         'image_url' => $image_url,
-                        'product_url' => WcFunctions::getProductUrl($item),
+                        'product_url' => WC::getProductUrl($item),
                         'properties' => array()
                     );
                     $items[] = apply_filters('rnoc_get_cart_line_item_details', $item_array, $cart, $item_key, $item, $item_details);
@@ -119,7 +118,7 @@ class Cart extends RestApi
      */
     public static function getCartTaxDetails()
     {
-        $tax_details = WcFunctions::getCartTaxes();
+        $tax_details = WC::getCartTaxes();
         $taxes = array();
         if (!empty($tax_details)) {
             foreach ($tax_details as $key => $tax_detail) {
@@ -182,7 +181,7 @@ class Cart extends RestApi
         $current_currency_code = self::getCurrentCurrencyCode();
         $default_currency_code = Settings::getBaseCurrency();
         $cart_created_at = self::userCartCreatedAt();
-        $cart_total = self::formatDecimalPrice(WcFunctions::getCartTotalPrice());
+        $cart_total = self::formatDecimalPrice(WC::getCartTotalPrice());
         $cart_hash = self::generateCartHash();
         $consider_on_hold_order_as_ac = SettingsHelper::get(RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status', 'retainful_settings');
         $cart = array(
@@ -196,28 +195,28 @@ class Cart extends RestApi
             'currency' => $default_currency_code,
             'customer' => $customer_details,
             'tax_lines' => self::getCartTaxDetails(),
-            'total_tax' => WcFunctions::getCartTotalTax(),
+            'total_tax' => WC::getCartTotalTax(),
             'cart_token' => $cart_token,
             'created_at' => self::formatToIso8601($cart_created_at),
             'line_items' => self::getCartLineItemsDetails(),
             'updated_at' => self::formatToIso8601(''),
             'total_price' => $cart_total,
             'completed_at' => NULL,
-            'discount_codes' => WcFunctions::getAppliedDiscounts(),
+            'discount_codes' => WC::getAppliedDiscounts(),
             'shipping_lines' => array(),
-            'subtotal_price' => self::formatDecimalPrice(WcFunctions::getCartSubTotal()),
+            'subtotal_price' => self::formatDecimalPrice(WC::getCartSubTotal()),
             'total_price_set' => self::getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
-            'taxes_included' => (!WcFunctions::isPriceExcludingTax()),
+            'taxes_included' => (!WC::isPriceExcludingTax()),
             'customer_locale' => $current_language,
             'order_status' => NULL,
-            'total_discounts' => self::formatDecimalPrice(WcFunctions::getCartTotalDiscount()),
+            'total_discounts' => self::formatDecimalPrice(WC::getCartTotalDiscount()),
             'shipping_address' => self::getCustomerShippingAddressDetails(),
             'billing_address' => self::getCustomerBillingAddressDetails(),
             'presentment_currency' => $current_currency_code,
             'abandoned_checkout_url' => self::getRecoveryLink($cart_token),
-            'total_line_items_price' => self::formatDecimalPrice(WcFunctions::getCartTotal()),
+            'total_line_items_price' => self::formatDecimalPrice(WC::getCartTotal()),
             'buyer_accepts_marketing' => self::isBuyerAcceptsMarketing(),
-            'client_session' => WcFunctions::getClientSession(),
+            'client_session' => WC::getClientSession(),
             'woocommerce_totals' => self::getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? self::formatToIso8601($recovered_at) : NULL,
             'recovered_by_retainful' => (self::$storage->getValue('rnoc_recovered_by_retainful')) ? true : false,
@@ -225,7 +224,7 @@ class Cart extends RestApi
             'client_details' => self::getClientDetails()
         );
         if (!empty($cart_token)) {
-            $referrer_automation_id = WcFunctions::getSession($cart_token . '_referrer_automation_id');
+            $referrer_automation_id = WC::getSession($cart_token . '_referrer_automation_id');
             if (!empty($referrer_automation_id)) {
                 $cart['referrer_automation_id'] = $referrer_automation_id;
             }
@@ -240,11 +239,11 @@ class Cart extends RestApi
     public static function getCartTotals()
     {
         return array(
-            'total_price' => self::formatDecimalPrice(WcFunctions::getCartTotalPrice()),
-            'subtotal_price' => self::formatDecimalPrice(WcFunctions::getCartSubTotal()),
-            'total_tax' => self::formatDecimalPrice(WcFunctions::getCartTaxTotal() + WcFunctions::getCartShippingTaxTotal()),
-            'total_discounts' => self::formatDecimalPrice(WcFunctions::getCartDiscountTotal()),
-            'total_shipping' => self::formatDecimalPrice(WcFunctions::getCartShippingTotal()),
+            'total_price' => self::formatDecimalPrice(WC::getCartTotalPrice()),
+            'subtotal_price' => self::formatDecimalPrice(WC::getCartSubTotal()),
+            'total_tax' => self::formatDecimalPrice(WC::getCartTaxTotal() + WC::getCartShippingTaxTotal()),
+            'total_discounts' => self::formatDecimalPrice(WC::getCartDiscountTotal()),
+            'total_shipping' => self::formatDecimalPrice(WC::getCartShippingTotal()),
             'fee_items' => self::getCartFeeDetails(),
         );
     }
@@ -256,7 +255,7 @@ class Cart extends RestApi
     public static function getCartFeeDetails()
     {
         $fee_items = array();
-        if ($fees = WcFunctions::getCartFees()) {
+        if ($fees = WC::getCartFees()) {
             foreach ($fees as $fee) {
                 $fee_items[] = array(
                     'title' => html_entity_decode($fee->name),
@@ -287,8 +286,8 @@ class Cart extends RestApi
     public static function getCustomerDetails()
     {
 
-        $user_id = WcFunctions::getCurrentUserId();
-        $billing_email = WcFunctions::getCustomerEmail();
+        $user_id = WC::getCurrentUserId();
+        $billing_email = WC::getCustomerEmail();
         $billing_phone = !empty($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
         $billing_state = !empty($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
         $billing_last_name = !empty($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
@@ -296,7 +295,7 @@ class Cart extends RestApi
         $created_at = self::$storage->getValue('rnoc_session_created_at');  //add the storage settings
         $updated_at = current_time('timestamp', true);
         if (!empty($user_id)) {
-            $user_data = WcFunctions::getCurrentUser();
+            $user_data = WC::getCurrentUser();
             $billing_email = !empty($billing_email) ? $billing_email : $user_data->user_email;
             $billing_phone = empty($user_data->billing_phone) ? $billing_phone : $user_data->billing_phone;
             $billing_state = empty($user_data->billing_state) ? $billing_state : $user_data->billing_state;
@@ -316,7 +315,7 @@ class Cart extends RestApi
             'verified_email' => true,
             'last_order_name' => NULL,
             'accepts_marketing' => true,
-            'user_roles' => WcFunctions::getUserRoles($billing_email)
+            'user_roles' => WC::getUserRoles($billing_email)
         );
     }
 
@@ -330,7 +329,7 @@ class Cart extends RestApi
         if (empty($shipping_details)) {
             $shipping_details = array();
         }
-        $user_id = WcFunctions::getCurrentUserId();
+        $user_id = WC::getCurrentUserId();
         $shipping_fields = array(
             'shipping_first_name' => '',
             'shipping_last_name' => '',
@@ -343,7 +342,7 @@ class Cart extends RestApi
         );
         foreach ($shipping_fields as $shipping_key => $shipping_value) {
             if (isset($user_id) && $user_id > 0) {
-                $shipping_value = WcFunctions::getUserMeta($user_id, $shipping_key, true);
+                $shipping_value = WC::getUserMeta($user_id, $shipping_key, true);
             }
             if (empty($shipping_value)) {
                 $shipping_value = !empty($shipping_details[$shipping_key]) ? $shipping_details[$shipping_key] : $shipping_value;

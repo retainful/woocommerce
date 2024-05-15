@@ -26,7 +26,6 @@ class Route
         if (is_admin()) {
             self::addAdminHooks();
         } else {
-
             self::addSiteHooks();
         }
         do_action('rnoc_after_init');
@@ -35,7 +34,6 @@ class Route
 
     public static function addAdminHooks()
     {
-
         add_action('admin_menu', array(Settings::class, 'registerMenu'));
         add_action('admin_enqueue_scripts', array(Settings::class, 'initAdminPageStyles'));
         add_action('wp_ajax_rnoc_save_settings', array(Settings::class, 'saveAcSettings'));
@@ -55,7 +53,7 @@ class Route
         /*
         * Retainful abandoned cart api
         */
-        add_action('woocommerce_after_calculate_totals', array(Cart::class, 'syncCartData'));
+        add_action('woocommerce_after_calculate_totals', [Cart::class, 'syncCartData']);
 //        add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
 //        add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
 

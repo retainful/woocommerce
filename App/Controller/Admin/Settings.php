@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit;
 
 use Rnoc\App\Controller\Admin\Webhooks;
 use Rnoc\App\Helpers\Input;
-use Rnoc\App\Helpers\WcFunctions;
+use Rnoc\App\Helpers\WC;
 use Rnoc\App\Helpers\Settings as SettingHelper;
 use Valitron\Validator;
 
@@ -39,7 +39,7 @@ class Settings extends BaseController
             });
         }
         if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings')) && Webhooks::isWebhookNoticeShow()) {
-            $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
+            $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', 'retainful-next-order-coupon-for-woocommerce'), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
             add_action('admin_notices', function () use ($message) {
                 echo '<div class="error notice"><p>' . $message . '</p></div>';
             });
@@ -64,7 +64,7 @@ class Settings extends BaseController
         if ($prefix != "retainful") {
             return;
         }
-        $plugin_url = WcFunctions::getWooPluginUrl();
+        $plugin_url = WC::getWooPluginUrl();
         $asset_path = RNOC_PLUGIN_URL . 'assets/admin';
         //product search select
         wp_enqueue_script('rnoc-select2-js', $plugin_url . '/assets/js/select2/select2.full.min.js', array('jquery'));
@@ -73,7 +73,7 @@ class Settings extends BaseController
         wp_enqueue_script('retainful-app-main', $asset_path . '/js/app.js', array(), RNOC_VERSION);
         wp_localize_script('retainful-app-main', 'retainful_admin', array(
             'i10n' => array(
-                'please_wait' => __('Please wait...', RNOC_TEXT_DOMAIN)
+                'please_wait' => __('Please wait...', 'retainful-next-order-coupon-for-woocommerce')
             ),
             'security' => array(
                 'get_search_coupon' => wp_create_nonce('rnoc_get_search_coupon'),
@@ -126,7 +126,7 @@ class Settings extends BaseController
      */
     public static function saveAcSettings()
     {
-        WcFunctions::checkSecuritykey('rnoc_save_settings');
+        WC::checkSecuritykey('rnoc_save_settings');
         $post = Input::post();
         $validator = new Validator($post);
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', ['js', 'php'])->message('This field contains invalid value');
@@ -152,7 +152,7 @@ class Settings extends BaseController
         $data = Input::clean($post);
         $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = trim(Input::sanitizeBasicHtml($cart_capture_msg));
         update_option(self::$slug . '_settings', $data);
-        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+        wp_send_json_success(__('Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce'));
     }
 
     /**
@@ -160,11 +160,11 @@ class Settings extends BaseController
      */
     public static function disconnectLicense()
     {
-        WcFunctions::checkSecuritykey('rnoc_disconnect_license');
+        WC::checkSecuritykey('rnoc_disconnect_license');
         $license_details = get_option(self::$slug . '_license', array());
         $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
         update_option(self::$slug . '_license', $license_details);
-        wp_send_json_success(__('App disconnected successfully!', RNOC_TEXT_DOMAIN));
+        wp_send_json_success(__('App disconnected successfully!', 'retainful-next-order-coupon-for-woocommerce'));
     }
 
     /**
@@ -172,7 +172,7 @@ class Settings extends BaseController
      */
     public static function validateAppKey()
     {
-        WcFunctions::checkSecuritykey('validate_app_key');
+        WC::checkSecuritykey('validate_app_key');
         $post = Input::post();
         $validator = new Validator($post);
         $validator->rule('required', ['app_id', 'secret_key']);
@@ -207,7 +207,7 @@ class Settings extends BaseController
             } elseif (isset($api_response['error'])) {
                 $response['error'] = $api_response['error'];
             } else {
-                $response['error'] = __('Please check the entered details', RNOC_TEXT_DOMAIN);
+                $response['error'] = __('Please check the entered details', 'retainful-next-order-coupon-for-woocommerce');
             }
         }
         wp_send_json($response);
