@@ -241,7 +241,7 @@ class Imports extends Order
             'presentment_currency' => $current_currency_code,
             'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
             'total_line_items_price' => $this->formatDecimalPrice($this->getOrderItemsTotal($order)),
-            'buyer_accepts_marketing' => ($is_buyer_accepts_marketing == 1),
+            'buyer_accepts_marketing' => true,
             'cancelled_at' => self::$woocommerce->getOrderMeta($order, $this->order_cancelled_date_key_for_db),
             'woocommerce_totals' => $this->getOrderTotals($order, $excluding_tax),
             'recovered_by_retainful' => (bool)self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by'),
