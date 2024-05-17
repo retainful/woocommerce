@@ -42,7 +42,7 @@ class Route
         add_action('wp_ajax_rnoc_disconnect_license', array(Settings::class, 'disconnectLicense'));
         //add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
         //Validate key
-        // add_action('wp_ajax_validate_app_key', array(self::$base_controller, 'validateAppKey'));
+        //add_action('wp_ajax_validate_app_key', array(self::$base_controller, 'validateAppKey'));
     }
 
 

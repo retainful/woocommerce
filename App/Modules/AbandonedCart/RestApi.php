@@ -167,47 +167,6 @@ class RestApi
         return $cart_session ? md5(wp_json_encode($cart_session) . WC::getCartTotalForEdit()) : '';
     }
 
-    /**
-     * Customer address mapping fields
-     * @return array
-     */
-    public static function getAddressMapFields()
-    {
-        $fields = array(
-            'first_name',
-            'last_name',
-            'state',
-            'phone',
-            'postcode',
-            'city',
-            'country',
-            'address_1',
-            'address_2',
-            'company'
-        );
-        return apply_filters('rnoc_get_checkout_mapping_fields', $fields);
-    }
-
-    /**
-     * Get the customer billing details
-     * @param $type
-     * @return array
-     */
-    public static function getCustomerCheckoutDetails($type = "billing")
-    {
-        $fields = self::getAddressMapFields();
-        $checkout_field_values = array();
-        if (!empty($fields)) {
-            foreach ($fields as $key) {
-                $method = 'get_' . $type . '_' . $key;
-                if (is_callable(array(WC()->customer, $method))) {
-                    $checkout_field_values[$type . '_' . $key] = WC()->customer->$method();
-                }
-            }
-        }
-        return $checkout_field_values;
-    }
-
 
     /**
      * retrieve cart token from session
@@ -387,19 +346,6 @@ class RestApi
         }
     }
 
-    /**
-     * Convert price to another price as per currency rate
-     * @param $price
-     * @param $rate
-     * @return float|int
-     */
-    public static function convertToCurrency($price, $rate)
-    {
-        if (!empty($price) && !empty($rate)) {
-            return $price / $rate;
-        }
-        return $price;
-    }
 
     /**
      * Encrypt the cart
@@ -429,16 +375,6 @@ class RestApi
         return NULL;
     }
 
-
-    /**
-     * get the active currency code
-     * @return String|null
-     */
-    public static function getCurrentCurrencyCode()
-    {
-        $default_currency = Settings::getBaseCurrency();
-        return apply_filters('rnoc_get_current_currency_code', $default_currency);
-    }
 
     /**
      * Get the date of cart tracing started
@@ -491,7 +427,7 @@ class RestApi
      */
     public static function isBuyerAcceptsMarketing()
     {
-        $enable_gdpr_compliance = SettingHelper::get(RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 'retainful_settings');
+        $enable_gdpr_compliance = SettingHelper::get(RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 'retainful_settings', 0);
         if ($enable_gdpr_compliance) {
             return in_array(WC::getSession('is_buyer_accepting_marketing'), array(1, 'true'));
         }

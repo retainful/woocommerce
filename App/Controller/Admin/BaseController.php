@@ -38,7 +38,7 @@ class BaseController
     public static function isAppConnected()
     {
         self::storeDetails('68b30adc-00fd-4196-a426-494384b50c63', 'd3177c054689e5df671893ec0369a28b');
-        $is_connected = SettingHelper::get(RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 'retainful_license');
+        $is_connected = SettingHelper::get(RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 'retainful_license', false);
         return !empty($is_connected);
     }
 
@@ -48,8 +48,7 @@ class BaseController
      */
     public static function getApiKey()
     {
-        $apikey = SettingHelper::get(RNOC_PLUGIN_PREFIX . 'retainful_app_id', 'retainful_license');
-        return !empty($apikey) ? $apikey : NULL;
+        return SettingHelper::get(RNOC_PLUGIN_PREFIX . 'retainful_app_id', 'retainful_license', '');
     }
 
     /**
@@ -58,8 +57,8 @@ class BaseController
      */
     public static function getSecretKey()
     {
-        $apikey = SettingHelper::get(RNOC_PLUGIN_PREFIX . 'retainful_app_id', 'retainful_license');
-        return !empty($apikey) ? $apikey : NULL;
+        return SettingHelper::get(RNOC_PLUGIN_PREFIX . 'retainful_app_id', 'retainful_license', '');
+
     }
 
     /**
@@ -217,8 +216,7 @@ class BaseController
      */
     public static function logMessage($message, $log_in_as = "checkout")
     {
-        $admin_settings = Settings::getAdminSettings();
-        if (isset($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($message)) {
+        if (!empty(SettingHelper::get(RNOC_PLUGIN_PREFIX . 'enable_debug_log', 'retainful_settings'))) {
             try {
                 if (is_array($message) || is_object($message)) {
                     $message = json_encode($message);
@@ -234,5 +232,4 @@ class BaseController
             }
         }
     }
-
 }

@@ -27,10 +27,6 @@ add_action('before_woocommerce_init', function () {
 if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
     return false;
 }
-//echo "<pre>";
-//print_r(__DIR__ . '/vendor/autoload.php');
-//exit;
-
 
 // Define the text domain
 defined('RNOC_TEXT_DOMAIN') || define('RNOC_TEXT_DOMAIN', 'retainful-next-order-coupon-for-woocommerce');

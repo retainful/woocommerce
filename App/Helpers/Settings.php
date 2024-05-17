@@ -54,12 +54,12 @@ class Settings
      * @param string $key Setting key.
      * @return mixed|string
      */
-    public static function get($key, $option_key)
+    public static function get($key, $option_key, $default = '')
     {
         $options = self::getData($option_key);
         if (!isset($options[$key])) {
             $default_data = self::getDefaultData();
-            return isset($default_data[$key]) && $default_data[$key] ? $default_data[$key]['value'] : '';
+            return isset($default_data[$key]) && $default_data[$key] ? $default_data[$key]['value'] : $default;
         }
         return $options[$key];
     }

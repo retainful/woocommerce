@@ -1106,4 +1106,27 @@ class Input
         return stripslashes(esc_attr__($txt));
     }
 
+    /**
+     * Format the date to ISO8601
+     * @param $timestamp
+     * @return string|null
+     */
+    public static function formatToIso8601($timestamp)
+    {
+        if (empty($timestamp)) {
+            $timestamp = current_time('timestamp', true);
+        }
+        if (is_object($timestamp) && $timestamp instanceof \WC_DateTime) {
+            $timestamp = $timestamp->getTimestamp();
+        }
+
+        try {
+            $date = date('Y-m-d H:i:s', $timestamp);
+            $date_time = new DateTime($date);
+            return $date_time->format(DateTime::ATOM);
+        } catch (Exception $e) {
+            return NULL;
+        }
+    }
+
 }

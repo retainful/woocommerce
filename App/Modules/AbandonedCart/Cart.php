@@ -5,6 +5,8 @@ namespace Rnoc\App\Modules\AbandonedCart;
 use Exception;
 use Rnoc\App\Controller\Admin\Settings;
 use Rnoc\App\Helpers\WC;
+use Rnoc\App\Helpers\Customer;
+use Rnoc\App\Helpers\Currency;
 use Rnoc\App\Helpers\Settings as SettingsHelper;
 use Rnoc\App\Modules\Integrations\MultiLingual;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
@@ -132,33 +134,6 @@ class Cart extends RestApi
         return $taxes;
     }
 
-    /**
-     * Currency details for cart
-     * @param $cart_total
-     * @param $current_currency_code
-     * @param $default_currency_code
-     * @return array
-     */
-    public static function getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code)
-    {
-        if ($current_currency_code != $default_currency_code) {
-            $exchange_rate = apply_filters('rnoc_get_currency_rate', $cart_total, $current_currency_code);
-            $shop_cart_total = self::convertToCurrency($cart_total, $exchange_rate);
-        } else {
-            $shop_cart_total = $cart_total;
-        }
-        $details = array(
-            'shop_money' => array(
-                'amount' => $shop_cart_total,
-                'currency_code' => $default_currency_code
-            ),
-            'presentment_money' => array(
-                'amount' => $cart_total,
-                'currency_code' => $current_currency_code
-            )
-        );
-        return apply_filters('rnoc_get_cart_currency_details', $details, $current_currency_code, $default_currency_code);
-    }
 
     /**
      * get user IP details
@@ -175,15 +150,16 @@ class Cart extends RestApi
      */
     public static function getUserCart()
     {
+        Customer::getAddressDetails();
         $current_language = MultiLingual::getCurrentLanguage();
-        $customer_details = self::getCustomerDetails();
+        $customer_details = Customer::getCustomerDetails();
         $cart_token = self::getCartToken();
-        $current_currency_code = self::getCurrentCurrencyCode();
+        $current_currency_code = Currency::getCurrentCurrencyCode();
         $default_currency_code = Settings::getBaseCurrency();
         $cart_created_at = self::userCartCreatedAt();
         $cart_total = self::formatDecimalPrice(WC::getCartTotalPrice());
         $cart_hash = self::generateCartHash();
-        $consider_on_hold_order_as_ac = SettingsHelper::get(RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status', 'retainful_settings');
+        $consider_on_hold_order_as_ac = SettingsHelper::get(RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status', 'retainful_settings', 0);
         $cart = array(
             'cart_type' => 'cart',
             'treat_on_hold_as_complete' => ($consider_on_hold_order_as_ac == 0),
@@ -205,13 +181,13 @@ class Cart extends RestApi
             'discount_codes' => WC::getAppliedDiscounts(),
             'shipping_lines' => array(),
             'subtotal_price' => self::formatDecimalPrice(WC::getCartSubTotal()),
-            'total_price_set' => self::getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
+            'total_price_set' => Currency::getCurrencyDetails($cart_total, $current_currency_code, $default_currency_code),
             'taxes_included' => (!WC::isPriceExcludingTax()),
             'customer_locale' => $current_language,
             'order_status' => NULL,
             'total_discounts' => self::formatDecimalPrice(WC::getCartTotalDiscount()),
-            'shipping_address' => self::getCustomerShippingAddressDetails(),
-            'billing_address' => self::getCustomerBillingAddressDetails(),
+            'shipping_address' => Customer::getAddressDetails('shipping'),
+            'billing_address' => Customer::getAddressDetails('billing'),
             'presentment_currency' => $current_currency_code,
             'abandoned_checkout_url' => self::getRecoveryLink($cart_token),
             'total_line_items_price' => self::formatDecimalPrice(WC::getCartTotal()),
@@ -279,145 +255,6 @@ class Cart extends RestApi
         return hash_hmac(self::HMAC_ALGORITHM, $data, $secret);
     }
 
-    /**
-     * Get the customer details
-     * @return array
-     */
-    public static function getCustomerDetails()
-    {
-
-        $user_id = WC::getCurrentUserId();
-        $billing_email = WC::getCustomerEmail();
-        $billing_phone = !empty($billing_details['billing_phone']) ? $billing_details['billing_phone'] : NULL;
-        $billing_state = !empty($billing_details['billing_state']) ? $billing_details['billing_state'] : NULL;
-        $billing_last_name = !empty($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
-        $billing_first_name = !empty($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
-        $created_at = self::$storage->getValue('rnoc_session_created_at');  //add the storage settings
-        $updated_at = current_time('timestamp', true);
-        if (!empty($user_id)) {
-            $user_data = WC::getCurrentUser();
-            $billing_email = !empty($billing_email) ? $billing_email : $user_data->user_email;
-            $billing_phone = empty($user_data->billing_phone) ? $billing_phone : $user_data->billing_phone;
-            $billing_state = empty($user_data->billing_state) ? $billing_state : $user_data->billing_state;
-            $billing_last_name = empty($user_data->billing_last_name) ? $billing_last_name : $user_data->billing_last_name;
-            $billing_first_name = empty($user_data->billing_first_name) ? $billing_first_name : $user_data->billing_first_name;
-        }
-        return array(
-            'id' => $user_id,
-            'email' => $billing_email,
-            'phone' => $billing_phone,
-            'state' => $billing_state,
-            'last_name' => $billing_last_name,
-            'first_name' => $billing_first_name,
-            'currency' => Settings::getBaseCurrency(),
-            'created_at' => self::formatToIso8601($created_at),
-            'updated_at' => self::formatToIso8601($updated_at),
-            'verified_email' => true,
-            'last_order_name' => NULL,
-            'accepts_marketing' => true,
-            'user_roles' => WC::getUserRoles($billing_email)
-        );
-    }
-
-    /**
-     * Get the shipping address of the customer
-     * @return array
-     */
-    public static function getCustomerShippingAddressDetails()
-    {
-        $shipping_details = self::getCustomerCheckoutDetails('shipping');
-        if (empty($shipping_details)) {
-            $shipping_details = array();
-        }
-        $user_id = WC::getCurrentUserId();
-        $shipping_fields = array(
-            'shipping_first_name' => '',
-            'shipping_last_name' => '',
-            'shipping_address_1' => '',
-            'shipping_city' => '',
-            'shipping_state' => '',
-            'shipping_postcode' => '',
-            'shipping_country' => '',
-            'shipping_address_2' => '',
-        );
-        foreach ($shipping_fields as $shipping_key => $shipping_value) {
-            if (isset($user_id) && $user_id > 0) {
-                $shipping_value = WC::getUserMeta($user_id, $shipping_key, true);
-            }
-            if (empty($shipping_value)) {
-                $shipping_value = !empty($shipping_details[$shipping_key]) ? $shipping_details[$shipping_key] : $shipping_value;
-            }
-            $shipping_fields[$shipping_key] = $shipping_value;
-        }
-        return array(
-            'zip' => $shipping_fields['shipping_postcode'],
-            'city' => $shipping_fields['shipping_city'],
-            'name' => $shipping_fields['shipping_first_name'] . ' ' . $shipping_fields['shipping_last_name'],
-            'phone' => NULL,
-            'company' => NULL,
-            'country' => $shipping_fields['shipping_country'],
-            'address1' => $shipping_fields['shipping_address_1'],
-            'address2' => $shipping_fields['shipping_address_2'],
-            'latitude' => '',
-            'province' => $shipping_fields['shipping_state'],
-            'last_name' => $shipping_fields['shipping_last_name'],
-            'longitude' => '',
-            'first_name' => $shipping_fields['shipping_first_name'],
-            'country_code' => $shipping_fields['shipping_country'],
-            'province_code' => $shipping_fields['shipping_state'],
-        );
-    }
-
-    /**
-     * Get the billing address of the customer
-     * @return array
-     */
-    public static function getCustomerBillingAddressDetails()
-    {
-        $billing_details = empty($billing_details) ? self::getCustomerCheckoutDetails('billing') : array();
-        $billing_first_name = empty($billing_details['billing_first_name']) ? $billing_details['billing_first_name'] : NULL;
-        $billing_last_name = empty($billing_details['billing_last_name']) ? $billing_details['billing_last_name'] : NULL;
-        $user_id = get_current_user_id();
-        if (!empty($user_id)) {
-            $user_data = wp_get_current_user();
-            $billing_first_name = !empty($user_data->first_name) ? $user_data->first_name : $billing_details['billing_first_name'];
-            $billing_last_name = !empty($user_data->last_name) ? $user_data->last_name : $billing_details['billing_last_name'];
-        }
-        $billing_fields = array(
-            'billing_address_1' => '',
-            'billing_city' => '',
-            'billing_state' => '',
-            'billing_postcode' => '',
-            'billing_country' => '',
-            'billing_phone' => '',
-            'billing_address_2' => '',
-            'billing_company' => ''
-        );
-        foreach ($billing_fields as $billing_key => $billing_value) {
-            if (isset($user_id) && $user_id > 0) {
-                $billing_value = get_user_meta($user_id, $billing_key, true);
-            }
-            if (empty($billing_value)) {
-                $billing_value = isset($billing_details[$billing_key]) ? $billing_details[$billing_key] : $billing_value;
-            }
-            $billing_fields[$billing_key] = $billing_value;
-        }
-        return array(
-            'zip' => $billing_fields['billing_postcode'],
-            'city' => $billing_fields['billing_city'],
-            'name' => $billing_first_name . ' ' . $billing_last_name,
-            'phone' => $billing_fields['billing_phone'],
-            'company' => $billing_fields['billing_company'],
-            'country' => $billing_fields['billing_country'],
-            'address1' => $billing_fields['billing_address_1'],
-            'address2' => $billing_fields['billing_address_2'],
-            'province' => $billing_fields['billing_state'],
-            'last_name' => $billing_last_name,
-            'first_name' => $billing_first_name,
-            'country_code' => $billing_fields['billing_country'],
-            'province_code' => $billing_fields['billing_state'],
-        );
-    }
 
     /**
      * need to track user cart
