@@ -27,6 +27,10 @@ add_action('before_woocommerce_init', function () {
 if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
     return false;
 }
+//echo "<pre>";
+//print_r(__DIR__ . '/vendor/autoload.php');
+//exit;
+
 
 // Define the text domain
 defined('RNOC_TEXT_DOMAIN') || define('RNOC_TEXT_DOMAIN', 'retainful-next-order-coupon-for-woocommerce');
@@ -59,20 +63,9 @@ defined('RNOC_MINIMUM_WP_VERSION') || define('RNOC_MINIMUM_WP_VERSION', '4.7.0')
 defined('RNOC_MINIMUM_PHP_VERSION') || define('RNOC_MINIMUM_PHP_VERSION', '5.6.0');
 defined('REQUESTS_SILENCE_PSR0_DEPRECATIONS') || define('REQUESTS_SILENCE_PSR0_DEPRECATIONS', true);
 
-if (!function_exists('rnocEscAttr')) {
-    function rnocEscAttr($txt)
-    {
-        return stripslashes(esc_attr__($txt));
-    }
-}
-
-if (!file_exists(RNOC_PLUGIN_PATH . '/vendor/autoload.php')) {
-    return;
-}
-
 require __DIR__ . '/vendor/autoload.php';
 if (class_exists('Rnoc\App\Route')) {
-    if (\Rnoc\App\Helpers\PluginCompatiable::checkDependencies()) {
+    if (\Rnoc\App\Helpers\Plugin::checkDependencies()) {
         \Rnoc\App\Route::init(); // init plugin hooks
     }
 }

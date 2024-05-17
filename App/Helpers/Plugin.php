@@ -4,7 +4,7 @@ namespace Rnoc\App\Helpers;
 
 defined('ABSPATH') || exit; // Exit if accessed directly
 
-class PluginCompatiable
+class Plugin
 {
     /**
      * Check the plugin are active or not.
@@ -12,7 +12,7 @@ class PluginCompatiable
      * @param string $plugin_path Plugin path.
      * @return bool
      */
-    public static function isActive(string $plugin_path): bool
+    public static function isActive($plugin_path)
     {
         $active_plugins = apply_filters('active_plugins', get_option('active_plugins', array()));
 
@@ -28,21 +28,29 @@ class PluginCompatiable
      * @param bool $allow_exit Allow exit.
      * @return bool
      */
-    public static function checkDependencies(bool $allow_exit = false): bool
+    public static function checkDependencies($allow_exit = false)
     {
 
         if (!self::isPHPCompatible()) {
-            wp_die(sprintf(__('This plugin can not be activated because it requires minimum PHP version of %1$s.', RNOC_TEXT_DOMAIN), RNOC_MINIMUM_PHP_VERSION));
+            $message = sprintf(__('%s requires minimum PHP version %s', 'retainful-next-order-coupon-for-woocommerce'), RNOC_PLUGIN_NAME, RNOC_MINIMUM_PHP_VERSION);
+            $allow_exit ? die(esc_html($message)) : WC::adminNotice(esc_html($message), 'error');
+            return false;
         }
         if (!self::isWordPressCompatible()) {
-            exit(__('Woocommerce Email Customizer + requires at least Wordpress', RNOC_TEXT_DOMAIN) . ' ' . RNOC_MINIMUM_WC_VERSION);
+            $message = sprintf(__('%s requires minimum WordPress version %s', 'retainful-next-order-coupon-for-woocommerce'), RNOC_PLUGIN_NAME, RNOC_MINIMUM_WC_VERSION);
+            $allow_exit ? exit($message) : WC::adminNotice(esc_html($message), 'error');
+            return false;
         }
 
         if (!self::isActive('woocommerce/woocommerce.php')) {
-            exit(__('Woocommerce must be installed and activated in-order to use Retainful!', RNOC_TEXT_DOMAIN));
+            $message = sprintf(__('%s requires WooCommerce to be installed and activated in order to be used.', 'retainful-next-order-coupon-for-woocommerce'), RNOC_PLUGIN_NAME);
+            $allow_exit ? exit($message) : WC::adminNotice(esc_html($message), 'error');
+            return false;
         }
         if (!self::isWooCompatible()) {
-            exit(__('Woocommerce Email Customizer + requires at least Woocommerce', RNOC_TEXT_DOMAIN) . ' ' . RNOC_MINIMUM_WC_VERSION);
+            $message = sprintf(__('%s requires minimum Woocommerce version %s', 'retainful-next-order-coupon-for-woocommerce'), RNOC_PLUGIN_NAME, RNOC_MINIMUM_WC_VERSION);
+            $allow_exit ? exit($message) : WC::adminNotice(esc_html($message), 'error');
+            return false;
         }
         return true;
     }
@@ -52,7 +60,7 @@ class PluginCompatiable
      *
      * @return bool
      */
-    protected static function isPHPCompatible(): bool
+    protected static function isPHPCompatible()
     {
         return (int)version_compare(PHP_VERSION, RNOC_MINIMUM_PHP_VERSION, '>=') > 0;
     }
@@ -62,7 +70,7 @@ class PluginCompatiable
      *
      * @return bool
      */
-    protected static function isWordPressCompatible(): bool
+    protected static function isWordPressCompatible()
     {
         return (int)version_compare(get_bloginfo('version'), RNOC_MINIMUM_WP_VERSION, '>=') > 0;
     }
@@ -72,7 +80,7 @@ class PluginCompatiable
      *
      * @return bool
      */
-    protected static function isWooCompatible(): bool
+    protected static function isWooCompatible()
     {
         $woo_version = self::getWooVersion();
         return (int)version_compare($woo_version, RNOC_MINIMUM_WC_VERSION, '>=') > 0;
@@ -83,7 +91,7 @@ class PluginCompatiable
      *
      * @return string
      */
-    protected static function getWooVersion(): string
+    protected static function getWooVersion()
     {
         if (defined('WC_VERSION')) {
             return WC_VERSION;
@@ -92,7 +100,7 @@ class PluginCompatiable
             require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         }
         $plugin_folder = get_plugins('/woocommerce');
-        return $plugin_folder['woocommerce.php']['Version'] ?? '1.0.0';
+        return isset($plugin_folder['woocommerce.php']['Version']) ? $plugin_folder['woocommerce.php']['Version'] : '1.0.0';
     }
 
 }

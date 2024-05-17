@@ -8,19 +8,35 @@ use Rnoc\App\Helpers\Settings as SettingHelper;
 class WC
 {
 
+    /**
+     * get product data.
+     *
+     * @param $product_id
+     * @return array|false|\WC_Product|null
+     */
     public static function getProduct($product_id)
     {
         return function_exists('wc_get_product') ? wc_get_product(intval($product_id)) : array();
     }
 
+    /**
+     * get product image id.
+     *
+     * @param \WC_Product $product
+     * @return int|mixed
+     */
     public static function getProductImageId($product)
     {
-        if (self::isMethodExists($product, 'get_image_id')) {
-            return $product->get_image_id();
-        }
-        return NULL;
+        return self::isMethodExists($product, 'get_image_id') ? $product->get_image_id() : 0;
     }
 
+
+    /**
+     * get product image src
+     *
+     * @param \WC_Product $product
+     * @return mixed|null
+     */
     public static function getProductImageSrc($product)
     {
         $image_id = self::getProductImageId($product);
@@ -44,6 +60,19 @@ class WC
         return false;
     }
 
+    /**
+     * check for method exists
+     * @param $obj
+     * @param $method
+     * @return bool
+     */
+    public static function isObjectExists($obj, $value)
+    {
+        if (is_object($obj) && !empty($obj->$value)) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Get used coupons of order
@@ -63,16 +92,12 @@ class WC
      * Get order meta from order object
      * @param $order
      * @param $meta_key
-     * @return null
+     * @return string
      * @since 2.2.5
      */
     public static function getOrderMeta($order, $meta_key)
     {
-        $meta_value = null;
-        if (is_object($order) && method_exists($order, 'get_meta')) {
-            $meta_value = $order->get_meta($meta_key);
-        }
-        return $meta_value;
+        return self::isMethodExists($order, 'get_meta') ? $order->get_meta($meta_key) : '';
     }
 
 
@@ -112,8 +137,7 @@ class WC
      */
     public static function getSession($key)
     {
-        if (empty($key))
-            return NULL;
+        if (empty($key)) return NULL;
         if (self::isMethodExists(WC()->session, 'get')) {
             return WC()->session->get($key);
         }
@@ -164,9 +188,10 @@ class WC
      */
     public static function getCartSubTotal()
     {
-        $subtotal = !empty(WC()->cart->subtotal) ? WC()->cart->subtotal : 0;
+
+        $subtotal = self::isObjectExists(WC()->cart, 'subtotal') ? WC()->cart->subtotal : 0;
         if (self::isPriceExcludingTax()) {
-            if (WC()->cart->subtotal_ex_tax) {
+            if (self::isObjectExists(WC()->cart, 'subtotal_ex_tax')) {
                 $subtotal = WC()->cart->subtotal_ex_tax;
             }
         }
@@ -248,16 +273,6 @@ class WC
         return isset(WC()->cart->total) && !empty(WC()->cart->total) ? WC()->cart->total : 0;
     }
 
-    /**
-     * Force to calculate cart totals
-     */
-    function calculateCartTotals()
-    {
-        if ($this->isMethodExists(WC()->cart, 'calculate_totals')) {
-            return WC()->cart->calculate_totals();
-        }
-        return NULL;
-    }
 
     /**
      * Get cart items
@@ -285,10 +300,7 @@ class WC
      */
     public static function getItemName($item)
     {
-        if (self::isMethodExists($item, 'get_name')) {
-            return apply_filters('rnoc_get_item_name', $item->get_name(), $item);
-        }
-        return NULL;
+        return self::isMethodExists($item, 'get_name') ? apply_filters('rnoc_get_item_name', $item->get_name(), $item) : '';
     }
 
 
@@ -308,10 +320,7 @@ class WC
      */
     public static function getDefaultCurrency()
     {
-        if (function_exists('get_woocommerce_currency')) {
-            return get_woocommerce_currency();
-        }
-        return NULL;
+        return function_exists('get_woocommerce_currency') ? get_woocommerce_currency() : '';
     }
 
 
@@ -321,7 +330,7 @@ class WC
      */
     public static function getCartTaxTotal()
     {
-        return !empty(WC()->cart->tax_total) ? WC()->cart->tax_total : 0;
+        return self::isObjectExists(WC()->cart, 'tax_total') ? WC()->cart->tax_total : 0;
     }
 
     /**
@@ -330,7 +339,7 @@ class WC
      */
     public static function getCartShippingTaxTotal()
     {
-        return !empty(WC()->cart->shipping_tax_total) ? WC()->cart->shipping_tax_total : 0;
+        return self::isObjectExists(WC()->cart, 'shipping_tax_total') ? WC()->cart->shipping_tax_total : 0;
     }
 
     /**
@@ -339,7 +348,7 @@ class WC
      */
     public static function getCartDiscountTotal()
     {
-        return !empty(WC()->cart->discount_cart) ? WC()->cart->discount_cart : 0;
+        return self::isObjectExists(WC()->cart, 'discount_cart') ? WC()->cart->discount_cart : 0;
     }
 
     /**
@@ -348,7 +357,7 @@ class WC
      */
     public static function getCartShippingTotal()
     {
-        return !empty(WC()->cart->shipping_total) ? WC()->cart->shipping_total : 0;
+        return self::isObjectExists(WC()->cart, 'shipping_total') ? WC()->cart->shipping_total : 0;
     }
 
     /**
@@ -367,10 +376,9 @@ class WC
      */
     public static function getCartItemPrice($product)
     {
+        $price = self::getPriceIncludingTax($product);
         if (self::isPriceExcludingTax()) {
             $price = self::getPriceExcludingTax($product);
-        } else {
-            $price = self::getPriceIncludingTax($product);
         }
         return $price;
     }
@@ -408,7 +416,7 @@ class WC
 
     public static function checkSecuritykey($security_name)
     {
-        $message = __('Security check failed', RNOC_TEXT_DOMAIN);
+        $message = __('Security check failed', 'retainful-next-order-coupon-for-woocommerce');
         if (empty($security_name)) wp_send_json_error($message);
         check_ajax_referer($security_name, 'security');
         if (!current_user_can('manage_woocommerce')) {
@@ -442,17 +450,18 @@ class WC
 
     public static function getWooPluginUrl()
     {
-        return function_exists('WC') ? WC()->plugin_url() : NULL;
+        return self::isMethodExists(WC(), 'plugin_url') ? WC()->plugin_url() : NULL;
+
     }
 
     public static function getStoreCountry()
     {
-        return function_exists('WC') ? WC()->countries->get_base_country() : NULL;
+        return self::isMethodExists(WC()->countries, 'get_base_country') ? WC()->countries->get_base_country() : NULL;
     }
 
     public static function getStoreState()
     {
-        return function_exists('WC') ? WC()->countries->get_base_state() : NULL;
+        return self::isMethodExists(WC()->countries, 'get_base_state') ? WC()->countries->get_base_state() : NULL;
     }
 
     public static function getUserRoles($email)
@@ -493,10 +502,7 @@ class WC
      */
     public static function getCartTotalForEdit()
     {
-        if (self::isMethodExists(WC()->cart, 'get_total')) {
-            return wc()->cart->get_total('edit');
-        }
-        return self::getCartTotal();
+        return self::isMethodExists(WC()->cart, 'get_total') ? wc()->cart->get_total('edit') : self::getCartTotal();
     }
 
 
@@ -527,4 +533,21 @@ class WC
         return function_exists('wc_get_product_term_ids') ? wc_get_product_term_ids($product_id, 'product_cat') : array();
     }
 
+    /**
+     * Add admin notice.
+     *
+     * @param string $message Message.
+     * @param string $status Status.
+     * @return void
+     */
+    public static function adminNotice($message, $status = "success")
+    {
+        add_action('admin_notices', function () use ($message, $status) {
+            ?>
+            <div class="notice notice-<?php echo esc_attr($status); ?>">
+                <p><?php echo wp_kses_post($message); ?></p>
+            </div>
+            <?php
+        }, 1);
+    }
 }

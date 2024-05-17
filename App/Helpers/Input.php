@@ -631,17 +631,6 @@ class Input
             : $this->post($index, $default, $xss_clean);
     }
 
-    /**
-     * Fetch an item from the COOKIE array
-     * @param null $index
-     * @param null $default
-     * @param null $xss_clean
-     * @return mixed
-     */
-    function cookie($index = NULL, $default = NULL, $xss_clean = NULL)
-    {
-        return $this->_fetch_from_array($_COOKIE, $index, $default, $xss_clean);
-    }
 
     /**
      * Fetch an item from the php://input stream
@@ -662,16 +651,6 @@ class Input
         return $this->_fetch_from_array($this->_input_stream, $index, $default, $xss_clean);
     }
 
-    /**
-     * Fetch User Agent string
-     * @param null $xss_clean
-     * @param null $default
-     * @return mixed
-     */
-    function user_agent($xss_clean = NULL, $default = NULL)
-    {
-        return $this->_fetch_from_array($_SERVER, 'HTTP_USER_AGENT', $default, $xss_clean);
-    }
 
     /**
      * Get Request Header
@@ -1114,6 +1093,17 @@ class Input
         } catch (\Exception $e) {
             return '';
         }
+    }
+
+    /**
+     * Escap attribute check
+     *
+     * @param $txt
+     * @return string
+     */
+    public static function rnocEscAttr($txt)
+    {
+        return stripslashes(esc_attr__($txt));
     }
 
 }

@@ -20,6 +20,7 @@ class Route
 
     public static function init()
     {
+
         //before init hook
         do_action('rnoc_before_init');
         self::addCommonHooks();
