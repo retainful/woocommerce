@@ -3,6 +3,9 @@
 namespace Rnoc\App\Helpers;
 
 use http\Encoding\Stream\Deflate;
+use Rnoc\App\Storage\Cookie;
+use Rnoc\App\Storage\PhpSession;
+use Rnoc\App\Storage\WCSession;
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 class Settings
@@ -54,7 +57,7 @@ class Settings
      * @param string $key Setting key.
      * @return mixed|string
      */
-    public static function get($key, $option_key, $default = '')
+    public static function get($option_key, $key, $default = '')
     {
         $options = self::getData($option_key);
         if (!isset($options[$key])) {
@@ -64,4 +67,61 @@ class Settings
         return $options[$key];
     }
 
+
+    /**
+     * init the storage classes
+     */
+    public static function initStorage()
+    {
+        $storage_handler = \Rnoc\App\Controller\Admin\Settings::getStorageHandler();
+        switch ($storage_handler) {
+            case "php";
+                $storage = new PhpSession();
+                break;
+            case "cookie";
+                $storage = new Cookie();
+                break;
+            default:
+            case "woocommerce":
+                $storage = new WCSession();
+                break;
+        }
+        return $storage;
+    }
+
+    /**
+     * Set identity.
+     *
+     * @param $value
+     * @return void
+     */
+    public static function setIdentity($value = '')
+    {
+        if (!self::isCustomerPage() || empty($value) || !self::needPopupWidget()) return;
+        $cookie = new \Rnoc\App\Storage\Cookie();
+        $cookie_data = ['email' => trim($value)];
+        $cookie->removeValue('_wc_rnoc_tk_session');
+        if (function_exists('wc_setcookie')) {
+            wc_setcookie('_wc_rnoc_tk_session', base64_encode(json_encode($cookie_data)), strtotime('+30 days'));
+        }
+    }
+
+    /**
+     * Is customer page.
+     *
+     * @return bool
+     */
+    public static function isCustomerPage()
+    {
+        if (is_ajax()) {
+            return true;
+        }
+        return !is_admin();
+    }
+
+    public static function needPopupWidget()
+    {
+        $need_widget = self::get('retainful_settings', RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup', 'no');
+        return apply_filters("retainful_enable_popup_widget", ($need_widget === "yes"));
+    }
 }

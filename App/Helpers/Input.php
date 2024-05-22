@@ -1,1132 +1,1451 @@
 <?php
 
 namespace Rnoc\App\Helpers;
-if (!defined('ABSPATH')) exit; // Exit if accessed directly
-class Input
-{
-    /**
-     * Character set
-     *
-     * Will be overridden by the constructor.
-     *
-     * @var    string
-     */
-    public static $charset = 'UTF-8';
-    /**
-     * IP address of the current user
-     *
-     * @var    string
-     */
-    protected static $ip_address = FALSE;
-    /**
-     * Allow GET array flag
-     *
-     * If set to FALSE, then $_GET will be set to an empty array.
-     *
-     * @var    bool
-     */
-    protected static $_allow_get_array = TRUE;
-    /**
-     * Standardize new lines flag
-     *
-     * If set to TRUE, then newlines are standardized.
-     *
-     * @var    bool
-     */
-    protected static $_standardize_newlines;
-    /**
-     * Enable XSS flag
-     *
-     * Determines whether the XSS filter is always active when
-     * GET, POST or COOKIE data is encountered.
-     * Set automatically based on config setting.
-     *
-     * @var    bool
-     */
-    protected static $_enable_xss = TRUE;
-    /**
-     * List of all HTTP request headers
-     *
-     * @var array
-     */
-    protected static $headers = array();
-    /**
-     * Raw input stream data
-     *
-     * Holds a cache of php://input contents
-     *
-     * @var    string
-     */
-    protected static $_raw_input_stream;
-    /**
-     * List of never allowed strings
-     *
-     * @var    array
-     */
-    protected static $_never_allowed_str = array(
-        'document.cookie' => '[removed]',
-        '(document).cookie' => '[removed]',
-        'document.write' => '[removed]',
-        '(document).write' => '[removed]',
-        '.parentNode' => '[removed]',
-        '.innerHTML' => '[removed]',
-        '-moz-binding' => '[removed]',
-        '<!--' => '&lt;!--',
-        '-->' => '--&gt;',
-        '<![CDATA[' => '&lt;![CDATA[',
-        '<comment>' => '&lt;comment&gt;',
-        '<%' => '&lt;&#37;'
-    );
-    /**
-     * List of never allowed regex replacements
-     *
-     * @var    array
-     */
-    protected static $_never_allowed_regex = array(
-        'javascript\s*:',
-        '(\(?document\)?|\(?window\)?(\.document)?)\.(location|on\w*)',
-        'expression\s*(\(|&\#40;)', // CSS and IE
-        'vbscript\s*:', // IE, surprise!
-        'wscript\s*:', // IE
-        'jscript\s*:', // IE
-        'vbs\s*:', // IE
-        'Redirect\s+30\d',
-        "([\"'])?data\s*:[^\\1]*?base64[^\\1]*?,[^\\1]*?\\1?"
-    );
-    /**
-     * XSS Hash
-     *
-     * Random Hash for protecting URLs.
-     *
-     * @var    string
-     */
-    protected static $_xss_hash;
-    /**
-     * Parsed input stream data
-     *
-     * Parsed from php://input at runtime
-     *
-     * @see    CI_Input::input_stream()
-     * @var    array
-     */
-    protected static $_input_stream;
-    protected static $security;
-    protected static $uni;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
-    public static function sanitize_globals()
-    {
-        // Sanitize global arrays
-        self::_sanitize_globals();
-    }
+use DateTime;
+use Exception;
 
-    /**
-     * Sanitize Globals
-     */
-    protected static function _sanitize_globals()
-    {
-        // Is $_GET data allowed? If not we'll set the $_GET to an empty array
-        if (self::$_allow_get_array === FALSE) {
-            $_GET = array();
-        } elseif (is_array($_GET)) {
-            foreach ($_GET as $key => $val) {
-                $_GET[self::_clean_input_keys($key)] = self::_clean_input_data($val);
-            }
-        }
-        // Clean $_POST Data
-        if (is_array($_POST)) {
-            foreach ($_POST as $key => $val) {
-                $_POST[self::_clean_input_keys($key)] = self::_clean_input_data($val);
-            }
-        }
-        // Clean $_COOKIE Data
-        if (is_array($_COOKIE)) {
-            // Also get rid of specially treated cookies that might be set by a server
-            // or silly application, that are of no use to a CI application anyway
-            // but that when present will trip our 'Disallowed Key Characters' alarm
-            // http://www.ietf.org/rfc/rfc2109.txt
-            // note that the key names below are single quoted strings, and are not PHP variables
-            unset(
-                $_COOKIE['$Version'],
-                $_COOKIE['$Path'],
-                $_COOKIE['$Domain']
-            );
-            foreach ($_COOKIE as $key => $val) {
-                if (($cookie_key = self::_clean_input_keys($key)) !== FALSE) {
-                    $_COOKIE[$cookie_key] = self::_clean_input_data($val);
-                } else {
-                    unset($_COOKIE[$key]);
-                }
-            }
-        }
-        // Sanitize PHP_SELF
-        $_SERVER['PHP_SELF'] = strip_tags($_SERVER['PHP_SELF']);
-    }
+class Input {
+	/**
+	 * Character set
+	 *
+	 * Will be overridden by the constructor.
+	 *
+	 * @var    string
+	 */
+	public static $charset = 'UTF-8';
+	/**
+	 * IP address of the current user
+	 *
+	 * @var    string
+	 */
+	protected static $ip_address = false;
+	/**
+	 * Allow GET array flag
+	 *
+	 * If set to FALSE, then $_GET will be set to an empty array.
+	 *
+	 * @var    bool
+	 */
+	protected static $_allow_get_array = true;
+	/**
+	 * Standardize new lines flag
+	 *
+	 * If set to TRUE, then newlines are standardized.
+	 *
+	 * @var    bool
+	 */
+	protected static $_standardize_newlines;
+	/**
+	 * Enable XSS flag
+	 *
+	 * Determines whether the XSS filter is always active when
+	 * GET, POST or COOKIE data is encountered.
+	 * Set automatically based on config setting.
+	 *
+	 * @var    bool
+	 */
+	protected static $_enable_xss = true;
+	/**
+	 * List of all HTTP request headers
+	 *
+	 * @var array
+	 */
+	protected static $headers = array();
+	/**
+	 * Raw input stream data
+	 *
+	 * Holds a cache of php://input contents
+	 *
+	 * @var    string
+	 */
+	protected static $_raw_input_stream;
+	/**
+	 * List of never allowed strings
+	 *
+	 * @var    array
+	 */
+	protected static $_never_allowed_str = array(
+		'document.cookie'   => '[removed]',
+		'(document).cookie' => '[removed]',
+		'document.write'    => '[removed]',
+		'(document).write'  => '[removed]',
+		'.parentNode'       => '[removed]',
+		'.innerHTML'        => '[removed]',
+		'-moz-binding'      => '[removed]',
+		'<!--'              => '&lt;!--',
+		'-->'               => '--&gt;',
+		'<![CDATA['         => '&lt;![CDATA[',
+		'<comment>'         => '&lt;comment&gt;',
+		'<%'                => '&lt;&#37;'
+	);
+	/**
+	 * List of never allowed regex replacements
+	 *
+	 * @var    array
+	 */
+	protected static $_never_allowed_regex = array(
+		'javascript\s*:',
+		'(\(?document\)?|\(?window\)?(\.document)?)\.(location|on\w*)',
+		'expression\s*(\(|&\#40;)', // CSS and IE
+		'vbscript\s*:', // IE, surprise!
+		'wscript\s*:', // IE
+		'jscript\s*:', // IE
+		'vbs\s*:', // IE
+		'Redirect\s+30\d',
+		"([\"'])?data\s*:[^\\1]*?base64[^\\1]*?,[^\\1]*?\\1?"
+	);
+	/**
+	 * XSS Hash
+	 *
+	 * Random Hash for protecting URLs.
+	 *
+	 * @var    string
+	 */
+	protected static $_xss_hash;
+	/**
+	 * Parsed input stream data
+	 *
+	 * Parsed from php://input at runtime
+	 *
+	 * @see    CI_Input::input_stream()
+	 * @var    array
+	 */
+	protected static $_input_stream;
+	protected static $security;
+	protected static $uni;
 
-    /**
-     * Clean Keys
-     * @param $str
-     * @param bool $fatal
-     * @return bool
-     */
-    protected static function _clean_input_keys($str, $fatal = TRUE)
-    {
-        /* Commented this as it sanitize all request values which making conflict with other plugins */
-        /*if (!preg_match('/^[a-z0-9:_\/|-]+$/i', $str)) {
-            if ($fatal === TRUE) {
-                return FALSE;
-            } else {
-                $this->set_status_header(503);
-                echo 'Disallowed Key Characters.';
-                exit(7); // EXIT_USER_INPUT
-            }
-        }*/
-        return $str;
-    }
+	public static function sanitize_globals() {
+		// Sanitize global arrays
+		self::_sanitize_globals();
+	}
 
-    /**
-     * Set HTTP Status Header
-     * @param int $code
-     * @param string $text
-     */
-    function set_status_header($code = 200, $text = '')
-    {
-        if (empty($text)) {
-            is_int($code) or $code = (int)$code;
-            $stati = array(
-                100 => 'Continue',
-                101 => 'Switching Protocols',
-                200 => 'OK',
-                201 => 'Created',
-                202 => 'Accepted',
-                203 => 'Non-Authoritative Information',
-                204 => 'No Content',
-                205 => 'Reset Content',
-                206 => 'Partial Content',
-                300 => 'Multiple Choices',
-                301 => 'Moved Permanently',
-                302 => 'Found',
-                303 => 'See Other',
-                304 => 'Not Modified',
-                305 => 'Use Proxy',
-                307 => 'Temporary Redirect',
-                400 => 'Bad Request',
-                401 => 'Unauthorized',
-                402 => 'Payment Required',
-                403 => 'Forbidden',
-                404 => 'Not Found',
-                405 => 'Method Not Allowed',
-                406 => 'Not Acceptable',
-                407 => 'Proxy Authentication Required',
-                408 => 'Request Timeout',
-                409 => 'Conflict',
-                410 => 'Gone',
-                411 => 'Length Required',
-                412 => 'Precondition Failed',
-                413 => 'Request Entity Too Large',
-                414 => 'Request-URI Too Long',
-                415 => 'Unsupported Media Type',
-                416 => 'Requested Range Not Satisfiable',
-                417 => 'Expectation Failed',
-                422 => 'Unprocessable Entity',
-                426 => 'Upgrade Required',
-                428 => 'Precondition Required',
-                429 => 'Too Many Requests',
-                431 => 'Request Header Fields Too Large',
-                500 => 'Internal Server Error',
-                501 => 'Not Implemented',
-                502 => 'Bad Gateway',
-                503 => 'Service Unavailable',
-                504 => 'Gateway Timeout',
-                505 => 'HTTP Version Not Supported',
-                511 => 'Network Authentication Required',
-            );
-            if (isset($stati[$code])) {
-                $text = $stati[$code];
-            }
-        }
-        $server_protocol = (isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], array('HTTP/1.0', 'HTTP/1.1', 'HTTP/2'), TRUE))
-            ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
-        header($server_protocol . ' ' . $code . ' ' . $text, TRUE, $code);
-    }
+	/**
+	 * Sanitize Globals
+	 */
+	protected static function _sanitize_globals() {
+		// Is $_GET data allowed? If not we'll set the $_GET to an empty array
+		if ( self::$_allow_get_array === false ) {
+			$_GET = array();
+		} elseif ( is_array( $_GET ) ) {
+			foreach ( $_GET as $key => $val ) {
+				$_GET[ self::_clean_input_keys( $key ) ] = self::_clean_input_data( $val );
+			}
+		}
+		// Clean $_POST Data
+		if ( is_array( $_POST ) ) {
+			foreach ( $_POST as $key => $val ) {
+				$_POST[ self::_clean_input_keys( $key ) ] = self::_clean_input_data( $val );
+			}
+		}
+		// Clean $_COOKIE Data
+		if ( is_array( $_COOKIE ) ) {
+			// Also get rid of specially treated cookies that might be set by a server
+			// or silly application, that are of no use to a CI application anyway
+			// but that when present will trip our 'Disallowed Key Characters' alarm
+			// http://www.ietf.org/rfc/rfc2109.txt
+			// note that the key names below are single quoted strings, and are not PHP variables
+			unset(
+				$_COOKIE['$Version'],
+				$_COOKIE['$Path'],
+				$_COOKIE['$Domain']
+			);
+			foreach ( $_COOKIE as $key => $val ) {
+				if ( ( $cookie_key = self::_clean_input_keys( $key ) ) !== false ) {
+					$_COOKIE[ $cookie_key ] = self::_clean_input_data( $val );
+				} else {
+					unset( $_COOKIE[ $key ] );
+				}
+			}
+		}
+		// Sanitize PHP_SELF
+		$_SERVER['PHP_SELF'] = strip_tags( $_SERVER['PHP_SELF'] );
+	}
 
-    /**
-     * Clean Input Data
-     * @param $str
-     * @return array|string|string[]|null
-     */
-    protected static function _clean_input_data($str)
-    {
-        if (is_object($str)) {
-            return $str;
-        }
-        if (is_array($str)) {
-            $new_array = array();
-            foreach (array_keys($str) as $key) {
-                $new_array[self::_clean_input_keys($key)] = self::_clean_input_data($str[$key]);
-            }
-            return $new_array;
-        }
-        /* We strip slashes if magic quotes is on to keep things consistent
+	/**
+	 * Clean Keys
+	 *
+	 * @param $str
+	 * @param bool $fatal
+	 *
+	 * @return bool
+	 */
+	protected static function _clean_input_keys( $str, $fatal = true ) {
+		/* Commented this as it sanitize all request values which making conflict with other plugins */
+		/*if (!preg_match('/^[a-z0-9:_\/|-]+$/i', $str)) {
+			if ($fatal === TRUE) {
+				return FALSE;
+			} else {
+				$this->set_status_header(503);
+				echo 'Disallowed Key Characters.';
+				exit(7); // EXIT_USER_INPUT
+			}
+		}*/
+		return $str;
+	}
 
-           NOTE: In PHP 5.4 get_magic_quotes_gpc() will always return 0 and
-                 it will probably not exist in future versions at all.
-        */
-        // Remove control characters
-        $str = self::remove_invisible_characters($str, FALSE);
-        // Standardize newlines if needed
-        if (self::$_standardize_newlines === TRUE) {
-            return preg_replace('/(?:\r\n|[\r\n])/', PHP_EOL, $str);
-        }
-        return $str;
-    }
+	/**
+	 * Set HTTP Status Header
+	 *
+	 * @param int $code
+	 * @param string $text
+	 */
+	function set_status_header( $code = 200, $text = '' ) {
+		if ( empty( $text ) ) {
+			is_int( $code ) or $code = (int) $code;
+			$stati = array(
+				100 => 'Continue',
+				101 => 'Switching Protocols',
+				200 => 'OK',
+				201 => 'Created',
+				202 => 'Accepted',
+				203 => 'Non-Authoritative Information',
+				204 => 'No Content',
+				205 => 'Reset Content',
+				206 => 'Partial Content',
+				300 => 'Multiple Choices',
+				301 => 'Moved Permanently',
+				302 => 'Found',
+				303 => 'See Other',
+				304 => 'Not Modified',
+				305 => 'Use Proxy',
+				307 => 'Temporary Redirect',
+				400 => 'Bad Request',
+				401 => 'Unauthorized',
+				402 => 'Payment Required',
+				403 => 'Forbidden',
+				404 => 'Not Found',
+				405 => 'Method Not Allowed',
+				406 => 'Not Acceptable',
+				407 => 'Proxy Authentication Required',
+				408 => 'Request Timeout',
+				409 => 'Conflict',
+				410 => 'Gone',
+				411 => 'Length Required',
+				412 => 'Precondition Failed',
+				413 => 'Request Entity Too Large',
+				414 => 'Request-URI Too Long',
+				415 => 'Unsupported Media Type',
+				416 => 'Requested Range Not Satisfiable',
+				417 => 'Expectation Failed',
+				422 => 'Unprocessable Entity',
+				426 => 'Upgrade Required',
+				428 => 'Precondition Required',
+				429 => 'Too Many Requests',
+				431 => 'Request Header Fields Too Large',
+				500 => 'Internal Server Error',
+				501 => 'Not Implemented',
+				502 => 'Bad Gateway',
+				503 => 'Service Unavailable',
+				504 => 'Gateway Timeout',
+				505 => 'HTTP Version Not Supported',
+				511 => 'Network Authentication Required',
+			);
+			if ( isset( $stati[ $code ] ) ) {
+				$text = $stati[ $code ];
+			}
+		}
+		$server_protocol = ( isset( $_SERVER['SERVER_PROTOCOL'] ) && in_array( $_SERVER['SERVER_PROTOCOL'], array(
+				'HTTP/1.0',
+				'HTTP/1.1',
+				'HTTP/2'
+			), true ) )
+			? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+		header( $server_protocol . ' ' . $code . ' ' . $text, true, $code );
+	}
 
-    /**
-     * Determines if the current version of PHP is equal to or greater than the supplied value
-     * @param $version
-     * @return mixed
-     */
-    public static function is_php($version)
-    {
-        static $_is_php;
-        $version = (string)$version;
-        if (!isset($_is_php[$version])) {
-            $_is_php[$version] = version_compare(PHP_VERSION, $version, '>=');
-        }
-        return $_is_php[$version];
-    }
+	/**
+	 * Clean Input Data
+	 *
+	 * @param $str
+	 *
+	 * @return array|string|string[]|null
+	 */
+	protected static function _clean_input_data( $str ) {
+		if ( is_object( $str ) ) {
+			return $str;
+		}
+		if ( is_array( $str ) ) {
+			$new_array = array();
+			foreach ( array_keys( $str ) as $key ) {
+				$new_array[ self::_clean_input_keys( $key ) ] = self::_clean_input_data( $str[ $key ] );
+			}
 
-    /**
-     * Remove Invisible Characters
-     * @param $str
-     * @param bool $url_encoded
-     * @return string|string[]|null
-     */
-    public static function remove_invisible_characters($str, $url_encoded = TRUE)
-    {
-        return $str;
-        $non_displayables = array();
-        // every control character except newline (dec 10),
-        // carriage return (dec 13) and horizontal tab (dec 09)
-        if ($url_encoded) {
-            $non_displayables[] = '/%0[0-8bcef]/i';    // url encoded 00-08, 11, 12, 14, 15
-            $non_displayables[] = '/%1[0-9a-f]/i';    // url encoded 16-31
-            $non_displayables[] = '/%7f/i';    // url encoded 127
-        }
-        $non_displayables[] = '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S';    // 00-08, 11, 12, 14-31, 127
-        do {
-            $str = preg_replace($non_displayables, '', $str, -1, $count);
-        } while ($count);
-        return $str;
-    }
+			return $new_array;
+		}
+		/* We strip slashes if magic quotes is on to keep things consistent
 
-    /**
-     * Fetch an item from POST data with fallback to GET
-     * @param $index
-     * @param null $xss_clean
-     * @param null $default
-     * @return mixed
-     */
-    public static function post_get($index, $default = NULL, $xss_clean = NULL)
-    {
-        return isset($_POST[$index])
-            ? self::post($index, $default, $xss_clean)
-            : self::get($index, $default, $xss_clean);
-    }
+		   NOTE: In PHP 5.4 get_magic_quotes_gpc() will always return 0 and
+				 it will probably not exist in future versions at all.
+		*/
+		// Remove control characters
+		$str = self::remove_invisible_characters( $str, false );
+		// Standardize newlines if needed
+		if ( self::$_standardize_newlines === true ) {
+			return preg_replace( '/(?:\r\n|[\r\n])/', PHP_EOL, $str );
+		}
 
-    /**
-     * Fetch an item from the POST array
-     * @param null $index
-     * @param null $default
-     * @param null $xss_clean
-     * @return mixed
-     */
-    public static function post($index = NULL, $default = NULL, $xss_clean = NULL)
-    {
-        return self::_fetch_from_array($_POST, $index, $default, $xss_clean);
-    }
+		return $str;
+	}
 
-    /**
-     * check an item found the POST array
-     * @param null $index
-     * @return mixed
-     */
-    public static function has_post($index = NULL)
-    {
-        return isset($_POST[$index]);
-    }
+	/**
+	 * Determines if the current version of PHP is equal to or greater than the supplied value
+	 *
+	 * @param $version
+	 *
+	 * @return mixed
+	 */
+	public static function is_php( $version ) {
+		static $_is_php;
+		$version = (string) $version;
+		if ( ! isset( $_is_php[ $version ] ) ) {
+			$_is_php[ $version ] = version_compare( PHP_VERSION, $version, '>=' );
+		}
 
-    /**
-     * Fetch from array
-     * @param $array
-     * @param null $index
-     * @param null $default
-     * @param null $xss_clean
-     * @return array|string|null
-     */
-    protected static function _fetch_from_array(&$array, $index = NULL, $default = NULL, $xss_clean = NULL)
-    {
-        is_bool($xss_clean) or $xss_clean = self::$_enable_xss;
-        // If $index is NULL, it means that the whole $array is requested
-        $index = (!isset($index) || is_null($index)) ? array_keys($array) : $index;
-        // allow fetching multiple keys at once
-        if (is_array($index)) {
-            $output = array();
-            foreach ($index as $key) {
-                $output[$key] = self::_fetch_from_array($array, $key, $default, $xss_clean);
-            }
-            return $output;
-        }
-        if (isset($array[$index])) {
-            $value = $array[$index];
-        } elseif (($count = preg_match_all('/(?:^[^\[]+)|\[[^]]*\]/', $index, $matches)) > 1) // Does the index contain array notation
-        {
-            $value = $array;
-            for ($i = 0; $i < $count; $i++) {
-                $key = trim($matches[0][$i], '[]');
-                if ($key === '') // Empty notation will return the value as array
-                {
-                    break;
-                }
-                if (isset($value[$key])) {
-                    $value = $value[$key];
-                } else {
-                    return NULL;
-                }
-            }
-        } else {
-            return $default;
-        }
-        return ($xss_clean === TRUE) ? self::xss_clean($value) : $value;
-    }
+		return $_is_php[ $version ];
+	}
 
-    /**
-     * XSS Clean
-     * @param $str
-     * @param bool $is_image
-     * @return array|bool|string|string[]|null
-     */
-    public static function xss_clean($str, $is_image = FALSE)
-    {
-        if (is_object($str)) {
-            return $str;
-        }
-        // Is the string an array?
-        if (is_array($str)) {
-            foreach ($str as $key => &$value) {
-                $str[$key] = self::xss_clean($value);
-            }
-            return $str;
-        }
-        // Remove Invisible Characters
-        $str = self::remove_invisible_characters($str);
-        /*
-         * URL Decode
-         *
-         * Just in case stuff like this is submitted:
-         *
-         * <a href="http://%77%77%77%2E%67%6F%6F%67%6C%65%2E%63%6F%6D">Google</a>
-         *
-         * Note: Use rawurldecode() so it does not remove plus signs
-         */
-        if (stripos($str, '%') !== false) {
-            do {
-                $oldstr = $str;
-                $str = rawurldecode($str);
-                $str = preg_replace_callback('#%(?:\s*[0-9a-f]){2,}#i', array(self::class, '_urldecodespaces'), $str);
-            } while ($oldstr !== $str);
-            unset($oldstr);
-        }
-        /*
-         * Convert character entities to ASCII
-         *
-         * This permits our tests below to work reliably.
-         * We only convert entities that are within tags since
-         * these are the ones that will pose security problems.
-         */
-        $str = preg_replace_callback("/[^a-z0-9>]+[a-z0-9]+=([\'\"]).*?\\1/si", array(self::class, '_convert_attribute'), $str);
-        $str = preg_replace_callback('/<\w+.*/si', array(self::class, '_decode_entity'), $str);
-        // Remove Invisible Characters Again!
-        $str = self::remove_invisible_characters($str);
-        /*
-         * Convert all tabs to spaces
-         *
-         * This prevents strings like this: ja	vascript
-         * NOTE: we deal with spaces between characters later.
-         * NOTE: preg_replace was found to be amazingly slow here on
-         * large blocks of data, so we use str_replace.
-         */
-        $str = str_replace("\t", ' ', $str);
-        // Capture converted string for later comparison
-        $converted_string = $str;
-        // Remove Strings that are never allowed
-        $str = self::_do_never_allowed($str);
-        /*
-         * Makes PHP tags safe
-         *
-         * Note: XML tags are inadvertently replaced too:
-         *
-         * <?xml
-         *
-         * But it doesn't seem to pose a problem.
-         */
-        if ($is_image === TRUE) {
-            // Images have a tendency to have the PHP short opening and
-            // closing tags every so often so we skip those and only
-            // do the long opening tags.
-            $str = preg_replace('/<\?(php)/i', '&lt;?\\1', $str);
-        } else {
-            $str = str_replace(array('<?', '?' . '>'), array('&lt;?', '?&gt;'), $str);
-        }
-        /*
-         * Compact any exploded words
-         *
-         * This corrects words like:  j a v a s c r i p t
-         * These words are compacted back to their correct state.
-         */
-        $words = array(
-            'javascript', 'expression', 'vbscript', 'jscript', 'wscript',
-            'vbs', 'script', 'base64', 'applet', 'alert', 'document',
-            'write', 'cookie', 'window', 'confirm', 'prompt', 'eval'
-        );
-        foreach ($words as $word) {
-            $word = implode('\s*', str_split($word)) . '\s*';
-            // We only want to do this when it is followed by a non-word character
-            // That way valid stuff like "dealer to" does not become "dealerto"
-            $str = preg_replace_callback('#(' . substr($word, 0, -3) . ')(\W)#is', array(self::class, '_compact_exploded_words'), $str);
-        }
-        /*
-         * Remove disallowed Javascript in links or img tags
-         * We used to do some version comparisons and use of stripos(),
-         * but it is dog slow compared to these simplified non-capturing
-         * preg_match(), especially if the pattern exists in the string
-         *
-         * Note: It was reported that not only space characters, but all in
-         * the following pattern can be parsed as separators between a tag name
-         * and its attributes: [\d\s"\'`;,\/\=\(\x00\x0B\x09\x0C]
-         * ... however, remove_invisible_characters() above already strips the
-         * hex-encoded ones, so we'll skip them below.
-         */
-        do {
-            $original = $str;
-            if (preg_match('/<a/i', $str)) {
-                $str = preg_replace_callback('#<a(?:rea)?[^a-z0-9>]+([^>]*?)(?:>|$)#si', array(self::class, '_js_link_removal'), $str);
-            }
-            if (preg_match('/<img/i', $str)) {
-                $str = preg_replace_callback('#<img[^a-z0-9]+([^>]*?)(?:\s?/?>|$)#si', array(self::class, '_js_img_removal'), $str);
-            }
-            if (preg_match('/script|xss/i', $str)) {
-                $str = preg_replace('#</*(?:script|xss).*?>#si', '[removed]', $str);
-            }
-        } while ($original !== $str);
-        unset($original);
-        /*
-         * Sanitize naughty HTML elements
-         *
-         * If a tag containing any of the words in the list
-         * below is found, the tag gets converted to entities.
-         *
-         * So this: <blink>
-         * Becomes: &lt;blink&gt;
-         */
-        $pattern = '#'
-            . '<((?<slash>/*\s*)((?<tagName>[a-z0-9]+)(?=[^a-z0-9]|$)|.+)' // tag start and name, followed by a non-tag character
-            . '[^\s\042\047a-z0-9>/=]*' // a valid attribute character immediately after the tag would count as a separator
-            // optional attributes
-            . '(?<attributes>(?:[\s\042\047/=]*' // non-attribute characters, excluding > (tag close) for obvious reasons
-            . '[^\s\042\047>/=]+' // attribute characters
-            // optional attribute-value
-            . '(?:\s*=' // attribute-value separator
-            . '(?:[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*))' // single, double or non-quoted value
-            . ')?' // end optional attribute-value group
-            . ')*)' // end optional attributes group
-            . '[^>]*)(?<closeTag>\>)?#isS';
-        // Note: It would be nice to optimize this for speed, BUT
-        //       only matching the naughty elements here results in
-        //       false positives and in turn - vulnerabilities!
-        do {
-            $old_str = $str;
-            $str = preg_replace_callback($pattern, array(self::class, '_sanitize_naughty_html'), $str);
-        } while ($old_str !== $str);
-        unset($old_str);
-        /*
-         * Sanitize naughty scripting elements
-         *
-         * Similar to above, only instead of looking for
-         * tags it looks for PHP and JavaScript commands
-         * that are disallowed. Rather than removing the
-         * code, it simply converts the parenthesis to entities
-         * rendering the code un-executable.
-         *
-         * For example:	eval('some code')
-         * Becomes:	eval&#40;'some code'&#41;
-         */
-        $str = preg_replace(
-            '#(alert|prompt|confirm|cmd|passthru|eval|exec|expression|system|fopen|fsockopen|file|file_get_contents|readfile|unlink)(\s*)\((.*?)\)#si',
-            '\\1\\2&#40;\\3&#41;',
-            $str
-        );
-        // Same thing, but for "tag functions" (e.g. eval`some code`)
-        // See https://github.com/bcit-ci/CodeIgniter/issues/5420
-        $str = preg_replace(
-            '#(alert|prompt|confirm|cmd|passthru|eval|exec|expression|system|fopen|fsockopen|file|file_get_contents|readfile|unlink)(\s*)`(.*?)`#si',
-            '\\1\\2&#96;\\3&#96;',
-            $str
-        );
-        // Final clean up
-        // This adds a bit of extra precaution in case
-        // something got through the above filters
-        $str = self::_do_never_allowed($str);
-        /*
-         * Images are Handled in a Special Way
-         * - Essentially, we want to know that after all of the character
-         * conversion is done whether any unwanted, likely XSS, code was found.
-         * If not, we return TRUE, as the image is clean.
-         * However, if the string post-conversion does not matched the
-         * string post-removal of XSS, then it fails, as there was unwanted XSS
-         * code found and removed/changed during processing.
-         */
-        if ($is_image === TRUE) {
-            return ($str === $converted_string);
-        }
-        return $str;
-    }
+	/**
+	 * Remove Invisible Characters
+	 *
+	 * @param $str
+	 * @param bool $url_encoded
+	 *
+	 * @return string|string[]|null
+	 */
+	public static function remove_invisible_characters( $str, $url_encoded = true ) {
+		return $str;
+		$non_displayables = array();
+		// every control character except newline (dec 10),
+		// carriage return (dec 13) and horizontal tab (dec 09)
+		if ( $url_encoded ) {
+			$non_displayables[] = '/%0[0-8bcef]/i';    // url encoded 00-08, 11, 12, 14, 15
+			$non_displayables[] = '/%1[0-9a-f]/i';    // url encoded 16-31
+			$non_displayables[] = '/%7f/i';    // url encoded 127
+		}
+		$non_displayables[] = '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S';    // 00-08, 11, 12, 14-31, 127
+		do {
+			$str = preg_replace( $non_displayables, '', $str, - 1, $count );
+		} while ( $count );
 
-    /**
-     * Do Never Allowed
-     * @param $str
-     * @return mixed|string|string[]|null
-     */
-    protected static function _do_never_allowed($str)
-    {
-        $str = str_replace(array_keys(self::$_never_allowed_str), self::$_never_allowed_str, $str);
-        foreach (self::$_never_allowed_regex as $regex) {
-            $str = preg_replace('#' . $regex . '#is', '[removed]', $str);
-        }
-        return $str;
-    }
+		return $str;
+	}
 
-    /**
-     * Fetch an item from the GET array
-     * @param null $index
-     * @param null $default
-     * @param null $xss_clean
-     * @return mixed
-     */
-    public static function get($index = NULL, $default = NULL, $xss_clean = NULL)
-    {
-        return self::_fetch_from_array($_GET, $index, $default, $xss_clean);
-    }
+	/**
+	 * Fetch an item from POST data with fallback to GET
+	 *
+	 * @param $index
+	 * @param null $xss_clean
+	 * @param null $default
+	 *
+	 * @return mixed
+	 */
+	public static function post_get( $index, $default = null, $xss_clean = null ) {
+		return isset( $_POST[ $index ] )
+			? self::post( $index, $default, $xss_clean )
+			: self::get( $index, $default, $xss_clean );
+	}
 
-    /**
-     * Fetch an item from GET data with fallback to POST
-     * @param $index
-     * @param null $xss_clean
-     * @param null $default
-     * @return mixed
-     */
-    function get_post($index, $default = NULL, $xss_clean = NULL)
-    {
-        return isset($_GET[$index])
-            ? $this->get($index, $default, $xss_clean)
-            : $this->post($index, $default, $xss_clean);
-    }
+	/**
+	 * Fetch an item from the POST array
+	 *
+	 * @param null $index
+	 * @param null $default
+	 * @param null $xss_clean
+	 *
+	 * @return mixed
+	 */
+	public static function post( $index = null, $default = null, $xss_clean = null ) {
+		return self::_fetch_from_array( $_POST, $index, $default, $xss_clean );
+	}
 
+	/**
+	 * check an item found the POST array
+	 *
+	 * @param null $index
+	 *
+	 * @return mixed
+	 */
+	public static function has_post( $index = null ) {
+		return isset( $_POST[ $index ] );
+	}
 
-    /**
-     * Fetch an item from the php://input stream
-     * @param null $index
-     * @param null $default
-     * @param null $xss_clean
-     * @return mixed
-     */
-    function input_stream($index = NULL, $default = NULL, $xss_clean = NULL)
-    {
-        // Prior to PHP 5.6, the input stream can only be read once,
-        // so we'll need to check if we have already done that first.
-        if (!is_array($this->_input_stream)) {
-            // $this->raw_input_stream will trigger __get().
-            parse_str($this->_raw_input_stream, $this->_input_stream);
-            is_array($this->_input_stream) or $this->_input_stream = array();
-        }
-        return $this->_fetch_from_array($this->_input_stream, $index, $default, $xss_clean);
-    }
+	/**
+	 * Fetch from array
+	 *
+	 * @param $array
+	 * @param null $index
+	 * @param null $default
+	 * @param null $xss_clean
+	 *
+	 * @return array|string|null
+	 */
+	protected static function _fetch_from_array( &$array, $index = null, $default = null, $xss_clean = null ) {
+		is_bool( $xss_clean ) or $xss_clean = self::$_enable_xss;
+		// If $index is NULL, it means that the whole $array is requested
+		$index = ( ! isset( $index ) || is_null( $index ) ) ? array_keys( $array ) : $index;
+		// allow fetching multiple keys at once
+		if ( is_array( $index ) ) {
+			$output = array();
+			foreach ( $index as $key ) {
+				$output[ $key ] = self::_fetch_from_array( $array, $key, $default, $xss_clean );
+			}
 
+			return $output;
+		}
+		if ( isset( $array[ $index ] ) ) {
+			$value = $array[ $index ];
+		} elseif ( ( $count = preg_match_all( '/(?:^[^\[]+)|\[[^]]*\]/', $index, $matches ) ) > 1 ) // Does the index contain array notation
+		{
+			$value = $array;
+			for ( $i = 0; $i < $count; $i ++ ) {
+				$key = trim( $matches[0][ $i ], '[]' );
+				if ( $key === '' ) // Empty notation will return the value as array
+				{
+					break;
+				}
+				if ( isset( $value[ $key ] ) ) {
+					$value = $value[ $key ];
+				} else {
+					return null;
+				}
+			}
+		} else {
+			return $default;
+		}
 
-    /**
-     * Get Request Header
-     * @param $index
-     * @param bool $xss_clean
-     * @return string|null
-     */
-    function get_request_header($index, $xss_clean = FALSE)
-    {
-        static $headers;
-        if (!isset($headers)) {
-            empty($this->headers) && $this->request_headers();
-            foreach ($this->headers as $key => $value) {
-                $headers[strtolower($key)] = $value;
-            }
-        }
-        $index = strtolower($index);
-        if (!isset($headers[$index])) {
-            return NULL;
-        }
-        return ($xss_clean === TRUE)
-            ? $this->xss_clean($headers[$index])
-            : $headers[$index];
-    }
+		return ( $xss_clean === true ) ? self::xss_clean( $value ) : $value;
+	}
 
-    /**
-     * Request Headers
-     * @param bool $xss_clean
-     * @return mixed
-     */
-    function request_headers($xss_clean = FALSE)
-    {
-        // If header is already defined, return it immediately
-        if (!empty($this->headers)) {
-            return $this->_fetch_from_array($this->headers, NULL, NULL, $xss_clean);
-        }
-        // In Apache, you can simply call apache_request_headers()
-        if (function_exists('apache_request_headers')) {
-            $this->headers = apache_request_headers();
-        } else {
-            isset($_SERVER['CONTENT_TYPE']) && $this->headers['Content-Type'] = $_SERVER['CONTENT_TYPE'];
-            foreach ($_SERVER as $key => $val) {
-                if (sscanf($key, 'HTTP_%s', $header) === 1) {
-                    // take SOME_HEADER and turn it into Some-Header
-                    $header = str_replace('_', ' ', strtolower($header));
-                    $header = str_replace(' ', '-', ucwords($header));
-                    $this->headers[$header] = $_SERVER[$key];
-                }
-            }
-        }
-        return $this->_fetch_from_array($this->headers, NULL, NULL, $xss_clean);
-    }
+	/**
+	 * XSS Clean
+	 *
+	 * @param $str
+	 * @param bool $is_image
+	 *
+	 * @return array|bool|string|string[]|null
+	 */
+	public static function xss_clean( $str, $is_image = false ) {
+		if ( is_object( $str ) ) {
+			return $str;
+		}
+		// Is the string an array?
+		if ( is_array( $str ) ) {
+			foreach ( $str as $key => &$value ) {
+				$str[ $key ] = self::xss_clean( $value );
+			}
 
-    /**
-     * Is AJAX request?
-     * @return bool
-     */
-    function is_ajax_request()
-    {
-        return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
-    }
+			return $str;
+		}
+		// Remove Invisible Characters
+		$str = self::remove_invisible_characters( $str );
+		/*
+		 * URL Decode
+		 *
+		 * Just in case stuff like this is submitted:
+		 *
+		 * <a href="http://%77%77%77%2E%67%6F%6F%67%6C%65%2E%63%6F%6D">Google</a>
+		 *
+		 * Note: Use rawurldecode() so it does not remove plus signs
+		 */
+		if ( stripos( $str, '%' ) !== false ) {
+			do {
+				$oldstr = $str;
+				$str    = rawurldecode( $str );
+				$str    = preg_replace_callback( '#%(?:\s*[0-9a-f]){2,}#i', array(
+					self::class,
+					'_urldecodespaces'
+				), $str );
+			} while ( $oldstr !== $str );
+			unset( $oldstr );
+		}
+		/*
+		 * Convert character entities to ASCII
+		 *
+		 * This permits our tests below to work reliably.
+		 * We only convert entities that are within tags since
+		 * these are the ones that will pose security problems.
+		 */
+		$str = preg_replace_callback( "/[^a-z0-9>]+[a-z0-9]+=([\'\"]).*?\\1/si", array(
+			self::class,
+			'_convert_attribute'
+		), $str );
+		$str = preg_replace_callback( '/<\w+.*/si', array( self::class, '_decode_entity' ), $str );
+		// Remove Invisible Characters Again!
+		$str = self::remove_invisible_characters( $str );
+		/*
+		 * Convert all tabs to spaces
+		 *
+		 * This prevents strings like this: ja	vascript
+		 * NOTE: we deal with spaces between characters later.
+		 * NOTE: preg_replace was found to be amazingly slow here on
+		 * large blocks of data, so we use str_replace.
+		 */
+		$str = str_replace( "\t", ' ', $str );
+		// Capture converted string for later comparison
+		$converted_string = $str;
+		// Remove Strings that are never allowed
+		$str = self::_do_never_allowed( $str );
+		/*
+		 * Makes PHP tags safe
+		 *
+		 * Note: XML tags are inadvertently replaced too:
+		 *
+		 * <?xml
+		 *
+		 * But it doesn't seem to pose a problem.
+		 */
+		if ( $is_image === true ) {
+			// Images have a tendency to have the PHP short opening and
+			// closing tags every so often so we skip those and only
+			// do the long opening tags.
+			$str = preg_replace( '/<\?(php)/i', '&lt;?\\1', $str );
+		} else {
+			$str = str_replace( array( '<?', '?' . '>' ), array( '&lt;?', '?&gt;' ), $str );
+		}
+		/*
+		 * Compact any exploded words
+		 *
+		 * This corrects words like:  j a v a s c r i p t
+		 * These words are compacted back to their correct state.
+		 */
+		$words = array(
+			'javascript',
+			'expression',
+			'vbscript',
+			'jscript',
+			'wscript',
+			'vbs',
+			'script',
+			'base64',
+			'applet',
+			'alert',
+			'document',
+			'write',
+			'cookie',
+			'window',
+			'confirm',
+			'prompt',
+			'eval'
+		);
+		foreach ( $words as $word ) {
+			$word = implode( '\s*', str_split( $word ) ) . '\s*';
+			// We only want to do this when it is followed by a non-word character
+			// That way valid stuff like "dealer to" does not become "dealerto"
+			$str = preg_replace_callback( '#(' . substr( $word, 0, - 3 ) . ')(\W)#is', array(
+				self::class,
+				'_compact_exploded_words'
+			), $str );
+		}
+		/*
+		 * Remove disallowed Javascript in links or img tags
+		 * We used to do some version comparisons and use of stripos(),
+		 * but it is dog slow compared to these simplified non-capturing
+		 * preg_match(), especially if the pattern exists in the string
+		 *
+		 * Note: It was reported that not only space characters, but all in
+		 * the following pattern can be parsed as separators between a tag name
+		 * and its attributes: [\d\s"\'`;,\/\=\(\x00\x0B\x09\x0C]
+		 * ... however, remove_invisible_characters() above already strips the
+		 * hex-encoded ones, so we'll skip them below.
+		 */
+		do {
+			$original = $str;
+			if ( preg_match( '/<a/i', $str ) ) {
+				$str = preg_replace_callback( '#<a(?:rea)?[^a-z0-9>]+([^>]*?)(?:>|$)#si', array(
+					self::class,
+					'_js_link_removal'
+				), $str );
+			}
+			if ( preg_match( '/<img/i', $str ) ) {
+				$str = preg_replace_callback( '#<img[^a-z0-9]+([^>]*?)(?:\s?/?>|$)#si', array(
+					self::class,
+					'_js_img_removal'
+				), $str );
+			}
+			if ( preg_match( '/script|xss/i', $str ) ) {
+				$str = preg_replace( '#</*(?:script|xss).*?>#si', '[removed]', $str );
+			}
+		} while ( $original !== $str );
+		unset( $original );
+		/*
+		 * Sanitize naughty HTML elements
+		 *
+		 * If a tag containing any of the words in the list
+		 * below is found, the tag gets converted to entities.
+		 *
+		 * So this: <blink>
+		 * Becomes: &lt;blink&gt;
+		 */
+		$pattern = '#'
+		           . '<((?<slash>/*\s*)((?<tagName>[a-z0-9]+)(?=[^a-z0-9]|$)|.+)' // tag start and name, followed by a non-tag character
+		           . '[^\s\042\047a-z0-9>/=]*' // a valid attribute character immediately after the tag would count as a separator
+		           // optional attributes
+		           . '(?<attributes>(?:[\s\042\047/=]*' // non-attribute characters, excluding > (tag close) for obvious reasons
+		           . '[^\s\042\047>/=]+' // attribute characters
+		           // optional attribute-value
+		           . '(?:\s*=' // attribute-value separator
+		           . '(?:[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*))' // single, double or non-quoted value
+		           . ')?' // end optional attribute-value group
+		           . ')*)' // end optional attributes group
+		           . '[^>]*)(?<closeTag>\>)?#isS';
+		// Note: It would be nice to optimize this for speed, BUT
+		//       only matching the naughty elements here results in
+		//       false positives and in turn - vulnerabilities!
+		do {
+			$old_str = $str;
+			$str     = preg_replace_callback( $pattern, array( self::class, '_sanitize_naughty_html' ), $str );
+		} while ( $old_str !== $str );
+		unset( $old_str );
+		/*
+		 * Sanitize naughty scripting elements
+		 *
+		 * Similar to above, only instead of looking for
+		 * tags it looks for PHP and JavaScript commands
+		 * that are disallowed. Rather than removing the
+		 * code, it simply converts the parenthesis to entities
+		 * rendering the code un-executable.
+		 *
+		 * For example:	eval('some code')
+		 * Becomes:	eval&#40;'some code'&#41;
+		 */
+		$str = preg_replace(
+			'#(alert|prompt|confirm|cmd|passthru|eval|exec|expression|system|fopen|fsockopen|file|file_get_contents|readfile|unlink)(\s*)\((.*?)\)#si',
+			'\\1\\2&#40;\\3&#41;',
+			$str
+		);
+		// Same thing, but for "tag functions" (e.g. eval`some code`)
+		// See https://github.com/bcit-ci/CodeIgniter/issues/5420
+		$str = preg_replace(
+			'#(alert|prompt|confirm|cmd|passthru|eval|exec|expression|system|fopen|fsockopen|file|file_get_contents|readfile|unlink)(\s*)`(.*?)`#si',
+			'\\1\\2&#96;\\3&#96;',
+			$str
+		);
+		// Final clean up
+		// This adds a bit of extra precaution in case
+		// something got through the above filters
+		$str = self::_do_never_allowed( $str );
+		/*
+		 * Images are Handled in a Special Way
+		 * - Essentially, we want to know that after all of the character
+		 * conversion is done whether any unwanted, likely XSS, code was found.
+		 * If not, we return TRUE, as the image is clean.
+		 * However, if the string post-conversion does not matched the
+		 * string post-removal of XSS, then it fails, as there was unwanted XSS
+		 * code found and removed/changed during processing.
+		 */
+		if ( $is_image === true ) {
+			return ( $str === $converted_string );
+		}
 
-    /**
-     * Get Request Method
-     * @param bool $upper
-     * @return string
-     */
-    function method($upper = FALSE)
-    {
-        return ($upper)
-            ? strtoupper($this->server('REQUEST_METHOD'))
-            : strtolower($this->server('REQUEST_METHOD'));
-    }
+		return $str;
+	}
 
-    /**
-     * Fetch an item from the SERVER array
-     * @param $index
-     * @param null $xss_clean
-     * @param null $default
-     * @return mixed
-     */
-    function server($index, $default = NULL, $xss_clean = NULL)
-    {
-        return $this->_fetch_from_array($_SERVER, $index, $default, $xss_clean);
-    }
+	/**
+	 * Do Never Allowed
+	 *
+	 * @param $str
+	 *
+	 * @return mixed|string|string[]|null
+	 */
+	protected static function _do_never_allowed( $str ) {
+		$str = str_replace( array_keys( self::$_never_allowed_str ), self::$_never_allowed_str, $str );
+		foreach ( self::$_never_allowed_regex as $regex ) {
+			$str = preg_replace( '#' . $regex . '#is', '[removed]', $str );
+		}
 
-    /**
-     * Allows read access to protected properties
-     * @param $name
-     * @return false|string
-     */
-    function __get($name)
-    {
-        if ($name === 'raw_input_stream') {
-            isset($this->_raw_input_stream) or $this->_raw_input_stream = file_get_contents('php://input');
-            return $this->_raw_input_stream;
-        } elseif ($name === 'ip_address') {
-            return $this->ip_address;
-        }
-    }
+		return $str;
+	}
 
-    /**
-     * URL-decode taking spaces into account
-     * @param $matches
-     * @return string
-     */
-    protected static function _urldecodespaces($matches)
-    {
-        $input = $matches[0];
-        $nospaces = preg_replace('#\s+#', '', $input);
-        return ($nospaces === $input)
-            ? $input
-            : rawurldecode($nospaces);
-    }
+	/**
+	 * Fetch an item from the GET array
+	 *
+	 * @param null $index
+	 * @param null $default
+	 * @param null $xss_clean
+	 *
+	 * @return mixed
+	 */
+	public static function getData( $index = null, $default = null, $xss_clean = null ) {
+		return self::_fetch_from_array( $_GET, $index, $default, $xss_clean );
+	}
 
-    /**
-     * HTML Entity Decode Callback
-     * @param $match
-     * @return mixed
-     * @throws \Exception
-     */
-    protected static function _decode_entity($match)
-    {
-        // Protect GET variables in URLs
-        // 901119URL5918AMP18930PROTECT8198
-        $match = preg_replace('|\&([a-z\_0-9\-]+)\=([a-z\_0-9\-/]+)|i', self::xss_hash() . '\\1=\\2', $match[0]);
-        // Decode, then un-protect URL GET vars
-        return str_replace(
-            self::xss_hash(),
-            '&',
-            self::entity_decode($match, self::$charset)
-        );
-    }
-
-    /**
-     * Generates the XSS hash if needed and returns it.
-     * @return mixed|string
-     * @throws \Exception
-     */
-    public static function xss_hash()
-    {
-        if (self::$_xss_hash === NULL) {
-            $rand = self::get_random_bytes(16);
-            self::$_xss_hash = ($rand === FALSE)
-                ? md5(uniqid(mt_rand(), TRUE))
-                : bin2hex($rand);
-        }
-        return self::$_xss_hash;
-    }
-
-    /**
-     * Get random bytes
-     * @param $length
-     * @return bool|string|void
-     * @throws \Exception
-     */
-    public static function get_random_bytes($length)
-    {
-        if (empty($length) or !ctype_digit((string)$length)) {
-            return FALSE;
-        }
-        if (function_exists('random_bytes')) {
-            try {
-                // The cast is required to avoid TypeError
-                return random_bytes((int)$length);
-            } catch (\Exception $e) {
-                // If random_bytes() can't do the job, we can't either ...
-                // There's no point in using fallbacks.
-                //log_message('error', $e->getMessage());
-                return FALSE;
-            }
-        }
-        if (is_readable('/dev/urandom') && ($fp = fopen('/dev/urandom', 'rb')) !== FALSE) {
-            // Try not to waste entropy ...
-            self::is_php('5.4') && stream_set_chunk_size($fp, $length);
-            $output = fread($fp, $length);
-            fclose($fp);
-            if ($output !== FALSE) {
-                return $output;
-            }
-        }
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            return openssl_random_pseudo_bytes($length);
-        }
-        return FALSE;
-    }
-
-    /**
-     * HTML Entities Decode
-     * @param $str
-     * @param null $charset
-     * @return mixed|string
-     */
-    public static function entity_decode($str, $charset = NULL)
-    {
-        if (strpos($str, '&') === FALSE) {
-            return $str;
-        }
-        static $_entities;
-        isset($charset) or $charset = self::$charset;
-        $flag = self::is_php('5.4')
-            ? ENT_COMPAT | ENT_HTML5
-            : ENT_COMPAT;
-        if (!isset($_entities)) {
-            $_entities = array_map('strtolower', get_html_translation_table(HTML_ENTITIES, $flag, $charset));
-            // If we're not on PHP 5.4+, add the possibly dangerous HTML 5
-            // entities to the array manually
-            if ($flag === ENT_COMPAT) {
-                $_entities[':'] = '&colon;';
-                $_entities['('] = '&lpar;';
-                $_entities[')'] = '&rpar;';
-                $_entities["\n"] = '&NewLine;';
-                $_entities["\t"] = '&Tab;';
-            }
-        }
-        do {
-            $str_compare = $str;
-            // Decode standard entities, avoiding false positives
-            if (preg_match_all('/&[a-z]{2,}(?![a-z;])/i', $str, $matches)) {
-                $replace = array();
-                $matches = array_unique(array_map('strtolower', $matches[0]));
-                foreach ($matches as &$match) {
-                    if (($char = array_search($match . ';', $_entities, TRUE)) !== FALSE) {
-                        $replace[$match] = $char;
-                    }
-                }
-                $str = str_replace(array_keys($replace), array_values($replace), $str);
-            }
-            // Decode numeric & UTF16 two byte entities
-            $str = html_entity_decode(
-                preg_replace('/(&#(?:x0*[0-9a-f]{2,5}(?![0-9a-f;])|(?:0*\d{2,4}(?![0-9;]))))/iS', '$1;', $str),
-                $flag,
-                $charset
-            );
-            if ($flag === ENT_COMPAT) {
-                $str = str_replace(array_values($_entities), array_keys($_entities), $str);
-            }
-        } while ($str_compare !== $str);
-        return $str;
-    }
-
-    /**
-     * Compact Exploded Words
-     * @param $matches
-     * @return string
-     */
-    protected static function _compact_exploded_words($matches)
-    {
-        return preg_replace('/\s+/s', '', $matches[1]) . $matches[2];
-    }
-
-    /**
-     * JS Link Removal
-     *
-     * Callback function for xss_clean() to sanitize links
-     * This limits the PCRE backtracks, making it more performance friendly
-     * and prevents PREG_BACKTRACK_LIMIT_ERROR from being triggered in
-     * PHP 5.2+ on link-heavy strings
-     *
-     * @param array
-     * @return  string
-     */
-    protected static function _js_link_removal($match)
-    {
-        return str_replace(
-            $match[1],
-            preg_replace(
-                '#href=.*?(alert\(|alert&\#40;|javascript\:|livescript\:|mocha\:|charset\=|window\.|document\.|\.cookie|<script|<xss|data\s*:)#si',
-                '',
-                self::_filter_attributes(str_replace(array('<', '>'), '', $match[1]))
-            ),
-            $match[0]
-        );
-    }
-
-    /**
-     * JS Image Removal
-     *
-     * Callback function for xss_clean() to sanitize image tags
-     * This limits the PCRE backtracks, making it more performance friendly
-     * and prevents PREG_BACKTRACK_LIMIT_ERROR from being triggered in
-     * PHP 5.2+ on image tag heavy strings
-     *
-     * @param array
-     * @return  string
-     */
-    protected static function _js_img_removal($match)
-    {
-        return str_replace(
-            $match[1],
-            preg_replace(
-                '#src=.*?(alert\(|alert&\#40;|javascript\:|livescript\:|mocha\:|charset\=|window\.|document\.|\.cookie|<script|<xss|base64\s*,)#si',
-                '',
-                self::_filter_attributes(str_replace(array('<', '>'), '', $match[1]))
-            ),
-            $match[0]
-        );
-    }
-
-    /**
-     * Filter Attributes
-     *
-     * Filters tag attributes for consistency and safety
-     *
-     * @param string
-     * @return  string
-     */
-    protected static function _filter_attributes($str)
-    {
-        $out = '';
-        if (preg_match_all('#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches)) {
-            foreach ($matches[0] as $match) {
-                $out .= preg_replace("#/\*.*?\*/#s", '', $match);
-            }
-        }
-        return $out;
-    }
-
-    /**
-     * Sanitize Naughty HTML
-     * @param $matches
-     * @return string
-     */
-    protected static function _sanitize_naughty_html($matches)
-    {
-        static $naughty_tags = array(
-            'alert', 'area', 'prompt', 'confirm', 'applet', 'audio', 'basefont', 'base', 'behavior', 'bgsound',
-            'blink', 'body', 'embed', 'expression', 'form', 'frameset', 'frame', 'head', 'html', 'ilayer',
-            'iframe', 'input', 'button', 'select', 'isindex', 'layer', 'link', 'meta', 'keygen', 'object',
-            'plaintext', 'style', 'script', 'textarea', 'title', 'math', 'video', 'svg', 'xml', 'xss'
-        );
-        static $evil_attributes = array(
-            'on\w+', 'style', 'xmlns', 'formaction', 'form', 'xlink:href', 'FSCommand', 'seekSegmentTime'
-        );
-        // First, escape unclosed tags
-        if (empty($matches['closeTag'])) {
-            return '&lt;' . $matches[1];
-        } // Is the element that we caught naughty? If so, escape it
-        elseif (in_array(strtolower($matches['tagName']), $naughty_tags, TRUE)) {
-            return '&lt;' . $matches[1] . '&gt;';
-        } // For other tags, see if their attributes are "evil" and strip those
-        elseif (isset($matches['attributes'])) {
-            // We'll store the already filtered attributes here
-            $attributes = array();
-            // Attribute-catching pattern
-            $attributes_pattern = '#'
-                . '(?<name>[^\s\042\047>/=]+)' // attribute characters
-                // optional attribute-value
-                . '(?:\s*=(?<value>[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*)))' // attribute-value separator
-                . '#i';
-            // Blacklist pattern for evil attribute names
-            $is_evil_pattern = '#^(' . implode('|', $evil_attributes) . ')$#i';
-            // Each iteration filters a single attribute
-            do {
-                // Strip any non-alpha characters that may precede an attribute.
-                // Browsers often parse these incorrectly and that has been a
-                // of numerous XSS issues we've had.
-                $matches['attributes'] = preg_replace('#^[^a-z]+#i', '', $matches['attributes']);
-                if (!preg_match($attributes_pattern, $matches['attributes'], $attribute, PREG_OFFSET_CAPTURE)) {
-                    // No (valid) attribute found? Discard everything else inside the tag
-                    break;
-                }
-                if (
-                    // Is it indeed an "evil" attribute?
-                    preg_match($is_evil_pattern, $attribute['name'][0])
-                    // Or does it have an equals sign, but no value and not quoted? Strip that too!
-                    or (trim($attribute['value'][0]) === '')
-                ) {
-                    $attributes[] = 'xss=removed';
-                } else {
-                    $attributes[] = $attribute[0][0];
-                }
-                $matches['attributes'] = substr($matches['attributes'], $attribute[0][1] + strlen($attribute[0][0]));
-            } while ($matches['attributes'] !== '');
-            $attributes = empty($attributes)
-                ? ''
-                : ' ' . implode(' ', $attributes);
-            return '<' . $matches['slash'] . $matches['tagName'] . $attributes . '>';
-        }
-        return $matches[0];
-    }
-
-    /**
-     * Attribute Conversion
-     * @param $match
-     * @return mixed
-     */
-    protected static function _convert_attribute($match)
-    {
-        return str_replace(array('>', '<', '\\'), array('&gt;', '&lt;', '\\\\'), $match[0]);
-    }
-
-    /**
-     * clean the data
-     * @param $var
-     * @return array|string
-     */
-    public static function clean($var)
-    {
-        if (is_array($var)) {
-            return array_map(array(self::class, 'clean'), $var);
-        } else {
-            return is_scalar($var) ? sanitize_text_field($var) : $var;
-        }
-    }
+	/**
+	 * Fetch an item from GET data with fallback to POST
+	 *
+	 * @param $index
+	 * @param null $xss_clean
+	 * @param null $default
+	 *
+	 * @return mixed
+	 */
+	function get_post( $index, $default = null, $xss_clean = null ) {
+		return isset( $_GET[ $index ] )
+			? $this->getData( $index, $default, $xss_clean )
+			: $this->post( $index, $default, $xss_clean );
+	}
 
 
-    /**
-     * sanitize the basic html tags
-     * @param $html
-     * @return mixed|void
-     */
-    public static function sanitizeBasicHtml($html)
-    {
-        try {
-            $html = stripslashes($html);
-            $html = html_entity_decode($html);
-            $allowed_html = array();
-            $tags = array(
-                'div', 'a', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'b', 'strong', 'i', 'img', 'br'
-            );
-            foreach ($tags as $tag) {
-                $allowed_html[$tag] = array(
-                    'class' => array(),
-                    'id' => array(),
-                    'style' => array()
-                );
-                if ($tag == 'a') {
-                    $allowed_html[$tag]['href'] = array();
-                }
-                if ($tag == 'img') {
-                    $allowed_html[$tag]['src'] = array();
-                    $allowed_html[$tag]['width'] = array();
-                    $allowed_html[$tag]['height'] = array();
-                }
-            }
-            $allowed_html = apply_filters('rnoc_sanitize_allowed_basic_html_tags', $allowed_html);
-            $sanitized_html = wp_kses($html, $allowed_html);
-            return apply_filters('rnoc_sanitize_basic_html', $sanitized_html, $html, $allowed_html);
-        } catch (\Exception $e) {
-            return '';
-        }
-    }
+	/**
+	 * Fetch an item from the php://input stream
+	 *
+	 * @param null $index
+	 * @param null $default
+	 * @param null $xss_clean
+	 *
+	 * @return mixed
+	 */
+	function input_stream( $index = null, $default = null, $xss_clean = null ) {
+		// Prior to PHP 5.6, the input stream can only be read once,
+		// so we'll need to check if we have already done that first.
+		if ( ! is_array( $this->_input_stream ) ) {
+			// $this->raw_input_stream will trigger __get().
+			parse_str( $this->_raw_input_stream, $this->_input_stream );
+			is_array( $this->_input_stream ) or $this->_input_stream = array();
+		}
 
-    /**
-     * Escap attribute check
-     *
-     * @param $txt
-     * @return string
-     */
-    public static function rnocEscAttr($txt)
-    {
-        return stripslashes(esc_attr__($txt));
-    }
+		return $this->_fetch_from_array( $this->_input_stream, $index, $default, $xss_clean );
+	}
 
-    /**
-     * Format the date to ISO8601
-     * @param $timestamp
-     * @return string|null
-     */
-    public static function formatToIso8601($timestamp)
-    {
-        if (empty($timestamp)) {
-            $timestamp = current_time('timestamp', true);
-        }
-        if (is_object($timestamp) && $timestamp instanceof \WC_DateTime) {
-            $timestamp = $timestamp->getTimestamp();
-        }
 
-        try {
-            $date = date('Y-m-d H:i:s', $timestamp);
-            $date_time = new DateTime($date);
-            return $date_time->format(DateTime::ATOM);
-        } catch (Exception $e) {
-            return NULL;
-        }
-    }
+	/**
+	 * Get Request Header
+	 *
+	 * @param $index
+	 * @param bool $xss_clean
+	 *
+	 * @return string|null
+	 */
+	function get_request_header( $index, $xss_clean = false ) {
+		static $headers;
+		if ( ! isset( $headers ) ) {
+			empty( $this->headers ) && $this->request_headers();
+			foreach ( $this->headers as $key => $value ) {
+				$headers[ strtolower( $key ) ] = $value;
+			}
+		}
+		$index = strtolower( $index );
+		if ( ! isset( $headers[ $index ] ) ) {
+			return null;
+		}
+
+		return ( $xss_clean === true )
+			? $this->xss_clean( $headers[ $index ] )
+			: $headers[ $index ];
+	}
+
+	/**
+	 * Request Headers
+	 *
+	 * @param bool $xss_clean
+	 *
+	 * @return mixed
+	 */
+	function request_headers( $xss_clean = false ) {
+		// If header is already defined, return it immediately
+		if ( ! empty( $this->headers ) ) {
+			return $this->_fetch_from_array( $this->headers, null, null, $xss_clean );
+		}
+		// In Apache, you can simply call apache_request_headers()
+		if ( function_exists( 'apache_request_headers' ) ) {
+			$this->headers = apache_request_headers();
+		} else {
+			isset( $_SERVER['CONTENT_TYPE'] ) && $this->headers['Content-Type'] = $_SERVER['CONTENT_TYPE'];
+			foreach ( $_SERVER as $key => $val ) {
+				if ( sscanf( $key, 'HTTP_%s', $header ) === 1 ) {
+					// take SOME_HEADER and turn it into Some-Header
+					$header                   = str_replace( '_', ' ', strtolower( $header ) );
+					$header                   = str_replace( ' ', '-', ucwords( $header ) );
+					$this->headers[ $header ] = $_SERVER[ $key ];
+				}
+			}
+		}
+
+		return $this->_fetch_from_array( $this->headers, null, null, $xss_clean );
+	}
+
+	/**
+	 * Is AJAX request?
+	 * @return bool
+	 */
+	function is_ajax_request() {
+		return ( ! empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ) === 'xmlhttprequest' );
+	}
+
+	/**
+	 * Get Request Method
+	 *
+	 * @param bool $upper
+	 *
+	 * @return string
+	 */
+	function method( $upper = false ) {
+		return ( $upper )
+			? strtoupper( $this->server( 'REQUEST_METHOD' ) )
+			: strtolower( $this->server( 'REQUEST_METHOD' ) );
+	}
+
+	/**
+	 * Fetch an item from the SERVER array
+	 *
+	 * @param $index
+	 * @param null $xss_clean
+	 * @param null $default
+	 *
+	 * @return mixed
+	 */
+	function server( $index, $default = null, $xss_clean = null ) {
+		return $this->_fetch_from_array( $_SERVER, $index, $default, $xss_clean );
+	}
+
+	/**
+	 * Allows read access to protected properties
+	 *
+	 * @param $name
+	 *
+	 * @return false|string
+	 */
+	function __get( $name ) {
+		if ( $name === 'raw_input_stream' ) {
+			isset( $this->_raw_input_stream ) or $this->_raw_input_stream = file_get_contents( 'php://input' );
+
+			return $this->_raw_input_stream;
+		} elseif ( $name === 'ip_address' ) {
+			return $this->ip_address;
+		}
+	}
+
+	/**
+	 * URL-decode taking spaces into account
+	 *
+	 * @param $matches
+	 *
+	 * @return string
+	 */
+	protected static function _urldecodespaces( $matches ) {
+		$input    = $matches[0];
+		$nospaces = preg_replace( '#\s+#', '', $input );
+
+		return ( $nospaces === $input )
+			? $input
+			: rawurldecode( $nospaces );
+	}
+
+	/**
+	 * HTML Entity Decode Callback
+	 *
+	 * @param $match
+	 *
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	protected static function _decode_entity( $match ) {
+		// Protect GET variables in URLs
+		// 901119URL5918AMP18930PROTECT8198
+		$match = preg_replace( '|\&([a-z\_0-9\-]+)\=([a-z\_0-9\-/]+)|i', self::xss_hash() . '\\1=\\2', $match[0] );
+
+		// Decode, then un-protect URL GET vars
+		return str_replace(
+			self::xss_hash(),
+			'&',
+			self::entity_decode( $match, self::$charset )
+		);
+	}
+
+	/**
+	 * Generates the XSS hash if needed and returns it.
+	 * @return mixed|string
+	 * @throws \Exception
+	 */
+	public static function xss_hash() {
+		if ( self::$_xss_hash === null ) {
+			$rand            = self::get_random_bytes( 16 );
+			self::$_xss_hash = ( $rand === false )
+				? md5( uniqid( mt_rand(), true ) )
+				: bin2hex( $rand );
+		}
+
+		return self::$_xss_hash;
+	}
+
+	/**
+	 * Get random bytes
+	 *
+	 * @param $length
+	 *
+	 * @return bool|string|void
+	 * @throws \Exception
+	 */
+	public static function get_random_bytes( $length ) {
+		if ( empty( $length ) or ! ctype_digit( (string) $length ) ) {
+			return false;
+		}
+		if ( function_exists( 'random_bytes' ) ) {
+			try {
+				// The cast is required to avoid TypeError
+				return random_bytes( (int) $length );
+			} catch ( \Exception $e ) {
+				// If random_bytes() can't do the job, we can't either ...
+				// There's no point in using fallbacks.
+				//log_message('error', $e->getMessage());
+				return false;
+			}
+		}
+		if ( is_readable( '/dev/urandom' ) && ( $fp = fopen( '/dev/urandom', 'rb' ) ) !== false ) {
+			// Try not to waste entropy ...
+			self::is_php( '5.4' ) && stream_set_chunk_size( $fp, $length );
+			$output = fread( $fp, $length );
+			fclose( $fp );
+			if ( $output !== false ) {
+				return $output;
+			}
+		}
+		if ( function_exists( 'openssl_random_pseudo_bytes' ) ) {
+			return openssl_random_pseudo_bytes( $length );
+		}
+
+		return false;
+	}
+
+	/**
+	 * HTML Entities Decode
+	 *
+	 * @param $str
+	 * @param null $charset
+	 *
+	 * @return mixed|string
+	 */
+	public static function entity_decode( $str, $charset = null ) {
+		if ( strpos( $str, '&' ) === false ) {
+			return $str;
+		}
+		static $_entities;
+		isset( $charset ) or $charset = self::$charset;
+		$flag = self::is_php( '5.4' )
+			? ENT_COMPAT | ENT_HTML5
+			: ENT_COMPAT;
+		if ( ! isset( $_entities ) ) {
+			$_entities = array_map( 'strtolower', get_html_translation_table( HTML_ENTITIES, $flag, $charset ) );
+			// If we're not on PHP 5.4+, add the possibly dangerous HTML 5
+			// entities to the array manually
+			if ( $flag === ENT_COMPAT ) {
+				$_entities[':']  = '&colon;';
+				$_entities['(']  = '&lpar;';
+				$_entities[')']  = '&rpar;';
+				$_entities["\n"] = '&NewLine;';
+				$_entities["\t"] = '&Tab;';
+			}
+		}
+		do {
+			$str_compare = $str;
+			// Decode standard entities, avoiding false positives
+			if ( preg_match_all( '/&[a-z]{2,}(?![a-z;])/i', $str, $matches ) ) {
+				$replace = array();
+				$matches = array_unique( array_map( 'strtolower', $matches[0] ) );
+				foreach ( $matches as &$match ) {
+					if ( ( $char = array_search( $match . ';', $_entities, true ) ) !== false ) {
+						$replace[ $match ] = $char;
+					}
+				}
+				$str = str_replace( array_keys( $replace ), array_values( $replace ), $str );
+			}
+			// Decode numeric & UTF16 two byte entities
+			$str = html_entity_decode(
+				preg_replace( '/(&#(?:x0*[0-9a-f]{2,5}(?![0-9a-f;])|(?:0*\d{2,4}(?![0-9;]))))/iS', '$1;', $str ),
+				$flag,
+				$charset
+			);
+			if ( $flag === ENT_COMPAT ) {
+				$str = str_replace( array_values( $_entities ), array_keys( $_entities ), $str );
+			}
+		} while ( $str_compare !== $str );
+
+		return $str;
+	}
+
+	/**
+	 * Compact Exploded Words
+	 *
+	 * @param $matches
+	 *
+	 * @return string
+	 */
+	protected static function _compact_exploded_words( $matches ) {
+		return preg_replace( '/\s+/s', '', $matches[1] ) . $matches[2];
+	}
+
+	/**
+	 * JS Link Removal
+	 *
+	 * Callback function for xss_clean() to sanitize links
+	 * This limits the PCRE backtracks, making it more performance friendly
+	 * and prevents PREG_BACKTRACK_LIMIT_ERROR from being triggered in
+	 * PHP 5.2+ on link-heavy strings
+	 *
+	 * @param array
+	 *
+	 * @return  string
+	 */
+	protected static function _js_link_removal( $match ) {
+		return str_replace(
+			$match[1],
+			preg_replace(
+				'#href=.*?(alert\(|alert&\#40;|javascript\:|livescript\:|mocha\:|charset\=|window\.|document\.|\.cookie|<script|<xss|data\s*:)#si',
+				'',
+				self::_filter_attributes( str_replace( array( '<', '>' ), '', $match[1] ) )
+			),
+			$match[0]
+		);
+	}
+
+	/**
+	 * JS Image Removal
+	 *
+	 * Callback function for xss_clean() to sanitize image tags
+	 * This limits the PCRE backtracks, making it more performance friendly
+	 * and prevents PREG_BACKTRACK_LIMIT_ERROR from being triggered in
+	 * PHP 5.2+ on image tag heavy strings
+	 *
+	 * @param array
+	 *
+	 * @return  string
+	 */
+	protected static function _js_img_removal( $match ) {
+		return str_replace(
+			$match[1],
+			preg_replace(
+				'#src=.*?(alert\(|alert&\#40;|javascript\:|livescript\:|mocha\:|charset\=|window\.|document\.|\.cookie|<script|<xss|base64\s*,)#si',
+				'',
+				self::_filter_attributes( str_replace( array( '<', '>' ), '', $match[1] ) )
+			),
+			$match[0]
+		);
+	}
+
+	/**
+	 * Filter Attributes
+	 *
+	 * Filters tag attributes for consistency and safety
+	 *
+	 * @param string
+	 *
+	 * @return  string
+	 */
+	protected static function _filter_attributes( $str ) {
+		$out = '';
+		if ( preg_match_all( '#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches ) ) {
+			foreach ( $matches[0] as $match ) {
+				$out .= preg_replace( "#/\*.*?\*/#s", '', $match );
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Sanitize Naughty HTML
+	 *
+	 * @param $matches
+	 *
+	 * @return string
+	 */
+	protected static function _sanitize_naughty_html( $matches ) {
+		static $naughty_tags = array(
+			'alert',
+			'area',
+			'prompt',
+			'confirm',
+			'applet',
+			'audio',
+			'basefont',
+			'base',
+			'behavior',
+			'bgsound',
+			'blink',
+			'body',
+			'embed',
+			'expression',
+			'form',
+			'frameset',
+			'frame',
+			'head',
+			'html',
+			'ilayer',
+			'iframe',
+			'input',
+			'button',
+			'select',
+			'isindex',
+			'layer',
+			'link',
+			'meta',
+			'keygen',
+			'object',
+			'plaintext',
+			'style',
+			'script',
+			'textarea',
+			'title',
+			'math',
+			'video',
+			'svg',
+			'xml',
+			'xss'
+		);
+		static $evil_attributes = array(
+			'on\w+',
+			'style',
+			'xmlns',
+			'formaction',
+			'form',
+			'xlink:href',
+			'FSCommand',
+			'seekSegmentTime'
+		);
+		// First, escape unclosed tags
+		if ( empty( $matches['closeTag'] ) ) {
+			return '&lt;' . $matches[1];
+		} // Is the element that we caught naughty? If so, escape it
+		elseif ( in_array( strtolower( $matches['tagName'] ), $naughty_tags, true ) ) {
+			return '&lt;' . $matches[1] . '&gt;';
+		} // For other tags, see if their attributes are "evil" and strip those
+		elseif ( isset( $matches['attributes'] ) ) {
+			// We'll store the already filtered attributes here
+			$attributes = array();
+			// Attribute-catching pattern
+			$attributes_pattern = '#'
+			                      . '(?<name>[^\s\042\047>/=]+)' // attribute characters
+			                      // optional attribute-value
+			                      . '(?:\s*=(?<value>[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*)))' // attribute-value separator
+			                      . '#i';
+			// Blacklist pattern for evil attribute names
+			$is_evil_pattern = '#^(' . implode( '|', $evil_attributes ) . ')$#i';
+			// Each iteration filters a single attribute
+			do {
+				// Strip any non-alpha characters that may precede an attribute.
+				// Browsers often parse these incorrectly and that has been a
+				// of numerous XSS issues we've had.
+				$matches['attributes'] = preg_replace( '#^[^a-z]+#i', '', $matches['attributes'] );
+				if ( ! preg_match( $attributes_pattern, $matches['attributes'], $attribute, PREG_OFFSET_CAPTURE ) ) {
+					// No (valid) attribute found? Discard everything else inside the tag
+					break;
+				}
+				if (
+					// Is it indeed an "evil" attribute?
+					preg_match( $is_evil_pattern, $attribute['name'][0] )
+					// Or does it have an equals sign, but no value and not quoted? Strip that too!
+					or ( trim( $attribute['value'][0] ) === '' )
+				) {
+					$attributes[] = 'xss=removed';
+				} else {
+					$attributes[] = $attribute[0][0];
+				}
+				$matches['attributes'] = substr( $matches['attributes'], $attribute[0][1] + strlen( $attribute[0][0] ) );
+			} while ( $matches['attributes'] !== '' );
+			$attributes = empty( $attributes )
+				? ''
+				: ' ' . implode( ' ', $attributes );
+
+			return '<' . $matches['slash'] . $matches['tagName'] . $attributes . '>';
+		}
+
+		return $matches[0];
+	}
+
+	/**
+	 * Attribute Conversion
+	 *
+	 * @param $match
+	 *
+	 * @return mixed
+	 */
+	protected static function _convert_attribute( $match ) {
+		return str_replace( array( '>', '<', '\\' ), array( '&gt;', '&lt;', '\\\\' ), $match[0] );
+	}
+
+	/**
+	 * clean the data
+	 *
+	 * @param $var
+	 *
+	 * @return array|string
+	 */
+	public static function clean( $var ) {
+		if ( is_array( $var ) ) {
+			return array_map( array( self::class, 'clean' ), $var );
+		} else {
+			return is_scalar( $var ) ? sanitize_text_field( $var ) : $var;
+		}
+	}
+
+
+	/**
+	 * sanitize the basic html tags
+	 *
+	 * @param $html
+	 *
+	 * @return mixed|void
+	 */
+	public static function sanitizeBasicHtml( $html ) {
+		try {
+			$html         = stripslashes( $html );
+			$html         = html_entity_decode( $html );
+			$allowed_html = array();
+			$tags         = array(
+				'div',
+				'a',
+				'p',
+				'h1',
+				'h2',
+				'h3',
+				'h4',
+				'h5',
+				'h6',
+				'span',
+				'b',
+				'strong',
+				'i',
+				'img',
+				'br'
+			);
+			foreach ( $tags as $tag ) {
+				$allowed_html[ $tag ] = array(
+					'class' => array(),
+					'id'    => array(),
+					'style' => array()
+				);
+				if ( $tag == 'a' ) {
+					$allowed_html[ $tag ]['href'] = array();
+				}
+				if ( $tag == 'img' ) {
+					$allowed_html[ $tag ]['src']    = array();
+					$allowed_html[ $tag ]['width']  = array();
+					$allowed_html[ $tag ]['height'] = array();
+				}
+			}
+			$allowed_html   = apply_filters( 'rnoc_sanitize_allowed_basic_html_tags', $allowed_html );
+			$sanitized_html = wp_kses( $html, $allowed_html );
+
+			return apply_filters( 'rnoc_sanitize_basic_html', $sanitized_html, $html, $allowed_html );
+		} catch ( \Exception $e ) {
+			return '';
+		}
+	}
+
+	/**
+	 * Escap attribute check
+	 *
+	 * @param $txt
+	 *
+	 * @return string
+	 */
+	public static function rnocEscAttr( $txt ) {
+		return stripslashes( esc_attr__( $txt ) );
+	}
+
+	/**
+	 * Format the date to ISO8601
+	 *
+	 * @param $timestamp
+	 *
+	 * @return string|null
+	 */
+	public static function formatToIso8601( $timestamp ) {
+		if ( empty( $timestamp ) ) {
+			$timestamp = current_time( 'timestamp', true );
+		}
+		if ( is_object( $timestamp ) && $timestamp instanceof \WC_DateTime ) {
+			$timestamp = $timestamp->getTimestamp();
+		}
+
+		try {
+			$date      = date( 'Y-m-d H:i:s', $timestamp );
+			$date_time = new DateTime( $date );
+
+			return $date_time->format( DateTime::ATOM );
+		} catch ( Exception $e ) {
+			return null;
+		}
+	}
+
+
+	/**
+	 * List of available input types.
+	 *
+	 * @var array
+	 */
+	protected static $input_types = [
+		'params',
+		'query',
+		'post',
+		'cookie',
+	];
+
+	/**
+	 * List of available sanitize callbacks.
+	 *
+	 * @var array
+	 */
+	protected static $sanitize_callbacks = [
+		'text'    => 'sanitize_text_field',
+		'title'   => 'sanitize_title',
+		'email'   => 'sanitize_email',
+		'url'     => 'sanitize_url',
+		'key'     => 'sanitize_key',
+		'meta'    => 'sanitize_meta',
+		'option'  => 'sanitize_option',
+		'file'    => 'sanitize_file_name',
+		'mime'    => 'sanitize_mime_type',
+		'class'   => 'sanitize_html_class',
+		'int'     => 'absint',
+		'html'    => [ __CLASS__, 'sanitizeHtml' ],
+		'content' => [ __CLASS__, 'sanitizeContent' ],
+	];
+
+	/**
+	 * Get sanitized input form request.
+	 *
+	 * @param string $var Variable name.
+	 * @param mixed $default Default value.
+	 * @param string $type Input type.
+	 * @param string|false $sanitize Sanitize type.
+	 *
+	 * @return mixed
+	 */
+	public static function get( $var, $default = '', $type = 'params', $sanitize = 'text' ) {
+		if ( ! in_array( $type, self::$input_types ) ) {
+			throw new \UnexpectedValueException( 'Expected a valid type on get method' );
+		}
+		switch ( $type ) {
+			case 'params':
+				return isset( $_REQUEST[ $var ] ) ? self::sanitize( $_REQUEST[ $var ], $sanitize ) : $default;
+			case 'query':
+				return isset( $_GET[ $var ] ) ? self::sanitize( $_GET[ $var ], $sanitize ) : $default;
+			case 'post':
+				return isset( $_POST[ $var ] ) ? self::sanitize( $_POST[ $var ], $sanitize ) : $default;
+			case 'cookie':
+				return isset( $_COOKIE[ $var ] ) ? self::sanitize( $_COOKIE[ $var ], $sanitize ) : $default;
+			default:
+				return $default;
+		}
+	}
+
+	/**
+	 * Sanitize inputs and values.
+	 *
+	 * @param string|array $value input value.
+	 * @param string|false $type input type.
+	 *
+	 * @return string|array
+	 */
+	public static function sanitize( $value, $type = 'text' ) {
+		if ( $type === false ) {
+			return $value;
+		}
+
+		if ( ! array_key_exists( $type, self::$sanitize_callbacks ) ) {
+			throw new \UnexpectedValueException( 'Expected a valid type on sanitize method' );
+		}
+
+		if ( is_array( $value ) ) {
+			return self::sanitizeRecursively( $value, self::$sanitize_callbacks[ $type ] );
+		}
+
+		return self::filterXss( call_user_func( self::$sanitize_callbacks[ $type ], $value ) );
+	}
+
+	/**
+	 * Sanitize recursively.
+	 *
+	 * @param array $array Input array.
+	 * @param string $callback Sanitize callback.
+	 *
+	 * @return array
+	 */
+	public static function sanitizeRecursively( &$array, $callback ) {
+		foreach ( $array as &$value ) {
+			if ( is_array( $value ) ) {
+				$value = self::sanitizeRecursively( $value, $callback );
+			} else {
+				$value = self::filterXss( call_user_func( $callback, $value ) );
+			}
+		}
+
+		return $array;
+	}
+
+	/**
+	 * Sanitize text and allow some basic HTML tags and attributes.
+	 *
+	 * @param string $value HTML value.
+	 *
+	 * @return string
+	 */
+	public static function sanitizeHtml( $value ) {
+		return wp_kses( $value, (array) apply_filters( 'wdr_allowed_html_elements_and_attributes', [
+			'br'     => [],
+			'strong' => [],
+			'span'   => [ 'class' => true, 'style' => true ],
+			'div'    => [ 'class' => true, 'style' => true ],
+			'p'      => [ 'class' => true, 'style' => true ],
+			'table'  => [ 'class' => true, 'style' => true, 'border' => true ],
+			'tr'     => [ 'class' => true, 'style' => true, 'border' => true ],
+			'th'     => [ 'class' => true, 'style' => true, 'border' => true ],
+			'td'     => [ 'class' => true, 'style' => true, 'border' => true ],
+			'h1'     => [ 'class' => true ],
+			'h2'     => [ 'class' => true ],
+			'h3'     => [ 'class' => true ],
+			'h4'     => [ 'class' => true ],
+		] ) );
+	}
+
+	/**
+	 * Sanitize text and allow HTML without input tags and attributes.
+	 *
+	 * @param string $value Content.
+	 *
+	 * @return string
+	 */
+	public static function sanitizeContent( $value ) {
+		return wp_kses_post( $value );
+	}
+
+	/**
+	 * Filter XSS.
+	 *
+	 * @param string $data Input string.
+	 *
+	 * @return string
+	 */
+	public static function filterXss( $data ) {
+		// Fix &entity\n;
+		$data = str_replace( [ '&amp;', '&lt;', '&gt;' ], [ '&amp;amp;', '&amp;lt;', '&amp;gt;' ], $data );
+		$data = preg_replace( '/(&#*\w+)[\x00-\x20]+;/u', '$1;', $data );
+		$data = preg_replace( '/(&#x*[0-9A-F]+);*/iu', '$1;', $data );
+		$data = html_entity_decode( $data, ENT_COMPAT, 'UTF-8' );
+
+		// Remove any attribute starting with "on" or xmlns
+		$data = preg_replace( '#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>]*+>#iu', '$1>', $data );
+
+		// Remove javascript: and vbscript: protocols
+		$data = preg_replace( '#([a-z]*)[\x00-\x20]*=[\x00-\x20]*([`\'"]*)[\x00-\x20]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2nojavascript...', $data );
+		$data = preg_replace( '#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2novbscript...', $data );
+		$data = preg_replace( '#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $data );
+
+		// Remove namespaced elements (we do not need them)
+		$data = preg_replace( '#</*\w+:\w[^>]*+>#i', '', $data );
+
+		// Remove really unwanted tags
+		do {
+			$old_data = $data;
+			$data     = preg_replace( '#</*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|i(?:frame|layer)|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|title|xml)[^>]*+>#i', '', $data );
+		} while ( $old_data !== $data );
+
+		return is_string( $data ) ? $data : '';
+	}
+
 
 }

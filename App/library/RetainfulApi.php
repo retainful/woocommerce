@@ -135,10 +135,9 @@ class RetainfulApi
                     }
                     break;
             }
+            $body = $result->body;
             if ($use_wp_requests) {
                 $body = wp_remote_retrieve_body($result);
-            } else {
-                $body = $result->body;
             }
             if (is_string($body)) {
                 $response = json_decode($body);
@@ -166,20 +165,6 @@ class RetainfulApi
         return $protocol . $domainName;
     }
 
-    /**
-     * Link to track email
-     * @param $url
-     * @param $fields
-     * @return string
-     */
-    function emailTrack($url, $fields)
-    {
-        if (is_array($fields) && !empty($fields)) {
-            $url = rtrim($url, '/');
-            $url .= '?' . http_build_query($fields);
-        }
-        return $this->getDomain() . $url;
-    }
 
     /**
      * abandoned_cart api url
@@ -221,57 +206,5 @@ class RetainfulApi
         return true;
     }
 
-    /**
-     * Synchronize call, without wait for response
-     * You can not get any response. This will only help for
-     * @param $url
-     * @param $body
-     * @param $headers
-     * @return bool
-     */
-    function broadCastEvent($url, $body, $headers)
-    {
-        $parts = parse_url($url);
-        $port = isset($parts['port']) ? $parts['port'] : 80;
-        $fp = fsockopen($parts['host'], $port, $errno, $errstr, 30);
-        $out = "POST " . $parts['path'] . " HTTP/1.1\r\n";
-        $out .= "Host: " . $parts['host'] . "\r\n";
-        if (!empty($headers)) {
-            foreach ($headers as $key => $value) {
-                $out .= "$key: $value\r\n";
-            }
-        }
-        $out .= "Content-Length: " . strlen($body) . "\r\n";
-        $out .= "Connection: Close\r\n\r\n";
-        if (isset($body)) $out .= $body;
-        fwrite($fp, $out);
-        fclose($fp);
-        return true;
-    }
 
-    /**
-     * Sync the cart details to server
-     * @param $app_id
-     * @param string $cart_token
-     * @return array|bool|mixed|object|string
-     */
-    function retrieveCartDetails($app_id, $cart_token)
-    {
-        $url = rtrim($this->getAbandonedCartApiUrl(), '/');
-        $url .= '/abandoned_checkouts/' . $cart_token;
-        $headers = array(
-            'app_id' => $app_id
-        );
-        $response = $this->request($url, array(), 'get', '', $headers);
-        if (isset($response->success) && $response->success) {
-            $referrer_automation_id = isset($_REQUEST['referrer_automation_id']) && !empty($_REQUEST['referrer_automation_id']) ? wc_clean($_REQUEST['referrer_automation_id']) : 0;
-            if (!empty($referrer_automation_id)) {
-                $woocommerce = new WC();
-                $woocommerce->setSession($cart_token . '_referrer_automation_id', $referrer_automation_id);
-                $response->data->referrer_automation_id = $referrer_automation_id;
-            }
-            return isset($response->data) ? $response->data : NULL;
-        }
-        return NULL;
-    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Rnoc\App\Modules\AbandonedCart;
+namespace Rnoc\App\Modules\Entity;
 
 use Rnoc\Retainful\OrderCoupon;
 

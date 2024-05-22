@@ -1,10 +1,10 @@
 <?php
 
-namespace Rnoc\App\Modules\AbandonedCart;
+namespace Rnoc\App\Modules\Entity;
 
 use Exception;
 
 class Checkout extends RestApi
 {
-    
+
 }
