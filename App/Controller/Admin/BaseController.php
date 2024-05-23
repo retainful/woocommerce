@@ -56,8 +56,7 @@ class BaseController {
 	 * @return String|null
 	 */
 	public static function getSecretKey() {
-		return SettingHelper::get( 'retainful_license', RNOC_PLUGIN_PREFIX . 'retainful_app_id', '' );
-
+		return SettingHelper::get( 'retainful_license', RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '' );
 	}
 
 	/**

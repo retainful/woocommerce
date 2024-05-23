@@ -788,4 +788,33 @@ class WC {
 
 		return apply_filters( 'rnoc_get_checkout_url', $checkout_url );
 	}
+
+
+	/**
+	 * get the post meta
+	 *
+	 * @param $post_id
+	 * @param $meta_key
+	 *
+	 * @return bool
+	 */
+	public static function getPostMeta( $post_id, $meta_key ) {
+		return ( function_exists( 'get_post_meta' ) ) ? get_post_meta( intval( $post_id ), $meta_key, true ) : '';
+	}
+
+
+	/**
+	 * Get order object
+	 *
+	 * @param $order_id
+	 *
+	 * @return bool|\WC_Order|null
+	 */
+	public static function getOrder( $order_id ) {
+		if ( function_exists( 'wc_get_order' ) ) {
+			return wc_get_order( intval( $order_id ) );
+		}
+
+		return null;
+	}
 }

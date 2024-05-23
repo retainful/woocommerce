@@ -357,7 +357,8 @@ class Cart extends RestApi {
 		}
 
 		if ( ! wp_script_is( RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued' ) ) {
-			wp_enqueue_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', self::getAbandonedCartJsEngineUrl() );
+			$asset_path = RNOC_PLUGIN_URL . 'assets/js/abandoned_cart.js';
+			wp_enqueue_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', $asset_path );
 			$user_ip              = self::getClientIp();
 			$user_ip              = self::formatUserIP( $user_ip );
 			$cart_tracking_engine = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' );
@@ -389,7 +390,7 @@ class Cart extends RestApi {
 	 * @return mixed|void
 	 */
 	public static function getAbandonedCartJsEngineUrl() {
-		$asset_path = RNOC_PLUGIN_URL . 'assets/';
+		$asset_path = RNOC_PLUGIN_URL . 'assets/js/abandoned_cart.js';
 
 		return apply_filters( 'rnoc_get_abandoned_cart_tracking_js_engine_url', $asset_path . 'js/abandoned_cart.js' );
 	}

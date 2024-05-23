@@ -1282,6 +1282,7 @@ class Input {
 		'query',
 		'post',
 		'cookie',
+		'server',
 	];
 
 	/**
@@ -1328,6 +1329,8 @@ class Input {
 				return isset( $_POST[ $var ] ) ? self::sanitize( $_POST[ $var ], $sanitize ) : $default;
 			case 'cookie':
 				return isset( $_COOKIE[ $var ] ) ? self::sanitize( $_COOKIE[ $var ], $sanitize ) : $default;
+			case 'server' :
+				return isset( $_SERVER[ $var ] ) ? self::sanitize( $_SERVER[ $var ], $sanitize ) : $default;
 			default:
 				return $default;
 		}

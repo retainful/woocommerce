@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Rnoc\App\Modules\Entity\Cart;
+use Rnoc\App\Modules\Entity\Order;
 use Rnoc\App\Modules\Entity\Checkout;
 use Rnoc\App\Modules\Entity\RestApi;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
@@ -50,7 +51,6 @@ class Route {
 		/*
 		* Retainful abandoned cart api
 		*/
-		add_action( 'woocommerce_after_calculate_totals', [ Cart::class, 'syncCartData' ] );
 		add_filter( 'script_loader_tag', [ Cart::class, 'addCloudFlareAttrScript' ], 10, 3 );
 		add_action( 'wp_loaded', [ cart::class, 'applyAbandonedCartCoupon' ] );
 		add_action( 'woocommerce_removed_coupon', [ cart::class, 'removeAbandonedCartCoupon' ] );
@@ -66,10 +66,14 @@ class Route {
 		}
 		add_action( 'wp_footer', [ cart::class, 'printRefreshFragmentScript' ] );
 		add_action( 'wp_enqueue_scripts', [ Cart::class, 'addCartTrackingScripts' ] );
+
 		//user action
 		add_action( 'wp_authenticate', [ Cart::class, 'userLoggedOn' ] );
 		add_action( 'user_register', [ Cart::class, 'userSignedUp' ] );
 		add_action( 'wp_logout', [ cart::class, 'userLoggedOut' ] );
+
+		add_action( 'wp_footer', [ Order::class, 'setRetainfulOrderData' ] );
+
 
 //      add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
 //      add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));

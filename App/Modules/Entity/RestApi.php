@@ -19,8 +19,11 @@ class RestApi {
 	protected static $cart_token_key = "rnoc_user_cart_token", $cart_token_key_for_db = "_rnoc_user_cart_token";
 	protected static $user_ip_key = "rnoc_user_ip_address", $user_ip_key_for_db = "_rnoc_user_ip_address";
 	protected static $cart_tracking_started_key = "rnoc_cart_created_at", $cart_tracking_started_key_for_db = "_rnoc_cart_tracking_started_at";
-	protected static $previous_cart_hash_key = "rnoc_previous_cart_hash";
+	protected static $pending_recovery_key = "rnoc_is_pending_recovery", $pending_recovery_key_for_db = "_rnoc_is_pending_recovery";
 
+	protected static $previous_cart_hash_key = "rnoc_previous_cart_hash";
+	protected static $cart_hash_key_for_db = "_rnoc_cart_hash";
+	protected static $accepts_marketing_key_for_db = "_rnoc_is_buyer_accepts_marketing";
 	/** The cipher method name to use to encrypt the cart data */
 	const CIPHER_METHOD = 'AES256';
 	/** The HMAC hash algorithm to use to sign the encrypted cart data */
@@ -611,6 +614,26 @@ class RestApi {
 			}
 		}
 
+	}
+
+	/**
+	 * get the user agent of client
+	 *
+	 * @param null $order
+	 *
+	 * @return mixed|string|null
+	 */
+	public static function getUserAgent( $order = null ) {
+		if ( ! empty( $order ) ) {
+			return Wc::getOrderMeta( $order, '_rnoc_get_http_user_agent' );
+		} else {
+			$user_agent = Input::get( 'HTTP_USER_AGENT', '', 'server' );
+			if ( ! empty( $user_agent ) ) {
+				return $user_agent;
+			}
+		}
+
+		return '';
 	}
 
 }
