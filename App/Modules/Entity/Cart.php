@@ -25,13 +25,13 @@ class Cart extends RestApi {
 		}
 		if ( $force_sync || self::needToTrackCart() ) {
 			$cart = self::getUserCart();
+
 			if ( ! empty( $cart ) ) {
 				Settings::logMessage( $cart, 'cart' );
 				$client_ip = self::formatUserIP( self::getClientIp() );
 				$cart_hash = self::encryptData( $cart );
 				if ( ! empty( $cart_hash ) ) {
-					$token = self::getCartToken();
-
+					$token         = self::getCartToken();
 					$extra_headers = array(
 						"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
 						"X-Retainful-Version"  => RNOC_VERSION,
@@ -357,7 +357,7 @@ class Cart extends RestApi {
 		}
 
 		if ( ! wp_script_is( RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued' ) ) {
-			wp_enqueue_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', self::getAbandonedCartJsEngineUrl(), array( 'jquery' ), RNOC_VERSION, false );
+			wp_enqueue_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', self::getAbandonedCartJsEngineUrl() );
 			$user_ip              = self::getClientIp();
 			$user_ip              = self::formatUserIP( $user_ip );
 			$cart_tracking_engine = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' );
@@ -389,7 +389,9 @@ class Cart extends RestApi {
 	 * @return mixed|void
 	 */
 	public static function getAbandonedCartJsEngineUrl() {
-		return apply_filters( 'rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION );
+		$asset_path = RNOC_PLUGIN_URL . 'assets/';
+
+		return apply_filters( 'rnoc_get_abandoned_cart_tracking_js_engine_url', $asset_path . 'js/abandoned_cart.js' );
 	}
 
 	/**
@@ -709,6 +711,7 @@ class Cart extends RestApi {
 	 */
 	public static function printRefreshFragmentScript() {
 		$refreshFragmentsOnPageLoad = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load', 0 );
+
 		if ( $refreshFragmentsOnPageLoad ) {
 			?>
             <script>
@@ -719,5 +722,16 @@ class Cart extends RestApi {
 			<?php
 		}
 	}
+
+//	/**
+//	 * Recover user cart
+//	 */
+//	function recoverUserCart() {
+//		// recovery URL
+//		if ( ! empty( $_REQUEST['token'] ) && ! empty( $_REQUEST['hash'] ) ) {
+//			self::recoverCart();
+//		}
+//	}
+
 
 }

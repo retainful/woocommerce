@@ -38,9 +38,8 @@ class Route {
 		add_action( 'admin_enqueue_scripts', [ Settings::class, 'initAdminPageStyles' ] );
 		add_action( 'wp_ajax_rnoc_save_settings', [ Settings::class, 'saveAcSettings' ] );
 		add_action( 'wp_ajax_rnoc_disconnect_license', [ Settings::class, 'disconnectLicense' ] );
-		//add_action('wp_ajax_rnoc_disconnect_license', array($this->admin, 'disconnectLicense'));
 		//Validate key
-		//add_action('wp_ajax_validate_app_key', array(self::$base_controller, 'validateAppKey'));
+		add_action( 'wp_ajax_validate_app_key', array( Settings::class, 'validateAppKey' ) );
 	}
 
 
@@ -86,6 +85,8 @@ class Route {
 		SettingHelpers::initStorage();
 		add_action( 'wp_ajax_rnoc_track_user_data', [ cart::class, 'setCustomerData' ] );
 		add_action( 'woocommerce_cart_loaded_from_session', [ cart::class, 'handlePersistentCart' ] );
+		//	add_action( 'woocommerce_api_retainful', [ cart::class, 'recoverUserCart' ] );
+
 	}
 
 

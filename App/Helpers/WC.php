@@ -776,4 +776,16 @@ class WC {
 		return null;
 	}
 
+	/**
+	 * get the checkout url
+	 * @return string|null
+	 */
+	public static function getCheckoutUrl() {
+		$checkout_url = "";
+		if ( function_exists( 'wc_get_checkout_url' ) ) {
+			$checkout_url = wc_get_checkout_url();
+		}
+
+		return apply_filters( 'rnoc_get_checkout_url', $checkout_url );
+	}
 }
