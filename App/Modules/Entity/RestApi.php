@@ -20,6 +20,8 @@ class RestApi {
 	protected static $user_ip_key = "rnoc_user_ip_address", $user_ip_key_for_db = "_rnoc_user_ip_address";
 	protected static $cart_tracking_started_key = "rnoc_cart_created_at", $cart_tracking_started_key_for_db = "_rnoc_cart_tracking_started_at";
 	protected static $pending_recovery_key = "rnoc_is_pending_recovery", $pending_recovery_key_for_db = "_rnoc_is_pending_recovery";
+	protected static $order_placed_date_key_for_db = "_rnoc_order_placed_at", $order_cancelled_date_key_for_db = "_rnoc_order_cancelled_at";
+	protected static $order_recovered_key_for_db = "_rnoc_order_recovered";
 
 	protected static $previous_cart_hash_key = "rnoc_previous_cart_hash";
 	protected static $cart_hash_key_for_db = "_rnoc_cart_hash";
@@ -617,6 +619,71 @@ class RestApi {
 	}
 
 	/**
+	 * Get the line items details
+	 * @return array
+	 */
+	public static function getLineItemsDetails( $cart = null, $type = 'cart' ) {
+		$items = array();
+		$cart  = ( $type == 'order' ) && ! empty( $cart ) ? $cart : WC::getCart();
+		if ( ! empty( $cart ) ) {
+			foreach ( $cart as $item_key => $item_details ) {
+				//Deceleration
+				$tax_details   = array();
+				$item_quantity = ! empty( $item_details['quantity'] ) ? $item_details['quantity'] : null;
+				$variant_id    = ! empty( $item_details['variation_id'] ) ? $item_details['variation_id'] : 0;
+				$product_id    = ! empty( $item_details['product_id'] ) ? $item_details['product_id'] : 0;
+				$cat_ids       = ! empty( $product_id ) && $product_id > 0 ? WC::getProductCategoryIds( $product_id ) : array();
+				$item          = apply_filters( 'woocommerce_cart_item_product', $item_details['data'], $item_details, $item_key );
+				if ( empty( $item ) ) {
+					if ( ! empty( $variant_id ) ) {
+						$item = WC::getProduct( $variant_id );
+					} elseif ( ! empty( $product_id ) ) {
+						$item = WC::getProduct( $product_id );
+					}
+				}
+				$line_tax = ( ! empty( $item_details['line_tax'] ) ) ? $item_details['line_tax'] : 0;
+				if ( $line_tax > 0 ) {
+					$tax_details[] = array(
+						'rate'       => 0,
+						'zone'       => 'province',
+						'price'      => self::formatDecimalPriceRemoveTrailingZeros( $line_tax ),
+						'title'      => 'tax',
+						'source'     => 'WooCommerce',
+						'position'   => 1,
+						'compare_at' => 0,
+					);
+				}
+				$image_url = WC::getProductImageSrc( $item );
+				if ( ! empty( $item ) && ! empty( $item_quantity ) ) {
+					$item_array = array(
+						'key'           => $item_key,
+						'sku'           => WC::getItemSku( $item ),
+						'price'         => self::formatDecimalPriceRemoveTrailingZeros( WC::getCartItemPrice( $item ) ),
+						'title'         => WC::getItemName( $item ),
+						'taxable'       => ( $line_tax != 0 ),
+						'quantity'      => $item_quantity,
+						'tax_lines'     => $tax_details,
+						'line_price'    => self::formatDecimalPriceRemoveTrailingZeros( self::getLineItemTotal( $item_details ) ),
+						'product_id'    => $product_id,
+						'cat_ids'       => implode( ',', $cat_ids ),
+						'cat_names'     => WC::getProductCategoryName( $product_id ),
+						'variant_id'    => $variant_id,
+						'variant_price' => self::formatDecimalPriceRemoveTrailingZeros( ! empty( $variant_id ) ? WC::getCartItemPrice( $item ) : 0 ),
+						'variant_title' => ! empty( $variant_id ) ? WC::getItemName( $item ) : '',
+						'image_url'     => $image_url,
+						'product_url'   => WC::getProductUrl( $item ),
+						'properties'    => array()
+					);
+					$items[]    = apply_filters( 'rnoc_get_cart_line_item_details', $item_array, $cart, $item_key, $item, $item_details );
+				}
+			}
+		}
+
+		return ( $type == 'cart' ) ? apply_filters( "rnoc_get_abandoned_cart_line_items", $items, $cart ) : $items;
+	}
+
+
+	/**
 	 * get the user agent of client
 	 *
 	 * @param null $order
@@ -634,6 +701,47 @@ class RestApi {
 		}
 
 		return '';
+	}
+
+	/**
+	 * need to track carts or not
+	 *
+	 * @param string $ip_address
+	 * @param $order null | \WC_Order | \WC_Cart
+	 *
+	 * @return bool
+	 */
+	public static function canTrackAbandonedCarts( $ip_address = null, $order = null ) {
+		if ( apply_filters( 'rnoc_is_cart_has_valid_ip', true, $ip_address ) && apply_filters( 'rnoc_can_track_abandoned_carts', true, $order ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check the order has valid order statuses
+	 *
+	 * @param $order_status
+	 *
+	 * @return bool
+	 */
+	public static function isOrderHasValidOrderStatus( $order_status ) {
+		$invalid_order_status         = apply_filters( 'rnoc_abandoned_cart_invalid_order_statuses', array(
+			'pending',
+			'failed',
+			'checkout-draft',
+			'trash',
+			'cancelled',
+			'refunded'
+		) );
+		$consider_on_hold_order_as_ac = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status', 1 );
+		if ( $consider_on_hold_order_as_ac == 1 ) {
+			$invalid_order_status[] = 'on-hold';
+		}
+		$invalid_order_status = array_unique( $invalid_order_status );
+
+		return ( ! in_array( $order_status, $invalid_order_status ) );
 	}
 
 }

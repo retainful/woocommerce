@@ -815,11 +815,7 @@ class WC {
 	 * @return bool|\WC_Order|null
 	 */
 	public static function getOrder( $order_id ) {
-		if ( function_exists( 'wc_get_order' ) ) {
-			return wc_get_order( intval( $order_id ) );
-		}
-
-		return null;
+		return function_exists( 'wc_get_order' ) ? wc_get_order( intval( $order_id ) ) : null;
 	}
 
 	/**
@@ -831,5 +827,136 @@ class WC {
 		if ( function_exists( 'wc_paying_customer' ) ) {
 			wc_paying_customer( intval( $order_id ) );
 		}
+	}
+
+
+	/**
+	 * Get Order Id
+	 *
+	 * @param $order
+	 *
+	 * @return String|null
+	 */
+	public static function getOrderId( $order ) {
+		if ( self::isMethodExists( $order, 'get_id' ) ) {
+			return $order->get_id();
+		} elseif ( is_object( $order ) && isset( $order->id ) ) {
+			return $order->id;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get User Last name
+	 *
+	 * @param \WC_Order $order
+	 *
+	 * @return null
+	 */
+	public static function getOrderCurrency( $order ) {
+		return self::isMethodExists( $order, 'get_currency' ) ? $order->get_currency() : null;
+	}
+
+	/**
+	 * Get status of order
+	 *
+	 * @param \WC_Order $order
+	 *
+	 * @return null
+	 */
+	public static function getStatus( $order ) {
+		if ( self::isMethodExists( $order, 'get_status' ) ) {
+			$order_status = $order->get_status();
+
+			return strtolower( $order_status );
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * get Ordered Date
+	 *
+	 * @param \WC_Order $order
+	 * @param $format
+	 *
+	 * @return null
+	 */
+	public static function getOrderDate( $order, $format = null ) {
+		if ( ! self::isMethodExists( $order, 'get_date_created' ) ) {
+			return null;
+		}
+		$date = $order->get_date_created();
+		if ( ! is_null( $format ) ) {
+			$date = $date->format( $format );
+		}
+
+		return $date;
+
+	}
+
+
+	/**
+	 * Get Order total tax
+	 *
+	 * @param \WC_Order $order
+	 *
+	 * @return null
+	 */
+	public static function getOrderTotalTax( $order ) {
+		return self::isMethodExists( $order, 'get_total_tax' ) ? $order->get_total_tax() : null;
+	}
+
+	/**
+	 * get Ordered Date
+	 *
+	 * @param $order
+	 * @param $format
+	 *
+	 * @return null
+	 */
+	public static function getOrderPlacedDate( $order, $format = null ) {
+		$date = null;
+		if ( self::isMethodExists( $order, 'get_date_paid' ) ) {
+			$dateObject = $order->get_date_paid();
+			if ( $dateObject instanceof \WC_DateTime ) {
+				$date = $dateObject->getTimestamp();
+			}
+			if ( ! is_null( $format ) ) {
+				$date = $dateObject->format( $format );
+			}
+
+			return $date;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * Get site's default language
+	 * @return string
+	 */
+	public static function getSiteDefaultLang() {
+		$current_lang = function_exists( 'get_locale' ) ? get_locale() : 'en_US';
+		if ( $current_lang == 'en' ) {
+			$current_lang = 'en_US';
+		}
+
+		return $current_lang;
+	}
+
+	/**
+	 * Get total order discount
+	 *
+	 * @param $order
+	 * @param $excluding
+	 *
+	 * @return String|null
+	 */
+	public static function getOrderDiscount( $order, $excluding = true ) {
+		return self::isMethodExists( $order, 'get_total_discount' ) ? $order->get_total_discount( $excluding ) : 0;
 	}
 }

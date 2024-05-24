@@ -73,11 +73,9 @@ class Route {
 		add_action( 'wp_logout', [ cart::class, 'userLoggedOut' ] );
 
 		add_action( 'wp_footer', [ Order::class, 'setRetainfulOrderData' ] );
-		add_action( 'woocommerce_payment_complete', [ Order::class, 'paymentCompleted' ] );
+		add_action( 'woocommerce_new_order', [ Order::class, 'paymentCompleted' ], 1, 2 );
+		add_action( 'woocommerce_checkout_update_order_meta', [ Order::class, 'checkoutOrderProcessed' ] );
 
-
-//      add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
-//      add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
 
 	}
 
@@ -90,8 +88,7 @@ class Route {
 		SettingHelpers::initStorage();
 		add_action( 'wp_ajax_rnoc_track_user_data', [ cart::class, 'setCustomerData' ] );
 		add_action( 'woocommerce_cart_loaded_from_session', [ cart::class, 'handlePersistentCart' ] );
-		//	add_action( 'woocommerce_api_retainful', [ cart::class, 'recoverUserCart' ] );
-
+		//add_action( 'woocommerce_api_retainful', [ cart::class, 'recoverUserCart' ] );
 	}
 
 

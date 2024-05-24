@@ -46,70 +46,6 @@ class Cart extends RestApi {
 
 
 	/**
-	 * Get the line items details
-	 * @return array
-	 */
-	public static function getCartLineItemsDetails() {
-		$items = array();
-		$cart  = WC::getCart();
-		if ( ! empty( $cart ) ) {
-			foreach ( $cart as $item_key => $item_details ) {
-				//Deceleration
-				$tax_details   = array();
-				$item_quantity = ! empty( $item_details['quantity'] ) ? $item_details['quantity'] : null;
-				$variant_id    = ! empty( $item_details['variation_id'] ) ? $item_details['variation_id'] : 0;
-				$product_id    = ! empty( $item_details['product_id'] ) ? $item_details['product_id'] : 0;
-				$cat_ids       = ! empty( $product_id ) && $product_id > 0 ? WC::getProductCategoryIds( $product_id ) : array();
-				$item          = apply_filters( 'woocommerce_cart_item_product', $item_details['data'], $item_details, $item_key );
-				if ( empty( $item ) ) {
-					if ( ! empty( $variant_id ) ) {
-						$item = WC::getProduct( $variant_id );
-					} elseif ( ! empty( $product_id ) ) {
-						$item = WC::getProduct( $product_id );
-					}
-				}
-				$line_tax = ( ! empty( $item_details['line_tax'] ) ) ? $item_details['line_tax'] : 0;
-				if ( $line_tax > 0 ) {
-					$tax_details[] = array(
-						'rate'       => 0,
-						'zone'       => 'province',
-						'price'      => self::formatDecimalPriceRemoveTrailingZeros( $line_tax ),
-						'title'      => 'tax',
-						'source'     => 'WooCommerce',
-						'position'   => 1,
-						'compare_at' => 0,
-					);
-				}
-				$image_url = WC::getProductImageSrc( $item );
-				if ( ! empty( $item ) && ! empty( $item_quantity ) ) {
-					$item_array = array(
-						'key'           => $item_key,
-						'sku'           => WC::getItemSku( $item ),
-						'price'         => self::formatDecimalPriceRemoveTrailingZeros( WC::getCartItemPrice( $item ) ),
-						'title'         => WC::getItemName( $item ),
-						'taxable'       => ( $line_tax != 0 ),
-						'quantity'      => $item_quantity,
-						'tax_lines'     => $tax_details,
-						'line_price'    => self::formatDecimalPriceRemoveTrailingZeros( self::getLineItemTotal( $item_details ) ),
-						'product_id'    => $product_id,
-						'cat_ids'       => implode( ',', $cat_ids ),
-						'cat_names'     => WC::getProductCategoryName( $product_id ),
-						'variant_id'    => $variant_id,
-						'variant_price' => self::formatDecimalPriceRemoveTrailingZeros( ! empty( $variant_id ) ? WC::getCartItemPrice( $item ) : 0 ),
-						'variant_title' => ! empty( $variant_id ) ? WC::getItemName( $item ) : '',
-						'image_url'     => $image_url,
-						'product_url'   => WC::getProductUrl( $item ),
-						'properties'    => array()
-					);
-					$items[]    = apply_filters( 'rnoc_get_cart_line_item_details', $item_array, $cart, $item_key, $item, $item_details );
-				}
-			}
-		}
-
-		return apply_filters( "rnoc_get_abandoned_cart_line_items", $items, $cart );
-	}
-
-	/**
 	 * get the cart tax details
 	 * @return array
 	 */
@@ -143,6 +79,7 @@ class Cart extends RestApi {
 	 * @return array
 	 */
 	public static function getUserCart() {
+
 		$current_language             = MultiLingual::getCurrentLanguage();
 		$customer_details             = self::getCustomerDetails();
 		$cart_token                   = self::getCartToken();
@@ -166,7 +103,7 @@ class Cart extends RestApi {
 			'total_tax'                 => WC::getCartTotalTax(),
 			'cart_token'                => $cart_token,
 			'created_at'                => self::formatToIso8601( $cart_created_at ),
-			'line_items'                => self::getCartLineItemsDetails(),
+			'line_items'                => self::getLineItemsDetails(),
 			'updated_at'                => self::formatToIso8601( '' ),
 			'total_price'               => $cart_total,
 			'completed_at'              => null,
@@ -260,28 +197,13 @@ class Cart extends RestApi {
 		if ( $crawler_detect->isCrawler() ) {
 			return false;
 		}
-		if ( self::canTrackAbandonedCarts() == false ) {
+		if ( ! self::canTrackAbandonedCarts() ) {
 			return false;
 		}
 
 		return true;
 	}
 
-	/**
-	 * need to track carts or not
-	 *
-	 * @param string $ip_address
-	 * @param $order null | \WC_Order | \WC_Cart
-	 *
-	 * @return bool
-	 */
-	public static function canTrackAbandonedCarts( $ip_address = null, $order = null ) {
-		if ( apply_filters( 'rnoc_is_cart_has_valid_ip', true, $ip_address ) && apply_filters( 'rnoc_can_track_abandoned_carts', true, $order ) ) {
-			return true;
-		}
-
-		return false;
-	}
 
 	/**
 	 * Check weather Retainful needs to track the cart or not
