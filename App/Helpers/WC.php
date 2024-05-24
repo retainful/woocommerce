@@ -449,6 +449,10 @@ class WC {
 		return function_exists( 'get_user_meta' ) ? get_user_meta( $user_id, $key, $single ) : null;
 	}
 
+	public static function deleteUserMeta( $user_id, $meta_key ) {
+		return function_exists( 'delete_user_meta' ) && delete_user_meta( $user_id, $meta_key );
+	}
+
 	public static function getWooPluginUrl() {
 		return self::isMethodExists( WC(), 'plugin_url' ) ? WC()->plugin_url() : null;
 
@@ -816,5 +820,16 @@ class WC {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Order payment completed - This is a paying customer.
+	 *
+	 * @param $order_id
+	 */
+	public static function setCustomerPayingForOrder( $order_id ) {
+		if ( function_exists( 'wc_paying_customer' ) ) {
+			wc_paying_customer( intval( $order_id ) );
+		}
 	}
 }

@@ -73,6 +73,7 @@ class Route {
 		add_action( 'wp_logout', [ cart::class, 'userLoggedOut' ] );
 
 		add_action( 'wp_footer', [ Order::class, 'setRetainfulOrderData' ] );
+		add_action( 'woocommerce_payment_complete', [ Order::class, 'paymentCompleted' ] );
 
 
 //      add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
