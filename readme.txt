@@ -3,9 +3,9 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.6.1
 Tested up to: 6.5
-WC tested up to: 8.8
+WC tested up to: 8.9
 Requires PHP: 5.6
-Stable tag: 2.6.33
+Stable tag: 2.6.34
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -249,6 +249,9 @@ No. There is no charges for support.
 == Screenshots ==
 
 == Changelog ==
+= 2.6.34 =
+- Fix: Marketing Consent: Default value Implicit in synchronization
+
 = 2.6.33 =
 - Fix: Exclude trash order in synchronization
 - Support: Exclude sale item as a params in coupon
