@@ -30,7 +30,7 @@ class Router {
 	 * @return void
 	 */
 	public static function addCommonHooks() {
-		add_action( 'admin_menu', [ Settings::class, 'addMenu' ] );
+		//add_filter( 'woocommerce_set_cookie_options', array( $this, 'changeIdentityPath' ), 10, 3 );
 	}
 
 	/**
@@ -39,7 +39,7 @@ class Router {
 	 * @return void
 	 */
 	public static function addAdminHooks() {
-
+		add_action( 'admin_menu', [ Settings::class, 'addMenu' ] );
 	}
 
 	/**
