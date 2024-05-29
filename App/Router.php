@@ -31,6 +31,8 @@ class Router {
 	 */
 	public static function addCommonHooks() {
 		add_action( 'admin_menu', [ Settings::class, 'addMenu' ] );
+		add_action( 'admin_enqueue_scripts', [ Settings::class, 'addAdminPageStyles' ] );
+
 	}
 
 	/**
