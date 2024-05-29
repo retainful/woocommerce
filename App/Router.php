@@ -3,6 +3,7 @@
 namespace RNOC\App;
 
 use RNOC\App\Controllers\Admin\Settings;
+use RNOC\App\Controllers\Site\Common;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -30,7 +31,8 @@ class Router {
 	 * @return void
 	 */
 	public static function addCommonHooks() {
-		//add_filter( 'woocommerce_set_cookie_options', array( $this, 'changeIdentityPath' ), 10, 3 );
+		//add_filter( 'woocommerce_set_cookie_options', [ Common::class, 'changeIdentityPath' ], 10, 3 );
+		//add_action( 'woocommerce_init', [ Common::class, 'setIdentityData' ] );
 	}
 
 	/**

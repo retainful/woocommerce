@@ -80,4 +80,15 @@ class Settings {
 	public static function isProPlan() {
 		return true;
 	}
+
+	/**
+	 * Identity path.
+	 *
+	 * @return string
+	 */
+	public static function getIdentityPath() {
+		$path = preg_replace( '|https?://[^/]+|i', '', get_option( 'home' ) );
+
+		return ! empty( $path ) ? $path : '/';
+	}
 }
