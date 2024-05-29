@@ -746,7 +746,7 @@ class WC {
 			return $order->get_items();
 		}
 
-		return array();
+		return [];
 	}
 
 

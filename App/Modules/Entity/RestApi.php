@@ -37,7 +37,7 @@ class RestApi {
 	 * @return array|string|null
 	 */
 	public static function getCartToken() {
-		$cart_token = self::retrieveCartToken();
+		$cart_token = self::getRetrieveCartToken();
 		if ( empty( $cart_token ) ) {
 			$cart_token = self::generateCartToken();
 			self::setCartToken( $cart_token );
@@ -159,7 +159,7 @@ class RestApi {
 	 *
 	 * @return array|mixed|string|null
 	 */
-	public static function retrieveCartToken( $user_id = null ) {
+	public static function getRetrieveCartToken( $user_id = null ) {
 
 		$user_id = ( $user_id == null ) ? WC::getCurrentUserId() : 0;
 		$token   = ! empty( $user_id ) ? get_user_meta( $user_id, self::$cart_token_key_for_db, true ) : SettingsHelper::initStorage()->getValue( self::$cart_token_key );
@@ -718,11 +718,36 @@ class RestApi {
 	 * @return bool
 	 */
 	public static function canTrackAbandonedCarts( $ip_address = null, $order = null ) {
-		if ( apply_filters( 'rnoc_is_cart_has_valid_ip', true, $ip_address ) && apply_filters( 'rnoc_can_track_abandoned_carts', true, $order ) ) {
+
+		if ( apply_filters( 'rnoc_is_cart_has_valid_ip', true, $ip_address ) && self::isZeroValueCart( $order ) && apply_filters( 'rnoc_can_track_abandoned_carts', true, $order ) ) {
 			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Need to track zero value carts or not
+	 *
+	 * @param \WC_Order|null $order Order object.
+	 *
+	 * @return bool
+	 */
+	public static function isZeroValueCart( $order = null ) {
+		$track_zero_cart_value = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'track_zero_value_carts', 'no' );
+		if ( $track_zero_cart_value != 'no' ) {
+			return true;
+		}
+
+		if ( ! empty( WC::getCart() ) && WC::getCartSubTotal() <= 0 && WC::getCartTotalPrice() <= 0 ) {
+			return false;
+		}
+
+		if ( $order instanceof \WC_Order && ! empty( WC::getOrderItems( $order ) ) && WC::getOrderSubTotal( $order ) <= 0 && WC::getOrderTotal( $order ) <= 0 ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

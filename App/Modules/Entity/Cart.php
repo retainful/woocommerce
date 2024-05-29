@@ -413,7 +413,7 @@ class Cart extends RestApi {
 			wp_send_json( array( 'success' => false ) );
 		}
 		$cart_token = Input::post( 'cart_token', '' );
-		if ( empty( self::retrieveCartToken() ) && ! empty( $cart_token ) ) {
+		if ( empty( self::getRetrieveCartToken() ) && ! empty( $cart_token ) ) {
 			self::setCartToken( $cart_token );
 		}
 		$cart           = self::getUserCart();
@@ -425,21 +425,25 @@ class Cart extends RestApi {
 	/**
 	 * Handle loading/setting Retainful data for the persistent cart.
 	 */
-	public static function handlePersistentCart() {
+	public static function loadCartToken() {
 		// bail for guest users, when the cart is empty, or when doing a WP cron request
 		if ( ! is_user_logged_in() || wc::isCartEmpty() || defined( 'DOING_CRON' ) ) {
 			return null;
 		}
-		$user_id    = WC::getCurrentUserId();
-		$cart_token = WC::getUserMeta( $user_id, self::$cart_token_key_for_db, true );
-		if ( $cart_token && ! self::retrieveCartToken() ) {
+		$user_id = WC::getCurrentUserId();
+		//$cart_token = WC::getUserMeta( $user_id, self::$cart_token_key_for_db, true );
+		$cart_token = self::getRetrieveCartToken( $user_id );
+		if ( $cart_token ) {
+			self::setCartToken( $cart_token );
+		}
+		/*if ( $cart_token && ! self::getRetrieveCartToken() ) {
 			// for a logged in user with a persistent cart, set the cart token to the session
 			self::setCartToken( $cart_token );
-		} elseif ( ! $cart_token && self::retrieveCartToken() ) {
+		} elseif ( ! $cart_token && self::getRetrieveCartToken() ) {
 			// when a guest user with an existing cart logs in, save the cart token to user meta
-			$cart_token = self::retrieveCartToken();
+			$cart_token = self::getRetrieveCartToken();
 			update_user_meta( $user_id, self::$cart_token_key_for_db, $cart_token );
-		}
+		}*/
 	}
 
 	/**
@@ -484,17 +488,17 @@ class Cart extends RestApi {
 	}
 
 	/**
-	 * Show GDPR message under email address.
+	 * Show GDPR field under email address.
 	 *
-	 * @param $fields
+	 * @param array $fields Fields.
 	 *
 	 * @return array
 	 */
-	public static function guestGdprMessage( $fields ) {
-
+	public static function addGuestGDPRField( $fields ) {
 		$enable_gdpr_compliance = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
 		$message                = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'cart_capture_msg', 'Keep me up to date on news and exclusive offers' );
 		$field_name             = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'gdpr_display_position', 'after_billing_email' );
+
 		if ( $enable_gdpr_compliance && $field_name == 'after_billing_email' && ! empty( $fields['billing']['billing_email'] ) ) {
 			$fields['billing'][ RNOC_PLUGIN_PREFIX . 'allow_gdpr' ] = [
 				'label'    => __( $message, RNOC_TEXT_DOMAIN ),
@@ -508,11 +512,11 @@ class Cart extends RestApi {
 	}
 
 	/**
-	 * Show GDPR message to  under the terms and condition.
+	 * Show GDPR field to  under the terms and condition.
 	 *
 	 * @return void
 	 */
-	public static function guestTermGdprMessage() {
+	public static function addGuestTermGDPRField() {
 		$enable_gdpr_compliance = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
 		$field_name             = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'gdpr_display_position', 'after_billing_email' );
 		$message                = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'cart_capture_msg', 'Keep me up to date on news and exclusive offers' );
@@ -521,29 +525,6 @@ class Cart extends RestApi {
             name="' . RNOC_PLUGIN_PREFIX . 'allow_gdpr' . '" id="' . RNOC_PLUGIN_PREFIX . 'allow_gdpr' . '" ' . ( self::isBuyerAcceptsMarketing() ? 'checked="checked"' : '' ) . ' />
 					<span class="woocommerce-terms-and-conditions-checkbox-text">' . __( $message, RNOC_TEXT_DOMAIN ) . ' ' . __( '(optional)', RNOC_TEXT_DOMAIN ) . '</span>';
 		}
-	}
-
-
-	/**
-	 * Need to track zero value carts or not
-	 *
-	 * @param $return
-	 * @param $order
-	 *
-	 * @return mixed
-	 */
-	public static function isZeroValueCart( $return, $order = false ) {
-		$track_zero_cart_value = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'track_zero_value_carts', 'no' );
-		if ( $track_zero_cart_value == "no" ) {
-			if ( ! empty( WC::getCart() ) && WC::getCartSubTotal() <= 0 && WC::getCartTotalPrice() <= 0 ) {
-				return false;
-			}
-			if ( $order instanceof \WC_Order && ! empty( WC::getOrderItems( $order ) ) && WC::getOrderSubTotal( $order ) <= 0 && WC::getOrderTotal( $order ) <= 0 ) {
-				return false;
-			}
-		}
-
-		return $return;
 	}
 
 

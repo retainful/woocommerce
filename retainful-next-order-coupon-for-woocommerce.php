@@ -11,46 +11,51 @@
  * Domain Path: /i18n/languages/
  * Plugin URI: https://www.retainful.com
  * Requires at least: 4.7.0
- * Contributers: Sathyaseelan
+ * Contributors: Sathyaseelan
  * WC requires at least: 6.0.0
  * WC tested up to: 8.7
  */
-defined('ABSPATH') || die;
 
-add_action('before_woocommerce_init', function () {
-    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
-        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
-    }
-});
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
+use Rnoc\App\Helpers\Plugin;
+use Rnoc\App\Route;
+
+defined( 'ABSPATH' ) || die;
+
+add_action( 'before_woocommerce_init', function () {
+	if ( class_exists( FeaturesUtil::class ) ) {
+		FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+	}
+} );
 
 //Check for required packages
-if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
-    return false;
+if ( ! file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	return false;
 }
 
 // Define the text domain
-defined('RNOC_TEXT_DOMAIN') || define('RNOC_TEXT_DOMAIN', 'retainful-next-order-coupon-for-woocommerce');
+defined( 'RNOC_TEXT_DOMAIN' ) || define( 'RNOC_TEXT_DOMAIN', 'retainful-next-order-coupon-for-woocommerce' );
 // Define the plugin slug
-defined('RNOC_PLUGIN_SLUG') || define('RNOC_PLUGIN_SLUG', 'retainful-next-order-coupon-for-woocommerce');
+defined( 'RNOC_PLUGIN_SLUG' ) || define( 'RNOC_PLUGIN_SLUG', 'retainful-next-order-coupon-for-woocommerce' );
 // Current version of our app
-defined('RNOC_VERSION') || define('RNOC_VERSION', '2.6.32');
+defined( 'RNOC_VERSION' ) || define( 'RNOC_VERSION', '2.6.32' );
 // Set base file URL
-defined('RNOC_PLUGIN_PREFIX') || define('RNOC_PLUGIN_PREFIX', 'rnoc_');
+defined( 'RNOC_PLUGIN_PREFIX' ) || define( 'RNOC_PLUGIN_PREFIX', 'rnoc_' );
 //Define plugin path
-defined('RNOC_PLUGIN_PATH') || define('RNOC_PLUGIN_PATH', plugin_dir_path(__FILE__));
+defined( 'RNOC_PLUGIN_PATH' ) || define( 'RNOC_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 //Define plugin path
-defined('RNOC_PLUGIN_URL') || define('RNOC_PLUGIN_URL', plugin_dir_url(__FILE__));
+defined( 'RNOC_PLUGIN_URL' ) || define( 'RNOC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 //Set Plugin log path
 $path = ABSPATH . 'wp-content/retainful.log';
-defined('RNOC_LOG_FILE_PATH') || define('RNOC_LOG_FILE_PATH', $path);
+defined( 'RNOC_LOG_FILE_PATH' ) || define( 'RNOC_LOG_FILE_PATH', $path );
 
-defined('RNOC_PLUGIN_NAME') || define('RNOC_PLUGIN_NAME', "Retainful - Abandoned Cart Recovery Emails and Next Order Coupons");
-defined('RNOC_MINIMUM_WC_VERSION') || define('RNOC_MINIMUM_WC_VERSION', '6.0.0');
-defined('RNOC_MINIMUM_WP_VERSION') || define('RNOC_MINIMUM_WP_VERSION', '4.7.0');
-defined('RNOC_MINIMUM_PHP_VERSION') || define('RNOC_MINIMUM_PHP_VERSION', '5.6.0');
+defined( 'RNOC_PLUGIN_NAME' ) || define( 'RNOC_PLUGIN_NAME', "Retainful - Abandoned Cart Recovery Emails and Next Order Coupons" );
+defined( 'RNOC_MINIMUM_WC_VERSION' ) || define( 'RNOC_MINIMUM_WC_VERSION', '6.0.0' );
+defined( 'RNOC_MINIMUM_WP_VERSION' ) || define( 'RNOC_MINIMUM_WP_VERSION', '4.7.0' );
+defined( 'RNOC_MINIMUM_PHP_VERSION' ) || define( 'RNOC_MINIMUM_PHP_VERSION', '5.6.0' );
 
 require __DIR__ . '/vendor/autoload.php';
-if (class_exists(\Rnoc\App\Route::class) && \Rnoc\App\Helpers\Plugin::checkDependencies()) {
-	\Rnoc\App\Route::init(); // init plugin hooks
+if ( class_exists( Route::class ) && Plugin::checkDependencies() ) {
+	Route::init(); // init plugin hooks
 }

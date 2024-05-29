@@ -35,7 +35,7 @@ class Order extends RestApi {
 			return null;
 		}
 		//TODO remove carthash from session after success place order
-		$cart_token = self::retrieveCartToken();
+		$cart_token = self::getRetrieveCartToken();
 		Settings::logMessage( array( "cart_token" => $cart_token, "order_id" => $order_id ), 'purchaseComplete' );
 		if ( ! empty( $cart_token ) ) {
 			$cart_created_at            = self::userCartCreatedAt();
@@ -77,7 +77,7 @@ class Order extends RestApi {
 	public static function paymentCompleted( $order_id ) {
 		$order = WC::getOrder( $order_id );
 		Settings::logMessage( array( "order" => $order ), 'paymentCompleted' );
-		$cart_token = self::retrieveCartToken();
+		$cart_token = self::getRetrieveCartToken();
 		if ( ! empty( $cart_token ) ) {
 			self::unsetOrderTempData();
 		}
@@ -114,7 +114,7 @@ class Order extends RestApi {
 	public static function checkoutOrderProcessed( $order_id ) {
 		Settings::logMessage( array( "order_id" => $order_id ), 'checkoutOrderProcessed' );
 		try {
-			$cart_token = self::retrieveCartToken();
+			$cart_token = self::getRetrieveCartToken();
 			if ( ! empty( $cart_token ) ) {
 				self::purchaseComplete( $order_id );
 				self::syncOrderToAPI( $order_id );
@@ -543,7 +543,7 @@ class Order extends RestApi {
 					if ( $this->isPendingRecovery( $user_id ) ) {
 						WC::setOrderMeta( $order_id, self::$pending_recovery_key_for_db, true );
 					}
-					if ( $this->retrieveCartToken( $user_id ) ) {
+					if ( $this->getRetrieveCartToken( $user_id ) ) {
 						$this->removeTempDataForUser( $user_id );
 					}
 				}

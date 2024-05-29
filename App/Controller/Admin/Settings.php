@@ -233,20 +233,7 @@ class Settings extends BaseController {
 		}
 		wp_send_json( $response );
 	}
-
-	/**
-	 * get where to save the temp data
-	 * @return mixed|string
-	 */
-	public static function getStorageHandler() {
-		$admin_settings = self::getAdminSettings();
-		if ( isset( $admin_settings[ RNOC_PLUGIN_PREFIX . 'handle_storage_using' ] ) && ! empty( $admin_settings[ RNOC_PLUGIN_PREFIX . 'handle_storage_using' ] ) ) {
-			return $admin_settings[ RNOC_PLUGIN_PREFIX . 'handle_storage_using' ];
-		} else {
-			return "woocommerce";
-		}
-	}
-
+	
 	/**
 	 * Get the user current plan
 	 * @return mixed|string
