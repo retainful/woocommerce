@@ -977,7 +977,7 @@ class WC {
 	 * @return String|null
 	 */
 	public static function getItemSubTotal( $item ) {
-		return self::isMethodExists( $item, 'get_subtotal' ) ? $item->get_subtotal : 0;
+		return is_object( $item ) && isset( $item->get_subtotal ) ? $item->get_subtotal : 0;
 	}
 
 
@@ -1063,4 +1063,38 @@ class WC {
 		return self::isMethodExists( $order, 'get_shipping_total' ) ? $order->get_shipping_total( $context ) : 0;
 	}
 
+
+	/**
+	 * @param $email
+	 * @param int $limit
+	 *
+	 * @return array
+	 */
+	public static function getCustomerOrdersByEmail( $email, $limit = - 1 ) {
+		if ( ! empty( $email ) && is_email( $email ) ) {
+			$args   = array(
+				'billing_email' => $email,
+				'orderby'       => 'ID',
+				'order'         => 'DESC',
+				'limit'         => $limit
+			);
+			$orders = self::getOrdersList( $args );
+
+			return apply_filters( 'rnoc_get_customer_orders_by_email', $orders );
+		} else {
+			return array();
+		}
+	}
+
+
+	/**
+	 * Orders list.
+	 *
+	 * @param array $args arguments
+	 *
+	 * @return array|\WC_Order[]
+	 */
+	public static function getOrdersList( $args ) {
+		return function_exists( 'wc_get_orders' ) ? Wc_get_orders( $args ) : [];
+	}
 }

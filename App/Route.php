@@ -74,10 +74,11 @@ class Route {
 		add_action( 'wp_logout', [ cart::class, 'userLoggedOut' ] );
 
 		add_action( 'wp_footer', [ Order::class, 'setRetainfulOrderData' ] );
-		add_action( 'woocommerce_thankyou', array( Order::class, 'payPageOrderCompletion' ) );
+		//add_action( 'woocommerce_thankyou', array( Order::class, 'payPageOrderCompletion' ) );
 		add_action( 'woocommerce_payment_complete', [ Order::class, 'paymentCompleted' ] );
-		add_action( 'woocommerce_checkout_update_order_meta', [ Order::class, 'checkoutOrderProcessed' ] );
-		add_action( 'woocommerce_order_status_changed', [ Order::class, 'orderStatusChanged' ], 15, 3 );
+		add_action( 'woocommerce_checkout_update_order_meta', [ Order::class, 'checkoutOrderSync' ] );
+		add_action( 'woocommerce_order_status_changed', [ Order::class, 'orderUpdated' ], 11, 1 );
+		//add_action( 'woocommerce_order_status_changed', [ Order::class, 'orderStatusChanged' ], 15, 3 );
 
 
 	}

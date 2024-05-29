@@ -474,7 +474,8 @@ class RestApi {
 
 	}
 
-	public static function getCustomerDetails( $order = null ) {
+	public static function getCustomerDetails( $order = null, $type = 'cart' ) {
+		$customer_details   = array();
 		$user_id            = WC::getCurrentUserId();
 		$billing_email      = WC::getCustomerEmail();
 		$billing_phone      = ! empty( $billing_details['billing_phone'] ) ? $billing_details['billing_phone'] : null;
@@ -491,8 +492,22 @@ class RestApi {
 			$billing_last_name  = empty( $user_data->billing_last_name ) ? $billing_last_name : $user_data->billing_last_name;
 			$billing_first_name = empty( $user_data->billing_first_name ) ? $billing_first_name : $user_data->billing_first_name;
 		}
-
-		return array(
+		if ( ! empty( $order ) && is_object( $order ) ) {
+			$customer_orders = WC::getCustomerOrdersByEmail( $billing_email );
+			$total_spent     = 0;
+			if ( is_array( $customer_orders ) ) {
+				foreach ( $customer_orders as $customer_order ) {
+					if ( $customer_order instanceof \WC_Order ) {
+						$total_spent = $total_spent + WC::getOrderTotal( $customer_order );
+					}
+				}
+			}
+			$last_order_id = null;
+			if ( ! empty( $customer_orders ) ) {
+				$last_order_id = ! empty( $customer_orders[0] ) && is_object( $customer_orders[0] ) && method_exists( $customer_orders[0], 'get_id' ) ? $customer_orders[0]->get_id() : null;
+			}
+		}
+		$customer_details = array(
 			'id'                => $user_id,
 			'email'             => $billing_email,
 			'phone'             => $billing_phone,
@@ -502,17 +517,19 @@ class RestApi {
 			'currency'          => Settings::getBaseCurrency(),
 			'created_at'        => Input::formatToIso8601( $created_at ),
 			'updated_at'        => Input::formatToIso8601( $updated_at ),
-//			'total_spent'       => $total_spent,
-//			//self::$woocommerce->getCustomerTotalSpent($email),
-//			'orders_count'      => is_array( $customer_orders ) ? count( $customer_orders ) : 0,
-//			//self::$woocommerce->getCustomerTotalOrders($email),
-//			'last_order_id'     => $last_order_id,
-			//self::$woocommerce->getCustomerLastOrderId($email),
 			'verified_email'    => true,
 			'last_order_name'   => null,
 			'accepts_marketing' => true,
 			'user_roles'        => WC::getUserRoles( $billing_email )
 		);
+		if ( $type == 'order' ) {
+			$customer_details['total_spent']    = ! empty( $total_spent ) ? $total_spent : 0;
+			$customer_details['orders_count']   = ! empty( $customer_orders ) && is_array( $customer_orders ) ? count( $customer_orders ) : 0;
+			$customer_details['lasst_order_id'] = ! empty( $last_order_id ) ? $last_order_id : 0;
+		}
+
+
+		return $customer_details;
 	}
 
 	/**
@@ -631,15 +648,17 @@ class RestApi {
 	public static function getLineItemsDetails( $cart = null, $type = 'cart' ) {
 		$items = array();
 		$cart  = ( $type == 'order' ) && ! empty( $cart ) ? $cart : WC::getCart();
+
+
 		if ( ! empty( $cart ) ) {
 			foreach ( $cart as $item_key => $item_details ) {
+
 				//Deceleration
 				$tax_details   = array();
 				$item_quantity = ! empty( $item_details['quantity'] ) ? $item_details['quantity'] : null;
 				$variant_id    = ! empty( $item_details['variation_id'] ) ? $item_details['variation_id'] : 0;
 				$product_id    = ! empty( $item_details['product_id'] ) ? $item_details['product_id'] : 0;
 				$cat_ids       = ! empty( $product_id ) && $product_id > 0 ? WC::getProductCategoryIds( $product_id ) : array();
-				$item          = apply_filters( 'woocommerce_cart_item_product', $item_details['data'], $item_details, $item_key );
 				if ( empty( $item ) ) {
 					if ( ! empty( $variant_id ) ) {
 						$item = WC::getProduct( $variant_id );
@@ -647,6 +666,7 @@ class RestApi {
 						$item = WC::getProduct( $product_id );
 					}
 				}
+
 				$line_tax = ( ! empty( $item_details['line_tax'] ) ) ? $item_details['line_tax'] : 0;
 				if ( $line_tax > 0 ) {
 					$tax_details[] = array(
@@ -681,9 +701,11 @@ class RestApi {
 						'properties'    => array()
 					);
 					$items[]    = apply_filters( 'rnoc_get_cart_line_item_details', $item_array, $cart, $item_key, $item, $item_details );
+
 				}
 			}
 		}
+
 
 		return ( $type == 'cart' ) ? apply_filters( "rnoc_get_abandoned_cart_line_items", $items, $cart ) : $items;
 	}

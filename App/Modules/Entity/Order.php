@@ -4,6 +4,7 @@ namespace Rnoc\App\Modules\Entity;
 
 use Rnoc\Retainful\OrderCoupon;
 use Rnoc\App\Controller\Admin\Settings;
+use Rnoc\App\Controller\Admin\ScheduleAction;
 use Rnoc\App\Helpers\Input;
 use Rnoc\App\Helpers\WC;
 use Rnoc\App\Helpers\Currency;
@@ -111,7 +112,7 @@ class Order extends RestApi {
 	 *
 	 * @param $order_id
 	 */
-	public static function checkoutOrderProcessed( $order_id ) {
+	public static function checkoutOrderSync( $order_id ) {
 		Settings::logMessage( array( "order_id" => $order_id ), 'checkoutOrderProcessed' );
 		try {
 			$cart_token = self::retrieveCartToken();
@@ -223,7 +224,7 @@ class Order extends RestApi {
 			$cart_hash = $order->get_cart_hash();
 		}
 		$is_buyer_accepts_marketing = WC::getOrderMeta( $order, self::$accepts_marketing_key_for_db );
-		$customer_details           = self::getCustomerDetails( $order );
+		$customer_details           = self::getCustomerDetails( $order, 'order' );
 		$current_currency_code      = WC::getOrderCurrency( $order );
 		$default_currency_code      = Settings::getBaseCurrency();
 		$cart_created_at            = WC::getOrderMeta( $order, self::$cart_tracking_started_key_for_db );
@@ -553,17 +554,82 @@ class Order extends RestApi {
 	}
 
 	/**
-	 * Check the cart is in pending recovery
+	 * schedule the sync of the cart
 	 *
-	 * @param null $user_id
-	 *
-	 * @return array|mixed|string|null
+	 * @param $order_id
 	 */
-	function isPendingRecovery( $user_id = null ) {
-		if ( $user_id || ( $user_id = get_current_user_id() ) ) {
-			return (bool) get_user_meta( $user_id, self::$pending_recovery_key_for_db, true );
+	public static function scheduleCartSync( $order_id ) {
+		if ( ! apply_filters( 'rnoc_schedule_cart_sync', true ) ) {
+			return;
+		}
+		$hook     = 'retainful_sync_abandoned_cart_order';
+		$meta_key = '_rnoc_order_id';
+		if ( ! ScheduleAction::hasAnyActiveScheduleExists( $hook, $order_id, $meta_key ) ) {
+			ScheduleAction::scheduleEvents( $hook, current_time( 'timestamp' ) + 60, array( $meta_key => $order_id ) );
+		}
+	}
+
+	/**
+	 * Order had some changes
+	 *
+	 * @param $order_id
+	 *
+	 * @return void|null
+	 */
+	public static function orderUpdated( $order_id ) {
+		Settings::logMessage( array( "order_id" => $order_id ), 'OrderUpdated ' );
+		if ( self::needInstantOrderSync() ) {
+			self::syncOrder( $order_id );
 		} else {
-			return (bool) SettingsHelper::initStorage()->getValue( self::$pending_recovery_key );
+			self::scheduleCartSync( $order_id );
+		}
+	}
+
+	/**
+	 * Sync the order with API
+	 *
+	 * @param $order_id
+	 *
+	 * @return void|null
+	 */
+	public static function syncOrder( $order_id ) {
+		$order_sync_enabled = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'yes' );
+		if ( $order_sync_enabled !== 'yes' ) {
+			return null;
+		}
+		$order      = WC::getOrder( $order_id );
+		$cart_token = WC::getOrderMeta( $order, self::$cart_token_key_for_db );
+		$cart_token = apply_filters( 'rnoc_sync_order_change_order_token', $cart_token, $order_id, self::class );
+		if ( empty( $cart_token ) ) {
+			return;
+		}
+		$order_status       = WC::getStatus( $order );
+		$order_cancelled_at = WC::getOrderMeta( $order, self::$order_cancelled_date_key_for_db );
+		// handle order cancellation
+		if ( ! $order_cancelled_at && 'cancelled' === $order_status ) {
+			$order_cancelled_at = current_time( 'timestamp', true );
+			WC::setOrderMeta( $order_id, self::$order_cancelled_date_key_for_db, $order_cancelled_at );
+			self::unsetOrderTempData();
+		}
+		$order_data = self::getOrderData( $order );
+
+		if ( empty( $order_data ) ) {
+			return null;
+		}
+		$order_data['cancelled_at'] = ( ! empty( $order_cancelled_at ) ) ? self::formatToIso8601( $order_cancelled_at ) : null;
+		Settings::logMessage( array( "order_id" => $order_id ), 'syncOrder' );
+		$cart_hash = self::encryptData( $order_data );
+		$client_ip = WC::getOrderMeta( $order, self::$user_ip_key_for_db );
+
+		if ( ! empty( $cart_hash ) ) {
+			$token         = WC::getOrderMeta( $order, self::$cart_token_key_for_db );
+			$extra_headers = array(
+				"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
+				"X-Retainful-Version"  => RNOC_VERSION,
+				"X-Cart-Token"         => $token,
+				"Cart-Token"           => $token
+			);
+			self::syncCart( $cart_hash, $extra_headers );
 		}
 	}
 
