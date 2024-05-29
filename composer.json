@@ -10,13 +10,7 @@
   "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
-      "Rnoc\\": "",
-      "Rnoc\\Retainful\\": "src/",
-      "Rnoc\\Retainful\\Helpers\\": "src/helpers/",
-      "Rnoc\\Retainful\\Admin\\": "src/admin/",
-      "Rnoc\\Retainful\\Premium\\": "src/premium/",
-      "Rnoc\\Retainful\\Integrations\\": "src/integrations/",
-      "Rnoc\\Retainful\\Library\\": "src/library/"
+      "RNOC\\": ""
     }
   }
 }
