@@ -48,8 +48,7 @@ class Order extends RestApi {
 			$recovered_cart_token = SettingsHelper::initStorage()->getValue( 'rnoc_recovered_cart_token' );
 			$user_agent           = self::getUserAgent();
 			$user_accept_language = self::getUserAcceptLanguage();
-
-			$order_object = WC::getOrder( $order_id );
+			$order_object         = WC::getOrder( $order_id );
 			if ( is_object( $order_object ) && ! empty( $order_object ) ) {
 				$order_object->update_meta_data( self::$cart_token_key_for_db, $cart_token );
 				$order_object->update_meta_data( self::$cart_hash_key_for_db, $cart_hash );
@@ -64,6 +63,7 @@ class Order extends RestApi {
 				$order_object->update_meta_data( self::$pending_recovery_key_for_db, true );
 				$order_object->save();
 			}
+
 		}
 
 		return null;
@@ -74,7 +74,8 @@ class Order extends RestApi {
 	 *
 	 * @param $order_id
 	 */
-	public static function paymentCompleted( $order_id, $order ) {
+	public static function paymentCompleted( $order_id ) {
+		$order = WC::getOrder( $order_id );
 		Settings::logMessage( array( "order" => $order ), 'paymentCompleted' );
 		$cart_token = self::retrieveCartToken();
 		if ( ! empty( $cart_token ) ) {
@@ -110,16 +111,16 @@ class Order extends RestApi {
 	 *
 	 * @param $order_id
 	 */
-	function checkoutOrderProcessed( $order_id ) {
+	public static function checkoutOrderProcessed( $order_id ) {
 		Settings::logMessage( array( "order_id" => $order_id ), 'checkoutOrderProcessed' );
 		try {
-			$cart_token = $this->retrieveCartToken();
+			$cart_token = self::retrieveCartToken();
 			if ( ! empty( $cart_token ) ) {
-				$order = WC::getOrder( $order_id );
-				$this->purchaseComplete( $order_id );
-				$this->syncOrderToAPI( $order, $order_id );
+				self::purchaseComplete( $order_id );
+				self::syncOrderToAPI( $order_id );
 			}
 		} catch ( Exception $e ) {
+
 		}
 	}
 
@@ -148,13 +149,16 @@ class Order extends RestApi {
 	 * @param $order
 	 * @param $order_id
 	 */
-	public static function syncOrderToAPI( $order, $order_id ) {
-		$order_sync_enabled = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', true );
-		if ( $order_sync_enabled ) {
+	public static function syncOrderToAPI( $order_id ) {
+		$order_sync_enabled = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'yes' );
+
+		if ( $order_sync_enabled !== 'yes' ) {
 			return;
 		}
+
 		if ( self::needInstantOrderSync() ) {
-			$cart = self::getOrderData( $order );
+			$order = WC::getOrder( $order_id );
+			$cart  = self::getOrderData( $order );
 			if ( ! empty( $cart ) ) {
 				$cart_hash = self::encryptData( $cart );
 				//Reduce the loading speed
@@ -194,7 +198,7 @@ class Order extends RestApi {
 	/**
 	 * get order details for sync cart
 	 *
-	 * @param $order
+	 * @param \WC_Order $order
 	 *
 	 * @return array
 	 */
@@ -262,12 +266,12 @@ class Order extends RestApi {
 			'taxes_included'            => ( ! wc::isPriceExcludingTax() ),
 			'customer_locale'           => self::getOrderLanguage( $order ),
 			'total_discounts'           => self::formatDecimalPrice( wc::getOrderDiscount( $order, $excluding_tax ) ),
-			'shipping_address'          => self::getCustomerAddressDetails( $order ),
-			'billing_address'           => self::getCustomerAddressDetails( $order ),
+			'shipping_address'          => self::getCustomerAddressDetails( $order, 'shipping' ),
+			'billing_address'           => self::getCustomerAddressDetails( $order, 'billing' ),
 			'presentment_currency'      => $current_currency_code,
 			'abandoned_checkout_url'    => self::getRecoveryLink( $cart_token ),
 			'total_line_items_price'    => self::formatDecimalPrice( self::getOrderItemsTotal( $order ) ),
-			'buyer_accepts_marketing'   => ( $is_buyer_accepts_marketing == 1 ),
+			'buyer_accepts_marketing'   => true,
 			'cancelled_at'              => wc::getOrderMeta( $order, self::$order_cancelled_date_key_for_db ),
 			'woocommerce_totals'        => self::getOrderTotals( $order, $excluding_tax ),
 			'recovered_by_retainful'    => ( wc::getOrderMeta( $order, '_rnoc_recovered_by' ) ) ? true : false,
@@ -278,13 +282,10 @@ class Order extends RestApi {
 				'value' => $order->get_payment_method(),
 				'name'  => $order->get_payment_method_title(),
 			)
-
 		);
-		if ( ! empty( $cart_token ) ) {
-			$referrer_automation_id = self::$woocommerce->getSession( $cart_token . '_referrer_automation_id' );
-			if ( ! empty( $referrer_automation_id ) ) {
-				$order_data['referrer_automation_id'] = $referrer_automation_id;
-			}
+		$referrer_automation_id       = WC::getSession( $cart_token . '_referrer_automation_id' );
+		if ( ! empty( $referrer_automation_id ) ) {
+			$order_data['referrer_automation_id'] = $referrer_automation_id;
 		}
 
 		return apply_filters( 'rnoc_api_get_order_data', $order_data, $order );
@@ -424,40 +425,146 @@ class Order extends RestApi {
 	 *
 	 * @return array
 	 */
-	function getCustomerAddressDetails( $order, $type = 'billing' ) {
-		$first_name    = $type == 'shipping' ? WC::getShippingFirstName( $order ) : WC::getBillingFirstName( $order );
-		$last_name     = $type == 'shipping' ? WC::getShippingLastName( $order ) : WC::getBillingLastName( $order );
-		$country_code  = $type == 'shipping' ? WC::getShippingCountry( $order ) : WC::getBillingCountry( $order );
-		$longitude     = '';
-		$latitude      = '';
-		$address2      = $type == 'shipping' ? WC::getShippingAddressTwo( $order ) : WC::getBillingAddressTwo( $order );
-		$address1      = $type == 'shipping' ? WC::getShippingAddressOne( $order ) : WC::getBillingAddressOne( $order );
-		$country       = $type == 'shipping' ? WC::getShippingCountry( $order ) : WC::getBillingCountry( $order );
-		$company       = $type == 'shipping' ? '' : WC::getBillingCompany( $order );
-		$phone         = $type == 'shipping' ? '' : WC::getBillingPhone( $order );
-		$name          = $type == 'shipping' ? WC::getShippingFirstName( $order ) . ' ' . wc::getShippingLastName( $order ) : WC::getBillingFirstName( $order ) . ' ' . wc::getBillingLastName( $order );
-		$city          = $type == 'shipping' ? WC::getShippingCity( $order ) : WC::getBillingcity( $order );
-		$zip           = $type == 'shipping' ? WC::getShippingPostCode( $order ) : WC::getBillingPostCode( $order );
-		$province_code = $type == 'shipping' ? WC::getShippingState( $order ) : WC::getBillingState( $order );
-		$province      = $type == 'shipping' ? WC::getShippingState( $order ) : WC::getBillingState( $order );
-
+	public static function getCustomerAddressDetails( $order, $type = 'billing' ) {
+		$first_name = $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_first_name' ) : WC::getOrderAddressInfo( $order, 'get_billing_first_name' );
+		$last_name  = $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_last_name' ) : WC::getOrderAddressInfo( $order, 'get_billing_last_name' );
 
 		return array(
-			'zip'           => self::$woocommerce->getShippingPostCode( $order ),
-			'city'          => self::$woocommerce->getShippingCity( $order ),
-			'name'          => self::$woocommerce->getShippingFirstName( $order ) . ' ' . self::$woocommerce->getShippingLastName( $order ),
-			'phone'         => null,
-			'company'       => null,
-			'country'       => self::$woocommerce->getShippingCountry( $order ),
-			'address1'      => self::$woocommerce->getShippingAddressOne( $order ),
-			'address2'      => self::$woocommerce->getShippingAddressTwo( $order ),
+			'zip'           => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_postcode' ) : WC::getOrderAddressInfo( $order, 'get_billing_postcode' ),
+			'city'          => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_city' ) : WC::getOrderAddressInfo( $order, 'get_billing_city' ),
+			'name'          => $first_name . ' ' . $last_name,
+			'phone'         => $type == 'shipping' ? '' : WC::getOrderAddressInfo( $order, 'get_billing_phone' ),
+			'company'       => $type == 'shipping' ? '' : WC::getOrderAddressInfo( $order, 'get_billing_phone' ),
+			'country'       => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_country' ) : WC::getOrderAddressInfo( $order, 'get_billing_country' ),
+			'address1'      => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_address_1' ) : WC::getOrderAddressInfo( $order, 'get_billing_address_1' ),
+			'address2'      => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_address_2' ) : WC::getOrderAddressInfo( $order, 'get_billing_address_2' ),
 			'latitude'      => '',
-			'province'      => self::$woocommerce->getShippingState( $order ),
-			'last_name'     => self::$woocommerce->getShippingLastName( $order ),
+			'province'      => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_state' ) : WC::getOrderAddressInfo( $order, 'get_billing_state' ),
+			'last_name'     => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_last_name' ) : WC::getOrderAddressInfo( $order, 'get_billing_last_name' ),
 			'longitude'     => '',
-			'first_name'    => self::$woocommerce->getShippingFirstName( $order ),
-			'country_code'  => self::$woocommerce->getShippingCountry( $order ),
-			'province_code' => self::$woocommerce->getShippingState( $order ),
+			'first_name'    => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_first_name' ) : WC::getOrderAddressInfo( $order, 'get_billing_first_name' ),
+			'country_code'  => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_country' ) : WC::getOrderAddressInfo( $order, 'get_billing_country' ),
+			'province_code' => $type == 'shipping' ? WC::getOrderAddressInfo( $order, 'get_shipping_state' ) : WC::getOrderAddressInfo( $order, 'get_billing_state' ),
 		);
 	}
+
+	/**
+	 * get the subtotal from order
+	 *
+	 * @param $order
+	 *
+	 * @return int|String|null
+	 */
+	public static function getOrderItemsTotal( $order ) {
+		$subtotal = 0;
+		$cart     = WC::getOrderItems( $order );
+		if ( ! empty( $cart ) ) {
+			foreach ( $cart as $item ) {
+				$subtotal += WC::getItemSubTotal( $item );
+				if ( ! WC::isPriceExcludingTax() ) {
+					$subtotal += WC::getItemTaxSubTotal( $item );
+				}
+			}
+		}
+
+		return $subtotal;
+	}
+
+
+	/**
+	 * get cart totals
+	 *
+	 * @param $order
+	 * @param $excluding_tax
+	 *
+	 * @return array
+	 */
+	public static function getOrderTotals( $order, $excluding_tax ) {
+		return array(
+			'total_price'     => self::formatDecimalPrice( WC::getOrderTotal( $order ) ),
+			'subtotal_price'  => self::formatDecimalPrice( self::getOrderItemsTotal( $order ) ),
+			'total_tax'       => self::formatDecimalPrice( WC::getOrderTotalTax( $order ) ),
+			'total_discounts' => self::formatDecimalPrice( WC::getOrderDiscount( $order, $excluding_tax ) ),
+			'total_shipping'  => self::formatDecimalPrice( self::getCustomerAddressDetails( $order, 'shipping' ) ),
+			'fee_items'       => self::getOrderFeeDetails( $order, $excluding_tax ),
+		);
+	}
+
+	/**
+	 * get cart fee details
+	 *
+	 * @param $order
+	 * @param $excluding_tax
+	 *
+	 * @return array
+	 */
+	public static function getOrderFeeDetails( $order, $excluding_tax ) {
+		$fee_items = array();
+		if ( $fees = WC::getOrderFees( $order ) ) {
+			foreach ( $fees as $id => $fee ) {
+				$fee_items[] = array(
+					'title'  => html_entity_decode( $fee['name'] ? $fee['name'] : __( 'Fee', RNOC_TEXT_DOMAIN ) ),
+					'key'    => $id,
+					'amount' => self::formatDecimalPrice( ( $excluding_tax ) ? $fee['line_total'] : $fee['line_total'] + $fee['line_tax'] )
+				);
+			}
+		}
+
+		return $fee_items;
+	}
+
+	/**
+	 * HAndle order completion in order page
+	 *
+	 * @param $order_id
+	 */
+	public static function payPageOrderCompletion( $order_id ) {
+		self::unsetOrderTempData();
+	}
+
+	/**
+	 * Clear any persistent cart session data for logged in customers
+	 *
+	 * @param int $order_id order ID
+	 * @param string $old_status
+	 * @param string $new_status
+	 */
+	public function orderStatusChanged( $order_id, $old_status, $new_status ) {
+		global $wp;
+		Settings::logMessage( array( "order_id" => $order_id ), 'orderStatusChanged' );
+		try {
+			// PayPal IPN request
+			if ( isset( $wp->query_vars['wc-api'] ) && ! empty( $wp->query_vars['wc-api'] ) && ( 'WC_Gateway_Paypal' === $wp->query_vars['wc-api'] ) ) {
+				$order = WC::getOrder( $order_id );
+				// PayPal order is completed or authorized: clear any user session
+				// data so that we don't have to rely on the thank-you page rendering
+				if ( ( WC::isOrderPaid( $order ) || $new_status == 'on-hold' ) && ( $user_id = WC::getOrderUserId( $order ) ) ) {
+					delete_user_meta( $user_id, '_woocommerce_persistent_cart_' . get_current_blog_id() );
+					if ( $this->isPendingRecovery( $user_id ) ) {
+						WC::setOrderMeta( $order_id, self::$pending_recovery_key_for_db, true );
+					}
+					if ( $this->retrieveCartToken( $user_id ) ) {
+						$this->removeTempDataForUser( $user_id );
+					}
+				}
+			}
+		} catch ( Exception $e ) {
+		}
+	}
+
+	/**
+	 * Check the cart is in pending recovery
+	 *
+	 * @param null $user_id
+	 *
+	 * @return array|mixed|string|null
+	 */
+	function isPendingRecovery( $user_id = null ) {
+		if ( $user_id || ( $user_id = get_current_user_id() ) ) {
+			return (bool) get_user_meta( $user_id, self::$pending_recovery_key_for_db, true );
+		} else {
+			return (bool) SettingsHelper::initStorage()->getValue( self::$pending_recovery_key );
+		}
+	}
+
 }

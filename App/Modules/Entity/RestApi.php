@@ -474,7 +474,7 @@ class RestApi {
 
 	}
 
-	public static function getCustomerDetails() {
+	public static function getCustomerDetails( $order = null ) {
 		$user_id            = WC::getCurrentUserId();
 		$billing_email      = WC::getCustomerEmail();
 		$billing_phone      = ! empty( $billing_details['billing_phone'] ) ? $billing_details['billing_phone'] : null;
@@ -502,6 +502,12 @@ class RestApi {
 			'currency'          => Settings::getBaseCurrency(),
 			'created_at'        => Input::formatToIso8601( $created_at ),
 			'updated_at'        => Input::formatToIso8601( $updated_at ),
+//			'total_spent'       => $total_spent,
+//			//self::$woocommerce->getCustomerTotalSpent($email),
+//			'orders_count'      => is_array( $customer_orders ) ? count( $customer_orders ) : 0,
+//			//self::$woocommerce->getCustomerTotalOrders($email),
+//			'last_order_id'     => $last_order_id,
+			//self::$woocommerce->getCustomerLastOrderId($email),
 			'verified_email'    => true,
 			'last_order_name'   => null,
 			'accepts_marketing' => true,

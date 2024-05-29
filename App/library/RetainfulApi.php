@@ -118,7 +118,7 @@ class RetainfulApi {
 						$result = wp_remote_post( $url, $args );
 					} else {
 						$result = \Requests::post( $url, $headers, $body );
-
+					
 					}
 					break;
 				default:

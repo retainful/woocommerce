@@ -959,4 +959,108 @@ class WC {
 	public static function getOrderDiscount( $order, $excluding = true ) {
 		return self::isMethodExists( $order, 'get_total_discount' ) ? $order->get_total_discount( $excluding ) : 0;
 	}
+
+
+	public static function getOrderAddressInfo( $order, $method ) {
+		if ( empty( $method ) ) {
+			return null;
+		}
+
+		return self::isMethodExists( $order, $method ) ? $order->$method() : null;
+	}
+
+	/**
+	 * Get Item subtotal
+	 *
+	 * @param $item
+	 *
+	 * @return String|null
+	 */
+	public static function getItemSubTotal( $item ) {
+		return self::isMethodExists( $item, 'get_subtotal' ) ? $item->get_subtotal : 0;
+	}
+
+
+	/**
+	 * Get Item subtotal tax
+	 *
+	 * @param $item
+	 *
+	 * @return String|null
+	 */
+	public static function getItemTaxSubTotal( $item ) {
+		return self::isMethodExists( $item, 'get_subtotal_tax' ) ? $item->get_subtotal_tax() : 0;
+	}
+
+	/**
+	 * get order fees
+	 *
+	 * @param $order
+	 *
+	 * @return int|\WC_Order_Item[]|\WC_Order_item_Fee[]
+	 */
+	public static function getOrderFees( $order ) {
+		return self::isMethodExists( $order, 'get_fees' ) ? $order->get_fees() : 0;
+	}
+
+
+	/**
+	 * Get order meta from order object
+	 *
+	 * @param $order_id
+	 * @param $meta_key
+	 * @param $meta_value
+	 *
+	 * @return void
+	 */
+	public static function setOrderMeta( $order_id, $meta_key, $meta_value ) {
+		if ( ! empty( $order_id ) && ! empty( $meta_key ) ) {
+			$order = self::getOrder( intval( $order_id ) );
+			$order->update_meta_data( $meta_key, $meta_value );
+			$order->save_meta_data();
+		}
+	}
+
+
+	/**
+	 * is order paid
+	 *
+	 * @param $order
+	 *
+	 * @return bool
+	 */
+	public static function isOrderPaid( $order ) {
+		return ( self::isMethodExists( $order, 'is_paid' ) ) ? $order->is_paid() : false;
+	}
+
+
+	/**
+	 * get Order User Id
+	 *
+	 * @param $order
+	 *
+	 * @return null
+	 */
+	public static function getOrderUserId( $order ) {
+		if ( self::isMethodExists( $order, 'get_user_id' ) ) {
+			return $order->get_user_id();
+		} elseif ( is_object( $order ) && isset( $order->user_id ) ) {
+			return $order->user_id;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get order shipping total
+	 *
+	 * @param $order
+	 * @param $context
+	 *
+	 * @return String|null
+	 */
+	public static function getOrderShippingTotal( $order, $context = "edit" ) {
+		return self::isMethodExists( $order, 'get_shipping_total' ) ? $order->get_shipping_total( $context ) : 0;
+	}
+
 }
