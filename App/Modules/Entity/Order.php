@@ -38,7 +38,7 @@ class Order extends RestApi {
 		$cart_token = self::getRetrieveCartToken();
 		Settings::logMessage( array( "cart_token" => $cart_token, "order_id" => $order_id ), 'purchaseComplete' );
 		if ( ! empty( $cart_token ) ) {
-			$cart_created_at            = self::userCartCreatedAt();
+			$cart_created_at            = self::getCartCreatedAt();
 			$user_ip                    = self::retrieveUserIp();
 			$is_buyer_accepts_marketing = ( self::isBuyerAcceptsMarketing() ) ? 1 : 0;
 			//$cart_hash = self::$storage->getValue('rnoc_current_cart_hash');

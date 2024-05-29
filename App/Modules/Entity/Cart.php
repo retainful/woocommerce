@@ -85,7 +85,7 @@ class Cart extends RestApi {
 		$cart_token                   = self::getCartToken();
 		$current_currency_code        = Currency::getCurrentCurrencyCode();
 		$default_currency_code        = Settings::getBaseCurrency();
-		$cart_created_at              = self::userCartCreatedAt();
+		$cart_created_at              = self::getCartCreatedAt();
 		$cart_total                   = self::formatDecimalPrice( WC::getCartTotalPrice() );
 		$cart_hash                    = self::generateCartHash();
 		$consider_on_hold_order_as_ac = SettingsHelper::get( 'retainful_settings', RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status', 0 );
@@ -211,7 +211,7 @@ class Cart extends RestApi {
 	 */
 	public static function needToTrackCart() {
 		$cart_hash       = self::generateCartHash();
-		$cart_created_at = self::userCartCreatedAt();
+		$cart_created_at = self::getCartCreatedAt();
 		if ( empty( $cart_hash ) && empty( $cart_created_at ) ) {
 			return false;
 		} elseif ( empty( $cart_hash ) && ! empty( $cart_created_at ) ) {
@@ -532,9 +532,8 @@ class Cart extends RestApi {
 	 * render the tracking div
 	 */
 	public static function renderAbandonedCartTrackingDiv() {
-
-		$data            = array();
-		$cart_created_at = self::userCartCreatedAt();
+		$data            = [];
+		$cart_created_at = self::getCartCreatedAt();
 		if ( self::isValidCartToTrack() && ! empty( $cart_created_at ) ) {
 			$data = self::getTrackingCartData();
 		}
@@ -587,10 +586,10 @@ class Cart extends RestApi {
 	public static function addToCartFragments( $fragments ) {
 		$selector        = 'div#' . self::getTrackingElementId();
 		$data            = array();
-		$cart_created_at = self::userCartCreatedAt();
+		$cart_created_at = self::getCartCreatedAt();
 		if ( empty( $cart_created_at ) ) {
 			self::needToTrackCart();
-			$cart_created_at = self::userCartCreatedAt();
+			$cart_created_at = self::getCartCreatedAt();
 		}
 		if ( self::isValidCartToTrack() ) {
 			$force_refresh = SettingsHelper::initStorage()->getValue( 'rnoc_force_refresh_cart' );

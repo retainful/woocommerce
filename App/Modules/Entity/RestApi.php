@@ -383,7 +383,7 @@ class RestApi {
 	 *
 	 * @return array|mixed|string|null
 	 */
-	public static function userCartCreatedAt( $user_id = null ) {
+	public static function getCartCreatedAt( $user_id = null ) {
 		$user_id = WC::getCurrentUserId();
 
 		return empty( $user_id ) ? SettingsHelper::initStorage()->getValue( self::$cart_tracking_started_key ) : WC::getUserMeta( $user_id, self::$cart_tracking_started_key_for_db, true );
