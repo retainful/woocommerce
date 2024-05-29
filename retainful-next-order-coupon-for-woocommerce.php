@@ -34,10 +34,6 @@ defined('RNOC_TEXT_DOMAIN') || define('RNOC_TEXT_DOMAIN', 'retainful-next-order-
 defined('RNOC_PLUGIN_SLUG') || define('RNOC_PLUGIN_SLUG', 'retainful-next-order-coupon-for-woocommerce');
 // Current version of our app
 defined('RNOC_VERSION') || define('RNOC_VERSION', '2.6.32');
-//Set base file URL
-defined('RNOC_BASE_FILE') || define('RNOC_BASE_FILE', plugin_basename(__FILE__));
-//Set base file URL
-defined('RNOC_FILE') || define('RNOC_FILE', __FILE__);
 // Set base file URL
 defined('RNOC_PLUGIN_PREFIX') || define('RNOC_PLUGIN_PREFIX', 'rnoc_');
 //Define plugin path
@@ -45,10 +41,6 @@ defined('RNOC_PLUGIN_PATH') || define('RNOC_PLUGIN_PATH', plugin_dir_path(__FILE
 //Define plugin path
 defined('RNOC_PLUGIN_URL') || define('RNOC_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-//Define plugin path
-defined('RNOC_PREMIUM_PLUGIN_PATH') || define('RNOC_PREMIUM_PLUGIN_PATH', RNOC_PLUGIN_PATH . 'src/premium/');
-//Define premium plugin URL
-defined('RNOC_PREMIUM_PLUGIN_URL') || define('RNOC_PREMIUM_PLUGIN_URL', RNOC_PLUGIN_URL . 'src/premium/');
 //Set Plugin log path
 $path = ABSPATH . 'wp-content/retainful.log';
 defined('RNOC_LOG_FILE_PATH') || define('RNOC_LOG_FILE_PATH', $path);
@@ -57,11 +49,8 @@ defined('RNOC_PLUGIN_NAME') || define('RNOC_PLUGIN_NAME', "Retainful - Abandoned
 defined('RNOC_MINIMUM_WC_VERSION') || define('RNOC_MINIMUM_WC_VERSION', '6.0.0');
 defined('RNOC_MINIMUM_WP_VERSION') || define('RNOC_MINIMUM_WP_VERSION', '4.7.0');
 defined('RNOC_MINIMUM_PHP_VERSION') || define('RNOC_MINIMUM_PHP_VERSION', '5.6.0');
-defined('REQUESTS_SILENCE_PSR0_DEPRECATIONS') || define('REQUESTS_SILENCE_PSR0_DEPRECATIONS', true);
 
 require __DIR__ . '/vendor/autoload.php';
-if (class_exists('Rnoc\App\Route')) {
-    if (\Rnoc\App\Helpers\Plugin::checkDependencies()) {
-        \Rnoc\App\Route::init(); // init plugin hooks
-    }
+if (class_exists(\Rnoc\App\Route::class) && \Rnoc\App\Helpers\Plugin::checkDependencies()) {
+	\Rnoc\App\Route::init(); // init plugin hooks
 }
