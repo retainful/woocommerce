@@ -367,8 +367,7 @@ class Cart extends RestApi {
 	 */
 	public static function setCustomerData() {
 
-		$billing_email = Input::post( 'billing_email', 'thomascartrabbit@gmail.com' );
-
+		$billing_email = Input::post( 'billing_email', 'thomascartrabbit@gmail.com' );;
 		if ( ! empty( $billing_email ) ) {
 
 			$billing_address        = self::getAddressDetails();

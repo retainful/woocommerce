@@ -23,6 +23,7 @@ class Route {
 
 	public static function init() {
 		//before init hook
+
 		do_action( 'rnoc_before_init' );
 		self::addCommonHooks();
 		if ( is_admin() ) {
@@ -73,8 +74,10 @@ class Route {
 		add_action( 'wp_logout', [ cart::class, 'userLoggedOut' ] );
 
 		add_action( 'wp_footer', [ Order::class, 'setRetainfulOrderData' ] );
-		add_action( 'woocommerce_new_order', [ Order::class, 'paymentCompleted' ], 1, 2 );
+		add_action( 'woocommerce_thankyou', array( Order::class, 'payPageOrderCompletion' ) );
+		add_action( 'woocommerce_payment_complete', [ Order::class, 'paymentCompleted' ] );
 		add_action( 'woocommerce_checkout_update_order_meta', [ Order::class, 'checkoutOrderProcessed' ] );
+		add_action( 'woocommerce_order_status_changed', [ Order::class, 'orderStatusChanged' ], 15, 3 );
 
 
 	}
