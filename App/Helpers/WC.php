@@ -158,23 +158,5 @@ class WC {
 
 		return apply_filters( 'rnoc_get_customer_orders_by_email', wc_get_orders( $args ) );
 	}
-
-
-	/**
-	 * check for method exists
-	 *
-	 * @param $obj
-	 * @param $method
-	 *
-	 * @return bool
-	 */
-	public static function isMethodExists( $obj, $method ) {
-		if ( is_object( $obj ) && method_exists( $obj, $method ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-
+	
 }
