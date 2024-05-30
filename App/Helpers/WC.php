@@ -158,4 +158,5 @@ class WC {
 
 		return apply_filters( 'rnoc_get_customer_orders_by_email', wc_get_orders( $args ) );
 	}
+	
 }

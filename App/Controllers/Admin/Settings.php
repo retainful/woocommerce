@@ -48,7 +48,7 @@ class Settings {
 		}
 		$sub_content        = Util::renderTemplate( $file_path, [
 			'settings'    => \RNOC\App\Helpers\Settings::getConnectionSettings(),
-			'app_url'     => '',
+			'app_url'     => "https://app.retainful.com",
 			'is_pro_plan' => \RNOC\App\Helpers\Settings::isProPlan()
 		], false );
 		$main_file_path     = RNOC_PLUGIN_PATH . 'App/Views/Admin/tabs.php';
@@ -85,6 +85,35 @@ class Settings {
 		Util::renderTemplate( $main_file_path, [ 'page' => 'retainful_settings', 'sub_content' => $sub_content ] );
 	}
 
+
+	/**
+	 * add admin script function
+	 *
+	 * @return void
+	 */
+	public static function addAdminScript() {
+		//$page = Input::getData( 'page', '' );
+		$page = 'retainful_license';
+		if ( ! in_array( $page, array( 'retainful_setting', 'retainful_license' ) ) ) {
+			return;
+		}
+		$asset_path = RNOC_PLUGIN_URL . 'assets/admin';
+		$localize   = array(
+			'rnoc_save_settings'      => wp_create_nonce( 'rnoc_save_settings' ),
+			'rnoc_disconnect_license' => wp_create_nonce( 'rnoc_disconnect_license' ),
+			'validate_app_key'        => wp_create_nonce( 'validate_app_key' ),
+			'ajax_url'                => admin_url( 'admin-ajax.php' ),
+			'admin_url'               => admin_url(),
+			'home_url'                => get_home_url(),
+
+		);
+		wp_enqueue_style( 'retainful-admin-css', $asset_path . '/css/main.css', array(), RNOC_VERSION );
+		wp_enqueue_script( 'retainful-abandoncart', $asset_path . '/js/rnoc_admin.js', array(), RNOC_VERSION );
+		wp_localize_script( 'retainful-abandoncart', 'rnoc_localize_data', $localize );
+		/*End Admin React */
+
+	}
+
 	/**
 	 * Schedule plan checker.
 	 *
@@ -107,4 +136,5 @@ class Settings {
 	public static function checkUserPlan() {
 		// do check here
 	}
+
 }

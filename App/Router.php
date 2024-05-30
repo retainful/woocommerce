@@ -48,6 +48,7 @@ class Router {
 	public static function addAdminHooks() {
 		add_action( 'admin_menu', [ Settings::class, 'addMenu' ] );
 		add_action( 'wp_after_admin_bar_render', [ Settings::class, 'schedulePlanChecker' ] );
+		add_action( 'admin_enqueue_scripts', [ Settings::class, 'addAdminScript' ] );
 	}
 
 	/**
