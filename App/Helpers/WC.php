@@ -2,6 +2,8 @@
 
 namespace RNOC\App\Helpers;
 
+use WC_Order;
+
 defined( 'ABSPATH' ) || exit;
 
 class WC {
@@ -31,6 +33,21 @@ class WC {
 		if ( ! empty( $value ) && function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, 'set_billing_email' ) ) {
 			WC()->customer->set_billing_email( $value );
 		}
+	}
+
+	/**
+	 * Get order billing email.
+	 *
+	 * @param WC_Order $order Order object.
+	 *
+	 * @return string
+	 */
+	public static function getOrderBillingEmail( $order ) {
+		if ( ! Util::isMethodExists( $order, 'get_billing_email' ) ) {
+			return '';
+		}
+
+		return $order->get_billing_email();
 	}
 
 	/**
@@ -64,5 +81,14 @@ class WC {
 		}
 
 		return $current_lang;
+	}
+
+	public static function removeSession( $key ) {
+		if ( empty( $key ) || ! function_exists( 'WC' ) || ! Util::isMethodExists( WC()->session, '__unset' ) ) {
+			return false;
+		}
+		WC()->session->__unset( $key );
+
+		return true;
 	}
 }

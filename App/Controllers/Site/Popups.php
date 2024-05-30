@@ -6,19 +6,11 @@ use RNOC\App\Helpers\Settings;
 use RNOC\App\Helpers\Util;
 use RNOC\App\Helpers\WC;
 use RNOC\App\Helpers\WP;
+use RNOC\App\Models\WC\Order;
 
 defined( 'ABSPATH' ) || exit;
 
 class Popups {
-	/**
-	 * Add referral popups.
-	 *
-	 * @return void
-	 */
-	public static function printReferralPopup() {
-
-	}
-
 	/**
 	 * Change cookie path.
 	 *
@@ -133,6 +125,62 @@ class Popups {
 
 		$file_path     = RNOC_PLUGIN_PATH . 'App/Views/Site/popup.php';
 		$override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/site/popup.php' );
+		if ( file_exists( $override_path ) ) {
+			$file_path = $override_path;
+		}
+		Util::renderTemplate( $file_path, [ 'params' => $params ] );
+	}
+
+	/**
+	 * Add referral popups.
+	 *
+	 * @return void
+	 */
+	public static function printReferralPopup() {
+		if ( ! WP::isCustomerPage() ) {
+			return;
+		}
+
+		$api_key           = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
+		$secret_key        = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
+		$user              = WP::getLoginUser();
+		$user_data         = [
+			'api_key'           => $api_key,
+			'accepts_marketing' => '0',
+			'email'             => is_object( $user ) && $user->user_email ? $user->user_email : '',
+			'first_name'        => is_object( $user ) && $user->first_name ? $user->first_name : '',
+			'id'                => is_object( $user ) && $user->ID ? $user->ID : '',
+			'last_name'         => is_object( $user ) && $user->last_name ? $user->last_name : '',
+			'tags'              => '',
+		];
+		$data              = implode( '', $user_data );
+		$account_url       = esc_url( get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
+		$customer_email    = $user_data['email'];
+		$is_thank_you_page = ( ! empty( is_wc_endpoint_url( 'order-received' ) ) );
+		if ( $is_thank_you_page ) {
+			WC::removeSession( 'rnoc_customer_total_orders' );
+			WC::removeSession( 'rnoc_customer_total_spent' );
+		}
+		$order_id = isset( $wp->query_vars['order-received'] ) ? $wp->query_vars['order-received'] : 0;
+		if ( $is_thank_you_page && empty( $customer_email ) && ! empty( $order_id ) ) {
+			$order          = Order::get( $order_id );
+			$customer_email = WC::getOrderBillingEmail( $order );
+		}
+		$default = [
+			'digest'       => hash_hmac( 'sha256', $data, $secret_key ),
+			'referral_url' => apply_filters( 'referral_engine_url', 'https://js.retainful.com/woocommerce/v1/widget.js' ),
+			'window'       => [
+				'is_thank_you_page' => $is_thank_you_page,
+				'customer_id'       => $user_data['id'],
+				'customer_email'    => $customer_email,
+				'login_url'         => apply_filters( 'rnoc_referral_login_url', $account_url ),
+				'register_url'      => apply_filters( 'rnoc_referral_register_url', $account_url ),
+			]
+		];
+		$params  = wp_parse_args( $user_data, $default );
+
+		$file_path     = RNOC_PLUGIN_PATH . 'App/Views/Site/referral.php';
+		$override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/site/referral.php' );
 		if ( file_exists( $override_path ) ) {
 			$file_path = $override_path;
 		}
