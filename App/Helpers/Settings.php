@@ -91,4 +91,33 @@ class Settings {
 
 		return ! empty( $path ) ? $path : '/';
 	}
+
+	/**
+	 * Get identity value.
+	 *
+	 * @param string $key Identity name.
+	 * @param mixed $default_value Identity value.
+	 *
+	 * @return mixed|string
+	 */
+	public static function getIdentity( $key, $default_value = '' ) {
+		return isset( $_COOKIE[ $key ] ) ? $_COOKIE[ $key ] : $default_value;
+	}
+
+	/**
+	 * Set identity value.
+	 *
+	 * @param string $key Identity key.
+	 * @param array $value Identity value.
+	 *
+	 * @return void
+	 */
+	public static function setIdentity( $key, $value ) {
+		if ( ! WP::isCustomerPage() || empty( $key ) || empty( $value ) || ! is_array( $value ) ) {
+			return;
+		}
+		if ( function_exists( 'wc_setcookie' ) ) {
+			wc_setcookie( $key, base64_encode( json_encode( $value ) ), strtotime( '+30 days' ) );
+		}
+	}
 }
