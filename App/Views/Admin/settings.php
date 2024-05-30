@@ -512,16 +512,19 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
             <th>
             </th>
             <td>
-                <button type="submit" data-action="rnoc_save_settings"
-                        data-security="<?php echo wp_create_nonce( 'rnoc_save_settings' ) ?>"
-                        class="button button-primary"><?php esc_html_e( 'save', 'retainful-next-order-coupon-for-woocommerce' ); ?></button>
+                <button type="button" id="save-setting"
+                        onclick="rnoc_jquery('body').trigger('saveSettings',['save-setting'])"
+                        class="button button-primary ">
+					<?php esc_html_e( 'save', 'retainful-next-order-coupon-for-woocommerce' ); ?>
+                </button>
             </td>
         </tr>
         </tbody>
     </table>
-    <button type="submit" data-action="rnoc_save_settings"
-            data-security="<?php echo wp_create_nonce( 'rnoc_save_settings' ) ?>"
-            class="button button-primary button-right-fixed"><i
-                class="dashicons dashicons-yes"></i>&nbsp;&nbsp;<span><?php esc_html_e( 'save', 'retainful-next-order-coupon-for-woocommerce' ); ?></span>
+    <button type="button" id='rnoc-save-settings'
+            onclick="rnoc_jquery('body').trigger('saveSettings',['rnoc-save-settings'])"
+            class="button button-primary button-right-fixed  rnoc-save-button">
+        <i class="dashicons dashicons-yes"></i>
+        <span><?php esc_html_e( 'save', 'retainful-next-order-coupon-for-woocommerce' ); ?></span>
     </button>
 </form>

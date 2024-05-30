@@ -48,14 +48,16 @@ $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ]
             <th>
             </th>
             <td>
-                <button type="button" data-action="validate_app_key" id="validate-app-id-and-secret"
-                        data-security="<?php echo wp_create_nonce( 'validate_app_key' ) ?>"
-                        class="button button-primary button-green"><?php echo ( ! $is_app_connected ) ? __( 'Connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 'Re-Connect', 'retainful-next-order-coupon-for-woocommerce' ); ?></button>
+                <button type="button" id="validate-app-id-and-secret"
+                        onclick="rnoc_jquery('body').trigger('validate_app_key',[<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>,<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>])"
+                        class="button button-primary button-green">
+					<?php echo ( ! $is_app_connected ) ? __( 'Connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 'Re-Connect', 'retainful-next-order-coupon-for-woocommerce' ); ?>
+                </button>
 				<?php
 				if ( $is_app_connected ) {
 					?>
-                    <button type="button" id="disconnect-app-btn" data-action="rnoc_disconnect_license"
-                            data-security="<?php echo wp_create_nonce( 'rnoc_disconnect_license' ) ?>"
+                    <button type="button" id="disconnect-app-btn"
+                            onclick="rnoc_jquery('body').trigger('rnoc-app-disconnect',[<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>,<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>])"
                             class="button"><?= __( 'Dis-connect', 'retainful-next-order-coupon-for-woocommerce' ) ?></button>
                     <a href="<?php echo $app_url ?>" target="_blank" class="button"
                        style="text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;border-color:#F27052;"><?php echo __( 'Visit Your Dashboard', 'retainful-next-order-coupon-for-woocommerce' ); ?></a>
