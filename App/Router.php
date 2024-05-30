@@ -37,6 +37,7 @@ class Router {
 		//register_deactivation_hook( RNOC_FILE, [ Common::class, 'onPluginDeactivation' ] );
 		// Rest api
 		add_action( 'rest_api_init', [ RestApi::class, 'registerEndPoints' ] );
+		add_action( 'rnocp_check_user_plan', [ Settings::class, 'checkUserPlan' ] );
 	}
 
 	/**
@@ -46,6 +47,7 @@ class Router {
 	 */
 	public static function addAdminHooks() {
 		add_action( 'admin_menu', [ Settings::class, 'addMenu' ] );
+		add_action( 'wp_after_admin_bar_render', [ Settings::class, 'schedulePlanChecker' ] );
 	}
 
 	/**

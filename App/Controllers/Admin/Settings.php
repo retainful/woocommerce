@@ -84,4 +84,27 @@ class Settings {
 		}
 		Util::renderTemplate( $main_file_path, [ 'page' => 'retainful_settings', 'sub_content' => $sub_content ] );
 	}
+
+	/**
+	 * Schedule plan checker.
+	 *
+	 * @return void
+	 */
+	public static function schedulePlanChecker() {
+		$hook      = 'rnocp_check_user_plan';
+		$timestamp = wp_next_scheduled( $hook );
+		if ( false === $timestamp ) {
+			$scheduled_time = strtotime( '+12 hours', current_time( 'timestamp' ) );
+			wp_schedule_event( $scheduled_time, 'hourly', $hook );
+		}
+	}
+
+	/**
+	 * Check use plan.
+	 *
+	 * @return void
+	 */
+	public static function checkUserPlan() {
+		// do check here
+	}
 }

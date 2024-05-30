@@ -3,10 +3,23 @@
 namespace RNOC\App\Helpers;
 
 use WC_Order;
+use WC_Order_Refund;
 
 defined( 'ABSPATH' ) || exit;
 
 class WC {
+
+	public static function getCustomer( $key, $default = '' ) {
+		if ( empty( $key ) ) {
+			return $default;
+		}
+		$method = 'get_' . $key;
+		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, $method ) ) {
+			return WC()->customer->$method();
+		}
+
+		return $default;
+	}
 
 	/**
 	 * Get Customer email.
@@ -33,21 +46,6 @@ class WC {
 		if ( ! empty( $value ) && function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, 'set_billing_email' ) ) {
 			WC()->customer->set_billing_email( $value );
 		}
-	}
-
-	/**
-	 * Get order billing email.
-	 *
-	 * @param WC_Order $order Order object.
-	 *
-	 * @return string
-	 */
-	public static function getOrderBillingEmail( $order ) {
-		if ( ! Util::isMethodExists( $order, 'get_billing_email' ) ) {
-			return '';
-		}
-
-		return $order->get_billing_email();
 	}
 
 	/**
@@ -90,5 +88,74 @@ class WC {
 		WC()->session->__unset( $key );
 
 		return true;
+	}
+
+	/**
+	 * Get order object.
+	 *
+	 * @param int|WC_Order $order_or_id Order object or id.
+	 *
+	 * @return WC_Order|WC_Order_Refund|bool
+	 */
+	public static function getOrder( $order_or_id ) {
+		return function_exists( 'wc_get_order' ) ? wc_get_order( $order_or_id ) : false;
+	}
+
+	/**
+	 * Get order user id.
+	 *
+	 * @param WC_Order $order Order object.
+	 *
+	 * @return int
+	 */
+	public static function getOrderUserId( $order ) {
+		return Util::isMethodExists( $order, 'get_user_id' ) ? $order->get_user_id() : 0;
+	}
+
+	/**
+	 * Get order billing email.
+	 *
+	 * @param WC_Order $order Order object.
+	 *
+	 * @return string
+	 */
+	public static function getOrderBillingEmail( $order ) {
+		if ( ! Util::isMethodExists( $order, 'get_billing_email' ) ) {
+			return '';
+		}
+
+		return $order->get_billing_email();
+	}
+
+	/**
+	 * Get order key data.
+	 *
+	 * @param string $key Order key
+	 * @param WC_Order $order Order object.
+	 * @param mixed $default default value.
+	 *
+	 * @return mixed
+	 */
+	public static function getOrderData( $key, $order, $default = '' ) {
+		if ( empty( $key ) ) {
+			return $default;
+		}
+		$method = 'get_' . $key;
+
+		return Util::isMethodExists( $order, $method ) ? $order->$method() : $default;
+	}
+
+	function getOrdersByEmail( $email, $limit = - 1 ) {
+		if ( empty( $email ) || ! is_email( $email ) ) {
+			return [];
+		}
+		$args = [
+			'billing_email' => $email,
+			'orderby'       => 'ID',
+			'order'         => 'DESC',
+			'limit'         => $limit
+		];
+
+		return apply_filters( 'rnoc_get_customer_orders_by_email', wc_get_orders( $args ) );
 	}
 }

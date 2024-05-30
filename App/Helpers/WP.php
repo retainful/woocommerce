@@ -47,4 +47,55 @@ class WP {
 
 		return is_object( $user ) && ! empty( $user->user_email ) ? $user->user_email : '';
 	}
+
+	/**
+	 * Format date field.
+	 *
+	 * @param int $timestamp Time stamp.
+	 *
+	 * @return string|null
+	 */
+	public static function formatToIso8601( $timestamp ) {
+		if ( empty( $timestamp ) ) {
+			$timestamp = current_time( 'timestamp', true );
+		}
+		if ( $timestamp instanceof \WC_DateTime ) {
+			$timestamp = $timestamp->getTimestamp();
+		}
+
+		try {
+			$date      = date( 'Y-m-d H:i:s', $timestamp );
+			$date_time = new \DateTime( $date );
+
+			return $date_time->format( \DateTime::ATOM );
+		} catch ( \Exception $e ) {
+
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get user role by email.
+	 *
+	 * @param string $email User email.
+	 *
+	 * @return array
+	 */
+	public static function getUserRoles( $email ) {
+		if ( empty( $email ) ) {
+			return [];
+		}
+
+		try {
+			$user = get_user_by( 'email', sanitize_email( $email ) );
+			if ( is_object( $user ) && isset( $user->roles ) ) {
+				return (array) $user->roles;
+			}
+		} catch ( \Exception $e ) {
+
+		}
+
+		return [];
+	}
 }

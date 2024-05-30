@@ -163,7 +163,7 @@ class Popups {
 		}
 		$order_id = isset( $wp->query_vars['order-received'] ) ? $wp->query_vars['order-received'] : 0;
 		if ( $is_thank_you_page && empty( $customer_email ) && ! empty( $order_id ) ) {
-			$order          = Order::get( $order_id );
+			$order          = WC::getOrder( $order_id );
 			$customer_email = WC::getOrderBillingEmail( $order );
 		}
 		$default = [

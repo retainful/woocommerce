@@ -2,6 +2,10 @@
 
 namespace RNOC\App\Helpers;
 
+use RNOC\App\Modules\Storage\PHPSession;
+use RNOC\App\Modules\Storage\WooSession;
+use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
+
 defined( 'ABSPATH' ) || exit;
 
 class Settings {
@@ -119,5 +123,29 @@ class Settings {
 		if ( function_exists( 'wc_setcookie' ) ) {
 			wc_setcookie( $key, base64_encode( json_encode( $value ) ), strtotime( '+30 days' ) );
 		}
+	}
+
+	/**
+	 * Get storage object.
+	 *
+	 * @return PHPSession|WooSession|Cookie
+	 */
+	public static function getStorage() {
+		$storage = Settings::get( RNOC_PLUGIN_PREFIX . 'handle_storage_using', 'woocommerce' );
+
+		switch ( $storage ) {
+			case "php";
+				$storage_handler = new PHPSession();
+				break;
+			case "cookie";
+				$storage_handler = new Cookie();
+				break;
+			default:
+			case "woocommerce":
+				$storage_handler = new WooSession();
+				break;
+		}
+
+		return $storage_handler;
 	}
 }
