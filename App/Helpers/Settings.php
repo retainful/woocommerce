@@ -2,6 +2,10 @@
 
 namespace RNOC\App\Helpers;
 
+use RNOC\App\Modules\Storage\PHPSession;
+use RNOC\App\Modules\Storage\WooSession;
+use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
+
 defined( 'ABSPATH' ) || exit;
 
 class Settings {
@@ -79,5 +83,69 @@ class Settings {
 	 */
 	public static function isProPlan() {
 		return true;
+	}
+
+	/**
+	 * Identity path.
+	 *
+	 * @return string
+	 */
+	public static function getIdentityPath() {
+		$path = preg_replace( '|https?://[^/]+|i', '', get_option( 'home' ) );
+
+		return ! empty( $path ) ? $path : '/';
+	}
+
+	/**
+	 * Get identity value.
+	 *
+	 * @param string $key Identity name.
+	 * @param mixed $default_value Identity value.
+	 *
+	 * @return mixed|string
+	 */
+	public static function getIdentity( $key, $default_value = '' ) {
+		return isset( $_COOKIE[ $key ] ) ? $_COOKIE[ $key ] : $default_value;
+	}
+
+	/**
+	 * Set identity value.
+	 *
+	 * @param string $key Identity key.
+	 * @param array $value Identity value.
+	 *
+	 * @return void
+	 */
+	public static function setIdentity( $key, $value ) {
+		if ( ! WP::isCustomerPage() || empty( $key ) || empty( $value ) || ! is_array( $value ) ) {
+			return;
+		}
+		if ( function_exists( 'wc_setcookie' ) ) {
+			wc_setcookie( $key, base64_encode( json_encode( $value ) ), strtotime( '+30 days' ) );
+		}
+	}
+
+	/**
+	 * Get storage object.
+	 *
+	 * @return PHPSession|WooSession|Cookie
+	 */
+	public static function getStorage() {
+		$storage = Settings::get( RNOC_PLUGIN_PREFIX . 'handle_storage_using', 'woocommerce' );
+
+		switch ( $storage ) {
+			case "php";
+				$storage_handler = new PHPSession();
+				break;
+			case "cookie";
+				$storage_handler = new Cookie();
+				break;
+			default:
+			case "woocommerce":
+				$storage_handler = new WooSession();
+				break;
+		}
+
+		return $storage_handler;
 	}
 }

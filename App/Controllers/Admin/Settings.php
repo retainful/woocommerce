@@ -3,7 +3,7 @@
 namespace RNOC\App\Controllers\Admin;
 
 use RNOC\App\Helpers\Util;
-use RNOC\App\Helpers\WC;
+use RNOC\App\Helpers\WP;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,7 +15,7 @@ class Settings {
 	 * @return void
 	 */
 	public static function addMenu() {
-		if ( ! WC::hasAdminPrivilege() ) {
+		if ( ! WP::hasAdminPrivilege() ) {
 			return;
 		}
 		add_menu_page( __( 'Retainful', 'retainful-next-order-coupon-for-woocommerce' ), __( 'Retainful', 'retainful-next-order-coupon-for-woocommerce' ), 'manage_woocommerce', 'retainful_license', [
@@ -38,11 +38,11 @@ class Settings {
 	 * @return void
 	 */
 	public static function getLicensePage() {
-		if ( ! WC::hasAdminPrivilege() ) {
+		if ( ! WP::hasAdminPrivilege() ) {
 			return;
 		}
 		$file_path     = RNOC_PLUGIN_PATH . 'App/Views/Admin/connection.php';
-		$override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/connection.php' );
+		$override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/admin/connection.php' );
 		if ( file_exists( $override_path ) ) {
 			$file_path = $override_path;
 		}
@@ -52,7 +52,7 @@ class Settings {
 			'is_pro_plan' => \RNOC\App\Helpers\Settings::isProPlan()
 		], false );
 		$main_file_path     = RNOC_PLUGIN_PATH . 'App/Views/Admin/tabs.php';
-		$main_override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/tabs.php' );
+		$main_override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/admin/tabs.php' );
 		if ( file_exists( $main_override_path ) ) {
 			$main_file_path = $main_override_path;
 		}
@@ -65,11 +65,11 @@ class Settings {
 	 * @return void
 	 */
 	public static function getSettingsPage() {
-		if ( ! WC::hasAdminPrivilege() ) {
+		if ( ! WP::hasAdminPrivilege() ) {
 			return;
 		}
 		$file_path     = RNOC_PLUGIN_PATH . 'App/Views/Admin/settings.php';
-		$override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/settings.php' );
+		$override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/admin/settings.php' );
 		if ( file_exists( $override_path ) ) {
 			$file_path = $override_path;
 		}
@@ -78,7 +78,7 @@ class Settings {
 
 		$main_file_path = RNOC_PLUGIN_PATH . 'App/Views/Admin/tabs.php';
 
-		$main_override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/tabs.php' );
+		$main_override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/admin/tabs.php' );
 		if ( file_exists( $main_override_path ) ) {
 			$main_file_path = $main_override_path;
 		}
@@ -112,6 +112,29 @@ class Settings {
 		wp_localize_script( 'retainful-abandoncart', 'rnoc_localize_data', $localize );
 		/*End Admin React */
 
+	}
+
+	/**
+	 * Schedule plan checker.
+	 *
+	 * @return void
+	 */
+	public static function schedulePlanChecker() {
+		$hook      = 'rnocp_check_user_plan';
+		$timestamp = wp_next_scheduled( $hook );
+		if ( false === $timestamp ) {
+			$scheduled_time = strtotime( '+12 hours', current_time( 'timestamp' ) );
+			wp_schedule_event( $scheduled_time, 'hourly', $hook );
+		}
+	}
+
+	/**
+	 * Check use plan.
+	 *
+	 * @return void
+	 */
+	public static function checkUserPlan() {
+		// do check here
 	}
 
 }

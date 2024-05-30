@@ -6,6 +6,22 @@ defined( 'ABSPATH' ) || exit;
 
 class Util {
 	/**
+	 * Is method exists in object.
+	 *
+	 * @param object $object Object.
+	 * @param string $method Method name.
+	 *
+	 * @return bool
+	 */
+	public static function isMethodExists( $object, $method ) {
+		if ( is_object( $object ) && method_exists( $object, $method ) ) {
+			return true;
+		}
+
+		return false;
+	}
+	
+	/**
 	 * render template.
 	 *
 	 * @param string $file File path.
