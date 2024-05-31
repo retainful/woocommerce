@@ -146,7 +146,7 @@ class Settings {
 	public static function validateAppKey() {
 		$security_check = WP::isSecurityValid( 'rnoc_validate_app_key' );
 		if ( empty( $security_check ) ) {
-			wp_send_json_error( 'security validation failed' );
+			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 		$app_id     = Input::get( 'app_id' );
 		$secret_key = Input::get( 'app_secret' );
@@ -159,21 +159,23 @@ class Settings {
 		$validator->rule( 'required', [ 'app_id', 'secret_key' ] );
 		$validator->rule( 'slug', [ 'app_id', 'secret_key' ] );
 		if ( ! $validator->validate() ) {
-			$response['error'] = $validator->errors();
-			wp_send_json( $response );
+			wp_send_json_error( [
+				'error_field' => $validator->errors(),
+				'message'     => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' )
+			] );
 		}
 
-		$is_production = apply_filters( 'rnoc_is_production_plugin', true );
+		/*$is_production = apply_filters( 'rnoc_is_production_plugin', true );
 		if ( ! $is_production ) {
-			wp_send_json_error( 'You can only change you App-Id and Secret key in production store!', 500 );
-		}
+			wp_send_json_error( [ 'message' => __( 'You can only change your App-Id and Secret key in production store!', 'retainful-next-order-coupon-for-woocommerce' ) ] );
+		}*/
 
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' );
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'retainful_app_id', $app_id, 'license' );
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', $secret_key, 'license' );
 
-		$response = array();
-		self::updateUserAsFreeUser();
+		$response = [];
+		//self::updateUserAsFreeUser();
 		if ( empty( $response ) ) {
 			$api_response = self::isApiEnabled( $app_id, $secret_key );
 
@@ -195,12 +197,11 @@ class Settings {
 	 * disconnect the app.
 	 */
 	public static function disConnectConnection() {
-		$security_check = WP::isSecurityValid( 'rnoc_disconnect_license' );
-		if ( empty( $security_check ) ) {
-			wp_send_json_error( 'security validation failed' );
+		if ( ! WP::isSecurityValid( 'rnoc_disconnect_license' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' );
-		wp_send_json_success( __( 'App disconnected successfully!', 'retainful-next-order-coupon-for-woocommerce' ) );
+		wp_send_json_success( [ 'message' => __( 'App disconnected successfully!', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 	}
 
 	/**

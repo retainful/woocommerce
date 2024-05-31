@@ -84,21 +84,19 @@ class Settings {
 	 * @param mixed $value Setting default value.
 	 * @param string $type Setting type.
 	 *
-	 * @return mixed|boolean
+	 * @return void
 	 */
 	public static function set( $key, $value, $type = 'settings' ) {
 		if ( ! in_array( $type, [ 'settings', 'license' ] ) ) {
-			return false;
+			return;
 		}
-		$settings        = $type === 'license' ? self::getConnectionSettings() : self::getSettings();
-		$option_settings = $type === 'license' ? 'retainful_license' : 'retainful_settings';
+		$settings    = $type === 'license' ? self::getConnectionSettings() : self::getSettings();
+		$setting_key = $type === 'license' ? 'retainful_license' : 'retainful_settings';
 		if ( isset( $settings[ $key ] ) ) {
 			$settings[ $key ] = $value;
 		}
 
-		update_option( $option_settings, $settings );
-
-		return isset( $settings[ $key ] ) ? $settings[ $key ] : $value;
+		update_option( $setting_key, $settings );
 	}
 
 
