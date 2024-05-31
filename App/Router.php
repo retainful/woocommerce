@@ -3,9 +3,9 @@
 namespace RNOC\App;
 
 use RNOC\App\Controllers\Admin\Settings;
-use RNOC\App\Controllers\Site\Common;
 use RNOC\App\Controllers\Site\Popups;
 use RNOC\App\Controllers\Site\RestApi;
+use RNOC\App\Modules\AbandonedCart\Cart;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,6 +37,9 @@ class Router {
 		// Rest api
 		add_action( 'rest_api_init', [ RestApi::class, 'registerEndPoints' ] );
 		add_action( 'rnocp_check_user_plan', [ Settings::class, 'checkUserPlan' ] );
+
+		add_action( 'wp_ajax_rnoc_track_user_data', [ Cart::class, 'setCustomerData' ] );
+		add_action( 'wp_ajax_nopriv_rnoc_track_user_data', [ Cart::class, 'setCustomerData' ] );
 	}
 
 	/**

@@ -9,7 +9,15 @@ defined( 'ABSPATH' ) || exit;
 
 class WC {
 
-	public static function getCustomer( $key, $default = '' ) {
+	/**
+	 * Get customer data.
+	 *
+	 * @param string $key Customer key.
+	 * @param mixed $default Customer data default value.
+	 *
+	 * @return mixed
+	 */
+	public static function getCustomerData( $key, $default = '' ) {
 		if ( empty( $key ) ) {
 			return $default;
 		}
@@ -145,7 +153,15 @@ class WC {
 		return Util::isMethodExists( $order, $method ) ? $order->$method() : $default;
 	}
 
-	function getOrdersByEmail( $email, $limit = - 1 ) {
+	/**
+	 * Get orders by email.
+	 *
+	 * @param string $email Order email.
+	 * @param int $limit
+	 *
+	 * @return array
+	 */
+	public static function getOrdersByEmail( $email, $limit = - 1 ) {
 		if ( empty( $email ) || ! is_email( $email ) ) {
 			return [];
 		}
@@ -160,12 +176,34 @@ class WC {
 	}
 
 	/**
+	 * Get order total.
+	 *
+	 * @param WC_Order $order Order object
+	 *
+	 * @return float
+	 */
+	public static function getOrderTotal( $order ) {
+		return Util::isMethodExists( $order, 'get_total' ) ? $order->get_total() : 0;
+	}
+
+	/**
+	 * Get order id.
+	 *
+	 * @param WC_Order $order Order object.
+	 *
+	 * @return int
+	 */
+	public static function getOrderId( $order ) {
+		return Util::isMethodExists( $order, 'get_id' ) ? $order->get_id() : 0;
+	}
+
+	/**
 	 * woocommerce get store Country.
 	 *
 	 * @return string|null
 	 */
 	public static function getStoreCountry() {
-		return Util::isMethodExists( WC()->countries, 'get_base_country' ) ? WC()->countries->get_base_country() : null;
+		return function_exists('WC') && Util::isMethodExists( WC()->countries, 'get_base_country' ) ? WC()->countries->get_base_country() : null;
 	}
 
 
@@ -175,6 +213,6 @@ class WC {
 	 * @return string|null
 	 */
 	public static function getStoreState() {
-		return Util::isMethodExists( WC()->countries, 'get_base_state' ) ? WC()->countries->get_base_state() : null;
+		return function_exists('WC') && Util::isMethodExists( WC()->countries, 'get_base_state' ) ? WC()->countries->get_base_state() : null;
 	}
 }
