@@ -6,13 +6,15 @@ use RNOC\App\Helpers\Util;
 use Rnoc\App\Helpers\WC;
 use RNOC\App\Helpers\WP;
 use RNOC\App\Helpers\Input;
-use RNOC\App\library\RetainfulApi;
+
+//use RNOC\App\library\RetainfulApi;
+use RNOC\App\Modules\AbandonedCart\Request;
 use Valitron\Validator;
 
 
 defined( 'ABSPATH' ) || exit;
 
-class Settings extends BaseController {
+class Settings {
 
 	/**
 	 * Add menu.
@@ -205,8 +207,8 @@ class Settings extends BaseController {
 	 * update user as Free user
 	 */
 	public static function updateUserAsFreeUser() {
-		$details = RetainfulApi::getPlanDetails();
-		self::updatePlanDetails( $details );
+		/*$details = RetainfulApi::getPlanDetails();
+		self::updatePlanDetails( $details );*/
 	}
 
 	/**
@@ -235,7 +237,7 @@ class Settings extends BaseController {
 		$store_data = empty( $store_data ) ? self::storeDetails( $api_key, $secret_key ) : $store_data;
 		if ( ! empty( $api_key ) ) {
 
-			if ( $details = RetainfulApi::validateApi( $api_key, $store_data ) ) {
+			if ( $details = Request::connect( $api_key, $store_data ) ) {
 				if ( empty( $details ) || is_string( $details ) ) {
 					self::updateUserAsFreeUser();
 
