@@ -30,10 +30,10 @@ class Customer {
 	 */
 	public static function getCartCustomer() {
 		$billing_email      = WC::getCustomerBillingEmail();
-		$billing_phone      = WC::getCustomer( 'billing_phone' );
-		$billing_state      = WC::getCustomer( 'billing_state' );
-		$billing_first_name = WC::getCustomer( 'billing_first_name' );
-		$billing_last_name  = WC::getCustomer( 'billing_last_name' );
+		$billing_phone      = WC::getCustomerData( 'billing_phone' );
+		$billing_state      = WC::getCustomerData( 'billing_state' );
+		$billing_first_name = WC::getCustomerData( 'billing_first_name' );
+		$billing_last_name  = WC::getCustomerData( 'billing_last_name' );
 		$created_at         = Settings::getStorage()->get( 'rnoc_session_created_at', current_time( 'timestamp', true ) );
 		$updated_at         = current_time( 'timestamp', true );
 		if ( $user_id = get_current_user_id() ) {

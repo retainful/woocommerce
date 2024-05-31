@@ -9,7 +9,15 @@ defined( 'ABSPATH' ) || exit;
 
 class WC {
 
-	public static function getCustomer( $key, $default = '' ) {
+	/**
+	 * Get customer data.
+	 *
+	 * @param string $key Customer key.
+	 * @param mixed $default Customer data default value.
+	 *
+	 * @return mixed
+	 */
+	public static function getCustomerData( $key, $default = '' ) {
 		if ( empty( $key ) ) {
 			return $default;
 		}
