@@ -513,7 +513,7 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
             </th>
             <td>
                 <button type="button" id="save-setting"
-                        onclick="rnoc_jquery('body').trigger('saveSettings',['save-setting'])"
+                        onclick="rnoc_jquery('body').trigger('save_settings',['save-setting'])"
                         class="button button-primary ">
 					<?php esc_html_e( 'save', 'retainful-next-order-coupon-for-woocommerce' ); ?>
                 </button>
@@ -522,7 +522,7 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
         </tbody>
     </table>
     <button type="button" id='rnoc-save-settings'
-            onclick="rnoc_jquery('body').trigger('saveSettings',['rnoc-save-settings'])"
+            onclick="rnoc_jquery('body').trigger('save_settings',['rnoc-save-settings'])"
             class="button button-primary button-right-fixed  rnoc-save-button">
         <i class="dashicons dashicons-yes"></i>
         <span><?php esc_html_e( 'save', 'retainful-next-order-coupon-for-woocommerce' ); ?></span>

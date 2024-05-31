@@ -23,7 +23,6 @@ class Router {
 		} else {
 			self::addStoreHooks();
 		}
-
 		do_action( RNOC_PLUGIN_PREFIX . 'after_init' );
 	}
 
@@ -49,6 +48,11 @@ class Router {
 		add_action( 'admin_menu', [ Settings::class, 'addMenu' ] );
 		add_action( 'wp_after_admin_bar_render', [ Settings::class, 'schedulePlanChecker' ] );
 		add_action( 'admin_enqueue_scripts', [ Settings::class, 'addAdminScript' ] );
+		//connection
+		add_action( 'wp_ajax_rnoc_validate_connection', [ Settings::class, 'validateAppKey' ] );
+		add_action( 'wp_ajax_rnoc_disconnect_connection', [ Settings::class, 'disConnectConnection' ] );
+
+
 	}
 
 	/**
@@ -61,12 +65,10 @@ class Router {
 		if ( \RNOC\App\Helpers\Settings::isProPlan() && \RNOC\App\Helpers\Settings::get( RNOC_PLUGIN_PREFIX . 'enable_referral_widget', 'no' ) == 'yes' ) {
 			add_action( 'wp_footer', [ Popups::class, 'printReferralPopup' ] );
 		}
-
 		if ( \RNOC\App\Helpers\Settings::isProPlan() && \RNOC\App\Helpers\Settings::get( RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup', 'no' ) == 'yes' ) {
 			// Cookie update hooks
 			add_filter( 'woocommerce_set_cookie_options', [ Popups::class, 'changeIdentityPath' ], 10, 3 );
 			add_action( 'woocommerce_init', [ Popups::class, 'setIdentityData' ] );
-
 			add_action( 'user_register', [ Popups::class, 'setRegisterIdentity' ] );
 			add_action( 'wp_login', [ Popups::class, 'setLoginIdentity' ], 10, 2 );
 			add_action( 'wp_enqueue_scripts', [ Popups::class, 'addPopupScript' ] );

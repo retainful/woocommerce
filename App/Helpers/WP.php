@@ -98,4 +98,54 @@ class WP {
 
 		return [];
 	}
+
+	/**
+	 * Create nonce for woocommerce.
+	 *
+	 * @param string $action
+	 *
+	 *
+	 * @return false|string
+	 */
+	public static function createNonce( $action = '' ) {
+		if ( empty( $action ) ) {
+			return false;
+		}
+
+		return wp_create_nonce( $action );
+	}
+
+
+	/**
+	 * Check the validity of a security nonce and the admin privilege.
+	 *
+	 * @param string $nonce_name The name of the nonce.
+	 *
+	 * @return bool
+	 */
+	public static function isSecurityValid( $nonce_name = '' ) {
+		$rnoc_nonce = Input::get( 'rnoc_nonce', '' );
+		if ( ! self::hasAdminPrivilege() || ! self::verifyNonce( $rnoc_nonce, $nonce_name ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Verify nonce.
+	 *
+	 * @param string $nonce Nonce.
+	 *
+	 * @param string $action Action.
+	 *
+	 * @return bool
+	 */
+	public static function verifyNonce( $nonce, $action ) {
+		if ( empty( $nonce ) || empty( $action ) ) {
+			return false;
+		}
+
+		return wp_verify_nonce( $nonce, $action );
+	}
 }

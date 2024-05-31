@@ -158,5 +158,23 @@ class WC {
 
 		return apply_filters( 'rnoc_get_customer_orders_by_email', wc_get_orders( $args ) );
 	}
-	
+
+	/**
+	 * woocommerce get store Country.
+	 *
+	 * @return string|null
+	 */
+	public static function getStoreCountry() {
+		return Util::isMethodExists( WC()->countries, 'get_base_country' ) ? WC()->countries->get_base_country() : null;
+	}
+
+
+	/**
+	 * woocommerce get store state.
+	 *
+	 * @return string|null
+	 */
+	public static function getStoreState() {
+		return Util::isMethodExists( WC()->countries, 'get_base_state' ) ? WC()->countries->get_base_state() : null;
+	}
 }

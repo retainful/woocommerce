@@ -2,6 +2,7 @@
 
 namespace RNOC\App\Helpers;
 
+use Rnoc\App\library\RetainfulApi;
 use RNOC\App\Modules\Storage\PHPSession;
 use RNOC\App\Modules\Storage\WooSession;
 use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
@@ -77,6 +78,31 @@ class Settings {
 	}
 
 	/**
+	 * set setting value.
+	 *
+	 * @param string $key Setting key.
+	 * @param mixed $value Setting default value.
+	 * @param string $type Setting type.
+	 *
+	 * @return mixed|boolean
+	 */
+	public static function set( $key, $value, $type = 'settings' ) {
+		if ( ! in_array( $type, [ 'settings', 'license' ] ) ) {
+			return false;
+		}
+		$settings        = $type === 'license' ? self::getConnectionSettings() : self::getSettings();
+		$option_settings = $type === 'license' ? 'retainful_license' : 'retainful_settings';
+		if ( isset( $settings[ $key ] ) ) {
+			$settings[ $key ] = $value;
+		}
+
+		update_option( $option_settings, $settings );
+
+		return isset( $settings[ $key ] ) ? $settings[ $key ] : $value;
+	}
+
+
+	/**
 	 * Check is pro plan.
 	 *
 	 * @return bool
@@ -148,4 +174,15 @@ class Settings {
 
 		return $storage_handler;
 	}
+
+	/**
+	 * Get Setting Data.
+	 *
+	 * @return array|mixed
+	 */
+	public static function getData( $option_key, $default = [] ) {
+		return get_option( $option_key, $default );
+	}
+
+
 }
