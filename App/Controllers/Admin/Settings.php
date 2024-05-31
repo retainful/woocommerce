@@ -144,7 +144,7 @@ class Settings {
 	 * Validate app Id
 	 */
 	public static function validateAppKey() {
-		$security_check = wp::isSecurityValid( 'rnoc_validate_app_key' );
+		$security_check = WP::isSecurityValid( 'rnoc_validate_app_key' );
 		if ( empty( $security_check ) ) {
 			wp_send_json_error( 'security validation failed' );
 		}
@@ -195,7 +195,7 @@ class Settings {
 	 * disconnect the app.
 	 */
 	public static function disConnectConnection() {
-		$security_check = wp::isSecurityValid( 'rnoc_disconnect_license' );
+		$security_check = WP::isSecurityValid( 'rnoc_disconnect_license' );
 		if ( empty( $security_check ) ) {
 			wp_send_json_error( 'security validation failed' );
 		}
