@@ -22,7 +22,7 @@ class WC {
 			return $default;
 		}
 		$method = 'get_' . $key;
-		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, $method ) ) {
+		if ( function_exists( 'WC' ) && isset( WC()->customer ) && Util::isMethodExists( WC()->customer, $method ) ) {
 			return WC()->customer->$method();
 		}
 
@@ -36,7 +36,7 @@ class WC {
 	 */
 	public static function getCustomerBillingEmail() {
 
-		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, 'get_billing_email' ) ) {
+		if ( function_exists( 'WC' ) && isset( WC()->customer ) && Util::isMethodExists( WC()->customer, 'get_billing_email' ) ) {
 			return WC()->customer->get_billing_email();
 		}
 
@@ -51,7 +51,7 @@ class WC {
 	 * @return void
 	 */
 	public static function setCustomerBillingEmail( $value ) {
-		if ( ! empty( $value ) && function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, 'set_billing_email' ) ) {
+		if ( ! empty( $value ) && function_exists( 'WC' ) && isset( WC()->customer ) && Util::isMethodExists( WC()->customer, 'set_billing_email' ) ) {
 			WC()->customer->set_billing_email( $value );
 		}
 	}
@@ -203,7 +203,7 @@ class WC {
 	 * @return string|null
 	 */
 	public static function getStoreCountry() {
-		return function_exists('WC') && Util::isMethodExists( WC()->countries, 'get_base_country' ) ? WC()->countries->get_base_country() : null;
+		return function_exists( 'WC' ) && isset( WC()->countries ) && Util::isMethodExists( WC()->countries, 'get_base_country' ) ? WC()->countries->get_base_country() : null;
 	}
 
 
@@ -213,6 +213,6 @@ class WC {
 	 * @return string|null
 	 */
 	public static function getStoreState() {
-		return function_exists('WC') && Util::isMethodExists( WC()->countries, 'get_base_state' ) ? WC()->countries->get_base_state() : null;
+		return function_exists( 'WC' ) && isset( WC()->countries ) && Util::isMethodExists( WC()->countries, 'get_base_state' ) ? WC()->countries->get_base_state() : null;
 	}
 }

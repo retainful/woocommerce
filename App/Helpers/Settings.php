@@ -2,7 +2,6 @@
 
 namespace RNOC\App\Helpers;
 
-use Rnoc\App\library\RetainfulApi;
 use RNOC\App\Modules\Storage\PHPSession;
 use RNOC\App\Modules\Storage\WooSession;
 use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
