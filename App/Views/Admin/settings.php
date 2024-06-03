@@ -521,9 +521,6 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
         </tr>
         </tbody>
     </table>
-    <input type="hidden" name="action" value="rnoc_save_settings_data">
-    <input type="hidden" name="rnoc_nonce"
-           value="<?php echo isset( $setting_nonce ) && ! empty( $setting_nonce ) ? esc_attr( $setting_nonce ) : ''; ?>">
     <button type="button" id='rnoc-save-settings'
             onclick="rnoc_jquery('body').trigger('rnoc_save_settings',['rnoc-save-settings'])"
             class="button button-primary button-right-fixed  rnoc-save-button">

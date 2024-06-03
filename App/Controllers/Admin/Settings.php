@@ -83,8 +83,7 @@ class Settings {
 		}
 
 		$sub_content = Util::renderTemplate( $file_path, [
-			'settings'      => \RNOC\App\Helpers\Settings::getSettings(),
-			'setting_nonce' => WP::createNonce( 'rnoc_settings_nonce' )
+			'settings' => \RNOC\App\Helpers\Settings::getSettings(),
 		], false );
 
 		$main_file_path = RNOC_PLUGIN_PATH . 'App/Views/Admin/tabs.php';
@@ -119,7 +118,7 @@ class Settings {
 		$localize = [
 			'save_settings'      => WP::createNonce( 'rnoc_save_setting' ),
 			'disconnect_license' => WP::createNonce( 'rnoc_disconnect_license' ),
-			'validate_app_key'   => WP::createNonce( 'rnoc_validate_app_key' ),
+			'app_connect'        => WP::createNonce( 'rnoc_app_connect' ),
 			'ajax_url'           => admin_url( 'admin-ajax.php' ),
 			'admin_url'          => admin_url(),
 			'home_url'           => get_home_url(),
@@ -153,15 +152,15 @@ class Settings {
 	/**
 	 * Validate app Id
 	 */
-	public static function connectConnection() {
+	public static function connect() {
 
-		$security_check = WP::isSecurityValid( 'rnoc_validate_app_key' );
+		$security_check = WP::isSecurityValid( 'rnoc_app_connect' );
 		if ( empty( $security_check ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 
-		$app_id     = Input::get( 'app_id' );
-		$secret_key = Input::get( 'app_secret' );
+		$app_id     = (string) Input::get( 'app_id' );
+		$secret_key = (string) Input::get( 'app_secret' );
 		$data       = [
 			'app_id'     => $app_id,
 			'secret_key' => $secret_key
@@ -186,21 +185,17 @@ class Settings {
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' );
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'retainful_app_id', $app_id, 'license' );
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', $secret_key, 'license' );
-
-		$store_data   = self::storeDetails( $app_id, $secret_key );
 		$data         = [
-			'shop' => $store_data
+			'shop' => self::storeDetails( $app_id, $secret_key ),
 		];
 		$api_response = Request::connect( $app_id, $data );
-
 		if ( ! empty( $api_response['success'] ) ) {
 			//Change app id status
 			\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 1, 'license' );
 			\RNOC\App\Helpers\Settings::updatePlanDetails( $api_response );
 			$response['success'] = $api_response['success'];
-		} elseif ( isset( $api_response['error'] ) ) {
-			$response['error'] = $api_response['error'];
 		} else {
+			\RNOC\App\Helpers\Settings::updatePlanDetails();
 			$response['error'] = __( 'Please check the entered details', 'retainful-next-order-coupon-for-woocommerce' );
 		}
 		wp_send_json( $response );
@@ -210,7 +205,7 @@ class Settings {
 	/**
 	 * disconnect the app.
 	 */
-	public static function disConnectConnection() {
+	public static function disConnect() {
 		if ( ! WP::isSecurityValid( 'rnoc_disconnect_license' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
@@ -228,6 +223,9 @@ class Settings {
 	 * @return array
 	 */
 	public static function storeDetails( $api_key, $secret_key ) {
+		if ( empty( $api_key ) && empty( $secret_key ) ) {
+			return array();
+		}
 		$scheme           = wc_site_is_https() ? 'https' : 'http';
 		$default_language = ''; //need to add the store language using the multilingual addon
 		$time_zone        = \RNOC\App\Helpers\Settings::getData( 'timezone_string' );
@@ -235,7 +233,7 @@ class Settings {
 			$time_zone = \RNOC\App\Helpers\Settings::getData( 'gmt_offset' );
 		}
 
-		return array(
+		return [
 			'woocommerce_app_id'             => $api_key,
 			'secret_key'                     => Request::encryptData( $api_key, $secret_key ),
 			'id'                             => null,
@@ -253,46 +251,41 @@ class Settings {
 			'country_code'                   => \RNOC\App\Helpers\WC::getStoreCountry(),
 			'province_code'                  => \RNOC\App\Helpers\WC::getStoreState(),
 			'force_ssl'                      => ( \RNOC\App\Helpers\Settings::getData( 'woocommerce_force_ssl_checkout', 'no' ) == 'yes' ),
-			'enabled_presentment_currencies' => self::getAllAvailableCurrencies(),
+			'enabled_presentment_currencies' => \RNOC\App\Helpers\WC::getAllAvailableCurrencies(),
 			'primary_locale'                 => $default_language
-		);
-	}
-
-
-	/**
-	 * Check the site has multi currency
-	 * @return bool
-	 */
-	public static function getAllAvailableCurrencies() {
-		$base_currency = WC::getDefaultCurrency();
-		$currencies    = array( $base_currency );
-
-		return apply_filters( 'rnoc_get_available_currencies', $currencies );
+		];
 	}
 
 
 	/**
 	 *
 	 */
-	public static function saveSettingsData() {
+	public static function saveSettings() {
 
-		if ( ! WP::isSecurityValid( 'rnoc_settings_nonce' ) ) {
+		if ( ! WP::isSecurityValid( 'rnoc_save_setting' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
-		$settings  = \RNOC\App\Helpers\Settings::getSettings();
-		$form_date = [];
+		$settings = \RNOC\App\Helpers\Settings::getSettings();
 		foreach ( $settings as $key => $value ) {
-			$form_date[ $key ] = Input::get( $key, $value );
+			$settings[ $key ] = Input::get( $key, $value );
 		}
-		$validator_message = \RNOC\App\Helpers\Settings::settingsValidation( $form_date );
-		if ( ! empty( $validator_message ) ) {
-			wp_send_json_error( $validator_message );
+		$errors = \RNOC\App\Helpers\Settings::settingsValidation( $settings );
+		if ( is_array( $errors ) ) {
+			foreach ( $errors as $field => $messages ) {
+				$errors[ $field ] = current( $messages );
+			}
+			wp_send_json_error( [
+				'success' => false,
+				'data'    => [
+					'field_error' => $errors,
+					'message'     => __( 'Settings not saved!', 'retainful-next-order-coupon-for-woocommerce' )
+				]
+			] );
 		}
-		$cart_capture_msg                                = Input::get( RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '' );
-		$post                                            = $form_date;
-		$data                                            = Input::clean( $post );
+		$cart_capture_msg                                = (string) Input::get( RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '' );
+		$data                                            = Input::clean( $settings );
 		$data[ RNOC_PLUGIN_PREFIX . 'cart_capture_msg' ] = trim( Input::sanitizeContent( $cart_capture_msg ) );
-		update_option( 'retainful_settings', $data );
+		\RNOC\App\Helpers\Settings::updateData( 'retainful_settings', $data );
 		wp_send_json_success( __( 'Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce' ) );
 	}
 

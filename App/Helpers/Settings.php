@@ -179,7 +179,24 @@ class Settings {
 	 * @return array|mixed
 	 */
 	public static function getData( $option_key, $default = [] ) {
+		if ( ! in_array( $option_key, [ 'retainful_license', 'retainful_settings' ] ) ) {
+			return false;
+		}
+
 		return get_option( $option_key, $default );
+	}
+
+	/**
+	 * update Data.
+	 *
+	 * @return array|mixed
+	 */
+	public static function updateData( $option_key, $default = [] ) {
+		if ( ! in_array( $option_key, [ 'retainful_license', 'retainful_settings' ] ) ) {
+			return false;
+		}
+
+		return update_option( $option_key, $default );
 	}
 
 
@@ -189,12 +206,15 @@ class Settings {
 	 * @param array $details
 	 */
 	public static function updatePlanDetails( $response = \stdClass::class ) {
-		$details = array(
+		if ( ! is_object( $response ) ) {
+			return;
+		}
+		$details = [
 			'plan'       => ! empty( $response->plan ) ? strtolower( $response->plan ) : 'free',
 			'status'     => ! empty( $response->status ) ? strtolower( $response->status ) : 'active',
 			'expired_on' => ! empty( $response->period_end ) ? strtolower( $response->period_end ) : 'never',
 			'message'    => ! empty( $response->message ) ? strtolower( $response->message ) : 'App connected successfully'
-		);
+		];
 		update_option( 'rnoc_plan_details', $details );
 		update_option( 'rnoc_last_plan_checked', current_time( 'timestamp' ) );
 	}
@@ -204,10 +224,10 @@ class Settings {
 	 *
 	 * @param $post_data
 	 *
-	 * @return string|void
+	 * @return string|array
 	 */
 	public static function settingsValidation( $post_data ) {
-		$message = '';
+
 		if ( empty( $post_data ) && ! is_array( $post_data ) ) {
 			return __( 'validation failed!', 'retainful-next-order-coupon-for-woocommerce' );
 		}
@@ -216,16 +236,16 @@ class Settings {
 			'js',
 			'php'
 		] )->message( 'This field contains invalid value' );
-		$validator->rule( 'in', array(
+		$validator->rule( 'in', [
 			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
 			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'
-		), [ 'yes', 'no' ] )->message( 'This field contains invalid value' );
+		], [ 'yes', 'no' ] )->message( 'This field contains invalid value' );
 		$validator->rule( 'in', RNOC_PLUGIN_PREFIX . 'handle_storage_using', [
 			'woocommerce',
 			'cookie',
 			'php'
 		] )->message( 'This field contains invalid value' );
-		$validator->rule( 'in', array(
+		$validator->rule( 'in', [
 			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
 			RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
 			RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status',
@@ -233,11 +253,12 @@ class Settings {
 			RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
 			RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
 			RNOC_PLUGIN_PREFIX . 'enable_debug_log',
-		), [ '0', '1' ] )->message( 'This field contains invalid value' );
-		if ( ! $validator->validate() ) {
-			$message = $validator->errors();
+		], [ '0', '1' ] )->message( 'This field contains invalid value' );
+
+		if ( $validator->validate() ) {
+			return true;
 		}
 
-		return $message;
+		return $validator->errors();
 	}
 }

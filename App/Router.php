@@ -52,10 +52,10 @@ class Router {
 		add_action( 'wp_after_admin_bar_render', [ Settings::class, 'schedulePlanChecker' ] );
 		add_action( 'admin_enqueue_scripts', [ Settings::class, 'addAdminScript' ] );
 		//retainful app connection
-		add_action( 'wp_ajax_rnoc_validate_connection', [ Settings::class, 'connectConnection' ] );
-		add_action( 'wp_ajax_rnoc_disconnect_connection', [ Settings::class, 'disConnectConnection' ] );
+		add_action( 'wp_ajax_rnoc_validate_connection', [ Settings::class, 'connect' ] );
+		add_action( 'wp_ajax_rnoc_disconnect_connection', [ Settings::class, 'disConnect' ] );
 		//retainful save settings
-		add_action( 'wp_ajax_rnoc_save_settings_data', [ Settings::class, 'saveSettingsData' ] );
+		add_action( 'wp_ajax_rnoc_save_settings_data', [ Settings::class, 'saveSettings' ] );
 
 	}
 

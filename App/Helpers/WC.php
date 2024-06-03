@@ -215,4 +215,15 @@ class WC {
 	public static function getStoreState() {
 		return function_exists( 'WC' ) && isset( WC()->countries ) && Util::isMethodExists( WC()->countries, 'get_base_state' ) ? WC()->countries->get_base_state() : null;
 	}
+
+	/**
+	 * Check the site has multi currency
+	 * @return bool
+	 */
+	public static function getAllAvailableCurrencies() {
+		$base_currency = WC::getDefaultCurrency();
+		$currencies    = array( $base_currency );
+
+		return apply_filters( 'rnoc_get_available_currencies', $currencies );
+	}
 }

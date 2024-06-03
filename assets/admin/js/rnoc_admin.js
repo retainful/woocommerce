@@ -7,6 +7,8 @@ rnoc = window.rnoc || {};
 (function (rnoc) {
     rnoc_jquery(document).on('rnoc_save_settings', function (e, button_id) {
         let data = rnoc_jquery('.rnoc-main #retainful-settings-form').serializeArray()
+        data.push({name: 'rnoc_nonce', value: rnoc_localize_data.save_settings});
+        data.push({name: 'action', value: 'rnoc_save_settings_data'});
         rnoc_jquery('.rnoc-main #retainful-settings-form #' + button_id).attr('disabled', true);
         rnoc_jquery.ajax({
             data: data,
@@ -16,24 +18,7 @@ rnoc = window.rnoc || {};
                 alertify.set('notifier', 'position', 'top-right');
                 rnoc_jquery('.rnoc-main #retainful-settings-form #' + button_id).attr('disabled', false);
                 if (!json.success) {
-                    if (typeof json.data === 'object') {
-                        rnoc_jquery.each(json.data, function (index, value) {
-                            // Check if the property is an array
-                            if (Array.isArray(value)) {
-                                // If it's an array, iterate over the array and display each item
-                                value.forEach(function (item) {
-                                    console.log(item);
-                                    alertify.error(item);
-                                });
-                            } else {
-                                // If it's not an array, display the value directly
-                                console.log(value);
-                                alertify.error(value);
-                            }
-                        });
-                    } else {
-                        alertify.error(json.data);
-                    }
+                    alertify.error(json.message());
                 } else {
                     alertify.success(json.data);
                     setTimeout(function () {
@@ -59,7 +44,7 @@ rnoc = window.rnoc || {};
         rnoc_jquery('.error').html('');
         let data = {
             action: "rnoc_validate_connection",
-            rnoc_nonce: rnoc_localize_data.validate_app_key,
+            rnoc_nonce: rnoc_localize_data.app_connect,
             app_id: rnoc_app_id,
             app_secret: rnoc_app_secret
         }
