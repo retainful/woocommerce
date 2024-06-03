@@ -183,4 +183,20 @@ class Input {
 
 		return is_string( $data ) ? $data : '';
 	}
+
+	/**
+	 * clean the data
+	 *
+	 * @param $var
+	 *
+	 * @return array|string
+	 */
+	public static function clean( $var ) {
+		if ( is_array( $var ) ) {
+			return array_map( array( self::class, 'clean' ), $var );
+		} else {
+			return is_scalar( $var ) ? sanitize_text_field( $var ) : $var;
+		}
+	}
+
 }

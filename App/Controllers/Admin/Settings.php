@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
 
 class Settings {
 
+
 	/**
 	 * Add menu.
 	 *
@@ -81,7 +82,10 @@ class Settings {
 			$file_path = $override_path;
 		}
 
-		$sub_content = Util::renderTemplate( $file_path, [ 'settings' => \RNOC\App\Helpers\Settings::getSettings() ], false );
+		$sub_content = Util::renderTemplate( $file_path, [
+			'settings'      => \RNOC\App\Helpers\Settings::getSettings(),
+			'setting_nonce' => WP::createNonce( 'rnoc_settings_nonce' )
+		], false );
 
 		$main_file_path = RNOC_PLUGIN_PATH . 'App/Views/Admin/tabs.php';
 
@@ -103,11 +107,17 @@ class Settings {
 		if ( ! in_array( $page, [ 'retainful_license', 'retainful_settings' ] ) ) {
 			return;
 		}
+		$suffix = '.min';
+		if ( defined( 'SCRIPT_DEBUG' ) ) {
+			$suffix = SCRIPT_DEBUG ? '' : '.min';
+		}
 		$asset_path = RNOC_PLUGIN_URL . 'assets/admin';
 		wp_enqueue_style( 'retainful-admin-css', $asset_path . '/css/main.css', [], RNOC_VERSION );
 		wp_enqueue_script( 'retainful-abandoncart', $asset_path . '/js/rnoc_admin.js', [], RNOC_VERSION );
+		wp_enqueue_style( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/css/alertify' . $suffix . '.css', array(), RNOC_VERSION );
+		wp_enqueue_script( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/js/alertify' . $suffix . '.js', array(), RNOC_VERSION . '&t=' . time() );
 		$localize = [
-			'save_settings'      => WP::createNonce( 'rnoc_save_settings' ),
+			'save_settings'      => WP::createNonce( 'rnoc_save_setting' ),
 			'disconnect_license' => WP::createNonce( 'rnoc_disconnect_license' ),
 			'validate_app_key'   => WP::createNonce( 'rnoc_validate_app_key' ),
 			'ajax_url'           => admin_url( 'admin-ajax.php' ),
@@ -143,11 +153,13 @@ class Settings {
 	/**
 	 * Validate app Id
 	 */
-	public static function validateAppKey() {
+	public static function connectConnection() {
+
 		$security_check = WP::isSecurityValid( 'rnoc_validate_app_key' );
 		if ( empty( $security_check ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
+
 		$app_id     = Input::get( 'app_id' );
 		$secret_key = Input::get( 'app_secret' );
 		$data       = [
@@ -158,6 +170,7 @@ class Settings {
 		$validator = new Validator( $data );
 		$validator->rule( 'required', [ 'app_id', 'secret_key' ] );
 		$validator->rule( 'slug', [ 'app_id', 'secret_key' ] );
+
 		if ( ! $validator->validate() ) {
 			wp_send_json_error( [
 				'error_field' => $validator->errors(),
@@ -174,20 +187,21 @@ class Settings {
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'retainful_app_id', $app_id, 'license' );
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', $secret_key, 'license' );
 
-		$response = [];
-		//self::updateUserAsFreeUser();
-		if ( empty( $response ) ) {
-			$api_response = self::isApiEnabled( $app_id, $secret_key );
+		$store_data   = self::storeDetails( $app_id, $secret_key );
+		$data         = [
+			'shop' => $store_data
+		];
+		$api_response = Request::connect( $app_id, $data );
 
-			if ( isset( $api_response['success'] ) ) {
-				//Change app id status
-				\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 1, 'license' );
-				$response['success'] = $api_response['success'];
-			} elseif ( isset( $api_response['error'] ) ) {
-				$response['error'] = $api_response['error'];
-			} else {
-				$response['error'] = __( 'Please check the entered details', 'retainful-next-order-coupon-for-woocommerce' );
-			}
+		if ( ! empty( $api_response['success'] ) ) {
+			//Change app id status
+			\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 1, 'license' );
+			\RNOC\App\Helpers\Settings::updatePlanDetails( $api_response );
+			$response['success'] = $api_response['success'];
+		} elseif ( isset( $api_response['error'] ) ) {
+			$response['error'] = $api_response['error'];
+		} else {
+			$response['error'] = __( 'Please check the entered details', 'retainful-next-order-coupon-for-woocommerce' );
 		}
 		wp_send_json( $response );
 	}
@@ -204,77 +218,83 @@ class Settings {
 		wp_send_json_success( [ 'message' => __( 'App disconnected successfully!', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 	}
 
-	/**
-	 * update user as Free user
-	 */
-	public static function updateUserAsFreeUser() {
-		/*$details = RetainfulApi::getPlanDetails();
-		self::updatePlanDetails( $details );*/
-	}
 
 	/**
-	 * update the plan details
+	 * Get the store details
 	 *
-	 * @param array $details
+	 * @param $api_key
+	 * @param $secret_key
+	 *
+	 * @return array
 	 */
-	public static function updatePlanDetails( $details = array() ) {
-		update_option( 'rnoc_plan_details', $details );
-		update_option( 'rnoc_last_plan_checked', current_time( 'timestamp' ) );
-	}
-
-	/**
-	 * Check fo entered API key is valid or not
-	 *
-	 * @param string $api_key
-	 * @param string $secret_key
-	 * @param string $store_data
-	 *
-	 * @return bool|array
-	 */
-	public static function isApiEnabled( $api_key = "", $secret_key = null, $store_data = null ) {
-
-		$api_key    = empty( $api_key ) ? self::getApiKey() : $api_key;
-		$secret_key = empty( $secret_key ) ? self::getSecretKey() : $secret_key;
-		$store_data = empty( $store_data ) ? self::storeDetails( $api_key, $secret_key ) : $store_data;
-		if ( ! empty( $api_key ) ) {
-
-			if ( $details = Request::connect( $api_key, $store_data ) ) {
-				if ( empty( $details ) || is_string( $details ) ) {
-					self::updateUserAsFreeUser();
-
-					return array( 'error' => $details );
-				} else {
-
-					self::updatePlanDetails( $details );
-
-					return array( 'success' => isset( $details['message'] ) ? $details['message'] : null );
-				}
-			} else {
-				self::updateUserAsFreeUser();
-
-				return false;
-			}
-		} else {
-			self::updateUserAsFreeUser();
-
-			return false;
+	public static function storeDetails( $api_key, $secret_key ) {
+		$scheme           = wc_site_is_https() ? 'https' : 'http';
+		$default_language = ''; //need to add the store language using the multilingual addon
+		$time_zone        = \RNOC\App\Helpers\Settings::getData( 'timezone_string' );
+		if ( empty( $time_zone ) ) {
+			$time_zone = \RNOC\App\Helpers\Settings::getData( 'gmt_offset' );
 		}
+
+		return array(
+			'woocommerce_app_id'             => $api_key,
+			'secret_key'                     => Request::encryptData( $api_key, $secret_key ),
+			'id'                             => null,
+			'name'                           => \RNOC\App\Helpers\Settings::getData( 'blogname' ),
+			'email'                          => \RNOC\App\Helpers\Settings::getData( 'admin_email' ),
+			'domain'                         => get_home_url( null, null, $scheme ),
+			'address1'                       => \RNOC\App\Helpers\Settings::getData( 'woocommerce_store_address', null ),
+			'address2'                       => \RNOC\App\Helpers\Settings::getData( 'woocommerce_store_address_2', null ),
+			'currency'                       => \RNOC\App\Helpers\WC::getDefaultCurrency(),
+			'city'                           => \RNOC\App\Helpers\Settings::getData( 'woocommerce_store_city', null ),
+			'zip'                            => \RNOC\App\Helpers\Settings::getData( 'woocommerce_store_postcode', null ),
+			'country'                        => null,
+			'timezone'                       => $time_zone,
+			'weight_unit'                    => \RNOC\App\Helpers\Settings::getData( 'woocommerce_weight_unit' ),
+			'country_code'                   => \RNOC\App\Helpers\WC::getStoreCountry(),
+			'province_code'                  => \RNOC\App\Helpers\WC::getStoreState(),
+			'force_ssl'                      => ( \RNOC\App\Helpers\Settings::getData( 'woocommerce_force_ssl_checkout', 'no' ) == 'yes' ),
+			'enabled_presentment_currencies' => self::getAllAvailableCurrencies(),
+			'primary_locale'                 => $default_language
+		);
 	}
 
-	/**
-	 * Get Admin API key
-	 * @return String|null
-	 */
-	public static function getApiKey() {
-		return \RNOC\App\Helpers\Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'retainful_license' );
-	}
 
 	/**
-	 * Get Admin API key
-	 * @return String|null
+	 * Check the site has multi currency
+	 * @return bool
 	 */
-	public static function getSecretKey() {
-		return \RNOC\App\Helpers\Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'retainful_license' );
+	public static function getAllAvailableCurrencies() {
+		$base_currency = WC::getDefaultCurrency();
+		$currencies    = array( $base_currency );
+
+		return apply_filters( 'rnoc_get_available_currencies', $currencies );
 	}
+
+
+	/**
+	 *
+	 */
+	public static function saveSettingsData() {
+
+		if ( ! WP::isSecurityValid( 'rnoc_settings_nonce' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
+		}
+		$settings  = \RNOC\App\Helpers\Settings::getSettings();
+		$form_date = [];
+		foreach ( $settings as $key => $value ) {
+			$form_date[ $key ] = Input::get( $key, $value );
+		}
+		$validator_message = \RNOC\App\Helpers\Settings::settingsValidation( $form_date );
+		if ( ! empty( $validator_message ) ) {
+			wp_send_json_error( $validator_message );
+		}
+		$cart_capture_msg                                = Input::get( RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '' );
+		$post                                            = $form_date;
+		$data                                            = Input::clean( $post );
+		$data[ RNOC_PLUGIN_PREFIX . 'cart_capture_msg' ] = trim( Input::sanitizeContent( $cart_capture_msg ) );
+		update_option( 'retainful_settings', $data );
+		wp_send_json_success( __( 'Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce' ) );
+	}
+
 
 }

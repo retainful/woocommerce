@@ -5,6 +5,7 @@ namespace RNOC\App\Helpers;
 use RNOC\App\Modules\Storage\PHPSession;
 use RNOC\App\Modules\Storage\WooSession;
 use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
+use Valitron\Validator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -182,4 +183,61 @@ class Settings {
 	}
 
 
+	/**
+	 * update the plan details
+	 *
+	 * @param array $details
+	 */
+	public static function updatePlanDetails( $response = \stdClass::class ) {
+		$details = array(
+			'plan'       => ! empty( $response->plan ) ? strtolower( $response->plan ) : 'free',
+			'status'     => ! empty( $response->status ) ? strtolower( $response->status ) : 'active',
+			'expired_on' => ! empty( $response->period_end ) ? strtolower( $response->period_end ) : 'never',
+			'message'    => ! empty( $response->message ) ? strtolower( $response->message ) : 'App connected successfully'
+		);
+		update_option( 'rnoc_plan_details', $details );
+		update_option( 'rnoc_last_plan_checked', current_time( 'timestamp' ) );
+	}
+
+	/**
+	 * validate settings date.
+	 *
+	 * @param $post_data
+	 *
+	 * @return string|void
+	 */
+	public static function settingsValidation( $post_data ) {
+		$message = '';
+		if ( empty( $post_data ) && ! is_array( $post_data ) ) {
+			return __( 'validation failed!', 'retainful-next-order-coupon-for-woocommerce' );
+		}
+		$validator = new Validator( $post_data );
+		$validator->rule( 'in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', [
+			'js',
+			'php'
+		] )->message( 'This field contains invalid value' );
+		$validator->rule( 'in', array(
+			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
+			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'
+		), [ 'yes', 'no' ] )->message( 'This field contains invalid value' );
+		$validator->rule( 'in', RNOC_PLUGIN_PREFIX . 'handle_storage_using', [
+			'woocommerce',
+			'cookie',
+			'php'
+		] )->message( 'This field contains invalid value' );
+		$validator->rule( 'in', array(
+			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
+			RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
+			RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status',
+			RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load',
+			RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
+			RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
+			RNOC_PLUGIN_PREFIX . 'enable_debug_log',
+		), [ '0', '1' ] )->message( 'This field contains invalid value' );
+		if ( ! $validator->validate() ) {
+			$message = $validator->errors();
+		}
+
+		return $message;
+	}
 }

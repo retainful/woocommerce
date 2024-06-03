@@ -3,11 +3,19 @@
 namespace RNOC\App\Modules\AbandonedCart;
 
 
+use RNOC\App\Helpers\Settings;
+
 defined( 'ABSPATH' ) || exit;
 
 class Request {
 	protected static $app_url = 'https://app.retainful.com/';
 	protected static $api_url = 'https://api.retainful.com/v1/';
+
+
+	/** The cipher method name to use to encrypt the cart data */
+	const CIPHER_METHOD = 'AES256';
+	/** The HMAC hash algorithm to use to sign the encrypted cart data */
+	const HMAC_ALGORITHM = 'sha256';
 
 	/**
 	 * Get api url.
@@ -38,14 +46,17 @@ class Request {
 	 * @return array
 	 */
 	public static function connect( $api_key, $data ) {
+
 		if ( empty( $api_key ) || empty( $data ) || ! is_array( $data ) ) {
 			return [];
 		}
-		$url     = self::getApiUrl() . 'app/' . $api_key;
+		$url = self::getApiUrl() . 'app/' . $api_key;
+
 		$headers = [
 			'api_key'      => $api_key,
 			'Content-Type' => 'application/json'
 		];
+
 
 		return self::post( $url, $data, $headers );
 	}
@@ -63,6 +74,7 @@ class Request {
 		if ( empty( $api_key ) || empty( $data ) || ! is_array( $data ) ) {
 			return [];
 		}
+
 		$url     = self::getAbandonedCartApiUrl() . 'webhooks/checkout';
 		$headers = [
 			'app_id'       => $api_key,
@@ -123,5 +135,38 @@ class Request {
 		}
 
 		return $response;
+	}
+
+
+	/**
+	 * Encrypt the cart
+	 *
+	 * @param $data
+	 * @param $secret
+	 *
+	 * @return string
+	 */
+	public static function encryptData( $data, $secret = null ) {
+
+		if ( extension_loaded( 'openssl' ) ) {
+			if ( is_array( $data ) || is_object( $data ) ) {
+				$data = wp_json_encode( $data );
+			}
+			try {
+				if ( empty( $secret ) ) {
+					$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
+				}
+				$iv_len          = openssl_cipher_iv_length( self::CIPHER_METHOD );
+				$iv              = openssl_random_pseudo_bytes( $iv_len );
+				$cipher_text_raw = openssl_encrypt( $data, self::CIPHER_METHOD, $secret, OPENSSL_RAW_DATA, $iv );
+				$hmac            = hash_hmac( self::HMAC_ALGORITHM, $cipher_text_raw, $secret, true );
+
+				return base64_encode( bin2hex( $iv ) . ':retainful:' . bin2hex( $hmac ) . ':retainful:' . bin2hex( $cipher_text_raw ) );
+			} catch ( Exception $e ) {
+				return null;
+			}
+		}
+
+		return null;
 	}
 }

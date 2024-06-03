@@ -49,7 +49,7 @@ $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ]
             </th>
             <td>
                 <button type="button" id="validate-app-id-and-secret"
-                        onclick="rnoc_jquery('body').trigger('validate_app_key',[<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>,<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>])"
+                        onclick="rnoc_jquery('body').trigger('rnoc-app-connect',[<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>,<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>])"
                         class="button button-primary button-green">
 					<?php echo ( ! $is_app_connected ) ? __( 'Connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 'Re-Connect', 'retainful-next-order-coupon-for-woocommerce' ); ?>
                 </button>
