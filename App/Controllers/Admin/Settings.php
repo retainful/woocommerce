@@ -7,7 +7,6 @@ use Rnoc\App\Helpers\WC;
 use RNOC\App\Helpers\WP;
 use RNOC\App\Helpers\Input;
 
-//use RNOC\App\library\RetainfulApi;
 use RNOC\App\Modules\AbandonedCart\Request;
 use Valitron\Validator;
 
@@ -102,7 +101,7 @@ class Settings {
 	 * @return void
 	 */
 	public static function addAdminScript() {
-		$page = Input::get( 'page', '' );
+		$page = (string) Input::get( 'page', '' );
 		if ( ! in_array( $page, [ 'retainful_license', 'retainful_settings' ] ) ) {
 			return;
 		}
@@ -154,8 +153,7 @@ class Settings {
 	 */
 	public static function connect() {
 
-		$security_check = WP::isSecurityValid( 'rnoc_app_connect' );
-		if ( empty( $security_check ) ) {
+		if ( empty( WP::isSecurityValid( 'rnoc_app_connect' ) ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 
