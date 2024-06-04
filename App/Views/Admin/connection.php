@@ -3,7 +3,7 @@ $settings         = ! empty( $settings ) ? $settings : [];
 $app_url          = ! empty( $app_url ) ? $app_url : '';
 $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ] == 1 );
 ?>
-<form id="retainful-license-form" class="card connection-form">
+<div id="retainful-license-form" class="card connection-form">
     <table class="form-table" role="presentation">
         <tbody>
         <tr>
@@ -49,7 +49,7 @@ $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ]
             </th>
             <td>
                 <button type="button" id="validate-app-id-and-secret"
-                        onclick="rnoc_jquery('body').trigger('validate_app_key',[<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>,<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>])"
+                        onclick="rnoc_jquery('body').trigger('rnoc-app-connect',[<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>,<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>])"
                         class="button button-primary button-green">
 					<?php echo ( ! $is_app_connected ) ? __( 'Connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 'Re-Connect', 'retainful-next-order-coupon-for-woocommerce' ); ?>
                 </button>
@@ -72,4 +72,4 @@ $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ]
         </tr>
         </tbody>
     </table>
-</form>
+</div>

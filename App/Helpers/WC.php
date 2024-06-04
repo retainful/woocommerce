@@ -233,7 +233,37 @@ class WC {
 	}
 
 	/**
-	 * Get order meta from order object.
+	 * woocommerce get store Country.
+	 *
+	 * @return string|null
+	 */
+	public static function getStoreCountry() {
+		return function_exists( 'WC' ) && isset( WC()->countries ) && Util::isMethodExists( WC()->countries, 'get_base_country' ) ? WC()->countries->get_base_country() : null;
+	}
+
+
+	/**
+	 * woocommerce get store state.
+	 *
+	 * @return string|null
+	 */
+	public static function getStoreState() {
+		return function_exists( 'WC' ) && isset( WC()->countries ) && Util::isMethodExists( WC()->countries, 'get_base_state' ) ? WC()->countries->get_base_state() : null;
+	}
+
+	/**
+	 * Check the site has multi currency
+	 * @return bool
+	 */
+	public static function getAllAvailableCurrencies() {
+		$base_currency = WC::getDefaultCurrency();
+		$currencies    = array( $base_currency );
+
+		return apply_filters( 'rnoc_get_available_currencies', $currencies );
+	}
+
+	/**
+	 * Get order meta.
 	 *
 	 * @param string $meta_key Meta key.
 	 * @param WC_Order $order Order object
