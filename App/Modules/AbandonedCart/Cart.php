@@ -60,6 +60,28 @@ class Cart extends AbandonedCart {
 	}
 
 	/**
+	 * Handle persistent cart.
+	 *
+	 * @return void
+	 */
+	public function handlePersistentCart() {
+		// bail for guest users, when the cart is empty, or when doing a WP cron request
+		if ( ! is_user_logged_in() || WC::isCartEmpty() || defined( 'DOING_CRON' ) ) {
+			return;
+		}
+		$user_id             = get_current_user_id();
+		$cart_token          = get_user_meta( $user_id, self::$cart_token_key_for_db, true );
+		$retrieve_cart_token = $this->retrieveCartToken();
+		if ( $cart_token && ! $retrieve_cart_token ) {
+			// for a logged-in user with a persistent cart, set the cart token to the session
+			$this->setCartToken( $cart_token );
+		} elseif ( ! $cart_token && $retrieve_cart_token ) {
+			// when a guest user with an existing cart logs in, save the cart token to user meta
+			update_user_meta( $user_id, self::$cart_token_key_for_db, $retrieve_cart_token );
+		}
+	}
+
+	/**
 	 * Get cart request data.
 	 *
 	 * @return mixed|null

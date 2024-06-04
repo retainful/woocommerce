@@ -804,4 +804,21 @@ class WC {
 
 		return [];
 	}
+
+	/**
+	 * Check is empty cart.
+	 *
+	 * @return bool
+	 */
+	public static function isCartEmpty() {
+		if ( function_exists( 'WC' ) && isset( WC()->cart ) && Util::isMethodExists( WC()->cart, 'is_empty' ) ) {
+			try {
+				return WC()->cart->is_empty();
+			} catch ( \Exception $e ) {
+				return true;
+			}
+		}
+
+		return true;
+	}
 }
