@@ -201,20 +201,28 @@ class Settings {
 
 
 	/**
-	 * update the plan details
+	 * Update plan details.
 	 *
-	 * @param array $details
+	 * @param object|string $response Response.
+	 *
+	 * @return void
 	 */
-	public static function updatePlanDetails( $response = \stdClass::class ) {
-		if ( ! is_object( $response ) ) {
-			return;
-		}
+	public static function updatePlanDetails( $response = '' ) {
 		$details = [
-			'plan'       => ! empty( $response->plan ) ? strtolower( $response->plan ) : 'free',
-			'status'     => ! empty( $response->status ) ? strtolower( $response->status ) : 'active',
-			'expired_on' => ! empty( $response->period_end ) ? strtolower( $response->period_end ) : 'never',
-			'message'    => ! empty( $response->message ) ? strtolower( $response->message ) : 'App connected successfully'
+			'plan'       => 'free',
+			'status'     => 'active',
+			'expired_on' => 'never',
+			'message'    => __( 'App connected successfully', 'retainful-next-order-coupon-for-woocommerce' )
 		];
+		if ( is_object( $response ) ) {
+			$details = [
+				'plan'       => ! empty( $response->plan ) ? strtolower( $response->plan ) : 'free',
+				'status'     => ! empty( $response->status ) ? strtolower( $response->status ) : 'active',
+				'expired_on' => ! empty( $response->period_end ) ? strtolower( $response->period_end ) : 'never',
+				'message'    => ! empty( $response->message ) ? strtolower( $response->message ) : 'App connected successfully'
+			];
+		}
+
 		update_option( 'rnoc_plan_details', $details );
 		update_option( 'rnoc_last_plan_checked', current_time( 'timestamp' ) );
 	}

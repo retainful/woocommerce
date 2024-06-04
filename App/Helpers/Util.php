@@ -2,11 +2,6 @@
 
 namespace RNOC\App\Helpers;
 
-use Rnoc\App\Helpers\Settings as SettingHelper;
-use Rnoc\App\Helpers\WC;
-
-//use Rnoc\App\Modules\Integrations\MultiLingual;
-
 defined( 'ABSPATH' ) || exit;
 
 class Util {

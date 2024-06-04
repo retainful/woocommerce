@@ -2,10 +2,6 @@
 
 namespace RNOC\App\Helpers;
 
-use RNOC\App\Modules\Storage\PHPSession;
-use RNOC\App\Modules\Storage\WooSession;
-use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
-
 defined( 'ABSPATH' ) || exit;
 
 class Input {

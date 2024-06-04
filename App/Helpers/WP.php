@@ -124,8 +124,8 @@ class WP {
 	 * @return bool
 	 */
 	public static function isSecurityValid( $nonce_name = '' ) {
-		$rnoc_nonce = Input::get( 'rnoc_nonce', '' );
-		if ( ! self::hasAdminPrivilege() || ! self::verifyNonce( $rnoc_nonce, $nonce_name ) ) {
+		$nonce = Input::get( 'rnoc_nonce', '' );
+		if ( ! self::hasAdminPrivilege() || ! self::verifyNonce( $nonce, $nonce_name ) ) {
 			return false;
 		}
 

@@ -3,10 +3,8 @@
 namespace RNOC\App\Controllers\Admin;
 
 use RNOC\App\Helpers\Util;
-use Rnoc\App\Helpers\WC;
 use RNOC\App\Helpers\WP;
 use RNOC\App\Helpers\Input;
-
 use RNOC\App\Modules\AbandonedCart\Request;
 use Valitron\Validator;
 
@@ -153,7 +151,7 @@ class Settings {
 	 */
 	public static function connect() {
 
-		if ( empty( WP::isSecurityValid( 'rnoc_app_connect' ) ) ) {
+		if ( ! WP::isSecurityValid( 'rnoc_app_connect' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 
@@ -184,7 +182,7 @@ class Settings {
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'retainful_app_id', $app_id, 'license' );
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', $secret_key, 'license' );
 		$data         = [
-			'shop' => self::storeDetails( $app_id, $secret_key ),
+			'shop' => self::getStoreDetails( $app_id, $secret_key ),
 		];
 		$api_response = Request::connect( $app_id, $data );
 		if ( ! empty( $api_response['success'] ) ) {
@@ -220,7 +218,7 @@ class Settings {
 	 *
 	 * @return array
 	 */
-	public static function storeDetails( $api_key, $secret_key ) {
+	public static function getStoreDetails( $api_key, $secret_key ) {
 		if ( empty( $api_key ) && empty( $secret_key ) ) {
 			return array();
 		}
@@ -253,11 +251,7 @@ class Settings {
 			'primary_locale'                 => $default_language
 		];
 	}
-
-
-	/**
-	 *
-	 */
+	
 	public static function saveSettings() {
 
 		if ( ! WP::isSecurityValid( 'rnoc_save_setting' ) ) {
