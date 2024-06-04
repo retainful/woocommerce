@@ -357,7 +357,7 @@ class Customer {
 	 */
 	public static function getCustomerBillingEmail() {
 
-		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, 'get_billing_email' ) ) {
+		if ( function_exists( 'WC' ) && isset( WC()->customer ) && Util::isMethodExists( WC()->customer, 'get_billing_email' ) ) {
 			return WC()->customer->get_billing_email();
 		}
 
@@ -377,7 +377,7 @@ class Customer {
 			return $default;
 		}
 		$method = 'get_' . $key;
-		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, $method ) ) {
+		if ( function_exists( 'WC' ) && isset( WC()->customer ) && Util::isMethodExists( WC()->customer, $method ) ) {
 			return WC()->customer->$method();
 		}
 
