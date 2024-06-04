@@ -2,9 +2,13 @@
 
 namespace RNOC\App\Helpers;
 
+use RNOC\App\Helpers\Traits\CartAddress;
+
 defined( 'ABSPATH' ) || exit;
 
 class Customer {
+	use CartAddress;
+
 	protected static $default = [
 		'id'                => 0,
 		'email'             => '',
@@ -23,49 +27,81 @@ class Customer {
 		'user_roles'        => ''
 	];
 
+
 	/**
 	 * Get cart customer.
 	 *
 	 * @return array
 	 */
 	public static function getCartCustomer() {
-		$billing_email      = WC::getCustomerBillingEmail();
-		$billing_phone      = WC::getCustomerData( 'billing_phone' );
-		$billing_state      = WC::getCustomerData( 'billing_state' );
-		$billing_first_name = WC::getCustomerData( 'billing_first_name' );
-		$billing_last_name  = WC::getCustomerData( 'billing_last_name' );
-		$created_at         = Settings::getStorage()->get( 'rnoc_session_created_at', current_time( 'timestamp', true ) );
-		$updated_at         = current_time( 'timestamp', true );
+		$billing_email = self::getCartBillingEmail();
+		$created_at    = Settings::getStorage()->get( 'rnoc_session_created_at', current_time( 'timestamp', true ) );
+		$updated_at    = current_time( 'timestamp', true );
 		if ( $user_id = get_current_user_id() ) {
-			$user          = wp_get_current_user();
-			$billing_email = empty( $billing_email ) ? WP::getLoginUserEmail() : $billing_email;
-			$billing_email = empty( $billing_email ) ? ( function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, 'get_email' ) ? WC()->customer->get_email() : '' ) : $billing_email;
-
-			$billing_state = empty( $billing_state ) ? get_user_meta( $user_id, 'billing_state', true ) : $billing_state;
-
-			$billing_phone      = empty( $billing_phone ) ? get_user_meta( $user_id, 'billing_phone', true ) : $billing_phone;
-			$billing_first_name = empty( $billing_first_name ) ? get_user_meta( $user_id, 'billing_first_name', true ) : $billing_first_name;
-			$billing_first_name = empty( $billing_first_name ) ? ( is_object( $user ) && ! empty( $user->first_name ) ? $user->first_name : '' ) : $billing_first_name;
-
-			$billing_last_name = empty( $billing_last_name ) ? get_user_meta( $user_id, 'billing_last_name', true ) : $billing_last_name;
-			$billing_last_name = empty( $billing_last_name ) ? ( is_object( $user ) && ! empty( $user->last_name ) ? $user->last_name : '' ) : $billing_last_name;
-
+			$user       = wp_get_current_user();
 			$created_at = $updated_at = is_object( $user->user_registered ) && ! empty( $user->user_registered ) ? strtotime( $user->user_registered ) : current_time( 'timestamp', true );
 		}
-		$user_data = [
+
+		return wp_parse_args( [
 			'id'         => $user_id,
 			'email'      => $billing_email,
-			'phone'      => $billing_phone,
-			'state'      => $billing_state,
-			'last_name'  => $billing_last_name,
-			'first_name' => $billing_first_name,
+			'phone'      => self::getCartPhone(),
+			'state'      => self::getCartState(),
+			'last_name'  => self::getCartLastName(),
+			'first_name' => self::getCartFirstName(),
 			'created_at' => WP::formatToIso8601( $created_at ),
 			'updated_at' => WP::formatToIso8601( $updated_at ),
 			'currency'   => WC::getDefaultCurrency(),
 			'user_roles' => WP::getUserRoles( $billing_email )
-		];
+		], self::$default );
+	}
 
-		return wp_parse_args( $user_data, self::$default );
+	/**
+	 * Get billing address.
+	 *
+	 * @return array
+	 */
+	public static function getCartBillingAddress() {
+		return [
+			'zip'           => self::getCartZipCode(),
+			'city'          => self::getCartCity(),
+			'name'          => self::getCartFirstName() . ' ' . self::getCartLastName(),
+			'phone'         => self::getCartPhone(),
+			'company'       => self::getCartCompany(),
+			'country'       => self::getCartCountry(),
+			'address1'      => self::getCartAddressOne(),
+			'address2'      => self::getCartAddressTwo(),
+			'province'      => self::getCartState(),
+			'last_name'     => self::getCartLastName(),
+			'first_name'    => self::getCartFirstName(),
+			'country_code'  => self::getCartCountry(),
+			'province_code' => self::getCartState(),
+		];
+	}
+
+	/**
+	 * Get shipping address.
+	 *
+	 * @return array
+	 */
+	public static function getCartShippingAddress() {
+		return [
+			'zip'           => self::getCartZipCode( 'shipping' ),
+			'city'          => self::getCartCity( 'shipping' ),
+			'name'          => self::getCartFirstName( 'shipping' ) . ' ' . self::getCartLastName( 'shipping' ),
+			'phone'         => null, // TODO: Need to ask, why we need to send null value
+			'company'       => null,// TODO: Need to ask, why we need to send null value
+			'country'       => self::getCartCountry( 'shipping' ),
+			'address1'      => self::getCartAddressOne( 'shipping' ),
+			'address2'      => self::getCartAddressTwo( 'shipping' ),
+			'latitude'      => '',
+			'longitude'     => '',
+			'province'      => self::getCartState( 'shipping' ),
+			'last_name'     => self::getCartLastName( 'shipping' ),
+			'first_name'    => self::getCartFirstName( 'shipping' ),
+			'country_code'  => self::getCartCountry( 'shipping' ),
+			'province_code' => self::getCartState( 'shipping' ),
+		];
 	}
 
 	/**
@@ -115,5 +151,102 @@ class Customer {
 			'orders_count'  => is_array( $customer_orders ) ? count( $customer_orders ) : 0
 		], self::$default );
 
+	}
+
+	/**
+	 * Get order billing address.
+	 *
+	 * @param \WC_Order $order Order object.
+	 *
+	 * @return array
+	 */
+	public static function getOrderBillingAddress( $order ) {
+		if ( ! $order instanceof \WC_Order ) {
+			return [];
+		}
+
+		return [
+			'zip'           => WC::getOrderData( 'billing_postcode', $order ),
+			'city'          => WC::getOrderData( 'billing_city', $order ),
+			'name'          => WC::getOrderData( 'billing_first_name', $order ) . ' ' . WC::getOrderData( 'billing_last_name', $order ),
+			'phone'         => null, // TODO: Need to ask, why we need to send null value
+			'company'       => null, // TODO: Need to ask, why we need to send null value
+			'country'       => WC::getOrderData( 'billing_country', $order ),
+			'address1'      => WC::getOrderData( 'billing_address_1', $order ),
+			'address2'      => WC::getOrderData( 'billing_address_2', $order ),
+			'latitude'      => '',
+			'longitude'     => '',
+			'province'      => WC::getOrderData( 'billing_state', $order ),
+			'last_name'     => WC::getOrderData( 'billing_last_name', $order ),
+			'first_name'    => WC::getOrderData( 'billing_first_name', $order ),
+			'country_code'  => WC::getOrderData( 'billing_country', $order ),
+			'province_code' => WC::getOrderData( 'billing_state', $order ),
+		];
+	}
+
+	/**
+	 * Get order shipping address.
+	 *
+	 * @param \WC_Order $order Order object.
+	 *
+	 * @return array
+	 */
+	public static function getOrderShippingAddress( $order ) {
+		if ( ! $order instanceof \WC_Order ) {
+			return [];
+		}
+
+		return [
+			'zip'           => WC::getOrderData( 'shipping_postcode', $order ),
+			'city'          => WC::getOrderData( 'shipping_city', $order ),
+			'name'          => WC::getOrderData( 'shipping_first_name', $order ) . ' ' . WC::getOrderData( 'shipping_last_name', $order ),
+			'phone'         => null, // TODO: Need to ask, why we need to send null value
+			'company'       => null, // TODO: Need to ask, why we need to send null value
+			'country'       => WC::getOrderData( 'shipping_country', $order ),
+			'address1'      => WC::getOrderData( 'shipping_address_1', $order ),
+			'address2'      => WC::getOrderData( 'shipping_address_2', $order ),
+			'latitude'      => '',
+			'longitude'     => '',
+			'province'      => WC::getOrderData( 'shipping_state', $order ),
+			'last_name'     => WC::getOrderData( 'shipping_last_name', $order ),
+			'first_name'    => WC::getOrderData( 'shipping_first_name', $order ),
+			'country_code'  => WC::getOrderData( 'shipping_country', $order ),
+			'province_code' => WC::getOrderData( 'shipping_state', $order ),
+		];
+
+	}
+
+	/**
+	 * Get client details.
+	 *
+	 * @param \WC_Order $order order object
+	 *
+	 * @return array
+	 */
+	public static function getClientDetails( $order = '' ) {
+		$client_details = [
+			'accept_language' => self::getUserAcceptLanguage( $order )
+		];
+
+		return apply_filters( 'rnoc_get_client_details', $client_details, $order );
+	}
+
+	/**
+	 * Get user agent language.
+	 *
+	 * @param \WC_Order $order Order object.
+	 *
+	 * @return string
+	 */
+	public static function getUserAcceptLanguage( $order = '' ) {
+		if ( ! empty( $order ) ) {
+			return WC::getOrderMeta( '_rnoc_get_http_accept_language', $order );
+		} else if ( ! empty( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ) {
+			$lang = trim( $_SERVER['HTTP_ACCEPT_LANGUAGE'] );
+
+			return substr( $lang, 0, 2 );
+		}
+
+		return '';
 	}
 }

@@ -226,4 +226,16 @@ class WC {
 
 		return apply_filters( 'rnoc_get_available_currencies', $currencies );
 	}
+
+	/**
+	 * Get order meta.
+	 *
+	 * @param string $meta_key Meta key.
+	 * @param WC_Order $order Order object
+	 *
+	 * @return mixed
+	 */
+	public static function getOrderMeta( $meta_key, $order ) {
+		return Util::isMethodExists( $order, 'get_meta' ) ? $order->get_meta( $meta_key ) : '';
+	}
 }
