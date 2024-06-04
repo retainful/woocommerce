@@ -196,4 +196,16 @@ class WC {
 	public static function getOrderId( $order ) {
 		return Util::isMethodExists( $order, 'get_id' ) ? $order->get_id() : 0;
 	}
+
+	/**
+	 * Get order meta from order object.
+	 *
+	 * @param string $meta_key Meta key.
+	 * @param WC_Order $order Order object
+	 *
+	 * @return mixed
+	 */
+	public static function getOrderMeta( $meta_key, $order ) {
+		return Util::isMethodExists( $order, 'get_meta' ) ? $order->get_meta( $meta_key ) : '';
+	}
 }
