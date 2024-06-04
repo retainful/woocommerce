@@ -148,4 +148,44 @@ class WP {
 
 		return wp_verify_nonce( $nonce, $action );
 	}
+
+	/**
+	 * Get the default language.
+	 *
+	 * @return string|null
+	 */
+	public static function getDefaultLanguage() {
+		$current_lang = null;
+		$wpml_options = get_option( 'icl_sitepress_settings' );
+		if ( ! empty( $wpml_options ) ) {
+			return ( isset( $wpml_options['default_language'] ) ) ? $wpml_options['default_language'] : null;
+		}
+		if ( function_exists( 'pll_default_language' ) ) {
+			return pll_default_language();
+		}
+		if ( function_exists( 'get_locale' ) ) {
+			$current_lang = get_locale();
+			if ( empty( $current_lang ) ) {
+				$current_lang = 'en';
+			}
+		}
+
+		return $current_lang;
+	}
+
+	/**
+	 * Get the current language.
+	 *
+	 * @return string|null
+	 */
+	public static function getCurrentLanguage() {
+		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
+			return ICL_LANGUAGE_CODE;
+		}
+		if ( function_exists( 'pll_current_language' ) ) {
+			return pll_current_language();
+		}
+
+		return self::getDefaultLanguage();
+	}
 }
