@@ -20,7 +20,7 @@ class Util {
 
 		return false;
 	}
-	
+
 	/**
 	 * render template.
 	 *

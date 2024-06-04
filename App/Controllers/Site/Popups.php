@@ -2,6 +2,7 @@
 
 namespace RNOC\App\Controllers\Site;
 
+use RNOC\App\Helpers\Customer;
 use RNOC\App\Helpers\Settings;
 use RNOC\App\Helpers\Util;
 use RNOC\App\Helpers\WC;
@@ -35,7 +36,7 @@ class Popups {
 	 * @return void
 	 */
 	public static function setIdentityData() {
-		$customer_billing_email = WC::getCustomerBillingEmail();
+		$customer_billing_email = Customer::getCustomerBillingEmail();
 
 		if ( ! WP::isCustomerPage() || ! empty( $customer_billing_email ) ) {
 			return;
@@ -49,7 +50,7 @@ class Popups {
 		if ( ! empty( $identity_data ) ) {
 			$identity_data = json_decode( base64_decode( $identity_data ), true );
 			if ( is_array( $identity_data ) && ! empty( $identity_data['email'] ) ) {
-				WC::setCustomerBillingEmail( $identity_data['email'] );
+				Customer::setCustomerEmail( $identity_data['email'] );
 			}
 		}
 	}

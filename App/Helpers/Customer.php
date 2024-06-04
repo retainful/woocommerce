@@ -23,10 +23,72 @@ class Customer {
 		'orders_count'      => 0,
 		'last_order_id'     => 0,
 		'verified_email'    => true,
+		'last_order_name'   => null,
 		'accepts_marketing' => true,
 		'user_roles'        => ''
 	];
 
+	/**
+	 * Get address fields.
+	 *
+	 * @return array
+	 */
+	public static function getAddressFields() {
+		return apply_filters( 'rnoc_get_checkout_mapping_fields', [
+			'first_name',
+			'last_name',
+			'state',
+			'phone',
+			'postcode',
+			'city',
+			'country',
+			'address_1',
+			'address_2',
+			'company'
+		] );
+	}
+
+	/**
+	 * Set customer details.
+	 *
+	 * @param string $from From address
+	 * @param string $set To address
+	 *
+	 * @return void
+	 */
+	public static function setCustomerDetails( $from = 'billing', $set = 'billing' ) {
+		$address_fields = self::getAddressFields();
+		foreach ( $address_fields as $field ) {
+			if ( $field == 'email' ) {
+				continue;
+			}
+			$field_name = $from . '_' . $field;
+			if ( ! isset( $_POST[ $field_name ] ) ) {
+				continue;
+			}
+			$field_value = $_POST[ $field_name ];//TODO: Use input helper.
+			if ( ! function_exists( 'WC' ) || ! is_object( WC()->customer ) ) {
+				continue;
+			}
+			$method_name = 'set_' . $set . '_' . $set;
+			if ( is_callable( [ WC()->customer, $method_name ] ) ) {
+				WC()->customer->$method_name( $field_value );
+			}
+		}
+	}
+
+	/**
+	 * Set customer email.
+	 *
+	 * @param string $billing_email Customer email.
+	 *
+	 * @return void
+	 */
+	public static function setCustomerEmail( $billing_email ) {
+		if ( is_email( $billing_email ) && function_exists( 'WC' ) && isset( WC()->customer ) && Util::isMethodExists( WC()->customer, 'set_billing_email' ) ) {
+			WC()->customer->set_billing_email( $billing_email );
+		}
+	}
 
 	/**
 	 * Get cart customer.
@@ -248,5 +310,77 @@ class Customer {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Customer user ip.
+	 *
+	 * @return string
+	 */
+	public static function getUserIPDetails() {
+		$ip = self::getClientIp();
+
+		return (string) trim( current( preg_split( '/,/', sanitize_text_field( wp_unslash( $ip ) ) ) ) );
+	}
+
+	/**
+	 * Get client ip.
+	 *
+	 * @return string
+	 */
+	public static function getClientIP() {
+		if ( isset( $_SERVER['HTTP_X_REAL_IP'] ) ) {
+			$client_ip = $_SERVER['HTTP_X_REAL_IP'];
+		} elseif ( isset( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$client_ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED'] ) ) {
+			$client_ip = $_SERVER['HTTP_X_FORWARDED'];
+		} elseif ( isset( $_SERVER['HTTP_FORWARDED_FOR'] ) ) {
+			$client_ip = $_SERVER['HTTP_FORWARDED_FOR'];
+		} elseif ( isset( $_SERVER['HTTP_FORWARDED'] ) ) {
+			$client_ip = $_SERVER['HTTP_FORWARDED'];
+		} elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$client_ip = $_SERVER['REMOTE_ADDR'];
+		} else {
+			$client_ip = '';
+		}
+
+		return $client_ip;
+	}
+
+	/**
+	 * Get Customer email.
+	 *
+	 * @return string
+	 */
+	public static function getCustomerBillingEmail() {
+
+		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, 'get_billing_email' ) ) {
+			return WC()->customer->get_billing_email();
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get customer data.
+	 *
+	 * @param string $key Customer key.
+	 * @param mixed $default Customer data default value.
+	 *
+	 * @return mixed
+	 */
+	public static function getCustomerData( $key, $default = '' ) {
+		if ( empty( $key ) ) {
+			return $default;
+		}
+		$method = 'get_' . $key;
+		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->customer, $method ) ) {
+			return WC()->customer->$method();
+		}
+
+		return $default;
 	}
 }
