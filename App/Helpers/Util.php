@@ -20,7 +20,7 @@ class Util {
 
 		return false;
 	}
-	
+
 	/**
 	 * render template.
 	 *
@@ -44,4 +44,6 @@ class Util {
 			return $content;
 		}
 	}
+
+
 }

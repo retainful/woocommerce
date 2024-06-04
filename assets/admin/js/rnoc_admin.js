@@ -5,34 +5,22 @@ if (typeof (rnoc_jquery) == 'undefined') {
 rnoc = window.rnoc || {};
 
 (function (rnoc) {
-    rnoc_jquery(document).on('saveSettings', function (e, button_id) {
-        let data = {
-            form_data: rnoc_jquery('.rnoc-main #retainful-settings-form').serializeArray(),
-            rnoc_nonce: rnoc_localize_data.rnoc_save_settings,
-            action: "rnoc_validate_connection",
-        }
+    rnoc_jquery(document).on('rnoc_save_settings', function (e, button_id) {
+        let data = rnoc_jquery('.rnoc-main #retainful-settings-form').serializeArray()
+        data.push({name: 'rnoc_nonce', value: rnoc_localize_data.save_settings});
+        data.push({name: 'action', value: 'rnoc_save_settings_data'});
         rnoc_jquery('.rnoc-main #retainful-settings-form #' + button_id).attr('disabled', true);
         rnoc_jquery.ajax({
             data: data,
             type: 'post',
             url: rnoc_localize_data.ajax_url,
-            error: function (request, error) {
-            },
             success: function (json) {
-                // alertify.set('notifier', 'position', 'top-right');
+                alertify.set('notifier', 'position', 'top-right');
                 rnoc_jquery('.rnoc-main #retainful-settings-form #' + button_id).attr('disabled', false);
-                if (json.error) {
-                    if (json.message) {
-                        alert(json.message);
-                    }
-                    if (json.field_error) {
-                        rnoc_jquery.each(json.field_error, function (index, value) {
-                            alert(value);
-                            //alertify.error(value);
-                        });
-                    }
+                if (!json.success) {
+                    alertify.error(json.message());
                 } else {
-                    alert(json.message);
+                    alertify.success(json.data);
                     setTimeout(function () {
                         location.reload();
                     }, 800);
@@ -43,36 +31,75 @@ rnoc = window.rnoc || {};
             }
         });
     });
-    rnoc_jquery(document).on('validate_app_key', function (e, app_id_button, app_secret_button) {
-        if (button_id !== '') {
-            rnoc_jquery('#' + button_id).attr('disabled', 'disabled');
+    rnoc_jquery(document).on('rnoc-app-connect', function (e, app_id, app_secret) {
+        let rnoc_app_id = rnoc_jquery(app_id).val();
+        let rnoc_app_secret = rnoc_jquery(app_secret).val();
+        var message = rnoc_jquery(".retainful_app_validation_message");
+        alertify.set('notifier', 'position', 'top-right');
+
+        rnoc_jquery(this).attr('disabled', true);
+        if (rnoc_app_id === "" && rnoc_app_secret === "") {
+            return false;
         }
-        let app_id = rnoc_jquery(app_id_button).val();
-        let app_secret_key = rnoc_jquery(app_secret_button).val();
+        rnoc_jquery('.error').html('');
         let data = {
             action: "rnoc_validate_connection",
-            rnoc_nonce: rnoc_localize_data.validate_app_key,
-            app_id: app_id,
-            app_secret: app_secret_key
+            rnoc_nonce: rnoc_localize_data.app_connect,
+            app_id: rnoc_app_id,
+            app_secret: rnoc_app_secret
         }
         rnoc_jquery.ajax({
             type: "POST",
             url: rnoc_localize_data.ajax_url,
             data: data,
+            async: false,
             dataType: "json",
-            success: function (json) {
+            success: function (response) {
+                console.log(response);
+                if (response.error && typeof response.error === "object") {
+                    var result = response.error;
+                    for (const [key, value] of Object.entries(result)) {
+                        var field = rnoc_jquery('#error_' + key);
+                        var res_html = '';
+                        if (Array.isArray(value)) {
+                            res_html = '<ul>';
+                            var i;
+                            for (i = 0; i < value.length; i++) {
+                                res_html += "<li>" + value[i] + "<li>";
+                            }
+                            res_html += '<ul>';
+                        } else {
+                            res_html = value;
+                        }
+                        field.html(res_html);
+                    }
+                    return false;
+                }
+                if (response.error && app_id !== "") {
+                    alertify.error(response.error);
+                    app_id.focus();
+                    message.html('<p style="color:red;">' + response.error + '</p>');
+                }
+                if (response.success) {
+                    alertify.success('Successfully connected to Retainful');
+                    message.html('<p style="color:green;">' + response.success + '</p>');
+                    window.location.reload();
+                }
 
+            },
+            error: function () {
+                alert('Please try again later.');
             }
         });
     });
-    rnoc_jquery(document).on('rnoc-app-disconnect', function (e, app_id_button, app_secret_button) {
-        let app_id = rnoc_jquery(app_id_button).val();
-        let app_secret_key = rnoc_jquery(app_secret_button).val();
+    rnoc_jquery(document).on('rnoc-app-disconnect', function (e, app_id, app_secret) {
+        let rnoc_app_id = rnoc_jquery(app_id).val();
+        let rnoc_app_secret = rnoc_jquery(app_secret).val();
         let data = {
-            action: "rnoc_validate_connection",
-            rnoc_nonce: rnoc_localize_data.rnoc_disconnect_license,
-            app_id: app_id,
-            app_secret: app_secret_key
+            action: "rnoc_disconnect_connection",
+            rnoc_nonce: rnoc_localize_data.disconnect_license,
+            app_id: rnoc_app_id,
+            app_secret: rnoc_app_secret
         }
         rnoc_jquery.ajax({
             type: "POST",
@@ -80,7 +107,10 @@ rnoc = window.rnoc || {};
             data: data,
             dataType: "json",
             success: function (json) {
-
+                window.location.reload();
+            },
+            error: function () {
+                alert('Please try again later.');
             }
         });
     });
