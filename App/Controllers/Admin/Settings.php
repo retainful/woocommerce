@@ -113,9 +113,9 @@ class Settings {
 		wp_enqueue_style( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/css/alertify' . $suffix . '.css', array(), RNOC_VERSION );
 		wp_enqueue_script( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/js/alertify' . $suffix . '.js', array(), RNOC_VERSION . '&t=' . time() );
 		$localize = [
-			'save_settings'      => WP::createNonce( 'rnoc_save_setting' ),
-			'disconnect_license' => WP::createNonce( 'rnoc_disconnect_license' ),
-			'app_connect'        => WP::createNonce( 'rnoc_app_connect' ),
+			'save_settings'      => WP::createNonce( 'rnoc-save-setting' ),
+			'disconnect_license' => WP::createNonce( 'rnoc-disconnect-license' ),
+			'app_connect'        => WP::createNonce( 'rnoc-app-connect' ),
 			'ajax_url'           => admin_url( 'admin-ajax.php' ),
 			'admin_url'          => admin_url(),
 			'home_url'           => get_home_url(),
@@ -151,7 +151,7 @@ class Settings {
 	 */
 	public static function connect() {
 
-		if ( ! WP::isSecurityValid( 'rnoc_app_connect' ) ) {
+		if ( ! WP::isSecurityValid( 'rnoc-app-connect' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 
@@ -202,7 +202,7 @@ class Settings {
 	 * disconnect the app.
 	 */
 	public static function disConnect() {
-		if ( ! WP::isSecurityValid( 'rnoc_disconnect_license' ) ) {
+		if ( ! WP::isSecurityValid( 'rnoc-disconnect-license' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' );
@@ -251,10 +251,10 @@ class Settings {
 			'primary_locale'                 => $default_language
 		];
 	}
-	
+
 	public static function saveSettings() {
 
-		if ( ! WP::isSecurityValid( 'rnoc_save_setting' ) ) {
+		if ( ! WP::isSecurityValid( 'rnoc-save-setting' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 		$settings = \RNOC\App\Helpers\Settings::getSettings();

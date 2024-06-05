@@ -114,6 +114,7 @@ class Request {
 	 * @return array|mixed|string|\WP_Error
 	 */
 	protected static function post( $url, $body, $headers ) {
+
 		if ( is_array( $body ) || is_object( $body ) ) {
 			$body = json_encode( $body );
 		}
@@ -130,9 +131,11 @@ class Request {
 			if ( is_string( $response ) ) {
 				$response = json_decode( $response, true );
 			}
+
 		} catch ( \Exception $e ) {
 
 		}
+
 
 		return $response;
 	}
