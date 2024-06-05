@@ -42,9 +42,10 @@ class Router {
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
+			$cart = new Cart();
 			//add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
-			add_action( 'wp_ajax_rnoc_track_user_data', [ Cart::class, 'setCustomerData' ] );
-			add_action( 'wp_ajax_nopriv_rnoc_track_user_data', [ Cart::class, 'setCustomerData' ] );
+			add_action( 'wp_ajax_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
+			add_action( 'wp_ajax_nopriv_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
 
 			//add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
 			//add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
@@ -122,7 +123,8 @@ class Router {
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
-			add_action( 'woocommerce_cart_loaded_from_session', [ Cart::class, 'handlePersistentCart' ] );
+			$cart = new Cart();
+			add_action( 'woocommerce_cart_loaded_from_session', [ $cart, 'handlePersistentCart' ] );
 			//add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
 			//add_action('woocommerce_checkout_after_terms_and_conditions', array($cart, 'guestTermGdprMessage'));
 		}
