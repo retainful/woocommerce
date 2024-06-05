@@ -94,7 +94,7 @@ class Settings {
 
 
 	/**
-	 * add admin script function
+	 * Add admin script function.
 	 *
 	 * @return void
 	 */
@@ -147,7 +147,9 @@ class Settings {
 	}
 
 	/**
-	 * Validate app Id
+	 * Connect to RetainFul.
+	 *
+	 * @return void
 	 */
 	public static function connect() {
 
@@ -168,8 +170,8 @@ class Settings {
 
 		if ( ! $validator->validate() ) {
 			wp_send_json_error( [
-				'error_field' => $validator->errors(),
-				'message'     => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' )
+				'error_fields' => $validator->errors(),
+				'message'      => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' )
 			] );
 		}
 
@@ -199,7 +201,9 @@ class Settings {
 
 
 	/**
-	 * disconnect the app.
+	 * Disconnect the app.
+	 *
+	 * @return void
 	 */
 	public static function disConnect() {
 		if ( ! WP::isSecurityValid( 'rnoc_disconnect_license' ) ) {
@@ -211,10 +215,10 @@ class Settings {
 
 
 	/**
-	 * Get the store details
+	 * Get the store details.
 	 *
-	 * @param $api_key
-	 * @param $secret_key
+	 * @param string $api_key Api key.
+	 * @param string $secret_key Secret key.
 	 *
 	 * @return array
 	 */
@@ -223,7 +227,7 @@ class Settings {
 			return array();
 		}
 		$scheme           = wc_site_is_https() ? 'https' : 'http';
-		$default_language = ''; //need to add the store language using the multilingual addon
+		$default_language = ''; //TODO:need to add the store language using the multilingual addon
 		$time_zone        = \RNOC\App\Helpers\Settings::getData( 'timezone_string' );
 		if ( empty( $time_zone ) ) {
 			$time_zone = \RNOC\App\Helpers\Settings::getData( 'gmt_offset' );
@@ -251,7 +255,12 @@ class Settings {
 			'primary_locale'                 => $default_language
 		];
 	}
-	
+
+	/**
+	 * Save settings.
+	 *
+	 * @return void
+	 */
 	public static function saveSettings() {
 
 		if ( ! WP::isSecurityValid( 'rnoc_save_setting' ) ) {
@@ -267,18 +276,15 @@ class Settings {
 				$errors[ $field ] = current( $messages );
 			}
 			wp_send_json_error( [
-				'success' => false,
-				'data'    => [
-					'field_error' => $errors,
-					'message'     => __( 'Settings not saved!', 'retainful-next-order-coupon-for-woocommerce' )
-				]
+				'field_error' => $errors,
+				'message'     => __( 'Settings not saved!', 'retainful-next-order-coupon-for-woocommerce' )
 			] );
 		}
-		$cart_capture_msg                                = (string) Input::get( RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '' );
-		$data                                            = Input::clean( $settings );
-		$data[ RNOC_PLUGIN_PREFIX . 'cart_capture_msg' ] = trim( Input::sanitizeContent( $cart_capture_msg ) );
-		\RNOC\App\Helpers\Settings::updateData( 'retainful_settings', $data );
-		wp_send_json_success( __( 'Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce' ) );
+		$cart_capture_msg                                    = (string) Input::get( RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '' );
+		$settings                                            = Input::clean( $settings );
+		$settings[ RNOC_PLUGIN_PREFIX . 'cart_capture_msg' ] = trim( Input::sanitizeContent( $cart_capture_msg ) );
+		\RNOC\App\Helpers\Settings::updateData( 'retainful_settings', $settings );
+		wp_send_json_success( [ 'message' => __( 'Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 	}
 
 
