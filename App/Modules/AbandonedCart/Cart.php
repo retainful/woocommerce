@@ -2,7 +2,9 @@
 
 namespace RNOC\App\Modules\AbandonedCart;
 
+use RNOC\App\Helpers\Cart as CartHelper;
 use RNOC\App\Helpers\Customer;
+use RNOC\App\Helpers\Product;
 use RNOC\App\Helpers\Settings;
 use RNOC\App\Helpers\WC;
 use RNOC\App\Helpers\WP;
@@ -66,7 +68,7 @@ class Cart extends AbandonedCart {
 	 */
 	public function handlePersistentCart() {
 		// bail for guest users, when the cart is empty, or when doing a WP cron request
-		if ( ! is_user_logged_in() || WC::isCartEmpty() || defined( 'DOING_CRON' ) ) {
+		if ( ! is_user_logged_in() || CartHelper::isCartEmpty() || defined( 'DOING_CRON' ) ) {
 			return;
 		}
 		$user_id             = get_current_user_id();
@@ -90,7 +92,7 @@ class Cart extends AbandonedCart {
 		$cart_token            = $this->getCartToken();
 		$customer_details      = Customer::getCartCustomer();
 		$created_at            = self::getTrackingStartAt();
-		$cart_total            = WC::formatDecimalPrice( WC::getCartTotal() );
+		$cart_total            = WC::formatDecimalPrice( CartHelper::getCartTotal() );
 		$current_currency_code = WC::getCurrentCurrencyCode();
 		$default_currency_code = WC::getDefaultCurrency();
 		$storage               = Settings::getStorage();
@@ -107,8 +109,8 @@ class Cart extends AbandonedCart {
 			'currency'                  => $default_currency_code,
 			'presentment_currency'      => $current_currency_code,
 			'customer'                  => $customer_details,
-			'tax_lines'                 => WC::getCartTaxDetails(),
-			'total_tax'                 => WC::getCartTotalTax(),
+			'tax_lines'                 => CartHelper::getCartTaxDetails(),
+			'total_tax'                 => CartHelper::getCartTotalTax(),
 			'created_at'                => WC::formatToIso8601( $created_at ),
 			'line_items'                => $this->getCartLineItemsDetails(),
 			'updated_at'                => WC::formatToIso8601( '' ),
@@ -116,16 +118,16 @@ class Cart extends AbandonedCart {
 			'completed_at'              => null,
 			'discount_codes'            => WC::getAppliedDiscounts(),
 			'shipping_lines'            => [],
-			'subtotal_price'            => WC::formatDecimalPrice( WC::getCartSubTotal() ),
+			'subtotal_price'            => WC::formatDecimalPrice( CartHelper::getCartSubTotal() ),
 			'total_price_set'           => self::getCurrencyDetails( $cart_total, $current_currency_code, $default_currency_code ),
 			'taxes_included'            => ( ! WC::isPriceExcludingTax() ),
 			'customer_locale'           => WP::getCurrentLanguage(),
 			'order_status'              => null,
-			'total_discounts'           => WC::formatDecimalPrice( WC::getCartTotalDiscount() ),
+			'total_discounts'           => WC::formatDecimalPrice( CartHelper::getCartTotalDiscount() ),
 			'shipping_address'          => Customer::getCartShippingAddress(),
 			'billing_address'           => Customer::getCartBillingAddress(),
 			'abandoned_checkout_url'    => self::getRecoveryLink( $cart_token ),
-			'total_line_items_price'    => WC::formatDecimalPrice( WC::getCartTotal() ),
+			'total_line_items_price'    => WC::formatDecimalPrice( CartHelper::getCartTotal() ),
 			'buyer_accepts_marketing'   => self::isBuyerAcceptsMarketing(),
 			'client_session'            => WC::getClientSession(),
 			'woocommerce_totals'        => self::getCartTotals(),
@@ -144,7 +146,7 @@ class Cart extends AbandonedCart {
 	 * @return array
 	 */
 	public function getCartLineItemsDetails() {
-		$cart = WC::getCart();
+		$cart = CartHelper::getCart();
 		if ( empty( $cart ) ) {
 			return [];
 		}
@@ -155,9 +157,9 @@ class Cart extends AbandonedCart {
 			$product    = apply_filters( 'woocommerce_cart_item_product', $item['data'], $item, $item_key );
 			if ( empty( $product ) ) {
 				if ( $variant_id > 0 ) {
-					$product = WC::getProduct( $variant_id );
+					$product = Product::getProduct( $variant_id );
 				} else {
-					$product = WC::getProduct( $product_id );
+					$product = Product::getProduct( $product_id );
 				}
 			}
 			if ( ! $product instanceof \WC_Product ) {
@@ -176,24 +178,24 @@ class Cart extends AbandonedCart {
 					'compare_at' => 0,
 				);
 			}
-			$cat_ids = ! empty( $product_id ) && $product_id > 0 ? WC::getProductCategoryIds( $product_id ) : array();
+			$cat_ids = ! empty( $product_id ) && $product_id > 0 ? Product::getProductCategoryIds( $product_id ) : array();
 			$items[] = apply_filters( 'rnoc_get_cart_line_item_details', [
 				'key'           => $item_key,
-				'sku'           => WC::getItemSku( $product ),
-				'price'         => WC::formatDecimalPriceRemoveTrailingZeros( WC::getCartItemPrice( $product ) ),
-				'title'         => WC::getItemName( $product ),
+				'sku'           => Product::getItemSku( $product ),
+				'price'         => WC::formatDecimalPriceRemoveTrailingZeros( CartHelper::getCartItemPrice( $product ) ),
+				'title'         => Product::getItemName( $product ),
 				'taxable'       => ( $line_tax != 0 ),
 				'quantity'      => ! empty( $item['quantity'] ) ? $item['quantity'] : 1,
 				'tax_lines'     => $tax_lines,
 				'line_price'    => WC::formatDecimalPriceRemoveTrailingZeros( $this->getLineItemTotal( $item ) ),
 				'product_id'    => $product_id,
 				'cat_ids'       => implode( ',', $cat_ids ),
-				'cat_names'     => WC::getProductCategoryName( $product_id ),
+				'cat_names'     => Product::getProductCategoryName( $product_id ),
 				'variant_id'    => $variant_id,
-				'variant_price' => $variant_id > 0 ? WC::formatDecimalPriceRemoveTrailingZeros( WC::getCartItemPrice( $product ) ) : 0,
-				'variant_title' => $variant_id > 0 ? WC::getItemName( $product ) : '',
-				'image_url'     => WC::getProductImageSrc( $product ),
-				'product_url'   => WC::getProductUrl( $item ),
+				'variant_price' => $variant_id > 0 ? WC::formatDecimalPriceRemoveTrailingZeros( CartHelper::getCartItemPrice( $product ) ) : 0,
+				'variant_title' => $variant_id > 0 ? Product::getItemName( $product ) : '',
+				'image_url'     => Product::getProductImageSrc( $product ),
+				'product_url'   => Product::getProductUrl( $item ),
 				'properties'    => []
 			], $cart, $item_key, $product, $item );
 		}
@@ -272,11 +274,11 @@ class Cart extends AbandonedCart {
 	 */
 	public static function getCartTotals() {
 		return [
-			'total_price'     => WC::formatDecimalPrice( WC::getCartTotal() ),
-			'subtotal_price'  => WC::formatDecimalPrice( WC::getCartSubTotal() ),
-			'total_tax'       => WC::formatDecimalPrice( WC::getCartTaxTotal() + WC::getCartShippingTaxTotal() ),
-			'total_discounts' => WC::formatDecimalPrice( WC::getCartTotalDiscount() ),
-			'total_shipping'  => WC::formatDecimalPrice( WC::getCartShippingTotal() ),
+			'total_price'     => WC::formatDecimalPrice( CartHelper::getCartTotal() ),
+			'subtotal_price'  => WC::formatDecimalPrice( CartHelper::getCartSubTotal() ),
+			'total_tax'       => WC::formatDecimalPrice( CartHelper::getCartTaxTotal() + CartHelper::getCartShippingTaxTotal() ),
+			'total_discounts' => WC::formatDecimalPrice( CartHelper::getCartTotalDiscount() ),
+			'total_shipping'  => WC::formatDecimalPrice( CartHelper::getCartShippingTotal() ),
 			'fee_items'       => self::getCartFeeDetails(),
 		];
 	}
@@ -287,7 +289,7 @@ class Cart extends AbandonedCart {
 	 * @return array
 	 */
 	public static function getCartFeeDetails() {
-		$fees = WC::getCartFees();
+		$fees = CartHelper::getCartFees();
 		if ( empty( $fees ) ) {
 			return [];
 		}

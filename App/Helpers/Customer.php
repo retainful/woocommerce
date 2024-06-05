@@ -178,21 +178,21 @@ class Customer {
 			return [];
 		}
 		$created_at = $updated_at = current_time( 'timestamp', true );
-		if ( $user_id = WC::getOrderUserId( $order ) ) {
-			$user       = WC::getOrderData( 'user', $order );
+		if ( $user_id = Order::getOrderUserId( $order ) ) {
+			$user       = Order::getOrderData( 'user', $order );
 			$created_at = $updated_at = is_object( $user->user_registered ) && ! empty( $user->user_registered ) ? strtotime( $user->user_registered ) : current_time( 'timestamp', true );
 		}
-		$billing_email   = WC::getOrderBillingEmail( $order );
-		$customer_orders = WC::getOrdersByEmail( $billing_email );
+		$billing_email   = Order::getOrderBillingEmail( $order );
+		$customer_orders = Order::getOrdersByEmail( $billing_email );
 		$total_spent     = 0;
 		$last_order_id   = 0;
 		if ( is_array( $customer_orders ) && count( $customer_orders ) ) {
 			foreach ( $customer_orders as $key => $customer_order ) {
 				if ( $customer_order instanceof \WC_Order ) {
 					if ( $key == 0 ) {
-						$last_order_id = WC::getOrderId( $customer_order );
+						$last_order_id = Order::getOrderId( $customer_order );
 					}
-					$total_spent += WC::getOrderTotal( $customer_order );
+					$total_spent += Order::getOrderTotal( $customer_order );
 				}
 			}
 		}
@@ -200,13 +200,13 @@ class Customer {
 		return wp_parse_args( [
 			'id'            => $user_id,
 			'email'         => $billing_email,
-			'phone'         => WC::getOrderData( 'billing_phone', $order ),
-			'state'         => WC::getOrderData( 'billing_state', $order ),
-			'last_name'     => WC::getOrderData( 'billing_last_name', $order ),
-			'first_name'    => WC::getOrderData( 'billing_first_name', $order ),
+			'phone'         => Order::getOrderData( 'billing_phone', $order ),
+			'state'         => Order::getOrderData( 'billing_state', $order ),
+			'last_name'     => Order::getOrderData( 'billing_last_name', $order ),
+			'first_name'    => Order::getOrderData( 'billing_first_name', $order ),
 			'created_at'    => WP::formatToIso8601( $created_at ),
 			'updated_at'    => WP::formatToIso8601( $updated_at ),
-			'currency'      => WC::getOrderData( 'currency', $order ),
+			'currency'      => Order::getOrderData( 'currency', $order ),
 			'user_roles'    => WP::getUserRoles( $billing_email ),
 			'last_order_id' => $last_order_id,
 			'total_spent'   => $total_spent,
@@ -228,21 +228,21 @@ class Customer {
 		}
 
 		return [
-			'zip'           => WC::getOrderData( 'billing_postcode', $order ),
-			'city'          => WC::getOrderData( 'billing_city', $order ),
-			'name'          => WC::getOrderData( 'billing_first_name', $order ) . ' ' . WC::getOrderData( 'billing_last_name', $order ),
+			'zip'           => Order::getOrderData( 'billing_postcode', $order ),
+			'city'          => Order::getOrderData( 'billing_city', $order ),
+			'name'          => Order::getOrderData( 'billing_first_name', $order ) . ' ' . Order::getOrderData( 'billing_last_name', $order ),
 			'phone'         => null, // TODO: Need to ask, why we need to send null value
 			'company'       => null, // TODO: Need to ask, why we need to send null value
-			'country'       => WC::getOrderData( 'billing_country', $order ),
-			'address1'      => WC::getOrderData( 'billing_address_1', $order ),
-			'address2'      => WC::getOrderData( 'billing_address_2', $order ),
+			'country'       => Order::getOrderData( 'billing_country', $order ),
+			'address1'      => Order::getOrderData( 'billing_address_1', $order ),
+			'address2'      => Order::getOrderData( 'billing_address_2', $order ),
 			'latitude'      => '',
 			'longitude'     => '',
-			'province'      => WC::getOrderData( 'billing_state', $order ),
-			'last_name'     => WC::getOrderData( 'billing_last_name', $order ),
-			'first_name'    => WC::getOrderData( 'billing_first_name', $order ),
-			'country_code'  => WC::getOrderData( 'billing_country', $order ),
-			'province_code' => WC::getOrderData( 'billing_state', $order ),
+			'province'      => Order::getOrderData( 'billing_state', $order ),
+			'last_name'     => Order::getOrderData( 'billing_last_name', $order ),
+			'first_name'    => Order::getOrderData( 'billing_first_name', $order ),
+			'country_code'  => Order::getOrderData( 'billing_country', $order ),
+			'province_code' => Order::getOrderData( 'billing_state', $order ),
 		];
 	}
 
@@ -259,21 +259,21 @@ class Customer {
 		}
 
 		return [
-			'zip'           => WC::getOrderData( 'shipping_postcode', $order ),
-			'city'          => WC::getOrderData( 'shipping_city', $order ),
-			'name'          => WC::getOrderData( 'shipping_first_name', $order ) . ' ' . WC::getOrderData( 'shipping_last_name', $order ),
+			'zip'           => Order::getOrderData( 'shipping_postcode', $order ),
+			'city'          => Order::getOrderData( 'shipping_city', $order ),
+			'name'          => Order::getOrderData( 'shipping_first_name', $order ) . ' ' . Order::getOrderData( 'shipping_last_name', $order ),
 			'phone'         => null, // TODO: Need to ask, why we need to send null value
 			'company'       => null, // TODO: Need to ask, why we need to send null value
-			'country'       => WC::getOrderData( 'shipping_country', $order ),
-			'address1'      => WC::getOrderData( 'shipping_address_1', $order ),
-			'address2'      => WC::getOrderData( 'shipping_address_2', $order ),
+			'country'       => Order::getOrderData( 'shipping_country', $order ),
+			'address1'      => Order::getOrderData( 'shipping_address_1', $order ),
+			'address2'      => Order::getOrderData( 'shipping_address_2', $order ),
 			'latitude'      => '',
 			'longitude'     => '',
-			'province'      => WC::getOrderData( 'shipping_state', $order ),
-			'last_name'     => WC::getOrderData( 'shipping_last_name', $order ),
-			'first_name'    => WC::getOrderData( 'shipping_first_name', $order ),
-			'country_code'  => WC::getOrderData( 'shipping_country', $order ),
-			'province_code' => WC::getOrderData( 'shipping_state', $order ),
+			'province'      => Order::getOrderData( 'shipping_state', $order ),
+			'last_name'     => Order::getOrderData( 'shipping_last_name', $order ),
+			'first_name'    => Order::getOrderData( 'shipping_first_name', $order ),
+			'country_code'  => Order::getOrderData( 'shipping_country', $order ),
+			'province_code' => Order::getOrderData( 'shipping_state', $order ),
 		];
 
 	}
@@ -302,7 +302,7 @@ class Customer {
 	 */
 	public static function getUserAcceptLanguage( $order = '' ) {
 		if ( ! empty( $order ) ) {
-			return WC::getOrderMeta( '_rnoc_get_http_accept_language', $order );
+			return Order::getOrderMeta( '_rnoc_get_http_accept_language', $order );
 		} else if ( ! empty( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ) {
 			$lang = trim( $_SERVER['HTTP_ACCEPT_LANGUAGE'] );
 

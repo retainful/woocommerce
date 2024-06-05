@@ -3,6 +3,7 @@
 namespace RNOC\App\Controllers\Site;
 
 use RNOC\App\Helpers\Customer;
+use RNOC\App\Helpers\Order as OrderAlias;
 use RNOC\App\Helpers\Settings;
 use RNOC\App\Helpers\Util;
 use RNOC\App\Helpers\WC;
@@ -164,8 +165,8 @@ class Popups {
 		}
 		$order_id = isset( $wp->query_vars['order-received'] ) ? $wp->query_vars['order-received'] : 0;
 		if ( $is_thank_you_page && empty( $customer_email ) && ! empty( $order_id ) ) {
-			$order          = WC::getOrder( $order_id );
-			$customer_email = WC::getOrderBillingEmail( $order );
+			$order          = OrderAlias::getOrder( $order_id );
+			$customer_email = OrderAlias::getOrderBillingEmail( $order );
 		}
 		$default = [
 			'digest'       => hash_hmac( 'sha256', $data, $secret_key ),
