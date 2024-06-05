@@ -42,12 +42,41 @@ class Router {
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
+			//add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
 			add_action( 'wp_ajax_rnoc_track_user_data', [ Cart::class, 'setCustomerData' ] );
 			add_action( 'wp_ajax_nopriv_rnoc_track_user_data', [ Cart::class, 'setCustomerData' ] );
-			add_action( 'woocommerce_cart_loaded_from_session', [ Cart::class, 'handlePersistentCart' ] );
+
 			//add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
+			//add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
+
 			//add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
 			//add_action('woocommerce_removed_coupon', array($cart, 'removeNextOrderCouponFromCart'));
+			$cart_tracking_engine = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' );
+			if ( $cart_tracking_engine == 'php' ) {
+				//add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
+			} else {
+				//Js tracking
+				//add_action('wp_footer', array($cart, 'renderAbandonedCartTrackingDiv'));
+				//add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
+			}
+			//add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
+
+			//add_action('wp_authenticate', array($cart, 'userLoggedOn'));
+			//add_action('user_register', array($cart, 'userSignedUp'));
+			//add_action('wp_logout', array($cart, 'userLoggedOut'));
+
+			//add_action('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
+			//add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
+			//add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
+			//add_action('woocommerce_store_api_checkout_update_order_meta', array($checkout, 'apiCheckoutOrderProcessed'));
+
+			//add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
+			// handle placed orders
+			//add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
+			//triggers when admin pdate the order
+			//add_action('woocommerce_process_shop_order_meta', array($checkout, 'OrderUpdatedShopBackend'), 50, 2);
+
+			//add_filter('woocommerce_webhook_http_args', array($checkout, 'changeWebHookHeader'), 10, 3);
 
 		}
 
@@ -62,10 +91,10 @@ class Router {
 		add_action( 'admin_menu', [ Settings::class, 'addMenu' ] );
 		add_action( 'wp_after_admin_bar_render', [ Settings::class, 'schedulePlanChecker' ] );
 		add_action( 'admin_enqueue_scripts', [ Settings::class, 'addAdminScript' ] );
-		//retainful app connection
+		//app connection
 		add_action( 'wp_ajax_rnoc_validate_connection', [ Settings::class, 'connect' ] );
 		add_action( 'wp_ajax_rnoc_disconnect_connection', [ Settings::class, 'disConnect' ] );
-		//retainful save settings
+		//save settings
 		add_action( 'wp_ajax_rnoc_save_settings_data', [ Settings::class, 'saveSettings' ] );
 
 	}
@@ -77,10 +106,10 @@ class Router {
 	 */
 	public static function addStoreHooks() {
 		//Popups
-		if ( \RNOC\App\Helpers\Settings::isProPlan() && \RNOC\App\Helpers\Settings::get( RNOC_PLUGIN_PREFIX . 'enable_referral_widget', 'no' ) == 'yes' ) {
+		if ( SettingsHelper::isProPlan() && SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'enable_referral_widget', 'no' ) == 'yes' ) {
 			add_action( 'wp_footer', [ Popups::class, 'printReferralPopup' ] );
 		}
-		if ( \RNOC\App\Helpers\Settings::isProPlan() && \RNOC\App\Helpers\Settings::get( RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup', 'no' ) == 'yes' ) {
+		if ( SettingsHelper::isProPlan() && SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup', 'no' ) == 'yes' ) {
 			// Cookie update hooks
 			add_filter( 'woocommerce_set_cookie_options', [ Popups::class, 'changeIdentityPath' ], 10, 3 );
 			add_action( 'woocommerce_init', [ Popups::class, 'setIdentityData' ] );
@@ -93,6 +122,7 @@ class Router {
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
+			add_action( 'woocommerce_cart_loaded_from_session', [ Cart::class, 'handlePersistentCart' ] );
 			//add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
 			//add_action('woocommerce_checkout_after_terms_and_conditions', array($cart, 'guestTermGdprMessage'));
 		}
