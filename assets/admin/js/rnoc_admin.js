@@ -8,7 +8,7 @@ rnoc = window.rnoc || {};
     rnoc_jquery(document).on('rnoc_save_settings', function (e, button_id) {
         let data = rnoc_jquery('.rnoc-main #retainful-settings-form').serializeArray()
         data.push({name: 'rnoc_nonce', value: rnoc_localize_data.save_settings});
-        data.push({name: 'action', value: 'rnoc_save_settings_data'});
+        data.push({name: 'action', value: 'rnoc_save_settings'});
         rnoc_jquery('.rnoc-main #retainful-settings-form #' + button_id).attr('disabled', true);
         rnoc_jquery.ajax({
             data: data,
@@ -43,7 +43,7 @@ rnoc = window.rnoc || {};
         }
         rnoc_jquery('.error').html('');
         let data = {
-            action: "rnoc_validate_connection",
+            action: "rnoc_connection",
             rnoc_nonce: rnoc_localize_data.app_connect,
             app_id: rnoc_app_id,
             app_secret: rnoc_app_secret
@@ -96,7 +96,7 @@ rnoc = window.rnoc || {};
         let rnoc_app_id = rnoc_jquery(app_id).val();
         let rnoc_app_secret = rnoc_jquery(app_secret).val();
         let data = {
-            action: "rnoc_disconnect_connection",
+            action: "rnoc_disconnect",
             rnoc_nonce: rnoc_localize_data.disconnect_license,
             app_id: rnoc_app_id,
             app_secret: rnoc_app_secret

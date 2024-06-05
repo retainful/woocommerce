@@ -93,10 +93,10 @@ class Router {
 		add_action( 'wp_after_admin_bar_render', [ Settings::class, 'schedulePlanChecker' ] );
 		add_action( 'admin_enqueue_scripts', [ Settings::class, 'addAdminScript' ] );
 		//app connection
-		add_action( 'wp_ajax_rnoc_validate_connection', [ Settings::class, 'connect' ] );
-		add_action( 'wp_ajax_rnoc_disconnect_connection', [ Settings::class, 'disConnect' ] );
+		add_action( 'wp_ajax_rnoc_connection', [ Settings::class, 'connect' ] );
+		add_action( 'wp_ajax_rnoc_disconnect', [ Settings::class, 'disConnect' ] );
 		//save settings
-		add_action( 'wp_ajax_rnoc_save_settings_data', [ Settings::class, 'saveSettings' ] );
+		add_action( 'wp_ajax_rnoc_save_settings', [ Settings::class, 'saveSettings' ] );
 
 	}
 
