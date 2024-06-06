@@ -6,12 +6,97 @@ use RNOC\App\Helpers\Cart as CartHelper;
 use RNOC\App\Helpers\Customer;
 use RNOC\App\Helpers\Product;
 use RNOC\App\Helpers\Settings;
+use RNOC\App\Helpers\Util;
 use RNOC\App\Helpers\WC;
 use RNOC\App\Helpers\WP;
 
 defined( 'ABSPATH' ) || exit;
 
 class Cart extends AbandonedCart {
+
+	/**
+	 * Display tracking div.
+	 *
+	 * @return void
+	 */
+	public function renderCartTrackingDiv() {
+		$cart_created_at = self::getTrackingStartAt();
+		$data            = [];
+		if ( empty( $cart_created_at ) && $this->needToTrackCart() ) {
+			$cart_created_at = self::getTrackingStartAt();
+		}
+		if ( self::isValidCartToTrack() && ! empty( $cart_created_at ) ) {
+			$data = $this->getCartTrackingData();
+		}
+
+		echo $this->getCartTrackingDiv( $data );
+	}
+	
+	/**
+	 * Get tracking data.
+	 *
+	 * @return array
+	 */
+	public function getCartTrackingData() {
+		$cart_data = $this->getCartData();
+
+		return apply_filters( 'rnoc_get_tracking_data', [
+			'cart_token' => $this->getCartToken(),
+			'cart_hash'  => self::generateCartHash(),
+			'data'       => self::getEncryptData( $cart_data )
+		] );
+	}
+
+	/**
+	 * Get tracking div.
+	 *
+	 * @param array $cart_data Tracking data.
+	 *
+	 * @return string
+	 */
+	public function getCartTrackingDiv( $cart_data ) {
+		$tracking_div = sprintf(
+			'<div id="%1$s" style="display: none !important;">%2$s</div>',
+			esc_attr( $this->getTrackingElementId() ),
+			esc_html( wp_json_encode( $cart_data ) ) );
+
+		return apply_filters( 'rnoc_get_cart_tracking_div', $tracking_div, $cart_data );
+	}
+
+	/**
+	 * Get cart tracking js url.
+	 *
+	 * @return string
+	 */
+	public static function getCartTrackingJsUrl() {
+		//'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION
+		return apply_filters( 'rnoc_get_abandoned_cart_tracking_js_engine_url', RNOC_PLUGIN_URL . 'assets/site/js/cart-syn.js' );
+	}
+
+	/**
+	 * Add a cart tracking script.
+	 *
+	 * @return void
+	 */
+	public static function addCartTrackingScripts() {
+		if ( ! wp_script_is( 'wc-cart-fragments' ) ) {
+			wp_enqueue_script( 'wc-cart-fragments' );
+		}
+		if ( ! wp_script_is( RNOC_PLUGIN_PREFIX . 'track-user-cart' ) ) {
+			wp_enqueue_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', self::getCartTrackingJsUrl(), [ 'jquery' ], RNOC_VERSION, false );
+			$data = [
+				'ajax_url'                  => admin_url( 'admin-ajax.php' ),
+				'ip'                        => Customer::getClientIP(),
+				'version'                   => RNOC_VERSION,
+				'public_key'                => Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' ),
+				'api_url'                   => Request::getAbandonedCartApiUrl() . 'webhooks/checkout',
+				'tracking_element_selector' => Cart::getTrackingElementId(),
+				'cart_tracking_engine'      => Settings::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' )
+			];
+			$data = apply_filters( 'rnoc_add_cart_tracking_scripts', $data );
+			wp_localize_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data );
+		}
+	}
 
 	/**
 	 * Set customer data.

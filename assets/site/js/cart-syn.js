@@ -1,0 +1,310 @@
+if (typeof (rnoc_jquery) == 'undefined') {
+    rnoc_jquery = jQuery.noConflict();
+}
+
+rnoc = window.rnoc || {};
+(function (rnoc) {
+    class RetainFul {
+        constructor(end_point = null, public_key = null) {
+            this.ajax_url = null;
+            this.is_force_synced = false;
+            this.end_point = end_point;
+            this.public_key = public_key;
+            this.abandoned_cart_data = null;
+            this.cart_token = null;
+            this.ip = null;
+            this.version = null;
+            this.cart_hash = null;
+            this.force_refresh_carts = null;
+            this.cart_tracking_element_id = "retainful-abandoned-cart-data";
+            this.async_request = true;
+            this.previous_cart_hash = null;
+        }
+
+        setIp = (ip) => {
+            if (ip === undefined) {
+                ip = null;
+            }
+            this.ip = ip;
+            return this;
+        }
+
+        setAjaxUrl = (url) => {
+            this.ajax_url = url;
+            return this;
+        }
+
+        setCartTrackingElementId = (element_id) => {
+            this.cart_tracking_element_id = element_id;
+            return this;
+        }
+        setVersion = (version) => {
+            this.version = version;
+            return this;
+        }
+
+        setCartToken = (cart_token) => {
+            this.cart_token = cart_token;
+        }
+
+        isLocalStorageSupports = () => {
+            try {
+                sessionStorage.setItem('retainful', 'test');
+                sessionStorage.removeItem('retainful');
+                localStorage.setItem('retainful', 'test');
+                localStorage.removeItem('retainful');
+                return true;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        setAbandonedCartData(cart_data = null) {
+            if (cart_data !== null) {
+                this.abandoned_cart_data = cart_data;
+            } else {
+                let element_id = this.cart_tracking_element_id
+                let data = rnoc_jquery("#" + element_id).html();
+                let cart_details = JSON.parse(data);
+                this.abandoned_cart_data = (cart_details.data !== undefined) ? cart_details.data : null;
+                this.cart_hash = (cart_details.cart_hash !== undefined) ? cart_details.cart_hash : null;
+                this.cart_token = (cart_details.cart_token !== undefined) ? cart_details.cart_token : null;
+                this.force_refresh_carts = (cart_details.force_refresh_carts !== undefined) ? cart_details.force_refresh_carts : null;
+                if (this.isLocalStorageSupports() && this.cart_token !== null) {
+                    let old_cart_token_history = localStorage.getItem('retainful_ac_cart_token_history');
+                    let old_cart_token = localStorage.getItem('retainful_ac_cart_token');
+                    let timestamp_in_ms = window.performance && window.performance.now && window.performance.timing && window.performance.timing.navigationStart ? window.performance.now() + window.performance.timing.navigationStart : Date.now();
+                    if (old_cart_token_history === null) {
+                        let cart_token_history = [];
+                        cart_token_history.push({"time": timestamp_in_ms, "token": this.cart_token});
+                        localStorage.setItem('retainful_ac_cart_token_history', JSON.stringify(cart_token_history));
+                    } else {
+                        let cart_token_history = JSON.parse(old_cart_token_history);
+                        if (old_cart_token !== this.cart_token) {
+                            cart_token_history.push({"time": timestamp_in_ms, "token": this.cart_token});
+                        }
+                        localStorage.setItem('retainful_ac_cart_token_history', JSON.stringify(cart_token_history));
+                    }
+                    localStorage.setItem('retainful_ac_cart_token', this.cart_token);
+                }
+            }
+            return this;
+        }
+
+        getCartHash = () => {
+            return this.cart_hash;
+        }
+
+        getAbandonedCartData = () => {
+            this.setAbandonedCartData();
+            return this.abandoned_cart_data;
+        }
+
+        getCartToken = () => {
+            let cart_token = localStorage.getItem('retainful_ac_cart_token');
+            if (cart_token !== null || cart_token !== '') {
+                this.setCartToken(cart_token);
+            }
+            return this.cart_token;
+        }
+
+        getTimeZone = () => {
+            return new Date().getTimezoneOffset();
+        }
+        request = (url, body = {}, headers = {}, data_type = "json", method = "POST", async = false) => {
+            let msg = null;
+            rnoc_jquery.ajax({
+                url: url,
+                headers: headers,
+                method: method,
+                dataType: data_type,
+                data: body,
+                async: async,
+                success: function (response) {
+                    msg = response;
+                },
+                error: function (response) {
+                    msg = response;
+                }
+            });
+            return msg;
+        }
+
+        syncCart = (cart_data = null, force_sync = false) => {
+            if (cart_data === null) {
+                cart_data = this.getAbandonedCartData();
+            }
+            let cart_hash = this.getCartHash();
+            if ((cart_data !== undefined && cart_data !== null && cart_data !== "" && cart_hash !== this.previous_cart_hash) || (force_sync)) {
+                this.previous_cart_hash = cart_hash;
+                let headers = {
+                    "app_id": this.public_key,
+                    "Content-Type": "application/json",
+                    "X-Client-Referrer-IP": this.ip,
+                    "X-Retainful-Version": this.version,
+                    "X-Cart-Token": this.getCartToken(),
+                    "Cart-Token": this.getCartToken(),
+                    "User-TimeZone": this.getTimeZone(),
+                };
+                let body = {"data": cart_data};
+                this.request(this.end_point, JSON.stringify(body), headers, 'json', 'POST', this.async_request);
+            }
+            if (this.force_refresh_carts !== null && !this.is_force_synced) {
+                this.is_force_synced = true;
+                let response = this.request(this.ajax_url, {action: 'rnoc_track_user_data'}, {}, "json", "POST", false);
+                if (response.success && response.data) {
+                    this.syncCart(response.data, true);
+                }
+            }
+        }
+
+        validateEmail = (value) => {
+            var valid = true;
+            if (value.indexOf('@') === -1) {
+                valid = false;
+            } else {
+                var parts = value.split('@');
+                var domain = parts[1];
+                if (domain.indexOf('.') === -1) {
+                    valid = false;
+                } else {
+                    var domainParts = domain.split('.');
+                    var ext = domainParts[1];
+                    if (ext.length > 14 || ext.length < 2) {
+                        valid = false;
+                    }
+                }
+            }
+            return valid;
+        }
+
+        initCartTracking = () => {
+            rnoc_jquery(document.body).on("added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout", function () {
+                this.syncCart();
+            }).on("wc_fragments_refreshed", function () {
+                this.syncCart();
+            }).on("wc_fragments_loaded", function () {
+                this.syncCart();
+            });
+            return this;
+        }
+    }
+
+    let default_retainful_cart_data = {
+        "ajax_url": "",
+        "ip": "",
+        "version": "",
+        "public_key": "",
+        "api_url": "",
+        "tracking_element_selector": "retainful-abandoned-cart-data",
+        "cart_tracking_engine": "js",
+    };
+    let retain_cart_js_data = {...default_retainful_cart_data, ...retainful_cart_data}
+    let retain = new RetainFul(retain_cart_js_data.api_url, retain_cart_js_data.public_key);
+    retain.setCartTrackingElementId(retain_cart_js_data.tracking_element_selector);
+    if (retain_cart_js_data.cart_tracking_engine === "js") {
+        retain.setAjaxUrl(retain_cart_js_data.ajax_url);
+        retain.setIp(retain_cart_js_data.ip);
+        retain.setVersion(retain_cart_js_data.version);
+        retain.initCartTracking();
+        rnoc_jquery(window).on('load', function () {
+            retain.syncCart();
+        });
+    }
+    if (retain_cart_js_data.cart !== undefined) {
+        let tracking_content = '<div id="' + retain_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retain_cart_js_data.cart) + '</div>';
+        rnoc_jquery(tracking_content).appendTo('body');
+    }
+
+    rnoc_jquery(document).on('change', 'input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone,input#rnoc_allow_gdpr', function () {
+        var rnoc_phone = ("#billing_phone").val();
+        var rnoc_email = rnoc_jquery("#billing_email").val();
+        var ship_to_bill = rnoc_jquery("#ship-to-different-address-checkbox:checked").length;
+        var guest_data = {
+            billing_first_name: rnoc_jquery('#billing_first_name').val(),
+            billing_last_name: rnoc_jquery('#billing_last_name').val(),
+            billing_company: rnoc_jquery('#billing_company').val(),
+            billing_address_1: rnoc_jquery('#billing_address_1').val(),
+            billing_address_2: rnoc_jquery('#billing_address_2').val(),
+            billing_city: rnoc_jquery('#billing_city').val(),
+            billing_state: rnoc_jquery('#billing_state').val(),
+            billing_postcode: rnoc_jquery('#billing_postcode').val(),
+            billing_country: rnoc_jquery('#billing_country').val(),
+            billing_phone: rnoc_jquery('#billing_phone').val(),
+            billing_email: rnoc_jquery('#billing_email').val(),
+            ship_to_billing: ship_to_bill,
+            order_notes: rnoc_jquery('#order_comments').val(),
+            shipping_first_name: rnoc_jquery('#shipping_first_name').val(),
+            shipping_last_name: rnoc_jquery('#shipping_last_name').val(),
+            shipping_company: rnoc_jquery('#shipping_company').val(),
+            shipping_address_1: rnoc_jquery('#shipping_address_1').val(),
+            shipping_address_2: rnoc_jquery('#shipping_address_2').val(),
+            shipping_city: rnoc_jquery('#shipping_city').val(),
+            shipping_state: rnoc_jquery('#shipping_state').val(),
+            shipping_postcode: rnoc_jquery('#shipping_postcode').val(),
+            shipping_country: rnoc_jquery('#shipping_country').val(),
+            allow_gdpr: rnoc_jquery('input#rnoc_allow_gdpr').is(':checked'),
+            cart_token: localStorage.getItem('retainful_ac_cart_token'),
+            action: 'rnoc_track_user_data'
+        };
+        updateCheckout(rnoc_email, rnoc_phone, guest_data);
+    });
+    rnoc_jquery(document).on('change', '.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
+        var rnoc_email = rnoc_jquery(".wp-block-woocommerce-checkout input#email").val();
+        var rnoc_phone = rnoc_jquery(".wp-block-woocommerce-checkout input#phone").val();
+        var guest_data = {
+            billing_first_name: rnoc_jquery('.wp-block-woocommerce-checkout #billing-first_name').val(),
+            billing_last_name: rnoc_jquery('.wp-block-woocommerce-checkout #billing-last_name').val(),
+            billing_address_1: rnoc_jquery('.wp-block-woocommerce-checkout #billing-address_1').val(),
+            billing_address_2: rnoc_jquery('.wp-block-woocommerce-checkout #billing-address_2').val(),
+            billing_city: rnoc_jquery('.wp-block-woocommerce-checkout #billing-city').val(),
+            billing_postcode: rnoc_jquery('.wp-block-woocommerce-checkout #billing-postcode').val(),
+            billing_phone: rnoc_phone,
+            billing_email: rnoc_email,
+            allow_gdpr: rnoc_jquery('.wp-block-woocommerce-checkout #rnoc_allow_gdpr').is(':checked'),
+            ship_to_billing: 1,
+            cart_token: localStorage.getItem('retainful_ac_cart_token'),
+            action: 'rnoc_track_user_data'
+        };
+        updateCheckout(rnoc_email, rnoc_phone, guest_data);
+    });
+
+    function updateCheckout(rnoc_email, rnoc_phone, guest_data) {
+        let msg = null;
+        if (typeof rnoc_email === 'undefined') {
+            return;
+        }
+        var atposition = rnoc_email.indexOf("@");
+        var dotposition = rnoc_email.lastIndexOf(".");
+        if (typeof rnoc_phone === 'undefined' || rnoc_phone === null) { //If phone number field does not exist on the Checkout form
+            rnoc_phone = '';
+        }
+        /*rnoc_jquery('input#billing_email').on('change', function () {*/
+        if (!(atposition < 1 || dotposition < atposition + 2 || dotposition + 2 >= rnoc_email.length) || rnoc_phone.length >= 1) {
+            Object.keys(guest_data).forEach(key => guest_data[key] === undefined && delete guest_data[key]);
+            if (retain.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
+                sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "1");
+                rnoc_jquery.ajax({
+                    url: retain_cart_js_data.ajax_url,
+                    headers: {},
+                    method: 'POST',
+                    dataType: 'json',
+                    data: guest_data,
+                    async: true,
+                    success: function (response) {
+                        if (response.success && response.data) {
+                            retain.syncCart(response.data, true);
+                        }
+                    },
+                    error: function (response) {
+                        msg = response;
+                    }
+                });
+            } else {
+                sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "0");
+                //console.log('Email validation failed');
+            }
+
+        }
+    }
+})(rnoc_jquery);

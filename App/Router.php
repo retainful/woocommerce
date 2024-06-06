@@ -43,7 +43,7 @@ class Router {
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
 			$cart = new Cart();
-			//add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
+			add_action( 'wp_enqueue_scripts', array( $cart, 'addCartTrackingScripts' ) );
 			add_action( 'wp_ajax_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
 			add_action( 'wp_ajax_nopriv_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
 
@@ -57,7 +57,7 @@ class Router {
 				//add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
 			} else {
 				//Js tracking
-				//add_action('wp_footer', array($cart, 'renderAbandonedCartTrackingDiv'));
+				add_action( 'wp_footer', [ $cart, 'renderCartTrackingDiv' ] );
 				//add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
 			}
 			//add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
