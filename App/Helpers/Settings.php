@@ -207,6 +207,27 @@ class Settings {
 	 *
 	 * @return void
 	 */
+
+	/*
+	 * success response
+	 *Array
+		(
+		    [plan] => business
+		    [status] => active
+		    [cancel_at_period_end] =>
+		    [type] => monthly
+		    [success] => 1
+		    [message] => Store verified and connected successfully!
+		)
+	 */
+
+	/*
+	 * error response
+	 * Array (
+         [message] => App ID is not valid.
+         [success] =>
+		)
+	 */
 	public static function updatePlanDetails( $response = '' ) {
 		$details = [
 			'plan'       => 'free',

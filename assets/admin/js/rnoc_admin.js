@@ -17,16 +17,17 @@ rnoc = window.rnoc || {};
             success: function (json) {
                 alertify.set('notifier', 'position', 'top-right');
                 rnoc_jquery('.rnoc-main #retainful-settings-form #' + button_id).attr('disabled', false);
-                if (!json.success) {
-                    alertify.error(json.message());
-                } else {
-                    alertify.success(json.data);
+                if (json.success) {
+                    alertify.success(json.data.message);
                     setTimeout(function () {
                         location.reload();
                     }, 800);
-                }
-                if (json.redirect) {
-                    window.location.href = json.redirect;
+                } else {
+                    if (json.data && json.data.error_fields) {
+                        rnoc_jquery.each(json.data.error_fields, function (index, value) {
+                            alertify.error(value);
+                        });
+                    }
                 }
             }
         });
@@ -76,14 +77,22 @@ rnoc = window.rnoc || {};
                     return false;
                 }
                 if (response.error && app_id !== "") {
-                    alertify.error(response.error);
-                    app_id.focus();
-                    message.html('<p style="color:red;">' + response.error + '</p>');
+                    if (response.error) {
+                        alertify.error(response.error);
+                    }
+
                 }
                 if (response.success) {
                     alertify.success('Successfully connected to Retainful');
                     message.html('<p style="color:green;">' + response.success + '</p>');
                     window.location.reload();
+                } else {
+                    if (response.data && response.data.error_fields) {
+                        rnoc_jquery.each(response.data.error_fields, function (index, value) {
+                            alertify.error(value);
+                            message.html('<p style="color:red;">' + value + '</p>');
+                        });
+                    }
                 }
 
             },

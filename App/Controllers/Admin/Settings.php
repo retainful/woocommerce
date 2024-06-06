@@ -113,9 +113,9 @@ class Settings {
 		wp_enqueue_style( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/css/alertify' . $suffix . '.css', array(), RNOC_VERSION );
 		wp_enqueue_script( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/js/alertify' . $suffix . '.js', array(), RNOC_VERSION . '&t=' . time() );
 		$localize = [
-			'save_settings'      => WP::createNonce( 'rnoc_save_setting' ),
-			'disconnect_license' => WP::createNonce( 'rnoc_disconnect_license' ),
-			'app_connect'        => WP::createNonce( 'rnoc_app_connect' ),
+			'save_settings'      => WP::createNonce( 'rnoc-save-setting' ),
+			'disconnect_license' => WP::createNonce( 'rnoc-disconnect-license' ),
+			'app_connect'        => WP::createNonce( 'rnoc-app-connect' ),
 			'ajax_url'           => admin_url( 'admin-ajax.php' ),
 			'admin_url'          => admin_url(),
 			'home_url'           => get_home_url(),
@@ -153,9 +153,10 @@ class Settings {
 	 */
 	public static function connect() {
 
-		if ( ! WP::isSecurityValid( 'rnoc_app_connect' ) ) {
+		if ( ! WP::isSecurityValid( 'rnoc-app-connect' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
+
 
 		$app_id     = (string) Input::get( 'app_id' );
 		$secret_key = (string) Input::get( 'app_secret' );
@@ -167,13 +168,17 @@ class Settings {
 		$validator = new Validator( $data );
 		$validator->rule( 'required', [ 'app_id', 'secret_key' ] );
 		$validator->rule( 'slug', [ 'app_id', 'secret_key' ] );
-
 		if ( ! $validator->validate() ) {
+			$errors = $validator->errors();
+			foreach ( $errors as $field => $messages ) {
+				$errors[ $field ] = current( $messages );
+			}
 			wp_send_json_error( [
-				'error_fields' => $validator->errors(),
+				'error_fields' => $errors,
 				'message'      => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' )
 			] );
 		}
+
 
 		/*$is_production = apply_filters( 'rnoc_is_production_plugin', true );
 		if ( ! $is_production ) {
@@ -196,6 +201,7 @@ class Settings {
 			\RNOC\App\Helpers\Settings::updatePlanDetails();
 			$response['error'] = __( 'Please check the entered details', 'retainful-next-order-coupon-for-woocommerce' );
 		}
+
 		wp_send_json( $response );
 	}
 
@@ -206,7 +212,7 @@ class Settings {
 	 * @return void
 	 */
 	public static function disConnect() {
-		if ( ! WP::isSecurityValid( 'rnoc_disconnect_license' ) ) {
+		if ( ! WP::isSecurityValid( 'rnoc-disconnect-license' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' );
@@ -263,7 +269,7 @@ class Settings {
 	 */
 	public static function saveSettings() {
 
-		if ( ! WP::isSecurityValid( 'rnoc_save_setting' ) ) {
+		if ( ! WP::isSecurityValid( 'rnoc-save-setting' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Basic validation failed', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 		}
 		$settings = \RNOC\App\Helpers\Settings::getSettings();
@@ -276,8 +282,8 @@ class Settings {
 				$errors[ $field ] = current( $messages );
 			}
 			wp_send_json_error( [
-				'field_error' => $errors,
-				'message'     => __( 'Settings not saved!', 'retainful-next-order-coupon-for-woocommerce' )
+				'error_fields' => $errors,
+				'message'      => __( 'Settings not saved!', 'retainful-next-order-coupon-for-woocommerce' )
 			] );
 		}
 		$cart_capture_msg                                    = (string) Input::get( RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '' );
