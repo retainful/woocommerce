@@ -7,6 +7,7 @@ use RNOC\App\Controllers\Site\Popups;
 use RNOC\App\Controllers\Site\RestApi;
 use RNOC\App\Modules\AbandonedCart\Cart;
 use RNOC\App\Helpers\Settings as SettingsHelper;
+use RNOC\App\Modules\AbandonedCart\Order;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -72,12 +73,12 @@ class Router {
 			//add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
 			//add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
 			//add_action('woocommerce_store_api_checkout_update_order_meta', array($checkout, 'apiCheckoutOrderProcessed'));
-
+			$order = new Order();
 			//add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
 			// handle placed orders
 			//add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
-			//triggers when admin pdate the order
-			//add_action('woocommerce_process_shop_order_meta', array($checkout, 'OrderUpdatedShopBackend'), 50, 2);
+			//triggers when admin changes the order
+			add_action( 'woocommerce_process_shop_order_meta', [ $order, 'orderUpdatedShopBackend' ], 50, 2 );
 
 			//add_filter('woocommerce_webhook_http_args', array($checkout, 'changeWebHookHeader'), 10, 3);
 
