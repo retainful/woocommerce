@@ -53,24 +53,26 @@ class Customer {
 	 *
 	 * @param string $from From address
 	 * @param string $set To address
+	 * @param string|object $address_value To address
 	 *
 	 * @return void
 	 */
-	public static function setCustomerDetails( $from = 'billing', $set = 'billing' ) {
+	public static function setCustomerDetails( $from = 'billing', $set = 'billing', $address_value = '' ) {
 		$address_fields = self::getAddressFields();
 		foreach ( $address_fields as $field ) {
 			if ( $field == 'email' ) {
 				continue;
 			}
 			$field_name = $from . '_' . $field;
-			if ( ! isset( $_POST[ $field_name ] ) ) {
+			if ( isset( $_POST[ $field_name ] ) ) {
+				$field_value = $_POST[ $field_name ];
+			} elseif ( is_object( $address_value ) && ! empty( $address_value ) ) {
+				$field_value = isset( $address_value->$field ) ? $address_value->$field : null;
+			}
+			if ( ! function_exists( 'WC' ) || ! is_object( WC()->customer ) || empty( $field_value ) ) {
 				continue;
 			}
-			$field_value = $_POST[ $field_name ];//TODO: Use input helper.
-			if ( ! function_exists( 'WC' ) || ! is_object( WC()->customer ) ) {
-				continue;
-			}
-			$method_name = 'set_' . $set . '_' . $set;
+			$method_name = 'set_' . $set . '_' . $field;
 			if ( is_callable( [ WC()->customer, $method_name ] ) ) {
 				WC()->customer->$method_name( $field_value );
 			}
@@ -383,4 +385,85 @@ class Customer {
 
 		return $default;
 	}
+
+
+	/**
+	 * get current user id
+	 *
+	 * @return int
+	 */
+	public static function getCurrentUserId() {
+		return function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0;
+	}
+
+
+	/**
+	 * set current user
+	 *
+	 * @param $user_id
+	 *
+	 * @return void
+	 */
+	public static function setCurrentUser( $user_id ) {
+		function_exists( 'set_current_user' ) && set_current_user( $user_id );
+	}
+
+	/**
+	 * Login the user if the user is registered user
+	 *
+	 * @param $user_id
+	 *
+	 * @return bool
+	 */
+	public static function loginUser( $user_id ) {
+		if ( is_user_logged_in() ) {
+			if ( (int) $user_id !== self::getCurrentUserId() ) {
+				wp_logout();
+
+				return self::updateRecoverCartUser( $user_id );
+			}
+		} else {
+			return self::updateRecoverCartUser( $user_id );
+		}
+
+		return false;
+	}
+
+	/**
+	 * update recover cart user data
+	 *
+	 * @param $user_id
+	 *
+	 * @return bool
+	 */
+	public static function updateRecoverCartUser( $user_id ) {
+		$logged_in = false;
+		if ( self::allowCartRecoveryUserLogin( $user_id ) ) {
+			self::setCurrentUser( $user_id );
+			WP::setAuthCookie( $user_id );
+			WP::updateUserMeta( $user_id, '_rnoc_is_pending_recovery', true );
+			$logged_in = true;
+		} else {
+			//"Not logging in user {$user_id} with admin rights"
+			WC::addNotice( __( 'Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', RNOC_TEXT_DOMAIN ) );
+		}
+
+		return $logged_in;
+	}
+
+	/**
+	 * Check if a user is allowed to be logged in for cart recovery
+	 *
+	 * @param int $user_id WP_User id
+	 *
+	 * @return bool
+	 * @since 1.0.0
+	 */
+	public static function allowCartRecoveryUserLogin( $user_id ) {
+		$allow_user_login = apply_filters( 'wc_retainful_allow_cart_recovery_user_login', ! user_can( $user_id, 'edit_others_posts' ), $user_id );
+
+		return (bool) $allow_user_login;
+	}
+     
+
 }

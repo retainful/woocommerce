@@ -138,4 +138,250 @@ class Order {
 
 		return [];
 	}
+
+
+	/**
+	 * check if order payment url
+	 *
+	 * @param $order
+	 *
+	 * @return string
+	 */
+	public static function getOrderReceivedURL( $order ) {
+		return Util::isMethodExists( $order, 'get_checkout_order_received_url' ) ? $order->get_checkout_order_received_url() : '';
+	}
+
+	/**
+	 * check if order payment url.
+	 *
+	 * @param WC_Order $order
+	 *
+	 * @return string
+	 */
+	public static function getOrderPaymentURL( $order ) {
+		return Util::isMethodExists( $order, 'get_checkout_payment_url' ) ? $order->get_checkout_payment_url() : '';
+	}
+
+	/**
+	 * apply coupon to the order
+	 *
+	 * @param $coupon string Coupon code to apply for the order
+	 * @param $order \WC_Order Order object
+	 *
+	 * @return bool True or false
+	 */
+
+	public static function applyCouponToOrder( $coupon, $order ) {
+		if ( self::isValidCoupon( $coupon ) && Util::isMethodExists( $order, "apply_coupon" ) && self::canApplyCoupon( $coupon, $order ) ) {
+			$result = $order->apply_coupon( $coupon );
+			if ( $result === true ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * validate the coupon code.
+	 *
+	 * @param $coupon_code
+	 *
+	 * @return bool|\WP_Error
+	 * @throws \Exception
+	 */
+	public static function isValidCoupon( $coupon_code ) {
+		if ( class_exists( 'WC_Coupon' ) ) {
+			$coupon = new \WC_Coupon( $coupon_code );
+			if ( Util::isMethodExists( $coupon, "is_valid" ) ) {
+				return $coupon->is_valid();
+			} elseif ( class_exists( 'WC_Discounts' ) ) {
+				$discounts = new \WC_Discounts();
+				if ( Util::isMethodExists( $discounts, "is_coupon_valid" ) ) {
+					return $discounts->is_coupon_valid( $coupon );
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * check the coupon can applicable
+	 *
+	 * @param string $coupon_code
+	 * @param \WC_Order $order
+	 *
+	 * @return bool
+	 */
+	public static function canApplyCoupon( $coupon_code, $order ) {
+		if ( empty( $coupon_code ) || ! Util::isMethodExists( $order, "get_items" ) ) {
+			return false;
+		}
+		$new_coupon = new \WC_Coupon( $coupon_code );
+		if ( ! Util::isMethodExists( $new_coupon, "get_individual_use" ) ) {
+			return false;
+		}
+		if ( $new_coupon->get_individual_use() && count( $order->get_items( 'coupon' ) ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Get order Email form order object.
+	 *
+	 * @param WC_Order $order
+	 * @param string $status
+	 *
+	 * @return bool
+	 */
+	public static function hasOrderStatus( $order, $status ) {
+		return Util::isMethodExists( $order, 'has_status' ) && $order->has_status( $status );
+	}
+
+
+	/**
+	 * Get order has particular status
+	 *
+	 * @param WC_Order $order
+	 * @param string $status
+	 * @param string $note
+	 *
+	 * @return bool
+	 */
+	public static function setOrderStatus( $order, $status, $note ) {
+		return Util::isMethodExists( $order, 'update_status' ) && $order->update_status( $status, $note );
+	}
+
+	/**
+	 * Set order note.
+	 *
+	 * @param \WC_Order $order
+	 * @param string $note
+	 */
+	public static function setOrderNote( $order, $note ) {
+		Util::isMethodExists( $order, 'add_order_note' ) && $order->add_order_note( $note );
+	}
+
+	/**
+	 * check if order needs payment or not.
+	 *
+	 * @param \WC_Order $order
+	 *
+	 * @return bool
+	 */
+	public static function isOrderNeedPayment( $order ) {
+		return Util::isMethodExists( $order, 'needs_payment' ) && $order->needs_payment();
+	}
+
+
+	/**
+	 * get the woocommerce checkout url.
+	 *
+	 * @return mixed|null
+	 *
+	 */
+	public static function getCheckoutUrl() {
+		$checkout_url = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : '';
+
+		return apply_filters( 'rnoc_get_checkout_url', $checkout_url );
+	}
+
+	/**
+	 * Get coupon usage count.
+	 *
+	 * @param \WC_Coupon $coupon Coupon object.
+	 *
+	 * @return int
+	 */
+	public static function getCouponUsageCount( $coupon ) {
+		if ( Util::isMethodExists( $coupon, 'get_usage_count' ) ) {
+			return $coupon->get_usage_count();
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Get coupon expire date.
+	 *
+	 * @param \WC_Coupon $coupon Coupon object.
+	 *
+	 * @return string
+	 */
+	public static function getCouponDateExpires( $coupon ) {
+		if ( Util::isMethodExists( $coupon, 'get_date_expires' ) ) {
+			return $coupon->get_date_expires();
+		}
+
+		return '';
+	}
+
+	/**
+	 * Coupon discount type.
+	 *
+	 * @param \WC_Coupon $coupon Coupon object.
+	 *
+	 * @return string
+	 */
+	public static function getCouponDiscountType( $coupon ) {
+		if ( Util::isMethodExists( $coupon, 'get_discount_type' ) ) {
+			return $coupon->get_discount_type();
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get coupon code.
+	 *
+	 * @param \WC_Coupon $coupon Coupon code.
+	 *
+	 * @return string
+	 */
+	public static function getCouponCode( $coupon ) {
+		if ( Util::isMethodExists( $coupon, 'get_code' ) ) {
+			return $coupon->get_code();
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get applied discounts.
+	 *
+	 * @param WC_Order|null $order Order object.
+	 *
+	 * @return array
+	 */
+	public static function getAppliedDiscounts( $order = null ) {
+		$discounts = [];
+		if ( ! is_null( $order ) ) {
+			$applied_discounts = Order::getUsedCoupons( $order );
+		} else {
+			$applied_discounts = Cart::getAppliedCartCoupons();
+		}
+		$i = 1;
+		if ( ! empty( $applied_discounts ) ) {
+			foreach ( $applied_discounts as $applied_discount ) {
+				if ( ! $applied_discount instanceof \WC_Coupon ) {
+					$applied_discount = new \WC_Coupon( $applied_discount );
+				}
+				$discounts[] = array(
+					"id"            => $i,
+					"usage_count"   => self::getCouponUsageCount( $applied_discount ),
+					"code"          => self::getCouponCode( $applied_discount ),
+					"date_expires"  => self::getCouponDateExpires( $applied_discount ),
+					"discount_type" => self::getCouponDiscountType( $applied_discount ),
+					"created_at"    => null,
+					"updated_at"    => null
+				);
+			}
+		}
+
+		return $discounts;
+	}
 }

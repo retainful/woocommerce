@@ -262,100 +262,6 @@ class WC {
 		return ( 'excl' == get_option( 'woocommerce_tax_display_cart' ) );
 	}
 
-	/**
-	 * Get coupon usage count.
-	 *
-	 * @param \WC_Coupon $coupon Coupon object.
-	 *
-	 * @return int
-	 */
-	public static function getCouponUsageCount( $coupon ) {
-		if ( Util::isMethodExists( $coupon, 'get_usage_count' ) ) {
-			return $coupon->get_usage_count();
-		}
-
-		return 0;
-	}
-
-	/**
-	 * Get coupon expire date.
-	 *
-	 * @param \WC_Coupon $coupon Coupon object.
-	 *
-	 * @return string
-	 */
-	public static function getCouponDateExpires( $coupon ) {
-		if ( Util::isMethodExists( $coupon, 'get_date_expires' ) ) {
-			return $coupon->get_date_expires();
-		}
-
-		return '';
-	}
-
-	/**
-	 * Coupon discount type.
-	 *
-	 * @param \WC_Coupon $coupon Coupon object.
-	 *
-	 * @return string
-	 */
-	public static function getCouponDiscountType( $coupon ) {
-		if ( Util::isMethodExists( $coupon, 'get_discount_type' ) ) {
-			return $coupon->get_discount_type();
-		}
-
-		return '';
-	}
-
-	/**
-	 * Get coupon code.
-	 *
-	 * @param \WC_Coupon $coupon Coupon code.
-	 *
-	 * @return string
-	 */
-	public static function getCouponCode( $coupon ) {
-		if ( Util::isMethodExists( $coupon, 'get_code' ) ) {
-			return $coupon->get_code();
-		}
-
-		return '';
-	}
-
-	/**
-	 * Get applied discounts.
-	 *
-	 * @param WC_Order|null $order Order object.
-	 *
-	 * @return array
-	 */
-	public static function getAppliedDiscounts( $order = null ) {
-		$discounts = [];
-		if ( ! is_null( $order ) ) {
-			$applied_discounts = Order::getUsedCoupons( $order );
-		} else {
-			$applied_discounts = Cart::getAppliedCartCoupons();
-		}
-		$i = 1;
-		if ( ! empty( $applied_discounts ) ) {
-			foreach ( $applied_discounts as $applied_discount ) {
-				if ( ! $applied_discount instanceof \WC_Coupon ) {
-					$applied_discount = new \WC_Coupon( $applied_discount );
-				}
-				$discounts[] = array(
-					"id"            => $i,
-					"usage_count"   => self::getCouponUsageCount( $applied_discount ),
-					"code"          => self::getCouponCode( $applied_discount ),
-					"date_expires"  => self::getCouponDateExpires( $applied_discount ),
-					"discount_type" => self::getCouponDiscountType( $applied_discount ),
-					"created_at"    => null,
-					"updated_at"    => null
-				);
-			}
-		}
-
-		return $discounts;
-	}
 
 	/**
 	 * Get client sessions.
@@ -374,5 +280,26 @@ class WC {
 
 		return apply_filters( 'rnoc_get_client_session', $session );
 	}
+
+
+	/**
+	 * add woocommerce notice
+	 *
+	 * @param $message
+	 */
+	public static function addNotice( $message ) {
+		function_exists( 'wc_add_notice' ) && wc_add_notice( $message );
+	}
+
+
+	/**
+	 * Clear all notices
+	 */
+	public static function clearWooNotices() {
+		if ( function_exists( 'wc_clear_notices' ) ) {
+			wc_clear_notices();
+		}
+	}
+
 
 }

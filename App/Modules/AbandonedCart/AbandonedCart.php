@@ -3,6 +3,8 @@
 namespace RNOC\App\Modules\AbandonedCart;
 
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
+use RNOC\App\Helpers\Order;
+use RNOC\App\Helpers\Cart;
 use RNOC\App\Helpers\Settings;
 
 defined( 'ABSPATH' ) || exit;
@@ -136,27 +138,11 @@ class AbandonedCart {
 			$storage->set( self::$cart_tracking_started_key, $current_time );
 			if ( ! empty( $user_id ) || $user_id = get_current_user_id() ) {
 				update_user_meta( $user_id, self::$cart_token_key_for_db, $cart_token );
-				self::setCartCreatedDate( $user_id, $current_time );
+				Cart::setCartCreatedDate( $user_id, $current_time );
 			}
 		}
 	}
 
-	/**
-	 * Set cart created date.
-	 *
-	 * @param int $user_id User id.
-	 * @param int $time Time stamp.
-	 *
-	 * @return void
-	 */
-	public static function setCartCreatedDate( $user_id, $time ) {
-		if ( empty( $time ) ) {
-			$time = current_time( 'timestamp', true );
-		}
-		if ( ! empty( $user_id ) || $user_id = get_current_user_id() ) {
-			update_user_meta( $user_id, self::$cart_tracking_started_key_for_db, $time );
-		}
-	}
 
 	/**
 	 * Generate cart hash.
@@ -164,7 +150,7 @@ class AbandonedCart {
 	 * @return string
 	 */
 	public static function generateCartHash() {
-		$cart = WC::getCart();
+		$cart = Cart::getCart();
 		if ( empty( $cart ) ) {
 			return '';
 		}

@@ -2,9 +2,14 @@
 
 namespace RNOC\App\Helpers;
 
+use Rnoc\Retainful\WcFunctions;
+use RNOC\App\Modules\AbandonedCart\Request;
+
 defined( 'ABSPATH' ) || exit;
 
 class Cart {
+
+	public static $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
 
 	/**
 	 * Check is empty cart.
@@ -203,5 +208,59 @@ class Cart {
 		}
 
 		return [];
+	}
+
+
+	/**
+	 * Add to cart
+	 *
+	 * @param $product_id
+	 * @param int $variation_id
+	 * @param int $quantity
+	 * @param array $variation
+	 * @param array $cart_item_data
+	 *
+	 * @return bool|string
+	 */
+	public static function addToCart( $product_id, $variation_id = 0, $quantity = 1, $variation = array(), $cart_item_data = array() ) {
+		if ( Util::isMethodExists( WC()->cart, 'add_to_cart' ) ) {
+			try {
+				WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation, $cart_item_data );
+			} catch ( \Exception $e ) {
+				return $e->getMessage();
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Empty the user cart
+	 * @return bool
+	 */
+	public static function emptyUserCart() {
+		global $woocommerce;
+		if ( is_object( $woocommerce ) && Util::isMethodExists( $woocommerce->cart, 'empty_cart' ) ) {
+			$woocommerce->cart->empty_cart();
+		}
+
+		return true;
+	}
+
+	/**
+	 * Set cart created date.
+	 *
+	 * @param int $user_id User id.
+	 * @param int $time Time stamp.
+	 *
+	 * @return void
+	 */
+	public static function setCartCreatedDate( $user_id = null, $time ) {
+		if ( empty( $time ) ) {
+			$time = current_time( 'timestamp', true );
+		}
+		if ( ! empty( $user_id ) || $user_id = get_current_user_id() ) {
+			update_user_meta( $user_id, '_rnoc_cart_tracking_started_at', $time );
+		}
 	}
 }

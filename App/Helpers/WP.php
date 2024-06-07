@@ -188,4 +188,23 @@ class WP {
 
 		return self::getDefaultLanguage();
 	}
+
+
+	/**
+	 * set the auth cookie.
+	 *
+	 * @param $user_id
+	 *
+	 */
+	public static function setAuthCookie( $user_id ) {
+		function_exists( 'wp_set_auth_cookie' ) && wp_set_auth_cookie( $user_id );
+	}
+
+
+	public static function updateUserMeta( $user_id, $meta_key, $meta_value ) {
+		if ( function_exists( 'update_user_meta' ) ) {
+			update_user_meta( $user_id, $meta_key, $meta_value );
+		}
+	}
+
 }
