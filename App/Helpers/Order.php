@@ -139,7 +139,22 @@ class Order {
 		return [];
 	}
 
+	/**
+	 * Get order status.
+	 *
+	 * @param WC_Order $order Order object.
+	 *
+	 * @return string
+	 */
+	public static function getStatus( $order ) {
+		if ( Util::isMethodExists( $order, 'get_status' ) ) {
+			$order_status = $order->get_status();
 
+			return strtolower( $order_status );
+		}
+
+		return '';
+	}
 	/**
 	 * check if order payment url
 	 *

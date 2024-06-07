@@ -3,17 +3,15 @@
 namespace RNOC\App\Modules\AbandonedCart;
 
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
-use RNOC\App\Helpers\Order;
-use RNOC\App\Helpers\Cart;
 use RNOC\App\Helpers\Settings;
+use RNOC\App\Helpers\WC;
+use RNOC\App\Modules\AbandonedCart\Traits\SyncData;
 
 defined( 'ABSPATH' ) || exit;
 
 class AbandonedCart {
-	protected static $cart_token_key_for_db = '_rnoc_user_cart_token';
-	protected static $cart_token_key = 'rnoc_user_cart_token';
-	protected static $cart_tracking_started_key = 'rnoc_cart_created_at';
-	protected static $cart_tracking_started_key_for_db = '_rnoc_cart_tracking_started_at';
+	use SyncData;
+
 	const HMAC_ALGORITHM = 'sha256';
 	const CIPHER_METHOD = 'AES256';
 
@@ -138,11 +136,27 @@ class AbandonedCart {
 			$storage->set( self::$cart_tracking_started_key, $current_time );
 			if ( ! empty( $user_id ) || $user_id = get_current_user_id() ) {
 				update_user_meta( $user_id, self::$cart_token_key_for_db, $cart_token );
-				Cart::setCartCreatedDate( $user_id, $current_time );
+				self::setCartCreatedDate( $user_id, $current_time );
 			}
 		}
 	}
 
+	/**
+	 * Set cart created date.
+	 *
+	 * @param int $user_id User id.
+	 * @param int $time Time stamp.
+	 *
+	 * @return void
+	 */
+	public static function setCartCreatedDate( $user_id, $time ) {
+		if ( empty( $time ) ) {
+			$time = current_time( 'timestamp', true );
+		}
+		if ( ! empty( $user_id ) || $user_id = get_current_user_id() ) {
+			update_user_meta( $user_id, self::$cart_tracking_started_key_for_db, $time );
+		}
+	}
 
 	/**
 	 * Generate cart hash.
@@ -150,7 +164,7 @@ class AbandonedCart {
 	 * @return string
 	 */
 	public static function generateCartHash() {
-		$cart = Cart::getCart();
+		$cart = \RNOC\App\Helpers\Cart::getCart();
 		if ( empty( $cart ) ) {
 			return '';
 		}
@@ -160,7 +174,7 @@ class AbandonedCart {
 			unset( $cart_session[ $key ]['data'] ); // Unset product object.
 		}
 
-		return $cart_session ? md5( wp_json_encode( $cart_session ) . WC::getCartTotal( 'edit' ) ) : '';
+		return $cart_session ? md5( wp_json_encode( $cart_session ) . \RNOC\App\Helpers\Cart::getCartTotal( 'edit' ) ) : '';
 	}
 
 	/**
@@ -230,7 +244,15 @@ class AbandonedCart {
 		return true;
 	}
 
-	public static function getEncryptData( $data, $secret = null ) {
+	/**
+	 * Get encrypt data.
+	 *
+	 * @param mixed $data Data.
+	 * @param string $secret Secret key.
+	 *
+	 * @return string|null
+	 */
+	public static function getEncryptData( $data, $secret = '' ) {
 		if ( extension_loaded( 'openssl' ) ) {
 			if ( is_array( $data ) || is_object( $data ) ) {
 				$data = wp_json_encode( $data );
@@ -251,6 +273,61 @@ class AbandonedCart {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get tracking id.
+	 *
+	 * @return string
+	 */
+	public static function getTrackingElementId() {
+		return apply_filters( 'retainful_abandoned_cart_tracking_element_id', 'retainful-abandoned-cart-data' );
+	}
+
+	/**
+	 * Need to track cart.
+	 *
+	 * @return bool
+	 */
+	function needToTrackCart() {
+		$cart_hash       = $this->generateCartHash();
+		$cart_created_at = self::getTrackingStartAt();
+		if ( empty( $cart_hash ) && empty( $cart_created_at ) ) {
+			return false;
+		} elseif ( empty( $cart_hash ) && ! empty( $cart_created_at ) ) {
+			return $this->comparePreviousCartHash( $cart_hash );
+		} elseif ( ! empty( $cart_hash ) && empty( $cart_created_at ) ) {
+			//TODO What if it fails to create cart created time
+			$time    = current_time( 'timestamp', true );
+			$storage = Settings::getStorage();
+			$storage->set( self::$cart_tracking_started_key, $time );
+			if ( $user_id = get_current_user_id() ) {
+				$this->setCartCreatedDate( $user_id, $time );
+			}
+
+			return $this->comparePreviousCartHash( $cart_hash );
+		} else {
+			return $this->comparePreviousCartHash( $cart_hash );
+		}
+	}
+
+	/**
+	 * Compare with previous cart.
+	 *
+	 * @param string $current_cart_hash Current cart hash.
+	 *
+	 * @return bool
+	 */
+	public static function comparePreviousCartHash( $current_cart_hash ) {
+		$storage        = Settings::getStorage();
+		$old_cart_hash  = $storage->get( self::$previous_cart_hash_key );
+		$is_not_similar = ( $old_cart_hash != $current_cart_hash );
+		if ( $is_not_similar ) {
+			$storage->set( self::$previous_cart_hash_key, $current_cart_hash );
+		}
+		$storage->set( 'rnoc_current_cart_hash', $current_cart_hash );
+
+		return $is_not_similar;
 	}
 
 }
