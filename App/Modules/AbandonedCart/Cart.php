@@ -21,17 +21,46 @@ class Cart extends AbandonedCart {
 	 */
 	public function renderCartTrackingDiv() {
 		$cart_created_at = self::getTrackingStartAt();
-		$data            = [];
 		if ( empty( $cart_created_at ) && $this->needToTrackCart() ) {
 			$cart_created_at = self::getTrackingStartAt();
 		}
+		$data = [];
 		if ( self::isValidCartToTrack() && ! empty( $cart_created_at ) ) {
 			$data = $this->getCartTrackingData();
 		}
-
 		echo $this->getCartTrackingDiv( $data );
 	}
-	
+
+	/**
+	 * Get cart fragments.
+	 *
+	 * @param array $fragments Fragment data.
+	 *
+	 * @return array
+	 */
+	public function getCartFragments( $fragments ) {
+		$cart_created_at = self::getTrackingStartAt();
+		if ( empty( $cart_created_at ) && $this->needToTrackCart() ) {
+			$cart_created_at = self::getTrackingStartAt();
+		}
+		$data = [];
+		if ( self::isValidCartToTrack() ) {
+			if ( ! empty( $cart_created_at ) ) {
+				$data = $this->getCartTrackingData();;
+			} else {
+				$storage       = Settings::getStorage();
+				$force_refresh = $storage->get( 'rnoc_force_refresh_cart' );
+				if ( empty( $force_refresh ) && ! empty( CartHelper::getCart() ) ) {
+					$storage->set( 'rnoc_force_refresh_cart', 1 );
+					$data = [ 'force_refresh_carts' => 1 ];
+				}
+			}
+		}
+		$fragments[ 'div#' . $this->getTrackingElementId() ] = $this->getCartTrackingDiv( $data );
+
+		return $fragments;
+	}
+
 	/**
 	 * Get tracking data.
 	 *
@@ -45,6 +74,15 @@ class Cart extends AbandonedCart {
 			'cart_hash'  => self::generateCartHash(),
 			'data'       => self::getEncryptData( $cart_data )
 		] );
+	}
+
+	/**
+	 * Get tracking update data.
+	 *
+	 * @return void
+	 */
+	public function getCartTrackingUpdatedData() {
+		wp_send_json_success( $this->getCartTrackingData() );
 	}
 
 	/**
@@ -83,7 +121,12 @@ class Cart extends AbandonedCart {
 			wp_enqueue_script( 'wc-cart-fragments' );
 		}
 		if ( ! wp_script_is( RNOC_PLUGIN_PREFIX . 'track-user-cart' ) ) {
-			wp_enqueue_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', self::getCartTrackingJsUrl(), [ 'jquery' ], RNOC_VERSION, false );
+			wp_enqueue_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', self::getCartTrackingJsUrl(), array(
+				'wp-hooks',
+				'wp-data',
+				'wp-element',
+				'wc-blocks-checkout'
+			), RNOC_VERSION, false );
 			$data = [
 				'ajax_url'                  => admin_url( 'admin-ajax.php' ),
 				'ip'                        => Customer::getClientIP(),
@@ -91,7 +134,7 @@ class Cart extends AbandonedCart {
 				'public_key'                => Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' ),
 				'api_url'                   => Request::getAbandonedCartApiUrl() . 'webhooks/checkout',
 				'tracking_element_selector' => Cart::getTrackingElementId(),
-				'cart_tracking_engine'      => Settings::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' )
+				'cart_tracking_engine'      => Settings::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' ),
 			];
 			$data = apply_filters( 'rnoc_add_cart_tracking_scripts', $data );
 			wp_localize_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data );

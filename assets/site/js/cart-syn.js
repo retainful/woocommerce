@@ -3,7 +3,7 @@ if (typeof (rnoc_jquery) == 'undefined') {
 }
 
 rnoc = window.rnoc || {};
-(function (rnoc) {
+(function () {
     class RetainFul {
         constructor(end_point = null, public_key = null) {
             this.ajax_url = null;
@@ -159,17 +159,17 @@ rnoc = window.rnoc || {};
         }
 
         validateEmail = (value) => {
-            var valid = true;
+            let valid = true;
             if (value.indexOf('@') === -1) {
                 valid = false;
             } else {
-                var parts = value.split('@');
-                var domain = parts[1];
+                let parts = value.split('@');
+                let domain = parts[1];
                 if (domain.indexOf('.') === -1) {
                     valid = false;
                 } else {
-                    var domainParts = domain.split('.');
-                    var ext = domainParts[1];
+                    let domainParts = domain.split('.');
+                    let ext = domainParts[1];
                     if (ext.length > 14 || ext.length < 2) {
                         valid = false;
                     }
@@ -179,14 +179,48 @@ rnoc = window.rnoc || {};
         }
 
         initCartTracking = () => {
-            rnoc_jquery(document.body).on("added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout", function () {
-                this.syncCart();
+            let retain = this;
+            rnoc_jquery(document.body).on("added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout", function (e) {
+                retain.syncCart();
             }).on("wc_fragments_refreshed", function () {
-                this.syncCart();
+                retain.syncCart();
             }).on("wc_fragments_loaded", function () {
-                this.syncCart();
+                retain.syncCart();
             });
             return this;
+        }
+
+        isCartUpdated = () => {
+            if (wp?.data?.select) {
+                let current_cart = wp?.data?.select('wc/store/cart').getCartData();
+                let old_cart = JSON.parse(localStorage.getItem("rnocp_store_cart_data", {}));
+                if (current_cart?.billingAddress?.email !== old_cart?.billingAddress?.email) {
+                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                    return true;
+                }
+                if (current_cart?.billingAddress?.first_name !== old_cart?.billingAddress?.first_name) {
+                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                    return true;
+                }
+                if (current_cart?.billingAddress?.last_name !== old_cart?.billingAddress?.last_name) {
+                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                    return true;
+                }
+                if (current_cart?.billingAddress?.phone !== old_cart?.billingAddress?.phone) {
+                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                    return true;
+                }
+                if (current_cart?.billingAddress?.postcode !== old_cart?.billingAddress?.postcode) {
+                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                    return true;
+                }
+                if (JSON.stringify(current_cart?.items) !== JSON.stringify(old_cart?.items)) {
+                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                    return true;
+                }
+                localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+            }
+            return false;
         }
     }
 
@@ -210,6 +244,26 @@ rnoc = window.rnoc || {};
         rnoc_jquery(window).on('load', function () {
             retain.syncCart();
         });
+        if (wp?.data?.select) {
+            wp?.data?.subscribe(function () {
+                if (retain.isCartUpdated()) {
+                    rnoc_jquery.ajax({
+                        url: retain_cart_js_data.ajax_url,
+                        method: 'POST',
+                        dataType: 'json',
+                        data: {
+                            action: 'rnoc_cart_item_change',
+                        },
+                        async: true,
+                        success: function (response) {
+                            if (response.success && response.data) {
+                                retain.syncCart(response.data.data, true);
+                            }
+                        }
+                    });
+                }
+            })
+        }
     }
     if (retain_cart_js_data.cart !== undefined) {
         let tracking_content = '<div id="' + retain_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retain_cart_js_data.cart) + '</div>';
@@ -217,10 +271,10 @@ rnoc = window.rnoc || {};
     }
 
     rnoc_jquery(document).on('change', 'input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone,input#rnoc_allow_gdpr', function () {
-        var rnoc_phone = ("#billing_phone").val();
-        var rnoc_email = rnoc_jquery("#billing_email").val();
-        var ship_to_bill = rnoc_jquery("#ship-to-different-address-checkbox:checked").length;
-        var guest_data = {
+        let rnoc_phone = ("#billing_phone").val();
+        let rnoc_email = rnoc_jquery("#billing_email").val();
+        let ship_to_bill = rnoc_jquery("#ship-to-different-address-checkbox:checked").length;
+        let guest_data = {
             billing_first_name: rnoc_jquery('#billing_first_name').val(),
             billing_last_name: rnoc_jquery('#billing_last_name').val(),
             billing_company: rnoc_jquery('#billing_company').val(),
@@ -250,9 +304,9 @@ rnoc = window.rnoc || {};
         updateCheckout(rnoc_email, rnoc_phone, guest_data);
     });
     rnoc_jquery(document).on('change', '.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
-        var rnoc_email = rnoc_jquery(".wp-block-woocommerce-checkout input#email").val();
-        var rnoc_phone = rnoc_jquery(".wp-block-woocommerce-checkout input#phone").val();
-        var guest_data = {
+        let rnoc_email = rnoc_jquery(".wp-block-woocommerce-checkout input#email").val();
+        let rnoc_phone = rnoc_jquery(".wp-block-woocommerce-checkout input#phone").val();
+        let guest_data = {
             billing_first_name: rnoc_jquery('.wp-block-woocommerce-checkout #billing-first_name').val(),
             billing_last_name: rnoc_jquery('.wp-block-woocommerce-checkout #billing-last_name').val(),
             billing_address_1: rnoc_jquery('.wp-block-woocommerce-checkout #billing-address_1').val(),
@@ -274,8 +328,8 @@ rnoc = window.rnoc || {};
         if (typeof rnoc_email === 'undefined') {
             return;
         }
-        var atposition = rnoc_email.indexOf("@");
-        var dotposition = rnoc_email.lastIndexOf(".");
+        let atposition = rnoc_email.indexOf("@");
+        let dotposition = rnoc_email.lastIndexOf(".");
         if (typeof rnoc_phone === 'undefined' || rnoc_phone === null) { //If phone number field does not exist on the Checkout form
             rnoc_phone = '';
         }
