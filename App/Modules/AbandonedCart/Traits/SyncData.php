@@ -1,6 +1,6 @@
 <?php
 
-namespace RNOC\App\Modules\Traits;
+namespace RNOC\App\Modules\AbandonedCart\Traits;
 trait SyncData {
 	protected static $cart_token_key_for_db = '_rnoc_user_cart_token';
 	protected static $cart_token_key = 'rnoc_user_cart_token';

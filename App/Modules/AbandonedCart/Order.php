@@ -3,7 +3,7 @@
 namespace RNOC\App\Modules\AbandonedCart;
 
 use RNOC\App\Helpers\Settings;
-use RNOC\App\Modules\Traits\SyncData;
+use RNOC\App\Modules\AbandonedCart\Traits\SyncData;
 
 defined( 'ABSPATH' ) || exit;
 

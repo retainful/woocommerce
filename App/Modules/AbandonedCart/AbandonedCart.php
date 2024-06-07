@@ -5,7 +5,7 @@ namespace RNOC\App\Modules\AbandonedCart;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use RNOC\App\Helpers\Settings;
 use RNOC\App\Helpers\WC;
-use RNOC\App\Modules\Traits\SyncData;
+use RNOC\App\Modules\AbandonedCart\Traits\SyncData;
 
 defined( 'ABSPATH' ) || exit;
 
