@@ -139,37 +139,4 @@ class Request {
 
 		return $response;
 	}
-
-
-	/**
-	 * Encrypt the cart
-	 *
-	 * @param $data
-	 * @param $secret
-	 *
-	 * @return string
-	 */
-	public static function encryptData( $data, $secret = null ) {
-
-		if ( extension_loaded( 'openssl' ) ) {
-			if ( is_array( $data ) || is_object( $data ) ) {
-				$data = wp_json_encode( $data );
-			}
-			try {
-				if ( empty( $secret ) ) {
-					$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
-				}
-				$iv_len          = openssl_cipher_iv_length( self::CIPHER_METHOD );
-				$iv              = openssl_random_pseudo_bytes( $iv_len );
-				$cipher_text_raw = openssl_encrypt( $data, self::CIPHER_METHOD, $secret, OPENSSL_RAW_DATA, $iv );
-				$hmac            = hash_hmac( self::HMAC_ALGORITHM, $cipher_text_raw, $secret, true );
-
-				return base64_encode( bin2hex( $iv ) . ':retainful:' . bin2hex( $hmac ) . ':retainful:' . bin2hex( $cipher_text_raw ) );
-			} catch ( Exception $e ) {
-				return null;
-			}
-		}
-
-		return null;
-	}
 }

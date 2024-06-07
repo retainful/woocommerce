@@ -7,6 +7,7 @@ use RNOC\App\Controllers\Site\Popups;
 use RNOC\App\Controllers\Site\RestApi;
 use RNOC\App\Modules\AbandonedCart\Cart;
 use RNOC\App\Helpers\Settings as SettingsHelper;
+use RNOC\App\Modules\AbandonedCart\Order;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -43,7 +44,7 @@ class Router {
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
 			$cart = new Cart();
-			//add_action('wp_enqueue_scripts', array($cart, 'addCartTrackingScripts'));
+			add_action( 'wp_enqueue_scripts', [ $cart, 'addCartTrackingScripts' ] );
 			add_action( 'wp_ajax_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
 			add_action( 'wp_ajax_nopriv_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
 
@@ -57,8 +58,10 @@ class Router {
 				//add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
 			} else {
 				//Js tracking
-				//add_action('wp_footer', array($cart, 'renderAbandonedCartTrackingDiv'));
-				//add_filter('woocommerce_add_to_cart_fragments', array($cart, 'addToCartFragments'));
+				add_action( 'wp_footer', [ $cart, 'renderCartTrackingDiv' ] );
+				add_filter( 'woocommerce_add_to_cart_fragments', [ $cart, 'getCartFragments' ] );
+				add_action( 'wp_ajax_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
+				add_action( 'wp_ajax_nopriv_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
 			}
 			//add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
 
@@ -70,12 +73,12 @@ class Router {
 			//add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
 			//add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
 			//add_action('woocommerce_store_api_checkout_update_order_meta', array($checkout, 'apiCheckoutOrderProcessed'));
-
+			$order = new Order();
 			//add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
 			// handle placed orders
 			//add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
-			//triggers when admin pdate the order
-			//add_action('woocommerce_process_shop_order_meta', array($checkout, 'OrderUpdatedShopBackend'), 50, 2);
+			//triggers when admin changes the order
+			add_action( 'woocommerce_process_shop_order_meta', [ $order, 'orderUpdatedShopBackend' ], 50, 2 );
 
 			//add_filter('woocommerce_webhook_http_args', array($checkout, 'changeWebHookHeader'), 10, 3);
 
