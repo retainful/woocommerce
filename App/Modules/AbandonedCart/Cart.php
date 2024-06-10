@@ -471,12 +471,13 @@ class Cart extends AbandonedCart {
 	}
 
 	/**
-	 * recreate the cart.
+	 * Recreate the woocommerce cart.
 	 *
-	 * @param $token
-	 * @param $hash
+	 * @param string $token cart token.
+	 * @param string $hash hash token.
 	 *
 	 * @return false|void
+	 * @throws \Exception
 	 */
 	public function reCreateCart( $token, $hash ) {
 		if ( empty( $token ) && empty( $hash ) ) {
@@ -484,12 +485,12 @@ class Cart extends AbandonedCart {
 		}
 		$data = wc_clean( rawurldecode( $token ) );
 		$hash = wc_clean( $hash );
-		if ( Util::isHashMatches( $hash, $data ) ) {
+		if ( Settings::isHashMatches( $hash, $data ) ) {
 			$app_id     = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 			$data       = json_decode( base64_decode( $data ) );
 			$cart_token = is_object( $data ) && isset( $data->cart_token ) ? $data->cart_token : '';
 			if ( empty( $cart_token ) ) {
-				throw new Exception( __( 'Cart token missed', 'retainful-next-order-coupon-for-woocommerce' ) );
+				throw new \Exception( __( 'Cart token missed', 'retainful-next-order-coupon-for-woocommerce' ) );
 			}
 			$cart_data = self::retrieveCartDetails( $app_id, $cart_token );
 			if ( empty( ( $cart_data ) ) ) {
@@ -524,9 +525,9 @@ class Cart extends AbandonedCart {
 					exit;
 				}
 			}
-			$is_buyer_accept_marketing = ( isset( $data->buyer_accepts_marketing ) && $data->buyer_accepts_marketing ) ? 1 : 0;
+			$is_buyer_accept_marketing = ( isset( $cart_data['buyer_accepts_marketing'] ) && $cart_data['buyer_accepts_marketing'] ) ? $cart_data['buyer_accepts_marketing'] : 0;
 			WC::setSession( 'is_buyer_accepting_marketing', $is_buyer_accept_marketing );
-			$user_currency = isset( $data->presentment_currency ) ? $data->presentment_currency : WC::getDefaultCurrency();
+			$user_currency = isset( $cart_data['presentment_currency'] ) ? $cart_data['presentment_currency'] : WC::getDefaultCurrency();
 			apply_filters( 'rnoc_set_current_currency_code', $user_currency );
 			Settings::getStorage()->set( 'rnoc_recovered_at', current_time( 'timestamp', true ) );
 			Settings::getStorage()->set( 'rnoc_recovered_by_retainful', 1 );
@@ -534,29 +535,28 @@ class Cart extends AbandonedCart {
 
 			$user_id        = self::getUserIdFromCartToken( $cart_token );
 			$cart_recreated = false;
-			if ( $user_id && Customer::loginUser( $user_id ) ) {
+			if ( $user_id && Customer::recoverCartUserLogin( $user_id ) ) {
 				WP::updateUserMeta( $user_id, '_rnoc_order_note', $note );
 				$current_cart   = CartHelper::getCart();
 				$cart_recreated = ! empty( $current_cart );
 			}
 
-			$cart_recreated = apply_filters( 'rnoc_cart_re_created', $cart_recreated, $data );
+			$cart_recreated = apply_filters( 'rnoc_cart_re_created', $cart_recreated, $cart_data );
 			if ( ! $cart_recreated ) {
 				Settings::getStorage()->set( '_rnoc_order_note', $note );
-				$this->reCreateCartForGuestUsers( $data );
+				$this->reCreateCartForGuestUsers( $cart_data );
 			}
-
-			$this->populateSessionDetails( $data );
+			$this->populateSessionDetails( $cart_data );
 			$cart_session = WC::getSession( 'cart' );
 			if ( empty( $cart_session ) ) {
-				$client_session = isset( $data->client_session ) ? $data->client_session : array();
+				$client_session = isset( $cart_data['client_session'] ) ? $cart_data['client_session'] : [];
 				if ( ! empty( $client_session ) ) {
 					$cart = json_decode( wp_json_encode( $client_session->cart ), true );
 					if ( ! empty( $cart ) ) {
 						WC::setSession( 'cart', $cart );
 					}
 				} else {
-					$cart_contents = isset( $data->cart_contents ) ? $data->cart_contents : array();
+					$cart_contents = isset( $cart_data['cart_contents'] ) ? $cart_data['cart_contents'] : [];
 					$this->recreateCartFromCartContents( $cart_contents );
 				}
 			}
@@ -568,10 +568,10 @@ class Cart extends AbandonedCart {
 
 
 	/**
-	 * Sync the cart details to server
+	 * Sync the cart details to server.
 	 *
-	 * @param $app_id
-	 * @param string $cart_token
+	 * @param string $app_id retainful app id.
+	 * @param string $cart_token cart token.
 	 *
 	 * @return array|bool|mixed|object|string
 	 */
@@ -599,19 +599,19 @@ class Cart extends AbandonedCart {
 	 * @throws \Exception
 	 */
 	function reCreateCartForGuestUsers( $data ) {
-		$this->setCartToken( $data->cart_token );
+		$this->setCartToken( $data['cart_token'] );
 		WC::setSession( self::$pending_recovery_key, true );
-		$created_at = isset( $data->created_at ) ? strtotime( $data->created_at ) : current_time( 'mysql', true );
+		$created_at = isset( $data['created_at'] ) ? strtotime( $data['created_at'] ) : current_time( 'mysql', true );
 		AbandonedCart::setCartCreatedDate( null, $created_at );
 		$data           = apply_filters( 'rnoc_abandoned_cart_recover_guest_cart', $data );
-		$client_session = isset( $data->client_session ) ? $data->client_session : array();
+		$client_session = ! empty( $data['client_session'] ) ? $data['client_session'] : [];
 		if ( ! empty( $client_session ) ) {
-			$cart = json_decode( wp_json_encode( $client_session->cart ), true );
+			$cart = json_decode( wp_json_encode( $client_session['cart'] ), true );
 			if ( ! empty( $cart ) ) {
-				$applied_coupons         = isset( $data->discount_codes ) ? $data->discount_codes : array();
-				$chosen_shipping_methods = (array) $client_session->chosen_shipping_methods;
-				$shipping_method_counts  = (array) $client_session->shipping_method_counts;
-				$chosen_payment_method   = $client_session->chosen_payment_method;
+				$applied_coupons         = isset( $data['discount_codes'] ) ? $data['discount_codes'] : [];
+				$chosen_shipping_methods = (array) $client_session['chosen_shipping_methods'];
+				$shipping_method_counts  = (array) $client_session['shipping_method_counts'];
+				$chosen_payment_method   = $client_session['chosen_payment_method'];
 				// base session data
 				WC::setSession( 'cart', $cart );
 				WC::setSession( 'applied_coupons', self::getValidCoupons( $applied_coupons ) );
@@ -620,7 +620,7 @@ class Cart extends AbandonedCart {
 				WC::setSession( 'chosen_payment_method', $chosen_payment_method );
 			}
 		} else {
-			$cart_contents = isset( $data->cart_contents ) ? $data->cart_contents : array();
+			$cart_contents = isset( $data['cart_contents'] ) ? $data['cart_contents'] : [];
 			self::recreateCartFromCartContents( $cart_contents );
 		}
 		// set (or refresh, if already set) session
@@ -633,18 +633,19 @@ class Cart extends AbandonedCart {
 	 * @param $cart_contents
 	 */
 	public static function recreateCartFromCartContents( $cart_contents ) {
+
 		if ( ! empty( $cart_contents ) ) {
-			CartHelper::emptyUserCart();
+			CartHelper::clearCart();
 			WC::clearWooNotices();
 			$remove_list = self::mustCartItemsKeys();
 			foreach ( $cart_contents as $key => $cart_item ) {
 				$array_cart_item = json_decode( wp_json_encode( $cart_item ), true );
 				self::unsetFromArray( $array_cart_item, $remove_list );
 				if ( ! is_array( $array_cart_item ) ) {
-					$array_cart_item = array();
+					$array_cart_item = [];
 				}
-				$variant_id = isset( $cart_item->variation_id ) ? $cart_item->variation_id : 0;
-				$variation  = isset( $cart_item->variation ) ? $cart_item->variation : array();
+				$variant_id = isset( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : 0;
+				$variation  = isset( $cart_item['variation'] ) ? $cart_item['variation'] : [];
 				if ( is_object( $variation ) ) {
 					$variation = json_decode( wp_json_encode( $variation ), true );
 				}
@@ -677,7 +678,7 @@ class Cart extends AbandonedCart {
 
 
 	/**
-	 * remove key value pairs from list
+	 * Remove key value pairs from list.
 	 *
 	 * @param $full_list
 	 * @param array $remove_list
@@ -756,13 +757,14 @@ class Cart extends AbandonedCart {
 	 * @param $data
 	 */
 	function populateSessionDetails( $data ) {
-		$customer_email = isset( $data->email ) ? $data->email : '';
+		$customer_email = isset( $data['email'] ) ? $data['email'] : '';
+
 		//Setting the email
 		Customer::setCustomerEmail( $customer_email );
-		Util::setIdentity( $customer_email );
-		$billing_details = isset( $data->billing_address ) ? $data->billing_address : new \stdClass();
+		Settings::setIdentity( 'email', $customer_email );
+		$billing_details = isset( $data['billing_address'] ) ? $data['billing_address'] : [];
 		Customer::setCustomerDetails( 'billing', 'billing', $billing_details );
-		$shipping_details = isset( $data->shipping_address ) ? $data->shipping_address : new \stdClass();
+		$shipping_details = isset( $data['shipping_address'] ) ? $data['shipping_address'] : [];
 		Customer::setCustomerDetails( 'shipping', 'shipping', $shipping_details );
 	}
 

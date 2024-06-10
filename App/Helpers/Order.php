@@ -155,6 +155,7 @@ class Order {
 
 		return '';
 	}
+
 	/**
 	 * check if order payment url
 	 *
@@ -198,23 +199,24 @@ class Order {
 	}
 
 	/**
-	 * validate the coupon code.
+	 * Check the coupon code.
 	 *
-	 * @param $coupon_code
+	 * @param string $coupon_code woocommerce coupon code.
 	 *
 	 * @return bool|\WP_Error
 	 * @throws \Exception
 	 */
 	public static function isValidCoupon( $coupon_code ) {
-		if ( class_exists( 'WC_Coupon' ) ) {
-			$coupon = new \WC_Coupon( $coupon_code );
-			if ( Util::isMethodExists( $coupon, "is_valid" ) ) {
-				return $coupon->is_valid();
-			} elseif ( class_exists( 'WC_Discounts' ) ) {
-				$discounts = new \WC_Discounts();
-				if ( Util::isMethodExists( $discounts, "is_coupon_valid" ) ) {
-					return $discounts->is_coupon_valid( $coupon );
-				}
+		if ( ! class_exists( 'WC_Coupon' ) ) {
+			return false;
+		}
+		$coupon = new \WC_Coupon( $coupon_code );
+		if ( Util::isMethodExists( $coupon, "is_valid" ) ) {
+			return $coupon->is_valid();
+		} elseif ( class_exists( 'WC_Discounts' ) ) {
+			$discounts = new \WC_Discounts();
+			if ( Util::isMethodExists( $discounts, "is_coupon_valid" ) ) {
+				return $discounts->is_coupon_valid( $coupon );
 			}
 		}
 

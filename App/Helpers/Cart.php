@@ -209,13 +209,13 @@ class Cart {
 
 
 	/**
-	 * Add to cart
+	 * Add to cart items.
 	 *
-	 * @param $product_id
-	 * @param int $variation_id
-	 * @param int $quantity
-	 * @param array $variation
-	 * @param array $cart_item_data
+	 * @param int $product_id product id.
+	 * @param int $variation_id variant id.
+	 * @param int $quantity product quantity.
+	 * @param array $variation variations.
+	 * @param array $cart_item_data cart item data.
 	 *
 	 * @return bool|string
 	 */
@@ -232,13 +232,14 @@ class Cart {
 	}
 
 	/**
-	 * Empty the user cart
+	 *  Clear the user cart.
+	 *
 	 * @return bool
 	 */
-	public static function emptyUserCart() {
-		global $woocommerce;
-		if ( is_object( $woocommerce ) && Util::isMethodExists( $woocommerce->cart, 'empty_cart' ) ) {
-			$woocommerce->cart->empty_cart();
+	public static function clearCart() {
+
+		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->cart, 'empty_cart' ) ) {
+			WC()->cart->empty_cart();
 		}
 
 		return true;

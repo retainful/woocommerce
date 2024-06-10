@@ -10,6 +10,7 @@ use Valitron\Validator;
 defined( 'ABSPATH' ) || exit;
 
 class Settings {
+	const HMAC_ALGORITHM = 'sha256';
 
 	/**
 	 * Get license settings.
@@ -289,5 +290,39 @@ class Settings {
 		}
 
 		return $validator->errors();
+	}
+
+
+	/**
+	 * Check the hash matches or not.
+	 *
+	 * @param $hash
+	 * @param $data
+	 *
+	 * @return bool
+	 */
+	public static function isHashMatches( $hash, $data ) {
+
+		$is_valid_hash = false;
+
+		if ( hash_equals( self::hashTheData( $data ), $hash ) ) {
+			$is_valid_hash = true;
+		}
+
+		return $is_valid_hash;
+	}
+
+	/**
+	 * Hash the data
+	 *
+	 * @param $data
+	 *
+	 * @return false|string
+	 */
+	public static function hashTheData( $data ) {
+
+		$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
+
+		return hash_hmac( self::HMAC_ALGORITHM, $data, $secret );
 	}
 }

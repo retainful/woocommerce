@@ -67,9 +67,11 @@ class Customer {
 			if ( isset( $_POST[ $field_name ] ) ) {
 				$field_value = $_POST[ $field_name ];
 			}
-			if ( is_object( $address_value ) && ! empty( $address_value ) ) {
-				$field_value = isset( $address_value->$field ) ? $address_value->$field : null;
+
+			if ( is_array( $address_value ) && ! empty( $address_value ) ) {
+				$field_value = isset( $address_value[ $field ] ) ? $address_value[ $field ] : null;
 			}
+
 			if ( ! function_exists( 'WC' ) || ! is_object( WC()->customer ) || empty( $field_value ) ) {
 				continue;
 			}
@@ -389,36 +391,15 @@ class Customer {
 
 
 	/**
-	 * get current user id
+	 * Login the recover cart user.
 	 *
-	 * @return int
-	 */
-	public static function getCurrentUserId() {
-		return function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0;
-	}
-
-
-	/**
-	 * set current user
-	 *
-	 * @param $user_id
-	 *
-	 * @return void
-	 */
-	public static function setCurrentUser( $user_id ) {
-		function_exists( 'set_current_user' ) && set_current_user( $user_id );
-	}
-
-	/**
-	 * Login the user if the user is registered user
-	 *
-	 * @param $user_id
+	 * @param int $user_id wp user id.
 	 *
 	 * @return bool
 	 */
-	public static function loginUser( $user_id ) {
-		if ( is_user_logged_in() ) {
-			if ( (int) $user_id !== self::getCurrentUserId() ) {
+	public static function recoverCartUserLogin( $user_id ) {
+		if ( $login_user = WP::getCurrentUserId() ) {
+			if ( (int) $user_id !== $login_user ) {
 				wp_logout();
 
 				return self::updateRecoverCartUser( $user_id );
@@ -440,7 +421,7 @@ class Customer {
 	public static function updateRecoverCartUser( $user_id ) {
 		$logged_in = false;
 		if ( self::allowCartRecoveryUserLogin( $user_id ) ) {
-			self::setCurrentUser( $user_id );
+			WP::setCurrentUser( $user_id );
 			WP::setAuthCookie( $user_id );
 			WP::updateUserMeta( $user_id, '_rnoc_is_pending_recovery', true );
 			$logged_in = true;

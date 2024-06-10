@@ -207,4 +207,25 @@ class WP {
 		}
 	}
 
+	/**
+	 * Get current user id.
+	 *
+	 * @return int
+	 */
+	public static function getCurrentUserId() {
+		return function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0;
+	}
+
+
+	/**
+	 * Set current user.
+	 *
+	 * @param $user_id
+	 *
+	 * @return void
+	 */
+	public static function setCurrentUser( $user_id ) {
+		function_exists( 'set_current_user' ) && set_current_user( $user_id );
+	}
+
 }

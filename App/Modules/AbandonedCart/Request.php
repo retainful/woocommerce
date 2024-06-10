@@ -152,17 +152,14 @@ class Request {
 
 		$response = [];
 		try {
-			$args = array(
+			$args     = array(
 				'timeout'     => '30',
 				'httpversion' => '1.0',
 				'blocking'    => $blocking,
 				'headers'     => $headers
 			);
-
 			$response = wp_remote_get( $url, $args );
-
 			$response = wp_remote_retrieve_body( $response );
-
 			if ( is_string( $response ) ) {
 				$response = json_decode( $response, true );
 			}
