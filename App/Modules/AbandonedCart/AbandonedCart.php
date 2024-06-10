@@ -144,12 +144,12 @@ class AbandonedCart {
 	/**
 	 * Set cart created date.
 	 *
-	 * @param int $user_id User id.
+	 * @param int|string $user_id User id.
 	 * @param int $time Time stamp.
 	 *
 	 * @return void
 	 */
-	public static function setCartCreatedDate( $user_id, $time ) {
+	public static function setCartCreatedDate( $user_id = null, $time ) {
 		if ( empty( $time ) ) {
 			$time = current_time( 'timestamp', true );
 		}
@@ -302,7 +302,7 @@ class AbandonedCart {
 			$storage = Settings::getStorage();
 			$storage->set( self::$cart_tracking_started_key, $time );
 			if ( $user_id = get_current_user_id() ) {
-				$this->setCartCreatedDate( $user_id, $time );
+				self::setCartCreatedDate( $user_id, $time );
 			}
 
 			return $this->comparePreviousCartHash( $cart_hash );

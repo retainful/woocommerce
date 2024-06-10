@@ -60,7 +60,9 @@ class Util {
 	 * @return bool
 	 */
 	public static function isHashMatches( $hash, $data ) {
+
 		$is_valid_hash = false;
+
 		if ( hash_equals( self::hashTheData( $data ), $hash ) ) {
 			$is_valid_hash = true;
 		}
@@ -77,7 +79,7 @@ class Util {
 	 */
 	public static function hashTheData( $data ) {
 
-		$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '' );
+		$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
 
 		return hash_hmac( self::HMAC_ALGORITHM, $data, $secret );
 	}

@@ -5,6 +5,7 @@ namespace RNOC\App\Controllers\Admin;
 use RNOC\App\Helpers\Util;
 use RNOC\App\Helpers\WP;
 use RNOC\App\Helpers\Input;
+use RNOC\App\Modules\AbandonedCart\AbandonedCart;
 use RNOC\App\Modules\AbandonedCart\Request;
 use Valitron\Validator;
 
@@ -192,17 +193,15 @@ class Settings {
 			'shop' => self::getStoreDetails( $app_id, $secret_key ),
 		];
 		$api_response = Request::connect( $app_id, $data );
-		if ( ! empty( $api_response['success'] ) ) {
-			//Change app id status
-			\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 1, 'license' );
-			\RNOC\App\Helpers\Settings::updatePlanDetails( $api_response );
-			$response['success'] = $api_response['success'];
-		} else {
-			\RNOC\App\Helpers\Settings::updatePlanDetails();
-			$response['error'] = __( 'Please check the entered details', 'retainful-next-order-coupon-for-woocommerce' );
-		}
 
-		wp_send_json( $response );
+		if ( empty( $api_response['success'] ) ) {
+			\RNOC\App\Helpers\Settings::updatePlanDetails();
+			wp_send_json_error( [ 'message' => __( 'Please check the entered details', 'retainful-next-order-coupon-for-woocommerce' ) ] );
+		}
+		//Change app id status
+		\RNOC\App\Helpers\Settings::set( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 1, 'license' );
+		\RNOC\App\Helpers\Settings::updatePlanDetails( $api_response );
+		wp_send_json_success( [ 'message' => $api_response['message'] ] );
 	}
 
 
@@ -241,7 +240,7 @@ class Settings {
 
 		return [
 			'woocommerce_app_id'             => $api_key,
-			'secret_key'                     => Request::encryptData( $api_key, $secret_key ),
+			'secret_key'                     => AbandonedCart::getEncryptData( $api_key, $secret_key ),
 			'id'                             => null,
 			'name'                           => \RNOC\App\Helpers\Settings::getData( 'blogname' ),
 			'email'                          => \RNOC\App\Helpers\Settings::getData( 'admin_email' ),

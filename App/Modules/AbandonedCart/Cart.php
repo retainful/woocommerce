@@ -227,7 +227,7 @@ class Cart extends AbandonedCart {
 	function getCartData() {
 		$cart_token            = $this->getCartToken();
 		$customer_details      = Customer::getCartCustomer();
-		$created_at            = self::getTrackingStartAt();
+		$created_at            = strtotime( self::getTrackingStartAt() );
 		$cart_total            = WC::formatDecimalPrice( CartHelper::getCartTotal() );
 		$current_currency_code = WC::getCurrentCurrencyCode();
 		$default_currency_code = WC::getDefaultCurrency();
@@ -252,7 +252,7 @@ class Cart extends AbandonedCart {
 			'updated_at'                => WC::formatToIso8601( '' ),
 			'total_price'               => $cart_total,
 			'completed_at'              => null,
-			'discount_codes'            => WC::getAppliedDiscounts(),
+			'discount_codes'            => Order::getAppliedDiscounts(),
 			'shipping_lines'            => [],
 			'subtotal_price'            => WC::formatDecimalPrice( CartHelper::getCartSubTotal() ),
 			'total_price_set'           => self::getCurrencyDetails( $cart_total, $current_currency_code, $default_currency_code ),
@@ -446,37 +446,28 @@ class Cart extends AbandonedCart {
 	 * Recover user cart
 	 */
 	function recoverUserCart() {
-		// recovery URL
+
 		$token  = (string) Input::get( 'token', '' );
 		$hash   = (string) Input::get( 'hash', '' );
 		$wc_api = (string) Input::get( 'wc_api', '' );
-		if ( empty( $token ) && empty( $hash ) ) {
+
+		if ( empty( $token ) && empty( $hash ) && empty( $wc_api ) ) {
 			return;
 		}
 		$checkout_url = Order::getCheckoutUrl();
+		$checkout_url = add_query_arg( 'token', $token, $checkout_url );
+		$checkout_url = add_query_arg( 'hash', $hash, $checkout_url );
+		$checkout_url = add_query_arg( 'wc_api', $wc_api, $checkout_url );
+
 		try {
 			$this->reCreateCart( $token, $hash );
 		} catch ( \Exception $e ) {
 
+
 		}
+		$checkout_url = apply_filters( 'retainful_recovery_redirect_url', $checkout_url );
+		wp_safe_redirect( $checkout_url );
 
-
-//		if ( ! empty( $_REQUEST['token'] ) && ! empty( $_REQUEST['hash'] ) ) {
-//			$checkout_url = self::$woocommerce->getCheckoutUrl();
-//			try {
-//				$this->reCreateCart();
-//			} catch ( Exception $exception ) {
-//			}
-//			if ( ! empty( $_GET ) ) {
-//				foreach ( $_GET as $key => $value ) {
-//					if ( ! in_array( $key, array( "token", "hash", "wc-api" ) ) ) {
-//						$checkout_url = add_query_arg( $key, $value, $checkout_url );
-//					}
-//				}
-//			}
-//			$checkout_url = apply_filters( 'retainful_recovery_redirect_url', $checkout_url );
-//			wp_safe_redirect( $checkout_url );
-//		}
 	}
 
 	/**
@@ -494,7 +485,7 @@ class Cart extends AbandonedCart {
 		$data = wc_clean( rawurldecode( $token ) );
 		$hash = wc_clean( $hash );
 		if ( Util::isHashMatches( $hash, $data ) ) {
-			$app_id     = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '' );
+			$app_id     = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 			$data       = json_decode( base64_decode( $data ) );
 			$cart_token = is_object( $data ) && isset( $data->cart_token ) ? $data->cart_token : '';
 			if ( empty( $cart_token ) ) {
@@ -517,14 +508,16 @@ class Cart extends AbandonedCart {
 					} else {
 						Order::setOrderNote( $order, $note );
 					}
+					$session_coupon = Settings::getStorage()->get( 'rnoc_ac_coupon' );
 
-					$session_coupon = Settings::getStorage()->getValue( 'rnoc_ac_coupon' );
 					if ( ! empty( $session_coupon ) && Order::isOrderNeedPayment( $order ) ) {
 						Order::applyCouponToOrder( $session_coupon, $order );
-						Settings::getStorage()->removeValue( 'rnoc_ac_coupon' );
+
+						Settings::getStorage()->remove( 'rnoc_ac_coupon' );
 					}
+
 					$redirect = Order::isOrderNeedPayment( $order ) ? Order::getOrderPaymentURL( $order ) : Order::getOrderReceivedURL( $order );
-					Settings::getStorage()->setValue( 'rnoc_is_pending_recovery', true );
+					Settings::getStorage()->set( 'rnoc_is_pending_recovery', true );
 					// set (or refresh, if already set) session
 					WC::setSessionCookie( true );
 					wp_safe_redirect( $redirect );
@@ -535,9 +528,9 @@ class Cart extends AbandonedCart {
 			WC::setSession( 'is_buyer_accepting_marketing', $is_buyer_accept_marketing );
 			$user_currency = isset( $data->presentment_currency ) ? $data->presentment_currency : WC::getDefaultCurrency();
 			apply_filters( 'rnoc_set_current_currency_code', $user_currency );
-			Settings::getStorage()->setValue( 'rnoc_recovered_at', current_time( 'timestamp', true ) );
-			Settings::getStorage()->setValue( 'rnoc_recovered_by_retainful', 1 );
-			Settings::getStorage()->setValue( 'rnoc_recovered_cart_token', $cart_token );
+			Settings::getStorage()->set( 'rnoc_recovered_at', current_time( 'timestamp', true ) );
+			Settings::getStorage()->set( 'rnoc_recovered_by_retainful', 1 );
+			Settings::getStorage()->set( 'rnoc_recovered_cart_token', $cart_token );
 
 			$user_id        = self::getUserIdFromCartToken( $cart_token );
 			$cart_recreated = false;
@@ -549,7 +542,7 @@ class Cart extends AbandonedCart {
 
 			$cart_recreated = apply_filters( 'rnoc_cart_re_created', $cart_recreated, $data );
 			if ( ! $cart_recreated ) {
-				Settings::getStorage()->setValue( '_rnoc_order_note', $note );
+				Settings::getStorage()->set( '_rnoc_order_note', $note );
 				$this->reCreateCartForGuestUsers( $data );
 			}
 
@@ -584,14 +577,14 @@ class Cart extends AbandonedCart {
 	 */
 	public static function retrieveCartDetails( $app_id, $cart_token ) {
 		$response = Request::getRetrieveCart( $app_id, $cart_token );//Request::get( $url, $headers );
-		if ( isset( $response->success ) && $response->success ) {
+		if ( is_array( $response ) && isset( $response['success'] ) && $response['success'] ) {
 			$referrer_automation_id = Input::get( 'referrer_automation_id', 0 );
 			if ( ! empty( $referrer_automation_id ) ) {
 				WC::setSession( $cart_token . '_referrer_automation_id', $referrer_automation_id );
-				$response->data->referrer_automation_id = $referrer_automation_id;
+				$response['data']['referrer_automation_id'] = $referrer_automation_id;
 			}
 
-			return isset( $response->data ) ? $response->data : null;
+			return isset( $response['data'] ) ? $response['data'] : null;
 		}
 
 		return null;
@@ -606,7 +599,7 @@ class Cart extends AbandonedCart {
 		$this->setCartToken( $data->cart_token );
 		WC::setSession( self::$pending_recovery_key, true );
 		$created_at = isset( $data->created_at ) ? strtotime( $data->created_at ) : current_time( 'mysql', true );
-		CartHelper::setCartCreatedDate( null, $created_at );
+		AbandonedCart::setCartCreatedDate( null, $created_at );
 		$data           = apply_filters( 'rnoc_abandoned_cart_recover_guest_cart', $data );
 		$client_session = isset( $data->client_session ) ? $data->client_session : array();
 		if ( ! empty( $client_session ) ) {

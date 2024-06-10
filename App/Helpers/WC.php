@@ -214,7 +214,7 @@ class WC {
 	/**
 	 * Format to Iso 8601
 	 *
-	 * @param int $timestamp Time stamp.
+	 * @param int|string $timestamp Time stamp.
 	 *
 	 * @return string|null
 	 */

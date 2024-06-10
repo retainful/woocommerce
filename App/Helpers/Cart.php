@@ -246,21 +246,5 @@ class Cart {
 
 		return true;
 	}
-
-	/**
-	 * Set cart created date.
-	 *
-	 * @param int $user_id User id.
-	 * @param int $time Time stamp.
-	 *
-	 * @return void
-	 */
-	public static function setCartCreatedDate( $user_id = null, $time ) {
-		if ( empty( $time ) ) {
-			$time = current_time( 'timestamp', true );
-		}
-		if ( ! empty( $user_id ) || $user_id = get_current_user_id() ) {
-			update_user_meta( $user_id, '_rnoc_cart_tracking_started_at', $time );
-		}
-	}
+	
 }
