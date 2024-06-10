@@ -591,9 +591,12 @@ class Cart extends AbandonedCart {
 	}
 
 	/**
-	 * Recreate user guest cart
+	 * recreate the cart for gust user.
 	 *
 	 * @param $data
+	 *
+	 * @return void
+	 * @throws \Exception
 	 */
 	function reCreateCartForGuestUsers( $data ) {
 		$this->setCartToken( $data->cart_token );
@@ -625,7 +628,7 @@ class Cart extends AbandonedCart {
 	}
 
 	/**
-	 * recreate the cart from cart content
+	 * recreate the cart from cart content.
 	 *
 	 * @param $cart_contents
 	 */
@@ -651,7 +654,8 @@ class Cart extends AbandonedCart {
 	}
 
 	/**
-	 * Contains the list of keys that every cart ites have
+	 * Contains the list of keys that every cart ites have.
+	 *
 	 * @return array
 	 */
 	public static function mustCartItemsKeys() {
@@ -702,7 +706,7 @@ class Cart extends AbandonedCart {
 			foreach ( $coupons as $coupon ) {
 				$coupon_code = isset( $coupon->code ) ? $coupon->code : null;
 				$coupon_code = apply_filters( 'rnoc_recover_cart_before_validate_coupon', $coupon_code, $coupon );
-				if ( ! empty( $coupon_code ) && WC::isValidCoupon( $coupon_code ) ) {
+				if ( ! empty( $coupon_code ) && Order::isValidCoupon( $coupon_code ) ) {
 					$valid_coupons[] = $coupon_code;
 				}
 			}

@@ -2,14 +2,11 @@
 
 namespace RNOC\App\Helpers;
 
-use Rnoc\Retainful\WcFunctions;
-use RNOC\App\Modules\AbandonedCart\Request;
 
 defined( 'ABSPATH' ) || exit;
 
 class Cart {
 
-	public static $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
 
 	/**
 	 * Check is empty cart.
@@ -246,5 +243,5 @@ class Cart {
 
 		return true;
 	}
-	
+
 }

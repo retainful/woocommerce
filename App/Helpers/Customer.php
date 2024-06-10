@@ -66,7 +66,8 @@ class Customer {
 			$field_name = $from . '_' . $field;
 			if ( isset( $_POST[ $field_name ] ) ) {
 				$field_value = $_POST[ $field_name ];
-			} elseif ( is_object( $address_value ) && ! empty( $address_value ) ) {
+			}
+			if ( is_object( $address_value ) && ! empty( $address_value ) ) {
 				$field_value = isset( $address_value->$field ) ? $address_value->$field : null;
 			}
 			if ( ! function_exists( 'WC' ) || ! is_object( WC()->customer ) || empty( $field_value ) ) {
@@ -464,6 +465,6 @@ class Customer {
 
 		return (bool) $allow_user_login;
 	}
-     
+
 
 }
