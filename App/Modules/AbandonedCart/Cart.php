@@ -282,7 +282,8 @@ class Cart extends AbandonedCart {
 		foreach ( $cart as $item_key => $item ) {
 			$variant_id = isset( $item['variation_id'] ) && $item['variation_id'] > 0 ? $item['variation_id'] : 0;
 			$product_id = isset( $item['product_id'] ) && $item['product_id'] > 0 ? $item['product_id'] : 0;
-			$product    = apply_filters( 'woocommerce_cart_item_product', $item['data'], $item, $item_key );
+
+			$product = apply_filters( 'woocommerce_cart_item_product', $item['data'], $item, $item_key );
 			if ( empty( $product ) ) {
 				if ( $variant_id > 0 ) {
 					$product = Product::getProduct( $variant_id );
@@ -290,13 +291,15 @@ class Cart extends AbandonedCart {
 					$product = Product::getProduct( $product_id );
 				}
 			}
+
 			if ( ! $product instanceof \WC_Product ) {
 				continue;
 			}
-			$line_tax  = ( isset( $item['line_tax'] ) && ! empty( $item['line_tax'] ) ) ? $item['line_tax'] : 0;
+
+			$line_tax  = ! empty( $item['line_tax'] ) ? $item['line_tax'] : 0;
 			$tax_lines = [];
 			if ( $line_tax > 0 ) {
-				$tax_lines[] = array(
+				$tax_lines[] = [
 					'rate'       => 0,
 					'zone'       => 'province',
 					'price'      => WC::formatDecimalPriceRemoveTrailingZeros( $line_tax ),
@@ -304,13 +307,13 @@ class Cart extends AbandonedCart {
 					'source'     => 'WooCommerce',
 					'position'   => 1,
 					'compare_at' => 0,
-				);
+				];
 			}
-			$cat_ids = ! empty( $product_id ) && $product_id > 0 ? Product::getProductCategoryIds( $product_id ) : array();
+			$cat_ids = ! empty( $product_id ) && $product_id > 0 ? Product::getProductCategoryIds( $product_id ) : [];
 			$items[] = apply_filters( 'rnoc_get_cart_line_item_details', [
 				'key'           => $item_key,
 				'sku'           => Product::getItemSku( $product ),
-				'price'         => WC::formatDecimalPriceRemoveTrailingZeros( CartHelper::getCartItemPrice( $product ) ),
+				'price'         => WC::formatDecimalPriceRemoveTrailingZeros( Product::getItemPrice( $product ) ),
 				'title'         => Product::getItemName( $product ),
 				'taxable'       => ( $line_tax != 0 ),
 				'quantity'      => ! empty( $item['quantity'] ) ? $item['quantity'] : 1,
@@ -320,7 +323,7 @@ class Cart extends AbandonedCart {
 				'cat_ids'       => implode( ',', $cat_ids ),
 				'cat_names'     => Product::getProductCategoryName( $product_id ),
 				'variant_id'    => $variant_id,
-				'variant_price' => $variant_id > 0 ? WC::formatDecimalPriceRemoveTrailingZeros( CartHelper::getCartItemPrice( $product ) ) : 0,
+				'variant_price' => $variant_id > 0 ? WC::formatDecimalPriceRemoveTrailingZeros( Product::getItemPrice( $product ) ) : 0,
 				'variant_title' => $variant_id > 0 ? Product::getItemName( $product ) : '',
 				'image_url'     => Product::getProductImageSrc( $product ),
 				'product_url'   => Product::getProductUrl( $item ),
@@ -328,71 +331,7 @@ class Cart extends AbandonedCart {
 			], $cart, $item_key, $product, $item );
 		}
 
-		return apply_filters( "rnoc_get_abandoned_cart_line_items", $items, $cart );
-	}
-
-	/**
-	 * Get line item total.
-	 *
-	 * @param array $item Cart item.
-	 *
-	 * @return float
-	 */
-	function getLineItemTotal( $item ) {
-		$line_total     = ( isset( $item['line_total'] ) && ! empty( $item['line_total'] ) ) ? $item['line_total'] : 0;
-		$line_total_tax = 0;
-		if ( ! WC::isPriceExcludingTax() ) {
-			$line_total_tax = ( isset( $item['line_tax'] ) && ! empty( $item['line_tax'] ) ) ? $item['line_tax'] : 0;
-		}
-		$total = $line_total + $line_total_tax;
-
-		return apply_filters( 'retainful_get_line_item_total', $total, $line_total, $line_total_tax, $item, $this );
-	}
-
-	/**
-	 * Get currency details.
-	 *
-	 * @param float $cart_total Cart total.
-	 * @param string $current_currency_code Current currency.
-	 * @param string $default_currency_code default currency.
-	 *
-	 * @return array
-	 */
-	public static function getCurrencyDetails( $cart_total, $current_currency_code, $default_currency_code ) {
-		if ( $current_currency_code != $default_currency_code ) {
-			$exchange_rate   = apply_filters( 'rnoc_get_currency_rate', $cart_total, $current_currency_code );
-			$shop_cart_total = self::convertToCurrency( $cart_total, $exchange_rate );
-		} else {
-			$shop_cart_total = $cart_total;
-		}
-		$details = [
-			'shop_money'        => [
-				'amount'        => $shop_cart_total,
-				'currency_code' => $default_currency_code
-			],
-			'presentment_money' => [
-				'amount'        => $cart_total,
-				'currency_code' => $current_currency_code
-			]
-		];
-
-		return apply_filters( 'rnoc_get_cart_currency_details', $details, $current_currency_code, $default_currency_code );
-	}
-
-	/**
-	 * Convert price.
-	 *
-	 * @param float $price Price.
-	 * @param float $rate Convert rate.
-	 *
-	 * @return float
-	 */
-	public static function convertToCurrency( $price, $rate ) {
-		if ( ! empty( $price ) && ! empty( $rate ) ) {
-			return $price / $rate;
-		}
-
-		return $price;
+		return apply_filters( 'rnoc_get_abandoned_cart_line_items', $items, $cart );
 	}
 
 	/**

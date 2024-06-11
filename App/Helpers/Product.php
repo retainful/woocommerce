@@ -162,4 +162,21 @@ class Product {
 
 		return $price;
 	}
+
+	/**
+	 * Get cart item price.
+	 *
+	 * @param \WC_Product $product Product object.
+	 *
+	 * @return float
+	 */
+	public static function getItemPrice( $product ) {
+		if ( WC::isPriceExcludingTax() ) {
+			$price = Product::getPriceExcludingTax( $product );
+		} else {
+			$price = Product::getPriceIncludingTax( $product );
+		}
+
+		return $price;
+	}
 }

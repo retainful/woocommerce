@@ -14,6 +14,8 @@ class Cart {
 	public static function isCartEmpty() {
 		if ( function_exists( 'WC' ) && isset( WC()->cart ) && Util::isMethodExists( WC()->cart, 'is_empty' ) ) {
 			try {
+				WC()->cart->empty_cart();
+
 				return WC()->cart->is_empty();
 			} catch ( \Exception $e ) {
 				return true;
@@ -98,23 +100,6 @@ class Cart {
 		}
 
 		return 0.0;
-	}
-
-	/**
-	 * Get cart item price.
-	 *
-	 * @param \WC_Product $product Product object.
-	 *
-	 * @return float
-	 */
-	public static function getCartItemPrice( $product ) {
-		if ( WC::isPriceExcludingTax() ) {
-			$price = Product::getPriceExcludingTax( $product );
-		} else {
-			$price = Product::getPriceIncludingTax( $product );
-		}
-
-		return $price;
 	}
 
 	/**
