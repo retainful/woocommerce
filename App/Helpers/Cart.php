@@ -209,7 +209,7 @@ class Cart {
 
 
 	/**
-	 * Add to cart items.
+	 * Add to cart.
 	 *
 	 * @param int $product_id product id.
 	 * @param int $variation_id variant id.

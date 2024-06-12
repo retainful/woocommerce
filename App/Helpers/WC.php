@@ -283,9 +283,10 @@ class WC {
 
 
 	/**
-	 * add woocommerce notice
+	 * Add woocommerce notice.
 	 *
-	 * @param $message
+	 * @param string $message notice message.
+	 *
 	 */
 	public static function addNotice( $message ) {
 		function_exists( 'wc_add_notice' ) && wc_add_notice( $message );
@@ -293,7 +294,7 @@ class WC {
 
 
 	/**
-	 * Clear all notices
+	 * Clear all notices.
 	 */
 	public static function clearWooNotices() {
 		if ( function_exists( 'wc_clear_notices' ) ) {

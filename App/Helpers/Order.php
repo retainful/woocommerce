@@ -226,8 +226,8 @@ class Order {
 	/**
 	 * check the coupon can applicable
 	 *
-	 * @param string $coupon_code
-	 * @param \WC_Order $order
+	 * @param string $coupon_code coupon code.
+	 * @param \WC_Order $order order object.
 	 *
 	 * @return bool
 	 */
@@ -250,8 +250,8 @@ class Order {
 	/**
 	 * Get order Email form order object.
 	 *
-	 * @param WC_Order $order
-	 * @param string $status
+	 * @param WC_Order $order order object.
+	 * @param string $status order status.
 	 *
 	 * @return bool
 	 */
@@ -261,11 +261,11 @@ class Order {
 
 
 	/**
-	 * Get order has particular status
+	 * Get order has particular status.
 	 *
-	 * @param WC_Order $order
-	 * @param string $status
-	 * @param string $note
+	 * @param WC_Order $order order object.
+	 * @param string $status order status.
+	 * @param string $note order note.
 	 *
 	 * @return bool
 	 */
@@ -276,17 +276,17 @@ class Order {
 	/**
 	 * Set order note.
 	 *
-	 * @param \WC_Order $order
-	 * @param string $note
+	 * @param \WC_Order $order order object.
+	 * @param string $note order note.
 	 */
 	public static function setOrderNote( $order, $note ) {
 		Util::isMethodExists( $order, 'add_order_note' ) && $order->add_order_note( $note );
 	}
 
 	/**
-	 * check if order needs payment or not.
+	 * Check if order needs payment or not.
 	 *
-	 * @param \WC_Order $order
+	 * @param \WC_Order $order order object.
 	 *
 	 * @return bool
 	 */
@@ -296,7 +296,7 @@ class Order {
 
 
 	/**
-	 * get the woocommerce checkout url.
+	 * Get the woocommerce checkout url.
 	 *
 	 * @return mixed|null
 	 *

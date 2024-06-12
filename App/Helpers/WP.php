@@ -191,9 +191,9 @@ class WP {
 
 
 	/**
-	 * set the auth cookie.
+	 * Set the auth cookie.
 	 *
-	 * @param $user_id
+	 * @param int $user_id wp user id.
 	 *
 	 */
 	public static function setAuthCookie( $user_id ) {
@@ -201,6 +201,15 @@ class WP {
 	}
 
 
+	/**
+	 * Update the user meta data.
+	 *
+	 * @param int $user_id user id.
+	 * @param string $meta_key user meta key.
+	 * @param string|int|bool $meta_value user meta value.
+	 *
+	 * @return void
+	 */
 	public static function updateUserMeta( $user_id, $meta_key, $meta_value ) {
 		if ( function_exists( 'update_user_meta' ) ) {
 			update_user_meta( $user_id, $meta_key, $meta_value );
@@ -220,7 +229,7 @@ class WP {
 	/**
 	 * Set current user.
 	 *
-	 * @param $user_id
+	 * @param int $user_id wp user id
 	 *
 	 * @return void
 	 */
