@@ -105,7 +105,7 @@ class Order {
 		$order_id                   = \RNOC\App\Helpers\Order::getOrderId( $order );
 		$customer_details           = Customer::getOrderCustomer( $order );
 		$default_currency_code      = WC::getDefaultCurrency();
-		$current_currency_code      = \RNOC\App\Helpers\Order::getOrderCurrency( $order );
+		$current_currency_code      = \RNOC\App\Helpers\Order::getOrderData( 'currency', $order );
 		$cart_created_at            = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_tracking_started_key_for_db, $order );
 		$cart_total                 = WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderTotal( $order ) );
 		$order_status               = \RNOC\App\Helpers\Order::getStatus( $order );
@@ -127,7 +127,7 @@ class Order {
 			'currency'                  => $default_currency_code,
 			'customer'                  => $customer_details,
 			'tax_lines'                 => [],
-			'total_tax'                 => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderTotalTax( $order ) ),
+			'total_tax'                 => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderData( 'total_tax', $order, 0 ) ),
 			'cart_token'                => $cart_token,
 			'created_at'                => WC::formatToIso8601( $cart_created_at ),
 			'line_items'                => $this->getOrderLineItemsDetails( $order ),
@@ -295,7 +295,7 @@ class Order {
 		return [
 			'total_price'     => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderTotal( $order ) ),
 			'subtotal_price'  => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderItemsTotal( $order ) ),
-			'total_tax'       => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderTotalTax( $order ) ),
+			'total_tax'       => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderData( 'total_tax', $order, 0 ) ),
 			'total_discounts' => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderDiscount( $order, $excluding_tax ) ),
 			'total_shipping'  => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderShippingTotal( $order ) ),
 			'fee_items'       => self::getOrderFeeDetails( $order, $excluding_tax ),

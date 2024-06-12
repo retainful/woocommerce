@@ -21,17 +21,6 @@ class Order {
 	}
 
 	/**
-	 * Get order user id.
-	 *
-	 * @param WC_Order $order Order object.
-	 *
-	 * @return int
-	 */
-	public static function getOrderUserId( $order ) {
-		return Util::isMethodExists( $order, 'get_user_id' ) ? $order->get_user_id() : 0;
-	}
-
-	/**
 	 * Get an order object.
 	 *
 	 * @param int|WC_Order $order_or_id Order object or id.
@@ -84,11 +73,7 @@ class Order {
 	 * @return string
 	 */
 	public static function getOrderBillingEmail( $order ) {
-		if ( ! Util::isMethodExists( $order, 'get_billing_email' ) ) {
-			return '';
-		}
-
-		return $order->get_billing_email();
+		return Util::isMethodExists( $order, 'get_billing_email' ) ? $order->get_billing_email() : '';
 	}
 
 	/**
@@ -207,36 +192,6 @@ class Order {
 		}
 
 		return self::getOrderId( $order );
-	}
-
-	/**
-	 * Get order currency.
-	 *
-	 * @param WC_Order $order Order object.
-	 *
-	 * @return string|null
-	 */
-	public static function getOrderCurrency( $order ) {
-		if ( Util::isMethodExists( $order, 'get_currency' ) ) {
-			return $order->get_currency();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Get order total tax.
-	 *
-	 * @param WC_Order $order Order tax.
-	 *
-	 * @return float
-	 */
-	public static function getOrderTotalTax( $order ) {
-		if ( Util::isMethodExists( $order, 'get_total_tax' ) ) {
-			return $order->get_total_tax();
-		}
-
-		return 0.0;
 	}
 
 	/**
@@ -457,6 +412,13 @@ class Order {
 		return '';
 	}
 
+	/**
+	 * Get payment method title.
+	 *
+	 * @param WC_Order $order Order object.
+	 *
+	 * @return string
+	 */
 	public static function getPaymentMethodTitle( $order ) {
 		if ( Util::isMethodExists( $order, 'get_payment_method_title' ) ) {
 			return $order->get_payment_method_title();
