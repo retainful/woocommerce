@@ -179,7 +179,7 @@ class Order {
 	}
 
 	/**
-	 * apply coupon to the order
+	 * Apply coupon to the order.
 	 *
 	 * @param string $coupon Coupon code to apply for the order
 	 * @param \WC_Order $order Order object

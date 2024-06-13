@@ -436,7 +436,7 @@ class Customer {
 	}
 
 	/**
-	 * Check if a user is allowed to be logged in for cart recovery.
+	 * Allowed to be logged in for cart recovery.
 	 *
 	 * @param int|\WP_User $user user id
 	 *
