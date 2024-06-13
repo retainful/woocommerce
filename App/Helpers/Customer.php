@@ -51,26 +51,34 @@ class Customer {
 	/**
 	 * Set customer details.
 	 *
-	 * @param string $from From address
-	 * @param string $set To address
+	 * @param string $from From address.
+	 * @param string $set To address.
+	 * @param string|object $address_value To address.
 	 *
 	 * @return void
 	 */
-	public static function setCustomerDetails( $from = 'billing', $set = 'billing' ) {
+	public static function setCustomerDetails( $from = 'billing', $set = 'billing', $address_value = [] ) {
+		if ( ! function_exists( 'WC' ) || ! is_object( WC()->customer ) ) {
+			return;
+		}
 		$address_fields = self::getAddressFields();
 		foreach ( $address_fields as $field ) {
 			if ( $field == 'email' ) {
 				continue;
 			}
 			$field_name = $from . '_' . $field;
-			if ( ! isset( $_POST[ $field_name ] ) ) {
+			if ( isset( $_POST[ $field_name ] ) ) {
+				$field_value = $_POST[ $field_name ];
+			}
+
+			if ( is_array( $address_value ) && ! empty( $address_value ) ) {
+				$field_value = isset( $address_value[ $field ] ) ? $address_value[ $field ] : null;
+			}
+
+			if ( empty( $field_value ) ) {
 				continue;
 			}
-			$field_value = $_POST[ $field_name ];//TODO: Use input helper.
-			if ( ! function_exists( 'WC' ) || ! is_object( WC()->customer ) ) {
-				continue;
-			}
-			$method_name = 'set_' . $set . '_' . $set;
+			$method_name = 'set_' . $set . '_' . $field;
 			if ( is_callable( [ WC()->customer, $method_name ] ) ) {
 				WC()->customer->$method_name( $field_value );
 			}
@@ -384,4 +392,60 @@ class Customer {
 
 		return $default;
 	}
+
+
+	/**
+	 * Login the recover cart user.
+	 *
+	 * @param int $user_id user id.
+	 *
+	 * @return bool
+	 */
+	public static function recoverCartUserLogin( $user_id ) {
+		if ( $login_user = WP::getCurrentUserId() ) {
+			if ( (int) $user_id !== $login_user ) {
+				wp_logout();
+
+				return self::updateRecoverCartUser( $user_id );
+			}
+		} else {
+			return self::updateRecoverCartUser( $user_id );
+		}
+
+		return false;
+	}
+
+	/**
+	 * update recover cart user data.
+	 *
+	 * @param int $user_id user id.
+	 *
+	 * @return bool
+	 */
+	public static function updateRecoverCartUser( $user_id ) {
+		if ( self::allowCartRecoveryUserLogin( $user_id ) ) {
+			WP::setCurrentUser( $user_id );
+			WP::setAuthCookie( $user_id );
+			WP::updateUserMeta( $user_id, '_rnoc_is_pending_recovery', true );
+
+			return true;
+		}
+		//"Not logging in user {$user_id} with admin rights"
+		WC::addNotice( __( 'Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', RNOC_TEXT_DOMAIN ) );
+
+		return false;
+	}
+
+	/**
+	 * Allowed to be logged in for cart recovery.
+	 *
+	 * @param int|\WP_User $user user id
+	 *
+	 * @return bool
+	 */
+	public static function allowCartRecoveryUserLogin( $user ) {
+		return (bool) apply_filters( 'wc_retainful_allow_cart_recovery_user_login', ! user_can( $user, 'edit_others_posts' ), $user );
+	}
+
+
 }

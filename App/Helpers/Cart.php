@@ -2,9 +2,11 @@
 
 namespace RNOC\App\Helpers;
 
+
 defined( 'ABSPATH' ) || exit;
 
 class Cart {
+
 
 	/**
 	 * Check is empty cart.
@@ -189,4 +191,41 @@ class Cart {
 
 		return [];
 	}
+
+
+	/**
+	 * Add to cart.
+	 *
+	 * @param int $product_id product id.
+	 * @param int $variation_id variant id.
+	 * @param int $quantity product quantity.
+	 * @param array $variation variations.
+	 * @param array $cart_item_data cart item data.
+	 *
+	 * @return bool|string
+	 */
+	public static function addToCart( $product_id, $variation_id = 0, $quantity = 1, $variation = [], $cart_item_data = [] ) {
+		if ( ! function_exists( 'WC' ) || is_null( WC()->cart ) || ! Util::isMethodExists( WC()->cart, 'add_to_cart' ) ) {
+			return false;
+		}
+		try {
+			return WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation, $cart_item_data );
+		} catch ( \Exception $e ) {
+
+		}
+
+		return false;
+	}
+
+	/**
+	 *  empty cart.
+	 *
+	 * @return void
+	 */
+	public static function clearCart() {
+		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->cart, 'empty_cart' ) ) {
+			WC()->cart->empty_cart();
+		}
+	}
+
 }

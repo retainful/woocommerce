@@ -2,14 +2,17 @@
 
 namespace RNOC\App\Helpers;
 
+use RNOC\App\Modules\Storage\Cookie;
+
 defined( 'ABSPATH' ) || exit;
+
 
 class Util {
 	/**
-	 * Is method exists in object.
+	 * Is method exists in an object.
 	 *
-	 * @param object $object Object.
-	 * @param string $method Method name.
+	 * @param   object  $object  Object.
+	 * @param   string  $method  Method name.
 	 *
 	 * @return bool
 	 */
@@ -24,9 +27,9 @@ class Util {
 	/**
 	 * render template.
 	 *
-	 * @param string $file File path.
-	 * @param array $data Template data.
-	 * @param bool $display Display or not.
+	 * @param   string  $file     File path.
+	 * @param   array   $data     Template data.
+	 * @param   bool    $display  Display or not.
 	 *
 	 * @return string|void
 	 */

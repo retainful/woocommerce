@@ -100,7 +100,8 @@ class Request {
 		}
 		$url = self::getAbandonedCartApiUrl() . 'abandoned_checkouts/' . $cart_token;
 
-		return self::post( $url, '', [ 'app_id' => $api_key ] );
+
+		return self::get( $url, [ 'app_id' => $api_key ] );
 	}
 
 	/**
@@ -126,6 +127,37 @@ class Request {
 			];
 
 			$response = wp_remote_post( $url, $options );
+			$response = wp_remote_retrieve_body( $response );
+			if ( is_string( $response ) ) {
+				$response = json_decode( $response, true );
+			}
+
+		} catch ( \Exception $e ) {
+
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Get request.
+	 *
+	 * @param string $url Request url.
+	 * @param array $headers Headers.
+	 *
+	 * @return array|mixed|string|\WP_Error
+	 */
+	protected static function get( $url, $headers, $blocking = true ) {
+
+		$response = [];
+		try {
+			$args     = array(
+				'timeout'     => '30',
+				'httpversion' => '1.0',
+				'blocking'    => $blocking,
+				'headers'     => $headers
+			);
+			$response = wp_remote_get( $url, $args );
 			$response = wp_remote_retrieve_body( $response );
 			if ( is_string( $response ) ) {
 				$response = json_decode( $response, true );

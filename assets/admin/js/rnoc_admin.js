@@ -83,8 +83,9 @@ rnoc = window.rnoc || {};
 
                 }
                 if (response.success) {
-                    alertify.success('Successfully connected to Retainful');
-                    message.html('<p style="color:green;">' + response.success + '</p>');
+                    var success_message = response.data.message ? response.data.message : response.success;
+                    alertify.success(success_message);
+                    message.html('<p style="color:green;">' + success_message + '</p>');
                     window.location.reload();
                 } else {
                     if (response.data && response.data.error_fields) {
@@ -92,9 +93,11 @@ rnoc = window.rnoc || {};
                             alertify.error(value);
                             message.html('<p style="color:red;">' + value + '</p>');
                         });
+                    } else {
+                        alertify.error(response.data.message);
+                        message.html('<p style="color:red;">' + response.data.message + '</p>');
                     }
                 }
-
             },
             error: function () {
                 alert('Please try again later.');
