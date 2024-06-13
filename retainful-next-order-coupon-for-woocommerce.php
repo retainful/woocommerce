@@ -19,7 +19,6 @@ use Automattic\WooCommerce\Utilities\FeaturesUtil;
 use RNOC\App\Router;
 
 defined( 'ABSPATH' ) || exit;
-
 if ( ! function_exists( 'isWoocommerceActive' ) ) {
 	function isWoocommerceActive() {
 		$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins', array() ) );

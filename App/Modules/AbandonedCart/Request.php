@@ -64,20 +64,19 @@ class Request {
 	/**
 	 * Synchronise cart data.
 	 *
-	 * @param string $api_key Api key.
 	 * @param array $data Request data.
 	 * @param array $extra_headers Extra headers.
 	 *
 	 * @return array
 	 */
-	public static function syncCart( $api_key, $data, $extra_headers = [] ) {
-		if ( empty( $api_key ) || empty( $data ) || ! is_array( $data ) ) {
+	public static function syncCart( $data, $extra_headers = [] ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
 			return [];
 		}
 
 		$url     = self::getAbandonedCartApiUrl() . 'webhooks/checkout';
 		$headers = [
-			'app_id'       => $api_key,
+			'app_id'       => Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' ),
 			'Content-Type' => 'application/json'
 		];
 		if ( is_array( $extra_headers ) && ! empty( $extra_headers ) ) {

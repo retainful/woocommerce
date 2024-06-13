@@ -33,21 +33,6 @@ class AbandonedCart {
 		return true;
 	}
 
-	/**
-	 * Can track abandoned cart.
-	 *
-	 * @param string $ip_address Ip address.
-	 * @param \WC_Order $order Order object.
-	 *
-	 * @return bool
-	 */
-	public static function canTrackAbandonedCart( $ip_address = null, $order = null ) {
-		if ( apply_filters( 'rnoc_is_cart_has_valid_ip', true, $ip_address ) && apply_filters( 'rnoc_can_track_abandoned_carts', true, $order ) ) {
-			return true;
-		}
-
-		return false;
-	}
 
 	/**
 	 * Retrieve cart token.
@@ -209,28 +194,6 @@ class AbandonedCart {
 	}
 
 	/**
-	 * Get recovery url.
-	 *
-	 * @param string $cart_token Cart token.
-	 *
-	 * @return string
-	 */
-	public static function getRecoveryLink( $cart_token ) {
-		if ( ! is_string( $cart_token ) ) {
-			return '';
-		}
-		$data = [ 'cart_token' => $cart_token ];
-		// encode
-		$data   = base64_encode( wp_json_encode( $data ) );
-		$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
-		// add hash for easier verification that the checkout URL hasn't been tampered with
-		$hash = hash_hmac( self::HMAC_ALGORITHM, $data, $secret );
-		$url  = self::getRetainfulApiUrl();
-
-		return esc_url_raw( add_query_arg( array( 'token' => rawurlencode( $data ), 'hash' => $hash ), $url ) );
-	}
-
-	/**
 	 * Is allow buyer accept marketing.
 	 *
 	 * @return bool
@@ -242,37 +205,6 @@ class AbandonedCart {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Get encrypt data.
-	 *
-	 * @param mixed $data Data.
-	 * @param string $secret Secret key.
-	 *
-	 * @return string|null
-	 */
-	public static function getEncryptData( $data, $secret = '' ) {
-		if ( extension_loaded( 'openssl' ) ) {
-			if ( is_array( $data ) || is_object( $data ) ) {
-				$data = wp_json_encode( $data );
-			}
-			try {
-				if ( empty( $secret ) ) {
-					$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
-				}
-				$iv_len          = openssl_cipher_iv_length( self::CIPHER_METHOD );
-				$iv              = openssl_random_pseudo_bytes( $iv_len );
-				$cipher_text_raw = openssl_encrypt( $data, self::CIPHER_METHOD, $secret, OPENSSL_RAW_DATA, $iv );
-				$hmac            = hash_hmac( self::HMAC_ALGORITHM, $cipher_text_raw, $secret, true );
-
-				return base64_encode( bin2hex( $iv ) . ':retainful:' . bin2hex( $hmac ) . ':retainful:' . bin2hex( $cipher_text_raw ) );
-			} catch ( \Exception $e ) {
-				return null;
-			}
-		}
-
-		return null;
 	}
 
 	/**

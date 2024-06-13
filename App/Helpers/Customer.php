@@ -186,7 +186,8 @@ class Customer {
 			return [];
 		}
 		$created_at = $updated_at = current_time( 'timestamp', true );
-		if ( $user_id = Order::getOrderUserId( $order ) ) {
+
+		if ( $user_id = Order::getOrderData( 'user_id', $order, 0 ) ) {
 			$user       = Order::getOrderData( 'user', $order );
 			$created_at = $updated_at = is_object( $user->user_registered ) && ! empty( $user->user_registered ) ? strtotime( $user->user_registered ) : current_time( 'timestamp', true );
 		}
