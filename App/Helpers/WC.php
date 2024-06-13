@@ -12,7 +12,7 @@ class WC {
 	/**
 	 * Get default currency.
 	 *
-	 * @param string $currency Currency code.
+	 * @param   string  $currency  Currency code.
 	 *
 	 * @return string
 	 */
@@ -27,7 +27,7 @@ class WC {
 	/**
 	 * Get default site language.
 	 *
-	 * @param string $current_lang Site language.
+	 * @param   string  $current_lang  Site language.
 	 *
 	 * @return string
 	 */
@@ -74,7 +74,7 @@ class WC {
 	/**
 	 * Set session cookie.
 	 *
-	 * @param bool $value cookie value.
+	 * @param   bool  $value  cookie value.
 	 *
 	 * @return void
 	 */
@@ -91,8 +91,8 @@ class WC {
 	/**
 	 * Set session.
 	 *
-	 * @param string $key Session key.
-	 * @param mixed $value Session value.
+	 * @param   string  $key    Session key.
+	 * @param   mixed   $value  Session value.
 	 *
 	 * @return void
 	 */
@@ -109,8 +109,8 @@ class WC {
 	/**
 	 * Get session.
 	 *
-	 * @param string $key Session key.
-	 * @param mixed $default Default value.
+	 * @param   string  $key      Session key.
+	 * @param   mixed   $default  Default value.
 	 *
 	 * @return mixed
 	 */
@@ -128,7 +128,7 @@ class WC {
 	/**
 	 * Remove session.
 	 *
-	 * @param string $key Session key.
+	 * @param   string  $key  Session key.
 	 *
 	 * @return bool
 	 */
@@ -187,7 +187,7 @@ class WC {
 	/**
 	 * Format price
 	 *
-	 * @param float $price Price.
+	 * @param   float  $price  Price.
 	 *
 	 * @return float
 	 */
@@ -214,7 +214,7 @@ class WC {
 	/**
 	 * Format to Iso 8601
 	 *
-	 * @param int|string $timestamp Time stamp.
+	 * @param   int|string  $timestamp  Time stamp.
 	 *
 	 * @return string|null
 	 */
@@ -231,7 +231,8 @@ class WC {
 			$date_time = new \DateTime( $date );
 
 			return $date_time->format( \DateTime::ATOM );
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 		}
 
@@ -241,7 +242,7 @@ class WC {
 	/**
 	 * Format price.
 	 *
-	 * @param float $price Price.
+	 * @param   float  $price  Price.
 	 *
 	 * @return string
 	 */
@@ -269,14 +270,14 @@ class WC {
 	 * @return array
 	 */
 	public static function getClientSession() {
-		$session = array(
+		$session = [
 			'cart'                      => self::getSession( 'cart' ),
 			'applied_coupons'           => self::getSession( 'applied_coupons' ),
 			'chosen_shipping_methods'   => self::getSession( 'chosen_shipping_methods' ),
 			'shipping_method_counts'    => self::getSession( 'shipping_method_counts' ),
 			'chosen_payment_method'     => self::getSession( 'chosen_payment_method' ),
 			'previous_shipping_methods' => self::getSession( 'previous_shipping_methods' ),
-		);
+		];
 
 		return apply_filters( 'rnoc_get_client_session', $session );
 	}
@@ -285,7 +286,7 @@ class WC {
 	/**
 	 * Add woocommerce notice.
 	 *
-	 * @param string $message notice message.
+	 * @param   string  $message  Notice message.
 	 *
 	 */
 	public static function addNotice( $message ) {
