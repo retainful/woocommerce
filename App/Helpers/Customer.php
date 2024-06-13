@@ -396,7 +396,7 @@ class Customer {
 	/**
 	 * Login the recover cart user.
 	 *
-	 * @param int $user_id wp user id.
+	 * @param int $user_id user id.
 	 *
 	 * @return bool
 	 */
@@ -415,9 +415,9 @@ class Customer {
 	}
 
 	/**
-	 * update recover cart user data
+	 * update recover cart user data.
 	 *
-	 * @param int $user_id wp user id.
+	 * @param int $user_id user id.
 	 *
 	 * @return bool
 	 */
@@ -438,10 +438,9 @@ class Customer {
 	/**
 	 * Check if a user is allowed to be logged in for cart recovery.
 	 *
-	 * @param int|\WP_User $user WP_User id
+	 * @param int|\WP_User $user user id
 	 *
 	 * @return bool
-	 * @since 1.0.0
 	 */
 	public static function allowCartRecoveryUserLogin( $user ) {
 		return (bool) apply_filters( 'wc_retainful_allow_cart_recovery_user_login', ! user_can( $user, 'edit_others_posts' ), $user );

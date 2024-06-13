@@ -159,7 +159,7 @@ class Order {
 	/**
 	 * Get order received url.
 	 *
-	 * @param WC_Order $order
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -168,9 +168,9 @@ class Order {
 	}
 
 	/**
-	 * check if order payment url.
+	 * Get order payment url.
 	 *
-	 * @param WC_Order $order
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -181,8 +181,8 @@ class Order {
 	/**
 	 * apply coupon to the order
 	 *
-	 * @param $coupon string Coupon code to apply for the order
-	 * @param $order  \WC_Order Order object
+	 * @param string $coupon Coupon code to apply for the order
+	 * @param \WC_Order $order Order object
 	 *
 	 * @return bool True or false
 	 */

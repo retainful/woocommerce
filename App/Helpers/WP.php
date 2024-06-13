@@ -193,7 +193,7 @@ class WP {
 	/**
 	 * Set the auth cookie.
 	 *
-	 * @param int $user_id wp user id.
+	 * @param int $user_id user id.
 	 *
 	 */
 	public static function setAuthCookie( $user_id ) {
@@ -229,7 +229,7 @@ class WP {
 	/**
 	 * Set current user.
 	 *
-	 * @param int $user_id wp user id
+	 * @param int $user_id user id
 	 *
 	 * @return void
 	 */
