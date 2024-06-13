@@ -157,9 +157,9 @@ class Order {
 	}
 
 	/**
-	 * check if order payment url
+	 * Get order received url.
 	 *
-	 * @param $order
+	 * @param WC_Order $order
 	 *
 	 * @return string
 	 */
@@ -182,17 +182,17 @@ class Order {
 	 * apply coupon to the order
 	 *
 	 * @param $coupon string Coupon code to apply for the order
-	 * @param $order \WC_Order Order object
+	 * @param $order  \WC_Order Order object
 	 *
 	 * @return bool True or false
 	 */
 
 	public static function applyCouponToOrder( $coupon, $order ) {
-		if ( self::isValidCoupon( $coupon ) && Util::isMethodExists( $order, "apply_coupon" ) && self::canApplyCoupon( $coupon, $order ) ) {
-			$result = $order->apply_coupon( $coupon );
-			if ( $result === true ) {
-				return true;
-			}
+		if ( ! self::isValidCoupon( $coupon ) || ! Util::isMethodExists( $order, "apply_coupon" ) || ! self::canApplyCoupon( $coupon, $order ) ) {
+			return false;
+		}
+		if ( $order->apply_coupon( $coupon ) === true ) {
+			return true;
 		}
 
 		return false;
@@ -203,8 +203,7 @@ class Order {
 	 *
 	 * @param string $coupon_code woocommerce coupon code.
 	 *
-	 * @return bool|\WP_Error
-	 * @throws \Exception
+	 * \     * @return bool|\WP_Error
 	 */
 	public static function isValidCoupon( $coupon_code ) {
 		if ( ! class_exists( 'WC_Coupon' ) ) {
@@ -213,10 +212,16 @@ class Order {
 		$coupon = new \WC_Coupon( $coupon_code );
 		if ( Util::isMethodExists( $coupon, "is_valid" ) ) {
 			return $coupon->is_valid();
-		} elseif ( class_exists( 'WC_Discounts' ) ) {
-			$discounts = new \WC_Discounts();
-			if ( Util::isMethodExists( $discounts, "is_coupon_valid" ) ) {
+		}
+		if ( ! class_exists( 'WC_Discounts' ) ) {
+			return false;
+		}
+		$discounts = new \WC_Discounts();
+		if ( Util::isMethodExists( $discounts, "is_coupon_valid" ) ) {
+			try {
 				return $discounts->is_coupon_valid( $coupon );
+			} catch ( \Exception $e ) {
+
 			}
 		}
 
@@ -232,11 +237,11 @@ class Order {
 	 * @return bool
 	 */
 	public static function canApplyCoupon( $coupon_code, $order ) {
-		if ( empty( $coupon_code ) || ! Util::isMethodExists( $order, "get_items" ) ) {
+		if ( empty( $coupon_code ) || ! Util::isMethodExists( $order, 'get_items' ) ) {
 			return false;
 		}
 		$new_coupon = new \WC_Coupon( $coupon_code );
-		if ( ! Util::isMethodExists( $new_coupon, "get_individual_use" ) ) {
+		if ( ! Util::isMethodExists( $new_coupon, 'get_individual_use' ) ) {
 			return false;
 		}
 		if ( $new_coupon->get_individual_use() && count( $order->get_items( 'coupon' ) ) ) {
@@ -261,7 +266,7 @@ class Order {
 
 
 	/**
-	 * Get order has particular status.
+	 * Set order status.
 	 *
 	 * @param WC_Order $order order object.
 	 * @param string $status order status.

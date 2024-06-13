@@ -5,7 +5,7 @@ namespace RNOC\App\Controllers\Admin;
 use RNOC\App\Helpers\Util;
 use RNOC\App\Helpers\WP;
 use RNOC\App\Helpers\Input;
-use RNOC\App\Modules\AbandonedCart\AbandonedCart;
+use RNOC\App\Modules\AbandonedCart\Cart;
 use RNOC\App\Modules\AbandonedCart\Request;
 use Valitron\Validator;
 
@@ -21,6 +21,7 @@ class Settings {
 	 * @return void
 	 */
 	public static function addMenu() {
+
 		if ( ! WP::hasAdminPrivilege() ) {
 			return;
 		}
@@ -229,7 +230,7 @@ class Settings {
 	 */
 	public static function getStoreDetails( $api_key, $secret_key ) {
 		if ( empty( $api_key ) && empty( $secret_key ) ) {
-			return array();
+			return [];
 		}
 		$scheme           = wc_site_is_https() ? 'https' : 'http';
 		$default_language = ''; //TODO:need to add the store language using the multilingual addon
@@ -240,7 +241,7 @@ class Settings {
 
 		return [
 			'woocommerce_app_id'             => $api_key,
-			'secret_key'                     => AbandonedCart::getEncryptData( $api_key, $secret_key ),
+			'secret_key'                     => Cart::getEncryptData( $api_key, $secret_key ),
 			'id'                             => null,
 			'name'                           => \RNOC\App\Helpers\Settings::getData( 'blogname' ),
 			'email'                          => \RNOC\App\Helpers\Settings::getData( 'admin_email' ),

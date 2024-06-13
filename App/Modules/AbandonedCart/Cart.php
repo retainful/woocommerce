@@ -443,7 +443,7 @@ class Cart extends AbandonedCart {
 	}
 
 	/**
-	 * Recover user cart
+	 * Recover user cart.
 	 */
 	function recoverUserCart() {
 
@@ -485,83 +485,86 @@ class Cart extends AbandonedCart {
 		}
 		$data = wc_clean( rawurldecode( $token ) );
 		$hash = wc_clean( $hash );
-		if ( Settings::isHashMatches( $hash, $data ) ) {
-			$app_id     = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
-			$data       = json_decode( base64_decode( $data ) );
-			$cart_token = is_object( $data ) && isset( $data->cart_token ) ? $data->cart_token : '';
-			if ( empty( $cart_token ) ) {
-				throw new \Exception( __( 'Cart token missed', 'retainful-next-order-coupon-for-woocommerce' ) );
-			}
-			$cart_data = self::retrieveCartDetails( $app_id, $cart_token );
-			if ( empty( ( $cart_data ) ) ) {
-				return false;
-			}
-			do_action( 'rnoc_retainful_cart_recreate', $cart_data );
-			$order_id = self::getOrderIdFromCartToken( $cart_token );
-			$note     = __( 'Customer visited Retainful order recovery URL.', 'retainful-next-order-coupon-for-woocommerce' );
-			if ( ! empty ( $order_id ) ) {
-				$order = Order::getOrder( $order_id );
-				if ( Order::hasOrderStatus( $order, 'checkout-draft' ) ) {
-					WC::setSession( 'store_api_draft_order', $order_id );
-				} else {
-					if ( Order::hasOrderStatus( $order, 'cancelled' ) ) {
-						Order::setOrderStatus( $order, 'pending', $note );
-					} else {
-						Order::setOrderNote( $order, $note );
-					}
-					$session_coupon = Settings::getStorage()->get( 'rnoc_ac_coupon' );
 
-					if ( ! empty( $session_coupon ) && Order::isOrderNeedPayment( $order ) ) {
-						Order::applyCouponToOrder( $session_coupon, $order );
-
-						Settings::getStorage()->remove( 'rnoc_ac_coupon' );
-					}
-
-					$redirect = Order::isOrderNeedPayment( $order ) ? Order::getOrderPaymentURL( $order ) : Order::getOrderReceivedURL( $order );
-					Settings::getStorage()->set( 'rnoc_is_pending_recovery', true );
-					// set (or refresh, if already set) session
-					WC::setSessionCookie( true );
-					wp_safe_redirect( $redirect );
-					exit;
-				}
-			}
-			$is_buyer_accept_marketing = ( isset( $cart_data['buyer_accepts_marketing'] ) && $cart_data['buyer_accepts_marketing'] ) ? $cart_data['buyer_accepts_marketing'] : 0;
-			WC::setSession( 'is_buyer_accepting_marketing', $is_buyer_accept_marketing );
-			$user_currency = isset( $cart_data['presentment_currency'] ) ? $cart_data['presentment_currency'] : WC::getDefaultCurrency();
-			apply_filters( 'rnoc_set_current_currency_code', $user_currency );
-			Settings::getStorage()->set( 'rnoc_recovered_at', current_time( 'timestamp', true ) );
-			Settings::getStorage()->set( 'rnoc_recovered_by_retainful', 1 );
-			Settings::getStorage()->set( 'rnoc_recovered_cart_token', $cart_token );
-
-			$user_id        = self::getUserIdFromCartToken( $cart_token );
-			$cart_recreated = false;
-			if ( $user_id && Customer::recoverCartUserLogin( $user_id ) ) {
-				WP::updateUserMeta( $user_id, '_rnoc_order_note', $note );
-				$current_cart   = CartHelper::getCart();
-				$cart_recreated = ! empty( $current_cart );
-			}
-
-			$cart_recreated = apply_filters( 'rnoc_cart_re_created', $cart_recreated, $cart_data );
-			if ( ! $cart_recreated ) {
-				Settings::getStorage()->set( '_rnoc_order_note', $note );
-				$this->reCreateCartForGuestUsers( $cart_data );
-			}
-			$this->populateSessionDetails( $cart_data );
-			$cart_session = WC::getSession( 'cart' );
-			if ( empty( $cart_session ) ) {
-				$client_session = isset( $cart_data['client_session'] ) ? $cart_data['client_session'] : [];
-				if ( ! empty( $client_session ) ) {
-					$cart = json_decode( wp_json_encode( $client_session->cart ), true );
-					if ( ! empty( $cart ) ) {
-						WC::setSession( 'cart', $cart );
-					}
-				} else {
-					$cart_contents = isset( $cart_data['cart_contents'] ) ? $cart_data['cart_contents'] : [];
-					$this->recreateCartFromCartContents( $cart_contents );
-				}
-			}
-
+		if ( ! Settings::isHashMatches( $hash, $data ) ) {
+			return false;
 		}
+
+		$app_id     = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
+		$data       = json_decode( base64_decode( $data ) );
+		$cart_token = is_object( $data ) && isset( $data->cart_token ) ? $data->cart_token : '';
+		if ( empty( $cart_token ) ) {
+			throw new \Exception( __( 'Cart token missed', 'retainful-next-order-coupon-for-woocommerce' ) );
+		}
+		$cart_data = self::retrieveCartDetails( $app_id, $cart_token );
+		if ( empty( ( $cart_data ) ) ) {
+			return false;
+		}
+		do_action( 'rnoc_retainful_cart_recreate', $cart_data );
+		$order_id = self::getOrderIdFromCartToken( $cart_token );
+		$note     = __( 'Customer visited Retainful order recovery URL.', 'retainful-next-order-coupon-for-woocommerce' );
+		if ( ! empty ( $order_id ) ) {
+			$order = Order::getOrder( $order_id );
+			if ( Order::hasOrderStatus( $order, 'checkout-draft' ) ) {
+				WC::setSession( 'store_api_draft_order', $order_id );
+			} else {
+				if ( Order::hasOrderStatus( $order, 'cancelled' ) ) {
+					Order::setOrderStatus( $order, 'pending', $note );
+				} else {
+					Order::setOrderNote( $order, $note );
+				}
+				$session_coupon = Settings::getStorage()->get( 'rnoc_ac_coupon' );
+
+				if ( ! empty( $session_coupon ) && Order::isOrderNeedPayment( $order ) ) {
+					Order::applyCouponToOrder( $session_coupon, $order );
+
+					Settings::getStorage()->remove( 'rnoc_ac_coupon' );
+				}
+
+				$redirect = Order::isOrderNeedPayment( $order ) ? Order::getOrderPaymentURL( $order ) : Order::getOrderReceivedURL( $order );
+				Settings::getStorage()->set( 'rnoc_is_pending_recovery', true );
+				// set (or refresh, if already set) session
+				WC::setSessionCookie( true );
+				wp_safe_redirect( $redirect );
+				exit;
+			}
+		}
+		$is_buyer_accept_marketing = ( isset( $cart_data['buyer_accepts_marketing'] ) && $cart_data['buyer_accepts_marketing'] ) ? $cart_data['buyer_accepts_marketing'] : 0;
+		WC::setSession( 'is_buyer_accepting_marketing', $is_buyer_accept_marketing );
+		$user_currency = isset( $cart_data['presentment_currency'] ) ? $cart_data['presentment_currency'] : WC::getDefaultCurrency();
+		apply_filters( 'rnoc_set_current_currency_code', $user_currency );
+		Settings::getStorage()->set( 'rnoc_recovered_at', current_time( 'timestamp', true ) );
+		Settings::getStorage()->set( 'rnoc_recovered_by_retainful', 1 );
+		Settings::getStorage()->set( 'rnoc_recovered_cart_token', $cart_token );
+
+		$user_id        = self::getUserIdFromCartToken( $cart_token );
+		$cart_recreated = false;
+		if ( $user_id && Customer::recoverCartUserLogin( $user_id ) ) {
+			WP::updateUserMeta( $user_id, '_rnoc_order_note', $note );
+			$current_cart   = CartHelper::getCart();
+			$cart_recreated = ! empty( $current_cart );
+		}
+
+		$cart_recreated = apply_filters( 'rnoc_cart_re_created', $cart_recreated, $cart_data );
+		if ( ! $cart_recreated ) {
+			Settings::getStorage()->set( '_rnoc_order_note', $note );
+			$this->reCreateCartForGuestUsers( $cart_data );
+		}
+		$this->populateSessionDetails( $cart_data );
+		$cart_session = WC::getSession( 'cart' );
+		if ( empty( $cart_session ) ) {
+			$client_session = isset( $cart_data['client_session'] ) ? $cart_data['client_session'] : [];
+			if ( ! empty( $client_session ) ) {
+				$cart = json_decode( wp_json_encode( $client_session->cart ), true );
+				if ( ! empty( $cart ) ) {
+					WC::setSession( 'cart', $cart );
+				}
+			} else {
+				$cart_contents = isset( $cart_data['cart_contents'] ) ? $cart_data['cart_contents'] : [];
+				$this->recreateCartFromCartContents( $cart_contents );
+			}
+		}
+
 
 		return false;
 	}
@@ -570,7 +573,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Sync the cart details to server.
 	 *
-	 * @param string $app_id retainful app id.
+	 * @param string $app_id app id.
 	 * @param string $cart_token cart token.
 	 *
 	 * @return array|bool|mixed|object|string
@@ -593,7 +596,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * recreate the cart for gust user.
 	 *
-	 * @param $data
+	 * @param array $data recover cart data.
 	 *
 	 * @return void
 	 * @throws \Exception
@@ -602,7 +605,7 @@ class Cart extends AbandonedCart {
 		$this->setCartToken( $data['cart_token'] );
 		WC::setSession( self::$pending_recovery_key, true );
 		$created_at = isset( $data['created_at'] ) ? strtotime( $data['created_at'] ) : current_time( 'mysql', true );
-		AbandonedCart::setCartCreatedDate( null, $created_at );
+		AbandonedCart::setCartCreatedDate( $created_at );
 		$data           = apply_filters( 'rnoc_abandoned_cart_recover_guest_cart', $data );
 		$client_session = ! empty( $data['client_session'] ) ? $data['client_session'] : [];
 		if ( ! empty( $client_session ) ) {
@@ -630,7 +633,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * recreate the cart from cart content.
 	 *
-	 * @param $cart_contents
+	 * @param array $cart_contents cart content.
 	 */
 	public static function recreateCartFromCartContents( $cart_contents ) {
 
@@ -696,31 +699,31 @@ class Cart extends AbandonedCart {
 	/**
 	 * Returns $coupons, with any invalid coupons removed.
 	 *
-	 * @param \WC_Coupon $coupons
+	 * @param \WC_Coupon $coupons coupon object.
 	 *
 	 * @return mixed|null
 	 * @throws \Exception
 	 */
 	protected static function getValidCoupons( $coupons ) {
-		$valid_coupons = array();
-		if ( $coupons ) {
-			foreach ( $coupons as $coupon ) {
-				$coupon_code = isset( $coupon->code ) ? $coupon->code : null;
-				$coupon_code = apply_filters( 'rnoc_recover_cart_before_validate_coupon', $coupon_code, $coupon );
-				if ( ! empty( $coupon_code ) && Order::isValidCoupon( $coupon_code ) ) {
-					$valid_coupons[] = $coupon_code;
-				}
+		if ( ! is_object( $coupons ) && empty( $coupons ) ) {
+			return [];
+		}
+		$valid_coupons = [];
+		foreach ( $coupons as $coupon ) {
+			$coupon_code = isset( $coupon->code ) ? $coupon->code : null;
+			$coupon_code = apply_filters( 'rnoc_recover_cart_before_validate_coupon', $coupon_code, $coupon );
+			if ( ! empty( $coupon_code ) && Order::isValidCoupon( $coupon_code ) ) {
+				$valid_coupons[] = $coupon_code;
 			}
 		}
-		$valid_coupons = apply_filters( "rnoc_recover_cart_coupons", $valid_coupons );
 
-		return $valid_coupons;
+		return apply_filters( "rnoc_recover_cart_coupons", $valid_coupons );
 	}
 
 	/**
 	 * Get Order ID from cart token
 	 *
-	 * @param $cart_token
+	 * @param string $cart_token cart token
 	 *
 	 * @return string|null
 	 */
@@ -737,7 +740,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Get User ID from cart token
 	 *
-	 * @param $cart_token
+	 * @param string $cart_token cart token
 	 *
 	 * @return string|null
 	 */
@@ -754,7 +757,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * populate cart from session data
 	 *
-	 * @param $data
+	 * @param array $data cart data
 	 */
 	function populateSessionDetails( $data ) {
 		$customer_email = isset( $data['email'] ) ? $data['email'] : '';

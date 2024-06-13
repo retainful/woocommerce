@@ -296,8 +296,8 @@ class Settings {
 	/**
 	 * Check the hash matches or not.
 	 *
-	 * @param $hash
-	 * @param $data
+	 * @param string $hash hash token.
+	 * @param string $data encrypt data.
 	 *
 	 * @return bool
 	 */

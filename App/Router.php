@@ -18,6 +18,7 @@ class Router {
 	 * @return void
 	 */
 	public static function init() {
+
 		do_action( RNOC_PLUGIN_PREFIX . 'before_init' );
 		self::addCommonHooks();
 		if ( is_admin() ) {

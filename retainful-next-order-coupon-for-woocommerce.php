@@ -53,6 +53,7 @@ defined( 'RNOC_PLUGIN_PATH' ) or define( 'RNOC_PLUGIN_PATH', plugin_dir_path( __
 defined( 'RNOC_PLUGIN_URL' ) or define( 'RNOC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 defined( 'RNOC_VERSION' ) or define( 'RNOC_VERSION', '2.6.32' );
 require __DIR__ . '/vendor/autoload.php';
+
 if ( class_exists( Router::class ) ) {
 	Router::init();
 }
