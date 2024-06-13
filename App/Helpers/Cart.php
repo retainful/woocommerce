@@ -17,7 +17,8 @@ class Cart {
 		if ( function_exists( 'WC' ) && isset( WC()->cart ) && Util::isMethodExists( WC()->cart, 'is_empty' ) ) {
 			try {
 				return WC()->cart->is_empty();
-			} catch ( \Exception $e ) {
+			}
+			catch ( \Exception $e ) {
 				return true;
 			}
 		}
@@ -105,7 +106,7 @@ class Cart {
 	/**
 	 * Get cart item price.
 	 *
-	 * @param \WC_Product $product Product object.
+	 * @param   \WC_Product  $product  Product object.
 	 *
 	 * @return float
 	 */
@@ -211,38 +212,37 @@ class Cart {
 	/**
 	 * Add to cart items.
 	 *
-	 * @param int $product_id product id.
-	 * @param int $variation_id variant id.
-	 * @param int $quantity product quantity.
-	 * @param array $variation variations.
-	 * @param array $cart_item_data cart item data.
+	 * @param   int    $product_id      product id.
+	 * @param   int    $variation_id    variant id.
+	 * @param   int    $quantity        product quantity.
+	 * @param   array  $variation       variations.
+	 * @param   array  $cart_item_data  cart item data.
 	 *
 	 * @return bool|string
 	 */
-	public static function addToCart( $product_id, $variation_id = 0, $quantity = 1, $variation = array(), $cart_item_data = array() ) {
-		if ( Util::isMethodExists( WC()->cart, 'add_to_cart' ) ) {
-			try {
-				WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation, $cart_item_data );
-			} catch ( \Exception $e ) {
-				return $e->getMessage();
-			}
+	public static function addToCart( $product_id, $variation_id = 0, $quantity = 1, $variation = [], $cart_item_data = [] ) {
+		if ( ! function_exists( 'WC' ) || is_null( WC()->cart ) || ! Util::isMethodExists( WC()->cart, 'add_to_cart' ) ) {
+			return false;
 		}
 
-		return true;
+		try {
+			return WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation, $cart_item_data );
+		}
+		catch ( \Exception $e ) {
+		}
+
+		return false;
 	}
 
 	/**
-	 *  Clear the user cart.
+	 * empty cart.
 	 *
-	 * @return bool
+	 * @return void
 	 */
 	public static function clearCart() {
-
 		if ( function_exists( 'WC' ) && Util::isMethodExists( WC()->cart, 'empty_cart' ) ) {
 			WC()->cart->empty_cart();
 		}
-
-		return true;
 	}
 
 }

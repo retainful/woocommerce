@@ -51,13 +51,16 @@ class Customer {
 	/**
 	 * Set customer details.
 	 *
-	 * @param string $from From address
-	 * @param string $set To address
-	 * @param string|object $address_value To address
+	 * @param   string         $from           From address
+	 * @param   string         $set            To address
+	 * @param   string|object  $address_value  To address
 	 *
 	 * @return void
 	 */
-	public static function setCustomerDetails( $from = 'billing', $set = 'billing', $address_value = '' ) {
+	public static function setCustomerDetails( $from = 'billing', $set = 'billing', $address_value = [] ) {
+		if ( ! function_exists( 'WC' ) || ! is_object( WC()->customer ) ) {
+			return;
+		}
 		$address_fields = self::getAddressFields();
 		foreach ( $address_fields as $field ) {
 			if ( $field == 'email' ) {
@@ -72,9 +75,10 @@ class Customer {
 				$field_value = isset( $address_value[ $field ] ) ? $address_value[ $field ] : null;
 			}
 
-			if ( ! function_exists( 'WC' ) || ! is_object( WC()->customer ) || empty( $field_value ) ) {
+			if ( empty( $field_value ) ) {
 				continue;
 			}
+
 			$method_name = 'set_' . $set . '_' . $field;
 			if ( is_callable( [ WC()->customer, $method_name ] ) ) {
 				WC()->customer->$method_name( $field_value );
@@ -85,7 +89,7 @@ class Customer {
 	/**
 	 * Set customer email.
 	 *
-	 * @param string $billing_email Customer email.
+	 * @param   string  $billing_email  Customer email.
 	 *
 	 * @return void
 	 */
@@ -174,7 +178,7 @@ class Customer {
 	/**
 	 * Get Order customer.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -223,7 +227,7 @@ class Customer {
 	/**
 	 * Get order billing address.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -254,7 +258,7 @@ class Customer {
 	/**
 	 * Get order shipping address.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -286,7 +290,7 @@ class Customer {
 	/**
 	 * Get client details.
 	 *
-	 * @param \WC_Order $order order object
+	 * @param   \WC_Order  $order  order object
 	 *
 	 * @return array
 	 */
@@ -301,7 +305,7 @@ class Customer {
 	/**
 	 * Get user agent language.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return string
 	 */
@@ -372,8 +376,8 @@ class Customer {
 	/**
 	 * Get customer data.
 	 *
-	 * @param string $key Customer key.
-	 * @param mixed $default Customer data default value.
+	 * @param   string  $key      Customer key.
+	 * @param   mixed   $default  Customer data default value.
 	 *
 	 * @return mixed
 	 */
@@ -393,7 +397,7 @@ class Customer {
 	/**
 	 * Login the recover cart user.
 	 *
-	 * @param int $user_id wp user id.
+	 * @param   int  $user_id  wp user id.
 	 *
 	 * @return bool
 	 */
@@ -419,33 +423,28 @@ class Customer {
 	 * @return bool
 	 */
 	public static function updateRecoverCartUser( $user_id ) {
-		$logged_in = false;
 		if ( self::allowCartRecoveryUserLogin( $user_id ) ) {
 			WP::setCurrentUser( $user_id );
 			WP::setAuthCookie( $user_id );
 			WP::updateUserMeta( $user_id, '_rnoc_is_pending_recovery', true );
-			$logged_in = true;
-		} else {
-			//"Not logging in user {$user_id} with admin rights"
-			WC::addNotice( __( 'Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', RNOC_TEXT_DOMAIN ) );
-		}
 
-		return $logged_in;
+			return true;
+
+		}
+		//"Not logging in user {$user_id} with admin rights"
+		WC::addNotice( __( 'Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', 'retainful-next-order-coupon-for-woocommerce' ) );
+
+		return false;
 	}
 
 	/**
 	 * Check if a user is allowed to be logged in for cart recovery
 	 *
-	 * @param int $user_id WP_User id
+	 * @param   int|\WP_User  $user  WP_User id
 	 *
 	 * @return bool
-	 * @since 1.0.0
 	 */
-	public static function allowCartRecoveryUserLogin( $user_id ) {
-		$allow_user_login = apply_filters( 'wc_retainful_allow_cart_recovery_user_login', ! user_can( $user_id, 'edit_others_posts' ), $user_id );
-
-		return (bool) $allow_user_login;
+	public static function allowCartRecoveryUserLogin( $user ) {
+		return (bool) apply_filters( 'wc_retainful_allow_cart_recovery_user_login', ! user_can( $user, 'edit_others_posts' ), $user );
 	}
-
-
 }
