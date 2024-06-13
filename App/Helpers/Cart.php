@@ -16,10 +16,9 @@ class Cart {
 	public static function isCartEmpty() {
 		if ( function_exists( 'WC' ) && isset( WC()->cart ) && Util::isMethodExists( WC()->cart, 'is_empty' ) ) {
 			try {
-				WC()->cart->empty_cart();
-
 				return WC()->cart->is_empty();
-			} catch ( \Exception $e ) {
+			}
+			catch ( \Exception $e ) {
 				return true;
 			}
 		}
@@ -196,11 +195,11 @@ class Cart {
 	/**
 	 * Add to cart.
 	 *
-	 * @param int $product_id product id.
-	 * @param int $variation_id variant id.
-	 * @param int $quantity product quantity.
-	 * @param array $variation variations.
-	 * @param array $cart_item_data cart item data.
+	 * @param   int    $product_id      product id.
+	 * @param   int    $variation_id    variant id.
+	 * @param   int    $quantity        product quantity.
+	 * @param   array  $variation       variations.
+	 * @param   array  $cart_item_data  cart item data.
 	 *
 	 * @return bool|string
 	 */
@@ -210,7 +209,8 @@ class Cart {
 		}
 		try {
 			return WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation, $cart_item_data );
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 		}
 
