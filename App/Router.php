@@ -18,6 +18,7 @@ class Router {
 	 * @return void
 	 */
 	public static function init() {
+
 		do_action( RNOC_PLUGIN_PREFIX . 'before_init' );
 		self::addCommonHooks();
 		if ( is_admin() ) {
@@ -48,7 +49,7 @@ class Router {
 			add_action( 'wp_ajax_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
 			add_action( 'wp_ajax_nopriv_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
 
-			//add_action('woocommerce_api_retainful', array($cart, 'recoverUserCart'));
+			add_action( 'woocommerce_api_retainful', [ $cart, 'recoverUserCart' ] );
 			//add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
 
 			//add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));

@@ -10,6 +10,7 @@ use Valitron\Validator;
 defined( 'ABSPATH' ) || exit;
 
 class Settings {
+	const HMAC_ALGORITHM = 'sha256';
 
 	/**
 	 * Get license settings.
@@ -62,9 +63,9 @@ class Settings {
 	/**
 	 * Get setting value.
 	 *
-	 * @param string $key Setting key.
-	 * @param mixed $default Setting default value.
-	 * @param string $type Setting type.
+	 * @param   string  $key      Setting key.
+	 * @param   mixed   $default  Setting default value.
+	 * @param   string  $type     Setting type.
 	 *
 	 * @return mixed|string
 	 */
@@ -80,9 +81,9 @@ class Settings {
 	/**
 	 * set setting value.
 	 *
-	 * @param string $key Setting key.
-	 * @param mixed $value Setting default value.
-	 * @param string $type Setting type.
+	 * @param   string  $key    Setting key.
+	 * @param   mixed   $value  Setting default value.
+	 * @param   string  $type   Setting type.
 	 *
 	 * @return void
 	 */
@@ -123,8 +124,8 @@ class Settings {
 	/**
 	 * Get identity value.
 	 *
-	 * @param string $key Identity name.
-	 * @param mixed $default_value Identity value.
+	 * @param   string  $key            Identity name.
+	 * @param   mixed   $default_value  Identity value.
 	 *
 	 * @return mixed|string
 	 */
@@ -135,8 +136,8 @@ class Settings {
 	/**
 	 * Set identity value.
 	 *
-	 * @param string $key Identity key.
-	 * @param array $value Identity value.
+	 * @param   string  $key    Identity key.
+	 * @param   array   $value  Identity value.
 	 *
 	 * @return void
 	 */
@@ -203,7 +204,7 @@ class Settings {
 	/**
 	 * Update plan details.
 	 *
-	 * @param object|string $response Response.
+	 * @param   object|string  $response  Response.
 	 *
 	 * @return void
 	 */
@@ -289,5 +290,39 @@ class Settings {
 		}
 
 		return $validator->errors();
+	}
+
+
+	/**
+	 * Check the hash matches or not.
+	 *
+	 * @param   string  $hash  Hash token.
+	 * @param   string  $data  Encrypt data.
+	 *
+	 * @return bool
+	 */
+	public static function isHashMatches( $hash, $data ) {
+
+		$is_valid_hash = false;
+
+		if ( hash_equals( self::hashTheData( $data ), $hash ) ) {
+			$is_valid_hash = true;
+		}
+
+		return $is_valid_hash;
+	}
+
+	/**
+	 * Hash the data.
+	 *
+	 * @param   string  $data  Hash data.
+	 *
+	 * @return false|string
+	 */
+	public static function hashTheData( $data ) {
+
+		$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
+
+		return hash_hmac( self::HMAC_ALGORITHM, $data, $secret );
 	}
 }
