@@ -2,7 +2,9 @@
 
 namespace RNOC\App\Controllers\Admin;
 
+use Automattic\Jetpack\Connection\Webhooks;
 use RNOC\App\Helpers\Util;
+use RNOC\App\Helpers\Webhook;
 use RNOC\App\Helpers\WP;
 use RNOC\App\Helpers\Input;
 use RNOC\App\Modules\AbandonedCart\Cart;
@@ -64,6 +66,7 @@ class Settings {
 			$main_file_path = $main_override_path;
 		}
 		Util::renderTemplate( $main_file_path, [ 'page' => 'retainful_license', 'sub_content' => $sub_content ] );
+		Webhook::createWebhook();
 	}
 
 	/**

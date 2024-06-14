@@ -81,7 +81,7 @@ class Router {
 			//triggers when admin changes the order
 			add_action( 'woocommerce_process_shop_order_meta', [ $order, 'orderUpdatedShopBackend' ], 50, 2 );
 
-			//add_filter('woocommerce_webhook_http_args', array($checkout, 'changeWebHookHeader'), 10, 3);
+			add_filter( 'woocommerce_webhook_http_args', [ $order, 'changeWebHookHeader' ], 10, 3 );
 
 		}
 

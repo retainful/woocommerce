@@ -2,10 +2,12 @@
 
 namespace RNOC\App\Modules\AbandonedCart;
 
+use MailPoetVendor\Doctrine\DBAL\Driver\Exception;
 use RNOC\App\Helpers\Customer;
 use RNOC\App\Helpers\Product;
 use RNOC\App\Helpers\Settings;
 use RNOC\App\Helpers\WC;
+use RNOC\App\Helpers\Webhook;
 use RNOC\App\Modules\AbandonedCart\Traits\SyncData;
 
 defined( 'ABSPATH' ) || exit;
@@ -326,5 +328,79 @@ class Order {
 		}
 
 		return $fee_items;
+	}
+
+	/**
+	 *  Change webhook header data.
+	 *
+	 * @param array $http_args Http argument data.
+	 * @param int $order_id Order id.
+	 * @param int $webhook_id Webhook id.
+	 *
+	 * return mixed
+	 *
+	 * @throws \Exception
+	 */
+	public function changeWebHookHeader( $http_args, $order_id, $webhook_id ) {
+		$is_app_connected = Settings::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0 );
+		if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! $is_app_connected ) {
+			return $http_args;
+		}
+		try {
+			$webhook      = new \WC_Webhook( $webhook_id );
+			$topic        = $webhook->get_topic();
+			$topic_status = Webhook::getWebHookStatus();
+			if ( ! isset( $topic_status[ $topic ] ) || ! $topic_status[ $topic ] ) {
+				return $http_args;
+			}
+			$delivery_url      = $webhook->get_delivery_url();
+			$site_delivery_url = Webhook::getDeliveryUrl();
+			if ( $delivery_url != $site_delivery_url || $order_id <= 0 ) {
+				return $http_args;
+			}
+			$order      = \RNOC\App\Helpers\Order::getOrder( $order_id );
+			$cart_token = \RNOC\App\Helpers\Order::getOrderData( self::$cart_token_key_for_db, $order );
+			if ( empty( $cart_token ) ) {
+				//Usually we should not force generate the cart token as this would sync all the old orders otherwise, if their status changes.
+				$force_generate_cart_token = apply_filters( 'rnoc_force_generate_cart_token', false, $http_args, $order_id, $webhook_id );
+
+				if ( $force_generate_cart_token === true ) {
+					//Let's generate a token and set to the order meta
+					$cart_token = AbandonedCart::generateCartToken();
+					\RNOC\App\Helpers\Order::setOrderMeta( $order_id, self::$cart_token_key_for_db, $cart_token );
+				}
+			}
+			if ( empty( $cart_token ) ) {
+				//bail on empty cart token
+				return $http_args;
+			}
+			$order_data = $this->getOrderData( $order );
+			if ( is_array( $order_data ) && ! empty( $order_data ) ) {
+				$client_ip     = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
+				$token         = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
+				$app_id        = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'licence' );
+				$extra_headers = [
+					"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
+					"X-Retainful-Version"  => RNOC_VERSION,
+					"X-Cart-Token"         => $token,
+					"Cart-Token"           => $token,
+					"app-id"               => $app_id,
+					"app_id"               => $app_id,
+					"Content-Type"         => 'application/json'
+				];
+				foreach ( $extra_headers as $key => $value ) {
+					$http_args['headers'][ $key ] = $value;
+				}
+				$cart_hash         = self::getEncryptData( $order_data );
+				$body              = [
+					'data' => $cart_hash
+				];
+				$http_args['body'] = trim( wp_json_encode( $body ) );
+			}
+		} catch ( Exception $e ) {
+
+		}
+
+		return $http_args;
 	}
 }
