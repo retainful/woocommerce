@@ -65,8 +65,9 @@ class Settings {
 		if ( file_exists( $main_override_path ) ) {
 			$main_file_path = $main_override_path;
 		}
-		Util::renderTemplate( $main_file_path, [ 'page' => 'retainful_license', 'sub_content' => $sub_content ] );
 		Webhook::createWebhook();
+		Util::renderTemplate( $main_file_path, [ 'page' => 'retainful_license', 'sub_content' => $sub_content ] );
+
 	}
 
 	/**
@@ -78,6 +79,7 @@ class Settings {
 		if ( ! WP::hasAdminPrivilege() ) {
 			return;
 		}
+
 		$file_path     = RNOC_PLUGIN_PATH . 'App/Views/Admin/settings.php';
 		$override_path = get_theme_file_path( 'retainful-next-order-coupon-for-woocommerce/admin/settings.php' );
 		if ( file_exists( $override_path ) ) {

@@ -78,7 +78,7 @@ class Webhook {
 	 */
 	public static function createWebhook() {
 		if ( is_admin() ) {
-			$is_app_connected = Settings::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0 );
+			$is_app_connected = Settings::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' );
 			if ( $is_app_connected ) {
 				$hook_status = self::getWebHookStatus();
 				if ( isset( $hook_status['order.updated'] ) && ! $hook_status['order.updated'] ) {
@@ -139,7 +139,7 @@ class Webhook {
 	 *
 	 */
 	public static function removeWebhook() {
-		if ( ! class_exists( 'WC_Data_Store' ) || ! class_exists( '\Rnoc\Retainful\library\RetainfulApi' ) || ! function_exists( 'wc_get_webhook' ) ) {
+		if ( ! class_exists( 'WC_Data_Store' ) || ! function_exists( 'wc_get_webhook' ) ) {
 			return;
 		}
 		try {

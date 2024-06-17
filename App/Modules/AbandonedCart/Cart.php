@@ -316,6 +316,7 @@ class Cart extends AbandonedCart {
 					'compare_at' => 0,
 				];
 			}
+
 			$cat_ids = ! empty( $product_id ) && $product_id > 0 ? Product::getProductCategoryIds( $product_id ) : [];
 			$items[] = apply_filters( 'rnoc_get_cart_line_item_details', [
 				'key'           => $item_key,

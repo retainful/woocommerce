@@ -448,4 +448,37 @@ class Customer {
 	}
 
 
+	/**
+	 * Retrieve User IP address.
+	 *
+	 * @param int|null $user_id User id.
+	 *
+	 * @return string
+	 */
+	public static function retrieveUserIp( $user_id = null ) {
+		$ip = $user_id ? get_user_meta( $user_id, '_rnoc_user_ip_address' ) : self::getClientIp();
+
+		return (string) trim( current( preg_split( '/,/', sanitize_text_field( wp_unslash( $ip ) ) ) ) );
+	}
+
+	/**
+	 * Get the user agent of client.
+	 *
+	 * @param null $order
+	 *
+	 * @return mixed|string|null
+	 */
+	public static function getUserAgent( $order = null ) {
+
+		if ( ! empty( $order ) ) {
+			return Order::getOrderMeta( '_rnoc_get_http_user_agent', $order );
+		}
+
+		if ( ! empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
+			return $_SERVER['HTTP_USER_AGENT'];
+		}
+
+		return '';
+	}
+
 }
