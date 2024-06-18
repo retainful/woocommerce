@@ -544,7 +544,7 @@ class Order {
 	 * @return mixed|void
 	 */
 	public static function needInstantOrderSync() {
-		return apply_filters( 'rnoc_sync_order_data_instantly_to_api', false );
+		return apply_filters( 'rnoc_sync_order_data_instantly_to_api', true );
 	}
 
 
