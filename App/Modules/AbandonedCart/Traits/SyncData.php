@@ -47,8 +47,8 @@ trait SyncData {
 	/**
 	 * Can track abandoned cart.
 	 *
-	 * @param string $ip_address Ip address.
-	 * @param \WC_Order $order Order object.
+	 * @param   string     $ip_address  Ip address.
+	 * @param   \WC_Order  $order       Order object.
 	 *
 	 * @return bool
 	 */
@@ -63,7 +63,7 @@ trait SyncData {
 	/**
 	 * Get line item total.
 	 *
-	 * @param array $item Line item.
+	 * @param   array  $item  Line item.
 	 *
 	 * @return float
 	 */
@@ -81,7 +81,7 @@ trait SyncData {
 	/**
 	 * Is valid order status.
 	 *
-	 * @param string $order_status Order status.
+	 * @param   string  $order_status  Order status.
 	 *
 	 * @return bool
 	 */
@@ -108,9 +108,9 @@ trait SyncData {
 	/**
 	 * Get currency details.
 	 *
-	 * @param float $cart_total Cart total.
-	 * @param string $current_currency_code Current currency.
-	 * @param string $default_currency_code default currency.
+	 * @param   float   $cart_total             Cart total.
+	 * @param   string  $current_currency_code  Current currency.
+	 * @param   string  $default_currency_code  default currency.
 	 *
 	 * @return array
 	 */
@@ -138,8 +138,8 @@ trait SyncData {
 	/**
 	 * Convert price.
 	 *
-	 * @param float $price Price.
-	 * @param float $rate Convert rate.
+	 * @param   float  $price  Price.
+	 * @param   float  $rate   Convert rate.
 	 *
 	 * @return float
 	 */
@@ -154,7 +154,7 @@ trait SyncData {
 	/**
 	 * Get recovery url.
 	 *
-	 * @param string $cart_token Cart token.
+	 * @param   string  $cart_token  Cart token.
 	 *
 	 * @return string
 	 */
@@ -165,7 +165,7 @@ trait SyncData {
 		$data = [ 'cart_token' => $cart_token ];
 		// encode
 		$data   = base64_encode( wp_json_encode( $data ) );
-		$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );;
+		$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
 
 
 		$hash = hash_hmac( self::$hmac_algorithm, $data, $secret );
@@ -178,8 +178,8 @@ trait SyncData {
 	/**
 	 * Get encrypt data.
 	 *
-	 * @param mixed $data Data.
-	 * @param string $secret Secret key.
+	 * @param   mixed   $data    Data.
+	 * @param   string  $secret  Secret key.
 	 *
 	 * @return string|null
 	 */
@@ -198,7 +198,8 @@ trait SyncData {
 				$hmac            = hash_hmac( self::$hmac_algorithm, $cipher_text_raw, $secret, true );
 
 				return base64_encode( bin2hex( $iv ) . ':retainful:' . bin2hex( $hmac ) . ':retainful:' . bin2hex( $cipher_text_raw ) );
-			} catch ( \Exception $e ) {
+			}
+			catch ( \Exception $e ) {
 				return null;
 			}
 		}
@@ -209,7 +210,7 @@ trait SyncData {
 	/**
 	 * Retrieve cart token.
 	 *
-	 * @param int $user_id User id.
+	 * @param   int  $user_id  User id.
 	 *
 	 * @return string
 	 */
@@ -227,6 +228,7 @@ trait SyncData {
 
 		return apply_filters( 'rnoc_retrieve_cart_token', $token, $user_id, $this );
 	}
+
 
 	/**
 	 * Get cart token.
@@ -288,5 +290,24 @@ trait SyncData {
 		return get_option( 'permalink_structure' )
 			? get_home_url( null, 'wc-api/retainful', $scheme )
 			: add_query_arg( 'wc-api', 'retainful', get_home_url( null, null, $scheme ) );
+	}
+
+
+	/**
+	 * Get tracking start date.
+	 *
+	 * @param   int|null  $user_id  User id.
+	 *
+	 * @return mixed
+	 */
+	public static function getTrackingStartAt( $user_id = null ) {
+		if ( $user_id || $user_id = get_current_user_id() ) {
+			$cart_created_at = get_user_meta( $user_id, self::$cart_tracking_started_key_for_db, true );
+		} else {
+			$storage         = Settings::getStorage();
+			$cart_created_at = $storage->get( self::$cart_tracking_started_key );
+		}
+
+		return $cart_created_at;
 	}
 }

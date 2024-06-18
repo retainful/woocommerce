@@ -43,7 +43,8 @@ class AbandonedCart {
 			$data[6] = chr( ord( $data[6] ) & 0x0f | 0x40 ); // set version to 0100
 			$data[8] = chr( ord( $data[8] ) & 0x3f | 0x80 ); // set bits 6-7 to 10
 			$token   = vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split( bin2hex( $data ), 4 ) );
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 			// fall back to mt_rand if random_bytes is unavailable
 			$token = sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 				// 32 bits for "time_low"
@@ -68,8 +69,8 @@ class AbandonedCart {
 	/**
 	 * Set cart token.
 	 *
-	 * @param string $cart_token Cart token.
-	 * @param int $user_id User id.
+	 * @param   string  $cart_token  Cart token.
+	 * @param   int     $user_id     User id.
 	 *
 	 * @return void
 	 */
@@ -91,8 +92,8 @@ class AbandonedCart {
 	/**
 	 * Set cart created date.
 	 *
-	 * @param int $time Time stamp.
-	 * @param int|null $user_id User id.
+	 * @param   int       $time     Time stamp.
+	 * @param   int|null  $user_id  User id.
 	 *
 	 * @return void
 	 */
@@ -103,25 +104,6 @@ class AbandonedCart {
 		if ( ! empty( $user_id ) || $user_id = get_current_user_id() ) {
 			update_user_meta( $user_id, self::$cart_tracking_started_key_for_db, $time );
 		}
-	}
-
-
-	/**
-	 * Get tracking start date.
-	 *
-	 * @param int|null $user_id User id.
-	 *
-	 * @return mixed
-	 */
-	public static function getTrackingStartAt( $user_id = null ) {
-		if ( $user_id || $user_id = get_current_user_id() ) {
-			$cart_created_at = get_user_meta( $user_id, self::$cart_tracking_started_key_for_db, true );
-		} else {
-			$storage         = Settings::getStorage();
-			$cart_created_at = $storage->get( self::$cart_tracking_started_key );
-		}
-
-		return $cart_created_at;
 	}
 
 
@@ -164,7 +146,7 @@ class AbandonedCart {
 	/**
 	 * Compare with previous cart.
 	 *
-	 * @param string $current_cart_hash Current cart hash.
+	 * @param   string  $current_cart_hash  Current cart hash.
 	 *
 	 * @return bool
 	 */

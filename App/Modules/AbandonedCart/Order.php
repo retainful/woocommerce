@@ -19,7 +19,7 @@ class Order {
 	/**
 	 * Backend order change time synchronization.
 	 *
-	 * @param int $order_id Order id.
+	 * @param   int  $order_id  Order id.
 	 *
 	 * @return void
 	 */
@@ -36,7 +36,7 @@ class Order {
 	/**
 	 * synchronize order.
 	 *
-	 * @param int $order_id Order id.
+	 * @param   int  $order_id  Order id.
 	 *
 	 * @return void
 	 */
@@ -84,7 +84,7 @@ class Order {
 	/**
 	 * Get order data.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -179,7 +179,7 @@ class Order {
 	/**
 	 * Get order cart token.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return string
 	 */
@@ -190,7 +190,7 @@ class Order {
 	/**
 	 * Get order line items.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -267,7 +267,7 @@ class Order {
 			return null;
 		}
 		$order_placed_at = \RNOC\App\Helpers\Order::getOrderMeta( self::$order_placed_date_key_for_db, $order );
-		$order_status    = \RNOC\App\Helpers\Order::getStatus( $order );;
+		$order_status    = \RNOC\App\Helpers\Order::getStatus( $order );
 		if ( empty( $order_placed_at ) && self::isValidOrderStatus( $order_status ) ) {
 			$order_placed_at = \RNOC\App\Helpers\Order::getOrderPaidDate( $order );
 			$order_placed_at = WC::formatToIso8601( $order_placed_at );
@@ -293,8 +293,8 @@ class Order {
 	/**
 	 * Get order totals.
 	 *
-	 * @param \WC_Order $order Order object.
-	 * @param bool $excluding_tax Is excluding tax.
+	 * @param   \WC_Order  $order          Order object.
+	 * @param   bool       $excluding_tax  Is excluding tax.
 	 *
 	 * @return array
 	 */
@@ -312,8 +312,8 @@ class Order {
 	/**
 	 * Get order fee details.
 	 *
-	 * @param \WC_Order $order Order object.
-	 * @param bool $excluding_tax Is excluding tax.
+	 * @param   \WC_Order  $order          Order object.
+	 * @param   bool       $excluding_tax  Is excluding tax.
 	 *
 	 * @return array
 	 */
@@ -338,9 +338,9 @@ class Order {
 	/**
 	 *  Change webhook header data.
 	 *
-	 * @param array $http_args Http argument data.
-	 * @param int $order_id Order id.
-	 * @param int $webhook_id Webhook id.
+	 * @param   array  $http_args   Http argument data.
+	 * @param   int    $order_id    Order id.
+	 * @param   int    $webhook_id  Webhook id.
 	 *
 	 * return mixed
 	 *
@@ -406,7 +406,8 @@ class Order {
 				];
 				$http_args['body'] = trim( wp_json_encode( $body ) );
 			}
-		} catch ( Exception $e ) {
+		}
+		catch ( Exception $e ) {
 
 		}
 
@@ -427,7 +428,8 @@ class Order {
 			if ( empty( $draft_order_cart_token ) && empty( $cart_token ) ) {
 				$this->getCartToken();
 			}
-			$this->purchaseComplete( intval( $draft_order ) );
+
+			$this->updateOrderMeta( intval( $draft_order ) );
 			WC::removeSession( 'store_api_draft_order' );
 		}
 	}
@@ -435,11 +437,11 @@ class Order {
 	/**
 	 * Update the order metadata after purchase.
 	 *
-	 * @param int $order_id Order id.
+	 * @param   int  $order_id  Order id.
 	 *
 	 * @return void
 	 */
-	public function purchaseComplete( $order_id ) {
+	public function updateOrderMeta( $order_id ) {
 		if ( empty( $order_id ) ) {
 			return;
 		}
@@ -448,8 +450,8 @@ class Order {
 		if ( empty( $cart_token ) ) {
 			return;
 		}
-		$cart_created_at            = self::userCartCreatedAt();
-		$user_ip                    = Customer::retrieveUserIp();
+		$cart_created_at            = self::getTrackingStartAt();
+		$user_ip                    = Customer::getUserIPDetails();
 		$is_buyer_accepts_marketing = ( self::isBuyerAcceptsMarketing() ) ? 1 : 0;
 		$cart_hash                  = self::generateCartHash();
 		$recovered_at               = Settings::getStorage()->get( 'rnoc_recovered_at' );
@@ -475,27 +477,11 @@ class Order {
 
 	}
 
-	/**
-	 * Get the date of cart tracing started.
-	 *
-	 * @param int $user_id User id.
-	 *
-	 * @return mixed
-	 */
-	public static function userCartCreatedAt( $user_id = null ) {
-		if ( $user_id || $user_id = get_current_user_id() ) {
-			$cart_created_at = get_user_meta( $user_id, self::$cart_tracking_started_key_for_db, true );
-		} else {
-			$cart_created_at = Settings::getStorage()->get( self::$cart_tracking_started_key );
-		}
-
-		return $cart_created_at;
-	}
 
 	/**
 	 * Update normal checkout order.
 	 *
-	 * @param int $order_id Order id.
+	 * @param   int  $order_id  Order id.
 	 *
 	 */
 	public function checkoutOrderProcessed( $order_id ) {
@@ -508,12 +494,11 @@ class Order {
 
 			if ( ! empty( $cart_token ) ) {
 				$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
-				$this->purchaseComplete( $order_id );
+				$this->updateOrderMeta( $order_id );
 				self::syncOrderToAPI( $order, $order_id );
-
-
 			}
-		} catch ( Exception $e ) {
+		}
+		catch ( Exception $e ) {
 		}
 
 		return;
@@ -522,8 +507,8 @@ class Order {
 	/**
 	 * Sync order to api.
 	 *
-	 * @param \WC_Order $order Order object.
-	 * @param int $order_id order id.
+	 * @param   \WC_Order  $order     Order object.
+	 * @param   int        $order_id  order id.
 	 */
 	public function syncOrderToAPI( $order, $order_id ) {
 		$background_order_sync = Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' );
@@ -566,7 +551,7 @@ class Order {
 	/**
 	 * Schedule the sync of the cart.
 	 *
-	 * @param int $order_id Order id.
+	 * @param   int  $order_id  Order id.
 	 *
 	 */
 	public static function scheduleCartSync( $order_id ) {
@@ -584,7 +569,7 @@ class Order {
 	/**
 	 * Update block checkout checkout order.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return void
 	 */
@@ -596,10 +581,11 @@ class Order {
 		try {
 			$cart_token = $this->retrieveCartToken();
 			if ( ! empty( $cart_token ) ) {
-				$this->purchaseComplete( $order_id );
+				$this->updateOrderMeta( $order_id );
 				$this->syncOrderToAPI( $order, $order_id );
 			}
-		} catch ( Exception $e ) {
+		}
+		catch ( Exception $e ) {
 		}
 	}
 

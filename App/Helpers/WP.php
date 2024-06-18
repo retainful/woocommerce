@@ -51,7 +51,7 @@ class WP {
 	/**
 	 * Format date field.
 	 *
-	 * @param int $timestamp Time stamp.
+	 * @param   int  $timestamp  Time stamp.
 	 *
 	 * @return string|null
 	 */
@@ -68,7 +68,8 @@ class WP {
 			$date_time = new \DateTime( $date );
 
 			return $date_time->format( \DateTime::ATOM );
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 		}
 
@@ -78,7 +79,7 @@ class WP {
 	/**
 	 * Get user role by email.
 	 *
-	 * @param string $email User email.
+	 * @param   string  $email  User email.
 	 *
 	 * @return array
 	 */
@@ -92,7 +93,8 @@ class WP {
 			if ( is_object( $user ) && isset( $user->roles ) ) {
 				return (array) $user->roles;
 			}
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 		}
 
@@ -102,7 +104,7 @@ class WP {
 	/**
 	 * Create nonce for woocommerce.
 	 *
-	 * @param string $action
+	 * @param   string  $action
 	 *
 	 *
 	 * @return false|string
@@ -119,7 +121,7 @@ class WP {
 	/**
 	 * Check the validity of a security nonce and the admin privilege.
 	 *
-	 * @param string $nonce_name The name of the nonce.
+	 * @param   string  $nonce_name  The name of the nonce.
 	 *
 	 * @return bool
 	 */
@@ -135,9 +137,9 @@ class WP {
 	/**
 	 * Verify nonce.
 	 *
-	 * @param string $nonce Nonce.
+	 * @param   string  $nonce   Nonce.
 	 *
-	 * @param string $action Action.
+	 * @param   string  $action  Action.
 	 *
 	 * @return bool
 	 */
@@ -193,7 +195,7 @@ class WP {
 	/**
 	 * Set the auth cookie.
 	 *
-	 * @param int $user_id User id.
+	 * @param   int  $user_id  User id.
 	 *
 	 */
 	public static function setAuthCookie( $user_id ) {
@@ -204,9 +206,9 @@ class WP {
 	/**
 	 * Update the user meta data.
 	 *
-	 * @param int $user_id User id.
-	 * @param string $meta_key User meta key.
-	 * @param string|int|bool $meta_value User meta value.
+	 * @param   int              $user_id     User id.
+	 * @param   string           $meta_key    User meta key.
+	 * @param   string|int|bool  $meta_value  User meta value.
 	 *
 	 * @return void
 	 */
@@ -229,7 +231,7 @@ class WP {
 	/**
 	 * Set current user.
 	 *
-	 * @param int $user_id User id
+	 * @param   int  $user_id  User id
 	 *
 	 * @return void
 	 */
@@ -241,8 +243,8 @@ class WP {
 	/**
 	 * Add post meta.
 	 *
-	 * @param int $post_id Post id.
-	 * @param array $args Argument.
+	 * @param   int    $post_id  Post id.
+	 * @param   array  $args     Argument.
 	 *
 	 * @return bool
 	 */
@@ -261,9 +263,9 @@ class WP {
 	/**
 	 * Check any pending hooks already exists.
 	 *
-	 * @param mixed $meta_value meta value.
-	 * @param string $hook hook name.
-	 * @param string $meta_key meta key.
+	 * @param   mixed   $meta_value  meta value.
+	 * @param   string  $hook        hook name.
+	 * @param   string  $meta_key    meta key.
 	 *
 	 * @return bool
 	 */
@@ -289,15 +291,14 @@ class WP {
 	/**
 	 * Schedule events.
 	 *
-	 * @param string $hook Hook name.
-	 * @param int|string $timestamp Time.
-	 * @param array $args Arguments.
-	 * @param string $type Type.
-	 * @param null $interval_in_seconds Interval seconds.
-	 * @param string $group Group.
+	 * @param   string      $hook                 Hook name.
+	 * @param   int|string  $timestamp            Time.
+	 * @param   array       $args                 Arguments.
+	 * @param   string      $type                 Type.
+	 * @param   null        $interval_in_seconds  Interval seconds.
+	 * @param   string      $group                Group.
 	 */
 	public static function scheduleEvents( $hook, $timestamp, $args = array(), $type = "single", $interval_in_seconds = null, $group = '' ) {
-
 		if ( class_exists( 'ActionScheduler' ) ) {
 			switch ( $type ) {
 				case "recurring":
@@ -332,9 +333,9 @@ class WP {
 	}
 
 	/**
-	 * @param string $hook
-	 * @param array $args
-	 * @param string $group
+	 * @param   string  $hook
+	 * @param   array   $args
+	 * @param   string  $group
 	 *
 	 * @return int|bool The timestamp for the next occurrence, or false if nothing was found
 	 */

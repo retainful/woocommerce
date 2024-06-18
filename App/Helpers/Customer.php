@@ -51,9 +51,9 @@ class Customer {
 	/**
 	 * Set customer details.
 	 *
-	 * @param string $from From address.
-	 * @param string $set To address.
-	 * @param string|object $address_value To address.
+	 * @param   string         $from           From address.
+	 * @param   string         $set            To address.
+	 * @param   string|object  $address_value  To address.
 	 *
 	 * @return void
 	 */
@@ -88,7 +88,7 @@ class Customer {
 	/**
 	 * Set customer email.
 	 *
-	 * @param string $billing_email Customer email.
+	 * @param   string  $billing_email  Customer email.
 	 *
 	 * @return void
 	 */
@@ -177,7 +177,7 @@ class Customer {
 	/**
 	 * Get Order customer.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -227,7 +227,7 @@ class Customer {
 	/**
 	 * Get order billing address.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -258,7 +258,7 @@ class Customer {
 	/**
 	 * Get order shipping address.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -290,7 +290,7 @@ class Customer {
 	/**
 	 * Get client details.
 	 *
-	 * @param \WC_Order $order order object
+	 * @param   \WC_Order  $order  order object
 	 *
 	 * @return array
 	 */
@@ -305,7 +305,7 @@ class Customer {
 	/**
 	 * Get user agent language.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return string
 	 */
@@ -376,8 +376,8 @@ class Customer {
 	/**
 	 * Get customer data.
 	 *
-	 * @param string $key Customer key.
-	 * @param mixed $default Customer data default value.
+	 * @param   string  $key      Customer key.
+	 * @param   mixed   $default  Customer data default value.
 	 *
 	 * @return mixed
 	 */
@@ -397,7 +397,7 @@ class Customer {
 	/**
 	 * Login the recover cart user.
 	 *
-	 * @param int $user_id user id.
+	 * @param   int  $user_id  user id.
 	 *
 	 * @return bool
 	 */
@@ -418,7 +418,7 @@ class Customer {
 	/**
 	 * update recover cart user data.
 	 *
-	 * @param int $user_id user id.
+	 * @param   int  $user_id  user id.
 	 *
 	 * @return bool
 	 */
@@ -439,7 +439,7 @@ class Customer {
 	/**
 	 * Allowed to be logged in for cart recovery.
 	 *
-	 * @param int|\WP_User $user user id
+	 * @param   int|\WP_User  $user  user id
 	 *
 	 * @return bool
 	 */
@@ -447,24 +447,11 @@ class Customer {
 		return (bool) apply_filters( 'wc_retainful_allow_cart_recovery_user_login', ! user_can( $user, 'edit_others_posts' ), $user );
 	}
 
-
-	/**
-	 * Retrieve User IP address.
-	 *
-	 * @param int|null $user_id User id.
-	 *
-	 * @return string
-	 */
-	public static function retrieveUserIp( $user_id = null ) {
-		$ip = $user_id ? get_user_meta( $user_id, '_rnoc_user_ip_address' ) : self::getClientIp();
-
-		return (string) trim( current( preg_split( '/,/', sanitize_text_field( wp_unslash( $ip ) ) ) ) );
-	}
-
+	
 	/**
 	 * Get the user agent of client.
 	 *
-	 * @param null $order
+	 * @param   null  $order
 	 *
 	 * @return mixed|string|null
 	 */
