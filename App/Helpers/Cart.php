@@ -17,7 +17,8 @@ class Cart {
 		if ( function_exists( 'WC' ) && isset( WC()->cart ) && Util::isMethodExists( WC()->cart, 'is_empty' ) ) {
 			try {
 				return WC()->cart->is_empty();
-			} catch ( \Exception $e ) {
+			}
+			catch ( \Exception $e ) {
 				return true;
 			}
 		}
@@ -43,9 +44,9 @@ class Cart {
 	 *
 	 * @return float|string
 	 */
-	public static function getCartTotal() {
+	public static function getCartTotal( $context = 'view' ) {
 		if ( function_exists( 'WC' ) && isset( WC()->cart ) && Util::isMethodExists( WC()->cart, 'get_total' ) ) {
-			return wc()->cart->get_cart_contents_total();
+			return wc()->cart->get_total( $context );
 		}
 
 		return 0;
@@ -147,7 +148,9 @@ class Cart {
 	 * @return float
 	 */
 	public static function getCartSubTotal() {
-		if ( ! function_exists( 'WC' ) || isset( WC()->cart ) ) {
+
+
+		if ( ! function_exists( 'WC' ) || ! isset( WC()->cart ) ) {
 			return 0.0;
 		}
 
@@ -194,11 +197,11 @@ class Cart {
 	/**
 	 * Add to cart.
 	 *
-	 * @param int $product_id product id.
-	 * @param int $variation_id variant id.
-	 * @param int $quantity product quantity.
-	 * @param array $variation variations.
-	 * @param array $cart_item_data cart item data.
+	 * @param   int    $product_id      product id.
+	 * @param   int    $variation_id    variant id.
+	 * @param   int    $quantity        product quantity.
+	 * @param   array  $variation       variations.
+	 * @param   array  $cart_item_data  cart item data.
 	 *
 	 * @return bool|string
 	 */
@@ -208,7 +211,8 @@ class Cart {
 		}
 		try {
 			return WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation, $cart_item_data );
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 		}
 
