@@ -270,19 +270,19 @@ class WP {
 	 * @return bool
 	 */
 	public static function hasAnyActiveScheduleExists( $hook, $meta_value, $meta_key ) {
-		$actions = new \WP_Query( array(
+		$actions = new \WP_Query( [
 			'post_title'     => $hook,
 			'post_status'    => 'pending',
 			'post_type'      => 'scheduled-action',
-			'meta_query'     => array(
-				array(
+			'meta_query'     => [
+				[
 					'key'     => $meta_key,
 					'value'   => $meta_value,
 					'compare' => '='
-				)
-			),
+				]
+			],
 			'posts_per_page' => 1
-		) );
+		] );
 
 		return $actions->have_posts();
 	}
