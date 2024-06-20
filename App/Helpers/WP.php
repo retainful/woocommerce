@@ -249,27 +249,29 @@ class WP {
 	 * @return bool
 	 */
 	public static function addPostMeta( $post_id, $args ) {
-		if ( ! empty( $args ) ) {
-			foreach ( $args as $meta_key => $meta_value ) {
-				add_post_meta( $post_id, $meta_key, $meta_value );
-			}
-
-			return true;
+		if ( empty( $post_id ) || ! is_int( $post_id ) || empty( $args ) || ! is_array( $args ) ) {
+			return false;
+		}
+		foreach ( $args as $meta_key => $meta_value ) {
+			add_post_meta( $post_id, $meta_key, $meta_value );
 		}
 
-		return false;
+		return true;
 	}
 
 	/**
 	 * Check any pending hooks already exists.
 	 *
-	 * @param   mixed   $meta_value  meta value.
 	 * @param   string  $hook        hook name.
 	 * @param   string  $meta_key    meta key.
+	 * @param   mixed   $meta_value  meta value.
 	 *
 	 * @return bool
 	 */
-	public static function hasAnyActiveScheduleExists( $hook, $meta_value, $meta_key ) {
+	public static function hasAnyActiveScheduleExists( $hook, $meta_key, $meta_value ) {
+		if ( empty( $hook ) || empty( $meta_key ) || empty( $meta_value ) ) {
+			return false;
+		}
 		$actions = new \WP_Query( [
 			'post_title'     => $hook,
 			'post_status'    => 'pending',
@@ -298,7 +300,10 @@ class WP {
 	 * @param   null        $interval_in_seconds  Interval seconds.
 	 * @param   string      $group                Group.
 	 */
-	public static function scheduleEvents( $hook, $timestamp, $args = array(), $type = "single", $interval_in_seconds = null, $group = '' ) {
+	public static function scheduleEvents( $hook, $timestamp, $args = [], $type = "single", $interval_in_seconds = null, $group = '' ) {
+		if ( empty( $hook ) || empty( $timestamp ) ) {
+			return;
+		}
 		if ( class_exists( 'ActionScheduler' ) ) {
 			switch ( $type ) {
 				case "recurring":
@@ -333,11 +338,13 @@ class WP {
 	}
 
 	/**
-	 * @param   string  $hook
-	 * @param   array   $args
-	 * @param   string  $group
+	 * Get the next schedule action.
 	 *
-	 * @return int|bool The timestamp for the next occurrence, or false if nothing was found
+	 * @param   string  $hook   Hook name.
+	 * @param   array   $args   Arguments.
+	 * @param   string  $group  Group.
+	 *
+	 * @return int|bool
 	 */
 	public static function nextScheduledAction( $hook, $args = null, $group = '' ) {
 		if ( empty( $hook ) && ! class_exists( 'ActionScheduler' ) ) {

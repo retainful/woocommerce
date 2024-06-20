@@ -2,17 +2,12 @@
 
 namespace RNOC\App\Helpers;
 
+use Google\Rpc\Context\AttributeContext\Request;
 use RNOC\App\Modules\AbandonedCart\AbandonedCart;
 
 defined( 'ABSPATH' ) || exit;
 
 class Webhook {
-
-	public static $domain = "https://api.retainful.com/v1/";
-
-	public static function getDomain() {
-		return apply_filters( 'retainful_domain_url', self::$domain );
-	}
 
 	/**
 	 * Get webhook status.
@@ -29,10 +24,10 @@ class Webhook {
 		}
 		try {
 			$data_store = \WC_Data_Store::load( 'webhook' );
-			$args       = array(
+			$args       = [
 				'limit'  => - 1,
 				'offset' => 0,
-			);
+			];
 			$webhooks   = $data_store->search_webhooks( $args );
 			if ( empty( $webhooks ) ) {
 				return $topics;
@@ -52,7 +47,8 @@ class Webhook {
 				}
 			}
 
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 		}
 
@@ -61,18 +57,18 @@ class Webhook {
 
 
 	/**
-	 * get retainful webhook delivery url.
+	 * Get retainful webhook delivery url.
 	 *
 	 * @return mixed|null
 	 */
 	public static function getDeliveryUrl() {
-		$url = self::getDomain() . 'woocommerce/webhooks/checkout';
+		$url = \RNOC\App\Modules\AbandonedCart\Request::getAbandonedCartApiUrl() . 'webhooks/checkout';
 
 		return apply_filters( 'change_delivery_url', $url );
 	}
 
 	/**
-	 * create the webhook
+	 * Create the webhook.
 	 *
 	 * @return void
 	 */
@@ -96,7 +92,7 @@ class Webhook {
 	/**
 	 * Add new webhook.
 	 *
-	 * @param string $topic webhook topic
+	 * @param   string  $topic  Webhook topic.
 	 *
 	 * @return bool
 	 */
@@ -127,7 +123,8 @@ class Webhook {
 			if ( $webhook_id > 0 ) {
 				return true;
 			}
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 			return false;
 		}
 
@@ -144,10 +141,10 @@ class Webhook {
 		}
 		try {
 			$data_store = \WC_Data_Store::load( 'webhook' );
-			$args       = array(
+			$args       = [
 				'limit'  => - 1,
 				'offset' => 0,
-			);
+			];
 			$webhooks   = $data_store->search_webhooks( $args );
 			foreach ( $webhooks as $webhook_id ) {
 				$webhook = wc_get_webhook( $webhook_id );
@@ -161,7 +158,8 @@ class Webhook {
 				}
 				$webhook->delete();
 			}
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 		}
 	}

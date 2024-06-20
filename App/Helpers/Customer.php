@@ -447,13 +447,12 @@ class Customer {
 		return (bool) apply_filters( 'wc_retainful_allow_cart_recovery_user_login', ! user_can( $user, 'edit_others_posts' ), $user );
 	}
 
-	
 	/**
 	 * Get the user agent of client.
 	 *
-	 * @param   null  $order
+	 * @param   \WC_Order|null  $order  Order Object
 	 *
-	 * @return mixed|string|null
+	 * @return mixed
 	 */
 	public static function getUserAgent( $order = null ) {
 

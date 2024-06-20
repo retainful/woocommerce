@@ -562,7 +562,7 @@ class Order {
 		}
 		$hook     = 'retainful_sync_abandoned_cart_order';
 		$meta_key = '_rnoc_order_id';
-		if ( ! WP::hasAnyActiveScheduleExists( $hook, $order_id, $meta_key ) ) {
+		if ( ! WP::hasAnyActiveScheduleExists( $hook, $meta_key, $order_id ) ) {
 			WP::scheduleEvents( $hook, current_time( 'timestamp' ) + 60, array( $meta_key => $order_id ) );
 		}
 	}
