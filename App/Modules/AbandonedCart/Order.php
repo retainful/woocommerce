@@ -27,7 +27,8 @@ class Order {
 		if ( ! is_admin() || $order_id <= 0 ) {
 			return;
 		}
-		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' ) == 'yes' ) {
+
+		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' ) !== 'yes' ) {
 			return;
 		}
 		$this->syncOrder( $order_id );
@@ -134,7 +135,7 @@ class Order {
 			'tax_lines'                 => [],
 			'total_tax'                 => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderData( 'total_tax', $order, 0 ) ),
 			'cart_token'                => $cart_token,
-			'created_at'                => WC::formatToIso8601( $cart_created_at ),
+			'created_at'                => WC::formatToIso8601( strtotime( $cart_created_at ) ),
 			'line_items'                => $this->getOrderLineItemsDetails( $order ),
 			'updated_at'                => WC::formatToIso8601(),
 			'source_name'               => 'web',
@@ -472,6 +473,7 @@ class Order {
 			$order_object->update_meta_data( '_rnoc_get_http_user_agent', $user_agent );
 			$order_object->update_meta_data( '_rnoc_get_http_accept_language', $user_accept_language );
 			$order_object->update_meta_data( self::$pending_recovery_key_for_db, true );
+			$order_object->save_meta_data();
 			$order_object->save();
 		}
 
@@ -493,9 +495,8 @@ class Order {
 			$cart_token = $this->retrieveCartToken();
 
 			if ( ! empty( $cart_token ) ) {
-				$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
 				$this->updateOrderMeta( $order_id );
-				self::syncOrderToAPI( $order, $order_id );
+				self::syncOrderToAPI( $order_id );
 			}
 		}
 		catch ( Exception $e ) {
@@ -510,13 +511,14 @@ class Order {
 	 * @param   \WC_Order  $order     Order object.
 	 * @param   int        $order_id  order id.
 	 */
-	public function syncOrderToAPI( $order, $order_id ) {
+	public function syncOrderToAPI( $order_id ) {
 		$background_order_sync = Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' );
 		if ( $background_order_sync == 'no' ) {
 			return;
 		}
 		if ( self::needInstantOrderSync() ) {
-			$cart = $this->getOrderData( $order );
+			$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
+			$cart  = $this->getOrderData( $order );
 			if ( ! empty( $cart ) ) {
 				$cart_hash = self::getEncryptData( $cart );
 				//Reduce the loading speed
@@ -582,7 +584,7 @@ class Order {
 			$cart_token = $this->retrieveCartToken();
 			if ( ! empty( $cart_token ) ) {
 				$this->updateOrderMeta( $order_id );
-				$this->syncOrderToAPI( $order, $order_id );
+				$this->syncOrderToAPI( $order_id );
 			}
 		}
 		catch ( Exception $e ) {

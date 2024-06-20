@@ -40,8 +40,8 @@ class Request {
 	/**
 	 * Connect to RetainFul api.
 	 *
-	 * @param string $api_key Api key.
-	 * @param array $data Request data.
+	 * @param   string  $api_key  Api key.
+	 * @param   array   $data     Request data.
 	 *
 	 * @return array
 	 */
@@ -64,8 +64,8 @@ class Request {
 	/**
 	 * Synchronise cart data.
 	 *
-	 * @param array $data Request data.
-	 * @param array $extra_headers Extra headers.
+	 * @param   array  $data           Request data.
+	 * @param   array  $extra_headers  Extra headers.
 	 *
 	 * @return array
 	 */
@@ -89,8 +89,8 @@ class Request {
 	/**
 	 * Get retrieve cart details.
 	 *
-	 * @param string $api_key Api key.
-	 * @param string $cart_token Cart token.
+	 * @param   string  $api_key     Api key.
+	 * @param   string  $cart_token  Cart token.
 	 *
 	 * @return array
 	 */
@@ -107,9 +107,9 @@ class Request {
 	/**
 	 * Send post request.
 	 *
-	 * @param string $url Request url.
-	 * @param array|string $body Request Body.
-	 * @param array $headers Headers.
+	 * @param   string        $url      Request url.
+	 * @param   array|string  $body     Request Body.
+	 * @param   array         $headers  Headers.
 	 *
 	 * @return array|mixed|string|\WP_Error
 	 */
@@ -132,9 +132,11 @@ class Request {
 				$response = json_decode( $response, true );
 			}
 
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 		}
+
 
 		return $response;
 	}
@@ -142,8 +144,8 @@ class Request {
 	/**
 	 * Get request.
 	 *
-	 * @param string $url Request url.
-	 * @param array $headers Headers.
+	 * @param   string  $url      Request url.
+	 * @param   array   $headers  Headers.
 	 *
 	 * @return array|mixed|string|\WP_Error
 	 */
@@ -163,7 +165,8 @@ class Request {
 				$response = json_decode( $response, true );
 			}
 
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 		}
 
