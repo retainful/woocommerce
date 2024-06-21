@@ -285,8 +285,7 @@ class Order {
 			}
 			$order->save();
 		}
-		$completed_at = ( ! empty( $order_placed_at ) ) ? WC::formatToIso8601( $order_placed_at ) : null;
-
+		$completed_at = ( ! empty( $order_placed_at ) ) ? WC::formatToIso8601( strtotime($order_placed_at) ) : null;
 
 		return apply_filters( 'rnoc_order_completed_at', $completed_at, $order );
 	}
@@ -421,6 +420,9 @@ class Order {
 	 *
 	 */
 	public function setRetainfulOrderData() {
+		if(!is_checkout() && !is_cart()){
+			return;
+		}
 		$draft_order = WC::getSession( 'store_api_draft_order' );
 		if ( ! empty( $draft_order ) && intval( $draft_order ) > 0 ) {
 			$cart_token             = $this->retrieveCartToken();
@@ -519,6 +521,7 @@ class Order {
 		if ( self::needInstantOrderSync() ) {
 			$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
 			$cart  = $this->getOrderData( $order );
+
 			if ( ! empty( $cart ) ) {
 				$cart_hash = self::getEncryptData( $cart );
 				//Reduce the loading speed
@@ -591,5 +594,20 @@ class Order {
 		}
 	}
 
+	/**
+	 * Order had some changes
+	 *
+	 * @param int $order_id Order id.
+	 *
+	 * @return void|null
+	 */
+	public function orderUpdated($order_id){
+
+		if ( $this->needInstantOrderSync() ) {
+			$this->syncOrder( $order_id );
+		} else {
+			$this->scheduleCartSync( $order_id );
+		}
+	}
 
 }

@@ -75,7 +75,7 @@ class Router {
 			add_action( 'woocommerce_store_api_checkout_update_order_meta', [ $order, 'apiCheckoutOrderProcessed' ] );
 			//add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
 			// handle placed orders
-			//add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
+			add_action('woocommerce_order_status_changed', array($order, 'orderUpdated'), 11, 1);
 
 			//triggers when admin changes the order
 			add_action( 'wp_footer', [ $order, 'setRetainfulOrderData' ] );
