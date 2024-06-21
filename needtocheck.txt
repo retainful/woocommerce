@@ -1,7 +1,0 @@
-need to discuss :
-  1.why webhook sync in back end side option we did't use the setting in any where
-  2.the apiordersyn need or not ( 'rnoc_sync_order_data_instantly_to_api');
-
-  GET THE REQUEST FUNCTION DOMAIN NAME
-
-  REQUEST
