@@ -279,7 +279,7 @@ class Order {
 				if ( ! $is_order_recovered && \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_by', $order ) == 1 ) {
 					$order->delete_meta_data( self::$pending_recovery_key_for_db );
 					$order->update_meta_data( self::$order_recovered_key_for_db, true );
-					$order->add_order_note( __( 'Order recovered by Retainful.', RNOC_TEXT_DOMAIN ) );
+					$order->add_order_note( __( 'Order recovered by Retainful.', 'retainful-next-order-coupon-for-woocommerce' ) );
 					do_action( 'rnoc_abandoned_order_recovered', $order );
 				}
 			}
@@ -605,4 +605,166 @@ class Order {
 		}
 	}
 
+	/**
+	 * Handle order completion in order page.
+	 *
+	 * @param   int  $order_id  Order id.
+	 */
+	function payPageOrderCompletion( $order_id ) {
+		self::unsetOrderTempData();
+	}
+
+	/**
+	 * Unset the temporary cart token and order data.
+	 */
+	function unsetOrderTempData() {
+		Settings::getStorage()->remove( self::$cart_token_key );
+		Settings::getStorage()->remove( self::$pending_recovery_key );
+		Settings::getStorage()->remove( self::$cart_tracking_started_key );
+		Settings::getStorage()->remove( self::$previous_cart_hash_key );
+		//This was set in plugin since 2.0.4
+		Settings::getStorage()->remove( 'rnoc_force_refresh_cart' );
+		Settings::getStorage()->remove( 'rnoc_recovered_at' );
+		Settings::getStorage()->remove( 'rnoc_current_cart_hash' );
+		Settings::getStorage()->remove( 'rnoc_recovered_by_retainful' );
+		Settings::getStorage()->remove( 'rnoc_recovered_cart_token' );
+		if ( $user_id = get_current_user_id() ) {
+			self::removeTempDataForUser( $user_id );
+		}
+	}
+
+	/**
+	 * Delete temp data of the user.
+	 *
+	 * @param   int  $user_id  User id.
+	 */
+	public static function removeTempDataForUser( $user_id ) {
+		if ( empty( $user_id ) || !is_int( $user_id ) ){
+			return;
+		}
+		delete_user_meta( $user_id, self::$cart_token_key_for_db );
+		delete_user_meta( $user_id, self::$pending_recovery_key_for_db );
+		delete_user_meta( $user_id, self::$cart_tracking_started_key_for_db );
+		delete_user_meta( $user_id, self::$user_ip_key_for_db );
+	}
+
+	/**
+	 * Payment completed.
+	 *
+	 * @param   int  $order_id  order id.
+	 *
+	 */
+	public function paymentCompleted( $order_id ) {
+		if( empty( $order_id ) ){
+			return;
+		}
+		if ( \RNOC\App\Helpers\Order::getOrder( $order_id ) ) {
+			\RNOC\App\Helpers\Order::setCustomerPayingForOrder( $order_id );
+		}
+		$cart_token = $this->retrieveCartToken();
+		if ( ! empty( $cart_token ) ) {
+			$this->unsetOrderTempData();
+		}
+	}
+
+	/**
+	 * Clear any persistent cart session data for logged in customers
+	 *
+	 * @param   int     $order_id  order ID
+	 * @param   string  $old_status
+	 * @param   string  $new_status
+	 */
+	public function orderStatusChanged( $order_id, $old_status, $new_status ) {
+		if( empty( $order_id ) || empty( $new_status ) ){
+			return ;
+		}
+		global $wp;
+		try {
+			// PayPal IPN request
+			if ( isset( $wp->query_vars['wc-api'] )
+			     && ! empty( $wp->query_vars['wc-api'] )
+			     && ( 'WC_Gateway_Paypal' === $wp->query_vars['wc-api'] )
+			) {
+				$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
+				// PayPal order is completed or authorized: clear any user session
+				// data so that we don't have to rely on the thank-you page rendering
+				if ( ( \RNOC\App\Helpers\Order::isOrderPaid( $order )
+				       || $new_status == 'on-hold' )
+				     && ( $user_id
+						= \RNOC\App\Helpers\Order::getOrderUserId( $order ) )
+				) {
+					delete_user_meta(
+						$user_id,
+						'_woocommerce_persistent_cart_' . get_current_blog_id()
+					);
+					if ( $this->isPendingRecovery( $user_id ) ) {
+						\RNOC\App\Helpers\Order::setOrderMeta(
+							$order_id, self::$pending_recovery_key_for_db, true
+						);
+					}
+					if ( $this->retrieveCartToken( $user_id ) ) {
+						$this->removeTempDataForUser( $user_id );
+					}
+				}
+			}
+		}
+		catch ( Exception $e ) {
+		}
+	}
+
+	/**
+	 * Check the cart is in pending recovery.
+	 *
+	 * @param   int|null  $user_id  User id.
+	 *
+	 * @return bool
+	 */
+	function isPendingRecovery( $user_id = null ) {
+		if ( $user_id || ( $user_id = get_current_user_id() ) ) {
+			return (bool) get_user_meta( $user_id,
+				self::$pending_recovery_key_for_db, true );
+		} else {
+			return (bool) Settings::getStorage()->get( self::$pending_recovery_key );
+		}
+	}
+
+	/**
+	 * Show GDPR message under email address field in checkout.
+	 *
+	 * @param array $fields Checkout fields.
+	 *
+	 * @return array
+	 */
+	public function guestGdprMessage( $fields ) {
+		if( empty( $fields ) || !is_array( $fields ) ){
+			return [];
+		}
+		$enable_gdpr_compliance = Settings::get(  RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
+		$message                = Settings::get(  RNOC_PLUGIN_PREFIX . 'cart_capture_msg', 'Keep me up to date on news and exclusive offers' );
+		$field_name             = Settings::get(  RNOC_PLUGIN_PREFIX . 'gdpr_display_position', 'after_billing_email' );
+		if ( $enable_gdpr_compliance && $field_name == 'after_billing_email' && ! empty( $fields['billing']['billing_email'] ) ) {
+			$fields['billing'][ RNOC_PLUGIN_PREFIX . 'allow_gdpr' ] = [
+				'label'    => __( $message, 'retainful-next-order-coupon-for-woocommerce' ),
+				'type'     => 'checkbox',
+				'priority' => $fields['billing']['billing_email']['priority'],
+				'default'  => (int) self::isBuyerAcceptsMarketing()
+			];
+		}
+		return $fields;
+	}
+
+	/**
+	 * Show GDPR message under the terms and condition field in checkout.
+	 */
+	public function guestTermGdprMessage()
+	{
+		$enable_gdpr_compliance = Settings::get(  RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
+		$field_name             = Settings::get(  RNOC_PLUGIN_PREFIX . 'gdpr_display_position', 'after_billing_email' );
+		$message                = Settings::get(  RNOC_PLUGIN_PREFIX . 'cart_capture_msg', 'Keep me up to date on news and exclusive offers' );
+		if ( $enable_gdpr_compliance && $field_name == 'after_term_and_condition' && $message ) {
+			echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
+            name="' . RNOC_PLUGIN_PREFIX . 'allow_gdpr' . '" id="' . RNOC_PLUGIN_PREFIX . 'allow_gdpr' . '" ' . ( self::isBuyerAcceptsMarketing() ? 'checked="checked"' : '' ) . ' />
+					<span class="woocommerce-terms-and-conditions-checkbox-text">' . __( $message,  'retainful-next-order-coupon-for-woocommerce' ) . ' ' . __( '(optional)',  'retainful-next-order-coupon-for-woocommerce' ) . '</span>';
+		}
+	}
 }

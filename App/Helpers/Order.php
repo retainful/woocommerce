@@ -28,7 +28,8 @@ class Order {
 	 * @return WC_Order|WC_Order_Refund|bool
 	 */
 	public static function getOrder( $order_or_id ) {
-		return function_exists( 'wc_get_order' ) ? wc_get_order( $order_or_id ) : false;
+		return function_exists( 'wc_get_order' ) ? wc_get_order( $order_or_id )
+			: false;
 	}
 
 	/**
@@ -40,7 +41,8 @@ class Order {
 	 * @return mixed
 	 */
 	public static function getOrderMeta( $meta_key, $order ) {
-		return Util::isMethodExists( $order, 'get_meta' ) ? $order->get_meta( $meta_key ) : '';
+		return Util::isMethodExists( $order, 'get_meta' )
+			? $order->get_meta( $meta_key ) : '';
 	}
 
 	/**
@@ -59,10 +61,11 @@ class Order {
 			'billing_email' => $email,
 			'orderby'       => 'ID',
 			'order'         => 'DESC',
-			'limit'         => $limit
+			'limit'         => $limit,
 		];
 
-		return apply_filters( 'rnoc_get_customer_orders_by_email', wc_get_orders( $args ) );
+		return apply_filters( 'rnoc_get_customer_orders_by_email',
+			wc_get_orders( $args ) );
 	}
 
 	/**
@@ -73,7 +76,8 @@ class Order {
 	 * @return string
 	 */
 	public static function getOrderBillingEmail( $order ) {
-		return Util::isMethodExists( $order, 'get_billing_email' ) ? $order->get_billing_email() : '';
+		return Util::isMethodExists( $order, 'get_billing_email' )
+			? $order->get_billing_email() : '';
 	}
 
 	/**
@@ -84,7 +88,8 @@ class Order {
 	 * @return float
 	 */
 	public static function getOrderTotal( $order ) {
-		return Util::isMethodExists( $order, 'get_total' ) ? $order->get_total() : 0;
+		return Util::isMethodExists( $order, 'get_total' ) ? $order->get_total()
+			: 0;
 	}
 
 	/**
@@ -102,7 +107,8 @@ class Order {
 		}
 		$method = 'get_' . $key;
 
-		return Util::isMethodExists( $order, $method ) ? $order->$method() : $default;
+		return Util::isMethodExists( $order, $method ) ? $order->$method()
+			: $default;
 	}
 
 	/**
@@ -113,11 +119,12 @@ class Order {
 	 * @return array
 	 */
 	public static function getUsedCoupons( $order ) {
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.7.0', '<' ) ) {
+		if ( defined( 'WC_VERSION' )
+		     && version_compare( WC_VERSION, '3.7.0', '<' ) ) {
 			if ( Util::isMethodExists( $order, 'get_used_coupons' ) ) {
 				return $order->get_used_coupons();
 			}
-		} else if ( Util::isMethodExists( $order, 'get_coupon_codes' ) ) {
+		} elseif ( Util::isMethodExists( $order, 'get_coupon_codes' ) ) {
 			return $order->get_coupon_codes();
 		}
 
@@ -144,9 +151,9 @@ class Order {
 	/**
 	 * Set order meta.
 	 *
-	 * @param int $order_id Order id.
-	 * @param string $meta_key Meta key.
-	 * @param mixed $meta_value Meta value.
+	 * @param   int     $order_id    Order id.
+	 * @param   string  $meta_key    Meta key.
+	 * @param   mixed   $meta_value  Meta value.
 	 *
 	 * @return void
 	 */
@@ -161,8 +168,8 @@ class Order {
 	/**
 	 * Get order created date.
 	 *
-	 * @param WC_Order $order Order object.
-	 * @param string $format Display format.
+	 * @param   WC_Order  $order   Order object.
+	 * @param   string    $format  Display format.
 	 *
 	 * @return string|null
 	 */
@@ -182,7 +189,7 @@ class Order {
 	/**
 	 * Get order number.
 	 *
-	 * @param WC_Order $order Order object.
+	 * @param   WC_Order  $order  Order object.
 	 *
 	 * @return int|string
 	 */
@@ -197,7 +204,7 @@ class Order {
 	/**
 	 * Get order items.
 	 *
-	 * @param WC_Order $order Order object.
+	 * @param   WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -212,8 +219,8 @@ class Order {
 	/**
 	 * Get order paid date.
 	 *
-	 * @param WC_Order $order Order object.
-	 * @param string $format Date format.
+	 * @param   WC_Order  $order   Order object.
+	 * @param   string    $format  Date format.
 	 *
 	 * @return null
 	 */
@@ -223,10 +230,13 @@ class Order {
 		}
 		if ( Util::isMethodExists( $order, 'get_date_paid' ) ) {
 			$date_object = $order->get_date_paid();
-			if ( is_object( $date_object ) && Util::isMethodExists( $date_object, 'getTimestamp' ) ) {
+			if ( is_object( $date_object )
+			     && Util::isMethodExists( $date_object, 'getTimestamp' ) ) {
 				$date = $date_object->getTimestamp();
 
-				return ! empty( $format ) && Util::isMethodExists( $date_object, 'format' ) ? $date_object->format( $format ) : $date;
+				return ! empty( $format )
+				       && Util::isMethodExists( $date_object, 'format' )
+					? $date_object->format( $format ) : $date;
 			}
 		}
 
@@ -236,7 +246,7 @@ class Order {
 	/**
 	 * Get retainful order status.
 	 *
-	 * @param string $order_status Order status.
+	 * @param   string  $order_status  Order status.
 	 *
 	 * @return string
 	 */
@@ -246,13 +256,19 @@ class Order {
 		}
 
 		$changeable_order_statuses = [ 'checkout-draft' ];
-		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status', 1 ) == 1 ) {
+		if ( Settings::get( RNOC_PLUGIN_PREFIX
+		                    . 'consider_cancelled_as_abandoned_status', 1 )
+		     == 1 ) {
 			$changeable_order_statuses[] = 'cancelled';
 		}
-		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status', 0 ) == 1 ) {
+		if ( Settings::get( RNOC_PLUGIN_PREFIX
+		                    . 'consider_on_hold_as_abandoned_status', 0 )
+		     == 1 ) {
 			$changeable_order_statuses[] = 'cancelled';
 		}
-		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status', 0 ) == 1 ) {
+		if ( Settings::get( RNOC_PLUGIN_PREFIX
+		                    . 'consider_failed_as_abandoned_status', 0 )
+		     == 1 ) {
 			$changeable_order_statuses[] = 'cancelled';
 		}
 		if ( in_array( $order_status, $changeable_order_statuses ) ) {
@@ -265,7 +281,7 @@ class Order {
 	/**
 	 * Get order subtotal.
 	 *
-	 * @param WC_Order $order Order object.
+	 * @param   WC_Order  $order  Order object.
 	 *
 	 * @return float
 	 */
@@ -280,17 +296,21 @@ class Order {
 	/**
 	 * Get order language.
 	 *
-	 * @param WC_Order $order Order object.
+	 * @param   WC_Order  $order  Order object.
 	 *
 	 * @return string
 	 */
 	public static function getOrderLanguage( $order ) {
-		$language          = is_object( $order ) ? self::getOrderMeta( 'wpml_language', $order ) : '';
+		$language          = is_object( $order )
+			? self::getOrderMeta( 'wpml_language', $order ) : '';
 		$selected_language = '';
 		if ( ! empty( $language ) ) {
-			$languages = function_exists( 'icl_get_languages' ) ? icl_get_languages() : [];
+			$languages = function_exists( 'icl_get_languages' )
+				? icl_get_languages() : [];
 			if ( ! empty( $languages ) && ! empty( $languages[ $language ] ) ) {
-				$selected_language = ! empty( $languages[ $language ]['default_locale'] ) ? $languages[ $language ]['default_locale'] : '';
+				$selected_language
+					= ! empty( $languages[ $language ]['default_locale'] )
+					? $languages[ $language ]['default_locale'] : '';
 			}
 		}
 		if ( empty( $selected_language ) ) {
@@ -303,8 +323,8 @@ class Order {
 	/**
 	 * Get order discount.
 	 *
-	 * @param WC_Order $order Order object.
-	 * @param bool $excluding is excluding tax.
+	 * @param   WC_Order  $order      Order object.
+	 * @param   bool      $excluding  is excluding tax.
 	 *
 	 * @return float
 	 */
@@ -319,7 +339,7 @@ class Order {
 	/**
 	 * Get item subtotal.
 	 *
-	 * @param \WC_Order_Item_Product $item Order item object.
+	 * @param   \WC_Order_Item_Product  $item  Order item object.
 	 *
 	 * @return float
 	 */
@@ -334,7 +354,7 @@ class Order {
 	/**
 	 * Get item subtotal tax.
 	 *
-	 * @param \WC_Order_Item_Product $item Order item object.
+	 * @param   \WC_Order_Item_Product  $item  Order item object.
 	 *
 	 * @return float
 	 */
@@ -349,7 +369,7 @@ class Order {
 	/**
 	 * Get order items total.
 	 *
-	 * @param WC_Order $order Order object.
+	 * @param   WC_Order  $order  Order object.
 	 *
 	 * @return float|int
 	 */
@@ -371,8 +391,8 @@ class Order {
 	/**
 	 * Get order shipping total.
 	 *
-	 * @param WC_Order $order Order object.
-	 * @param string $context Context.
+	 * @param   WC_Order  $order    Order object.
+	 * @param   string    $context  Context.
 	 *
 	 * @return float
 	 */
@@ -385,7 +405,7 @@ class Order {
 	}
 
 	/**
-	 * @param WC_Order $order Order object.
+	 * @param   WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -400,7 +420,7 @@ class Order {
 	/**
 	 * Get payment method.
 	 *
-	 * @param WC_Order $order Order object.
+	 * @param   WC_Order  $order  Order object.
 	 *
 	 * @return string
 	 */
@@ -415,7 +435,7 @@ class Order {
 	/**
 	 * Get payment method title.
 	 *
-	 * @param WC_Order $order Order object.
+	 * @param   WC_Order  $order  Order object.
 	 *
 	 * @return string
 	 */
@@ -435,7 +455,8 @@ class Order {
 	 * @return string
 	 */
 	public static function getOrderReceivedURL( $order ) {
-		return Util::isMethodExists( $order, 'get_checkout_order_received_url' ) ? $order->get_checkout_order_received_url() : '';
+		return Util::isMethodExists( $order, 'get_checkout_order_received_url' )
+			? $order->get_checkout_order_received_url() : '';
 	}
 
 	/**
@@ -446,7 +467,8 @@ class Order {
 	 * @return string
 	 */
 	public static function getOrderPaymentURL( $order ) {
-		return Util::isMethodExists( $order, 'get_checkout_payment_url' ) ? $order->get_checkout_payment_url() : '';
+		return Util::isMethodExists( $order, 'get_checkout_payment_url' )
+			? $order->get_checkout_payment_url() : '';
 	}
 
 	/**
@@ -459,7 +481,9 @@ class Order {
 	 */
 
 	public static function applyCouponToOrder( $coupon, $order ) {
-		if ( ! self::isValidCoupon( $coupon ) || ! Util::isMethodExists( $order, "apply_coupon" ) || ! self::canApplyCoupon( $coupon, $order ) ) {
+		if ( ! self::isValidCoupon( $coupon )
+		     || ! Util::isMethodExists( $order, "apply_coupon" )
+		     || ! self::canApplyCoupon( $coupon, $order ) ) {
 			return false;
 		}
 		if ( $order->apply_coupon( $coupon ) === true ) {
@@ -493,7 +517,6 @@ class Order {
 				return $discounts->is_coupon_valid( $coupon );
 			}
 			catch ( \Exception $e ) {
-
 			}
 		}
 
@@ -509,20 +532,21 @@ class Order {
 	 * @return bool
 	 */
 	public static function canApplyCoupon( $coupon_code, $order ) {
-		if ( empty( $coupon_code ) || ! Util::isMethodExists( $order, 'get_items' ) ) {
+		if ( empty( $coupon_code )
+		     || ! Util::isMethodExists( $order, 'get_items' ) ) {
 			return false;
 		}
 		$new_coupon = new \WC_Coupon( $coupon_code );
 		if ( ! Util::isMethodExists( $new_coupon, 'get_individual_use' ) ) {
 			return false;
 		}
-		if ( $new_coupon->get_individual_use() && count( $order->get_items( 'coupon' ) ) ) {
+		if ( $new_coupon->get_individual_use()
+		     && count( $order->get_items( 'coupon' ) ) ) {
 			return false;
 		}
 
 		return true;
 	}
-
 
 	/**
 	 * Get order Email form order object.
@@ -533,9 +557,9 @@ class Order {
 	 * @return bool
 	 */
 	public static function hasOrderStatus( $order, $status ) {
-		return Util::isMethodExists( $order, 'has_status' ) && $order->has_status( $status );
+		return Util::isMethodExists( $order, 'has_status' )
+		       && $order->has_status( $status );
 	}
-
 
 	/**
 	 * Set order status.
@@ -547,7 +571,8 @@ class Order {
 	 * @return bool
 	 */
 	public static function setOrderStatus( $order, $status, $note ) {
-		return Util::isMethodExists( $order, 'update_status' ) && $order->update_status( $status, $note );
+		return Util::isMethodExists( $order, 'update_status' )
+		       && $order->update_status( $status, $note );
 	}
 
 	/**
@@ -557,7 +582,8 @@ class Order {
 	 * @param   string     $note   Order note.
 	 */
 	public static function setOrderNote( $order, $note ) {
-		Util::isMethodExists( $order, 'add_order_note' ) && $order->add_order_note( $note );
+		Util::isMethodExists( $order, 'add_order_note' )
+		&& $order->add_order_note( $note );
 	}
 
 	/**
@@ -568,9 +594,9 @@ class Order {
 	 * @return bool
 	 */
 	public static function isOrderNeedPayment( $order ) {
-		return Util::isMethodExists( $order, 'needs_payment' ) && $order->needs_payment();
+		return Util::isMethodExists( $order, 'needs_payment' )
+		       && $order->needs_payment();
 	}
-
 
 	/**
 	 * Get the woocommerce checkout url.
@@ -579,7 +605,8 @@ class Order {
 	 *
 	 */
 	public static function getCheckoutUrl() {
-		$checkout_url = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : '';
+		$checkout_url = function_exists( 'wc_get_checkout_url' )
+			? wc_get_checkout_url() : '';
 
 		return apply_filters( 'rnoc_get_checkout_url', $checkout_url );
 	}
@@ -664,18 +691,63 @@ class Order {
 				if ( ! $applied_discount instanceof \WC_Coupon ) {
 					$applied_discount = new \WC_Coupon( $applied_discount );
 				}
-				$discounts[] = array(
+				$discounts[] = [
 					'id'            => $i,
 					'usage_count'   => self::getCouponUsageCount( $applied_discount ),
 					'code'          => self::getCouponCode( $applied_discount ),
 					'date_expires'  => self::getCouponDateExpires( $applied_discount ),
 					'discount_type' => self::getCouponDiscountType( $applied_discount ),
 					'created_at'    => null,
-					'updated_at'    => null
-				);
+					'updated_at'    => null,
+				];
 			}
 		}
 
 		return $discounts;
 	}
+
+	/**
+	 * Order payment completed - This is a paying customer.
+	 *
+	 * @param   int  $order_id  Order id.
+	 *
+	 */
+	public static function setCustomerPayingForOrder( $order_id ) {
+		if ( function_exists( 'wc_paying_customer' ) ) {
+			wc_paying_customer( intval( $order_id ) );
+		}
+	}
+
+	/**
+	 * Is order is paid.
+	 *
+	 * @param   WC_Order  $order  Order object.
+	 *
+	 * @return bool
+	 */
+	public static function isOrderPaid( $order ) {
+		if ( Util::isMethodExists( $order, 'is_paid' ) ) {
+			return $order->is_paid();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get order user id.
+	 *
+	 * @param   WC_Order  $order  Order Object.
+	 *
+	 * @return mixed|null
+	 */
+	public static function getOrderUserId( $order ) {
+		if ( Util::isMethodExists( $order, 'get_user_id' ) ) {
+			return $order->get_user_id();
+		} elseif ( is_object( $order ) && isset( $order->user_id ) ) {
+			return $order->user_id;
+		}
+
+		return null;
+	}
+
 }

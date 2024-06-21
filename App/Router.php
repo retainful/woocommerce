@@ -5,6 +5,7 @@ namespace RNOC\App;
 use RNOC\App\Controllers\Admin\Settings;
 use RNOC\App\Controllers\Site\Popups;
 use RNOC\App\Controllers\Site\RestApi;
+use RNOC\App\Helpers\Customer;
 use RNOC\App\Modules\AbandonedCart\Cart;
 use RNOC\App\Helpers\Settings as SettingsHelper;
 use RNOC\App\Modules\AbandonedCart\Order;
@@ -65,17 +66,17 @@ class Router {
 			}
 			//add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
 
-			//add_action('wp_authenticate', array($cart, 'userLoggedOn'));
-			//add_action( 'user_register', array( $cart, 'userSignedUp' ) );
-			//add_action('wp_logout', array($cart, 'userLoggedOut'));
+			add_action( 'wp_authenticate', [ Customer::class, 'userLoggedOn' ] );
+			add_action( 'user_register', [ Customer::class, 'userSignedUp' ] );
+			add_action( 'wp_logout', [ Customer::class, 'userLoggedOut' ] );
 			$order = new Order();
-			//add_action('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
-			//add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
+			add_action( 'woocommerce_thankyou', [ $order, 'payPageOrderCompletion' ] );
+			add_action( 'woocommerce_payment_complete', [ $order, 'paymentCompleted' ] );
 			add_action( 'woocommerce_checkout_update_order_meta', [ $order, 'checkoutOrderProcessed' ] );
 			add_action( 'woocommerce_store_api_checkout_update_order_meta', [ $order, 'apiCheckoutOrderProcessed' ] );
-			//add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
+			add_action( 'woocommerce_order_status_changed', [ $order, 'orderStatusChanged' ], 15, 3 );
 			// handle placed orders
-			add_action('woocommerce_order_status_changed', array($order, 'orderUpdated'), 11, 1);
+			add_action( 'woocommerce_order_status_changed', [ $order, 'orderUpdated' ], 11, 1 );
 
 			//triggers when admin changes the order
 			add_action( 'wp_footer', [ $order, 'setRetainfulOrderData' ] );
@@ -127,10 +128,11 @@ class Router {
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
-			$cart = new Cart();
+			$cart  = new Cart();
+			$order = new Order();
 			add_action( 'woocommerce_cart_loaded_from_session', [ $cart, 'handlePersistentCart' ] );
-			//add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
-			//add_action('woocommerce_checkout_after_terms_and_conditions', array($cart, 'guestTermGdprMessage'));
+			add_filter( 'woocommerce_checkout_fields', [ $order, 'guestGdprMessage' ], 10, 1 );
+			add_action( 'woocommerce_checkout_after_terms_and_conditions', [ $order, 'guestTermGdprMessage' ] );
 		}
 
 	}
