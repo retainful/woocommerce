@@ -16,12 +16,7 @@ use RNOC\App\Modules\Storage\Cookie;
 defined( 'ABSPATH' ) || exit;
 
 class Cart extends AbandonedCart {
-
-	protected static $cart_token_key = "rnoc_user_cart_token", $cart_token_key_for_db = "_rnoc_user_cart_token";
-	protected static $cart_tracking_started_key = "rnoc_cart_created_at", $cart_tracking_started_key_for_db = "_rnoc_cart_tracking_started_at";
-	protected static $pending_recovery_key = "rnoc_is_pending_recovery";
-	protected static $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
-
+	
 	/**
 	 * Display tracking div.
 	 *
@@ -42,7 +37,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Get cart fragments.
 	 *
-	 * @param array $fragments Fragment data.
+	 * @param   array  $fragments  Fragment data.
 	 *
 	 * @return array
 	 */
@@ -54,7 +49,7 @@ class Cart extends AbandonedCart {
 		$data = [];
 		if ( self::isValidCartToTrack() ) {
 			if ( ! empty( $cart_created_at ) ) {
-				$data = $this->getCartTrackingData();;
+				$data = $this->getCartTrackingData();
 			} else {
 				$storage       = Settings::getStorage();
 				$force_refresh = $storage->get( 'rnoc_force_refresh_cart' );
@@ -96,7 +91,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Get tracking div.
 	 *
-	 * @param array $cart_data Tracking data.
+	 * @param   array  $cart_data  Tracking data.
 	 *
 	 * @return string
 	 */
@@ -228,7 +223,7 @@ class Cart extends AbandonedCart {
 		$cart_token            = $this->getCartToken();
 		$customer_details      = Customer::getCartCustomer();
 		$created_at            = strtotime( self::getTrackingStartAt() );
-		$cart_total            = WC::formatDecimalPrice( CartHelper::getCartTotal() );
+		$cart_total            = WC::formatDecimalPrice( CartHelper::getCartTotal( 'edit' ) );
 		$current_currency_code = WC::getCurrentCurrencyCode();
 		$default_currency_code = WC::getDefaultCurrency();
 		$storage               = Settings::getStorage();
@@ -272,6 +267,7 @@ class Cart extends AbandonedCart {
 			'recovered_cart_token'      => $storage->get( 'rnoc_recovered_cart_token' ),
 			'client_details'            => Customer::getClientDetails()
 		];
+
 
 		return apply_filters( 'rnoc_get_user_cart', $cart );
 	}
@@ -317,6 +313,7 @@ class Cart extends AbandonedCart {
 					'compare_at' => 0,
 				];
 			}
+
 			$cat_ids = ! empty( $product_id ) && $product_id > 0 ? Product::getProductCategoryIds( $product_id ) : [];
 			$items[] = apply_filters( 'rnoc_get_cart_line_item_details', [
 				'key'           => $item_key,
@@ -349,7 +346,7 @@ class Cart extends AbandonedCart {
 	 */
 	public static function getCartTotals() {
 		return [
-			'total_price'     => WC::formatDecimalPrice( CartHelper::getCartTotal() ),
+			'total_price'     => WC::formatDecimalPrice( CartHelper::getCartTotal( 'edit' ) ),
 			'subtotal_price'  => WC::formatDecimalPrice( CartHelper::getCartSubTotal() ),
 			'total_tax'       => WC::formatDecimalPrice( CartHelper::getCartTaxTotal() + CartHelper::getCartShippingTaxTotal() ),
 			'total_discounts' => WC::formatDecimalPrice( CartHelper::getCartTotalDiscount() ),
@@ -400,7 +397,8 @@ class Cart extends AbandonedCart {
 
 		try {
 			$this->reCreateCart( $token, $hash );
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 
 
 		}
@@ -412,8 +410,8 @@ class Cart extends AbandonedCart {
 	/**
 	 * Recreate the woocommerce cart.
 	 *
-	 * @param string $token cart token.
-	 * @param string $hash hash token.
+	 * @param   string  $token  cart token.
+	 * @param   string  $hash   hash token.
 	 *
 	 * @return false|void
 	 * @throws \Exception
@@ -512,8 +510,8 @@ class Cart extends AbandonedCart {
 	/**
 	 * Sync the cart details to server.
 	 *
-	 * @param string $app_id app id.
-	 * @param string $cart_token cart token.
+	 * @param   string  $app_id      app id.
+	 * @param   string  $cart_token  cart token.
 	 *
 	 * @return array|bool|mixed|object|string
 	 */
@@ -535,7 +533,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * recreate the cart for gust user.
 	 *
-	 * @param array $data recover cart data.
+	 * @param   array  $data  recover cart data.
 	 *
 	 * @return void
 	 * @throws \Exception
@@ -572,7 +570,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * recreate the cart from cart content.
 	 *
-	 * @param array $cart_contents cart content.
+	 * @param   array  $cart_contents  cart content.
 	 */
 	public static function recreateCartFromCartContents( $cart_contents ) {
 
@@ -622,8 +620,8 @@ class Cart extends AbandonedCart {
 	/**
 	 * Remove key value pairs from list.
 	 *
-	 * @param $full_list
-	 * @param array $remove_list
+	 * @param          $full_list
+	 * @param   array  $remove_list
 	 */
 	public static function unsetFromArray( &$full_list, $remove_list = array() ) {
 		if ( ! empty( $remove_list ) ) {
@@ -638,7 +636,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Returns $coupons, with any invalid coupons removed.
 	 *
-	 * @param \WC_Coupon $coupons coupon object.
+	 * @param   \WC_Coupon  $coupons  coupon object.
 	 *
 	 * @return mixed|null
 	 * @throws \Exception
@@ -662,7 +660,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Get Order ID from cart token
 	 *
-	 * @param string $cart_token cart token
+	 * @param   string  $cart_token  cart token
 	 *
 	 * @return string|null
 	 */
@@ -679,7 +677,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Get User ID from cart token
 	 *
-	 * @param string $cart_token cart token
+	 * @param   string  $cart_token  cart token
 	 *
 	 * @return string|null
 	 */
@@ -696,7 +694,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * populate cart from session data
 	 *
-	 * @param array $data cart data
+	 * @param   array  $data  cart data
 	 */
 	function populateSessionDetails( $data ) {
 		$customer_email = isset( $data['email'] ) ? $data['email'] : '';

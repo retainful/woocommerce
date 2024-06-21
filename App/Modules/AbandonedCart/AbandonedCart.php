@@ -12,8 +12,6 @@ defined( 'ABSPATH' ) || exit;
 class AbandonedCart {
 	use SyncData;
 
-	const HMAC_ALGORITHM = 'sha256';
-	const CIPHER_METHOD = 'AES256';
 
 	/**
 	 * Check is valid cart to track.
@@ -35,42 +33,6 @@ class AbandonedCart {
 
 
 	/**
-	 * Retrieve cart token.
-	 *
-	 * @param int $user_id User id.
-	 *
-	 * @return string
-	 */
-	public function retrieveCartToken( $user_id = null ) {
-		if ( $user_id == null ) {
-			$user_id = get_current_user_id();
-		}
-		if ( ! empty( $user_id ) ) {
-			$token = get_user_meta( $user_id, self::$cart_token_key_for_db, true );
-		} else {
-			$storage = Settings::getStorage();
-			$token   = $storage->get( self::$cart_token_key );
-		}
-
-		return apply_filters( 'rnoc_retrieve_cart_token', $token, $user_id, $this );
-	}
-
-	/**
-	 * Get cart token.
-	 *
-	 * @return string
-	 */
-	public function getCartToken() {
-		$cart_token = $this->retrieveCartToken();
-		if ( empty( $cart_token ) ) {
-			$cart_token = $this->generateCartToken();
-			$this->setCartToken( $cart_token );
-		}
-
-		return apply_filters( 'rnoc_get_cart_token', $cart_token, $this );
-	}
-
-	/**
 	 * Generate cart token.
 	 *
 	 * @return string
@@ -81,7 +43,8 @@ class AbandonedCart {
 			$data[6] = chr( ord( $data[6] ) & 0x0f | 0x40 ); // set version to 0100
 			$data[8] = chr( ord( $data[8] ) & 0x3f | 0x80 ); // set bits 6-7 to 10
 			$token   = vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split( bin2hex( $data ), 4 ) );
-		} catch ( \Exception $e ) {
+		}
+		catch ( \Exception $e ) {
 			// fall back to mt_rand if random_bytes is unavailable
 			$token = sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 				// 32 bits for "time_low"
@@ -106,8 +69,8 @@ class AbandonedCart {
 	/**
 	 * Set cart token.
 	 *
-	 * @param string $cart_token Cart token.
-	 * @param int $user_id User id.
+	 * @param   string  $cart_token  Cart token.
+	 * @param   int     $user_id     User id.
 	 *
 	 * @return void
 	 */
@@ -129,8 +92,8 @@ class AbandonedCart {
 	/**
 	 * Set cart created date.
 	 *
-	 * @param int $time Time stamp.
-	 * @param int|null $user_id User id.
+	 * @param   int       $time     Time stamp.
+	 * @param   int|null  $user_id  User id.
 	 *
 	 * @return void
 	 */
@@ -143,69 +106,6 @@ class AbandonedCart {
 		}
 	}
 
-	/**
-	 * Generate cart hash.
-	 *
-	 * @return string
-	 */
-	public static function generateCartHash() {
-		$cart = \RNOC\App\Helpers\Cart::getCart();
-		if ( empty( $cart ) ) {
-			return '';
-		}
-		$cart_session = [];
-		foreach ( $cart as $key => $values ) {
-			$cart_session[ $key ] = $values;
-			unset( $cart_session[ $key ]['data'] ); // Unset product object.
-		}
-
-		return $cart_session ? md5( wp_json_encode( $cart_session ) . \RNOC\App\Helpers\Cart::getCartTotal( 'edit' ) ) : '';
-	}
-
-	/**
-	 * Get tracking start date.
-	 *
-	 * @param int|null $user_id User id.
-	 *
-	 * @return mixed
-	 */
-	public static function getTrackingStartAt( $user_id = null ) {
-		if ( $user_id || $user_id = get_current_user_id() ) {
-			$cart_created_at = get_user_meta( $user_id, self::$cart_tracking_started_key_for_db, true );
-		} else {
-			$storage         = Settings::getStorage();
-			$cart_created_at = $storage->get( self::$cart_tracking_started_key );
-		}
-
-		return $cart_created_at;
-	}
-
-	/**
-	 * Get retainful api url.
-	 *
-	 * @return string
-	 */
-	private static function getRetainfulApiUrl() {
-		$scheme = wc_site_is_https() ? 'https' : 'http';
-
-		return get_option( 'permalink_structure' )
-			? get_home_url( null, 'wc-api/retainful', $scheme )
-			: add_query_arg( 'wc-api', 'retainful', get_home_url( null, null, $scheme ) );
-	}
-
-	/**
-	 * Is allow buyer accept marketing.
-	 *
-	 * @return bool
-	 */
-	public static function isBuyerAcceptsMarketing() {
-		$enable_gdpr_compliance = Settings::get( RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
-		if ( $enable_gdpr_compliance ) {
-			return in_array( WC::getSession( 'is_buyer_accepting_marketing' ), array( 1, 'true' ) );
-		}
-
-		return true;
-	}
 
 	/**
 	 * Get tracking id.
@@ -246,7 +146,7 @@ class AbandonedCart {
 	/**
 	 * Compare with previous cart.
 	 *
-	 * @param string $current_cart_hash Current cart hash.
+	 * @param   string  $current_cart_hash  Current cart hash.
 	 *
 	 * @return bool
 	 */

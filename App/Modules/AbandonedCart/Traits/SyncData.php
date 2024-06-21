@@ -8,6 +8,8 @@ use RNOC\App\Helpers\Settings;
 use RNOC\App\Helpers\WC;
 
 trait SyncData {
+	protected static $hmac_algorithm = 'sha256';
+	protected static $cipher_method = 'AES256';
 	protected static $cart_token_key_for_db = '_rnoc_user_cart_token';
 	protected static $cart_token_key = 'rnoc_user_cart_token';
 	protected static $cart_tracking_started_key = 'rnoc_cart_created_at';
@@ -45,8 +47,8 @@ trait SyncData {
 	/**
 	 * Can track abandoned cart.
 	 *
-	 * @param string $ip_address Ip address.
-	 * @param \WC_Order $order Order object.
+	 * @param   string     $ip_address  Ip address.
+	 * @param   \WC_Order  $order       Order object.
 	 *
 	 * @return bool
 	 */
@@ -61,11 +63,11 @@ trait SyncData {
 	/**
 	 * Get line item total.
 	 *
-	 * @param array $item Line item.
+	 * @param   array  $item  Line item.
 	 *
 	 * @return float
 	 */
-	function getLineItemTotal( $item ) {
+	public function getLineItemTotal( $item ) {
 		$line_total     = ( isset( $item['line_total'] ) && ! empty( $item['line_total'] ) ) ? $item['line_total'] : 0;
 		$line_total_tax = 0;
 		if ( ! WC::isPriceExcludingTax() ) {
@@ -79,7 +81,7 @@ trait SyncData {
 	/**
 	 * Is valid order status.
 	 *
-	 * @param string $order_status Order status.
+	 * @param   string  $order_status  Order status.
 	 *
 	 * @return bool
 	 */
@@ -106,9 +108,9 @@ trait SyncData {
 	/**
 	 * Get currency details.
 	 *
-	 * @param float $cart_total Cart total.
-	 * @param string $current_currency_code Current currency.
-	 * @param string $default_currency_code default currency.
+	 * @param   float   $cart_total             Cart total.
+	 * @param   string  $current_currency_code  Current currency.
+	 * @param   string  $default_currency_code  default currency.
 	 *
 	 * @return array
 	 */
@@ -136,8 +138,8 @@ trait SyncData {
 	/**
 	 * Convert price.
 	 *
-	 * @param float $price Price.
-	 * @param float $rate Convert rate.
+	 * @param   float  $price  Price.
+	 * @param   float  $rate   Convert rate.
 	 *
 	 * @return float
 	 */
@@ -152,7 +154,7 @@ trait SyncData {
 	/**
 	 * Get recovery url.
 	 *
-	 * @param string $cart_token Cart token.
+	 * @param   string  $cart_token  Cart token.
 	 *
 	 * @return string
 	 */
@@ -164,9 +166,11 @@ trait SyncData {
 		// encode
 		$data   = base64_encode( wp_json_encode( $data ) );
 		$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
-		// add hash for easier verification that the checkout URL hasn't been tampered with
-		$hash = hash_hmac( self::HMAC_ALGORITHM, $data, $secret );
-		$url  = self::getRetainfulApiUrl();
+
+
+		$hash = hash_hmac( self::$hmac_algorithm, $data, $secret );
+
+		$url = self::getRetainfulApiUrl();
 
 		return esc_url_raw( add_query_arg( array( 'token' => rawurlencode( $data ), 'hash' => $hash ), $url ) );
 	}
@@ -174,8 +178,8 @@ trait SyncData {
 	/**
 	 * Get encrypt data.
 	 *
-	 * @param mixed $data Data.
-	 * @param string $secret Secret key.
+	 * @param   mixed   $data    Data.
+	 * @param   string  $secret  Secret key.
 	 *
 	 * @return string|null
 	 */
@@ -188,17 +192,122 @@ trait SyncData {
 				if ( empty( $secret ) ) {
 					$secret = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
 				}
-				$iv_len          = openssl_cipher_iv_length( self::CIPHER_METHOD );
+				$iv_len          = openssl_cipher_iv_length( self::$cipher_method );
 				$iv              = openssl_random_pseudo_bytes( $iv_len );
-				$cipher_text_raw = openssl_encrypt( $data, self::CIPHER_METHOD, $secret, OPENSSL_RAW_DATA, $iv );
-				$hmac            = hash_hmac( self::HMAC_ALGORITHM, $cipher_text_raw, $secret, true );
+				$cipher_text_raw = openssl_encrypt( $data, self::$cipher_method, $secret, OPENSSL_RAW_DATA, $iv );
+				$hmac            = hash_hmac( self::$hmac_algorithm, $cipher_text_raw, $secret, true );
 
 				return base64_encode( bin2hex( $iv ) . ':retainful:' . bin2hex( $hmac ) . ':retainful:' . bin2hex( $cipher_text_raw ) );
-			} catch ( \Exception $e ) {
+			}
+			catch ( \Exception $e ) {
 				return null;
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Retrieve cart token.
+	 *
+	 * @param   int  $user_id  User id.
+	 *
+	 * @return string
+	 */
+	public function retrieveCartToken( $user_id = null ) {
+
+		if ( $user_id == null ) {
+			$user_id = get_current_user_id();
+		}
+		if ( ! empty( $user_id ) ) {
+			$token = get_user_meta( $user_id, self::$cart_token_key_for_db, true );
+		} else {
+			$storage = Settings::getStorage();
+			$token   = $storage->get( self::$cart_token_key );
+		}
+
+		return apply_filters( 'rnoc_retrieve_cart_token', $token, $user_id, $this );
+	}
+
+
+	/**
+	 * Get cart token.
+	 *
+	 * @return string
+	 */
+	public function getCartToken() {
+
+		$cart_token = $this->retrieveCartToken();
+		if ( empty( $cart_token ) ) {
+			$cart_token = $this->generateCartToken();
+			$this->setCartToken( $cart_token );
+		}
+
+		return apply_filters( 'rnoc_get_cart_token', $cart_token, $this );
+	}
+
+	/**
+	 * Is allow buyer accept marketing.
+	 *
+	 * @return bool
+	 */
+	public static function isBuyerAcceptsMarketing() {
+		$enable_gdpr_compliance = Settings::get( RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
+		if ( $enable_gdpr_compliance ) {
+			return in_array( WC::getSession( 'is_buyer_accepting_marketing' ), array( 1, 'true' ) );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Generate cart hash.
+	 *
+	 * @return string
+	 */
+	public static function generateCartHash() {
+		$cart = \RNOC\App\Helpers\Cart::getCart();
+		if ( empty( $cart ) ) {
+			return '';
+		}
+		$cart_session = [];
+		foreach ( $cart as $key => $values ) {
+			$cart_session[ $key ] = $values;
+			unset( $cart_session[ $key ]['data'] ); // Unset product object.
+		}
+
+		return $cart_session ? md5( wp_json_encode( $cart_session ) . \RNOC\App\Helpers\Cart::getCartTotal() ) : '';
+	}
+
+	/**
+	 * Get retainful api url.
+	 *
+	 * @return string
+	 */
+	private static function getRetainfulApiUrl() {
+		$scheme = function_exists( 'wc_site_is_https' ) && wc_site_is_https() ? 'https' : 'http';
+
+		return get_option( 'permalink_structure' )
+			? get_home_url( null, 'wc-api/retainful', $scheme )
+			: add_query_arg( 'wc-api', 'retainful', get_home_url( null, null, $scheme ) );
+	}
+
+
+	/**
+	 * Get tracking start date.
+	 *
+	 * @param   int|null  $user_id  User id.
+	 *
+	 * @return mixed
+	 */
+	public static function getTrackingStartAt( $user_id = null ) {
+		if ( $user_id || $user_id = get_current_user_id() ) {
+			$cart_created_at = get_user_meta( $user_id, self::$cart_tracking_started_key_for_db, true );
+		} else {
+			$storage         = Settings::getStorage();
+			$cart_created_at = $storage->get( self::$cart_tracking_started_key );
+		}
+
+		return $cart_created_at;
 	}
 }

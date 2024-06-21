@@ -2,10 +2,13 @@
 
 namespace RNOC\App\Modules\AbandonedCart;
 
+use Exception;
 use RNOC\App\Helpers\Customer;
 use RNOC\App\Helpers\Product;
 use RNOC\App\Helpers\Settings;
 use RNOC\App\Helpers\WC;
+use RNOC\App\Helpers\Webhook;
+use RNOC\App\Helpers\WP;
 use RNOC\App\Modules\AbandonedCart\Traits\SyncData;
 
 defined( 'ABSPATH' ) || exit;
@@ -16,7 +19,7 @@ class Order {
 	/**
 	 * Backend order change time synchronization.
 	 *
-	 * @param int $order_id Order id.
+	 * @param   int  $order_id  Order id.
 	 *
 	 * @return void
 	 */
@@ -24,7 +27,8 @@ class Order {
 		if ( ! is_admin() || $order_id <= 0 ) {
 			return;
 		}
-		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' ) == 'yes' ) {
+
+		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' ) !== 'yes' ) {
 			return;
 		}
 		$this->syncOrder( $order_id );
@@ -33,11 +37,11 @@ class Order {
 	/**
 	 * synchronize order.
 	 *
-	 * @param int $order_id Order id.
+	 * @param   int  $order_id  Order id.
 	 *
 	 * @return void
 	 */
-	function syncOrder( $order_id ) {
+	public function syncOrder( $order_id ) {
 		if ( $order_id <= 0 || Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' ) == 'yes' ) {
 			return;
 		}
@@ -57,6 +61,8 @@ class Order {
 		}
 
 		$order_data = $this->getOrderData( $order );
+
+
 		if ( empty( $order_data ) ) {
 			return;
 		}
@@ -79,7 +85,7 @@ class Order {
 	/**
 	 * Get order data.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -129,14 +135,14 @@ class Order {
 			'tax_lines'                 => [],
 			'total_tax'                 => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderData( 'total_tax', $order, 0 ) ),
 			'cart_token'                => $cart_token,
-			'created_at'                => WC::formatToIso8601( $cart_created_at ),
+			'created_at'                => WC::formatToIso8601( strtotime( $cart_created_at ) ),
 			'line_items'                => $this->getOrderLineItemsDetails( $order ),
 			'updated_at'                => WC::formatToIso8601(),
 			'source_name'               => 'web',
 			'total_price'               => $cart_total,
-			'completed_at'              => $this->getCompletedAt( $order ),
+			'completed_at'              => self::getCompletedAt( $order ),
 			'total_weight'              => 0,
-			'discount_codes'            => WC::getAppliedDiscounts( $order ),
+			'discount_codes'            => \RNOC\App\Helpers\Order::getAppliedDiscounts( $order ),
 			'order_status'              => apply_filters( 'rnoc_abandoned_cart_order_status', $order_status, $order ),
 			'shipping_lines'            => [],
 			'subtotal_price'            => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderSubTotal( $order ) ),
@@ -151,7 +157,7 @@ class Order {
 			'total_line_items_price'    => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderItemsTotal( $order ) ),
 			'buyer_accepts_marketing'   => ( $is_buyer_accepts_marketing == 1 ),
 			'cancelled_at'              => \RNOC\App\Helpers\Order::getOrderMeta( self::$order_cancelled_date_key_for_db, $order ),
-			'woocommerce_totals'        => $this->getOrderTotals( $order, $excluding_tax ),
+			'woocommerce_totals'        => self::getOrderTotals( $order, $excluding_tax ),
 
 			'recovered_by_retainful' => (bool) \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_by', $order ),
 			'recovered_cart_token'   => \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_cart_token', $order ),
@@ -174,7 +180,7 @@ class Order {
 	/**
 	 * Get order cart token.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return string
 	 */
@@ -185,7 +191,7 @@ class Order {
 	/**
 	 * Get order line items.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -256,7 +262,8 @@ class Order {
 	 *
 	 * @return void|null
 	 */
-	function getCompletedAt( $order = '' ) {
+	public static function getCompletedAt( $order = '' ) {
+
 		if ( ! $order instanceof \WC_Order ) {
 			return null;
 		}
@@ -278,7 +285,7 @@ class Order {
 			}
 			$order->save();
 		}
-		$completed_at = ( ! empty( $order_placed_at ) ) ? WC::formatToIso8601( $order_placed_at ) : null;
+		$completed_at = ( ! empty( $order_placed_at ) ) ? WC::formatToIso8601( strtotime( $order_placed_at ) ) : null;
 
 		return apply_filters( 'rnoc_order_completed_at', $completed_at, $order );
 	}
@@ -286,8 +293,8 @@ class Order {
 	/**
 	 * Get order totals.
 	 *
-	 * @param \WC_Order $order Order object.
-	 * @param bool $excluding_tax Is excluding tax.
+	 * @param   \WC_Order  $order          Order object.
+	 * @param   bool       $excluding_tax  Is excluding tax.
 	 *
 	 * @return array
 	 */
@@ -305,8 +312,8 @@ class Order {
 	/**
 	 * Get order fee details.
 	 *
-	 * @param \WC_Order $order Order object.
-	 * @param bool $excluding_tax Is excluding tax.
+	 * @param   \WC_Order  $order          Order object.
+	 * @param   bool       $excluding_tax  Is excluding tax.
 	 *
 	 * @return array
 	 */
@@ -327,4 +334,275 @@ class Order {
 
 		return $fee_items;
 	}
+
+	/**
+	 *  Change webhook header data.
+	 *
+	 * @param   array  $http_args   Http argument data.
+	 * @param   int    $order_id    Order id.
+	 * @param   int    $webhook_id  Webhook id.
+	 *                              return mixed
+	 *
+	 * @throws \Exception
+	 */
+	public function changeWebHookHeader( $http_args, $order_id, $webhook_id ) {
+		$is_app_connected = Settings::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' );
+		if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! $is_app_connected ) {
+			return $http_args;
+		}
+		try {
+			$webhook      = new \WC_Webhook( $webhook_id );
+			$topic        = $webhook->get_topic();
+			$topic_status = Webhook::getWebHookStatus();
+			if ( ! isset( $topic_status[ $topic ] ) || ! $topic_status[ $topic ] ) {
+				return $http_args;
+			}
+			$delivery_url      = $webhook->get_delivery_url();
+			$site_delivery_url = Webhook::getDeliveryUrl();
+			if ( $delivery_url != $site_delivery_url || $order_id <= 0 ) {
+				return $http_args;
+			}
+			$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
+
+			$cart_token = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
+
+			if ( empty( $cart_token ) ) {
+				//Usually we should not force generate the cart token as this would sync all the old orders otherwise, if their status changes.
+				$force_generate_cart_token = apply_filters( 'rnoc_force_generate_cart_token', false, $http_args, $order_id, $webhook_id );
+
+				if ( $force_generate_cart_token === true ) {
+					//Let's generate a token and set to the order meta
+					$cart_token = AbandonedCart::generateCartToken();
+					\RNOC\App\Helpers\Order::setOrderMeta( $order_id, self::$cart_token_key_for_db, $cart_token );
+				}
+			}
+
+			if ( empty( $cart_token ) ) {
+				//bail on empty cart token
+				return $http_args;
+			}
+			$order_data = $this->getOrderData( $order );
+
+			if ( is_array( $order_data ) && ! empty( $order_data ) ) {
+				$client_ip     = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
+				$token         = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
+				$app_id        = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'licence' );
+				$extra_headers = [
+					"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
+					"X-Retainful-Version"  => RNOC_VERSION,
+					"X-Cart-Token"         => $token,
+					"Cart-Token"           => $token,
+					"app-id"               => $app_id,
+					"app_id"               => $app_id,
+					"Content-Type"         => 'application/json'
+				];
+				foreach ( $extra_headers as $key => $value ) {
+					$http_args['headers'][ $key ] = $value;
+				}
+				$cart_hash         = self::getEncryptData( $order_data );
+				$body              = [
+					'data' => $cart_hash
+				];
+				$http_args['body'] = trim( wp_json_encode( $body ) );
+			}
+		}
+		catch ( Exception $e ) {
+
+		}
+
+		return $http_args;
+	}
+
+
+	/**
+	 * Set retainful related data to order.
+	 */
+	public function setRetainfulOrderData() {
+		if ( ! is_checkout() && ! is_cart() ) {
+			return;
+		}
+		$draft_order = WC::getSession( 'store_api_draft_order' );
+		if ( ! empty( $draft_order ) && intval( $draft_order ) > 0 ) {
+			$cart_token             = $this->retrieveCartToken();
+			$order                  = \RNOC\App\Helpers\Order::getOrder( intval( $draft_order ) );
+			$draft_order_cart_token = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
+			if ( empty( $draft_order_cart_token ) && empty( $cart_token ) ) {
+				$this->getCartToken();
+			}
+
+			$this->updateOrderMeta( intval( $draft_order ) );
+			WC::removeSession( 'store_api_draft_order' );
+		}
+	}
+
+	/**
+	 * Update the order metadata after purchase.
+	 *
+	 * @param   int  $order_id  Order id.
+	 *
+	 * @return void
+	 */
+	public function updateOrderMeta( $order_id ) {
+		if ( empty( $order_id ) ) {
+			return;
+		}
+		//TODO remove carthash from session after success place order
+		$cart_token = $this->retrieveCartToken();
+		if ( empty( $cart_token ) ) {
+			return;
+		}
+		$cart_created_at            = self::getTrackingStartAt();
+		$user_ip                    = Customer::getUserIPDetails();
+		$is_buyer_accepts_marketing = ( self::isBuyerAcceptsMarketing() ) ? 1 : 0;
+		$cart_hash                  = self::generateCartHash();
+		$recovered_at               = Settings::getStorage()->get( 'rnoc_recovered_at' );
+		$recovered_by               = Settings::getStorage()->get( 'rnoc_recovered_by_retainful' );
+		$recovered_cart_token       = Settings::getStorage()->get( 'rnoc_recovered_cart_token' );
+		$user_agent                 = Customer::getUserAgent();
+		$user_accept_language       = Customer::getUserAcceptLanguage();
+		$order_object               = \RNOC\App\Helpers\Order::getOrder( $order_id );
+		if ( is_object( $order_object ) && ! empty( $order_object ) ) {
+			$order_object->update_meta_data( self::$cart_token_key_for_db, $cart_token );
+			$order_object->update_meta_data( self::$cart_hash_key_for_db, $cart_hash );
+			$order_object->update_meta_data( self::$cart_tracking_started_key_for_db, $cart_created_at );
+			$order_object->update_meta_data( self::$user_ip_key_for_db, $user_ip );
+			$order_object->update_meta_data( self::$accepts_marketing_key_for_db, $is_buyer_accepts_marketing );
+			$order_object->update_meta_data( '_rnoc_recovered_at', $recovered_at );
+			$order_object->update_meta_data( '_rnoc_recovered_by', $recovered_by );
+			$order_object->update_meta_data( '_rnoc_recovered_cart_token', $recovered_cart_token );
+			$order_object->update_meta_data( '_rnoc_get_http_user_agent', $user_agent );
+			$order_object->update_meta_data( '_rnoc_get_http_accept_language', $user_accept_language );
+			$order_object->update_meta_data( self::$pending_recovery_key_for_db, true );
+			$order_object->save_meta_data();
+			$order_object->save();
+		}
+
+	}
+
+
+	/**
+	 * Update normal checkout order.
+	 *
+	 * @param   int  $order_id  Order id.
+	 */
+	public function checkoutOrderProcessed( $order_id ) {
+
+		if ( $order_id <= 0 ) {
+			return;
+		}
+		try {
+			$cart_token = $this->retrieveCartToken();
+
+			if ( ! empty( $cart_token ) ) {
+				$this->updateOrderMeta( $order_id );
+				self::syncOrderToAPI( $order_id );
+			}
+		}
+		catch ( Exception $e ) {
+		}
+
+		return;
+	}
+
+	/**
+	 * Sync order to api.
+	 *
+	 * @param   \WC_Order  $order     Order object.
+	 * @param   int        $order_id  order id.
+	 */
+	public function syncOrderToAPI( $order_id ) {
+		$background_order_sync = Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' );
+		if ( $background_order_sync == 'no' ) {
+			return;
+		}
+		if ( self::needInstantOrderSync() ) {
+			$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
+			$cart  = $this->getOrderData( $order );
+
+			if ( ! empty( $cart ) ) {
+				$cart_hash = self::getEncryptData( $cart );
+				//Reduce the loading speed
+				$client_ip = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
+				$token     = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
+				if ( ! empty( $cart_hash ) ) {
+					$extra_headers = array(
+						"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
+						"X-Retainful-Version"  => RNOC_VERSION,
+						"X-Cart-Token"         => $token,
+						"Cart-Token"           => $token
+					);
+					Request::syncCart( [ 'data' => $cart_hash ], $extra_headers );
+				}
+			}
+		} else {
+			self::scheduleCartSync( $order_id );
+
+		}
+	}
+
+	/**
+	 * Need the instant sync or not.
+	 * @return mixed|void
+	 */
+	public static function needInstantOrderSync() {
+		return apply_filters( 'rnoc_sync_order_data_instantly_to_api', true );
+	}
+
+
+	/**
+	 * Schedule the sync of the cart.
+	 *
+	 * @param   int  $order_id  Order id.
+	 */
+	public static function scheduleCartSync( $order_id ) {
+		if ( ! apply_filters( 'rnoc_schedule_cart_sync', true ) ) {
+			return;
+		}
+		$hook     = 'retainful_sync_abandoned_cart_order';
+		$meta_key = '_rnoc_order_id';
+		if ( ! WP::hasAnyActiveScheduleExists( $hook, $meta_key, $order_id ) ) {
+			WP::scheduleEvents( $hook, current_time( 'timestamp' ) + 60, array( $meta_key => $order_id ) );
+		}
+	}
+
+
+	/**
+	 * Update block checkout checkout order.
+	 *
+	 * @param   \WC_Order  $order  Order object.
+	 *
+	 * @return void
+	 */
+	public function apiCheckoutOrderProcessed( $order ) {
+		if ( ! is_object( $order ) ) {
+			return;
+		}
+		$order_id = \RNOC\App\Helpers\Order::getOrderId( $order );
+		try {
+			$cart_token = $this->retrieveCartToken();
+			if ( ! empty( $cart_token ) ) {
+				$this->updateOrderMeta( $order_id );
+				$this->syncOrderToAPI( $order_id );
+			}
+		}
+		catch ( Exception $e ) {
+		}
+	}
+
+	/**
+	 * Order had some changes
+	 *
+	 * @param   int  $order_id  Order id.
+	 *
+	 * @return void|null
+	 */
+	public function orderUpdated( $order_id ) {
+
+		if ( $this->needInstantOrderSync() ) {
+			$this->syncOrder( $order_id );
+		} else {
+			$this->scheduleCartSync( $order_id );
+		}
+	}
+
 }

@@ -148,7 +148,9 @@ class Cart {
 	 * @return float
 	 */
 	public static function getCartSubTotal() {
-		if ( ! function_exists( 'WC' ) || isset( WC()->cart ) ) {
+
+
+		if ( ! function_exists( 'WC' ) || ! isset( WC()->cart ) ) {
 			return 0.0;
 		}
 

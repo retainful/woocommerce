@@ -30,7 +30,6 @@ class Customer {
 
 	/**
 	 * Get address fields.
-	 *
 	 * @return array
 	 */
 	public static function getAddressFields() {
@@ -51,9 +50,9 @@ class Customer {
 	/**
 	 * Set customer details.
 	 *
-	 * @param string $from From address.
-	 * @param string $set To address.
-	 * @param string|object $address_value To address.
+	 * @param   string         $from           From address.
+	 * @param   string         $set            To address.
+	 * @param   string|object  $address_value  To address.
 	 *
 	 * @return void
 	 */
@@ -88,7 +87,7 @@ class Customer {
 	/**
 	 * Set customer email.
 	 *
-	 * @param string $billing_email Customer email.
+	 * @param   string  $billing_email  Customer email.
 	 *
 	 * @return void
 	 */
@@ -100,7 +99,6 @@ class Customer {
 
 	/**
 	 * Get cart customer.
-	 *
 	 * @return array
 	 */
 	public static function getCartCustomer() {
@@ -128,7 +126,6 @@ class Customer {
 
 	/**
 	 * Get billing address.
-	 *
 	 * @return array
 	 */
 	public static function getCartBillingAddress() {
@@ -151,7 +148,6 @@ class Customer {
 
 	/**
 	 * Get shipping address.
-	 *
 	 * @return array
 	 */
 	public static function getCartShippingAddress() {
@@ -177,7 +173,7 @@ class Customer {
 	/**
 	 * Get Order customer.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -227,7 +223,7 @@ class Customer {
 	/**
 	 * Get order billing address.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -258,7 +254,7 @@ class Customer {
 	/**
 	 * Get order shipping address.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return array
 	 */
@@ -290,7 +286,7 @@ class Customer {
 	/**
 	 * Get client details.
 	 *
-	 * @param \WC_Order $order order object
+	 * @param   \WC_Order  $order  order object
 	 *
 	 * @return array
 	 */
@@ -305,7 +301,7 @@ class Customer {
 	/**
 	 * Get user agent language.
 	 *
-	 * @param \WC_Order $order Order object.
+	 * @param   \WC_Order  $order  Order object.
 	 *
 	 * @return string
 	 */
@@ -323,7 +319,6 @@ class Customer {
 
 	/**
 	 * Customer user ip.
-	 *
 	 * @return string
 	 */
 	public static function getUserIPDetails() {
@@ -334,7 +329,6 @@ class Customer {
 
 	/**
 	 * Get client ip.
-	 *
 	 * @return string
 	 */
 	public static function getClientIP() {
@@ -361,7 +355,6 @@ class Customer {
 
 	/**
 	 * Get Customer email.
-	 *
 	 * @return string
 	 */
 	public static function getCustomerBillingEmail() {
@@ -376,8 +369,8 @@ class Customer {
 	/**
 	 * Get customer data.
 	 *
-	 * @param string $key Customer key.
-	 * @param mixed $default Customer data default value.
+	 * @param   string  $key      Customer key.
+	 * @param   mixed   $default  Customer data default value.
 	 *
 	 * @return mixed
 	 */
@@ -397,7 +390,7 @@ class Customer {
 	/**
 	 * Login the recover cart user.
 	 *
-	 * @param int $user_id user id.
+	 * @param   int  $user_id  user id.
 	 *
 	 * @return bool
 	 */
@@ -418,7 +411,7 @@ class Customer {
 	/**
 	 * update recover cart user data.
 	 *
-	 * @param int $user_id user id.
+	 * @param   int  $user_id  user id.
 	 *
 	 * @return bool
 	 */
@@ -439,7 +432,7 @@ class Customer {
 	/**
 	 * Allowed to be logged in for cart recovery.
 	 *
-	 * @param int|\WP_User $user user id
+	 * @param   int|\WP_User  $user  user id
 	 *
 	 * @return bool
 	 */
@@ -447,5 +440,24 @@ class Customer {
 		return (bool) apply_filters( 'wc_retainful_allow_cart_recovery_user_login', ! user_can( $user, 'edit_others_posts' ), $user );
 	}
 
+	/**
+	 * Get the user agent of a client.
+	 *
+	 * @param   \WC_Order|null  $order  Order object.
+	 *
+	 * @return string
+	 */
+	public static function getUserAgent( $order = null ) {
+
+		if ( ! empty( $order ) ) {
+			return Order::getOrderMeta( '_rnoc_get_http_user_agent', $order );
+		}
+
+		if ( ! empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
+			return $_SERVER['HTTP_USER_AGENT'];
+		}
+
+		return '';
+	}
 
 }

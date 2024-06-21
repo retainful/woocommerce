@@ -50,7 +50,6 @@ class Router {
 			add_action( 'wp_ajax_nopriv_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
 
 			add_action( 'woocommerce_api_retainful', [ $cart, 'recoverUserCart' ] );
-			//add_action('wp_footer', array($checkout, 'setRetainfulOrderData'));
 
 			//add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
 			//add_action('woocommerce_removed_coupon', array($cart, 'removeNextOrderCouponFromCart'));
@@ -67,21 +66,22 @@ class Router {
 			//add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
 
 			//add_action('wp_authenticate', array($cart, 'userLoggedOn'));
-			//add_action('user_register', array($cart, 'userSignedUp'));
+			//add_action( 'user_register', array( $cart, 'userSignedUp' ) );
 			//add_action('wp_logout', array($cart, 'userLoggedOut'));
-
+			$order = new Order();
 			//add_action('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
 			//add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
-			//add_action('woocommerce_checkout_update_order_meta', array($checkout, 'checkoutOrderProcessed'));
-			//add_action('woocommerce_store_api_checkout_update_order_meta', array($checkout, 'apiCheckoutOrderProcessed'));
-			$order = new Order();
+			add_action( 'woocommerce_checkout_update_order_meta', [ $order, 'checkoutOrderProcessed' ] );
+			add_action( 'woocommerce_store_api_checkout_update_order_meta', [ $order, 'apiCheckoutOrderProcessed' ] );
 			//add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
 			// handle placed orders
-			//add_action('woocommerce_order_status_changed', array($checkout, 'orderUpdated'), 11, 1);
-			//triggers when admin changes the order
-			add_action( 'woocommerce_process_shop_order_meta', [ $order, 'orderUpdatedShopBackend' ], 50, 2 );
+			add_action('woocommerce_order_status_changed', array($order, 'orderUpdated'), 11, 1);
 
-			//add_filter('woocommerce_webhook_http_args', array($checkout, 'changeWebHookHeader'), 10, 3);
+			//triggers when admin changes the order
+			add_action( 'wp_footer', [ $order, 'setRetainfulOrderData' ] );
+
+			add_action( 'woocommerce_process_shop_order_meta', [ $order, 'orderUpdatedShopBackend' ], 50, 2 );
+			add_filter( 'woocommerce_webhook_http_args', [ $order, 'changeWebHookHeader' ], 10, 3 );
 
 		}
 
@@ -134,4 +134,5 @@ class Router {
 		}
 
 	}
+
 }

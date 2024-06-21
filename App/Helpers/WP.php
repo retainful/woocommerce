@@ -8,7 +8,6 @@ class WP {
 
 	/**
 	 * Has admin privilege.
-	 *
 	 * @return bool
 	 */
 	public static function hasAdminPrivilege() {
@@ -17,7 +16,6 @@ class WP {
 
 	/**
 	 * Check is customer page.
-	 *
 	 * @return bool
 	 */
 	public static function isCustomerPage() {
@@ -30,7 +28,6 @@ class WP {
 
 	/**
 	 * Get login user.
-	 *
 	 * @return false|\WP_User|null
 	 */
 	public static function getLoginUser() {
@@ -39,7 +36,6 @@ class WP {
 
 	/**
 	 * Get login user email.
-	 *
 	 * @return string
 	 */
 	public static function getLoginUserEmail() {
@@ -106,7 +102,6 @@ class WP {
 	 *
 	 * @param   string  $action
 	 *
-	 *
 	 * @return false|string
 	 */
 	public static function createNonce( $action = '' ) {
@@ -138,7 +133,6 @@ class WP {
 	 * Verify nonce.
 	 *
 	 * @param   string  $nonce   Nonce.
-	 *
 	 * @param   string  $action  Action.
 	 *
 	 * @return bool
@@ -153,7 +147,6 @@ class WP {
 
 	/**
 	 * Get the default language.
-	 *
 	 * @return string|null
 	 */
 	public static function getDefaultLanguage() {
@@ -177,7 +170,6 @@ class WP {
 
 	/**
 	 * Get the current language.
-	 *
 	 * @return string|null
 	 */
 	public static function getCurrentLanguage() {
@@ -196,7 +188,6 @@ class WP {
 	 * Set the auth cookie.
 	 *
 	 * @param   int  $user_id  User id.
-	 *
 	 */
 	public static function setAuthCookie( $user_id ) {
 		function_exists( 'wp_set_auth_cookie' ) && wp_set_auth_cookie( $user_id );
@@ -220,7 +211,6 @@ class WP {
 
 	/**
 	 * Get current user id.
-	 *
 	 * @return int
 	 */
 	public static function getCurrentUserId() {
@@ -238,5 +228,159 @@ class WP {
 	public static function setCurrentUser( $user_id ) {
 		function_exists( 'set_current_user' ) && set_current_user( $user_id );
 	}
+
+
+	/**
+	 * Add post-meta.
+	 *
+	 * @param   int    $post_id  Post id.
+	 * @param   array  $args     Arguments.
+	 *
+	 * @return bool
+	 */
+	public static function addPostMeta( $post_id, $args ) {
+		if ( empty( $post_id ) || ! is_int( $post_id ) || empty( $args ) || ! is_array( $args ) ) {
+			return false;
+		}
+		foreach ( $args as $meta_key => $meta_value ) {
+			add_post_meta( $post_id, $meta_key, $meta_value );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check any pending hooks already exists.
+	 *
+	 * @param   string  $hook        hook name.
+	 * @param   string  $meta_key    meta key.
+	 * @param   mixed   $meta_value  meta value.
+	 *
+	 * @return bool
+	 */
+	public static function hasAnyActiveScheduleExists( $hook, $meta_key, $meta_value ) {
+		if ( empty( $hook ) || empty( $meta_key ) || empty( $meta_value ) ) {
+			return false;
+		}
+		$actions = new \WP_Query( [
+			'post_title'     => $hook,
+			'post_status'    => 'pending',
+			'post_type'      => 'scheduled-action',
+			'meta_query'     => [
+				[
+					'key'     => $meta_key,
+					'value'   => $meta_value,
+					'compare' => '='
+				]
+			],
+			'posts_per_page' => 1
+		] );
+
+		return $actions->have_posts();
+	}
+
+
+	/**
+	 * Schedule events.
+	 *
+	 * @param   string      $hook                 Hook name.
+	 * @param   int|string  $timestamp            Time.
+	 * @param   array       $args                 Arguments.
+	 * @param   string      $type                 Type.
+	 * @param   null        $interval_in_seconds  Interval seconds.
+	 * @param   string      $group                Group.
+	 */
+	public static function scheduleEvents( $hook, $timestamp, $args = [], $type = "single", $interval_in_seconds = null, $group = '' ) {
+		if ( empty( $hook ) || empty( $timestamp ) ) {
+			return;
+		}
+		if ( class_exists( 'ActionScheduler' ) ) {
+			switch ( $type ) {
+				case "recurring":
+					if ( ! self::nextScheduledAction( $hook ) ) {
+						\ActionScheduler::factory()->recurring( $hook, $args, $timestamp, $interval_in_seconds, $group );
+					}
+					break;
+				case 'single':
+				default:
+					$action_id = \ActionScheduler::factory()->single( $hook, $args, $timestamp );
+					self::addPostMeta( $action_id, $args );
+					break;
+			}
+		} else {
+			switch ( $type ) {
+				case "recurring":
+					if ( function_exists( 'as_schedule_recurring_action' ) && function_exists( 'as_next_scheduled_action' ) ) {
+						if ( ! as_next_scheduled_action( $hook ) ) {
+							as_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, $args, $group );
+						}
+					}
+					break;
+				case 'single':
+				default:
+					if ( function_exists( 'as_schedule_single_action' ) ) {
+						$action_id = as_schedule_single_action( $timestamp, $hook, $args );
+						self::addPostMeta( $action_id, $args );
+					}
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Get the next schedule action.
+	 *
+	 * @param   string  $hook   Hook name.
+	 * @param   array   $args   Arguments.
+	 * @param   string  $group  Group.
+	 *
+	 * @return int|bool
+	 */
+	public static function nextScheduledAction( $hook, $args = null, $group = '' ) {
+		if ( empty( $hook ) && ! class_exists( 'ActionScheduler' ) ) {
+			return false;
+		}
+		$params = [];
+		if ( is_array( $args ) ) {
+			$params['args'] = $args;
+		}
+		if ( ! empty( $group ) ) {
+			$params['group'] = $group;
+		}
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '4.0', '>=' ) ) {
+			$params['status'] = \ActionScheduler_Store::STATUS_RUNNING;
+			$job_id           = \ActionScheduler::store()->find_action( $hook, $params );
+			if ( ! empty( $job_id ) ) {
+				return true;
+			}
+			$params['status'] = \ActionScheduler_Store::STATUS_PENDING;
+			$job_id           = \ActionScheduler::store()->find_action( $hook, $params );
+			if ( empty( $job_id ) ) {
+				return false;
+			}
+			$job            = \ActionScheduler::store()->fetch_action( $job_id );
+			$scheduled_date = $job->get_schedule()->get_date();
+			if ( $scheduled_date ) {
+				return (int) $scheduled_date->format( 'U' );
+			} elseif ( null === $scheduled_date ) { // pending async action with NullSchedule
+				return true;
+			}
+
+			return false;
+		} else {
+			$job_id = \ActionScheduler::store()->find_action( $hook, $params );
+			if ( empty( $job_id ) ) {
+				return false;
+			}
+			$job  = \ActionScheduler::store()->fetch_action( $job_id );
+			$next = $job->get_schedule()->next();
+			if ( $next ) {
+				return (int) ( $next->format( 'U' ) );
+			}
+
+			return false;
+		}
+	}
+
 
 }
