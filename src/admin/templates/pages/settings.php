@@ -231,8 +231,6 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
                 </p>
             </td>
         </tr>
-        <?php endif; ?>
-        <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'] == 'yes'): ?>
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'; ?>"><?php
