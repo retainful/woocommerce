@@ -30,7 +30,6 @@ class Customer {
 
 	/**
 	 * Get address fields.
-	 *
 	 * @return array
 	 */
 	public static function getAddressFields() {
@@ -100,7 +99,6 @@ class Customer {
 
 	/**
 	 * Get cart customer.
-	 *
 	 * @return array
 	 */
 	public static function getCartCustomer() {
@@ -128,7 +126,6 @@ class Customer {
 
 	/**
 	 * Get billing address.
-	 *
 	 * @return array
 	 */
 	public static function getCartBillingAddress() {
@@ -151,7 +148,6 @@ class Customer {
 
 	/**
 	 * Get shipping address.
-	 *
 	 * @return array
 	 */
 	public static function getCartShippingAddress() {
@@ -323,7 +319,6 @@ class Customer {
 
 	/**
 	 * Customer user ip.
-	 *
 	 * @return string
 	 */
 	public static function getUserIPDetails() {
@@ -334,7 +329,6 @@ class Customer {
 
 	/**
 	 * Get client ip.
-	 *
 	 * @return string
 	 */
 	public static function getClientIP() {
@@ -361,7 +355,6 @@ class Customer {
 
 	/**
 	 * Get Customer email.
-	 *
 	 * @return string
 	 */
 	public static function getCustomerBillingEmail() {
@@ -448,11 +441,11 @@ class Customer {
 	}
 
 	/**
-	 * Get the user agent of client.
+	 * Get the user agent of a client.
 	 *
-	 * @param   \WC_Order|null  $order  Order Object
+	 * @param   \WC_Order|null  $order  Order object.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public static function getUserAgent( $order = null ) {
 

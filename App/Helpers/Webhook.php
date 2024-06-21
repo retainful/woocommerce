@@ -11,7 +11,6 @@ class Webhook {
 
 	/**
 	 * Get webhook status.
-	 *
 	 * @return array
 	 */
 	public static function getWebHookStatus() {
@@ -58,18 +57,16 @@ class Webhook {
 
 	/**
 	 * Get retainful webhook delivery url.
-	 *
 	 * @return mixed|null
 	 */
 	public static function getDeliveryUrl() {
 		$url = \RNOC\App\Modules\AbandonedCart\Request::getAbandonedCartApiUrl() . 'webhooks/checkout';
 
-		return apply_filters( 'change_delivery_url', $url );
+		return apply_filters( 'retainful_change_delivery_url', $url );
 	}
 
 	/**
 	 * Create the webhook.
-	 *
 	 * @return void
 	 */
 	public static function createWebhook() {
@@ -133,7 +130,6 @@ class Webhook {
 
 	/**
 	 * Remove retainful webhook.
-	 *
 	 */
 	public static function removeWebhook() {
 		if ( ! class_exists( 'WC_Data_Store' ) || ! function_exists( 'wc_get_webhook' ) ) {

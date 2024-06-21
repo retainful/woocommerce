@@ -2,7 +2,7 @@
 
 namespace RNOC\App\Modules\AbandonedCart;
 
-use MailPoetVendor\Doctrine\DBAL\Driver\Exception;
+use Exception;
 use RNOC\App\Helpers\Customer;
 use RNOC\App\Helpers\Product;
 use RNOC\App\Helpers\Settings;
@@ -285,7 +285,7 @@ class Order {
 			}
 			$order->save();
 		}
-		$completed_at = ( ! empty( $order_placed_at ) ) ? WC::formatToIso8601( strtotime($order_placed_at) ) : null;
+		$completed_at = ( ! empty( $order_placed_at ) ) ? WC::formatToIso8601( strtotime( $order_placed_at ) ) : null;
 
 		return apply_filters( 'rnoc_order_completed_at', $completed_at, $order );
 	}
@@ -341,8 +341,7 @@ class Order {
 	 * @param   array  $http_args   Http argument data.
 	 * @param   int    $order_id    Order id.
 	 * @param   int    $webhook_id  Webhook id.
-	 *
-	 * return mixed
+	 *                              return mixed
 	 *
 	 * @throws \Exception
 	 */
@@ -417,10 +416,9 @@ class Order {
 
 	/**
 	 * Set retainful related data to order.
-	 *
 	 */
 	public function setRetainfulOrderData() {
-		if(!is_checkout() && !is_cart()){
+		if ( ! is_checkout() && ! is_cart() ) {
 			return;
 		}
 		$draft_order = WC::getSession( 'store_api_draft_order' );
@@ -486,7 +484,6 @@ class Order {
 	 * Update normal checkout order.
 	 *
 	 * @param   int  $order_id  Order id.
-	 *
 	 */
 	public function checkoutOrderProcessed( $order_id ) {
 
@@ -545,7 +542,6 @@ class Order {
 
 	/**
 	 * Need the instant sync or not.
-	 *
 	 * @return mixed|void
 	 */
 	public static function needInstantOrderSync() {
@@ -557,7 +553,6 @@ class Order {
 	 * Schedule the sync of the cart.
 	 *
 	 * @param   int  $order_id  Order id.
-	 *
 	 */
 	public static function scheduleCartSync( $order_id ) {
 		if ( ! apply_filters( 'rnoc_schedule_cart_sync', true ) ) {
@@ -597,11 +592,11 @@ class Order {
 	/**
 	 * Order had some changes
 	 *
-	 * @param int $order_id Order id.
+	 * @param   int  $order_id  Order id.
 	 *
 	 * @return void|null
 	 */
-	public function orderUpdated($order_id){
+	public function orderUpdated( $order_id ) {
 
 		if ( $this->needInstantOrderSync() ) {
 			$this->syncOrder( $order_id );

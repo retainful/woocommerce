@@ -8,7 +8,6 @@ class WP {
 
 	/**
 	 * Has admin privilege.
-	 *
 	 * @return bool
 	 */
 	public static function hasAdminPrivilege() {
@@ -17,7 +16,6 @@ class WP {
 
 	/**
 	 * Check is customer page.
-	 *
 	 * @return bool
 	 */
 	public static function isCustomerPage() {
@@ -30,7 +28,6 @@ class WP {
 
 	/**
 	 * Get login user.
-	 *
 	 * @return false|\WP_User|null
 	 */
 	public static function getLoginUser() {
@@ -39,7 +36,6 @@ class WP {
 
 	/**
 	 * Get login user email.
-	 *
 	 * @return string
 	 */
 	public static function getLoginUserEmail() {
@@ -106,7 +102,6 @@ class WP {
 	 *
 	 * @param   string  $action
 	 *
-	 *
 	 * @return false|string
 	 */
 	public static function createNonce( $action = '' ) {
@@ -138,7 +133,6 @@ class WP {
 	 * Verify nonce.
 	 *
 	 * @param   string  $nonce   Nonce.
-	 *
 	 * @param   string  $action  Action.
 	 *
 	 * @return bool
@@ -153,7 +147,6 @@ class WP {
 
 	/**
 	 * Get the default language.
-	 *
 	 * @return string|null
 	 */
 	public static function getDefaultLanguage() {
@@ -177,7 +170,6 @@ class WP {
 
 	/**
 	 * Get the current language.
-	 *
 	 * @return string|null
 	 */
 	public static function getCurrentLanguage() {
@@ -196,7 +188,6 @@ class WP {
 	 * Set the auth cookie.
 	 *
 	 * @param   int  $user_id  User id.
-	 *
 	 */
 	public static function setAuthCookie( $user_id ) {
 		function_exists( 'wp_set_auth_cookie' ) && wp_set_auth_cookie( $user_id );
@@ -220,7 +211,6 @@ class WP {
 
 	/**
 	 * Get current user id.
-	 *
 	 * @return int
 	 */
 	public static function getCurrentUserId() {
@@ -241,10 +231,10 @@ class WP {
 
 
 	/**
-	 * Add post meta.
+	 * Add post-meta.
 	 *
 	 * @param   int    $post_id  Post id.
-	 * @param   array  $args     Argument.
+	 * @param   array  $args     Arguments.
 	 *
 	 * @return bool
 	 */
