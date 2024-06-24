@@ -380,5 +380,20 @@ class WP {
 //		}
 //	}
 
+	/**
+	 * Check is HPOS enabled.
+	 *
+	 * @return bool
+	 */
+	public static function isHPOSEnabled() {
+		if ( ! class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) ) {
+			return false;
+		}
+		if ( \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ) {
+			return true;
+		}
+
+		return false;
+	}
 
 }

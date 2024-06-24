@@ -9,6 +9,7 @@ use RNOC\App\Helpers\Customer;
 use RNOC\App\Modules\AbandonedCart\Cart;
 use RNOC\App\Helpers\Settings as SettingsHelper;
 use RNOC\App\Modules\AbandonedCart\Order;
+use RNOC\App\Modules\Imports\OrderImports;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -45,6 +46,9 @@ class Router {
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
+			add_action( 'rest_api_init', [ self::class, 'registerSyncEndPoints' ] );
+
+
 			$cart = new Cart();
 			add_action( 'wp_enqueue_scripts', [ $cart, 'addCartTrackingScripts' ] );
 			add_action( 'wp_ajax_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
@@ -84,8 +88,23 @@ class Router {
 			add_action( 'woocommerce_process_shop_order_meta', [ $order, 'orderUpdatedShopBackend' ], 50, 2 );
 			add_filter( 'woocommerce_webhook_http_args', [ $order, 'changeWebHookHeader' ], 10, 3 );
 
+
 		}
 
+	}
+
+	public static function registerSyncEndPoints() {
+		$import = new OrderImports();
+		register_rest_route( 'retainful-api/v1', '/orders/count', array(
+			'methods'             => 'GET',
+			'permission_callback' => '__return_true',
+			'callback'            => array( $import, 'getSyncOrderCount' )
+		) );
+		register_rest_route( 'retainful-api/v1', '/orders', array(
+			'methods'             => 'GET',
+			'permission_callback' => '__return_true',
+			'callback'            => array( $import, 'getSyncOrders' )
+		) );
 	}
 
 	/**

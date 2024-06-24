@@ -67,14 +67,17 @@ class Order {
 	 * Get order data.
 	 *
 	 * @param \WC_Order $order Order object.
+	 * @param string $type type.
 	 *
 	 * @return array
 	 */
-	public function getOrderData( $order ) {
+	public function getOrderData( $order, $type = null ) {
 		// Can track order.
 		$user_ip = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
-		if ( ! $order instanceof \WC_Order || ! self::canTrackAbandonedCart( $user_ip, $order ) ) {
-			return [];
+		if ( $type !== 'import' ) {
+			if ( ! $order instanceof \WC_Order || ! self::canTrackAbandonedCart( $user_ip, $order ) ) {
+				return [];
+			}
 		}
 
 		// is valid cart hash
@@ -154,7 +157,7 @@ class Order {
 		if ( ! empty( $referrer_automation_id ) ) {
 			$order_data['referrer_automation_id'] = $referrer_automation_id;
 		}
-		
+
 		return apply_filters( 'rnoc_api_get_order_data', $order_data, $order );
 	}
 
