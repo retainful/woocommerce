@@ -19,7 +19,7 @@ class Order {
 	/**
 	 * Backend order change time synchronization.
 	 *
-	 * @param   int  $order_id  Order id.
+	 * @param int $order_id Order id.
 	 *
 	 * @return void
 	 */
@@ -27,8 +27,7 @@ class Order {
 		if ( ! is_admin() || $order_id <= 0 ) {
 			return;
 		}
-
-		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' ) !== 'yes' ) {
+		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' ) == 'yes' ) {
 			return;
 		}
 		$this->syncOrder( $order_id );
@@ -37,7 +36,7 @@ class Order {
 	/**
 	 * synchronize order.
 	 *
-	 * @param   int  $order_id  Order id.
+	 * @param int $order_id Order id.
 	 *
 	 * @return void
 	 */
@@ -60,32 +59,14 @@ class Order {
 			self::removeTmpStorageData();
 		}
 
-		$order_data = $this->getOrderData( $order );
+		self::syncData( $order );
 
-
-		if ( empty( $order_data ) ) {
-			return;
-		}
-		$cart_hash = self::getEncryptData( $order_data );
-
-		$client_ip = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
-
-		if ( ! empty( $cart_hash ) ) {
-			$token         = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
-			$extra_headers = [
-				"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
-				"X-Retainful-Version"  => RNOC_VERSION,
-				"X-Cart-Token"         => $token,
-				"Cart-Token"           => $token
-			];
-			Request::syncCart( [ 'data' => $cart_hash ], $extra_headers );
-		}
 	}
 
 	/**
 	 * Get order data.
 	 *
-	 * @param   \WC_Order  $order  Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -173,14 +154,14 @@ class Order {
 		if ( ! empty( $referrer_automation_id ) ) {
 			$order_data['referrer_automation_id'] = $referrer_automation_id;
 		}
-
+		
 		return apply_filters( 'rnoc_api_get_order_data', $order_data, $order );
 	}
 
 	/**
 	 * Get order cart token.
 	 *
-	 * @param   \WC_Order  $order  Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -191,7 +172,7 @@ class Order {
 	/**
 	 * Get order line items.
 	 *
-	 * @param   \WC_Order  $order  Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -293,8 +274,8 @@ class Order {
 	/**
 	 * Get order totals.
 	 *
-	 * @param   \WC_Order  $order          Order object.
-	 * @param   bool       $excluding_tax  Is excluding tax.
+	 * @param \WC_Order $order Order object.
+	 * @param bool $excluding_tax Is excluding tax.
 	 *
 	 * @return array
 	 */
@@ -312,8 +293,8 @@ class Order {
 	/**
 	 * Get order fee details.
 	 *
-	 * @param   \WC_Order  $order          Order object.
-	 * @param   bool       $excluding_tax  Is excluding tax.
+	 * @param \WC_Order $order Order object.
+	 * @param bool $excluding_tax Is excluding tax.
 	 *
 	 * @return array
 	 */
@@ -338,9 +319,9 @@ class Order {
 	/**
 	 *  Change webhook header data.
 	 *
-	 * @param   array  $http_args   Http argument data.
-	 * @param   int    $order_id    Order id.
-	 * @param   int    $webhook_id  Webhook id.
+	 * @param array $http_args Http argument data.
+	 * @param int $order_id Order id.
+	 * @param int $webhook_id Webhook id.
 	 *                              return mixed
 	 *
 	 * @throws \Exception
@@ -405,8 +386,7 @@ class Order {
 				];
 				$http_args['body'] = trim( wp_json_encode( $body ) );
 			}
-		}
-		catch ( Exception $e ) {
+		} catch ( Exception $e ) {
 
 		}
 
@@ -438,7 +418,7 @@ class Order {
 	/**
 	 * Update the order metadata after purchase.
 	 *
-	 * @param   int  $order_id  Order id.
+	 * @param int $order_id Order id.
 	 *
 	 * @return void
 	 */
@@ -483,7 +463,7 @@ class Order {
 	/**
 	 * Update normal checkout order.
 	 *
-	 * @param   int  $order_id  Order id.
+	 * @param int $order_id Order id.
 	 */
 	public function checkoutOrderProcessed( $order_id ) {
 
@@ -497,8 +477,7 @@ class Order {
 				$this->updateOrderMeta( $order_id );
 				self::syncOrderToAPI( $order_id );
 			}
-		}
-		catch ( Exception $e ) {
+		} catch ( Exception $e ) {
 		}
 
 		return;
@@ -507,69 +486,54 @@ class Order {
 	/**
 	 * Sync order to api.
 	 *
-	 * @param   \WC_Order  $order     Order object.
-	 * @param   int        $order_id  order id.
+	 * @param \WC_Order $order Order object.
+	 * @param int $order_id order id.
 	 */
 	public function syncOrderToAPI( $order_id ) {
 		$background_order_sync = Settings::get( RNOC_PLUGIN_PREFIX . 'enable_background_order_sync', 'no' );
-		if ( $background_order_sync == 'no' ) {
+		if ( $background_order_sync == 'yes' ) {
 			return;
 		}
-		if ( self::needInstantOrderSync() ) {
-			$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
-			$cart  = $this->getOrderData( $order );
-
-			if ( ! empty( $cart ) ) {
-				$cart_hash = self::getEncryptData( $cart );
-				//Reduce the loading speed
-				$client_ip = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
-				$token     = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
-				if ( ! empty( $cart_hash ) ) {
-					$extra_headers = array(
-						"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
-						"X-Retainful-Version"  => RNOC_VERSION,
-						"X-Cart-Token"         => $token,
-						"Cart-Token"           => $token
-					);
-					Request::syncCart( [ 'data' => $cart_hash ], $extra_headers );
-				}
-			}
-		} else {
-			self::scheduleCartSync( $order_id );
-
-		}
+		$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
+		self::syncData( $order );
 	}
 
 	/**
-	 * Need the instant sync or not.
-	 * @return mixed|void
-	 */
-	public static function needInstantOrderSync() {
-		return apply_filters( 'rnoc_sync_order_data_instantly_to_api', true );
-	}
-
-
-	/**
-	 * Schedule the sync of the cart.
+	 * Sync order data.
 	 *
-	 * @param   int  $order_id  Order id.
+	 * @param \WC_Order $order Order object.
+	 * @param array $cart Cart data.
+	 *
 	 */
-	public static function scheduleCartSync( $order_id ) {
-		if ( ! apply_filters( 'rnoc_schedule_cart_sync', true ) ) {
+	public function syncData( $order ) {
+		if ( empty( $order ) ) {
 			return;
 		}
-		$hook     = 'retainful_sync_abandoned_cart_order';
-		$meta_key = '_rnoc_order_id';
-		if ( ! WP::hasAnyActiveScheduleExists( $hook, $meta_key, $order_id ) ) {
-			WP::scheduleEvents( $hook, current_time( 'timestamp' ) + 60, array( $meta_key => $order_id ) );
+		$cart = $this->getOrderData( $order );
+		if ( empty ( $cart ) ) {
+			return;
 		}
+		$cart_hash = self::getEncryptData( $cart );
+		//Reduce the loading speed
+		$client_ip = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
+		$token     = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
+		if ( ! empty( $cart_hash ) ) {
+			$extra_headers = array(
+				"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
+				"X-Retainful-Version"  => RNOC_VERSION,
+				"X-Cart-Token"         => $token,
+				"Cart-Token"           => $token
+			);
+			Request::syncCart( [ 'data' => $cart_hash ], $extra_headers );
+		}
+
 	}
 
 
 	/**
 	 * Update block checkout checkout order.
 	 *
-	 * @param   \WC_Order  $order  Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return void
 	 */
@@ -584,31 +548,25 @@ class Order {
 				$this->updateOrderMeta( $order_id );
 				$this->syncOrderToAPI( $order_id );
 			}
-		}
-		catch ( Exception $e ) {
+		} catch ( Exception $e ) {
 		}
 	}
 
 	/**
 	 * Order had some changes
 	 *
-	 * @param   int  $order_id  Order id.
+	 * @param int $order_id Order id.
 	 *
 	 * @return void|null
 	 */
 	public function orderUpdated( $order_id ) {
-
-		if ( $this->needInstantOrderSync() ) {
-			$this->syncOrder( $order_id );
-		} else {
-			$this->scheduleCartSync( $order_id );
-		}
+		$this->syncOrder( $order_id );
 	}
 
 	/**
 	 * Handle order completion in order page.
 	 *
-	 * @param   int  $order_id  Order id.
+	 * @param int $order_id Order id.
 	 */
 	function payPageOrderCompletion( $order_id ) {
 		self::unsetOrderTempData();
@@ -636,10 +594,10 @@ class Order {
 	/**
 	 * Delete temp data of the user.
 	 *
-	 * @param   int  $user_id  User id.
+	 * @param int $user_id User id.
 	 */
 	public static function removeTempDataForUser( $user_id ) {
-		if ( empty( $user_id ) || !is_int( $user_id ) ){
+		if ( empty( $user_id ) || ! is_int( $user_id ) ) {
 			return;
 		}
 		delete_user_meta( $user_id, self::$cart_token_key_for_db );
@@ -651,11 +609,11 @@ class Order {
 	/**
 	 * Payment completed.
 	 *
-	 * @param   int  $order_id  order id.
+	 * @param int $order_id order id.
 	 *
 	 */
 	public function paymentCompleted( $order_id ) {
-		if( empty( $order_id ) ){
+		if ( empty( $order_id ) ) {
 			return;
 		}
 		if ( \RNOC\App\Helpers\Order::getOrder( $order_id ) ) {
@@ -670,13 +628,13 @@ class Order {
 	/**
 	 * Clear any persistent cart session data for logged in customers
 	 *
-	 * @param   int     $order_id  order ID
-	 * @param   string  $old_status
-	 * @param   string  $new_status
+	 * @param int $order_id order ID
+	 * @param string $old_status
+	 * @param string $new_status
 	 */
 	public function orderStatusChanged( $order_id, $old_status, $new_status ) {
-		if( empty( $order_id ) || empty( $new_status ) ){
-			return ;
+		if ( empty( $order_id ) || empty( $new_status ) ) {
+			return;
 		}
 		global $wp;
 		try {
@@ -707,15 +665,14 @@ class Order {
 					}
 				}
 			}
-		}
-		catch ( Exception $e ) {
+		} catch ( Exception $e ) {
 		}
 	}
 
 	/**
 	 * Check the cart is in pending recovery.
 	 *
-	 * @param   int|null  $user_id  User id.
+	 * @param int|null $user_id User id.
 	 *
 	 * @return bool
 	 */
@@ -736,12 +693,12 @@ class Order {
 	 * @return array
 	 */
 	public function guestGdprMessage( $fields ) {
-		if( empty( $fields ) || !is_array( $fields ) ){
+		if ( empty( $fields ) || ! is_array( $fields ) ) {
 			return [];
 		}
-		$enable_gdpr_compliance = Settings::get(  RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
-		$message                = Settings::get(  RNOC_PLUGIN_PREFIX . 'cart_capture_msg', 'Keep me up to date on news and exclusive offers' );
-		$field_name             = Settings::get(  RNOC_PLUGIN_PREFIX . 'gdpr_display_position', 'after_billing_email' );
+		$enable_gdpr_compliance = Settings::get( RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
+		$message                = Settings::get( RNOC_PLUGIN_PREFIX . 'cart_capture_msg', 'Keep me up to date on news and exclusive offers' );
+		$field_name             = Settings::get( RNOC_PLUGIN_PREFIX . 'gdpr_display_position', 'after_billing_email' );
 		if ( $enable_gdpr_compliance && $field_name == 'after_billing_email' && ! empty( $fields['billing']['billing_email'] ) ) {
 			$fields['billing'][ RNOC_PLUGIN_PREFIX . 'allow_gdpr' ] = [
 				'label'    => __( $message, 'retainful-next-order-coupon-for-woocommerce' ),
@@ -750,21 +707,21 @@ class Order {
 				'default'  => (int) self::isBuyerAcceptsMarketing()
 			];
 		}
+
 		return $fields;
 	}
 
 	/**
 	 * Show GDPR message under the terms and condition field in checkout.
 	 */
-	public function guestTermGdprMessage()
-	{
-		$enable_gdpr_compliance = Settings::get(  RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
-		$field_name             = Settings::get(  RNOC_PLUGIN_PREFIX . 'gdpr_display_position', 'after_billing_email' );
-		$message                = Settings::get(  RNOC_PLUGIN_PREFIX . 'cart_capture_msg', 'Keep me up to date on news and exclusive offers' );
+	public function guestTermGdprMessage() {
+		$enable_gdpr_compliance = Settings::get( RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 );
+		$field_name             = Settings::get( RNOC_PLUGIN_PREFIX . 'gdpr_display_position', 'after_billing_email' );
+		$message                = Settings::get( RNOC_PLUGIN_PREFIX . 'cart_capture_msg', 'Keep me up to date on news and exclusive offers' );
 		if ( $enable_gdpr_compliance && $field_name == 'after_term_and_condition' && $message ) {
 			echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
             name="' . RNOC_PLUGIN_PREFIX . 'allow_gdpr' . '" id="' . RNOC_PLUGIN_PREFIX . 'allow_gdpr' . '" ' . ( self::isBuyerAcceptsMarketing() ? 'checked="checked"' : '' ) . ' />
-					<span class="woocommerce-terms-and-conditions-checkbox-text">' . __( $message,  'retainful-next-order-coupon-for-woocommerce' ) . ' ' . __( '(optional)',  'retainful-next-order-coupon-for-woocommerce' ) . '</span>';
+					<span class="woocommerce-terms-and-conditions-checkbox-text">' . __( $message, 'retainful-next-order-coupon-for-woocommerce' ) . ' ' . __( '(optional)', 'retainful-next-order-coupon-for-woocommerce' ) . '</span>';
 		}
 	}
 }

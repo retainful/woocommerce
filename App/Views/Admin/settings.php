@@ -4,31 +4,7 @@ $settings = ! empty( $settings ) ? $settings : [];
 <form id="retainful-settings-form" class="card retainful-settings-form">
     <table class="form-table" role="presentation">
         <tbody>
-        <tr>
-            <th scope="row">
-                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'; ?>"><?php
-					esc_html_e( 'Cart tracking engine?', 'retainful-next-order-coupon-for-woocommerce' );
-					?></label>
-            </th>
-            <td>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'cart_tracking_engine_js'; ?>"
-                           value="js" <?php if ( $settings[ RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' ] == 'js' ) {
-						echo "checked";
-					} ?>>
-					<?php esc_html_e( 'JavaScript (Default,Recommended)', 'retainful-next-order-coupon-for-woocommerce' ); ?>
-                </label>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'cart_tracking_engine_php'; ?>"
-                           value="php" <?php if ( $settings[ RNOC_PLUGIN_PREFIX . 'cart_tracking_engine' ] == 'php' ) {
-						echo "checked";
-					} ?>>
-					<?php esc_html_e( 'PHP', 'retainful-next-order-coupon-for-woocommerce' ); ?>
-                </label>
-            </td>
-        </tr>
+
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'; ?>"><?php

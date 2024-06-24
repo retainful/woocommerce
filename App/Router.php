@@ -52,18 +52,18 @@ class Router {
 
 			add_action( 'woocommerce_api_retainful', [ $cart, 'recoverUserCart' ] );
 
-			//add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
-			//add_action('woocommerce_removed_coupon', array($cart, 'removeNextOrderCouponFromCart'));
-			$cart_tracking_engine = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' );
-			if ( $cart_tracking_engine == 'php' ) {
-				//add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
-			} else {
-				//Js tracking
-				add_action( 'wp_footer', [ $cart, 'renderCartTrackingDiv' ] );
-				add_filter( 'woocommerce_add_to_cart_fragments', [ $cart, 'getCartFragments' ] );
-				add_action( 'wp_ajax_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
-				add_action( 'wp_ajax_nopriv_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
-			}
+			add_action( 'wp_loaded', [ $cart, 'applyAbandonedCartCoupon' ] );
+			add_action( 'woocommerce_removed_coupon', [ $cart, 'removeCouponFromCart' ] );
+//			$cart_tracking_engine = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' );
+//			if ( $cart_tracking_engine == 'php' ) {
+//				//add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
+//			} else {
+			//Js tracking
+			add_action( 'wp_footer', [ $cart, 'renderCartTrackingDiv' ] );
+			add_filter( 'woocommerce_add_to_cart_fragments', [ $cart, 'getCartFragments' ] );
+			add_action( 'wp_ajax_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
+			add_action( 'wp_ajax_nopriv_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
+//			}
 			//add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
 
 			add_action( 'wp_authenticate', [ Customer::class, 'userLoggedOn' ] );
@@ -134,7 +134,6 @@ class Router {
 			add_filter( 'woocommerce_checkout_fields', [ $order, 'guestGdprMessage' ], 10, 1 );
 			add_action( 'woocommerce_checkout_after_terms_and_conditions', [ $order, 'guestTermGdprMessage' ] );
 		}
-
 	}
 
 }

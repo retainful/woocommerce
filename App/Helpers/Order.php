@@ -12,7 +12,7 @@ class Order {
 	/**
 	 * Get order id.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return int
 	 */
@@ -23,7 +23,7 @@ class Order {
 	/**
 	 * Get an order object.
 	 *
-	 * @param   int|WC_Order  $order_or_id  Order object or id.
+	 * @param int|WC_Order $order_or_id Order object or id.
 	 *
 	 * @return WC_Order|WC_Order_Refund|bool
 	 */
@@ -35,8 +35,8 @@ class Order {
 	/**
 	 * Get order meta.
 	 *
-	 * @param   string    $meta_key  Meta key.
-	 * @param   WC_Order  $order     Order object
+	 * @param string $meta_key Meta key.
+	 * @param WC_Order $order Order object
 	 *
 	 * @return mixed
 	 */
@@ -48,8 +48,8 @@ class Order {
 	/**
 	 * Get orders by email.
 	 *
-	 * @param   string  $email  Order email.
-	 * @param   int     $limit
+	 * @param string $email Order email.
+	 * @param int $limit
 	 *
 	 * @return array
 	 */
@@ -71,7 +71,7 @@ class Order {
 	/**
 	 * Get order billing email.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -83,7 +83,7 @@ class Order {
 	/**
 	 * Get order total.
 	 *
-	 * @param   WC_Order  $order  Order object
+	 * @param WC_Order $order Order object
 	 *
 	 * @return float
 	 */
@@ -95,9 +95,9 @@ class Order {
 	/**
 	 * Get order key data.
 	 *
-	 * @param   string    $key      Order key
-	 * @param   WC_Order  $order    Order object.
-	 * @param   mixed     $default  default value.
+	 * @param string $key Order key
+	 * @param WC_Order $order Order object.
+	 * @param mixed $default default value.
 	 *
 	 * @return mixed
 	 */
@@ -114,7 +114,7 @@ class Order {
 	/**
 	 * Get used coupons.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -134,7 +134,7 @@ class Order {
 	/**
 	 * Get order status.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -151,9 +151,9 @@ class Order {
 	/**
 	 * Set order meta.
 	 *
-	 * @param   int     $order_id    Order id.
-	 * @param   string  $meta_key    Meta key.
-	 * @param   mixed   $meta_value  Meta value.
+	 * @param int $order_id Order id.
+	 * @param string $meta_key Meta key.
+	 * @param mixed $meta_value Meta value.
 	 *
 	 * @return void
 	 */
@@ -168,8 +168,8 @@ class Order {
 	/**
 	 * Get order created date.
 	 *
-	 * @param   WC_Order  $order   Order object.
-	 * @param   string    $format  Display format.
+	 * @param WC_Order $order Order object.
+	 * @param string $format Display format.
 	 *
 	 * @return string|null
 	 */
@@ -189,7 +189,7 @@ class Order {
 	/**
 	 * Get order number.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return int|string
 	 */
@@ -204,7 +204,7 @@ class Order {
 	/**
 	 * Get order items.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -219,8 +219,8 @@ class Order {
 	/**
 	 * Get order paid date.
 	 *
-	 * @param   WC_Order  $order   Order object.
-	 * @param   string    $format  Date format.
+	 * @param WC_Order $order Order object.
+	 * @param string $format Date format.
 	 *
 	 * @return null
 	 */
@@ -246,7 +246,7 @@ class Order {
 	/**
 	 * Get retainful order status.
 	 *
-	 * @param   string  $order_status  Order status.
+	 * @param string $order_status Order status.
 	 *
 	 * @return string
 	 */
@@ -281,7 +281,7 @@ class Order {
 	/**
 	 * Get order subtotal.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return float
 	 */
@@ -296,7 +296,7 @@ class Order {
 	/**
 	 * Get order language.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -323,8 +323,8 @@ class Order {
 	/**
 	 * Get order discount.
 	 *
-	 * @param   WC_Order  $order      Order object.
-	 * @param   bool      $excluding  is excluding tax.
+	 * @param WC_Order $order Order object.
+	 * @param bool $excluding is excluding tax.
 	 *
 	 * @return float
 	 */
@@ -339,7 +339,7 @@ class Order {
 	/**
 	 * Get item subtotal.
 	 *
-	 * @param   \WC_Order_Item_Product  $item  Order item object.
+	 * @param \WC_Order_Item_Product $item Order item object.
 	 *
 	 * @return float
 	 */
@@ -354,7 +354,7 @@ class Order {
 	/**
 	 * Get item subtotal tax.
 	 *
-	 * @param   \WC_Order_Item_Product  $item  Order item object.
+	 * @param \WC_Order_Item_Product $item Order item object.
 	 *
 	 * @return float
 	 */
@@ -369,7 +369,7 @@ class Order {
 	/**
 	 * Get order items total.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return float|int
 	 */
@@ -391,8 +391,8 @@ class Order {
 	/**
 	 * Get order shipping total.
 	 *
-	 * @param   WC_Order  $order    Order object.
-	 * @param   string    $context  Context.
+	 * @param WC_Order $order Order object.
+	 * @param string $context Context.
 	 *
 	 * @return float
 	 */
@@ -405,7 +405,7 @@ class Order {
 	}
 
 	/**
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -420,7 +420,7 @@ class Order {
 	/**
 	 * Get payment method.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -435,7 +435,7 @@ class Order {
 	/**
 	 * Get payment method title.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -450,7 +450,7 @@ class Order {
 	/**
 	 * Get order received url.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -462,7 +462,7 @@ class Order {
 	/**
 	 * Get order payment url.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -474,8 +474,8 @@ class Order {
 	/**
 	 * Apply coupon to the order.
 	 *
-	 * @param   string     $coupon  Coupon code to apply for the order.
-	 * @param   \WC_Order  $order   Order object.
+	 * @param string $coupon Coupon code to apply for the order.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return bool True or false
 	 */
@@ -496,7 +496,7 @@ class Order {
 	/**
 	 * Check the coupon code.
 	 *
-	 * @param   string  $coupon_code  Woocommerce coupon code.
+	 * @param string $coupon_code Woocommerce coupon code.
 	 *
 	 * @return bool|\WP_Error
 	 */
@@ -515,8 +515,7 @@ class Order {
 		if ( Util::isMethodExists( $discounts, "is_coupon_valid" ) ) {
 			try {
 				return $discounts->is_coupon_valid( $coupon );
-			}
-			catch ( \Exception $e ) {
+			} catch ( \Exception $e ) {
 			}
 		}
 
@@ -526,8 +525,8 @@ class Order {
 	/**
 	 * Check the coupon can applicable.
 	 *
-	 * @param   string     $coupon_code  Coupon code.
-	 * @param   \WC_Order  $order        Order object.
+	 * @param string $coupon_code Coupon code.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return bool
 	 */
@@ -551,8 +550,8 @@ class Order {
 	/**
 	 * Get order Email form order object.
 	 *
-	 * @param   WC_Order  $order   Order object.
-	 * @param   string    $status  Order status.
+	 * @param WC_Order $order Order object.
+	 * @param string $status Order status.
 	 *
 	 * @return bool
 	 */
@@ -564,9 +563,9 @@ class Order {
 	/**
 	 * Set order status.
 	 *
-	 * @param   WC_Order  $order   Order object.
-	 * @param   string    $status  Order status.
-	 * @param   string    $note    Order note.
+	 * @param WC_Order $order Order object.
+	 * @param string $status Order status.
+	 * @param string $note Order note.
 	 *
 	 * @return bool
 	 */
@@ -578,8 +577,8 @@ class Order {
 	/**
 	 * Set order note.
 	 *
-	 * @param   \WC_Order  $order  Order object.
-	 * @param   string     $note   Order note.
+	 * @param \WC_Order $order Order object.
+	 * @param string $note Order note.
 	 */
 	public static function setOrderNote( $order, $note ) {
 		Util::isMethodExists( $order, 'add_order_note' )
@@ -589,7 +588,7 @@ class Order {
 	/**
 	 * Check if order needs payment or not.
 	 *
-	 * @param   \WC_Order  $order  Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return bool
 	 */
@@ -614,7 +613,7 @@ class Order {
 	/**
 	 * Get coupon usage count.
 	 *
-	 * @param   \WC_Coupon  $coupon  Coupon object.
+	 * @param \WC_Coupon $coupon Coupon object.
 	 *
 	 * @return int
 	 */
@@ -629,7 +628,7 @@ class Order {
 	/**
 	 * Get coupon expire date.
 	 *
-	 * @param   \WC_Coupon  $coupon  Coupon object.
+	 * @param \WC_Coupon $coupon Coupon object.
 	 *
 	 * @return string
 	 */
@@ -644,7 +643,7 @@ class Order {
 	/**
 	 * Coupon discount type.
 	 *
-	 * @param   \WC_Coupon  $coupon  Coupon object.
+	 * @param \WC_Coupon $coupon Coupon object.
 	 *
 	 * @return string
 	 */
@@ -659,7 +658,7 @@ class Order {
 	/**
 	 * Get coupon code.
 	 *
-	 * @param   \WC_Coupon  $coupon  Coupon code.
+	 * @param \WC_Coupon $coupon Coupon code.
 	 *
 	 * @return string
 	 */
@@ -674,7 +673,7 @@ class Order {
 	/**
 	 * Get applied discounts.
 	 *
-	 * @param   WC_Order|null  $order  Order object.
+	 * @param WC_Order|null $order Order object.
 	 *
 	 * @return array
 	 */
@@ -709,7 +708,7 @@ class Order {
 	/**
 	 * Order payment completed - This is a paying customer.
 	 *
-	 * @param   int  $order_id  Order id.
+	 * @param int $order_id Order id.
 	 *
 	 */
 	public static function setCustomerPayingForOrder( $order_id ) {
@@ -721,7 +720,7 @@ class Order {
 	/**
 	 * Is order is paid.
 	 *
-	 * @param   WC_Order  $order  Order object.
+	 * @param WC_Order $order Order object.
 	 *
 	 * @return bool
 	 */
@@ -736,7 +735,7 @@ class Order {
 	/**
 	 * Get order user id.
 	 *
-	 * @param   WC_Order  $order  Order Object.
+	 * @param WC_Order $order Order Object.
 	 *
 	 * @return mixed|null
 	 */
@@ -750,4 +749,33 @@ class Order {
 		return null;
 	}
 
+	/**
+	 * Check the coupon code is available on cart.
+	 *
+	 * @param string $discount_code coupon code
+	 *
+	 * @return bool
+	 */
+	public static function hasDiscount( $discount_code ) {
+		if ( empty( $discount_code ) ) {
+			return false;
+		}
+
+		return Util::isMethodExists( WC()->cart, 'has_discount' ) && WC()->cart->has_discount( $discount_code );
+	}
+
+	/**
+	 * Add discount to cart.
+	 *
+	 * @param $discount_code
+	 *
+	 * @return bool
+	 */
+	public static function addDiscount( $discount_code ) {
+		if ( empty( $discount_code ) ) {
+			return false;
+		}
+
+		return function_exists( 'WC' ) && util::isMethodExists( WC()->cart, 'add_discount' ) && WC()->cart->add_discount( $discount_code );
+	}
 }

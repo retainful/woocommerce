@@ -47,7 +47,7 @@ class WP {
 	/**
 	 * Format date field.
 	 *
-	 * @param   int  $timestamp  Time stamp.
+	 * @param int $timestamp Time stamp.
 	 *
 	 * @return string|null
 	 */
@@ -64,8 +64,7 @@ class WP {
 			$date_time = new \DateTime( $date );
 
 			return $date_time->format( \DateTime::ATOM );
-		}
-		catch ( \Exception $e ) {
+		} catch ( \Exception $e ) {
 
 		}
 
@@ -75,7 +74,7 @@ class WP {
 	/**
 	 * Get user role by email.
 	 *
-	 * @param   string  $email  User email.
+	 * @param string $email User email.
 	 *
 	 * @return array
 	 */
@@ -89,8 +88,7 @@ class WP {
 			if ( is_object( $user ) && isset( $user->roles ) ) {
 				return (array) $user->roles;
 			}
-		}
-		catch ( \Exception $e ) {
+		} catch ( \Exception $e ) {
 
 		}
 
@@ -100,7 +98,7 @@ class WP {
 	/**
 	 * Create nonce for woocommerce.
 	 *
-	 * @param   string  $action
+	 * @param string $action
 	 *
 	 * @return false|string
 	 */
@@ -116,7 +114,7 @@ class WP {
 	/**
 	 * Check the validity of a security nonce and the admin privilege.
 	 *
-	 * @param   string  $nonce_name  The name of the nonce.
+	 * @param string $nonce_name The name of the nonce.
 	 *
 	 * @return bool
 	 */
@@ -132,8 +130,8 @@ class WP {
 	/**
 	 * Verify nonce.
 	 *
-	 * @param   string  $nonce   Nonce.
-	 * @param   string  $action  Action.
+	 * @param string $nonce Nonce.
+	 * @param string $action Action.
 	 *
 	 * @return bool
 	 */
@@ -187,7 +185,7 @@ class WP {
 	/**
 	 * Set the auth cookie.
 	 *
-	 * @param   int  $user_id  User id.
+	 * @param int $user_id User id.
 	 */
 	public static function setAuthCookie( $user_id ) {
 		function_exists( 'wp_set_auth_cookie' ) && wp_set_auth_cookie( $user_id );
@@ -197,9 +195,9 @@ class WP {
 	/**
 	 * Update the user meta data.
 	 *
-	 * @param   int              $user_id     User id.
-	 * @param   string           $meta_key    User meta key.
-	 * @param   string|int|bool  $meta_value  User meta value.
+	 * @param int $user_id User id.
+	 * @param string $meta_key User meta key.
+	 * @param string|int|bool $meta_value User meta value.
 	 *
 	 * @return void
 	 */
@@ -221,7 +219,7 @@ class WP {
 	/**
 	 * Set current user.
 	 *
-	 * @param   int  $user_id  User id
+	 * @param int $user_id User id
 	 *
 	 * @return void
 	 */
@@ -233,8 +231,8 @@ class WP {
 	/**
 	 * Add post-meta.
 	 *
-	 * @param   int    $post_id  Post id.
-	 * @param   array  $args     Arguments.
+	 * @param int $post_id Post id.
+	 * @param array $args Arguments.
 	 *
 	 * @return bool
 	 */
@@ -252,9 +250,9 @@ class WP {
 	/**
 	 * Check any pending hooks already exists.
 	 *
-	 * @param   string  $hook        hook name.
-	 * @param   string  $meta_key    meta key.
-	 * @param   mixed   $meta_value  meta value.
+	 * @param string $hook hook name.
+	 * @param string $meta_key meta key.
+	 * @param mixed $meta_value meta value.
 	 *
 	 * @return bool
 	 */
@@ -280,107 +278,107 @@ class WP {
 	}
 
 
-	/**
-	 * Schedule events.
-	 *
-	 * @param   string      $hook                 Hook name.
-	 * @param   int|string  $timestamp            Time.
-	 * @param   array       $args                 Arguments.
-	 * @param   string      $type                 Type.
-	 * @param   null        $interval_in_seconds  Interval seconds.
-	 * @param   string      $group                Group.
-	 */
-	public static function scheduleEvents( $hook, $timestamp, $args = [], $type = "single", $interval_in_seconds = null, $group = '' ) {
-		if ( empty( $hook ) || empty( $timestamp ) ) {
-			return;
-		}
-		if ( class_exists( 'ActionScheduler' ) ) {
-			switch ( $type ) {
-				case "recurring":
-					if ( ! self::nextScheduledAction( $hook ) ) {
-						\ActionScheduler::factory()->recurring( $hook, $args, $timestamp, $interval_in_seconds, $group );
-					}
-					break;
-				case 'single':
-				default:
-					$action_id = \ActionScheduler::factory()->single( $hook, $args, $timestamp );
-					self::addPostMeta( $action_id, $args );
-					break;
-			}
-		} else {
-			switch ( $type ) {
-				case "recurring":
-					if ( function_exists( 'as_schedule_recurring_action' ) && function_exists( 'as_next_scheduled_action' ) ) {
-						if ( ! as_next_scheduled_action( $hook ) ) {
-							as_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, $args, $group );
-						}
-					}
-					break;
-				case 'single':
-				default:
-					if ( function_exists( 'as_schedule_single_action' ) ) {
-						$action_id = as_schedule_single_action( $timestamp, $hook, $args );
-						self::addPostMeta( $action_id, $args );
-					}
-					break;
-			}
-		}
-	}
-
-	/**
-	 * Get the next schedule action.
-	 *
-	 * @param   string  $hook   Hook name.
-	 * @param   array   $args   Arguments.
-	 * @param   string  $group  Group.
-	 *
-	 * @return int|bool
-	 */
-	public static function nextScheduledAction( $hook, $args = null, $group = '' ) {
-		if ( empty( $hook ) && ! class_exists( 'ActionScheduler' ) ) {
-			return false;
-		}
-		$params = [];
-		if ( is_array( $args ) ) {
-			$params['args'] = $args;
-		}
-		if ( ! empty( $group ) ) {
-			$params['group'] = $group;
-		}
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '4.0', '>=' ) ) {
-			$params['status'] = \ActionScheduler_Store::STATUS_RUNNING;
-			$job_id           = \ActionScheduler::store()->find_action( $hook, $params );
-			if ( ! empty( $job_id ) ) {
-				return true;
-			}
-			$params['status'] = \ActionScheduler_Store::STATUS_PENDING;
-			$job_id           = \ActionScheduler::store()->find_action( $hook, $params );
-			if ( empty( $job_id ) ) {
-				return false;
-			}
-			$job            = \ActionScheduler::store()->fetch_action( $job_id );
-			$scheduled_date = $job->get_schedule()->get_date();
-			if ( $scheduled_date ) {
-				return (int) $scheduled_date->format( 'U' );
-			} elseif ( null === $scheduled_date ) { // pending async action with NullSchedule
-				return true;
-			}
-
-			return false;
-		} else {
-			$job_id = \ActionScheduler::store()->find_action( $hook, $params );
-			if ( empty( $job_id ) ) {
-				return false;
-			}
-			$job  = \ActionScheduler::store()->fetch_action( $job_id );
-			$next = $job->get_schedule()->next();
-			if ( $next ) {
-				return (int) ( $next->format( 'U' ) );
-			}
-
-			return false;
-		}
-	}
+//	/**
+//	 * Schedule events.
+//	 *
+//	 * @param   string      $hook                 Hook name.
+//	 * @param   int|string  $timestamp            Time.
+//	 * @param   array       $args                 Arguments.
+//	 * @param   string      $type                 Type.
+//	 * @param   null        $interval_in_seconds  Interval seconds.
+//	 * @param   string      $group                Group.
+//	 */
+//	public static function scheduleEvents( $hook, $timestamp, $args = [], $type = "single", $interval_in_seconds = null, $group = '' ) {
+//		if ( empty( $hook ) || empty( $timestamp ) ) {
+//			return;
+//		}
+//		if ( class_exists( 'ActionScheduler' ) ) {
+//			switch ( $type ) {
+//				case "recurring":
+//					if ( ! self::nextScheduledAction( $hook ) ) {
+//						\ActionScheduler::factory()->recurring( $hook, $args, $timestamp, $interval_in_seconds, $group );
+//					}
+//					break;
+//				case 'single':
+//				default:
+//					$action_id = \ActionScheduler::factory()->single( $hook, $args, $timestamp );
+//					self::addPostMeta( $action_id, $args );
+//					break;
+//			}
+//		} else {
+//			switch ( $type ) {
+//				case "recurring":
+//					if ( function_exists( 'as_schedule_recurring_action' ) && function_exists( 'as_next_scheduled_action' ) ) {
+//						if ( ! as_next_scheduled_action( $hook ) ) {
+//							as_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, $args, $group );
+//						}
+//					}
+//					break;
+//				case 'single':
+//				default:
+//					if ( function_exists( 'as_schedule_single_action' ) ) {
+//						$action_id = as_schedule_single_action( $timestamp, $hook, $args );
+//						self::addPostMeta( $action_id, $args );
+//					}
+//					break;
+//			}
+//		}
+//	}
+//
+//	/**
+//	 * Get the next schedule action.
+//	 *
+//	 * @param   string  $hook   Hook name.
+//	 * @param   array   $args   Arguments.
+//	 * @param   string  $group  Group.
+//	 *
+//	 * @return int|bool
+//	 */
+//	public static function nextScheduledAction( $hook, $args = null, $group = '' ) {
+//		if ( empty( $hook ) && ! class_exists( 'ActionScheduler' ) ) {
+//			return false;
+//		}
+//		$params = [];
+//		if ( is_array( $args ) ) {
+//			$params['args'] = $args;
+//		}
+//		if ( ! empty( $group ) ) {
+//			$params['group'] = $group;
+//		}
+//		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '4.0', '>=' ) ) {
+//			$params['status'] = \ActionScheduler_Store::STATUS_RUNNING;
+//			$job_id           = \ActionScheduler::store()->find_action( $hook, $params );
+//			if ( ! empty( $job_id ) ) {
+//				return true;
+//			}
+//			$params['status'] = \ActionScheduler_Store::STATUS_PENDING;
+//			$job_id           = \ActionScheduler::store()->find_action( $hook, $params );
+//			if ( empty( $job_id ) ) {
+//				return false;
+//			}
+//			$job            = \ActionScheduler::store()->fetch_action( $job_id );
+//			$scheduled_date = $job->get_schedule()->get_date();
+//			if ( $scheduled_date ) {
+//				return (int) $scheduled_date->format( 'U' );
+//			} elseif ( null === $scheduled_date ) { // pending async action with NullSchedule
+//				return true;
+//			}
+//
+//			return false;
+//		} else {
+//			$job_id = \ActionScheduler::store()->find_action( $hook, $params );
+//			if ( empty( $job_id ) ) {
+//				return false;
+//			}
+//			$job  = \ActionScheduler::store()->fetch_action( $job_id );
+//			$next = $job->get_schedule()->next();
+//			if ( $next ) {
+//				return (int) ( $next->format( 'U' ) );
+//			}
+//
+//			return false;
+//		}
+//	}
 
 
 }
