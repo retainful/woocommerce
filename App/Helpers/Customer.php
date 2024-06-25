@@ -472,29 +472,26 @@ class Customer {
 		return function_exists( 'get_user_by' ) ? get_user_by( $field, $user_name ) : new \stdClass();
 	}
 
-	/**
-	 * After User logged in.
-	 *
-	 * @param string $user_name User name.
-	 *
-	 */
-	public static function userLoggedOn( $user_name ) {
+	public static function setUserDateOnLogin() {
 		if ( empty( $user_name ) ) {
 			return;
 		}
 		$user = ! empty( self::getUserBy( 'login', $user_name ) ) ? self::getUserBy( 'login', $user_name ) : self::getUserBy( 'email', $user_name );
 		if ( ! empty( $user ) && is_object( $user ) && isset( $user->ID ) ) {
-			self::userSignedUp( $user->ID );
+			self::setUserData( $user->ID );
 		}
 	}
 
-
 	/**
-	 * Add the user data after login.
+	 * Set the user data.
 	 *
-	 * @param int $user_id User id.
+	 * @param string $user_name User name.
+	 *
 	 */
-	public static function userSignedUp( $user_id ) {
+	public static function setUserData( $user_id ) {
+		if ( empty( $user_id ) && ! is_int( $user_id ) ) {
+			return;
+		}
 		$cart_token = Settings::getStorage()->get( '_rnoc_user_cart_token' );
 		if ( ! empty( $cart_token ) ) {
 			WP::updateUserMeta( $user_id, '_rnoc_user_cart_token', $cart_token );
@@ -507,9 +504,12 @@ class Customer {
 
 
 	/**
-	 * Remove user data after user logout.
+	 * Remove user data on local storage.
 	 */
-	public static function userLoggedOut() {
+	public static function removeUserData( $user_id ) {
+		if ( empty( $user_id ) && ! is_int( $user_id ) ) {
+			return;
+		}
 		Settings::getStorage()->remove( '_rnoc_user_cart_token' );
 		Settings::getStorage()->remove( 'rnoc_cart_created_at' );
 	}

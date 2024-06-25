@@ -70,9 +70,9 @@ class Router {
 //			}
 			//add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
 
-			add_action( 'wp_authenticate', [ Customer::class, 'userLoggedOn' ] );
-			add_action( 'user_register', [ Customer::class, 'userSignedUp' ] );
-			add_action( 'wp_logout', [ Customer::class, 'userLoggedOut' ] );
+			add_action( 'wp_authenticate', [ Customer::class, 'setUserDateOnLogin' ] );
+			add_action( 'user_register', [ Customer::class, 'setUserData' ] );
+			add_action( 'wp_logout', [ Customer::class, 'removeUserData' ] );
 			$order = new Order();
 			add_action( 'woocommerce_thankyou', [ $order, 'payPageOrderCompletion' ] );
 			add_action( 'woocommerce_payment_complete', [ $order, 'paymentCompleted' ] );
