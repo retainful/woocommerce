@@ -15,8 +15,11 @@ class Webhook {
 	 */
 	public static function getWebHookStatus() {
 		$topics = [
-			'order.updated' => false,
-			'order.created' => false
+			'order.updated'   => false,
+			'order.created'   => false,
+			'product.created' => false,
+			'product.updated' => false,
+			'product.deleted' => false
 		];
 		if ( ! class_exists( 'WC_Data_Store' ) ) {
 			return $topics;
@@ -36,8 +39,9 @@ class Webhook {
 				if ( empty( $webhook ) ) {
 					continue;
 				}
+				$topic             = $webhook->get_topic();
 				$delivery_url      = $webhook->get_delivery_url();
-				$site_delivery_url = self::getDeliveryUrl();
+				$site_delivery_url = self::getDeliveryUrl( $topic );
 				if ( $delivery_url != $site_delivery_url ) {
 					continue;
 				}
@@ -46,8 +50,7 @@ class Webhook {
 				}
 			}
 
-		}
-		catch ( \Exception $e ) {
+		} catch ( \Exception $e ) {
 
 		}
 
@@ -57,10 +60,19 @@ class Webhook {
 
 	/**
 	 * Get retainful webhook delivery url.
+	 *
 	 * @return mixed|null
 	 */
-	public static function getDeliveryUrl() {
-		$url = \RNOC\App\Modules\AbandonedCart\Request::getAbandonedCartApiUrl() . 'webhooks/checkout';
+	public static function getDeliveryUrl( $topic ) {
+		if ( empty( $topic ) ) {
+			return;
+		}
+		$url = '';
+		if ( in_array( $topic, array( 'order.created', 'order.updated' ) ) ) {
+			$url = \RNOC\App\Modules\AbandonedCart\Request::getAbandonedCartApiUrl() . 'webhooks/checkout';
+		} elseif ( in_array( $topic, array( 'product.created', 'product.updated', 'product.deleted' ) ) ) {
+			$url = 'https://5tzcs7zuy3.execute-api.us-east-2.amazonaws.com/development/v3/event/woocommerce/products';
+		}
 
 		return apply_filters( 'retainful_change_delivery_url', $url );
 	}
@@ -74,11 +86,21 @@ class Webhook {
 			$is_app_connected = Settings::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' );
 			if ( $is_app_connected ) {
 				$hook_status = self::getWebHookStatus();
+
 				if ( isset( $hook_status['order.updated'] ) && ! $hook_status['order.updated'] ) {
 					self::addNewWebhook();
 				}
 				if ( isset( $hook_status['order.created'] ) && ! $hook_status['order.created'] ) {
 					self::addNewWebHook( 'order.created' );
+				}
+				if ( isset( $hook_status['product.updated'] ) && ! $hook_status['product.updated'] ) {
+					self::addNewWebHook( 'product.updated' );
+				}
+				if ( isset( $hook_status['product.created'] ) && ! $hook_status['product.created'] ) {
+					self::addNewWebHook( 'product.created' );
+				}
+				if ( isset( $hook_status['product.deleted'] ) && ! $hook_status['product.deleted'] ) {
+					self::addNewWebHook( 'product.deleted' );
 				}
 			} else {
 				self::removeWebhook();
@@ -89,24 +111,47 @@ class Webhook {
 	/**
 	 * Add new webhook.
 	 *
-	 * @param   string  $topic  Webhook topic.
+	 * @param string $topic Webhook topic.
 	 *
 	 * @return bool
 	 */
 	protected static function addNewWebHook( $topic = 'order.updated' ) {
-		if ( ! in_array( $topic, [ 'order.updated', 'order.created' ] ) || ! class_exists( 'WC_Webhook' ) ) {
+		if ( ! in_array( $topic, array(
+			'order.updated',
+			'order.created',
+			'product.updated',
+			'product.created',
+			'product.deleted'
+		) ) ) {
 			return false;
 		}
 		try {
+			$name = '';
+			switch ( $topic ) {
+				case 'order.updated':
+					$name = 'Retainful Order Update';
+					break;
+				case 'order.created':
+					$name = 'Retainful Order created';
+					break;
+				case 'product.updated':
+					$name = 'Retainful product Update';
+					break;
+				case 'product.created':
+					$name = 'Retainful product created';
+					break;
+				case 'product.deleted':
+					$name = 'Retainful product deleted';
+					break;
+			}
 			$webhook = new \WC_Webhook();
-			$name    = $topic == 'order.updated' ? sanitize_text_field( wp_unslash( 'Retainful Order Update' ) ) : sanitize_text_field( wp_unslash( 'Retainful Order Create' ) );
 			$webhook->set_name( $name );
 			if ( ! $webhook->get_user_id() ) {
 				$webhook->set_user_id( get_current_user_id() );
 			}
 			//
 			$webhook->set_status( 'active' );
-			$delivery_url = self::getDeliveryUrl();
+			$delivery_url = self::getDeliveryUrl( $topic );
 			$webhook->set_delivery_url( $delivery_url );
 			$secret = wp_generate_password( 50, true, true );
 			$webhook->set_secret( $secret );
@@ -120,8 +165,7 @@ class Webhook {
 			if ( $webhook_id > 0 ) {
 				return true;
 			}
-		}
-		catch ( \Exception $e ) {
+		} catch ( \Exception $e ) {
 			return false;
 		}
 
@@ -147,15 +191,16 @@ class Webhook {
 				if ( empty( $webhook ) ) {
 					continue;
 				}
+				$topic = $webhook->get_topic();
+
 				$delivery_url      = $webhook->get_delivery_url();
-				$site_delivery_url = self::getDeliveryUrl();
+				$site_delivery_url = self::getDeliveryUrl( $topic );
 				if ( $delivery_url != $site_delivery_url ) {
 					continue;
 				}
 				$webhook->delete();
 			}
-		}
-		catch ( \Exception $e ) {
+		} catch ( \Exception $e ) {
 
 		}
 	}

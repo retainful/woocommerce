@@ -179,4 +179,34 @@ class Product {
 
 		return $price;
 	}
+
+	/**
+	 * Get Item title from Item object.
+	 *
+	 * @param object $item item.
+	 *
+	 * @return null
+	 */
+	public static function getItemTitle( $item ) {
+		if ( Util::isMethodExists( $item, 'get_title' ) ) {
+			return $item->get_title();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get Item Id from Item object.
+	 *
+	 * @param object $item item.
+	 *
+	 * @return null
+	 */
+	public static function getItemId( $item ) {
+		if ( Util::isMethodExists( $item, 'get_id' ) ) {
+			return $item->get_id();
+		}
+
+		return null;
+	}
 }

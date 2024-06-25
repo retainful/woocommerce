@@ -71,13 +71,11 @@ class Order {
 	 *
 	 * @return array
 	 */
-	public function getOrderData( $order, $type = null ) {
+	public function getOrderData( $order ) {
 		// Can track order.
 		$user_ip = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
-		if ( $type !== 'import' ) {
-			if ( ! $order instanceof \WC_Order || ! self::canTrackAbandonedCart( $user_ip, $order ) ) {
-				return [];
-			}
+		if ( ! $order instanceof \WC_Order || ! self::canTrackAbandonedCart( $user_ip, $order ) ) {
+			return [];
 		}
 
 		// is valid cart hash
@@ -342,7 +340,7 @@ class Order {
 				return $http_args;
 			}
 			$delivery_url      = $webhook->get_delivery_url();
-			$site_delivery_url = Webhook::getDeliveryUrl();
+			$site_delivery_url = Webhook::getDeliveryUrl( $topic );
 			if ( $delivery_url != $site_delivery_url || $order_id <= 0 ) {
 				return $http_args;
 			}
