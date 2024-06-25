@@ -118,11 +118,11 @@ class OrderImports {
 		$orders_data = $this->getOrders( $params );
 
 		//Do like his response
-		$response = array(
+		$response = [
 			'success'       => true,
 			'RESPONSE_CODE' => 'Ok',
-			'items'         => array()
-		);
+			'items'         => []
+		];
 
 		$orders = new Order();
 		foreach ( $orders_data as $order_id ) {
@@ -143,7 +143,7 @@ class OrderImports {
 	 */
 	protected function getOrders( $params ) {
 		if ( ! is_array( $params ) || ! isset( $params['since_id'] ) || ! isset( $params['limit'] ) ) {
-			return array();
+			return [];
 		}
 
 		global $wpdb;

@@ -286,7 +286,7 @@ class Customer {
 	/**
 	 * Get client details.
 	 *
-	 * @param \WC_Order $order order object
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -461,10 +461,10 @@ class Customer {
 	}
 
 	/**
-	 * get user by filed.
+	 * Get user by filed.
 	 *
-	 * @param $field
-	 * @param $user_name
+	 * @param string $field Field.
+	 * @param string $user_name User name.
 	 *
 	 * @return false|\stdClass|\WP_User
 	 */
@@ -475,7 +475,7 @@ class Customer {
 	/**
 	 * After User logged in.
 	 *
-	 * @param string $user_name user name.
+	 * @param string $user_name User name.
 	 *
 	 */
 	public static function userLoggedOn( $user_name ) {

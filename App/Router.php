@@ -93,18 +93,23 @@ class Router {
 
 	}
 
+	/**
+	 * Add sync endpoints.
+	 *
+	 * @return void
+	 */
 	public static function registerSyncEndPoints() {
 		$import = new OrderImports();
-		register_rest_route( 'retainful-api/v1', '/orders/count', array(
+		register_rest_route( 'retainful-api/v1', '/orders/count', [
 			'methods'             => 'GET',
 			'permission_callback' => '__return_true',
-			'callback'            => array( $import, 'getSyncOrderCount' )
-		) );
-		register_rest_route( 'retainful-api/v1', '/orders', array(
+			'callback'            => [ $import, 'getSyncOrderCount' ]
+		] );
+		register_rest_route( 'retainful-api/v1', '/orders', [
 			'methods'             => 'GET',
 			'permission_callback' => '__return_true',
-			'callback'            => array( $import, 'getSyncOrders' )
-		) );
+			'callback'            => [ $import, 'getSyncOrders' ]
+		] );
 	}
 
 	/**
