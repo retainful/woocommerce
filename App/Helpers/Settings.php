@@ -297,14 +297,14 @@ class Settings {
 	 * Check the hash matches or not.
 	 *
 	 * @param string $hash Hash token.
-	 * @param string $data Encrypt data.
+	 * @param string|array $data Encrypt data.
 	 *
 	 * @return bool
 	 */
 	public static function isHashMatches( $hash, $data ) {
 
 		$is_valid_hash = false;
-
+		$data          = json_encode( $data );
 		if ( hash_equals( self::hashTheData( $data ), $hash ) ) {
 			$is_valid_hash = true;
 		}
@@ -315,7 +315,7 @@ class Settings {
 	/**
 	 * Hash the data.
 	 *
-	 * @param string $data Hash data.
+	 * @param string|array $data Hash data.
 	 *
 	 * @return false|string
 	 */
@@ -325,6 +325,6 @@ class Settings {
 
 		return hash_hmac( self::HMAC_ALGORITHM, $data, $secret );
 	}
-	
+
 
 }

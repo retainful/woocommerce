@@ -50,9 +50,9 @@ class Customer {
 	/**
 	 * Set customer details.
 	 *
-	 * @param   string         $from           From address.
-	 * @param   string         $set            To address.
-	 * @param   string|object  $address_value  To address.
+	 * @param string $from From address.
+	 * @param string $set To address.
+	 * @param string|object $address_value To address.
 	 *
 	 * @return void
 	 */
@@ -87,7 +87,7 @@ class Customer {
 	/**
 	 * Set customer email.
 	 *
-	 * @param   string  $billing_email  Customer email.
+	 * @param string $billing_email Customer email.
 	 *
 	 * @return void
 	 */
@@ -173,7 +173,7 @@ class Customer {
 	/**
 	 * Get Order customer.
 	 *
-	 * @param   \WC_Order  $order  Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -223,7 +223,7 @@ class Customer {
 	/**
 	 * Get order billing address.
 	 *
-	 * @param   \WC_Order  $order  Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -254,7 +254,7 @@ class Customer {
 	/**
 	 * Get order shipping address.
 	 *
-	 * @param   \WC_Order  $order  Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -286,7 +286,7 @@ class Customer {
 	/**
 	 * Get client details.
 	 *
-	 * @param   \WC_Order  $order  order object
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return array
 	 */
@@ -301,7 +301,7 @@ class Customer {
 	/**
 	 * Get user agent language.
 	 *
-	 * @param   \WC_Order  $order  Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return string
 	 */
@@ -369,8 +369,8 @@ class Customer {
 	/**
 	 * Get customer data.
 	 *
-	 * @param   string  $key      Customer key.
-	 * @param   mixed   $default  Customer data default value.
+	 * @param string $key Customer key.
+	 * @param mixed $default Customer data default value.
 	 *
 	 * @return mixed
 	 */
@@ -390,7 +390,7 @@ class Customer {
 	/**
 	 * Login the recover cart user.
 	 *
-	 * @param   int  $user_id  user id.
+	 * @param int $user_id user id.
 	 *
 	 * @return bool
 	 */
@@ -411,7 +411,7 @@ class Customer {
 	/**
 	 * update recover cart user data.
 	 *
-	 * @param   int  $user_id  user id.
+	 * @param int $user_id user id.
 	 *
 	 * @return bool
 	 */
@@ -424,7 +424,7 @@ class Customer {
 			return true;
 		}
 		//"Not logging in user {$user_id} with admin rights"
-		WC::addNotice( __( 'Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', RNOC_TEXT_DOMAIN ) );
+		WC::addNotice( __( 'Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', 'retainful-next-order-coupon-for-woocommerce' ) );
 
 		return false;
 	}
@@ -432,7 +432,7 @@ class Customer {
 	/**
 	 * Allowed to be logged in for cart recovery.
 	 *
-	 * @param   int|\WP_User  $user  user id
+	 * @param int|\WP_User $user user id
 	 *
 	 * @return bool
 	 */
@@ -443,7 +443,7 @@ class Customer {
 	/**
 	 * Get the user agent of a client.
 	 *
-	 * @param   \WC_Order|null  $order  Order object.
+	 * @param \WC_Order|null $order Order object.
 	 *
 	 * @return string
 	 */
@@ -458,6 +458,60 @@ class Customer {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Get user by filed.
+	 *
+	 * @param string $field Field.
+	 * @param string $user_name User name.
+	 *
+	 * @return false|\stdClass|\WP_User
+	 */
+	public static function getUserBy( $field, $user_name ) {
+		return function_exists( 'get_user_by' ) ? get_user_by( $field, $user_name ) : new \stdClass();
+	}
+
+	public static function setUserDateOnLogin() {
+		if ( empty( $user_name ) ) {
+			return;
+		}
+		$user = ! empty( self::getUserBy( 'login', $user_name ) ) ? self::getUserBy( 'login', $user_name ) : self::getUserBy( 'email', $user_name );
+		if ( ! empty( $user ) && is_object( $user ) && isset( $user->ID ) ) {
+			self::setUserData( $user->ID );
+		}
+	}
+
+	/**
+	 * Set the user data.
+	 *
+	 * @param string $user_name User name.
+	 *
+	 */
+	public static function setUserData( $user_id ) {
+		if ( empty( $user_id ) && ! is_int( $user_id ) ) {
+			return;
+		}
+		$cart_token = Settings::getStorage()->get( '_rnoc_user_cart_token' );
+		if ( ! empty( $cart_token ) ) {
+			WP::updateUserMeta( $user_id, '_rnoc_user_cart_token', $cart_token );
+		}
+		$cart_created_at = Settings::getStorage()->get( 'rnoc_cart_created_at' );
+		if ( ! empty( $cart_created_at ) ) {
+			WP::updateUserMeta( $user_id, '_rnoc_cart_tracking_started_at', $cart_created_at );
+		}
+	}
+
+
+	/**
+	 * Remove user data on local storage.
+	 */
+	public static function removeUserData( $user_id ) {
+		if ( empty( $user_id ) && ! is_int( $user_id ) ) {
+			return;
+		}
+		Settings::getStorage()->remove( '_rnoc_user_cart_token' );
+		Settings::getStorage()->remove( 'rnoc_cart_created_at' );
 	}
 
 }

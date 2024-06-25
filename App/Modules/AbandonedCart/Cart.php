@@ -16,7 +16,7 @@ use RNOC\App\Modules\Storage\Cookie;
 defined( 'ABSPATH' ) || exit;
 
 class Cart extends AbandonedCart {
-	
+
 	/**
 	 * Display tracking div.
 	 *
@@ -37,7 +37,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Get cart fragments.
 	 *
-	 * @param   array  $fragments  Fragment data.
+	 * @param array $fragments Fragment data.
 	 *
 	 * @return array
 	 */
@@ -91,7 +91,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Get tracking div.
 	 *
-	 * @param   array  $cart_data  Tracking data.
+	 * @param array $cart_data Tracking data.
 	 *
 	 * @return string
 	 */
@@ -397,8 +397,7 @@ class Cart extends AbandonedCart {
 
 		try {
 			$this->reCreateCart( $token, $hash );
-		}
-		catch ( \Exception $e ) {
+		} catch ( \Exception $e ) {
 
 
 		}
@@ -410,8 +409,8 @@ class Cart extends AbandonedCart {
 	/**
 	 * Recreate the woocommerce cart.
 	 *
-	 * @param   string  $token  cart token.
-	 * @param   string  $hash   hash token.
+	 * @param string $token cart token.
+	 * @param string $hash hash token.
 	 *
 	 * @return false|void
 	 * @throws \Exception
@@ -510,8 +509,8 @@ class Cart extends AbandonedCart {
 	/**
 	 * Sync the cart details to server.
 	 *
-	 * @param   string  $app_id      app id.
-	 * @param   string  $cart_token  cart token.
+	 * @param string $app_id app id.
+	 * @param string $cart_token cart token.
 	 *
 	 * @return array|bool|mixed|object|string
 	 */
@@ -533,7 +532,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * recreate the cart for gust user.
 	 *
-	 * @param   array  $data  recover cart data.
+	 * @param array $data recover cart data.
 	 *
 	 * @return void
 	 * @throws \Exception
@@ -570,7 +569,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * recreate the cart from cart content.
 	 *
-	 * @param   array  $cart_contents  cart content.
+	 * @param array $cart_contents cart content.
 	 */
 	public static function recreateCartFromCartContents( $cart_contents ) {
 
@@ -620,8 +619,8 @@ class Cart extends AbandonedCart {
 	/**
 	 * Remove key value pairs from list.
 	 *
-	 * @param          $full_list
-	 * @param   array  $remove_list
+	 * @param array $full_list
+	 * @param array $remove_list
 	 */
 	public static function unsetFromArray( &$full_list, $remove_list = array() ) {
 		if ( ! empty( $remove_list ) ) {
@@ -636,7 +635,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Returns $coupons, with any invalid coupons removed.
 	 *
-	 * @param   \WC_Coupon  $coupons  coupon object.
+	 * @param \WC_Coupon $coupons coupon object.
 	 *
 	 * @return mixed|null
 	 * @throws \Exception
@@ -660,7 +659,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Get Order ID from cart token
 	 *
-	 * @param   string  $cart_token  cart token
+	 * @param string $cart_token cart token
 	 *
 	 * @return string|null
 	 */
@@ -677,7 +676,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * Get User ID from cart token
 	 *
-	 * @param   string  $cart_token  cart token
+	 * @param string $cart_token cart token
 	 *
 	 * @return string|null
 	 */
@@ -694,7 +693,7 @@ class Cart extends AbandonedCart {
 	/**
 	 * populate cart from session data
 	 *
-	 * @param   array  $data  cart data
+	 * @param array $data cart data
 	 */
 	function populateSessionDetails( $data ) {
 		$customer_email = isset( $data['email'] ) ? $data['email'] : '';
@@ -708,5 +707,40 @@ class Cart extends AbandonedCart {
 		Customer::setCustomerDetails( 'shipping', 'shipping', $shipping_details );
 	}
 
+	/**
+	 * Add abandon cart coupon automatically
+	 */
+	function applyAbandonedCartCoupon() {
+		if ( is_admin() ) {
+			return;
+		}
+		$retainful_ac_coupon = Input::get( 'retainful_ac_coupon', '' );
+		if ( ! empty( $retainful_ac_coupon ) ) {
+			Settings::getStorage()->set( 'rnoc_ac_coupon', $retainful_ac_coupon );
+		}
+		$session_coupon = Settings::getStorage()->get( 'rnoc_ac_coupon' );
+		if ( ! empty( $session_coupon ) ) {
+			if ( Order::isValidCoupon( $session_coupon ) ) {
+				$cart = \RNOC\App\Helpers\Cart::getCart();
+				if ( ! empty( $cart ) && ! Order::hasDiscount( $session_coupon ) ) {
+					if ( Order::addDiscount( $session_coupon ) ) {
+						Settings::getStorage()->remove( 'rnoc_ac_coupon' );
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Remove coupon code.
+	 *
+	 * @param string $remove_coupon Coupon code.
+	 */
+	function removeCouponFromCart( $remove_coupon ) {
+		$coupon_code = Settings::getStorage()->get( 'rnoc_ac_coupon' );
+		if ( strtoupper( $remove_coupon ) == strtoupper( $coupon_code ) ) {
+			Settings::getStorage()->remove( 'rnoc_ac_coupon' );
+		}
+	}
 
 }

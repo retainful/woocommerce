@@ -5,9 +5,11 @@ namespace RNOC\App;
 use RNOC\App\Controllers\Admin\Settings;
 use RNOC\App\Controllers\Site\Popups;
 use RNOC\App\Controllers\Site\RestApi;
+use RNOC\App\Helpers\Customer;
 use RNOC\App\Modules\AbandonedCart\Cart;
 use RNOC\App\Helpers\Settings as SettingsHelper;
 use RNOC\App\Modules\AbandonedCart\Order;
+use RNOC\App\Modules\Imports\OrderImports;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -44,6 +46,9 @@ class Router {
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
+			add_action( 'rest_api_init', [ self::class, 'registerSyncEndPoints' ] );
+
+
 			$cart = new Cart();
 			add_action( 'wp_enqueue_scripts', [ $cart, 'addCartTrackingScripts' ] );
 			add_action( 'wp_ajax_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
@@ -51,31 +56,31 @@ class Router {
 
 			add_action( 'woocommerce_api_retainful', [ $cart, 'recoverUserCart' ] );
 
-			//add_action('wp_loaded', array($cart, 'applyAbandonedCartCoupon'));
-			//add_action('woocommerce_removed_coupon', array($cart, 'removeNextOrderCouponFromCart'));
-			$cart_tracking_engine = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' );
-			if ( $cart_tracking_engine == 'php' ) {
-				//add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
-			} else {
-				//Js tracking
-				add_action( 'wp_footer', [ $cart, 'renderCartTrackingDiv' ] );
-				add_filter( 'woocommerce_add_to_cart_fragments', [ $cart, 'getCartFragments' ] );
-				add_action( 'wp_ajax_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
-				add_action( 'wp_ajax_nopriv_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
-			}
+			add_action( 'wp_loaded', [ $cart, 'applyAbandonedCartCoupon' ] );
+			add_action( 'woocommerce_removed_coupon', [ $cart, 'removeCouponFromCart' ] );
+//			$cart_tracking_engine = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' );
+//			if ( $cart_tracking_engine == 'php' ) {
+//				//add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
+//			} else {
+			//Js tracking
+			add_action( 'wp_footer', [ $cart, 'renderCartTrackingDiv' ] );
+			add_filter( 'woocommerce_add_to_cart_fragments', [ $cart, 'getCartFragments' ] );
+			add_action( 'wp_ajax_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
+			add_action( 'wp_ajax_nopriv_rnoc_cart_item_change', [ $cart, 'getCartTrackingUpdatedData' ] );
+//			}
 			//add_action('wp_footer', array($cart, 'printRefreshFragmentScript'));
 
-			//add_action('wp_authenticate', array($cart, 'userLoggedOn'));
-			//add_action( 'user_register', array( $cart, 'userSignedUp' ) );
-			//add_action('wp_logout', array($cart, 'userLoggedOut'));
+			add_action( 'wp_authenticate', [ Customer::class, 'setUserDateOnLogin' ] );
+			add_action( 'user_register', [ Customer::class, 'setUserData' ] );
+			add_action( 'wp_logout', [ Customer::class, 'removeUserData' ] );
 			$order = new Order();
-			//add_action('woocommerce_thankyou', array($checkout, 'payPageOrderCompletion'));
-			//add_action('woocommerce_payment_complete', array($checkout, 'paymentCompleted'));
+			add_action( 'woocommerce_thankyou', [ $order, 'payPageOrderCompletion' ] );
+			add_action( 'woocommerce_payment_complete', [ $order, 'paymentCompleted' ] );
 			add_action( 'woocommerce_checkout_update_order_meta', [ $order, 'checkoutOrderProcessed' ] );
 			add_action( 'woocommerce_store_api_checkout_update_order_meta', [ $order, 'apiCheckoutOrderProcessed' ] );
-			//add_action('woocommerce_order_status_changed', array($checkout, 'orderStatusChanged'), 15, 3);
+			add_action( 'woocommerce_order_status_changed', [ $order, 'orderStatusChanged' ], 15, 3 );
 			// handle placed orders
-			add_action('woocommerce_order_status_changed', array($order, 'orderUpdated'), 11, 1);
+			add_action( 'woocommerce_order_status_changed', [ $order, 'orderUpdated' ], 11, 1 );
 
 			//triggers when admin changes the order
 			add_action( 'wp_footer', [ $order, 'setRetainfulOrderData' ] );
@@ -83,8 +88,28 @@ class Router {
 			add_action( 'woocommerce_process_shop_order_meta', [ $order, 'orderUpdatedShopBackend' ], 50, 2 );
 			add_filter( 'woocommerce_webhook_http_args', [ $order, 'changeWebHookHeader' ], 10, 3 );
 
+
 		}
 
+	}
+
+	/**
+	 * Add sync endpoints.
+	 *
+	 * @return void
+	 */
+	public static function registerSyncEndPoints() {
+		$import = new OrderImports();
+		register_rest_route( 'retainful-api/v1', '/orders/count', [
+			'methods'             => 'GET',
+			'permission_callback' => '__return_true',
+			'callback'            => [ $import, 'getSyncOrderCount' ]
+		] );
+		register_rest_route( 'retainful-api/v1', '/orders', [
+			'methods'             => 'GET',
+			'permission_callback' => '__return_true',
+			'callback'            => [ $import, 'getSyncOrders' ]
+		] );
 	}
 
 	/**
@@ -127,12 +152,12 @@ class Router {
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
 		if ( ! empty( $secret ) && ! empty( $app_key ) && $is_app_connected ) {
-			$cart = new Cart();
+			$cart  = new Cart();
+			$order = new Order();
 			add_action( 'woocommerce_cart_loaded_from_session', [ $cart, 'handlePersistentCart' ] );
-			//add_filter('woocommerce_checkout_fields', array($cart, 'guestGdprMessage'), 10, 1);
-			//add_action('woocommerce_checkout_after_terms_and_conditions', array($cart, 'guestTermGdprMessage'));
+			add_filter( 'woocommerce_checkout_fields', [ $order, 'guestGdprMessage' ], 10, 1 );
+			add_action( 'woocommerce_checkout_after_terms_and_conditions', [ $order, 'guestTermGdprMessage' ] );
 		}
-
 	}
 
 }
