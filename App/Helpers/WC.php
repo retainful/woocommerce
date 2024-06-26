@@ -12,7 +12,7 @@ class WC {
 	/**
 	 * Get default currency.
 	 *
-	 * @param   string  $currency  Currency code.
+	 * @param string $currency Currency code.
 	 *
 	 * @return string
 	 */
@@ -27,7 +27,7 @@ class WC {
 	/**
 	 * Get default site language.
 	 *
-	 * @param   string  $current_lang  Site language.
+	 * @param string $current_lang Site language.
 	 *
 	 * @return string
 	 */
@@ -74,7 +74,7 @@ class WC {
 	/**
 	 * Set session cookie.
 	 *
-	 * @param   bool  $value  cookie value.
+	 * @param bool $value cookie value.
 	 *
 	 * @return void
 	 */
@@ -91,8 +91,8 @@ class WC {
 	/**
 	 * Set session.
 	 *
-	 * @param   string  $key    Session key.
-	 * @param   mixed   $value  Session value.
+	 * @param string $key Session key.
+	 * @param mixed $value Session value.
 	 *
 	 * @return void
 	 */
@@ -109,8 +109,8 @@ class WC {
 	/**
 	 * Get session.
 	 *
-	 * @param   string  $key      Session key.
-	 * @param   mixed   $default  Default value.
+	 * @param string $key Session key.
+	 * @param mixed $default Default value.
 	 *
 	 * @return mixed
 	 */
@@ -128,7 +128,7 @@ class WC {
 	/**
 	 * Remove session.
 	 *
-	 * @param   string  $key  Session key.
+	 * @param string $key Session key.
 	 *
 	 * @return bool
 	 */
@@ -187,7 +187,7 @@ class WC {
 	/**
 	 * Format price
 	 *
-	 * @param   float  $price  Price.
+	 * @param float $price Price.
 	 *
 	 * @return float
 	 */
@@ -214,7 +214,7 @@ class WC {
 	/**
 	 * Format to Iso 8601
 	 *
-	 * @param   int|string  $timestamp  Time stamp.
+	 * @param int|string $timestamp Time stamp.
 	 *
 	 * @return string|null
 	 */
@@ -231,8 +231,7 @@ class WC {
 			$date_time = new \DateTime( $date );
 
 			return $date_time->format( \DateTime::ATOM );
-		}
-		catch ( \Exception $e ) {
+		} catch ( \Exception $e ) {
 
 		}
 
@@ -242,7 +241,7 @@ class WC {
 	/**
 	 * Format price.
 	 *
-	 * @param   float  $price  Price.
+	 * @param float $price Price.
 	 *
 	 * @return string
 	 */
@@ -286,7 +285,7 @@ class WC {
 	/**
 	 * Add woocommerce notice.
 	 *
-	 * @param   string  $message  Notice message.
+	 * @param string $message Notice message.
 	 *
 	 */
 	public static function addNotice( $message ) {
@@ -303,5 +302,29 @@ class WC {
 		}
 	}
 
+	/**
+	 * get Ordered Date
+	 *
+	 * @param $order
+	 * @param $format
+	 *
+	 * @return null
+	 */
+	public static function getOrderPlacedDate( $order, $format = null ) {
+		$date = null;
+		if ( Util::isMethodExists( $order, 'get_date_paid' ) ) {
+			$dateObject = $order->get_date_paid();
+			if ( is_object( $dateObject ) && $dateObject instanceof \WC_DateTime ) {
+				$date = $dateObject->getTimestamp();
+			}
+			if ( ! is_null( $format ) ) {
+				$date = $dateObject->format( $format );
+			}
+
+			return $date;
+		}
+
+		return null;
+	}
 
 }

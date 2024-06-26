@@ -10,6 +10,7 @@ use RNOC\App\Modules\AbandonedCart\Cart;
 use RNOC\App\Helpers\Settings as SettingsHelper;
 use RNOC\App\Modules\AbandonedCart\Order;
 use RNOC\App\Modules\Imports\OrderImports;
+use RNOC\App\Modules\Imports\ProductImport;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -41,7 +42,6 @@ class Router {
 		//register_deactivation_hook( RNOC_FILE, [ Common::class, 'onPluginDeactivation' ] );
 		// Rest api
 		add_action( 'rest_api_init', [ RestApi::class, 'registerEndPoints' ] );
-		add_action( 'rnocp_check_user_plan', [ Settings::class, 'checkUserPlan' ] );
 		$secret           = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );
@@ -87,6 +87,10 @@ class Router {
 
 			add_action( 'woocommerce_process_shop_order_meta', [ $order, 'orderUpdatedShopBackend' ], 50, 2 );
 			add_filter( 'woocommerce_webhook_http_args', [ $order, 'changeWebHookHeader' ], 10, 3 );
+			add_filter( 'woocommerce_webhook_http_args', [
+				ProductImport::class,
+				'changeWebHookHeaderProduct'
+			], 10, 3 );
 
 
 		}
@@ -110,6 +114,17 @@ class Router {
 			'permission_callback' => '__return_true',
 			'callback'            => [ $import, 'getSyncOrders' ]
 		] );
+		$product_import = new ProductImport();
+		register_rest_route( 'retainful-api/v1', '/products/count', [
+			'methods'             => 'GET',
+			'permission_callback' => '__return_true',
+			'callback'            => [ $product_import, 'getSyncProductCount' ]
+		] );
+		register_rest_route( 'retainful-api/v1', '/products', [
+			'methods'             => 'GET',
+			'permission_callback' => '__return_true',
+			'callback'            => [ $product_import, 'getSyncProducts' ]
+		] );
 	}
 
 	/**
@@ -119,7 +134,6 @@ class Router {
 	 */
 	public static function addAdminHooks() {
 		add_action( 'admin_menu', [ Settings::class, 'addMenu' ] );
-		add_action( 'wp_after_admin_bar_render', [ Settings::class, 'schedulePlanChecker' ] );
 		add_action( 'admin_enqueue_scripts', [ Settings::class, 'addAdminScript' ] );
 		//app connection
 		add_action( 'wp_ajax_rnoc_connection', [ Settings::class, 'connect' ] );
