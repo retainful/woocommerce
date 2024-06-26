@@ -200,6 +200,7 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
                 </p>
             </td>
         </tr>
+        <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'] == 'yes'): ?>
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>"><?php
@@ -230,7 +231,6 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
                 </p>
             </td>
         </tr>
-
         <tr>
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'; ?>"><?php
@@ -256,6 +256,7 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
                 </label>
             </td>
         </tr>
+        <?php endif; ?>
         <tr >
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'; ?>"><?php
