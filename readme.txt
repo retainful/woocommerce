@@ -1,4 +1,4 @@
-=== Email Marketing for WooCommerce by Retainful - WooCommerce Abandoned Cart Recovery, Newsletters, Signup Forms & Popups ===
+=== Email Marketing for WooCommerce by Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms & Popups and Email Automations ===
 Contributors: retainful
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.6.1
