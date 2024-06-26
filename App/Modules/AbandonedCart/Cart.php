@@ -222,7 +222,7 @@ class Cart extends AbandonedCart {
 	function getCartData() {
 		$cart_token            = $this->getCartToken();
 		$customer_details      = Customer::getCartCustomer();
-		$created_at            = strtotime( self::getTrackingStartAt() );
+		$created_at            = self::getTrackingStartAt();
 		$cart_total            = WC::formatDecimalPrice( CartHelper::getCartTotal( 'edit' ) );
 		$current_currency_code = WC::getCurrentCurrencyCode();
 		$default_currency_code = WC::getDefaultCurrency();
@@ -267,8 +267,7 @@ class Cart extends AbandonedCart {
 			'recovered_cart_token'      => $storage->get( 'rnoc_recovered_cart_token' ),
 			'client_details'            => Customer::getClientDetails()
 		];
-
-
+		
 		return apply_filters( 'rnoc_get_user_cart', $cart );
 	}
 

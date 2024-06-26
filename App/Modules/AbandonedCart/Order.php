@@ -117,7 +117,7 @@ class Order {
 			'tax_lines'                 => [],
 			'total_tax'                 => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderData( 'total_tax', $order, 0 ) ),
 			'cart_token'                => $cart_token,
-			'created_at'                => WC::formatToIso8601( strtotime( $cart_created_at ) ),
+			'created_at'                => WC::formatToIso8601( $cart_created_at ),
 			'line_items'                => $this->getOrderLineItemsDetails( $order ),
 			'updated_at'                => WC::formatToIso8601(),
 			'source_name'               => 'web',
