@@ -3,9 +3,9 @@ Contributors: retainful, flycart
 Tags: abandoned cart, cart abandonment, woocommerce, email marketing automation, coupon
 Requires at least: 4.6.1
 Tested up to: 6.5
-WC tested up to: 8.9
+WC tested up to: 9.0
 Requires PHP: 5.6
-Stable tag: 2.6.34
+Stable tag: 2.6.35
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -257,6 +257,9 @@ You can reach out to our experts [here](https://www.retainful.com/support).
 7. Retainful Contacts
 
 == Changelog ==
+= 2.6.35 =
+- Deprecated: Referral Popup.
+
 = 2.6.34 =
 - Fix: Marketing Consent: Default value Implicit in synchronization
 
