@@ -341,7 +341,10 @@ class Order {
 			}
 			$delivery_url      = $webhook->get_delivery_url();
 			$site_delivery_url = Webhook::getDeliveryUrl( $topic );
-			if ( $delivery_url != $site_delivery_url || $order_id <= 0 ) {
+			if ( $delivery_url != $site_delivery_url || $order_id <= 0 || ! in_array( $topic, [
+					'order.created',
+					'order.updated',
+				] ) ) {
 				return $http_args;
 			}
 			$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
@@ -368,13 +371,12 @@ class Order {
 			if ( is_array( $order_data ) && ! empty( $order_data ) ) {
 				$client_ip     = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
 				$token         = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
-				$app_id        = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'licence' );
+				$app_id        = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 				$extra_headers = [
 					"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
 					"X-Retainful-Version"  => RNOC_VERSION,
 					"X-Cart-Token"         => $token,
 					"Cart-Token"           => $token,
-					"app-id"               => $app_id,
 					"app_id"               => $app_id,
 					"Content-Type"         => 'application/json'
 				];
