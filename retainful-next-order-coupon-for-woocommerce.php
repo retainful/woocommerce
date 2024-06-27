@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin name: Retainful - Abandoned Cart Recovery Emails and Next Order Coupons
+ * Plugin name: Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms & Popups
  * Plugin URI: https://www.retainful.com
- * Description: Recover abandoned carts and drive repeat purchases by sending single-use, unique coupon codes to customers for their next purchase
+ * Description: Do life-cycle WooCommerce email marketing with Retainful - grow email list, nurture and retain customers through automation & email campaigns.
  * Author: Retainful
  * Author URI: https://www.retainful.com
  * Version: 2.6.35
