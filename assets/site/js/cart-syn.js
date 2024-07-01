@@ -271,7 +271,7 @@ rnoc = window.rnoc || {};
     }
 
     rnoc_jquery(document).on('change', 'input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone,input#rnoc_allow_gdpr', function () {
-        let rnoc_phone = ("#billing_phone").val();
+        let rnoc_phone = rnoc_jquery("#billing_phone").val();
         let rnoc_email = rnoc_jquery("#billing_email").val();
         let ship_to_bill = rnoc_jquery("#ship-to-different-address-checkbox:checked").length;
         let guest_data = {

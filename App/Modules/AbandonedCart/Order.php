@@ -138,14 +138,13 @@ class Order {
 			'abandoned_checkout_url'    => self::getRecoveryLink( $cart_token ),
 			'total_line_items_price'    => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderItemsTotal( $order ) ),
 			'buyer_accepts_marketing'   => ( $is_buyer_accepts_marketing == 1 ),
-			'cancelled_at'              => \RNOC\App\Helpers\Order::getOrderMeta( self::$order_cancelled_date_key_for_db, $order ),
+			'cancelled_at'              => WC::formatToIso8601( \RNOC\App\Helpers\Order::getOrderMeta( self::$order_cancelled_date_key_for_db, $order ) ),
 			'woocommerce_totals'        => self::getOrderTotals( $order, $excluding_tax ),
-
-			'recovered_by_retainful' => (bool) \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_by', $order ),
-			'recovered_cart_token'   => \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_cart_token', $order ),
-			'recovered_at'           => ( ! empty( $recovered_at ) ) ? WC::formatToIso8601( $recovered_at ) : null,
-			'client_details'         => Customer::getClientDetails( $order ),
-			'payment_method'         => [
+			'recovered_by_retainful'    => (bool) \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_by', $order ),
+			'recovered_cart_token'      => \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_cart_token', $order ),
+			'recovered_at'              => ( ! empty( $recovered_at ) ) ? WC::formatToIso8601( $recovered_at ) : null,
+			'client_details'            => Customer::getClientDetails( $order ),
+			'payment_method'            => [
 				'value' => \RNOC\App\Helpers\Order::getPaymentMethod( $order ),
 				'name'  => \RNOC\App\Helpers\Order::getPaymentMethodTitle( $order ),
 			]
