@@ -138,14 +138,13 @@ class Order {
 			'abandoned_checkout_url'    => self::getRecoveryLink( $cart_token ),
 			'total_line_items_price'    => WC::formatDecimalPrice( \RNOC\App\Helpers\Order::getOrderItemsTotal( $order ) ),
 			'buyer_accepts_marketing'   => ( $is_buyer_accepts_marketing == 1 ),
-			'cancelled_at'              => \RNOC\App\Helpers\Order::getOrderMeta( self::$order_cancelled_date_key_for_db, $order ),
+			'cancelled_at'              => WC::formatToIso8601( \RNOC\App\Helpers\Order::getOrderMeta( self::$order_cancelled_date_key_for_db, $order ) ),
 			'woocommerce_totals'        => self::getOrderTotals( $order, $excluding_tax ),
-
-			'recovered_by_retainful' => (bool) \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_by', $order ),
-			'recovered_cart_token'   => \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_cart_token', $order ),
-			'recovered_at'           => ( ! empty( $recovered_at ) ) ? WC::formatToIso8601( $recovered_at ) : null,
-			'client_details'         => Customer::getClientDetails( $order ),
-			'payment_method'         => [
+			'recovered_by_retainful'    => (bool) \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_by', $order ),
+			'recovered_cart_token'      => \RNOC\App\Helpers\Order::getOrderMeta( '_rnoc_recovered_cart_token', $order ),
+			'recovered_at'              => ( ! empty( $recovered_at ) ) ? WC::formatToIso8601( $recovered_at ) : null,
+			'client_details'            => Customer::getClientDetails( $order ),
+			'payment_method'            => [
 				'value' => \RNOC\App\Helpers\Order::getPaymentMethod( $order ),
 				'name'  => \RNOC\App\Helpers\Order::getPaymentMethodTitle( $order ),
 			]
@@ -341,7 +340,10 @@ class Order {
 			}
 			$delivery_url      = $webhook->get_delivery_url();
 			$site_delivery_url = Webhook::getDeliveryUrl( $topic );
-			if ( $delivery_url != $site_delivery_url || $order_id <= 0 ) {
+			if ( $delivery_url != $site_delivery_url || $order_id <= 0 || ! in_array( $topic, [
+					'order.created',
+					'order.updated',
+				] ) ) {
 				return $http_args;
 			}
 			$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
@@ -368,13 +370,12 @@ class Order {
 			if ( is_array( $order_data ) && ! empty( $order_data ) ) {
 				$client_ip     = \RNOC\App\Helpers\Order::getOrderMeta( self::$user_ip_key_for_db, $order );
 				$token         = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
-				$app_id        = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'licence' );
+				$app_id        = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 				$extra_headers = [
 					"X-Client-Referrer-IP" => ( ! empty( $client_ip ) ) ? $client_ip : null,
 					"X-Retainful-Version"  => RNOC_VERSION,
 					"X-Cart-Token"         => $token,
 					"Cart-Token"           => $token,
-					"app-id"               => $app_id,
 					"app_id"               => $app_id,
 					"Content-Type"         => 'application/json'
 				];

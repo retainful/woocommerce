@@ -120,7 +120,7 @@ class ProductImport {
 			'items'         => []
 		];
 		foreach ( $products as $product_data ) {
-			$response['items'][] = $this->setProductData( $product_data->ID );
+			$response['items'][] = self::setProductData( $product_data->ID );
 		}
 		$status = 200;
 
@@ -157,7 +157,7 @@ class ProductImport {
 	 *
 	 * @return array|void
 	 */
-	protected function setProductData( $product_id ) {
+	protected static function setProductData( $product_id ) {
 		if ( empty( $product_id ) ) {
 			return;
 		}
@@ -226,28 +226,34 @@ class ProductImport {
 	 * @return array|\WP_REST_Response
 	 * @throws \Exception
 	 */
-	function changeWebHookHeaderProduct( $http_args, $product_id, $webhook_id ) {
-		if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! self::$settings->isConnectionActive() ) {
+	public static function changeWebHookHeaderProduct( $http_args, $product_id, $webhook_id ) {
+		$is_app_connected = Settings::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' );
+		$secret           = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
+
+		if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! $is_app_connected ) {
 			return $http_args;
 		}
+
 		try {
 			$webhook      = new \WC_Webhook( $webhook_id );
 			$topic        = $webhook->get_topic();
 			$topic_status = Webhook::getWebHookStatus();
-
-			if ( ! isset( $topic_status[ $topic ] ) || ! $topic_status[ $topic ] ) {
+			if ( ! isset( $topic_status[ $topic ] ) || ! $topic_status[ $topic ] || ! in_array( $topic, [
+					'product.created',
+					'product.updated',
+					'product.deleted'
+				] ) ) {
 				return $http_args;
 			}
-			$delivery_url      = $webhook->get_delivery_url();
-			$site_delivery_url = self::$settings->getDeliveryUrl( $topic );
 
+			$delivery_url      = $webhook->get_delivery_url();
+			$site_delivery_url = Webhook::getDeliveryUrl( $topic );
 			if ( $delivery_url != $site_delivery_url || $product_id <= 0 ) {
 				return $http_args;
 			}
-			$product_data = $this->setProductData( $product_id );
+			$product_data = self::setProductData( $product_id );
 
 			if ( is_array( $product_data['id'] ) || empty( $product_data['created_at'] ) ) {
-				self::$settings->logMessage( $product_data, 'API Product data missing' );
 				$status   = 400;
 				$response = array(
 					'success'       => false,
@@ -257,14 +263,14 @@ class ProductImport {
 
 				return new \WP_REST_Response( $response, $status );
 			}
-			$product_data['digest']     = $this->hashToken( array(
+			$product_data['digest']     = Settings::isHashMatches( $secret, array(
 				$product_data['id'],
 				$product_data['created_at'],
 				$product_data['title']
 			) );
 			$product_data['event_type'] = $topic;
 			if ( ! empty( $product_data ) ) {
-				$app_id        = self::$settings->getApiKey();
+				$app_id        = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 				$extra_headers = array(
 					"X-Retainful-Version" => RNOC_VERSION,
 					"app_id"              => $app_id,
@@ -273,9 +279,10 @@ class ProductImport {
 				foreach ( $extra_headers as $key => $value ) {
 					$http_args['headers'][ $key ] = $value;
 				}
-				$body              = array(
+				$body = array(
 					'data' => $product_data
 				);
+
 				$http_args['body'] = trim( wp_json_encode( $body ) );
 			}
 		} catch ( Exception $e ) {
