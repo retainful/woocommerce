@@ -1,6 +1,9 @@
 <?php
 
 namespace RNOC\App\Modules\Integrations;
+
+defined( 'ABSPATH' ) || exit;
+
 class Currency {
 	/**
 	 * Currency filters
