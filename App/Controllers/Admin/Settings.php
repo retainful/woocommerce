@@ -39,7 +39,8 @@ class Settings {
 			self::class,
 			'getSettingsPage'
 		) );
-		if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], [
+		$page = Input::get( 'page', '' );
+		if ( ! empty( $page ) && in_array( $page, [
 				'retainful_license',
 				'retainful_settings',
 			] ) && Webhook::isWebhookNoticeShow() ) {
