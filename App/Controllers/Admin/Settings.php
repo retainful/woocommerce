@@ -129,7 +129,7 @@ class Settings {
 		];
 		wp_localize_script( 'retainful-abandoncart', 'rnoc_localize_data', $localize );
 	}
-	
+
 	/**
 	 * Connect to RetainFul.
 	 *
@@ -215,7 +215,7 @@ class Settings {
 			return [];
 		}
 		$scheme           = wc_site_is_https() ? 'https' : 'http';
-		$default_language = ''; //TODO:need to add the store language using the multilingual addon
+		$default_language = WP::getDefaultLanguage(); //TODO:need to add the store language using the multilingual addon
 		$time_zone        = \RNOC\App\Helpers\Settings::getData( 'timezone_string' );
 		if ( empty( $time_zone ) ) {
 			$time_zone = \RNOC\App\Helpers\Settings::getData( 'gmt_offset' );
