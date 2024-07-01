@@ -657,7 +657,7 @@ class Order {
 						$user_id,
 						'_woocommerce_persistent_cart_' . get_current_blog_id()
 					);
-					if ( $this->isPendingRecovery( $user_id ) ) {
+					if ( self::isPendingRecovery( $user_id ) ) {
 						\RNOC\App\Helpers\Order::setOrderMeta(
 							$order_id, self::$pending_recovery_key_for_db, true
 						);
@@ -678,7 +678,7 @@ class Order {
 	 *
 	 * @return bool
 	 */
-	function isPendingRecovery( $user_id = null ) {
+	public static function isPendingRecovery( $user_id = null ) {
 		if ( $user_id || ( $user_id = get_current_user_id() ) ) {
 			return (bool) get_user_meta( $user_id,
 				self::$pending_recovery_key_for_db, true );

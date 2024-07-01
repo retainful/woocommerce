@@ -11,6 +11,8 @@ use RNOC\App\Helpers\Settings as SettingsHelper;
 use RNOC\App\Modules\AbandonedCart\Order;
 use RNOC\App\Modules\Imports\OrderImports;
 use RNOC\App\Modules\Imports\ProductImport;
+use RNOC\App\Modules\Integrations\AfterPay;
+use RNOC\App\Modules\Integrations\Currency;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -91,7 +93,12 @@ class Router {
 				ProductImport::class,
 				'changeWebHookHeaderProduct'
 			], 10, 3 );
-
+			//initialise currency helper
+			new Currency();
+			$after_pay = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'enable_afterpay_action', 'no' );
+			if ( $after_pay == 'yes' ) {
+				new AfterPay();
+			}
 
 		}
 
