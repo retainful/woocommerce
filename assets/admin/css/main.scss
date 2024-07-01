@@ -152,6 +152,16 @@
     border-bottom: 3px solid transparent;
     margin-left: 0;
   }
+
+  .premium-label {
+    color: white;
+    background: green;
+    padding: 2px;
+    border-radius: 2px;
+    border: 1px solid green;
+    margin-left: 5px;
+    font-size: 12px;
+  }
 }
 
 .ajs-message.ajs-success, .ajs-message.ajs-error {

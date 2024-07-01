@@ -20,7 +20,7 @@ $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ]
                 <p class="error" id="error_app_id" style="color: red;"></p>
                 <p class="description">
 					<?php
-					echo sprintf( esc_html__( 'Get your App-id %s', 'retainful-next-order-coupon-for-woocommerce' ), '<a target="_blank" href="' . $app_url . 'app/settings/general">here</a>' );
+					echo sprintf( esc_html__( 'Get your App-id %s', 'retainful-next-order-coupon-for-woocommerce' ), '<a target="_blank" href="' . $app_url . '/app/settings/general">here</a>' );
 					?>
                 </p>
             </td>
@@ -39,7 +39,7 @@ $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ]
                 <p class="error" id="error_secret_key" style="color: red;"></p>
                 <p class="description">
 					<?php
-					echo sprintf( esc_html__( 'Get your secret key %s', 'retainful-next-order-coupon-for-woocommerce' ), '<a target="_blank" href="' . $app_url . 'app/settings/general">here</a>' );
+					echo sprintf( esc_html__( 'Get your secret key %s', 'retainful-next-order-coupon-for-woocommerce' ), '<a target="_blank" href="' . $app_url . '/app/settings/general">here</a>' );
 					?>
                 </p>
             </td>

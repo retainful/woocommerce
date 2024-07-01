@@ -105,6 +105,7 @@ rnoc = window.rnoc || {};
         });
     });
     rnoc_jquery(document).on('rnoc-app-disconnect', function (e, app_id, app_secret) {
+        alertify.set('notifier', 'position', 'top-right');
         let rnoc_app_id = rnoc_jquery(app_id).val();
         let rnoc_app_secret = rnoc_jquery(app_secret).val();
         let data = {
@@ -118,7 +119,8 @@ rnoc = window.rnoc || {};
             url: rnoc_localize_data.ajax_url,
             data: data,
             dataType: "json",
-            success: function (json) {
+            success: function (response) {
+                alertify.success(response.data.message);
                 window.location.reload();
             },
             error: function () {

@@ -5,6 +5,8 @@ namespace RNOC\App\Modules\AbandonedCart;
 use RNOC\App\Helpers\Settings;
 use Valitron\Validator;
 
+defined( 'ABSPATH' ) || exit;
+
 class Coupon {
 
 	/**

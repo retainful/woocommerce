@@ -39,6 +39,15 @@ class Settings {
 			self::class,
 			'getSettingsPage'
 		) );
+		if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], [
+				'retainful_license',
+				'retainful_settings',
+			] ) && Webhook::isWebhookNoticeShow() ) {
+			$message = sprintf( __( 'Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', 'retainful-next-order-coupon-for-woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=advanced&section=webhooks' ) );
+			add_action( 'admin_notices', function () use ( $message ) {
+				echo '<div class="error notice"><p>' . $message . '</p></div>';
+			} );
+		}
 	}
 
 	/**

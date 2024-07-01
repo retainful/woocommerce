@@ -175,62 +175,6 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>"><?php
-					esc_html_e( 'Enable Referral program for your store?', 'retainful-next-order-coupon-for-woocommerce' );
-					?> <span class="premium-label">Premium</span></label>
-            </th>
-            <td>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget_yes'; ?>"
-                           value="yes" <?php if ( $settings[ RNOC_PLUGIN_PREFIX . 'enable_referral_widget' ] == 'yes' ) {
-						echo "checked";
-					} ?>>
-					<?php esc_html_e( 'Yes', 'retainful-next-order-coupon-for-woocommerce' ); ?>
-                </label>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_referral_widget_no'; ?>"
-                           value="no" <?php if ( $settings[ RNOC_PLUGIN_PREFIX . 'enable_referral_widget' ] == 'no' ) {
-						echo "checked";
-					} ?>>
-					<?php esc_html_e( 'No', 'retainful-next-order-coupon-for-woocommerce' ); ?>
-                </label>
-                <p class="description">
-					<?php
-					esc_html_e( 'You should also enable and configure the referral program in your Retainful dashboard.', 'retainful-next-order-coupon-for-woocommerce' );
-					?>
-                </p>
-            </td>
-        </tr>
-
-        <tr>
-            <th scope="row">
-                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'; ?>"><?php
-					esc_html_e( 'Show unique referral link in my account page for logged in customers?', 'retainful-next-order-coupon-for-woocommerce' );
-					?> <span class="premium-label">Premium</span></label>
-            </th>
-            <td>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget_yes'; ?>"
-                           value="yes" <?php if ( $settings[ RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget' ] == 'yes' ) {
-						echo "checked";
-					} ?>>
-					<?php esc_html_e( 'Yes', 'retainful-next-order-coupon-for-woocommerce' ); ?>
-                </label>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget_no'; ?>"
-                           value="no" <?php if ( $settings[ RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget' ] == 'no' ) {
-						echo "checked";
-					} ?>>
-					<?php esc_html_e( 'No', 'retainful-next-order-coupon-for-woocommerce' ); ?>
-                </label>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'; ?>"><?php
 					esc_html_e( 'Enable Signup Forms / Popups', 'retainful-next-order-coupon-for-woocommerce' );
 					?> <span class="premium-label">Premium</span></label>

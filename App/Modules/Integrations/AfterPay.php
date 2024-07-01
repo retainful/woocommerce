@@ -7,6 +7,8 @@ use RNOC\App\Modules\AbandonedCart\Cart;
 use RNOC\App\Modules\AbandonedCart\Order;
 use RNOC\App\Modules\AbandonedCart\Traits\SyncData;
 
+defined( 'ABSPATH' ) || exit;
+
 class AfterPay {
 	use SyncData;
 

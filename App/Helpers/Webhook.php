@@ -205,4 +205,70 @@ class Webhook {
 		}
 	}
 
+	/**
+	 * Is need to show webhook notice.
+	 *
+	 * @return bool
+	 */
+	public static function isWebhookNoticeShow() {
+
+		if ( ! settings::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', 0, 'license' ) ) {
+			return false;
+		}
+
+		if ( ! class_exists( 'WC_Data_Store' ) || ! function_exists( 'wc_get_webhook' ) ) {
+			return false;
+		}
+		$webhook_status = [
+			'order_created'   => false,
+			'order_updated'   => false,
+			'product_created' => false,
+			'product_updated' => false,
+			'product_deleted' => false
+
+		];
+		try {
+			$data_store = \WC_Data_Store::load( 'webhook' );
+			$args       = [
+				'limit'  => - 1,
+				'offset' => 0,
+			];
+
+			$webhooks = $data_store->search_webhooks( $args );
+
+			foreach ( $webhooks as $webhook_id ) {
+				$webhook = wc_get_webhook( $webhook_id );
+				if ( empty( $webhook ) ) {
+					continue;
+				}
+				$topic             = $webhook->get_topic();
+				$delivery_url      = $webhook->get_delivery_url();
+				$site_delivery_url = self::getDeliveryUrl( $topic );
+				if ( $delivery_url != $site_delivery_url ) {
+					continue;
+				}
+				$topic  = $webhook->get_topic();
+				$status = $webhook->get_status();
+				if ( $status == 'active' && $topic == 'order.created' ) {
+					$webhook_status['order_created'] = true;
+				}
+				if ( $status == 'active' && $topic == 'order.updated' ) {
+					$webhook_status['order_updated'] = true;
+				}
+				if ( $status == 'active' && $topic == 'product.created' ) {
+					$webhook_status['product_created'] = true;
+				}
+				if ( $status == 'active' && $topic == 'product.updated' ) {
+					$webhook_status['product_updated'] = true;
+				}
+				if ( $status == 'active' && $topic == 'product.deleted' ) {
+					$webhook_status['product_deleted'] = true;
+				}
+			}
+		} catch ( \Exception $e ) {
+
+		}
+
+		return in_array( false, $webhook_status );
+	}
 }
