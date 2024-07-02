@@ -3,6 +3,7 @@
 namespace RNOC\App;
 
 use RNOC\App\Controllers\Admin\Settings;
+use RNOC\App\Controllers\Site\Common;
 use RNOC\App\Controllers\Site\Popups;
 use RNOC\App\Controllers\Site\RestApi;
 use RNOC\App\Helpers\Customer;
@@ -41,7 +42,7 @@ class Router {
 	 */
 	public static function addCommonHooks() {
 		//Register deactivation hook
-		//register_deactivation_hook( RNOC_FILE, [ Common::class, 'onPluginDeactivation' ] );
+		register_deactivation_hook( RNOC_FILE, [ Common::class, 'onPluginDeactivation' ] );
 		// Rest api
 		add_action( 'rest_api_init', [ RestApi::class, 'registerEndPoints' ] );
 		$secret           = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
@@ -57,7 +58,7 @@ class Router {
 			add_action( 'wp_ajax_nopriv_rnoc_track_user_data', [ $cart, 'setCustomerData' ] );
 
 			add_action( 'woocommerce_api_retainful', [ $cart, 'recoverUserCart' ] );
-
+			add_filter( 'rnoc_can_track_abandoned_carts', [ $cart, 'isZeroValueCart' ], 15, 2 );
 			add_action( 'wp_loaded', [ $cart, 'applyAbandonedCartCoupon' ] );
 			add_action( 'woocommerce_removed_coupon', [ $cart, 'removeCouponFromCart' ] );
 //			$cart_tracking_engine = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' );
@@ -179,6 +180,9 @@ class Router {
 			add_filter( 'woocommerce_checkout_fields', [ $order, 'guestGdprMessage' ], 10, 1 );
 			add_action( 'woocommerce_checkout_after_terms_and_conditions', [ $order, 'guestTermGdprMessage' ] );
 		}
+
+		//ip filter
+		Customer::ipFilter();
 	}
 
 }

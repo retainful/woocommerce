@@ -4,7 +4,7 @@ namespace RNOC\App\Helpers;
 
 use RNOC\App\Modules\Storage\PHPSession;
 use RNOC\App\Modules\Storage\WooSession;
-use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
+use RNOC\App\Modules\Storage\Cookie;
 use Valitron\Validator;
 
 defined( 'ABSPATH' ) || exit;
@@ -262,10 +262,10 @@ class Settings {
 			return __( 'validation failed!', 'retainful-next-order-coupon-for-woocommerce' );
 		}
 		$validator = new Validator( $post_data );
-		$validator->rule( 'in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', [
-			'js',
-			'php'
-		] )->message( 'This field contains invalid value' );
+//		$validator->rule( 'in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', [
+//			'js',
+//			'php'
+//		] )->message( 'This field contains invalid value' );
 		$validator->rule( 'in', [
 			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
 			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'
@@ -275,6 +275,7 @@ class Settings {
 			'cookie',
 			'php'
 		] )->message( 'This field contains invalid value' );
+		$validator->rule( 'required', [ RNOC_PLUGIN_PREFIX . 'cart_capture_msg' ] )->message( 'Text for the opt-in checkbox field is required' );
 		$validator->rule( 'in', [
 			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
 			RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',

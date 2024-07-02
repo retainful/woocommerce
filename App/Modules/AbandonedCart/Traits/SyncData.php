@@ -47,8 +47,8 @@ trait SyncData {
 	/**
 	 * Can track abandoned cart.
 	 *
-	 * @param   string     $ip_address  Ip address.
-	 * @param   \WC_Order  $order       Order object.
+	 * @param string $ip_address Ip address.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return bool
 	 */
@@ -63,7 +63,7 @@ trait SyncData {
 	/**
 	 * Get line item total.
 	 *
-	 * @param   array  $item  Line item.
+	 * @param array $item Line item.
 	 *
 	 * @return float
 	 */
@@ -81,7 +81,7 @@ trait SyncData {
 	/**
 	 * Is valid order status.
 	 *
-	 * @param   string  $order_status  Order status.
+	 * @param string $order_status Order status.
 	 *
 	 * @return bool
 	 */
@@ -108,9 +108,9 @@ trait SyncData {
 	/**
 	 * Get currency details.
 	 *
-	 * @param   float   $cart_total             Cart total.
-	 * @param   string  $current_currency_code  Current currency.
-	 * @param   string  $default_currency_code  default currency.
+	 * @param float $cart_total Cart total.
+	 * @param string $current_currency_code Current currency.
+	 * @param string $default_currency_code default currency.
 	 *
 	 * @return array
 	 */
@@ -138,8 +138,8 @@ trait SyncData {
 	/**
 	 * Convert price.
 	 *
-	 * @param   float  $price  Price.
-	 * @param   float  $rate   Convert rate.
+	 * @param float $price Price.
+	 * @param float $rate Convert rate.
 	 *
 	 * @return float
 	 */
@@ -154,7 +154,7 @@ trait SyncData {
 	/**
 	 * Get recovery url.
 	 *
-	 * @param   string  $cart_token  Cart token.
+	 * @param string $cart_token Cart token.
 	 *
 	 * @return string
 	 */
@@ -178,8 +178,8 @@ trait SyncData {
 	/**
 	 * Get encrypt data.
 	 *
-	 * @param   mixed   $data    Data.
-	 * @param   string  $secret  Secret key.
+	 * @param mixed $data Data.
+	 * @param string $secret Secret key.
 	 *
 	 * @return string|null
 	 */
@@ -198,8 +198,7 @@ trait SyncData {
 				$hmac            = hash_hmac( self::$hmac_algorithm, $cipher_text_raw, $secret, true );
 
 				return base64_encode( bin2hex( $iv ) . ':retainful:' . bin2hex( $hmac ) . ':retainful:' . bin2hex( $cipher_text_raw ) );
-			}
-			catch ( \Exception $e ) {
+			} catch ( \Exception $e ) {
 				return null;
 			}
 		}
@@ -210,7 +209,7 @@ trait SyncData {
 	/**
 	 * Retrieve cart token.
 	 *
-	 * @param   int  $user_id  User id.
+	 * @param int $user_id User id.
 	 *
 	 * @return string
 	 */
@@ -296,7 +295,7 @@ trait SyncData {
 	/**
 	 * Get tracking start date.
 	 *
-	 * @param   int|null  $user_id  User id.
+	 * @param int|null $user_id User id.
 	 *
 	 * @return mixed
 	 */

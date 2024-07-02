@@ -3,11 +3,14 @@
 namespace RNOC\App\Helpers;
 
 use RNOC\App\Helpers\Traits\CartAddress;
+use RNOC\App\Modules\AbandonedCart\Traits\SyncData;
 
 defined( 'ABSPATH' ) || exit;
 
 class Customer {
 	use CartAddress;
+
+	public static $black_list_ip = "";
 
 	protected static $default = [
 		'id'                => 0,
@@ -512,6 +515,92 @@ class Customer {
 		}
 		Settings::getStorage()->remove( '_rnoc_user_cart_token' );
 		Settings::getStorage()->remove( 'rnoc_cart_created_at' );
+	}
+
+	public static function ipFilter() {
+
+		if ( empty( Settings::get( RNOC_PLUGIN_PREFIX . 'enable_ip_filter', 0 ) ) || empty( Settings::get( RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' ) ) ) {
+			return;
+		}
+
+		$ip = Settings::get( RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' );
+
+		if ( ! empty( $ip ) ) {
+			self::$black_list_ip = $ip;
+
+			add_filter( 'rnoc_is_cart_has_valid_ip', [ self::class, 'trackAbandonedCart' ], 10, 2 );
+		}
+	}
+
+	/**
+	 * Need to track the abandoned cart or not.
+	 *
+	 * @param bool $need_tracking Need tracking.
+	 * @param string $ip_address Ip address.
+	 *
+	 * @return bool
+	 */
+	public static function trackAbandonedCart( $need_tracking, $ip_address = null ) {
+		$ignored_ip_addresses = trim( self::$black_list_ip );
+		if ( empty( $ignored_ip_addresses ) ) {
+			return true;
+		}
+		$black_list_ip = explode( ',', $ignored_ip_addresses );
+		$client_ip     = empty( $ip_address ) ? self::getClientIp() : $ip_address;
+		if ( self::isBlockedIp( $client_ip, $black_list_ip ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Check the IP address is valid.
+	 *
+	 * @param string $client_ip Client ip.
+	 * @param array $black_list_ip List of blocked ip.
+	 *
+	 * @return bool
+	 */
+	public static function isBlockedIp( $client_ip, $black_list_ip ) {
+		if ( empty( $black_list_ip ) ) {
+			return false;
+		}
+
+		$blocked = false;
+		foreach ( $black_list_ip as $ip ) {
+			if ( $client_ip == $ip ) {
+				$blocked = true;
+				break;
+			} elseif ( strpos( $ip, '*' ) !== false ) {
+				$digits           = explode( ".", $ip );
+				$client_ip_digits = explode( ".", $client_ip );
+				if ( isset( $digits[1] ) && isset( $client_ip_digits[0] ) && $digits[1] == '*' && $digits[0] == $client_ip_digits[0] ) {
+					$blocked = true;
+					break;
+				} elseif ( isset( $digits[2] ) && isset( $client_ip_digits[1] ) && $digits[2] == '*' && $digits[0] == $client_ip_digits[0] && $digits[1] == $client_ip_digits[1] ) {
+					$blocked = true;
+					break;
+				} elseif ( isset( $digits[3] ) && isset( $client_ip_digits[2] ) && $digits[3] == '*' && $digits[0] == $client_ip_digits[0] && $digits[1] == $client_ip_digits[1] && $digits[2] == $client_ip_digits[2] ) {
+					$blocked = true;
+					break;
+				}
+			} elseif ( strpos( $ip, "-" ) !== false ) {
+				list( $start_ip, $end_ip ) = explode( "-", $ip );
+				$start_ip       = preg_replace( '/\s+/', '', $start_ip );
+				$end_ip         = preg_replace( '/\s+/', '', $end_ip );
+				$start_ip_long  = ip2long( $start_ip );
+				$end_ip_long    = ip2long( $end_ip );
+				$client_ip_long = ip2long( $client_ip );
+				if ( $client_ip_long >= $start_ip_long && $client_ip_long <= $end_ip_long ) {
+					$blocked = true;
+					break;
+				}
+			}
+		}
+
+		return $blocked;
 	}
 
 }

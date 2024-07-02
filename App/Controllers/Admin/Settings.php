@@ -106,6 +106,7 @@ class Settings {
 		if ( file_exists( $main_override_path ) ) {
 			$main_file_path = $main_override_path;
 		}
+		Webhook::createWebhook();
 		Util::renderTemplate( $main_file_path, [ 'page' => 'retainful_settings', 'sub_content' => $sub_content ] );
 	}
 

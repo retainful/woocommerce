@@ -236,35 +236,35 @@ rnoc = window.rnoc || {};
     let retain_cart_js_data = {...default_retainful_cart_data, ...retainful_cart_data}
     let retain = new RetainFul(retain_cart_js_data.api_url, retain_cart_js_data.public_key);
     retain.setCartTrackingElementId(retain_cart_js_data.tracking_element_selector);
-    if (retain_cart_js_data.cart_tracking_engine === "js") {
-        retain.setAjaxUrl(retain_cart_js_data.ajax_url);
-        retain.setIp(retain_cart_js_data.ip);
-        retain.setVersion(retain_cart_js_data.version);
-        retain.initCartTracking();
-        rnoc_jquery(window).on('load', function () {
-            retain.syncCart();
-        });
-        if (wp?.data?.select) {
-            wp?.data?.subscribe(function () {
-                if (retain.isCartUpdated()) {
-                    rnoc_jquery.ajax({
-                        url: retain_cart_js_data.ajax_url,
-                        method: 'POST',
-                        dataType: 'json',
-                        data: {
-                            action: 'rnoc_cart_item_change',
-                        },
-                        async: true,
-                        success: function (response) {
-                            if (response.success && response.data) {
-                                retain.syncCart(response.data.data, true);
-                            }
+    //if (retain_cart_js_data.cart_tracking_engine === "js") {
+    retain.setAjaxUrl(retain_cart_js_data.ajax_url);
+    retain.setIp(retain_cart_js_data.ip);
+    retain.setVersion(retain_cart_js_data.version);
+    retain.initCartTracking();
+    rnoc_jquery(window).on('load', function () {
+        retain.syncCart();
+    });
+    if (wp?.data?.select) {
+        wp?.data?.subscribe(function () {
+            if (retain.isCartUpdated()) {
+                rnoc_jquery.ajax({
+                    url: retain_cart_js_data.ajax_url,
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'rnoc_cart_item_change',
+                    },
+                    async: true,
+                    success: function (response) {
+                        if (response.success && response.data) {
+                            retain.syncCart(response.data.data, true);
                         }
-                    });
-                }
-            })
-        }
+                    }
+                });
+            }
+        })
     }
+    // }
     if (retain_cart_js_data.cart !== undefined) {
         let tracking_content = '<div id="' + retain_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retain_cart_js_data.cart) + '</div>';
         rnoc_jquery(tracking_content).appendTo('body');

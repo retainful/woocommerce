@@ -116,13 +116,18 @@ class Webhook {
 	 * @return bool
 	 */
 	protected static function addNewWebHook( $topic = 'order.updated' ) {
-		if ( ! in_array( $topic, array(
+		$order_topic         = [
 			'order.updated',
 			'order.created',
+		];
+		$product_topic       = [
 			'product.updated',
 			'product.created',
 			'product.deleted'
-		) ) ) {
+		];
+		$allow_product_topic = apply_filters( 'retainful_allow_product_webhooks', false, $product_topic );
+		$allowed_topic       = ! empty( $allow_product_topic ) ? array_merge( $order_topic, $product_topic ) : $order_topic;
+		if ( ! in_array( $topic, $allowed_topic ) ) {
 			return false;
 		}
 		try {
@@ -219,14 +224,18 @@ class Webhook {
 		if ( ! class_exists( 'WC_Data_Store' ) || ! function_exists( 'wc_get_webhook' ) ) {
 			return false;
 		}
-		$webhook_status = [
-			'order_created'   => false,
-			'order_updated'   => false,
+		$order_status        = [
+			'order_created' => false,
+			'order_updated' => false,
+		];
+		$product_status      = [
 			'product_created' => false,
 			'product_updated' => false,
 			'product_deleted' => false
-
 		];
+		$allow_product_topic = apply_filters( 'retainful_allow_product_webhooks', false, $product_status );
+		$webhook_status      = ! empty( $allow_product_topic ) ? array_merge( $order_status, $product_status ) : $order_status;
+
 		try {
 			$data_store = \WC_Data_Store::load( 'webhook' );
 			$args       = [

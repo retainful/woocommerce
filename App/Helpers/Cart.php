@@ -226,4 +226,13 @@ class Cart {
 		}
 	}
 
+	/**
+	 * Get cart items total.
+	 *
+	 * @return float
+	 */
+	public static function getCartTotalPrice() {
+		return function_exists( 'WC' ) && is_object( WC()->cart ) ? WC()->cart->get_cart_total() : 0;
+	}
+
 }
