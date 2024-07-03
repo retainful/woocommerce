@@ -24,7 +24,7 @@ class Coupon {
 		];
 		$params               = wp_parse_args( $requestParams, $defaultRequestParams );
 		if ( is_array( $params['discount_rule'] ) && ! empty( $params['discount_rule'] ) && is_string( $params['digest'] ) && ! empty( $params['digest'] ) ) {
-			$secret          = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'licence' );
+			$secret          = Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
 			$to_hash         = [
 				'value_type'  => ( isset( $params['discount_rule']['value_type'] ) ) ? $params['discount_rule']['value_type'] : "",
 				'value'       => ( isset( $params['discount_rule']['value'] ) ) ? $params['discount_rule']['value'] : "",
