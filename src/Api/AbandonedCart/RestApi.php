@@ -63,8 +63,6 @@ class RestApi {
 		if ( empty( $cart_token ) ) {
 			$cart_token = $this->generateCartToken();
 			$this->setCartToken( $cart_token );
-			$logger = wc_get_logger();
-			$logger->add( 'Retainful', 'Cart token gen:' . $cart_token );
 		}
 
 		return apply_filters( 'rnoc_get_cart_token', $cart_token, $this );

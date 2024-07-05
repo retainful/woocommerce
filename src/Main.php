@@ -358,7 +358,7 @@ class Main {
 				//triggers when admin pdate the order
 				add_action( 'woocommerce_process_shop_order_meta', array(
 					$checkout,
-					'OrderUpdatedShopBackend'
+					'orderUpdatedShopBackend'
 				), 50, 2 );
 
 				//add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);

@@ -24,18 +24,12 @@ class Checkout extends RestApi {
 			$order      = self::$woocommerce->getOrder( $draft_order );
 			$cart_token = self::$woocommerce->getOrderMeta( $order, $this->cart_token_key_for_db );
 			if ( empty( $cart_token ) ) {
-				$logger = wc_get_logger();
-				$logger->add( 'Retainful', 'Draft order id:' . $draft_order );
-				$cart_token = $this->retrieveCartToken();
-				$logger->add( 'Retainful', 'Draft retrive token:' . $cart_token );
+				$cart_token             = $this->retrieveCartToken();
 				$draft_order_cart_token = self::$woocommerce->getPostMeta( intval( $draft_order ), $this->cart_token_key_for_db );
 				if ( empty( $draft_order_cart_token ) && empty( $cart_token ) ) {
 					$cart_token = $this->getCartToken();
-					$logger->add( 'Retainful', 'Draft regenerate token:' . $cart_token );
 				}
-				$logger->add( 'Retainful', 'Draft order token:' . $cart_token );
 			}
-
 			$this->purchaseComplete( intval( $draft_order ) );
 		}
 	}
@@ -54,12 +48,8 @@ class Checkout extends RestApi {
 		//TODO remove carthash from session after success place order
 		$order_object = self::$woocommerce->getOrder( $order_id );
 		$cart_token   = self::$woocommerce->getOrderMeta( $order_object, $this->cart_token_key_for_db );
-		$logger       = wc_get_logger();
-		$logger->add( 'Retainful', 'Purchase order id:' . $order_id );
-		$logger->add( 'Retainful', 'Purchase order token:' . $cart_token );
 		if ( empty( $cart_token ) ) {
 			$cart_token = $this->retrieveCartToken();
-			$logger->add( 'Retainful', 'Purchase retrive order token:' . $cart_token );
 		}
 
 		self::$settings->logMessage( array(
@@ -92,7 +82,6 @@ class Checkout extends RestApi {
 				$order_object->update_meta_data( '_rnoc_get_http_accept_language', $user_accept_language );
 				$order_object->update_meta_data( $this->pending_recovery_key_for_db, true );
 				$order_object->save();
-				$logger->add( 'Retainful', 'Purchase update order token:' . $order_object->get_meta( $this->cart_token_key_for_db ) );
 				self::$woocommerce->setSession( 'store_api_draft_order', 0 );
 				/*if ( $user_id = get_current_user_id() ) {
 					delete_user_meta( $user_id, $this->cart_token_key_for_db );
@@ -130,7 +119,7 @@ class Checkout extends RestApi {
 	 *
 	 * @return void|null
 	 */
-	function OrderUpdatedShopBackend( $order_id ) {
+	function orderUpdatedShopBackend( $order_id ) {
 		self::$settings->logMessage( array( "order_id" => $order_id ), 'OrderUpdatedShopBackend ' );
 		if ( is_admin() ) {
 			if ( $this->needInstantOrderSync() ) {
@@ -170,8 +159,6 @@ class Checkout extends RestApi {
 			if ( $delivery_url != $site_delivery_url || $order_id <= 0 ) {
 				return $http_args;
 			}
-			$logger = wc_get_logger();
-			$logger->add( 'Retainful', 'Webhook order id:' . $order_id );
 			$order = self::$woocommerce->getOrder( $order_id );
 			if ( self::$woocommerce->getStatus( $order ) == 'checkout-draft' ) {
 				return $http_args;
@@ -179,13 +166,9 @@ class Checkout extends RestApi {
 			$order_obj  = new Order();
 			$cart_token = self::$woocommerce->getOrderMeta( $order, $this->cart_token_key_for_db );
 			self::$settings->logMessage( array( "cart_token" => $cart_token ), 'Cart Token' );
-			$logger = wc_get_logger();
-			$logger->add( 'Retainful', 'order id:' . $order_id );
-			$logger->add( 'Retainful', 'Token:' . $cart_token );
 			if ( empty( $cart_token ) ) {
 				//Usually we should not force generate the cart token as this would sync all the old orders otherwise, if their status changes.
 				$force_generate_cart_token = apply_filters( 'rnoc_force_generate_cart_token', false, $http_args, $order_id, $webhook_id );
-				$logger->add( 'Retainful', 'Force:' . $force_generate_cart_token );
 				if ( $force_generate_cart_token === true ) {
 					//Let's generate a token and set to the order meta
 					$cart_token = $this->generateCartToken();
@@ -198,10 +181,7 @@ class Checkout extends RestApi {
 				//bail on empty cart token
 				return $http_args;
 			}
-
-			//self::$settings->logMessage(array("order_id" => $order_id), 'Triggering Webhook ID:'.$stored_webhook_id);
 			$order_data = $order_obj->getOrderData( $order );
-			// $logger->add('Retainful','Order Data:'.json_encode($order_data));
 			if ( ! empty( $cart_token ) && $order_data ) {
 				$client_ip     = self::$woocommerce->getOrderMeta( $order, $this->user_ip_key_for_db );
 				$token         = self::$woocommerce->getOrderMeta( $order, $this->cart_token_key_for_db );
@@ -218,7 +198,6 @@ class Checkout extends RestApi {
 				foreach ( $extra_headers as $key => $value ) {
 					$http_args['headers'][ $key ] = $value;
 				}
-				//$logger->add('Retainful','App id:'.$app_id);
 				$cart_hash         = $this->encryptData( $order_data );
 				$body              = array(
 					'data' => $cart_hash
@@ -248,8 +227,6 @@ class Checkout extends RestApi {
 		if ( self::$woocommerce->getStatus( $order ) == 'checkout-draft' ) {
 			return;
 		}
-		$logger = wc_get_logger();
-		$logger->add( 'Retainful', 'SyncOrder order id:' . $order_id );
 		$order_obj  = new Order();
 		$cart_token = self::$woocommerce->getOrderMeta( $order, $this->cart_token_key_for_db );
 		$cart_token = apply_filters( 'rnoc_sync_order_change_order_token', $cart_token, $order_id, $this );
@@ -280,8 +257,6 @@ class Checkout extends RestApi {
 				"X-Cart-Token"         => $token,
 				"Cart-Token"           => $token
 			);
-
-			$logger->add( 'Retainful', 'SyncOrder token:' . $token );
 			$this->syncCart( $cart_hash, $extra_headers );
 		}
 	}
@@ -364,8 +339,6 @@ class Checkout extends RestApi {
 	 * @param $order_id
 	 */
 	function payPageOrderCompletion( $order_id ) {
-		$logger = wc_get_logger();
-		$logger->add( 'Retainful', 'Cleared order temp data:' . $order_id );
 		$this->unsetOrderTempData();
 	}
 
@@ -384,7 +357,6 @@ class Checkout extends RestApi {
 				$cart_token = $this->retrieveCartToken();
 			}
 			if ( ! empty( $cart_token ) ) {
-				$order = self::$woocommerce->getOrder( $order_id );
 				$this->purchaseComplete( $order_id );
 				$this->syncOrderToAPI( $order, $order_id );
 				//$this->unsetOrderTempData();
@@ -405,7 +377,6 @@ class Checkout extends RestApi {
 			 $this->markOrderAsPendingRecovery($order_id);
 		 }*/
 		try {
-			$order      = self::$woocommerce->getOrder( $order_id );
 			$cart_token = self::$woocommerce->getOrderMeta( $order, $this->cart_token_key_for_db );
 			if ( empty( $cart_token ) ) {
 				$cart_token = $this->retrieveCartToken();
@@ -431,8 +402,6 @@ class Checkout extends RestApi {
 		if ( self::$settings->isBackgroundOrderSyncEnabled() || self::$woocommerce->getStatus( $order ) == 'checkout-draft' ) {
 			return;
 		}
-		$logger = wc_get_logger();
-		$logger->add( 'Retainful', 'SyncOrderToApi order id:' . $order_id );
 		if ( $this->needInstantOrderSync() ) {
 			$order_obj = new Order();
 			$cart      = $order_obj->getOrderData( $order );
@@ -455,7 +424,6 @@ class Checkout extends RestApi {
 						"Cart-Token"           => $token
 					);
 
-					$logger->add( 'Retainful', 'SyncOrderToApi token:' . $token );
 					$this->syncCart( $cart_hash, $extra_headers );
 				}
 			} else {
@@ -519,8 +487,6 @@ class Checkout extends RestApi {
 		}
 		$cart_token = $this->retrieveCartToken();
 		if ( ! empty( $cart_token ) ) {
-			$logger = wc_get_logger();
-			$logger->add( 'Retainful', 'Cleared order payment complete:' . $order_id );
 			$this->unsetOrderTempData();
 		}
 	}
@@ -542,8 +508,6 @@ class Checkout extends RestApi {
 		self::$storage->removeValue( 'rnoc_recovered_by_retainful' );
 		self::$storage->removeValue( 'rnoc_recovered_cart_token' );
 		if ( $user_id || ( $user_id = get_current_user_id() ) ) {
-			$logger = wc_get_logger();
-			$logger->add( 'Retainful', 'Cleared user temp:' . $user_id );
 			$this->removeTempDataForUser( $user_id );
 		}
 	}
