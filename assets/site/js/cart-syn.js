@@ -246,6 +246,7 @@ rnoc = window.rnoc || {};
     });
     if (wp?.data?.select) {
         wp?.data?.subscribe(function () {
+
             if (retain.isCartUpdated()) {
                 rnoc_jquery.ajax({
                     url: retain_cart_js_data.ajax_url,

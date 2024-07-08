@@ -258,7 +258,7 @@ class Cart extends AbandonedCart {
 			'shipping_address'          => Customer::getCartShippingAddress(),
 			'billing_address'           => Customer::getCartBillingAddress(),
 			'abandoned_checkout_url'    => self::getRecoveryLink( $cart_token ),
-			'total_line_items_price'    => WC::formatDecimalPrice( CartHelper::getCartTotal() ),
+			'total_line_items_price'    => $cart_total,
 			'buyer_accepts_marketing'   => self::isBuyerAcceptsMarketing(),
 			'client_session'            => WC::getClientSession(),
 			'woocommerce_totals'        => self::getCartTotals(),

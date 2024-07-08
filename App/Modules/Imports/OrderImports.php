@@ -198,6 +198,7 @@ class OrderImports {
 		$cart_token = Order::getOrderMeta( self::$cart_token_key_for_db, $order );
 		if ( empty( $cart_token ) ) {
 			$cart_token = AbandonedCart::generateCartToken();
+			Order::setOrderMeta( $order_id, self::$cart_token_key_for_db, $cart_token );
 		}
 		//still Cart token empty
 		if ( empty( $cart_token ) ) {

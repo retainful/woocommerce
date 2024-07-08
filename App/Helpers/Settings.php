@@ -2,7 +2,6 @@
 
 namespace RNOC\App\Helpers;
 
-use RNOC\App\Modules\Storage\PHPSession;
 use RNOC\App\Modules\Storage\WooSession;
 use RNOC\App\Modules\Storage\Cookie;
 use Valitron\Validator;
@@ -153,15 +152,12 @@ class Settings {
 	/**
 	 * Get storage object.
 	 *
-	 * @return PHPSession|WooSession|Cookie
+	 * @return WooSession|Cookie
 	 */
 	public static function getStorage() {
 		$storage = Settings::get( RNOC_PLUGIN_PREFIX . 'handle_storage_using', 'woocommerce' );
 
 		switch ( $storage ) {
-			case "php";
-				$storage_handler = new PHPSession();
-				break;
 			case "cookie";
 				$storage_handler = new Cookie();
 				break;

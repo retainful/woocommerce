@@ -357,14 +357,6 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
 					} ?>>
 					<?php esc_html_e( 'Cookie', 'retainful-next-order-coupon-for-woocommerce' ); ?>
                 </label>
-                <label>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'handle_storage_using'; ?>" type="radio"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'handle_storage_using_php'; ?>"
-                           value="php" <?php if ( $settings[ RNOC_PLUGIN_PREFIX . 'handle_storage_using' ] == 'php' ) {
-						echo "checked";
-					} ?>>
-					<?php esc_html_e( 'PHP Session', 'retainful-next-order-coupon-for-woocommerce' ); ?>
-                </label>
                 <p class="description">
 					<?php
 					esc_html_e( 'DO NOT change this setting unless you are instructed by the Retainful Support team. WooCommerce session will work for 99% of the shops.', 'retainful-next-order-coupon-for-woocommerce' );
