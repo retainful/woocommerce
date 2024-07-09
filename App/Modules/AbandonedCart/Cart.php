@@ -214,6 +214,8 @@ class Cart extends AbandonedCart {
 		}
 	}
 
+
+
 	/**
 	 * Get cart request data.
 	 *
@@ -759,7 +761,7 @@ class Cart extends AbandonedCart {
 				$return = false;
 			}
 		} else {
-			if ( ! empty( CartHelper::getCart() ) && CartHelper::getCartSubTotal() <= 0 && CartHelper::getCartTotalPrice() <= 0 ) {
+			if ( ! empty( CartHelper::getCart() ) && CartHelper::getCartSubTotal() <= 0 && CartHelper::getCartTotalPrice('edit') <= 0 ) {
 				$return = false;
 			}
 		}

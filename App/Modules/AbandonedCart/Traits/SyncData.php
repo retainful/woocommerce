@@ -229,21 +229,6 @@ trait SyncData {
 	}
 
 
-	/**
-	 * Get cart token.
-	 *
-	 * @return string
-	 */
-	public function getCartToken() {
-
-		$cart_token = $this->retrieveCartToken();
-		if ( empty( $cart_token ) ) {
-			$cart_token = $this->generateCartToken();
-			$this->setCartToken( $cart_token );
-		}
-
-		return apply_filters( 'rnoc_get_cart_token', $cart_token, $this );
-	}
 
 	/**
 	 * Is allow buyer accept marketing.

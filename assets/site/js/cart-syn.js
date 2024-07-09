@@ -194,26 +194,26 @@ rnoc = window.rnoc || {};
             if (wp?.data?.select) {
                 let current_cart = wp?.data?.select('wc/store/cart').getCartData();
                 let old_cart = JSON.parse(localStorage.getItem("rnocp_store_cart_data", {}));
-                if (current_cart?.billingAddress?.email !== old_cart?.billingAddress?.email) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
-                if (current_cart?.billingAddress?.first_name !== old_cart?.billingAddress?.first_name) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
-                if (current_cart?.billingAddress?.last_name !== old_cart?.billingAddress?.last_name) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
-                if (current_cart?.billingAddress?.phone !== old_cart?.billingAddress?.phone) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
-                if (current_cart?.billingAddress?.postcode !== old_cart?.billingAddress?.postcode) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
+                // if (current_cart?.billingAddress?.email !== old_cart?.billingAddress?.email) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
+                // if (current_cart?.billingAddress?.first_name !== old_cart?.billingAddress?.first_name) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
+                // if (current_cart?.billingAddress?.last_name !== old_cart?.billingAddress?.last_name) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
+                // if (current_cart?.billingAddress?.phone !== old_cart?.billingAddress?.phone) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
+                // if (current_cart?.billingAddress?.postcode !== old_cart?.billingAddress?.postcode) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
                 if (JSON.stringify(current_cart?.items) !== JSON.stringify(old_cart?.items)) {
                     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
                     return true;

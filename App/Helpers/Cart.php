@@ -231,8 +231,8 @@ class Cart {
 	 *
 	 * @return float
 	 */
-	public static function getCartTotalPrice() {
-		return function_exists( 'WC' ) && is_object( WC()->cart ) ? WC()->cart->get_cart_total() : 0;
+	public static function getCartTotalPrice($context = 'view' ) {
+		return function_exists( 'WC' ) && is_object( WC()->cart ) ? WC()->cart->get_total($context) : 0;
 	}
 
 }
