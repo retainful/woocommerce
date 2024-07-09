@@ -1,15 +1,15 @@
 === Email Marketing for WooCommerce by Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms, Popups and Email Automations ===
 Contributors: retainful
-Tags: email marketing, newsletter, woocommerce, marketing, popups, abandoned cart
+Tags: abandoned cart, email marketing, newsletter, forms, popups
 Requires at least: 4.6.1
 Tested up to: 6.5
 WC tested up to: 9.0
 Requires PHP: 5.6
-Stable tag: 2.6.35
+Stable tag: 2.6.36
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Grow revenue with Email Marketing, Newsletters, Email Marketing Automation, Optin forms, popups, WooCommerce Abandoned Cart recovery with Retainful
+Grow revenue with WooCommerce Abandoned Cart recovery, Email campaigns, Newsletters, Email Marketing Automation, Optin forms, popups with Retainful
 
 == Description ==
 
@@ -254,6 +254,11 @@ You can reach out to our experts [here](https://www.retainful.com/support).
 7. Retainful Contacts
 
 == Changelog ==
+= 2.6.36 =
+- Fix: Duplicate order synchronization
+- Fix: Ignore draft order synchronization(Block Checkout)
+- Removed: PHP Session handler
+
 = 2.6.35 =
 - Deprecated: Referral Popup.
 
