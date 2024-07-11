@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 jQuery(document).on('wc-rtl-popup-coupon',function (event){
-    if(event.message){
+    if(event.coupon_code){
         jQuery.ajax({
             url: retainful_cart_data.ajax_url,
             headers: {},
@@ -57,7 +57,7 @@ jQuery(document).on('wc-rtl-popup-coupon',function (event){
             dataType: 'json',
             data: {
                 action: 'rnoc_apply_popup_coupon',
-                coupon_code : event.message,
+                coupon_code : event.coupon_code,
             },
             success: function (response) {
 
