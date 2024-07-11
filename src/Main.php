@@ -302,6 +302,11 @@ class Main {
 						add_action( 'wp_login', array( $popup, 'userLogin' ), 10, 2 );
 						add_action( 'wp_enqueue_scripts', array( $popup, 'addPopupScripts' ) );
 						add_action( 'wp_footer', array( $popup, 'printPopup' ) );
+
+						//apply popup coupon
+						add_action('wp_ajax_rnoc_apply_popup_coupon', array($popup, 'addPopupCouponToSession'));
+						add_action('wp_ajax_nopriv_rnoc_apply_popup_coupon', array($popup, 'addPopupCouponToSession')); // For non-logged-in users
+						add_action( 'wp_loaded', array( $popup, 'applyPopupCoupon' ), 10 );
 					}
 				}
 				add_filter( 'script_loader_tag', array( $cart, 'addCloudFlareAttrScript' ), 10, 3 );

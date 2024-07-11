@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
     let default_retainful_cart_data = {
         "ajax_url": "",
@@ -47,6 +48,26 @@ document.addEventListener("DOMContentLoaded", function () {
         initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data);
     }
 });
+jQuery(document).on('wc-rtl-popup-coupon',function (event){
+    if(event.message){
+        jQuery.ajax({
+            url: retainful_cart_data.ajax_url,
+            headers: {},
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'rnoc_apply_popup_coupon',
+                coupon_code : event.message,
+            },
+            success: function (response) {
+
+            },
+            error: function (response) {
+            }
+        });
+    }
+
+})
 
 function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
     jQuery(function ($) {
@@ -475,8 +496,34 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 }
 
             } else {
+                if (retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
+                    sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "1");
+                    $.ajax({
+                        url: rnoc_cart_js_data.ajax_url,
+                        headers: {},
+                        method: 'POST',
+                        dataType: 'json',
+                        data: guest_data,
+                        async: true,
+                        success: function (response) {
+                            if (response.success && response.data) {
+                                retainful.syncCart(response.data, true);
+                            }
+                        },
+                        error: function (response) {
+                            msg = response;
+                        }
+                    });
+                } else {
+                    sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "0");
+                    //console.log('Email validation failed');
+                }
                 //console.log('Not a valid email yet');
             }
         }
     });
+    //jQuery(document).ready(function( $ ){
+
+    //});
+
 }
