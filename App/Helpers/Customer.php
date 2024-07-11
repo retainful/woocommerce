@@ -517,6 +517,9 @@ class Customer {
 		Settings::getStorage()->remove( 'rnoc_cart_created_at' );
 	}
 
+	/**
+	 * IPFilter
+	 */
 	public static function ipFilter() {
 
 		if ( empty( Settings::get( RNOC_PLUGIN_PREFIX . 'enable_ip_filter', 0 ) ) || empty( Settings::get( RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' ) ) ) {
@@ -524,10 +527,8 @@ class Customer {
 		}
 
 		$ip = Settings::get( RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' );
-
 		if ( ! empty( $ip ) ) {
 			self::$black_list_ip = $ip;
-
 			add_filter( 'rnoc_is_cart_has_valid_ip', [ self::class, 'trackAbandonedCart' ], 10, 2 );
 		}
 	}
@@ -542,6 +543,7 @@ class Customer {
 	 */
 	public static function trackAbandonedCart( $need_tracking, $ip_address = null ) {
 		$ignored_ip_addresses = trim( self::$black_list_ip );
+
 		if ( empty( $ignored_ip_addresses ) ) {
 			return true;
 		}
@@ -550,6 +552,7 @@ class Customer {
 		if ( self::isBlockedIp( $client_ip, $black_list_ip ) ) {
 			return false;
 		}
+
 
 		return true;
 	}

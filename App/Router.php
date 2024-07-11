@@ -94,6 +94,10 @@ class Router {
 				ProductImport::class,
 				'changeWebHookHeaderProduct'
 			], 10, 3 );
+
+			//ip filter
+			Customer::ipFilter();
+			
 			//initialise currency helper
 			new Currency();
 			$after_pay = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'enable_afterpay_action', 'no' );
@@ -181,8 +185,7 @@ class Router {
 			add_action( 'woocommerce_checkout_after_terms_and_conditions', [ $order, 'guestTermGdprMessage' ] );
 		}
 
-		//ip filter
-		Customer::ipFilter();
+
 	}
 
 }
