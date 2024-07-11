@@ -48,26 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data);
     }
 });
-jQuery(document).on('wc-rtl-popup-coupon',function (event){
-    if(event.coupon_code){
-        jQuery.ajax({
-            url: retainful_cart_data.ajax_url,
-            headers: {},
-            method: 'POST',
-            dataType: 'json',
-            data: {
-                action: 'rnoc_apply_popup_coupon',
-                coupon_code : event.coupon_code,
-            },
-            success: function (response) {
 
-            },
-            error: function (response) {
-            }
-        });
-    }
-
-})
 
 function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
     jQuery(function ($) {
@@ -521,9 +502,26 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 //console.log('Not a valid email yet');
             }
         }
-    });
-    //jQuery(document).ready(function( $ ){
-
-    //});
-
+    })
 }
+
+jQuery(document).on('wc-rtl-popup-coupon',function (event){
+    if(event.coupon_code){
+        jQuery.ajax({
+            url: retainful_cart_data.ajax_url,
+            headers: {},
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'rnoc_apply_popup_coupon',
+                coupon_code : event.coupon_code,
+            },
+            success: function (response) {
+
+            },
+            error: function (response) {
+            }
+        });
+    }
+
+});

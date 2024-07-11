@@ -123,7 +123,7 @@ class Popup
 	 */
 	public function addPopupCouponToSession() {
 		$input = new Input();
-		$coupon_code = $input->get_post('coupon_code','new');
+		$coupon_code = $input->get_post('coupon_code','');
 		if(empty($coupon_code)){
 			wp_send_json_error(['is_redirect' => false, 'message' => __('Coupon code invalid', RNOC_TEXT_DOMAIN)]);
 		}
