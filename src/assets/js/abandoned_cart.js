@@ -525,3 +525,12 @@ jQuery(document).on('wc-rtl-popup-coupon',function (event){
     }
 
 });
+jQuery(document).on('wc-rtl-popup-redirect',function (event){
+    if(event.redirect_url.url){
+        event.preventDefault();
+        setTimeout(function() {
+            location.href = event.redirect_url.url;
+        }, 4000); // Delay of 2000 milliseconds (2 seconds)
+    }
+
+});

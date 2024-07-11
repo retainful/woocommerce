@@ -201,9 +201,6 @@ class Cart extends RestApi
         if (!wp_script_is('wc-cart-fragments', 'enqueued')) {
             wp_enqueue_script('wc-cart-fragments');
         }
-	    $abandoned_cart_js = plugins_url().'/retainful-woocommerce/src/assets/js/abandoned_cart.js';
-	    //product search select
-	    wp_enqueue_script('retainful-app-main', $abandoned_cart_js, array(), RNOC_VERSION);
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
             $user_ip = $this->getClientIp();
