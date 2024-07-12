@@ -525,12 +525,32 @@ jQuery(document).on('wc-rtl-popup-coupon',function (event){
     }
 
 });
+
+
 jQuery(document).on('wc-rtl-popup-redirect',function (event){
     if(event.redirect_url.url){
-        event.preventDefault();
-        setTimeout(function() {
-            location.href = event.redirect_url.url;
-        }, 4000); // Delay of 2000 milliseconds (2 seconds)
+        sessionStorage.setItem("rnocp_popup_redirect", event.redirect_url.url);
+        sessionStorage.setItem("rnocp_popup_redirect_type", event.redirect_url.type);
+        let single_page = jQuery('body').hasClass('single-product')
+        if (event.redirect_url.url !== null && !single_page ) {
+            setTimeout(function() {
+                window.open( event.redirect_url.url, event.redirect_url.type);
+                sessionStorage.removeItem('rnocp_popup_redirect');
+                sessionStorage.removeItem('rnocp_popup_redirect_type');
+            }, 4000);
+        }
     }
+});
 
+jQuery(document).ready(function(){
+   let redirect_url = sessionStorage.getItem('rnocp_popup_redirect');
+    let redirect_type = sessionStorage.getItem('rnocp_popup_redirect_type');
+    if(redirect_url !== null) {
+       var currentUrl = window.location.href;
+       if (redirect_url !== currentUrl) {
+           window.open( redirect_url, redirect_type);
+           sessionStorage.removeItem('rnocp_popup_redirect');
+           sessionStorage.removeItem('rnocp_popup_redirect_type');
+       }
+   }
 });
