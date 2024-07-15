@@ -537,7 +537,7 @@ jQuery(document).on('wc-rtl-popup-redirect',function (event){
                 window.open( event.redirect_url.url, event.redirect_url.type);
                 sessionStorage.removeItem('rnocp_popup_redirect');
                 sessionStorage.removeItem('rnocp_popup_redirect_type');
-            }, 4000);
+            }, 1500);
         }
     }
 });
