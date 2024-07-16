@@ -85,7 +85,9 @@ class Cart extends AbandonedCart {
 	 * @return void
 	 */
 	public function getCartTrackingUpdatedData() {
-		wp_send_json_success( $this->getCartTrackingData() );
+		if ( self::isValidCartToTrack() ) {
+			wp_send_json_success( $this->getCartTrackingData() );
+		}
 	}
 
 	/**

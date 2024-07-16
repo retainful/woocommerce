@@ -323,5 +323,24 @@ class Settings {
 		return hash_hmac( self::HMAC_ALGORITHM, $data, $secret );
 	}
 
+	/**
+	 * Create log file named retainful.
+	 *
+	 * @param string|array|object $data Log data.
+	 * @param string $context Log title.
+	 * @param string $type Log data type.
+	 *
+	 * @return void
+	 */
+	public static function log($data,$context = "Log data",$type = 'info'){
+		if (is_array($data) || is_object($data)) {
+			// Convert arrays and objects to JSON strings for logging
+			$data = json_encode($data);
+		}
+		if(Settings::get(RNOC_PLUGIN_PREFIX . 'enable_debug_log',0) > 0){
+			$logger = wc_get_logger();
+			$logger->add('Retainful',$context.':'.$data,$type);
+		}
+	}
 
 }
