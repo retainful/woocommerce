@@ -201,13 +201,16 @@ class Cart extends RestApi
         if (!wp_script_is('wc-cart-fragments', 'enqueued')) {
             wp_enqueue_script('wc-cart-fragments');
         }
+
 	    $abandoned_cart_js = plugins_url().'/retainful-next-order-coupon-for-woocommerce/src/assets/js/abandoned_cart.js';
+	    //$abandoned_cart_js = plugins_url().'/retainful-woocommerce/src/assets/js/abandoned_cart.js';
 	    //product search select
 	    wp_enqueue_script('retainful-app-main', $abandoned_cart_js, array(), RNOC_VERSION);
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
             $user_ip = $this->getClientIp();
             $user_ip = $this->formatUserIP($user_ip);
+            $popup_redirect_timeout = apply_filters('rnoc_popup_redirect_time_after_add_to_cart', 1500);
             $data = array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
@@ -216,7 +219,8 @@ class Cart extends RestApi
                 'public_key' => self::$settings->getApiKey(),
                 'api_url' => self::$api->getAbandonedCartEndPoint(),
                 'tracking_element_selector' => $this->getTrackingElementId(),
-                'cart_tracking_engine' => self::$settings->getCartTrackingEngine()
+                'cart_tracking_engine' => self::$settings->getCartTrackingEngine(),
+                'popup_redirect_timeout' => $popup_redirect_timeout
             );
             $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
             wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);

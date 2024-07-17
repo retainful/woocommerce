@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "api_url": "",
         "tracking_element_selector": "retainful-abandoned-cart-data",
         "cart_tracking_engine": "js",
+        'popup_redirect_timeout' : "",
     };
     let rnoc_cart_js_data = {};
     if (typeof retainful_cart_data === "undefined") {
@@ -48,7 +49,6 @@ document.addEventListener("DOMContentLoaded", function () {
         initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data);
     }
 });
-
 
 function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
     jQuery(function ($) {
@@ -504,7 +504,6 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
         }
     })
 }
-
 jQuery(document).on('wc-rtl-popup-coupon',function (event){
     if(event.coupon_code){
         jQuery.ajax({
@@ -526,7 +525,6 @@ jQuery(document).on('wc-rtl-popup-coupon',function (event){
 
 });
 
-
 jQuery(document).on('wc-rtl-popup-redirect',function (event){
     if(event.redirect_url.url){
         sessionStorage.setItem("rnocp_popup_redirect", event.redirect_url.url);
@@ -534,23 +532,25 @@ jQuery(document).on('wc-rtl-popup-redirect',function (event){
         let single_page = jQuery('body').hasClass('single-product')
         if (event.redirect_url.url !== null && !single_page ) {
             setTimeout(function() {
-                window.open( event.redirect_url.url, event.redirect_url.type);
                 sessionStorage.removeItem('rnocp_popup_redirect');
                 sessionStorage.removeItem('rnocp_popup_redirect_type');
-            }, 1500);
+                window.open( event.redirect_url.url, event.redirect_url.type);
+            }, retainful_cart_data.popup_redirect_timeout);
         }
     }
 });
 
 jQuery(document).ready(function(){
-   let redirect_url = sessionStorage.getItem('rnocp_popup_redirect');
-    let redirect_type = sessionStorage.getItem('rnocp_popup_redirect_type');
-    if(redirect_url !== null) {
-       var currentUrl = window.location.href;
-       if (redirect_url !== currentUrl) {
-           window.open( redirect_url, redirect_type);
-           sessionStorage.removeItem('rnocp_popup_redirect');
-           sessionStorage.removeItem('rnocp_popup_redirect_type');
-       }
-   }
+    setTimeout(function() {
+        let redirect_url = sessionStorage.getItem('rnocp_popup_redirect');
+        let redirect_type = sessionStorage.getItem('rnocp_popup_redirect_type');
+        if(redirect_url !== null) {
+            var currentUrl = window.location.href;
+            if (redirect_url !== currentUrl) {
+                sessionStorage.removeItem('rnocp_popup_redirect');
+                sessionStorage.removeItem('rnocp_popup_redirect_type');
+                window.open( redirect_url, redirect_type);
+            }
+        }
+    }, retainful_cart_data.popup_redirect_timeout);
 });
