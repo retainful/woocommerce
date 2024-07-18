@@ -253,25 +253,38 @@ class Settings {
 	 * @return string|array
 	 */
 	public static function settingsValidation( $post_data ) {
+		$labels_array_fields = array(
+			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
+			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync',
+			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
+			RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
+			RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status',
+			RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load',
+			RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
+			RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
+			RNOC_PLUGIN_PREFIX . 'enable_debug_log',
+		);
 
 		if ( empty( $post_data ) && ! is_array( $post_data ) ) {
 			return __( 'validation failed!', 'retainful-next-order-coupon-for-woocommerce' );
 		}
 		$validator = new Validator( $post_data );
-//		$validator->rule( 'in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', [
-//			'js',
-//			'php'
-//		] )->message( 'This field contains invalid value' );
+		$this_field          = __( "This field", "retainful-next-order-coupon-for-woocommerce" );
+		foreach ( $labels_array_fields as $label ) {
+			$labels_array[ $label ] = $this_field;
+		}
+		$validator->labels( $labels_array );
+
 		$validator->rule( 'in', [
 			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
 			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'
-		], [ 'yes', 'no' ] )->message( 'This field contains invalid value' );
+		], [ 'yes', 'no' ] )->message( '{field} This field contains invalid value' );
 		$validator->rule( 'in', RNOC_PLUGIN_PREFIX . 'handle_storage_using', [
 			'woocommerce',
 			'cookie',
 			'php'
 		] )->message( 'This field contains invalid value' );
-		$validator->rule( 'required', [ RNOC_PLUGIN_PREFIX . 'cart_capture_msg' ] )->message( 'Text for the opt-in checkbox field is required' );
+		$validator->rule( 'required', [ RNOC_PLUGIN_PREFIX . 'cart_capture_msg' ] )->message( '{fields}Text for the opt-in checkbox field is required' );
 		$validator->rule( 'in', [
 			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
 			RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
