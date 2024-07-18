@@ -304,9 +304,9 @@ rnoc = window.rnoc || {};
         };
         updateCheckout(rnoc_email, rnoc_phone, guest_data);
     });
-    rnoc_jquery(document).on('change', '.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
+    rnoc_jquery(document).on('change', '.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#billing-phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
         let rnoc_email = rnoc_jquery(".wp-block-woocommerce-checkout input#email").val();
-        let rnoc_phone = rnoc_jquery(".wp-block-woocommerce-checkout input#phone").val();
+        let rnoc_phone = rnoc_jquery(".wp-block-woocommerce-checkout input#billing-phone").val();
         let guest_data = {
             billing_first_name: rnoc_jquery('.wp-block-woocommerce-checkout #billing-first_name').val(),
             billing_last_name: rnoc_jquery('.wp-block-woocommerce-checkout #billing-last_name').val(),

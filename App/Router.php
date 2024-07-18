@@ -61,10 +61,6 @@ class Router {
 			add_filter( 'rnoc_can_track_abandoned_carts', [ $cart, 'isZeroValueCart' ], 15, 2 );
 			add_action( 'wp_loaded', [ $cart, 'applyAbandonedCartCoupon' ] );
 			add_action( 'woocommerce_removed_coupon', [ $cart, 'removeCouponFromCart' ] );
-//			$cart_tracking_engine = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' );
-//			if ( $cart_tracking_engine == 'php' ) {
-//				//add_action('woocommerce_after_calculate_totals', array($cart, 'syncCartData'));
-//			} else {
 			//Js tracking
 			add_action( 'wp_footer', [ $cart, 'renderCartTrackingDiv' ] );
 			add_filter( 'woocommerce_add_to_cart_fragments', [ $cart, 'getCartFragments' ] );
@@ -96,7 +92,7 @@ class Router {
 			], 10, 3 );
 
 			//ip filter
-			Customer::ipFilter();
+			Customer::handleIpFilter();
 			
 			//initialise currency helper
 			new Currency();
