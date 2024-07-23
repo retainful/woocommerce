@@ -1,6 +1,6 @@
-=== Email Marketing for WooCommerce by Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms, Popups and Email Automations ===
+=== Retainful - WooCommerce Abandoned Cart, Newsletters, Email Marketing, Signup Forms and Automation ===
 Contributors: retainful
-Tags: abandoned cart, email marketing, newsletter, forms, popups
+Tags: abandoned cart, email marketing, newsletter, forms, woocommerce
 Requires at least: 4.6.1
 Tested up to: 6.5
 WC tested up to: 9.0
@@ -9,15 +9,13 @@ Stable tag: 2.6.36
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Grow revenue with WooCommerce Abandoned Cart recovery, Email campaigns, Newsletters, Email Marketing Automation, Optin forms, popups with Retainful
+Recover abandoned carts, send beautiful email marketing campaigns, newsletters, grow list using email subscription forms & popups
 
 == Description ==
+= Simple, easy-to-use WooCommerce Cart Abandonment Recovery, Email Marketing, Newsletters & Automation plugin for WooCommerce = 
+**[Retainful](https://www.retainful.com/?utm_source=wp_repo&utm_medium=wp_description&utm_campaign=retainful&utm_id=wp_retainful)** is an all-in-one WooCommerce email marketing plugin, trusted by over 16,000+ ecommerce stores worldwide to recover abandoned carts, build powerful email lists, send irresistible targeted campaigns, automate workflows and track success.
 
-**[Retainful](https://www.retainful.com/?utm_source=wp_repo&utm_medium=wp_description&utm_campaign=retainful&utm_id=wp_retainful)** is an all-in-one WooCommerce email marketing plugin that simplifies your email marketing efforts at every stage - from acquiring new customers to retaining them.
-
-The email marketing plugin is tailor-made for WooCommerce store owners like you, helping you to build your email list with signup forms & popups, send personalized email marketing campaigns & newsletters, automate order follow-ups to save time, recover WooCommerce abandoned carts and grow revenue without the complexity and high costs.
-
-16,000+ e-commerce store owners chose us for cost-effective email marketing and ease of use.
+Retainful is tailor-made for WooCommerce, helping you to build your email list with signup forms & popups, send personalized email marketing campaigns & newsletters, automate order follow-ups to save time, recover WooCommerce abandoned carts and grow revenue without the complexity and high costs. 16,000+ e-commerce store owners chose us for cost-effective email marketing and ease of use.
 
 Join them & get started free!
 
