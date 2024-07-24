@@ -5,7 +5,6 @@ namespace Rnoc\Retainful\Api\AbandonedCart;
 use Exception;
 use Rnoc\Retainful\Integrations\MultiLingual;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
-use Rnoc\Retainful\Admin\Settings;
 use stdClass;
 
 class Cart extends RestApi
@@ -202,8 +201,7 @@ class Cart extends RestApi
         if (!wp_script_is('wc-cart-fragments', 'enqueued')) {
             wp_enqueue_script('wc-cart-fragments');
         }
-        $settings = new Settings();
-        $pop_coupon_url =  apply_filters('rnoc_popup_coupon_url',$settings->getWooPluginUrl() . '/src/assets/js/popup_coupon.js');
+        $pop_coupon_url =  apply_filters('rnoc_popup_coupon_url',RNOC_PLUGIN_URL . '/src/assets/js/popup_coupon.js');
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
             wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart',$this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
 	        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popup-coupon', $pop_coupon_url, array('jquery', RNOC_PLUGIN_PREFIX . 'track-user-cart' ), RNOC_VERSION, false);
