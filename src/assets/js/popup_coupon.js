@@ -1,7 +1,7 @@
 jQuery(document).on('wc-rtl-popup-coupon',function (event){
     if(event.coupon_code){
         jQuery.ajax({
-            url: retainful_cart_data.ajax_url,
+            url: retainful_popup_data.ajax_url,
             headers: {},
             method: 'POST',
             dataType: 'json',
@@ -16,9 +16,8 @@ jQuery(document).on('wc-rtl-popup-coupon',function (event){
             }
         });
     }
-
 });
-
+console.log(retainful_popup_data);
 jQuery(document).on('wc-rtl-popup-redirect',function (event){
     if(event.redirect_url.url){
         sessionStorage.setItem("rnocp_popup_redirect", event.redirect_url.url);
@@ -29,7 +28,7 @@ jQuery(document).on('wc-rtl-popup-redirect',function (event){
                 sessionStorage.removeItem('rnocp_popup_redirect');
                 sessionStorage.removeItem('rnocp_popup_redirect_type');
                 window.open( event.redirect_url.url, event.redirect_url.type);
-            }, retainful_cart_data.popup_redirect_timeout);
+            }, retainful_popup_data.popup_redirect_timeout);
         }
     }
 });
@@ -46,5 +45,5 @@ jQuery(document).ready(function(){
                 window.open( redirect_url, redirect_type);
             }
         }
-    }, retainful_cart_data.popup_redirect_timeout);
+    }, retainful_popup_data.popup_redirect_timeout);
 });

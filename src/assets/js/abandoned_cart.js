@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "api_url": "",
         "tracking_element_selector": "retainful-abandoned-cart-data",
         "cart_tracking_engine": "js",
-        'popup_redirect_timeout' : "",
     };
     let rnoc_cart_js_data = {};
     if (typeof retainful_cart_data === "undefined") {
@@ -477,29 +476,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 }
 
             } else {
-                if (retainful.validateEmail(rnoc_email) || rnoc_phone.length >= 4) {
-                    sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "1");
-                    $.ajax({
-                        url: rnoc_cart_js_data.ajax_url,
-                        headers: {},
-                        method: 'POST',
-                        dataType: 'json',
-                        data: guest_data,
-                        async: true,
-                        success: function (response) {
-                            if (response.success && response.data) {
-                                retainful.syncCart(response.data, true);
-                            }
-                        },
-                        error: function (response) {
-                            msg = response;
-                        }
-                    });
-                } else {
-                    sessionStorage.setItem("rnocp_is_add_to_cart_popup_email_entered", "0");
-                    //console.log('Email validation failed');
-                }
-                //console.log('Not a valid email yet');
+
             }
         }
     })
