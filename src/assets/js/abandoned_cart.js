@@ -479,5 +479,5 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 //console.log('Not a valid email yet');
             }
         }
-    })
+    });
 }
