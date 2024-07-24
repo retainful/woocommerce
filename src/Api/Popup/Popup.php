@@ -3,6 +3,8 @@
 namespace Rnoc\Retainful\Api\Popup;
 
 use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Helpers\Input;
+use Rnoc\Retainful\OrderCoupon;
 use Rnoc\Retainful\WcFunctions;
 
 class Popup
@@ -113,4 +115,42 @@ class Popup
         $params = wp_parse_args($user_arr, $default_params);
         include_once plugin_dir_path(RNOC_FILE) . 'src/templates/popup.php';
     }
+
+	/**
+	 * Add coupon code into session.
+	 *
+	 * @return void
+	 */
+	public function addPopupCouponToSession() {
+		$input = new Input();
+		$coupon_code = $input->get_post('coupon_code','');
+		if(empty($coupon_code)){
+			wp_send_json_error(['is_redirect' => false, 'message' => __('Coupon code invalid', RNOC_TEXT_DOMAIN)]);
+		}
+		$wc_function = new WcFunctions();
+		$wc_function->setSession('rnoc_popup_coupon_code',$coupon_code);
+		wp_send_json_success(['is_redirect' => true, 'message' => __('Coupon added into the Session', RNOC_TEXT_DOMAIN)]);
+	}
+
+	/**
+	 * Add coupon code into cart.
+	 *
+	 * @return void
+	 */
+	public function applyPopupCoupon(){
+		$wc_function = new WcFunctions();
+		$popup_coupon_code = $wc_function->getSession('rnoc_popup_coupon_code');
+		if(!empty($popup_coupon_code) && function_exists('WC') && is_object(WC()->cart) && !$wc_function->isCartEmpty()){
+			if($wc_function->hasDiscount($popup_coupon_code)){
+				$wc_function->setSession('rnoc_popup_coupon_code','');
+				return;
+			}
+			$coupon = new OrderCoupon();
+			//Do not apply coupon until the coupon is valid
+			if ($coupon->checkCouponBeforeCouponApply($popup_coupon_code)) {
+				$wc_function->addDiscount($popup_coupon_code);
+				$wc_function->setSession('rnoc_popup_coupon_code','');
+			}
+		}
+	}
 }

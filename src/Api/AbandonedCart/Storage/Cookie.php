@@ -80,7 +80,7 @@ class Cookie extends Base
         }
         if (isset($_COOKIE[$key])) {
             unset($_COOKIE[$key]);
-            $this->setCookieValue($key, null, -1);
+            $this->setCookieValue($key, '', -1);
             return true;
         } else {
             return false;

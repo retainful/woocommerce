@@ -202,10 +202,18 @@ class Cart extends RestApi
             wp_enqueue_script('wc-cart-fragments');
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
-            wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', $this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
-            $user_ip = $this->getClientIp();
+	        $pop_coupon_url =  apply_filters('rnoc_popup_coupon_url',RNOC_PLUGIN_URL . '/src/assets/js/popup_coupon.js');
+	        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart',$this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
+	        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popup-coupon', $pop_coupon_url, array('jquery', RNOC_PLUGIN_PREFIX . 'track-user-cart' ), RNOC_VERSION, false);
+	        $popup_data = [
+		        'ajax_url' => admin_url('admin-ajax.php'),
+		        'version' => RNOC_VERSION,
+		        'popup_redirect_timeout' => apply_filters('rnoc_popup_redirect_time_after_add_to_cart', 1500)
+	        ];
+	        wp_localize_script(RNOC_PLUGIN_PREFIX . 'popup-coupon', 'retainful_popup_data', $popup_data);
+	        $user_ip = $this->getClientIp();
             $user_ip = $this->formatUserIP($user_ip);
-            $data = array(
+            $data = [
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'jquery_url' => includes_url('js/jquery/jquery.js'),
                 'ip' => $user_ip,
@@ -214,9 +222,9 @@ class Cart extends RestApi
                 'api_url' => self::$api->getAbandonedCartEndPoint(),
                 'tracking_element_selector' => $this->getTrackingElementId(),
                 'cart_tracking_engine' => self::$settings->getCartTrackingEngine()
-            );
+            ];
             $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
-            wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
+	        wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
         }
     }
 
