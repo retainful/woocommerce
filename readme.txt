@@ -2,10 +2,10 @@
 Contributors: retainful
 Tags: abandoned cart, email marketing, newsletter, forms, popups
 Requires at least: 4.6.1
-Tested up to: 6.5
-WC tested up to: 9.0
+Tested up to: 6.6
+WC tested up to: 9.1
 Requires PHP: 5.6
-Stable tag: 2.6.36
+Stable tag: 2.6.37
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -254,6 +254,9 @@ You can reach out to our experts [here](https://www.retainful.com/support).
 7. Retainful Contacts
 
 == Changelog ==
+= 2.6.37 =
+- Added: Automatic Popup coupon applies
+
 = 2.6.36 =
 - Fix: Duplicate order synchronization
 - Fix: Ignore draft order synchronization(Block Checkout)
