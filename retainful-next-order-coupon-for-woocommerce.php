@@ -48,6 +48,7 @@ if ( ! file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 // Constants
 defined( 'RNOC_PLUGIN_SLUG' ) or define( 'RNOC_PLUGIN_SLUG', 'retainful-next-order-coupon-for-woocommerce' );
 defined( 'RNOC_PLUGIN_PREFIX' ) or define( 'RNOC_PLUGIN_PREFIX', 'rnoc_' );
+defined( 'RNOC_FILE' ) or define( 'RNOC_FILE', __FILE__ );
 defined( 'RNOC_PLUGIN_PATH' ) or define( 'RNOC_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 defined( 'RNOC_PLUGIN_URL' ) or define( 'RNOC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 defined( 'RNOC_VERSION' ) or define( 'RNOC_VERSION', '2.6.32' );

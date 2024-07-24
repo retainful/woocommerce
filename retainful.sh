@@ -1,4 +1,4 @@
-echo "Discount Rule Pro"
+echo "Retainful Pro pack"
 current_dir="$PWD"
 composer_run() {
   # shellcheck disable=SC2164

@@ -409,7 +409,8 @@ class Order {
 			$order                  = \RNOC\App\Helpers\Order::getOrder( intval( $draft_order ) );
 			$draft_order_cart_token = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
 			if ( empty( $draft_order_cart_token ) && empty( $cart_token ) ) {
-				$this->getCartToken();
+				$abandoned_cart =  new AbandonedCart();
+				$abandoned_cart->getCartToken();
 			}
 
 			$this->updateOrderMeta( intval( $draft_order ) );

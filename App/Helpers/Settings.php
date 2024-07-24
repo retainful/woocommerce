@@ -2,9 +2,8 @@
 
 namespace RNOC\App\Helpers;
 
-use RNOC\App\Modules\Storage\PHPSession;
 use RNOC\App\Modules\Storage\WooSession;
-use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
+use RNOC\App\Modules\Storage\Cookie;
 use Valitron\Validator;
 
 defined( 'ABSPATH' ) || exit;
@@ -153,15 +152,12 @@ class Settings {
 	/**
 	 * Get storage object.
 	 *
-	 * @return PHPSession|WooSession|Cookie
+	 * @return WooSession|Cookie
 	 */
 	public static function getStorage() {
 		$storage = Settings::get( RNOC_PLUGIN_PREFIX . 'handle_storage_using', 'woocommerce' );
 
 		switch ( $storage ) {
-			case "php";
-				$storage_handler = new PHPSession();
-				break;
 			case "cookie";
 				$storage_handler = new Cookie();
 				break;
@@ -257,24 +253,35 @@ class Settings {
 	 * @return string|array
 	 */
 	public static function settingsValidation( $post_data ) {
+		$labels_array_fields = [
+			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => __( "Track Zero value carts", "retainful-next-order-coupon-for-woocommerce" ),
+			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'  => __( "Use only webhooks for tracking the order events in the background", "retainful-next-order-coupon-for-woocommerce" ),
+			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status'  => __( "Consider On-Hold order status as abandoned cart?", "retainful-next-order-coupon-for-woocommerce" ),
+			RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'  => __( "Consider Canceled order status as abandoned cart?", "retainful-next-order-coupon-for-woocommerce" ),
+			RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'  => __( "Consider failed order status as abandoned cart?", "retainful-next-order-coupon-for-woocommerce" ),
+			RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'  => __( "Fix for Cart sync not working", "retainful-next-order-coupon-for-woocommerce" ),
+			RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'  => __( "Marketing Consent", "retainful-next-order-coupon-for-woocommerce" ),
+			RNOC_PLUGIN_PREFIX . 'enable_ip_filter'  => __( "Enable IP filter?", "retainful-next-order-coupon-for-woocommerce" ),
+			RNOC_PLUGIN_PREFIX . 'enable_debug_log'  => __( "Enable debug log?", "retainful-next-order-coupon-for-woocommerce" ),
+			RNOC_PLUGIN_PREFIX . 'cart_capture_msg'  => __( "Text for the opt-in checkbox", "retainful-next-order-coupon-for-woocommerce" ),
+		];
 
 		if ( empty( $post_data ) && ! is_array( $post_data ) ) {
 			return __( 'validation failed!', 'retainful-next-order-coupon-for-woocommerce' );
 		}
 		$validator = new Validator( $post_data );
-		$validator->rule( 'in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', [
-			'js',
-			'php'
-		] )->message( 'This field contains invalid value' );
+
+		$validator->labels( $labels_array_fields );
 		$validator->rule( 'in', [
 			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
 			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'
-		], [ 'yes', 'no' ] )->message( 'This field contains invalid value' );
+		], [ 'yes', 'no' ] )->message( '{field} contains invalid value' );
 		$validator->rule( 'in', RNOC_PLUGIN_PREFIX . 'handle_storage_using', [
 			'woocommerce',
 			'cookie',
 			'php'
-		] )->message( 'This field contains invalid value' );
+		] )->message( '{field} contains invalid value' );
+		$validator->rule( 'required', [ RNOC_PLUGIN_PREFIX . 'cart_capture_msg' ] )->message( '{field} is required' );
 		$validator->rule( 'in', [
 			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
 			RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
@@ -283,7 +290,7 @@ class Settings {
 			RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
 			RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
 			RNOC_PLUGIN_PREFIX . 'enable_debug_log',
-		], [ '0', '1' ] )->message( 'This field contains invalid value' );
+		], [ '0', '1' ] )->message( '{field} contains invalid value' );
 
 		if ( $validator->validate() ) {
 			return true;
@@ -326,5 +333,24 @@ class Settings {
 		return hash_hmac( self::HMAC_ALGORITHM, $data, $secret );
 	}
 
+	/**
+	 * Create log file named retainful.
+	 *
+	 * @param string|array|object $data Log data.
+	 * @param string $context Log title.
+	 * @param string $type Log data type.
+	 *
+	 * @return void
+	 */
+	public static function log($data,$context = "Log data",$type = 'info'){
+		if (is_array($data) || is_object($data)) {
+			// Convert arrays and objects to JSON strings for logging
+			$data = json_encode($data);
+		}
+		if(Settings::get(RNOC_PLUGIN_PREFIX . 'enable_debug_log',0) > 0){
+			$logger = wc_get_logger();
+			$logger->add('Retainful',$context.':'.$data,$type);
+		}
+	}
 
 }

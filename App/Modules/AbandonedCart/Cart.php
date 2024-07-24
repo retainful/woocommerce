@@ -85,7 +85,9 @@ class Cart extends AbandonedCart {
 	 * @return void
 	 */
 	public function getCartTrackingUpdatedData() {
-		wp_send_json_success( $this->getCartTrackingData() );
+		if ( self::isValidCartToTrack() ) {
+			wp_send_json_success( $this->getCartTrackingData() );
+		}
 	}
 
 	/**
@@ -137,7 +139,7 @@ class Cart extends AbandonedCart {
 				'public_key'                => Settings::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' ),
 				'api_url'                   => Request::getAbandonedCartApiUrl() . 'webhooks/checkout',
 				'tracking_element_selector' => Cart::getTrackingElementId(),
-				'cart_tracking_engine'      => Settings::get( RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', 'js' ),
+				'cart_tracking_engine'      => 'js',
 			];
 			$data = apply_filters( 'rnoc_add_cart_tracking_scripts', $data );
 			wp_localize_script( RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data );
@@ -151,7 +153,7 @@ class Cart extends AbandonedCart {
 	 */
 	public function setCustomerData() {
 		//TODO: Get deta from input helper
-		$billing_email = $_POST['billing_email'];
+		$billing_email = Input::get( 'billing_email', '' );
 		if ( ! empty( $billing_email ) && is_email( $billing_email ) ) {
 			// update customer email
 			Customer::setCustomerEmail( $billing_email );
@@ -168,7 +170,7 @@ class Cart extends AbandonedCart {
 			}
 			$is_buyer_accept_marketing = true;
 			if ( Settings::get( RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance', 0 ) ) {
-				$is_buyer_accept_marketing = ( isset( $_POST['allow_gdpr'] ) && $_POST['allow_gdpr'] == 'true' ); //TODO: use input helper
+				$is_buyer_accept_marketing = ( Input::get( 'allow_gdpr', '' ) == 'true' ); //TODO: use input helper
 			}
 			WC::setSession( 'is_buyer_accepting_marketing', $is_buyer_accept_marketing );
 			$storage            = Settings::getStorage();
@@ -181,7 +183,7 @@ class Cart extends AbandonedCart {
 
 		if ( self::isValidCartToTrack() ) {
 			$cart_token      = $this->retrieveCartToken();
-			$post_cart_token = $_POST['cart_token'];// TODO: use input helper
+			$post_cart_token = Input::get( 'cart_token', '' );// TODO: use input helper
 			if ( empty( $cart_token ) && ! empty( $post_cart_token ) ) {
 				$this->setCartToken( $post_cart_token );
 			}
@@ -213,6 +215,8 @@ class Cart extends AbandonedCart {
 			update_user_meta( $user_id, self::$cart_token_key_for_db, $retrieve_cart_token );
 		}
 	}
+
+
 
 	/**
 	 * Get cart request data.
@@ -258,7 +262,7 @@ class Cart extends AbandonedCart {
 			'shipping_address'          => Customer::getCartShippingAddress(),
 			'billing_address'           => Customer::getCartBillingAddress(),
 			'abandoned_checkout_url'    => self::getRecoveryLink( $cart_token ),
-			'total_line_items_price'    => WC::formatDecimalPrice( CartHelper::getCartTotal() ),
+			'total_line_items_price'    => $cart_total,
 			'buyer_accepts_marketing'   => self::isBuyerAcceptsMarketing(),
 			'client_session'            => WC::getClientSession(),
 			'woocommerce_totals'        => self::getCartTotals(),
@@ -267,7 +271,7 @@ class Cart extends AbandonedCart {
 			'recovered_cart_token'      => $storage->get( 'rnoc_recovered_cart_token' ),
 			'client_details'            => Customer::getClientDetails()
 		];
-		
+
 		return apply_filters( 'rnoc_get_user_cart', $cart );
 	}
 
@@ -740,6 +744,32 @@ class Cart extends AbandonedCart {
 		if ( strtoupper( $remove_coupon ) == strtoupper( $coupon_code ) ) {
 			Settings::getStorage()->remove( 'rnoc_ac_coupon' );
 		}
+	}
+
+	/**
+	 * Need to track zero value carts or not.
+	 *
+	 * @param bool $return Return.
+	 * @param \WC_Order $order Order object.
+	 *
+	 * @return bool
+	 */
+	public function isZeroValueCart( $return, $order = false ) {
+		if ( Settings::get( RNOC_PLUGIN_PREFIX . 'track_zero_value_carts', 'no' ) !== "no" ) {
+			return $return;
+		}
+		if ( is_object( $order ) ) {
+			if ( ! empty( Order::getOrderItems( $order ) ) && Order::getOrderSubTotal( $order ) <= 0 && Order::getOrderTotal( $order ) <= 0 ) {
+				$return = false;
+			}
+		} else {
+			if ( ! empty( CartHelper::getCart() ) && CartHelper::getCartSubTotal() <= 0 && CartHelper::getCartTotalPrice('edit') <= 0 ) {
+				$return = false;
+			}
+		}
+
+		return $return;
+
 	}
 
 }

@@ -3,6 +3,7 @@
 
 namespace RNOC\App\Modules\Integrations;
 
+use RNOC\App\Modules\AbandonedCart\AbandonedCart;
 use RNOC\App\Modules\AbandonedCart\Cart;
 use RNOC\App\Modules\AbandonedCart\Order;
 use RNOC\App\Modules\AbandonedCart\Traits\SyncData;
@@ -43,7 +44,8 @@ class AfterPay {
 		if ( Order::isPendingRecovery() ) {
 			\RNOC\App\Helpers\Order::setOrderMeta( $post_id, '_rnoc_is_pending_recovery', true );
 		}
-		$cart_token = self::getCartToken();
+		$abandoned_cart = new AbandonedCart();
+		$cart_token = $abandoned_cart->getCartToken();
 		if ( $cart_token ) {
 			$cart = new Cart();
 			$cart->setCartToken( $cart_token, $post_id );

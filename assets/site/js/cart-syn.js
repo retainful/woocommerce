@@ -194,26 +194,26 @@ rnoc = window.rnoc || {};
             if (wp?.data?.select) {
                 let current_cart = wp?.data?.select('wc/store/cart').getCartData();
                 let old_cart = JSON.parse(localStorage.getItem("rnocp_store_cart_data", {}));
-                if (current_cart?.billingAddress?.email !== old_cart?.billingAddress?.email) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
-                if (current_cart?.billingAddress?.first_name !== old_cart?.billingAddress?.first_name) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
-                if (current_cart?.billingAddress?.last_name !== old_cart?.billingAddress?.last_name) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
-                if (current_cart?.billingAddress?.phone !== old_cart?.billingAddress?.phone) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
-                if (current_cart?.billingAddress?.postcode !== old_cart?.billingAddress?.postcode) {
-                    localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
-                    return true;
-                }
+                // if (current_cart?.billingAddress?.email !== old_cart?.billingAddress?.email) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
+                // if (current_cart?.billingAddress?.first_name !== old_cart?.billingAddress?.first_name) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
+                // if (current_cart?.billingAddress?.last_name !== old_cart?.billingAddress?.last_name) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
+                // if (current_cart?.billingAddress?.phone !== old_cart?.billingAddress?.phone) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
+                // if (current_cart?.billingAddress?.postcode !== old_cart?.billingAddress?.postcode) {
+                //     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
+                //     return true;
+                // }
                 if (JSON.stringify(current_cart?.items) !== JSON.stringify(old_cart?.items)) {
                     localStorage.setItem("rnocp_store_cart_data", JSON.stringify(current_cart));
                     return true;
@@ -236,35 +236,36 @@ rnoc = window.rnoc || {};
     let retain_cart_js_data = {...default_retainful_cart_data, ...retainful_cart_data}
     let retain = new RetainFul(retain_cart_js_data.api_url, retain_cart_js_data.public_key);
     retain.setCartTrackingElementId(retain_cart_js_data.tracking_element_selector);
-    if (retain_cart_js_data.cart_tracking_engine === "js") {
-        retain.setAjaxUrl(retain_cart_js_data.ajax_url);
-        retain.setIp(retain_cart_js_data.ip);
-        retain.setVersion(retain_cart_js_data.version);
-        retain.initCartTracking();
-        rnoc_jquery(window).on('load', function () {
-            retain.syncCart();
-        });
-        if (wp?.data?.select) {
-            wp?.data?.subscribe(function () {
-                if (retain.isCartUpdated()) {
-                    rnoc_jquery.ajax({
-                        url: retain_cart_js_data.ajax_url,
-                        method: 'POST',
-                        dataType: 'json',
-                        data: {
-                            action: 'rnoc_cart_item_change',
-                        },
-                        async: true,
-                        success: function (response) {
-                            if (response.success && response.data) {
-                                retain.syncCart(response.data.data, true);
-                            }
+    //if (retain_cart_js_data.cart_tracking_engine === "js") {
+    retain.setAjaxUrl(retain_cart_js_data.ajax_url);
+    retain.setIp(retain_cart_js_data.ip);
+    retain.setVersion(retain_cart_js_data.version);
+    retain.initCartTracking();
+    rnoc_jquery(window).on('load', function () {
+        retain.syncCart();
+    });
+    if (wp?.data?.select) {
+        wp?.data?.subscribe(function () {
+
+            if (retain.isCartUpdated()) {
+                rnoc_jquery.ajax({
+                    url: retain_cart_js_data.ajax_url,
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'rnoc_cart_item_change',
+                    },
+                    async: true,
+                    success: function (response) {
+                        if (response.success && response.data) {
+                            retain.syncCart(response.data.data, true);
                         }
-                    });
-                }
-            })
-        }
+                    }
+                });
+            }
+        })
     }
+    // }
     if (retain_cart_js_data.cart !== undefined) {
         let tracking_content = '<div id="' + retain_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(retain_cart_js_data.cart) + '</div>';
         rnoc_jquery(tracking_content).appendTo('body');
@@ -303,9 +304,9 @@ rnoc = window.rnoc || {};
         };
         updateCheckout(rnoc_email, rnoc_phone, guest_data);
     });
-    rnoc_jquery(document).on('change', '.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
+    rnoc_jquery(document).on('change', '.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#billing-phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
         let rnoc_email = rnoc_jquery(".wp-block-woocommerce-checkout input#email").val();
-        let rnoc_phone = rnoc_jquery(".wp-block-woocommerce-checkout input#phone").val();
+        let rnoc_phone = rnoc_jquery(".wp-block-woocommerce-checkout input#billing-phone").val();
         let guest_data = {
             billing_first_name: rnoc_jquery('.wp-block-woocommerce-checkout #billing-first_name').val(),
             billing_last_name: rnoc_jquery('.wp-block-woocommerce-checkout #billing-last_name').val(),

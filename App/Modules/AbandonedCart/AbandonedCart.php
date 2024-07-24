@@ -31,9 +31,23 @@ class AbandonedCart {
 		return true;
 	}
 
+	/**
+	 * Get cart token.
+	 *
+	 * @return string
+	 */
+	public function getCartToken() {
+		$cart_token = $this->retrieveCartToken();
+		if ( empty( $cart_token ) ) {
+			$cart_token = $this->generateCartToken();
+			$this->setCartToken( $cart_token );
+		}
+
+		return apply_filters( 'rnoc_get_cart_token', $cart_token, $this );
+	}
 
 	/**
-	 * Generate cart token.
+	 * Generate cart token.+
 	 *
 	 * @return string
 	 */
