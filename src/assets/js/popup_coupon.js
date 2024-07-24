@@ -17,7 +17,6 @@ jQuery(document).on('wc-rtl-popup-coupon',function (event){
         });
     }
 });
-console.log(retainful_popup_data);
 jQuery(document).on('wc-rtl-popup-redirect',function (event){
     if(event.redirect_url.url){
         sessionStorage.setItem("rnocp_popup_redirect", event.redirect_url.url);
