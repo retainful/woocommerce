@@ -46,6 +46,9 @@ class Order {
 		}
 
 		$order      = \RNOC\App\Helpers\Order::getOrder( $order_id );
+		if ( \RNOC\App\Helpers\Order::getStatus( $order ) == 'checkout-draft' ) {
+			return;
+		}
 		$cart_token = apply_filters( 'rnoc_sync_order_change_order_token', \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order ), $order_id, $this );
 
 		if ( empty( $cart_token ) ) {
@@ -346,7 +349,11 @@ class Order {
 				] ) ) {
 				return $http_args;
 			}
+
 			$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
+			if ( \RNOC\App\Helpers\Order::getStatus( $order ) == 'checkout-draft' ) {
+				return $http_args;
+			}
 
 			$cart_token = \RNOC\App\Helpers\Order::getOrderMeta( self::$cart_token_key_for_db, $order );
 
@@ -498,6 +505,9 @@ class Order {
 			return;
 		}
 		$order = \RNOC\App\Helpers\Order::getOrder( $order_id );
+		if ( \RNOC\App\Helpers\Order::getStatus( $order ) == 'checkout-draft' ) {
+			return;
+		}
 		self::syncData( $order );
 	}
 

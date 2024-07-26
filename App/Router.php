@@ -101,8 +101,13 @@ class Router {
 				new AfterPay();
 			}
 
+		}else{
+			if (is_admin()) {
+				$connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', 'retainful-next-order-coupon-for-woocommerce') : __('re-connect', 'retainful-next-order-coupon-for-woocommerce');
+				$notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", 'retainful-next-order-coupon-for-woocommerce'), $connect_txt) . '</p>';
+				Settings::showAdminNotice($notice);
+			}
 		}
-
 	}
 
 	/**
