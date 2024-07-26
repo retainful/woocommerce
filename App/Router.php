@@ -163,9 +163,6 @@ class Router {
 	 */
 	public static function addStoreHooks() {
 		//Popups
-		if ( SettingsHelper::isProPlan() && SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'enable_referral_widget', 'no' ) == 'yes' ) {
-			add_action( 'wp_footer', [ Popups::class, 'printReferralPopup' ] );
-		}
 		if ( SettingsHelper::isProPlan() && SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup', 'no' ) == 'yes' ) {
 			// Cookie update hooks
 			add_filter( 'woocommerce_set_cookie_options', [ Popups::class, 'changeIdentityPath' ], 10, 3 );
