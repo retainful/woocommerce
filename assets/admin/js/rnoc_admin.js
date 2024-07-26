@@ -27,8 +27,8 @@ rnoc = window.rnoc || {};
                         rnoc_jquery.each(json.data.error_fields, function (index, value) {
                             let error_field = rnoc_jquery('#'+index);
                             error_field.addClass('input-error');
-                            if(rnoc_jquery('.text-red').length <= 0) {
-                                error_field.after('<div><p class="text-red">'+value+'</p></div>');
+                            if(rnoc_jquery('.rnoc-error').length <= 0) {
+                                error_field.after('<div><p class="rnoc-error">'+value+'</p></div>');
                             }
                             alertify.error(value);
                         });
