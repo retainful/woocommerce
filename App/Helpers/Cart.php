@@ -228,11 +228,10 @@ class Cart {
 
 	/**
 	 * Get cart items total.
-	 *
 	 * @return float
 	 */
-	public static function getCartTotalPrice($context = 'view' ) {
-		return function_exists( 'WC' ) && is_object( WC()->cart ) ? WC()->cart->get_total($context) : 0;
+	public static function getCartTotalPrice( $context = 'view' ) {
+		return function_exists( 'WC' ) && Util::isMethodExists( WC()->cart, 'get_total' ) ? WC()->cart->get_total( $context ) : 0;
 	}
 
 }

@@ -49,16 +49,19 @@ $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ]
             </th>
             <td>
                 <button type="button" id="validate-app-id-and-secret"
-                        onclick="rnoc_jquery('body').trigger('rnoc-app-connect',[<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>,<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>])"
+                        onclick="rnoc_jquery('body').trigger('rnoc-app-connect',['<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>','<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>'])"
                         class="button button-primary button-green">
 					<?php echo ( ! $is_app_connected ) ? __( 'Connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 'Re-Connect', 'retainful-next-order-coupon-for-woocommerce' ); ?>
+                        <span class="loading-icon"></span>
                 </button>
 				<?php
 				if ( $is_app_connected ) {
 					?>
                     <button type="button" id="disconnect-app-btn"
-                            onclick="rnoc_jquery('body').trigger('rnoc-app-disconnect',[<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>,<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>])"
-                            class="button"><?= __( 'Dis-connect', 'retainful-next-order-coupon-for-woocommerce' ) ?></button>
+                            onclick="rnoc_jquery('body').trigger('rnoc-app-disconnect',['<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>','<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>'])"
+                            class="button"><?= __( 'Dis-connect', 'retainful-next-order-coupon-for-woocommerce' ) ?>
+                        <span class="loading-icon"></span>
+                    </button>
                     <a href="<?php echo $app_url ?>" target="_blank" class="button"
                        style="text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;border-color:#F27052;"><?php echo __( 'Visit Your Dashboard', 'retainful-next-order-coupon-for-woocommerce' ); ?></a>
                     <br>

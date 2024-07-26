@@ -162,6 +162,76 @@
     margin-left: 5px;
     font-size: 12px;
   }
+
+  .input-error {
+    border: 2px solid rgb(233, 100, 100) !important;
+    border-radius: 4px !important;
+    background-color: rgba(254, 244, 244, 0.35686) !important;
+  }
+
+  .tracking-wide {
+    letter-spacing: 0.025em !important;
+  }
+
+  .rnoc-error{
+    color: #E96464FF;
+  }
+
+  #validate-app-id-and-secret, #disconnect-app-btn {
+    padding: 0 23px;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between !important;
+    align-items: center;
+    gap: 1rem;
+  }
+
+}
+
+.rnoc-loader {
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  position: relative;
+  animation: wprelayRotate 1s linear infinite
+}
+
+.rnoc-loader::before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0px;
+  border-radius: 100%;
+  border: 5px solid #000000;
+  animation: wprelayPrixClipFix 2s linear infinite;
+}
+
+@keyframes rnocRotate {
+  100% {
+    transform: rotate(360deg)
+  }
+}
+
+@keyframes rnocPrixClipFix {
+  0% {
+    clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0)
+  }
+
+  25% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0)
+  }
+
+  50% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%)
+  }
+
+  75% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%)
+  }
+
+  100% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0)
+  }
 }
 
 .ajs-message.ajs-success, .ajs-message.ajs-error {

@@ -253,25 +253,30 @@ class Settings {
 	 * @return string|array
 	 */
 	public static function settingsValidation( $post_data ) {
-		$labels_array_fields = [
-			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts' => __( "Track Zero value carts", "retainful-next-order-coupon-for-woocommerce" ),
-			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'  => __( "Use only webhooks for tracking the order events in the background", "retainful-next-order-coupon-for-woocommerce" ),
-			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status'  => __( "Consider On-Hold order status as abandoned cart?", "retainful-next-order-coupon-for-woocommerce" ),
-			RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'  => __( "Consider Canceled order status as abandoned cart?", "retainful-next-order-coupon-for-woocommerce" ),
-			RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'  => __( "Consider failed order status as abandoned cart?", "retainful-next-order-coupon-for-woocommerce" ),
-			RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'  => __( "Fix for Cart sync not working", "retainful-next-order-coupon-for-woocommerce" ),
-			RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'  => __( "Marketing Consent", "retainful-next-order-coupon-for-woocommerce" ),
-			RNOC_PLUGIN_PREFIX . 'enable_ip_filter'  => __( "Enable IP filter?", "retainful-next-order-coupon-for-woocommerce" ),
-			RNOC_PLUGIN_PREFIX . 'enable_debug_log'  => __( "Enable debug log?", "retainful-next-order-coupon-for-woocommerce" ),
-			RNOC_PLUGIN_PREFIX . 'cart_capture_msg'  => __( "Text for the opt-in checkbox", "retainful-next-order-coupon-for-woocommerce" ),
+		$default_label = [
+			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
+			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync',
+			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
+			RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status',
+			RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status',
+			RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load',
+			RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance',
+			RNOC_PLUGIN_PREFIX . 'enable_ip_filter',
+			RNOC_PLUGIN_PREFIX . 'enable_debug_log',
+			RNOC_PLUGIN_PREFIX . 'cart_capture_msg',
 		];
 
 		if ( empty( $post_data ) && ! is_array( $post_data ) ) {
 			return __( 'validation failed!', 'retainful-next-order-coupon-for-woocommerce' );
 		}
 		$validator = new Validator( $post_data );
+		$this_field = __("This field", "retainful-next-order-coupon-for-woocommerce");
+		$labels_array = [];
+		foreach ($default_label as $key => $label) {
+			$labels_array[$label] = $this_field;
+		}
 
-		$validator->labels( $labels_array_fields );
+		$validator->labels( $labels_array );
 		$validator->rule( 'in', [
 			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
 			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'

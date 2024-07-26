@@ -25,6 +25,11 @@ rnoc = window.rnoc || {};
                 } else {
                     if (json.data && json.data.error_fields) {
                         rnoc_jquery.each(json.data.error_fields, function (index, value) {
+                            let error_field = rnoc_jquery('#'+index);
+                            error_field.addClass('input-error');
+                            if(rnoc_jquery('.rnoc-error').length <= 0) {
+                                error_field.after('<div><p class="rnoc-error">'+value+'</p></div>');
+                            }
                             alertify.error(value);
                         });
                     }
@@ -33,30 +38,43 @@ rnoc = window.rnoc || {};
         });
     });
     rnoc_jquery(document).on('rnoc-app-connect', function (e, app_id, app_secret) {
-        let rnoc_app_id = rnoc_jquery(app_id).val();
-        let rnoc_app_secret = rnoc_jquery(app_secret).val();
-        var message = rnoc_jquery(".retainful_app_validation_message");
+        let button = rnoc_jquery('#validate-app-id-and-secret');
+        let loading_icon = button.find('.loading-icon');
+
+        button.attr('disabled', true).css('pointer-events', 'none');
+        loading_icon.addClass('rnoc-loader');
+        // Retrieve values
+        let rnoc_app_id = rnoc_jquery('#' + app_id).val();
+        let rnoc_app_secret = rnoc_jquery('#' + app_secret).val();
+        let message = rnoc_jquery(".retainful_app_validation_message");
         alertify.set('notifier', 'position', 'top-right');
 
-        rnoc_jquery(this).attr('disabled', true);
-        if (rnoc_app_id === "" && rnoc_app_secret === "") {
+        // Validate inputs
+        if (!rnoc_app_id || !rnoc_app_secret) {
+            // Re-enable the button if validation fails
+            button.attr('disabled', false).css('pointer-events', 'auto');
+            loading_icon.removeClass('rnoc-loader');
             return false;
         }
-        rnoc_jquery('.error').html('');
+
+        // Prepare data for AJAX request
         let data = {
             action: "rnoc_connection",
             rnoc_nonce: rnoc_localize_data.app_connect,
             app_id: rnoc_app_id,
             app_secret: rnoc_app_secret
-        }
+        };
+
+        // AJAX request
         rnoc_jquery.ajax({
             type: "POST",
             url: rnoc_localize_data.ajax_url,
             data: data,
-            async: false,
             dataType: "json",
             success: function (response) {
-                console.log(response);
+                button.prop('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
+                loading_icon.removeClass('rnoc-loader');
+
                 if (response.error && typeof response.error === "object") {
                     var result = response.error;
                     for (const [key, value] of Object.entries(result)) {
@@ -64,11 +82,10 @@ rnoc = window.rnoc || {};
                         var res_html = '';
                         if (Array.isArray(value)) {
                             res_html = '<ul>';
-                            var i;
-                            for (i = 0; i < value.length; i++) {
-                                res_html += "<li>" + value[i] + "<li>";
+                            for (let i = 0; i < value.length; i++) {
+                                res_html += "<li>" + value[i] + "</li>";
                             }
-                            res_html += '<ul>';
+                            res_html += '</ul>';
                         } else {
                             res_html = value;
                         }
@@ -76,16 +93,17 @@ rnoc = window.rnoc || {};
                     }
                     return false;
                 }
-                if (response.error && app_id !== "") {
-                    if (response.error) {
-                        alertify.error(response.error);
-                    }
 
+                if (response.error) {
+                    alertify.error(response.error);
+                    return false;
                 }
+
                 if (response.success) {
                     var success_message = response.data.message ? response.data.message : response.success;
                     alertify.success(success_message);
                     message.html('<p style="color:green;">' + success_message + '</p>');
+                    // Optional: Reload the page to reflect changes
                     window.location.reload();
                 } else {
                     if (response.data && response.data.error_fields) {
@@ -100,11 +118,21 @@ rnoc = window.rnoc || {};
                 }
             },
             error: function () {
+                button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
+                loading_icon.removeClass('rnoc-loader');
                 alert('Please try again later.');
             }
         });
     });
+
     rnoc_jquery(document).on('rnoc-app-disconnect', function (e, app_id, app_secret) {
+        let button = rnoc_jquery('#disconnect-app-btn');
+        let loading_icon = button.find('.loading-icon');
+
+        button.attr('disabled', true).css('pointer-events', 'none');
+        loading_icon.addClass('rnoc-loader');
+        // Disable the button and set pointer-events to none
+        loading_icon.addClass('rnoc-loader');
         alertify.set('notifier', 'position', 'top-right');
         let rnoc_app_id = rnoc_jquery(app_id).val();
         let rnoc_app_secret = rnoc_jquery(app_secret).val();
@@ -120,10 +148,14 @@ rnoc = window.rnoc || {};
             data: data,
             dataType: "json",
             success: function (response) {
+                button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
+                loading_icon.removeClass('rnoc-loader');
                 alertify.success(response.data.message);
                 window.location.reload();
             },
             error: function () {
+                button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
+                loading_icon.removeClass('rnoc-loader');
                 alert('Please try again later.');
             }
         });
