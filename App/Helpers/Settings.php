@@ -253,7 +253,7 @@ class Settings {
 	 * @return string|array
 	 */
 	public static function settingsValidation( $post_data ) {
-		$default_setting = [
+		$default_label = [
 			RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
 			RNOC_PLUGIN_PREFIX . 'enable_background_order_sync',
 			RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status',
@@ -270,10 +270,9 @@ class Settings {
 			return __( 'validation failed!', 'retainful-next-order-coupon-for-woocommerce' );
 		}
 		$validator = new Validator( $post_data );
-		$this_field = __("This field", "woo-discount-rules");
+		$this_field = __("This field", "retainful-next-order-coupon-for-woocommerce");
 		$labels_array = [];
-
-		foreach ($default_setting as $key => $label) {
+		foreach ($default_label as $key => $label) {
 			$labels_array[$label] = $this_field;
 		}
 
