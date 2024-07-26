@@ -79,8 +79,8 @@ class OrderImports {
 		}
 		$query = $wpdb->prepare(
 			"SELECT COUNT(DISTINCT {$ordersTable}.id) FROM {$ordersTable} LEFT JOIN {$orderItemsTable} ON {$ordersTable}.id = {$orderItemsTable}.order_id
-         WHERE {$typeOrPostTypeColumn} = %s AND {$ordersTable}.id > 0 AND {$orderItemsTable}.order_id > 0 AND {$orderItemsTable}.order_item_type = %s",
-			[ 'shop_order', 'line_item' ]
+         WHERE {$typeOrPostTypeColumn} = %s AND {$ordersTable}.id > 0 AND status != %s AND {$orderItemsTable}.order_id > 0 AND {$orderItemsTable}.order_item_type = %s",
+			[ 'shop_order', 'trash', 'line_item' ]
 		);
 
 		return $wpdb->get_var( $query );
@@ -172,8 +172,8 @@ class OrderImports {
 		}
 
 		$query = $wpdb->prepare( "SELECT {$id} FROM {$ordersTable} LEFT JOIN {$orderItemsTable} ON {$ordersTable}.{$id} = {$orderItemsTable}.order_id WHERE {$typeOrPostTypeColumn} = %s 
-	AND {$ordersTable}.{$id} > %d AND {$orderItemsTable}.order_id > 0 AND {$orderItemsTable}.order_item_type = %s GROUP BY {$id} ORDER BY {$id} ASC LIMIT %d",
-			[ $typeOrPostType, $sinceId, $orderItemType, $limit ]
+	AND {$ordersTable}.{$id} > %d AND {$orderItemsTable}.order_id > 0 AND status != %s AND {$orderItemsTable}.order_item_type = %s GROUP BY {$id} ORDER BY {$id} ASC LIMIT %d",
+			[ $typeOrPostType, $sinceId,'trash',$orderItemType, $limit ]
 		);
 
 		return $wpdb->get_col( $query );

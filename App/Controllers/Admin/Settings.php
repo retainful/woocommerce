@@ -286,5 +286,19 @@ class Settings {
 		wp_send_json_success( [ 'message' => __( 'Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce' ) ] );
 	}
 
+	/**
+	 * Show notices for admin user
+	 *
+	 * @param string $message Notice message.
+	 */
+	public static function showAdminNotice($message = "")
+	{
+		if (!empty($message)) {
+			add_action('admin_notices', function () use ($message) {
+				echo '<div class="error notice"><p>' . $message . '</p></div>';
+			});
+		}
+	}
+
 
 }
