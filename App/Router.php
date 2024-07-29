@@ -91,9 +91,12 @@ class Router {
 				'changeWebHookHeaderProduct'
 			], 10, 3 );
 
+			//add popup coupon to session
+			add_action( 'wp_ajax_rnoc_apply_popup_coupon', [ Popups::class, 'addPopupCouponToSession' ] );
+			add_action( 'wp_ajax_nopriv_rnoc_apply_popup_coupon', [ Popups::class, 'addPopupCouponToSession' ] );
 			//ip filter
 			Customer::handleIpFilter();
-			
+
 			//initialise currency helper
 			new Currency();
 			$after_pay = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'enable_afterpay_action', 'no' );
@@ -101,11 +104,11 @@ class Router {
 				new AfterPay();
 			}
 
-		}else{
-			if (is_admin()) {
-				$connect_txt = (!empty($secret_key) && !empty($app_id)) ? __('connect', 'retainful-next-order-coupon-for-woocommerce') : __('re-connect', 'retainful-next-order-coupon-for-woocommerce');
-				$notice = '<p>' . sprintf(__("Please <a href='" . admin_url('admin.php?page=retainful_license') . "'>%s</a> with Retainful to track and manage abandoned carts. ", 'retainful-next-order-coupon-for-woocommerce'), $connect_txt) . '</p>';
-				Settings::showAdminNotice($notice);
+		} else {
+			if ( is_admin() ) {
+				$connect_txt = ( ! empty( $secret_key ) && ! empty( $app_id ) ) ? __( 'connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 're-connect', 'retainful-next-order-coupon-for-woocommerce' );
+				$notice      = '<p>' . sprintf( __( "Please <a href='" . admin_url( 'admin.php?page=retainful_license' ) . "'>%s</a> with Retainful to track and manage abandoned carts. ", 'retainful-next-order-coupon-for-woocommerce' ), $connect_txt ) . '</p>';
+				Settings::showAdminNotice( $notice );
 			}
 		}
 	}
@@ -163,6 +166,7 @@ class Router {
 	 */
 	public static function addStoreHooks() {
 		//Popups
+
 		if ( SettingsHelper::isProPlan() && SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup', 'no' ) == 'yes' ) {
 			// Cookie update hooks
 			add_filter( 'woocommerce_set_cookie_options', [ Popups::class, 'changeIdentityPath' ], 10, 3 );
@@ -171,7 +175,12 @@ class Router {
 			add_action( 'wp_login', [ Popups::class, 'setLoginIdentity' ], 10, 2 );
 			add_action( 'wp_enqueue_scripts', [ Popups::class, 'addPopupScript' ] );
 			add_action( 'wp_footer', [ Popups::class, 'printPopup' ] );
+
 		}
+		//apply popup coupon
+
+		add_action( 'wp_loaded', array( Popups::class, 'applyPopupCoupon' ) );
+
 		$secret           = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_secret', '', 'license' );
 		$app_key          = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'retainful_app_id', '', 'license' );
 		$is_app_connected = SettingsHelper::get( RNOC_PLUGIN_PREFIX . 'is_retainful_connected', '', 'license' );

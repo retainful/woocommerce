@@ -2,12 +2,14 @@
 
 namespace RNOC\App\Controllers\Site;
 
+use RNOC\App\Helpers\Cart;
 use RNOC\App\Helpers\Customer;
 use RNOC\App\Helpers\Order as OrderAlias;
 use RNOC\App\Helpers\Settings;
 use RNOC\App\Helpers\Util;
 use RNOC\App\Helpers\WC;
 use RNOC\App\Helpers\WP;
+use RNOC\App\Helpers\Input;
 use RNOC\App\Models\WC\Order;
 
 defined( 'ABSPATH' ) || exit;
@@ -100,6 +102,17 @@ class Popups {
 		}
 		$popup_js = apply_filters( 'rnoc_popup_js', 'https://js.retainful.com/woocommerce/v2/popup/production/poup-widget.js' );
 		wp_enqueue_script( RNOC_PLUGIN_PREFIX . 'popups', $popup_js, [ 'jquery' ], RNOC_VERSION, true );
+		$pop_coupon_url = apply_filters( 'rnoc_popup_coupon_url', RNOC_PLUGIN_URL . 'assets/site/js/popup_coupon.js' );
+		wp_enqueue_script( RNOC_PLUGIN_PREFIX . 'popup-coupon', $pop_coupon_url, array(
+			'jquery',
+			RNOC_PLUGIN_PREFIX . 'popups'
+		), RNOC_VERSION, false );
+		$popup_data = [
+			'ajax_url'               => admin_url( 'admin-ajax.php' ),
+			'version'                => RNOC_VERSION,
+			'popup_redirect_timeout' => apply_filters( 'rnoc_popup_redirect_time_after_add_to_cart', 1500 )
+		];
+		wp_localize_script( RNOC_PLUGIN_PREFIX . 'popup-coupon', 'retainful_popup_data', $popup_data );
 	}
 
 	public static function printPopup() {
@@ -133,4 +146,43 @@ class Popups {
 		Util::renderTemplate( $file_path, [ 'params' => $params ] );
 	}
 
+	/**
+	 * Add coupon code into session.
+	 *
+	 * @return void
+	 */
+	public static function addPopupCouponToSession() {
+
+		$coupon_code = Input::get( 'coupon_code', '' );
+		if ( empty( $coupon_code ) ) {
+			wp_send_json_error( [
+				'is_redirect' => false,
+				'message'     => __( 'Coupon code invalid', 'retainful-next-order-coupon-for-woocommerce' )
+			] );
+		}
+		WC::setSession( 'rnoc_popup_coupon_code', $coupon_code );
+		wp_send_json_success( [
+			'is_redirect' => true,
+			'message'     => __( 'Coupon added into the Session', 'retainful-next-order-coupon-for-woocommerce' )
+		] );
+	}
+
+	/**
+	 * Add coupon code into cart.
+	 *
+	 * @return void
+	 */
+	public static function applyPopupCoupon() {
+		$popup_coupon_code = WC::getSession( 'rnoc_popup_coupon_code' );
+
+		if ( ! empty( $popup_coupon_code ) && function_exists( 'WC' ) && is_object( WC()->cart ) && ! Cart::isCartEmpty() ) {
+			if ( \RNOC\App\Helpers\Order::hasDiscount( $popup_coupon_code ) ) {
+				WC::setSession( 'rnoc_popup_coupon_code', '' );
+
+				return;
+			}
+			\RNOC\App\Helpers\Order::addDiscount( $popup_coupon_code );
+			WC::setSession( 'rnoc_popup_coupon_code', '' );
+		}
+	}
 }
