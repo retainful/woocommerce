@@ -121,14 +121,9 @@ class Settings {
 		if ( ! in_array( $page, [ 'retainful_license', 'retainful_settings' ] ) ) {
 			return;
 		}
-		$suffix = '.min';
-		if ( defined( 'SCRIPT_DEBUG' ) ) {
-			$suffix = SCRIPT_DEBUG ? '' : '.min';
-		}
 		$asset_path = RNOC_PLUGIN_URL . 'assets/admin';
 		wp_enqueue_style( 'retainful-admin-css', $asset_path . '/css/main.css', [], RNOC_VERSION );
 		wp_enqueue_script( 'retainful-abandoncart', $asset_path . '/js/rnoc_admin.js', [], 4.5 );
-		wp_enqueue_style( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/css/rnoc-toasts' . $suffix . '.css', array(), RNOC_VERSION );
 		$localize = [
 			'save_settings'      => WP::createNonce( 'rnoc-save-setting' ),
 			'disconnect_license' => WP::createNonce( 'rnoc-disconnect-license' ),
@@ -136,6 +131,8 @@ class Settings {
 			'ajax_url'           => admin_url( 'admin-ajax.php' ),
 			'admin_url'          => admin_url(),
 			'home_url'           => get_home_url(),
+			'rnoc_success'       => __( 'Success' ),
+			'rnoc_error'         => __( 'Error' ),
 		];
 		wp_localize_script( 'retainful-abandoncart', 'rnoc_localize_data', $localize );
 	}

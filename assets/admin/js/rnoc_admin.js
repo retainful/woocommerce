@@ -17,7 +17,7 @@ rnoc = window.rnoc || {};
             success: function (json) {
                 rnoc_jquery('.rnoc-main #retainful-settings-form #' + button_id).attr('disabled', false);
                 if (json.success) {
-                    createToast('success', 'tick-icon', 'Success', json.data.message);
+                    createToast(json.data.message, 'success');
                     setTimeout(function () {
                         location.reload();
                     }, 800);
@@ -29,7 +29,7 @@ rnoc = window.rnoc || {};
                             if (rnoc_jquery('.rnoc-error').length <= 0) {
                                 error_field.after('<div><p class="rnoc-error">' + value + '</p></div>');
                             }
-                            createToast('error', 'close-icon', 'error', value);
+                            createToast(value, 'error');
                         });
                     }
                 }
@@ -98,26 +98,26 @@ rnoc = window.rnoc || {};
 
                 if (response.success) {
                     var success_message = response.data.message ? response.data.message : response.success;
-                    createToast('success', 'tick-icon', 'Success', success_message);
+                    createToast(success_message, 'success');
                     message.html('<p style="color:green;">' + success_message + '</p>');
                     // Optional: Reload the page to reflect changes
                     window.location.reload();
                 } else {
                     if (response.data && response.data.error_fields) {
                         rnoc_jquery.each(response.data.error_fields, function (index, value) {
-                            createToast('error', 'close-icon', 'Field error', response.data.error_fields);
+                            createToast(response.data.error_fields, 'error');
                             message.html('<p style="color:red;">' + value + '</p>');
                         });
                     } else {
-                        createToast('error', 'close-icon', 'Field error', response.data.message);
+                        createToast(response.data.message, 'error');
                         message.html('<p style="color:red;">' + response.data.message + '</p>');
                     }
                 }
             },
-            error: function () {
+            error: function (response) {
                 button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
                 loading_icon.removeClass('rnoc-loader');
-                alert('Please try again later.');
+                createToast(response.statusText, 'error');
             }
         });
     });
@@ -146,20 +146,29 @@ rnoc = window.rnoc || {};
             success: function (response) {
                 button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
                 loading_icon.removeClass('rnoc-loader');
-                createToast('success', 'tick-icon', 'Success', response.data.message);
+                createToast(response.data.message, 'success');
                 window.location.reload();
             },
-            error: function () {
+            error: function (response) {
                 button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
                 loading_icon.removeClass('rnoc-loader');
-                createToast('error', 'close-icon', 'error', 'Please try again later.');
+                createToast(response.statusText, 'error');
             }
         });
     });
 })(rnoc_jquery);
 
 
-function createToast(type, icon, title, text) {
+function createToast(text, type) {
+    var icon = '';
+    var title = '';
+    if (type === 'success') {
+        icon = 'tick-icon';
+        title = rnoc_localize_data.rnoc_success;
+    } else if (type === 'error') {
+        icon = 'close-icon';
+        title = rnoc_localize_data.rnoc_error;
+    }
     let newToast = document.createElement('div');
     newToast.classList.add('toast', type);
     newToast.innerHTML = `
