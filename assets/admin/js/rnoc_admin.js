@@ -15,22 +15,21 @@ rnoc = window.rnoc || {};
             type: 'post',
             url: rnoc_localize_data.ajax_url,
             success: function (json) {
-                alertify.set('notifier', 'position', 'top-right');
                 rnoc_jquery('.rnoc-main #retainful-settings-form #' + button_id).attr('disabled', false);
                 if (json.success) {
-                    alertify.success(json.data.message);
+                    createToast('success', 'tick-icon', 'Success', json.data.message);
                     setTimeout(function () {
                         location.reload();
                     }, 800);
                 } else {
                     if (json.data && json.data.error_fields) {
                         rnoc_jquery.each(json.data.error_fields, function (index, value) {
-                            let error_field = rnoc_jquery('#'+index);
+                            let error_field = rnoc_jquery('#' + index);
                             error_field.addClass('input-error');
-                            if(rnoc_jquery('.rnoc-error').length <= 0) {
-                                error_field.after('<div><p class="rnoc-error">'+value+'</p></div>');
+                            if (rnoc_jquery('.rnoc-error').length <= 0) {
+                                error_field.after('<div><p class="rnoc-error">' + value + '</p></div>');
                             }
-                            alertify.error(value);
+                            createToast('error', 'close-icon', 'error', value);
                         });
                     }
                 }
@@ -47,7 +46,6 @@ rnoc = window.rnoc || {};
         let rnoc_app_id = rnoc_jquery('#' + app_id).val();
         let rnoc_app_secret = rnoc_jquery('#' + app_secret).val();
         let message = rnoc_jquery(".retainful_app_validation_message");
-        alertify.set('notifier', 'position', 'top-right');
 
         // Validate inputs
         if (!rnoc_app_id || !rnoc_app_secret) {
@@ -64,7 +62,6 @@ rnoc = window.rnoc || {};
             app_id: rnoc_app_id,
             app_secret: rnoc_app_secret
         };
-
         // AJAX request
         rnoc_jquery.ajax({
             type: "POST",
@@ -101,18 +98,18 @@ rnoc = window.rnoc || {};
 
                 if (response.success) {
                     var success_message = response.data.message ? response.data.message : response.success;
-                    alertify.success(success_message);
+                    createToast('success', 'tick-icon', 'Success', success_message);
                     message.html('<p style="color:green;">' + success_message + '</p>');
                     // Optional: Reload the page to reflect changes
                     window.location.reload();
                 } else {
                     if (response.data && response.data.error_fields) {
                         rnoc_jquery.each(response.data.error_fields, function (index, value) {
-                            alertify.error(value);
+                            createToast('error', 'close-icon', 'Field error', response.data.error_fields);
                             message.html('<p style="color:red;">' + value + '</p>');
                         });
                     } else {
-                        alertify.error(response.data.message);
+                        createToast('error', 'close-icon', 'Field error', response.data.message);
                         message.html('<p style="color:red;">' + response.data.message + '</p>');
                     }
                 }
@@ -133,7 +130,6 @@ rnoc = window.rnoc || {};
         loading_icon.addClass('rnoc-loader');
         // Disable the button and set pointer-events to none
         loading_icon.addClass('rnoc-loader');
-        alertify.set('notifier', 'position', 'top-right');
         let rnoc_app_id = rnoc_jquery(app_id).val();
         let rnoc_app_secret = rnoc_jquery(app_secret).val();
         let data = {
@@ -150,14 +146,34 @@ rnoc = window.rnoc || {};
             success: function (response) {
                 button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
                 loading_icon.removeClass('rnoc-loader');
-                alertify.success(response.data.message);
+                createToast('success', 'tick-icon', 'Success', response.data.message);
                 window.location.reload();
             },
             error: function () {
                 button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
                 loading_icon.removeClass('rnoc-loader');
-                alert('Please try again later.');
+                createToast('error', 'close-icon', 'error', 'Please try again later.');
             }
         });
     });
 })(rnoc_jquery);
+
+
+function createToast(type, icon, title, text) {
+    let newToast = document.createElement('div');
+    newToast.classList.add('toast', type);
+    newToast.innerHTML = `
+        <i class='${icon}'></i>
+        <div class="content">
+            <div class="title">${title}</div>
+            <span class="toast-msg">${text}</span>
+        </div>
+        <i class='bx bx-x' onclick="(this.parentElement).remove()"></i>
+    `;
+    document.querySelector('.rnoc_notification').appendChild(newToast);
+
+    //Auto remove after 5 seconds
+    newToast.timeOut = setTimeout(function () {
+        newToast.remove();
+    }, 5000);
+}

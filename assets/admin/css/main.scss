@@ -173,7 +173,7 @@
     letter-spacing: 0.025em !important;
   }
 
-  .rnoc-error{
+  .rnoc-error {
     color: #E96464FF;
   }
 
@@ -193,7 +193,7 @@
   height: 20px;
   border-radius: 100%;
   position: relative;
-  animation: wprelayRotate 1s linear infinite
+  animation: rnocRotate 1s linear infinite
 }
 
 .rnoc-loader::before {
@@ -203,7 +203,7 @@
   inset: 0px;
   border-radius: 100%;
   border: 5px solid #000000;
-  animation: wprelayPrixClipFix 2s linear infinite;
+  animation: rnocPrixClipFix 2s linear infinite;
 }
 
 @keyframes rnocRotate {

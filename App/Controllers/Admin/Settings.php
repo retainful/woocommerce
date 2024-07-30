@@ -127,9 +127,8 @@ class Settings {
 		}
 		$asset_path = RNOC_PLUGIN_URL . 'assets/admin';
 		wp_enqueue_style( 'retainful-admin-css', $asset_path . '/css/main.css', [], RNOC_VERSION );
-		wp_enqueue_script( 'retainful-abandoncart', $asset_path . '/js/rnoc_admin.js', [], RNOC_VERSION );
-		wp_enqueue_style( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/css/alertify' . $suffix . '.css', array(), RNOC_VERSION );
-		wp_enqueue_script( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/js/alertify' . $suffix . '.js', array(), RNOC_VERSION . '&t=' . time() );
+		wp_enqueue_script( 'retainful-abandoncart', $asset_path . '/js/rnoc_admin.js', [], 4.5 );
+		wp_enqueue_style( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/css/rnoc-toasts' . $suffix . '.css', array(), RNOC_VERSION );
 		$localize = [
 			'save_settings'      => WP::createNonce( 'rnoc-save-setting' ),
 			'disconnect_license' => WP::createNonce( 'rnoc-disconnect-license' ),
@@ -291,12 +290,11 @@ class Settings {
 	 *
 	 * @param string $message Notice message.
 	 */
-	public static function showAdminNotice($message = "")
-	{
-		if (!empty($message)) {
-			add_action('admin_notices', function () use ($message) {
+	public static function showAdminNotice( $message = "" ) {
+		if ( ! empty( $message ) ) {
+			add_action( 'admin_notices', function () use ( $message ) {
 				echo '<div class="error notice"><p>' . $message . '</p></div>';
-			});
+			} );
 		}
 	}
 

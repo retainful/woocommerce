@@ -1,6 +1,7 @@
 <?php
 $settings = ! empty( $settings ) ? $settings : [];
 ?>
+<div class="rnoc_notification"></div>
 <form id="retainful-settings-form" class="card retainful-settings-form">
     <table class="form-table" role="presentation">
         <tbody>
