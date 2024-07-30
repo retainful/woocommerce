@@ -52,7 +52,7 @@ $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ]
                         onclick="rnoc_jquery('body').trigger('rnoc-app-connect',['<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_id'; ?>','<?php echo RNOC_PLUGIN_PREFIX . 'retainful_app_secret'; ?>'])"
                         class="button button-primary button-green">
 					<?php echo ( ! $is_app_connected ) ? __( 'Connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 'Re-Connect', 'retainful-next-order-coupon-for-woocommerce' ); ?>
-                        <span class="loading-icon"></span>
+                    <span class="loading-icon"></span>
                 </button>
 				<?php
 				if ( $is_app_connected ) {

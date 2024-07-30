@@ -173,7 +173,7 @@
     letter-spacing: 0.025em !important;
   }
 
-  .rnoc-error{
+  .rnoc-error {
     color: #E96464FF;
   }
 
@@ -193,7 +193,7 @@
   height: 20px;
   border-radius: 100%;
   position: relative;
-  animation: wprelayRotate 1s linear infinite
+  animation: rnocRotate 1s linear infinite
 }
 
 .rnoc-loader::before {
@@ -203,7 +203,7 @@
   inset: 0px;
   border-radius: 100%;
   border: 5px solid #000000;
-  animation: wprelayPrixClipFix 2s linear infinite;
+  animation: rnocPrixClipFix 2s linear infinite;
 }
 
 @keyframes rnocRotate {
@@ -231,6 +231,168 @@
 
   100% {
     clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0)
+  }
+}
+
+.rnoc_notification {
+  position: fixed;
+  top: 50px;
+  right: 20px;
+  z-index: 1000;
+
+  .toast {
+    position: relative;
+    padding: 8px;
+    color: #fff;
+    margin-bottom: 10px;
+    width: 350px;
+    display: grid;
+    grid-template-columns: 70px 1fr 70px;
+    border-radius: 5px;
+    --color: #0abf30;
+    animation: show 0.3s ease 1 forwards;
+    background: #75b17a;
+    border: 2px solid #0abf30;
+
+    i {
+      color: var(--color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+
+    }
+
+
+    .content .title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+
+    }
+
+    .toast-msg, i:nth-child(3) {
+      color: #ffffff;
+      opacity: 0.6;
+      font-weight: 600;
+    }
+
+  }
+
+
+  @keyframes show {
+    0% {
+      transform: translateX(100%);
+    }
+    40% {
+      transform: translateX(-50%);
+    }
+    80% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-10%);
+    }
+  }
+
+
+  @keyframes timeOut {
+    to {
+      width: 0;
+    }
+
+  }
+
+  .toast.error .close-icon, .toast.error {
+    border: 2px solid #f1e1e1 !important;
+    background: #ec5555 !important;
+  }
+
+
+  .toast.warning .tick-icon .toast.warning {
+    border: 2px solid #e9bd0c !important;
+  }
+
+  .toast.warning .tick-icon::before {
+    --color: #e9bd0c;
+    border-right: 2px solid #e9bd0c !important;
+    border-bottom: 2px solid #e9bd0c !important;
+
+  }
+
+  .toast.info .tick-icon, .toast.info {
+    border: 2px solid #3498db !important;
+  }
+
+  .toast.info .tick-icon::before {
+    --color: #3498db;
+    border-right: 2px solid #3498db !important;
+    border-bottom: 2px solid #3498db !important;
+
+
+  }
+
+  .toast::before {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    color: #fff;
+    width: 100%;
+    height: 3px;
+    background: #fff;
+    content: '';
+    animation: timeOut 5s linear 1 forwards;
+  }
+
+  .tick-icon {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    border: 2px solid #fff;
+    transform: rotate(45deg);
+    position: relative;
+    border-radius: 50%;
+  }
+
+  .tick-icon::before {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 13px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    top: 7px;
+    left: 13px;
+  }
+
+  .close-icon {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    border: 2px solid #f24d4c;
+    transform: rotate(45deg);
+    position: relative;
+    border-radius: 50%;
+  }
+
+  .close-icon::before, .close-icon::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    height: 53%;
+    background-color: #fff;
+    top: 6px;
+    left: 49%;
+  }
+
+  .close-icon::before {
+    transform: rotate(-15deg) translateX(-50%);
+  }
+
+  .close-icon::after {
+    transform: rotate(-79deg) translateX(-50%);
   }
 }
 

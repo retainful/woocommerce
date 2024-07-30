@@ -121,15 +121,9 @@ class Settings {
 		if ( ! in_array( $page, [ 'retainful_license', 'retainful_settings' ] ) ) {
 			return;
 		}
-		$suffix = '.min';
-		if ( defined( 'SCRIPT_DEBUG' ) ) {
-			$suffix = SCRIPT_DEBUG ? '' : '.min';
-		}
 		$asset_path = RNOC_PLUGIN_URL . 'assets/admin';
 		wp_enqueue_style( 'retainful-admin-css', $asset_path . '/css/main.css', [], RNOC_VERSION );
-		wp_enqueue_script( 'retainful-abandoncart', $asset_path . '/js/rnoc_admin.js', [], RNOC_VERSION );
-		wp_enqueue_style( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/css/alertify' . $suffix . '.css', array(), RNOC_VERSION );
-		wp_enqueue_script( RNOC_PLUGIN_SLUG . '-alertify', RNOC_PLUGIN_URL . 'assets/admin/js/alertify' . $suffix . '.js', array(), RNOC_VERSION . '&t=' . time() );
+		wp_enqueue_script( 'retainful-abandoncart', $asset_path . '/js/rnoc_admin.js', [], 4.5 );
 		$localize = [
 			'save_settings'      => WP::createNonce( 'rnoc-save-setting' ),
 			'disconnect_license' => WP::createNonce( 'rnoc-disconnect-license' ),
@@ -137,6 +131,8 @@ class Settings {
 			'ajax_url'           => admin_url( 'admin-ajax.php' ),
 			'admin_url'          => admin_url(),
 			'home_url'           => get_home_url(),
+			'rnoc_success'       => __( 'Success', 'retainful-next-order-coupon-for-woocommerce' ),
+			'rnoc_error'         => __( 'Error', 'retainful-next-order-coupon-for-woocommerce' ),
 		];
 		wp_localize_script( 'retainful-abandoncart', 'rnoc_localize_data', $localize );
 	}
@@ -291,12 +287,11 @@ class Settings {
 	 *
 	 * @param string $message Notice message.
 	 */
-	public static function showAdminNotice($message = "")
-	{
-		if (!empty($message)) {
-			add_action('admin_notices', function () use ($message) {
+	public static function showAdminNotice( $message = "" ) {
+		if ( ! empty( $message ) ) {
+			add_action( 'admin_notices', function () use ( $message ) {
 				echo '<div class="error notice"><p>' . $message . '</p></div>';
-			});
+			} );
 		}
 	}
 
