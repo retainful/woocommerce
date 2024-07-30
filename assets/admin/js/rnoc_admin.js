@@ -29,7 +29,7 @@ rnoc = window.rnoc || {};
                             if (rnoc_jquery('.rnoc-error').length <= 0) {
                                 error_field.after('<div><p class="rnoc-error">' + value + '</p></div>');
                             }
-                            createToast(value, 'error');
+                            createToast(value);
                         });
                     }
                 }
@@ -109,7 +109,7 @@ rnoc = window.rnoc || {};
                             message.html('<p style="color:red;">' + value + '</p>');
                         });
                     } else {
-                        createToast(response.data.message, 'error');
+                        createToast(response.data.message);
                         message.html('<p style="color:red;">' + response.data.message + '</p>');
                     }
                 }
@@ -117,7 +117,7 @@ rnoc = window.rnoc || {};
             error: function (response) {
                 button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
                 loading_icon.removeClass('rnoc-loader');
-                createToast(response.statusText, 'error');
+                createToast(response.statusText);
             }
         });
     });
@@ -152,14 +152,17 @@ rnoc = window.rnoc || {};
             error: function (response) {
                 button.attr('disabled', false).css('pointer-events', 'auto'); // Re-enable the button
                 loading_icon.removeClass('rnoc-loader');
-                createToast(response.statusText, 'error');
+                createToast(response.statusText);
             }
         });
     });
 })(rnoc_jquery);
 
 
-function createToast(text, type) {
+function createToast(text, type = 'error') {
+    if (type !== 'success' && type !== 'error') {
+        return;
+    }
     var icon = '';
     var title = '';
     if (type === 'success') {
@@ -169,17 +172,20 @@ function createToast(text, type) {
         icon = 'close-icon';
         title = rnoc_localize_data.rnoc_error;
     }
+
     let newToast = document.createElement('div');
-    newToast.classList.add('toast', type);
+    newToast.classList.add('rnoc_notification');
     newToast.innerHTML = `
+    <div class="toast ${type}">
         <i class='${icon}'></i>
         <div class="content">
             <div class="title">${title}</div>
             <span class="toast-msg">${text}</span>
         </div>
         <i class='bx bx-x' onclick="(this.parentElement).remove()"></i>
+    </div>
     `;
-    document.querySelector('.rnoc_notification').appendChild(newToast);
+    document.querySelector('.rnoc-main').appendChild(newToast);
 
     //Auto remove after 5 seconds
     newToast.timeOut = setTimeout(function () {

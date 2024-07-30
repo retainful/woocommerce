@@ -3,7 +3,6 @@ $settings         = ! empty( $settings ) ? $settings : [];
 $app_url          = ! empty( $app_url ) ? $app_url : '';
 $is_app_connected = ( $settings[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ] == 1 );
 ?>
-<div class="rnoc_notification"></div>
 <div id="retainful-license-form" class="card connection-form">
     <table class="form-table" role="presentation">
         <tbody>

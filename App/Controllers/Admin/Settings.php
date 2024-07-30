@@ -131,8 +131,8 @@ class Settings {
 			'ajax_url'           => admin_url( 'admin-ajax.php' ),
 			'admin_url'          => admin_url(),
 			'home_url'           => get_home_url(),
-			'rnoc_success'       => __( 'Success' ),
-			'rnoc_error'         => __( 'Error' ),
+			'rnoc_success'       => __( 'Success', 'retainful-next-order-coupon-for-woocommerce' ),
+			'rnoc_error'         => __( 'Error', 'retainful-next-order-coupon-for-woocommerce' ),
 		];
 		wp_localize_script( 'retainful-abandoncart', 'rnoc_localize_data', $localize );
 	}
