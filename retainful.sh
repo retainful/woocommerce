@@ -9,6 +9,14 @@ composer_run() {
   echo "Compress Done"
   cd $current_dir
 }
+
+update_ini_file() {
+  cd "$current_dir"
+  wp i18n make-pot . "i18n/languages/retainful-next-order-coupon-for-woocommerce.pot" --slug="retainful-next-order-coupon-for-woocommerce" --domain="retainful-next-order-coupon-for-woocommerce" --include=retainful-next-order-coupon-for-woocommerce.php,/App/ --headers='{"Last-Translator":"retainful <support@retainful.com>","Language-Team":"retainful <support@retainful.com>"}'
+  cd "$current_dir"
+  echo "Update ini done"
+}
+
 copy_folder() {
   cd $current_dir
   cd ..
@@ -41,6 +49,8 @@ zip_folder() {
 }
 echo "Composer Run:"
 composer_run
+echo "Update ini"
+update_ini_file
 echo "Copy Folder:"
 copy_folder
 echo "Zip Folder:"
