@@ -217,7 +217,11 @@ class Main {
 			add_action( 'woocommerce_get_shop_coupon_data', array( $this->rnoc, 'addVirtualCoupon' ), 10, 2 );
 			add_action( 'rnoc_create_new_next_order_coupon', array( $this->rnoc, 'createNewCoupon' ), 10, 2 );
 			add_action( 'rnoc_initiated', array( $this->rnoc, 'setCouponToSession' ) );
-			add_action( 'wp_loaded', array( $this->rnoc, 'addCouponToCheckout' ), 10 );
+			add_action( 'wp_loaded', array( $this->rnoc, 'addCouponToCheckout' ) );
+			add_action( 'wp_ajax_rnoc_apply_coupon', array( $this->rnoc, 'applyCouponToCheckout' ) );
+			add_action( 'wp_ajax_nopriv_rnoc_apply_coupon', array( $this->rnoc, 'applyCouponToCheckout' ) );
+			add_action( 'wp_footer', array( $this->rnoc, 'setRnocCouponCode' ) );
+
 			//Attach coupon to email
 			$hook = $this->admin->couponMessageHook();
 			if ( ! empty( $hook ) && $hook != "none" ) {
@@ -304,8 +308,8 @@ class Main {
 						add_action( 'wp_footer', array( $popup, 'printPopup' ) );
 
 						//apply popup coupon
-						add_action('wp_ajax_rnoc_apply_popup_coupon', array($popup, 'addPopupCouponToSession'));
-						add_action('wp_ajax_nopriv_rnoc_apply_popup_coupon', array($popup, 'addPopupCouponToSession')); // For non-logged-in users
+						add_action( 'wp_ajax_rnoc_apply_popup_coupon', array($popup, 'addPopupCouponToSession' ) );
+						add_action( 'wp_ajax_nopriv_rnoc_apply_popup_coupon', array($popup, 'addPopupCouponToSession' ) ); // For non-logged-in users
 						add_action( 'wp_loaded', array( $popup, 'applyPopupCoupon' ), 10 );
 					}
 				}
@@ -575,7 +579,7 @@ class Main {
 	/**
 	 * Show notices for user..if anything unusually happen in our plugin
 	 *
-	 * @param   string  $message  - message to notice users
+	 * @param string $message - message to notice users
 	 */
 	function showAdminNotice( $message = "" ) {
 		if ( ! empty( $message ) ) {

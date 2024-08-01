@@ -46,3 +46,27 @@ jQuery(document).ready(function(){
         }
     }, retainful_popup_data.popup_redirect_timeout);
 });
+
+jQuery(document).ready(function () {
+    let coupon_code = localStorage.getItem('retainful_coupon_code');
+    if (coupon_code) {
+        let data = {
+            action: "rnoc_apply_coupon",
+            retainful_coupon_code: localStorage.getItem('retainful_coupon_code')
+        };
+        jQuery.ajax({
+            type: "POST",
+            url: retainful_popup_data.ajax_url,
+            data: data,
+            dataType: "json",
+            success: function (response) {
+                if (response.data?.message === true) {
+                    localStorage.removeItem('retainful_coupon_code')
+                }
+            },
+            error: function (response) {
+
+            },
+        });
+    }
+});
