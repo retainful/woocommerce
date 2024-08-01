@@ -422,7 +422,7 @@ class OrderCoupon
 	 */
 	public function setRnocCouponCode() {
 		$request_coupon_code = null;
-		$input               = new input();
+		$input               = new Input();
 		if ( ! empty ( $input->get( 'retainful_ac_coupon' ) ) ) {
 			$request_coupon_code = $input->get( 'retainful_ac_coupon' );
 		} elseif ( ! empty ( $input->get( 'retainful_coupon_code' ) ) ) {
