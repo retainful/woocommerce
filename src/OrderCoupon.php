@@ -254,11 +254,12 @@ class OrderCoupon
 		if ( ! empty( $coupon_code ) && ! empty( $this->wc_functions->getCart() ) ) {
 			//Do not apply coupon until the coupon is valid
 			if ( $this->wc_functions->hasDiscount( $coupon_code ) ) {
-				wp_send_json_success( [ 'message' => true ] );
+				wp_send_json_success( [ 'is_coupon_applied' => true ] );
 			} elseif ( $this->checkCouponBeforeCouponApply( $coupon_code ) ) {
-				wp_send_json_success( [ 'message' => $this->wc_functions->addDiscount( $coupon_code ) ] );
+				wp_send_json_success( [ 'is_coupon_applied' => $this->wc_functions->addDiscount( $coupon_code ) ] );
 			}
 		}
+		wp_send_json_error( [ 'is_coupon_applied' => false ] );
 	}
 
     /**

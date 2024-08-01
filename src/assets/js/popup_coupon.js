@@ -60,7 +60,7 @@ jQuery(document).ready(function () {
             data: data,
             dataType: "json",
             success: function (response) {
-                if (response.data?.message === true) {
+                if (response.data?.is_coupon_applied === true) {
                     localStorage.removeItem('retainful_coupon_code')
                 }
             },
