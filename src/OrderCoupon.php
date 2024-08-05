@@ -4,6 +4,7 @@ namespace Rnoc\Retainful;
 if (!defined('ABSPATH')) exit;
 
 use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Helpers\Input;
 
 class OrderCoupon
 {
@@ -242,6 +243,25 @@ class OrderCoupon
         }
     }
 
+	/**
+	 *
+	 * @return void
+	 */
+	public function applyCouponToCheckout() {
+		$input       = new Input();
+		$coupon_code = $input->get_post( 'retainful_coupon_code', '' );
+
+		if ( ! empty( $coupon_code ) && ! empty( $this->wc_functions->getCart() ) ) {
+			//Do not apply coupon until the coupon is valid
+			if ( $this->wc_functions->hasDiscount( $coupon_code ) ) {
+				wp_send_json_success( [ 'is_coupon_applied' => true ] );
+			} elseif ( $this->checkCouponBeforeCouponApply( $coupon_code ) ) {
+				wp_send_json_success( [ 'is_coupon_applied' => $this->wc_functions->addDiscount( $coupon_code ) ] );
+			}
+		}
+		wp_send_json_error( [ 'is_coupon_applied' => false ] );
+	}
+
     /**
      * show applied coupon popup
      */
@@ -393,6 +413,31 @@ class OrderCoupon
             }
         }
     }
+
+
+	/**
+	 * Set the retainful coupon into localStorage.
+	 *
+	 * @return void
+	 *
+	 */
+	public function setRnocCouponCode() {
+		$request_coupon_code = null;
+		$input               = new Input();
+		if ( ! empty ( $input->get( 'retainful_ac_coupon' ) ) ) {
+			$request_coupon_code = $input->get( 'retainful_ac_coupon' );
+		} elseif ( ! empty ( $input->get( 'retainful_coupon_code' ) ) ) {
+			$request_coupon_code = $input->get( 'retainful_coupon_code' );
+		}
+		if ( ! empty( $request_coupon_code ) ) {
+			echo "<script>let is_local_storage = ( 'localStorage' in window && window.localStorage !== null );
+    				let retainful_storage = window.localStorage.getItem('retainful_coupon_code');
+    				if(is_local_storage &&  retainful_storage === null){
+        					window.localStorage.setItem('retainful_coupon_code','$request_coupon_code');
+ 					}
+    				</script>";
+		}
+	}
 
     /**
      * Create the virtual coupon
