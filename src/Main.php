@@ -218,9 +218,6 @@ class Main {
 			add_action( 'rnoc_create_new_next_order_coupon', array( $this->rnoc, 'createNewCoupon' ), 10, 2 );
 			add_action( 'rnoc_initiated', array( $this->rnoc, 'setCouponToSession' ) );
 			add_action( 'wp_loaded', array( $this->rnoc, 'addCouponToCheckout' ) );
-			add_action( 'wp_ajax_rnoc_apply_coupon', array( $this->rnoc, 'applyCouponToCheckout' ) );
-			add_action( 'wp_ajax_nopriv_rnoc_apply_coupon', array( $this->rnoc, 'applyCouponToCheckout' ) );
-			add_action( 'wp_footer', array( $this->rnoc, 'setRnocCouponCode' ) );
 
 			//Attach coupon to email
 			$hook = $this->admin->couponMessageHook();
@@ -325,6 +322,10 @@ class Main {
 				//add_action('wp_login', array($cart, 'userLoggedIn'));
 				add_action( 'woocommerce_api_retainful', array( $cart, 'recoverUserCart' ) );
 				add_action( 'wp_loaded', array( $cart, 'applyAbandonedCartCoupon' ) );
+				add_action( 'wp_ajax_rnoc_apply_coupon', array( $this->rnoc, 'applyCouponToCheckout' ) );
+				add_action( 'wp_ajax_nopriv_rnoc_apply_coupon', array( $this->rnoc, 'applyCouponToCheckout' ) );
+				add_action( 'wp_footer', array( $this->rnoc, 'setRnocCouponCode' ) );
+
 				add_action( 'woocommerce_removed_coupon', array( $cart, 'removeNextOrderCouponFromCart' ) );
 				//Add tracking message
 				/*if (is_user_logged_in()) {
