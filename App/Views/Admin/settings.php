@@ -1,7 +1,7 @@
 <?php
 $settings = ! empty( $settings ) ? $settings : [];
 ?>
-<form id="retainful-settings-form" class="card retainful-settings-form">
+<form id="retainful-settings-form" class=" retainful-settings-form">
     <table class="form-table" role="presentation">
         <tbody>
 
