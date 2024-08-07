@@ -174,6 +174,61 @@ class Customer {
 	}
 
 	/**
+	 * Get the customer order data.
+	 *
+	 * @param string $email Customer email.
+	 *
+	 * @return array|object|\stdClass|null
+	 */
+	public static function getCustomerOrder( $email ) {
+		if ( empty( $email ) ) {
+			return [];
+		}
+
+		global $wpdb;
+		if ( WP::isHPOSEnabled() ) {
+			$query = $wpdb->prepare( "SELECT COUNT(DISTINCT {$wpdb->prefix}wc_orders.id) as total_count, SUM({$wpdb->prefix}wc_orders.total_amount) as total_amount
+		FROM {$wpdb->prefix}wc_orders WHERE type = %s AND status Not In (%s,%s) AND billing_email = %s",
+				'shop_order',
+				'trash',
+				'wc-checkout-draft',
+				$email
+			);
+		} else {
+			$query = $wpdb->prepare(
+				"SELECT COUNT(DISTINCT p.ID) as total_count, SUM(pm1.meta_value) as total_amount FROM {$wpdb->prefix}posts as p LEFT JOIN {$wpdb->prefix}postmeta pm1 ON p.ID = pm1.post_id AND pm1.meta_key = '_order_total'
+     LEFT JOIN {$wpdb->prefix}postmeta pm2 ON p.ID = pm2.post_id AND pm2.meta_key = '_billing_email' WHERE p.post_type = %s AND p.post_status Not In ((%s,%s)) 
+     AND pm2.meta_value = %s",
+				'shop_order',
+				'trash',
+				'wc-checkout-draft',
+				$email
+			);
+		}
+
+		return $wpdb->get_row( $query );
+	}
+
+	/**
+	 * Get customer last order id
+	 *
+	 * @param string $email Email id.
+	 *
+	 * @return null
+	 */
+	public static function getCustomerLastOrderId($email)
+	{
+
+		if (empty($email) && !is_email($email)) {
+			return null;
+		}
+		$customer_orders = Order::getOrdersByEmail($email, 1);
+		if (!empty($customer_orders)) {
+			return !empty($customer_orders[0]) && is_object($customer_orders[0]) && method_exists($customer_orders[0], 'get_id') ? $customer_orders[0]->get_id() : null;
+		}
+	}
+
+	/**
 	 * Get Order customer.
 	 *
 	 * @param \WC_Order $order Order object.
@@ -191,19 +246,8 @@ class Customer {
 			$created_at = $updated_at = is_object( $user->user_registered ) && ! empty( $user->user_registered ) ? strtotime( $user->user_registered ) : current_time( 'timestamp', true );
 		}
 		$billing_email   = Order::getOrderBillingEmail( $order );
-		$customer_orders = Order::getOrdersByEmail( $billing_email );
-		$total_spent     = 0;
-		$last_order_id   = 0;
-		if ( is_array( $customer_orders ) && count( $customer_orders ) ) {
-			foreach ( $customer_orders as $key => $customer_order ) {
-				if ( $customer_order instanceof \WC_Order ) {
-					if ( $key == 0 ) {
-						$last_order_id = Order::getOrderId( $customer_order );
-					}
-					$total_spent += Order::getOrderTotal( $customer_order );
-				}
-			}
-		}
+		$customer_orders = self::getCustomerOrder( $billing_email );
+		$last_order_id = !empty($billing_email) ? self::getCustomerLastOrderId($billing_email) : '';
 
 		return wp_parse_args( [
 			'id'            => $user_id,
@@ -217,8 +261,8 @@ class Customer {
 			'currency'      => Order::getOrderData( 'currency', $order ),
 			'user_roles'    => WP::getUserRoles( $billing_email ),
 			'last_order_id' => $last_order_id,
-			'total_spent'   => $total_spent,
-			'orders_count'  => is_array( $customer_orders ) ? count( $customer_orders ) : 0
+			'total_spent'   => is_object( $customer_orders ) && ! empty( $customer_orders->total_amount ) ? $customer_orders->total_amount : 0,
+			'orders_count'  => is_object( $customer_orders ) && ! empty( $customer_orders->total_count ) ? $customer_orders->total_count : 0
 		], self::$default );
 
 	}
