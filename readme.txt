@@ -9,10 +9,10 @@ Stable tag: 2.6.37
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Recover abandoned carts, send beautiful email marketing campaigns, newsletters, grow list using email subscription forms & popups
+WooCommerce abandoned cart recovery, Newsletters, Email campaigns, Subscription forms, Popups and Email Marketing Automation plugin
 
 == Description ==
-= Simple, easy-to-use WooCommerce Cart Abandonment Recovery, Email Marketing, Newsletters & Automation plugin for WooCommerce = 
+= Best WooCommerce Abandoned Cart Recovery, Email Marketing, Newsletters, Automation, Popups & Signup Forms plugin for WooCommerce =
 **[Retainful](https://www.retainful.com/?utm_source=wp_repo&utm_medium=wp_description&utm_campaign=retainful&utm_id=wp_retainful)** is an all-in-one WooCommerce email marketing plugin, trusted by over 16,000+ ecommerce stores worldwide to recover abandoned carts, build powerful email lists, send irresistible targeted campaigns, automate workflows and track success.
 
 Retainful is tailor-made for WooCommerce, helping you to build your email list with signup forms & popups, send personalized email marketing campaigns & newsletters, automate order follow-ups to save time, recover WooCommerce abandoned carts and grow revenue without the complexity and high costs. 16,000+ e-commerce store owners chose us for cost-effective email marketing and ease of use.

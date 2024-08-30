@@ -263,7 +263,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
              */
             initCartTracking() {
                 let retainful = this;
-                $(document.body).on("added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout", function () {
+                $(document.body).on("added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout wc-blocks_added_to_cart wc-blocks_removed_from_cart", function () {
                     retainful.syncCart();
                 }).on("wc_fragments_refreshed", function () {
                     retainful.syncCart();
