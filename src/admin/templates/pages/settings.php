@@ -261,7 +261,7 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
             <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'; ?>"><?php
                     esc_html_e('Enable Signup Forms / Popups', RNOC_TEXT_DOMAIN);
-                    ?> <span class="premium-label">Premium</span></label>
+                    ?>
             </th>
             <td>
                 <label>
