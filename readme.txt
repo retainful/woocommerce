@@ -3,9 +3,9 @@ Contributors: retainful
 Tags: abandoned cart, email marketing, newsletter, forms, woocommerce
 Requires at least: 4.6.1
 Tested up to: 6.6
-WC tested up to: 9.1
+WC tested up to: 9.3
 Requires PHP: 5.6
-Stable tag: 2.6.37
+Stable tag: 2.6.38
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -252,6 +252,9 @@ You can reach out to our experts [here](https://www.retainful.com/support).
 7. Retainful Contacts
 
 == Changelog ==
+= 2.6.38 =
+- Added: Popup widget in free plan
+
 = 2.6.37 =
 - Added: Automatic Popup coupon applies
 

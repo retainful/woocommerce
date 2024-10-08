@@ -5,7 +5,7 @@
  * Description: Do life-cycle WooCommerce email marketing with Retainful - grow email list, nurture and retain customers through automation & email campaigns.
  * Author: Retainful
  * Author URI: https://www.retainful.com
- * Version: 2.6.37
+ * Version: 2.6.38
  * Slug: retainful-next-order-coupon-for-woocommerce
  * Text Domain: retainful-next-order-coupon-for-woocommerce
  * Domain Path: /i18n/languages/
@@ -13,7 +13,7 @@
  * Requires at least: 4.7.0
  * Contributers: Sathyaseelan
  * WC requires at least: 6.0.0
- * WC tested up to: 9.1
+ * WC tested up to: 9.3
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -34,7 +34,7 @@ if ( ! defined( 'RNOC_PLUGIN_SLUG' ) ) {
  * Current version of our app
  */
 if ( ! defined( 'RNOC_VERSION' ) ) {
-	define( 'RNOC_VERSION', '2.6.37' );
+	define( 'RNOC_VERSION', '2.6.38' );
 }
 /**
  * Set base file URL
