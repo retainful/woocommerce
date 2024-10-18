@@ -725,8 +725,8 @@ class RestApi {
 	 */
 	function isBuyerAcceptsMarketing() {
 		$cookie = new Cookie();
-		$gdpr_compliance_enabled_in_popup = $cookie->getValue('_wc_rnoc_tk_session');
-		if(!empty($gdpr_compliance_enabled_in_popup)) return true;
+		$popup_gdpr_data = !empty( $cookie->getValue('_wc_rnoc_tk_session')) ? json_decode(base64_decode($cookie->getValue('_wc_rnoc_tk_session')),true): '';
+		if( !empty($popup_gdpr_data['consent'])) return true;
 		$settings               = self::$settings->getAdminSettings();
 		$enable_gdpr_compliance = ( isset( $settings[ RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' ] ) ) ? $settings[ RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' ] : 0;
 		if ( $enable_gdpr_compliance ) {
