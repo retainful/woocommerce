@@ -724,8 +724,8 @@ class RestApi {
 	 * @return bool
 	 */
 	function isBuyerAcceptsMarketing() {
-		$cookie = new Cookie();
-		$popup_gdpr_data = !empty( $cookie->getValue('_wc_rnoc_tk_session')) ? json_decode(base64_decode($cookie->getValue('_wc_rnoc_tk_session')),true): '';
+		$popup_consent = self::$settings->getIdentity('_wc_rnoc_tk_session');;
+		$popup_gdpr_data = !empty( $popup_consent) ? json_decode(base64_decode($popup_consent),true): '';
 		if( !empty($popup_gdpr_data['consent'])) return true;
 		$settings               = self::$settings->getAdminSettings();
 		$enable_gdpr_compliance = ( isset( $settings[ RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' ] ) ) ? $settings[ RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' ] : 0;
