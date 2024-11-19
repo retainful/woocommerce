@@ -96,8 +96,8 @@ class CouponManagement
                         'usage_limit_per_user' => $ruleParams['usage_limit_per_user'],
                         'individual_use' => 'yes',
                         'customer_email' => $ruleParams['customer_email'],
-                        'product_ids' => array(),
-                        'exclude_product_ids' => array(),
+                        'product_ids' => isset($ruleParams['include_product_ids']) && is_string($ruleParams['include_product_ids']) && self::validateCommaSeparatedString($ruleParams['include_product_ids']) ? $ruleParams['include_product_ids']: array(),
+                        'exclude_product_ids' => isset($ruleParams['exclude_product_ids']) && is_string($ruleParams['exclude_product_ids']) &&  self::validateCommaSeparatedString($ruleParams['exclude_product_ids']) ? $ruleParams['exclude_product_ids'] : array(),
                         'product_categories' => array(),
                         'exclude_product_categories' => array(),
                         'exclude_sale_items' => isset($ruleParams['exclude_sale_items']) && $ruleParams['exclude_sale_items'] == 'yes' ? $ruleParams['exclude_sale_items'] : 'no',
@@ -148,6 +148,28 @@ class CouponManagement
             $response = array('success' => false, 'RESPONSE_CODE' => 'DATA_MISSING', 'message' => 'Invalid data!');
         }
         return new \WP_REST_Response($response, $status);
+    }
+
+    /**
+     * validate value is comma separated.
+     *
+     * @param $value
+     * @return bool
+     */
+    public static function validateCommaSeparatedString($value)
+    {
+        // 1. Ensure the input is not empty
+        if (empty($value)) {
+            return false;
+        }
+        // Updated regex pattern:
+        // ^: Start of string
+        // [^,]+: One or more characters that are not a comma
+        // (,[^,]+)*: Zero or more groups of a comma followed by non-comma characters
+        // $: End of string
+        $pattern = '/^[^,]+(,[^,]+)*$/';
+        // Perform regex match
+        return preg_match($pattern, $value) === 1;
     }
 
     /**
