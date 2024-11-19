@@ -826,9 +826,9 @@ class WcFunctions
      */
     function getSession($key)
     {
-        if (empty($key))
+        if (empty($key) || !function_exists('WC'))
             return NULL;
-        if ($this->isMethodExists(WC()->session, 'get')) {
+        if (isset(WC()->session) && $this->isMethodExists(WC()->session, 'get')) {
             return WC()->session->get($key);
         }
         return NULL;
