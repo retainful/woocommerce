@@ -214,7 +214,7 @@ if ( ! function_exists( 'rnocEscAttr' ) ) {
  * check is woocommerce is active
  */
 if ( ! rnocIsWoocommerceActive() ) {
-	return '';
+    return '';
 }
 require __DIR__ . '/vendor/autoload.php';
 

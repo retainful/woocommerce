@@ -221,7 +221,7 @@ class RestApi {
 	function getCustomerCheckoutDetails( $type = "billing" ) {
 		$fields                = $this->getAddressMapFields();
 		$checkout_field_values = array();
-		if ( ! empty( $fields ) ) {
+		if ( function_exists('WC') && ! empty( $fields ) ) {
 			foreach ( $fields as $key ) {
 				$method = 'get_' . $type . '_' . $key;
 				if ( is_callable( array( WC()->customer, $method ) ) ) {
@@ -302,7 +302,7 @@ class RestApi {
 	 * @since 1.1.0
 	 */
 	private static function getRetainfulApiUrl() {
-		$scheme = wc_site_is_https() ? 'https' : 'http';
+		$scheme = function_exists('wc_site_is_https') && wc_site_is_https() ? 'https' : 'http';
 
 		return get_option( 'permalink_structure' )
 			? get_home_url( null, 'wc-api/retainful', $scheme )

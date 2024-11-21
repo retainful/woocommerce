@@ -665,7 +665,7 @@ class WcFunctions
     {
         if (empty($key)) return false;
         $this->initWoocommerceSession();
-        if ($this->isMethodExists(WC()->session, 'set')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->session, 'set')) {
             WC()->session->set($key, $value);
         }
         return true;
@@ -678,7 +678,7 @@ class WcFunctions
      */
     function setSessionCookie($value)
     {
-        if (isset(WC()->session) && !is_null(WC()->session) && is_object(WC()->session) && $this->isMethodExists(WC()->session, 'set_customer_session_cookie')) {
+        if (function_exists('WC') && isset(WC()->session) && !is_null(WC()->session) && is_object(WC()->session) && $this->isMethodExists(WC()->session, 'set_customer_session_cookie')) {
             WC()->session->set_customer_session_cookie($value);
         }
         return true;
@@ -691,7 +691,7 @@ class WcFunctions
      */
     function setCustomerEmail($value)
     {
-        if ($this->isMethodExists(WC()->customer, 'set_billing_email')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->customer, 'set_billing_email')) {
             return WC()->customer->set_billing_email($value);
         }
         return false;
@@ -703,7 +703,7 @@ class WcFunctions
      */
     function getCustomerBillingEmail()
     {
-        if ($this->isMethodExists(WC()->customer, 'get_billing_email')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->customer, 'get_billing_email')) {
             return WC()->customer->get_billing_email();
         }
         return false;
@@ -717,7 +717,7 @@ class WcFunctions
     {
         $email = $this->getCustomerBillingEmail();
         if (empty($email)) {
-            if ($this->isMethodExists(WC()->customer, 'get_email')) {
+            if (function_exists('WC') && $this->isMethodExists(WC()->customer, 'get_email')) {
                 return WC()->customer->get_email();
             } else {
                 return false;
@@ -752,7 +752,7 @@ class WcFunctions
         if (is_null(WC()->session)) {
             return false;
         }
-        if ($this->isMethodExists(WC()->session, 'has_session')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->session, 'has_session')) {
             return WC()->session->has_session();
         }
         return false;
@@ -828,7 +828,7 @@ class WcFunctions
     {
         if (empty($key))
             return NULL;
-        if ($this->isMethodExists(WC()->session, 'get')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->session, 'get')) {
             return WC()->session->get($key);
         }
         return NULL;
@@ -856,7 +856,7 @@ class WcFunctions
      */
     function getSessionCustomerId()
     {
-        if ($this->isMethodExists(WC()->session, 'get_customer_id')) {
+        if (function_exists('WC') &&  $this->isMethodExists(WC()->session, 'get_customer_id')) {
             return WC()->session->get_customer_id();
         }
         return NULL;
@@ -873,7 +873,7 @@ class WcFunctions
      */
     function addToCart($product_id, $variation_id = 0, $quantity = 1, $variation = array(), $cart_item_data = array())
     {
-        if ($this->isMethodExists(WC()->cart, 'add_to_cart')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'add_to_cart')) {
             try {
                 WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation, $cart_item_data);
             } catch (\Exception $e) {
@@ -891,7 +891,7 @@ class WcFunctions
      */
     function setQuantity($cart_key, $quantity = 1)
     {
-        if ($this->isMethodExists(WC()->cart, 'set_quantity')) {
+        if (function_exists('WC') &&  $this->isMethodExists(WC()->cart, 'set_quantity')) {
             try {
                 WC()->cart->set_quantity($cart_key, $quantity);
             } catch (\Exception $e) {
@@ -907,7 +907,7 @@ class WcFunctions
      */
     function isCartEmpty()
     {
-        if ($this->isMethodExists(WC()->cart, 'is_empty')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'is_empty')) {
             try {
                 return WC()->cart->is_empty();
             } catch (\Exception $e) {
@@ -926,7 +926,7 @@ class WcFunctions
     {
         if (empty($key))
             return false;
-        if ($this->isMethodExists(WC()->session, '__unset')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->session, '__unset')) {
             WC()->session->__unset($key);
         }
         return true;
@@ -957,7 +957,7 @@ class WcFunctions
     {
         if (empty($discount_code))
             return false;
-        if ($this->isMethodExists(WC()->cart, 'has_discount')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'has_discount')) {
             return WC()->cart->has_discount($discount_code);
         }
         return false;
@@ -972,7 +972,7 @@ class WcFunctions
     {
         if (empty($discount_code))
             return false;
-        if ($this->isMethodExists(WC()->cart, 'add_discount')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'add_discount')) {
             return WC()->cart->add_discount($discount_code);
         }
         return false;
@@ -987,7 +987,7 @@ class WcFunctions
     {
         if (empty($discount_code))
             return false;
-        if ($this->isMethodExists(WC()->cart, 'remove_coupon')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'remove_coupon')) {
             return WC()->cart->remove_coupon($discount_code);
         }
         return false;
@@ -999,7 +999,7 @@ class WcFunctions
      */
     function getAppliedCouponsOfCart()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_applied_coupons'))
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'get_applied_coupons'))
             return WC()->cart->get_applied_coupons();
         return false;
     }
@@ -1027,7 +1027,7 @@ class WcFunctions
      */
     function getCart()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_cart')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'get_cart')) {
             return WC()->cart->get_cart();
         }
         return array();
@@ -1039,7 +1039,7 @@ class WcFunctions
      */
     function getCartHash()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_cart_hash')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'get_cart_hash')) {
             return WC()->cart->get_cart_hash();
         }
         return "";
@@ -1051,7 +1051,7 @@ class WcFunctions
      */
     function getCartTotalForEdit()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_total')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'get_total')) {
             return wc()->cart->get_total('edit');
         }
         return $this->getCartTotal();
@@ -1063,7 +1063,7 @@ class WcFunctions
      */
     function getCartTotalTax()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_total_tax')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'get_total_tax')) {
             return WC()->cart->get_total_tax();
         }
         return 0;
@@ -1077,11 +1077,11 @@ class WcFunctions
     {
         $subtotal = 0;
         if ($this->isPriceExcludingTax()) {
-            if (WC()->cart->subtotal_ex_tax) {
+            if (function_exists('WC') && WC()->cart->subtotal_ex_tax) {
                 $subtotal = WC()->cart->subtotal_ex_tax;
             }
         } else {
-            if (WC()->cart->subtotal) {
+            if (function_exists('WC') && WC()->cart->subtotal) {
                 $subtotal = WC()->cart->subtotal;
             }
         }
@@ -1122,7 +1122,7 @@ class WcFunctions
      */
     function getAppliedCartCoupons()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_coupons')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'get_coupons')) {
             return WC()->cart->get_coupons();
         }
         return array();
@@ -1163,7 +1163,7 @@ class WcFunctions
      */
     function getCartTotalDiscount()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_discount_total')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'get_discount_total')) {
             return WC()->cart->get_discount_total();
         }
         return 0;
@@ -1175,7 +1175,7 @@ class WcFunctions
      */
     function getCartTotalPrice()
     {
-        if (isset(WC()->cart->total)) {
+        if (function_exists('WC') && isset(WC()->cart->total)) {
             return WC()->cart->total;
         }
         return 0;
@@ -1186,7 +1186,7 @@ class WcFunctions
      */
     function calculateCartTotals()
     {
-        if ($this->isMethodExists(WC()->cart, 'calculate_totals')) {
+        if ( function_exists('WC') && $this->isMethodExists(WC()->cart, 'calculate_totals')) {
             return WC()->cart->calculate_totals();
         }
         return NULL;
@@ -1198,7 +1198,7 @@ class WcFunctions
      */
     function getCartTaxes()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_tax_totals')) {
+        if (function_exists('WC') &&$this->isMethodExists(WC()->cart, 'get_tax_totals')) {
             return WC()->cart->get_tax_totals();
         }
         return array();
@@ -1242,7 +1242,7 @@ class WcFunctions
      */
     function getCartTotal()
     {
-        if (isset(WC()->cart->subtotal)) {
+        if (function_exists('WC') && isset(WC()->cart->subtotal)) {
             return WC()->cart->subtotal;
         }
         return 0;
@@ -1799,7 +1799,7 @@ class WcFunctions
      */
     function getCartTaxTotal()
     {
-        if (isset(WC()->cart->tax_total)) {
+        if (function_exists('WC') && isset(WC()->cart->tax_total)) {
             return WC()->cart->tax_total;
         }
         return 0;
@@ -1811,7 +1811,7 @@ class WcFunctions
      */
     function getCartShippingTaxTotal()
     {
-        if (isset(WC()->cart->shipping_tax_total)) {
+        if (function_exists('WC') && isset(WC()->cart->shipping_tax_total)) {
             return WC()->cart->shipping_tax_total;
         }
         return 0;
@@ -1823,7 +1823,7 @@ class WcFunctions
      */
     function getCartDiscountTotal()
     {
-        if (isset(WC()->cart->discount_cart)) {
+        if (function_exists('WC') &&isset(WC()->cart->discount_cart)) {
             return WC()->cart->discount_cart;
         }
         return 0;
@@ -1835,7 +1835,7 @@ class WcFunctions
      */
     function getCartShippingTotal()
     {
-        if (isset(WC()->cart->shipping_total)) {
+        if (function_exists('WC') && isset(WC()->cart->shipping_total)) {
             return WC()->cart->shipping_total;
         }
         return 0;
@@ -1847,7 +1847,7 @@ class WcFunctions
      */
     function getCartFees()
     {
-        if ($this->isMethodExists(WC()->cart, 'get_fees')) {
+        if (function_exists('WC') && $this->isMethodExists(WC()->cart, 'get_fees')) {
             return WC()->cart->get_fees();
         }
         return array();
@@ -2111,7 +2111,7 @@ class WcFunctions
      */
     function getDefaultWoocommerceCurrency($currency = '')
     {
-        if (empty($currency)) {
+        if (empty($currency) && function_exists('get_woocommerce_currency')) {
             $currency = get_woocommerce_currency();
         }
         return apply_filters('rnoc_custom_default_currency', $currency);
