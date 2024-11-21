@@ -691,7 +691,7 @@ class WcFunctions
      */
     function setCustomerEmail($value)
     {
-        if (function_exists('WC') && $this->isMethodExists(WC()->customer, 'set_billing_email')) {
+        if ($this->isMethodExists(WC()->customer, 'set_billing_email')) {
             return WC()->customer->set_billing_email($value);
         }
         return false;
@@ -826,9 +826,9 @@ class WcFunctions
      */
     function getSession($key)
     {
-        if (empty($key))
+        if (empty($key) || !function_exists('WC'))
             return NULL;
-        if (function_exists('WC') && $this->isMethodExists(WC()->session, 'get')) {
+        if (isset(WC()->session) && $this->isMethodExists(WC()->session, 'get')) {
             return WC()->session->get($key);
         }
         return NULL;
@@ -2111,7 +2111,7 @@ class WcFunctions
      */
     function getDefaultWoocommerceCurrency($currency = '')
     {
-        if (empty($currency) && function_exists('get_woocommerce_currency')) {
+        if (empty($currency)) {
             $currency = get_woocommerce_currency();
         }
         return apply_filters('rnoc_custom_default_currency', $currency);
