@@ -213,7 +213,7 @@ if ( ! function_exists( 'rnocEscAttr' ) ) {
 /**
  * check is woocommerce is active
  */
-if ( ! rnocIsWoocommerceActive() ) {
+if ( ! rnocIsWoocommerceActive()  && !function_exists( 'WC' ) ) {
     return '';
 }
 require __DIR__ . '/vendor/autoload.php';
