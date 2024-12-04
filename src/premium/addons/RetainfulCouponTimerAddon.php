@@ -12,7 +12,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
     {
         function __construct()
         {
-            parent::__construct();
+            //parent::__construct();
             $this->title = __('Countdown Timer', RNOC_TEXT_DOMAIN);
             $this->description = __('Give a clear deadline to grab the offer and create a sense of urgency using Countdown Timer', RNOC_TEXT_DOMAIN);
             $this->version = '1.0.0';

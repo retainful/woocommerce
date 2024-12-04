@@ -220,6 +220,7 @@ class Cart extends RestApi
                 'version' => RNOC_VERSION,
                 'public_key' => self::$settings->getApiKey(),
                 'api_url' => self::$api->getAbandonedCartEndPoint(),
+                'billing_email' => !empty( self::$woocommerce->getCustomerEmail()) ?self::$woocommerce->getCustomerEmail() : '',
                 'tracking_element_selector' => $this->getTrackingElementId(),
                 'cart_tracking_engine' => self::$settings->getCartTrackingEngine()
             ];
@@ -382,6 +383,9 @@ class Cart extends RestApi
      */
     function syncCartData($force_sync = false)
     {
+        if(empty(self::$woocommerce->getCustomerEmail())){
+            return;
+        }
         if (!$this->isValidCartToTrack()) {
             return;
         }

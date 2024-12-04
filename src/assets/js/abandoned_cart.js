@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "api_url": "",
         "tracking_element_selector": "retainful-abandoned-cart-data",
         "cart_tracking_engine": "js",
+        "billing_email" : ""
     };
     let rnoc_cart_js_data = {};
     if (typeof retainful_cart_data === "undefined") {
@@ -293,6 +294,9 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
              * sync cart to api
              */
             syncCart(cart_data = null, force_sync = false) {
+                if(!rnoc_cart_js_data.billing_email && !$("#billing_email").val() && !$(".wp-block-woocommerce-checkout input#email").val()) {
+                    return;
+                }
                 if (cart_data === null) {
                     cart_data = this.getAbandonedCartData();
                 }
