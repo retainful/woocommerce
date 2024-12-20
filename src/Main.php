@@ -12,7 +12,6 @@ use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Api\Imports\Imports;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Popup\Popup;
-use Rnoc\Retainful\Api\Referral\ReferralManagement;
 use Rnoc\Retainful\Integrations\AfterPay;
 use Rnoc\Retainful\Integrations\Currency;
 use Rnoc\Retainful\library\RetainfulApi;
@@ -282,21 +281,7 @@ class Main {
 				*/
 				$cart                  = new Cart();
 				$checkout              = new Checkout();
-				$need_referral_program = $this->admin->needReferralWidget();
 				$need_popup_widget     = $this->admin->needPopupWidget();
-				if ( $this->admin->isProPlan() && ( $need_referral_program || $need_popup_widget ) ) {
-					if ( $need_referral_program ) {
-						$referral_program = new ReferralManagement();
-						add_action( 'wp_footer', array( $referral_program, 'printReferralPopup' ) );
-						$need_embeded_referral_program = $this->admin->needEmbededReferralWidget();
-						if ( $need_embeded_referral_program ) {
-							add_action( 'woocommerce_account_dashboard', array(
-								$referral_program,
-								'printEmbededReferralPopup'
-							) );
-						}
-					}
-				}
 				if ( $need_popup_widget ) {
 					$popup = new Popup();
 					add_action( 'user_register', array( $popup, 'userRegister' ) );

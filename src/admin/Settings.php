@@ -1467,17 +1467,6 @@ class Settings
         return (isset($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'])) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] : 'js';
     }
 
-    /**
-     * is referral widget is required for store
-     * @return mixed|void
-     */
-    function needReferralWidget()
-    {
-        $settings = $this->getAdminSettings();
-        $need_widget = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_referral_widget'] : 'no';
-        return apply_filters("retainful_enable_referral_program", ($need_widget === "yes"));
-    }
-
     function needPopupWidget()
     {
         $settings = $this->getAdminSettings();

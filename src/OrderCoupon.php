@@ -742,6 +742,10 @@ class OrderCoupon
      */
     function createNewCoupon($order_id, $data)
     {
+        if(get_option('retainful_hide_next_order_coupon', 'no') == 'yes') {
+            return false;
+        }
+
         if (!$this->admin->isNextOrderCouponEnabled()) {
             return false;
         }
