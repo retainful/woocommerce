@@ -379,9 +379,11 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             retainful.setIp(rnoc_cart_js_data.ip);
             retainful.setVersion(rnoc_cart_js_data.version);
             retainful.initCartTracking();
-            /*$(document).ready(function () {
+            $(document).ready(function () {
                 retainful.syncCart();
-            });*/
+            }).on("retainful-form-submitted",function (){
+                retainful.syncCart();
+            });
             $(window).on('load',function (){
                 retainful.syncCart();
             });
