@@ -893,6 +893,9 @@ class Settings
             'order.created' => false
         ];
         try {
+            if(!class_exists('WC_Data_Store')){
+                return $topics;
+            }
             $data_store = \WC_Data_Store::load('webhook');
             $args = array(
                 'limit' => -1,
@@ -937,6 +940,9 @@ class Settings
             return false;
         }
         try {
+            if(!class_exists('WC_Webhook')){
+                return false;
+            }
             $webhook = new \WC_Webhook();
             $name = $topic == 'order.updated' ? sanitize_text_field(wp_unslash('Retainful Order Update')) : sanitize_text_field(wp_unslash('Retainful Order Create'));
             $webhook->set_name($name);
@@ -2353,7 +2359,7 @@ class Settings
      */
     function isCustomerPage()
     {
-        if (is_ajax()) {
+        if (function_exists( 'is_ajax' ) && is_ajax()) {
             return true;
         }
         return !is_admin();
