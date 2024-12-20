@@ -381,7 +381,12 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             retainful.initCartTracking();
             $(document).ready(function () {
                 retainful.syncCart();
-            }).on("retainful-form-submitted",function (){
+            })
+            $(document).on("retainful-form-submitted",function (e,email){
+                if(e.email === undefined){
+                    return;
+                }
+                rnoc_cart_js_data.billing_email = e.email;
                 retainful.syncCart();
             });
             $(window).on('load',function (){
