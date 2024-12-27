@@ -378,9 +378,9 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             retainful.setIp(rnoc_cart_js_data.ip);
             retainful.setVersion(rnoc_cart_js_data.version);
             retainful.initCartTracking();
-            $(document).ready(function () {
-                retainful.syncCart();
-            })
+            // $(document).ready(function () {
+            //     retainful.syncCart();
+            // })
             $(document).on("retainful-form-submitted", function (e, email) {
                 if (e.email === undefined) {
                     return;
@@ -391,9 +391,22 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 };
                 updateCheckout(e.email, rnoc_phone = '', guest_data);
             });
-            $(window).on('load', function () {
-                retainful.syncCart();
-            });
+            // $(window).on('load', function () {
+            //     retainful.syncCart();
+            // });
+            $(document).ready(scheduleSync);
+            $(window).on('load', scheduleSync);
+        }
+        let syncScheduled = false;
+        function scheduleSync() {
+            if (!syncScheduled) {
+                console.log('inside sync');
+                syncScheduled = true;
+                // Give both ready and load events a moment to occur
+                setTimeout(function() {
+                    retainful.syncCart();
+                }, 0);
+            }
         }
         if (rnoc_cart_js_data.cart !== undefined) {
             let tracking_content = '<div id="' + rnoc_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(rnoc_cart_js_data.cart) + '</div>';
