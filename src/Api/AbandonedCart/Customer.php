@@ -20,9 +20,9 @@ class Customer {
 		 $order_arg = [
 			 'email' => !empty( $request->get_param('email')) ? $request->get_param('email') : '',
 			 'date_after' => !empty( $request->get_param('date_after')) ?  $request->get_param('date_after') : '',
-			 'status' => ['wc-completed', 'wc-processing'],
+			 'post_status' => ['wc-completed', 'wc-processing'],
 		 ];
-		$orders = function_exists('wc_get_orders' ) ?  wc_get_orders($order_arg) : '';
+		$orders = function_exists('wc_get_orders' ) && !empty($order_arg) ?  wc_get_orders($order_arg) : '';
 		if(!empty($orders)) {
 			$response = [
 				'success'       => true,
