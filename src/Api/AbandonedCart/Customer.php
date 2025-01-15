@@ -24,8 +24,11 @@ class Customer {
 		$after_date = !empty( $request->get_param('date_after')) ?  sanitize_text_field( $request->get_param('date_after') ) : '';
 		$digest = !empty( $request->get_param('digest')) ?  $request->get_param('digest') : '';
 
-		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			return new \WP_Error('invalid_email', 'The email address provided is invalid.', ['status' => 400]);
+		if ( empty( $digest ) || ! is_string( $digest ) || empty ($email) || empty ($after_date) || !filter_var($email, FILTER_VALIDATE_EMAIL) ){
+			$settings->logMessage( $digest, 'API customer order request data missing' );
+			$status   = 400;
+			$response = array( 'success' => false, 'RESPONSE_CODE' => 'INVALID_DATA', 'message' => 'Invalid data!' );
+			return new \WP_REST_Response( $response, $status );
 		}
 
 		if ( ! self::hashVerification( array( 'email' => $email ,'date_after' => $after_date ), $digest ) ) {
