@@ -81,6 +81,11 @@ class Main {
 			'permission_callback' => '__return_true',
 			'callback'            => 'Rnoc\Retainful\Api\Referral\ReferralManagement::getCustomer'
 		) );
+		register_rest_route( 'retainful-api/v1', '/customer/order', array(
+			'methods'             => 'GET',
+			'permission_callback' => '__return_true',
+			'callback'            => 'Rnoc\Retainful\Api\AbandonedCart\Customer::getCustomerOrders'
+		) );
 	}
 
 	function registerSyncEndPoints() {
