@@ -1073,7 +1073,7 @@ class Settings
         add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat', 56);
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
-	    add_submenu_page('retainful_license', 'add-on', 'add-on', 'manage_woocommerce', 'retainful_addons', array($this, 'retainfulAddonPage'));
+	    add_submenu_page('retainful_license', 'Add-on', 'Add-on', 'manage_woocommerce', 'retainful_addons', array($this, 'retainfulAddonPage'));
 	    $settings = $this->getAdminSettings();
 
         $is_next_order_disable = get_option('retainful_hide_next_order_coupon', 'no');
