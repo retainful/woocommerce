@@ -1026,8 +1026,8 @@ class Settings
 				'description'  => 'Sends form data and contact information to Retainful automatically from Contact Form 7',
 				'icon_url'     => '',
 				'download_url' => '',
-				'plugin_file'  =>'rnoc_contact_form_7/rnoc-contact-form-7.php',
-				'show_activate' => self::isPluginactive('rnoc_contact_form_7/rnoc-contact-form-7.php'),
+				'plugin_file'  =>'rnoc-contact-form-7/rnoc-contact-form-7.php',
+				'show_activate' => self::isPluginactive('rnoc-contact-form-7/rnoc-contact-form-7.php'),
 			],
 		];
 		$activated_addons = apply_filters('rnoc_installed_addon_list', []);
