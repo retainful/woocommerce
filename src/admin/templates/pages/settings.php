@@ -5,6 +5,62 @@
 require_once "tabs.php";
 ?>
 <form id="retainful-settings-form" class="card">
+    <div id="contact-sync" class="card">
+        <table class="form-table" role="presentation">
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        <label for="<?php echo RNOC_PLUGIN_PREFIX . 'public_api_key'; ?>"><?php
+                            esc_html_e('Public Api Key', RNOC_TEXT_DOMAIN);
+                            ?></label>
+                    </th>
+                    <td>
+                        <input name="<?php echo RNOC_PLUGIN_PREFIX . 'public_api_key'; ?>" type="text"
+                               id="<?php echo RNOC_PLUGIN_PREFIX . 'public_api_key'; ?>" value="<?php echo rnocEscAttr(trim($settings[RNOC_PLUGIN_PREFIX . 'public_api_key'])); ?> "
+                        >
+                        <p class="description">
+                            <?php
+                            esc_html_e('Enter the Public Api Key.', RNOC_TEXT_DOMAIN);
+                            ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="<?php echo RNOC_PLUGIN_PREFIX . 'list_id'; ?>"><?php
+                            esc_html_e('List ID\'s', RNOC_TEXT_DOMAIN);
+                            ?></label>
+                    </th>
+                    <td>
+                        <input name="<?php echo RNOC_PLUGIN_PREFIX . 'list_id'; ?>" type="text"
+                               id="<?php echo RNOC_PLUGIN_PREFIX . 'list_id'; ?>" value="<?php echo rnocEscAttr(trim($settings[RNOC_PLUGIN_PREFIX . 'list_id'])); ?>"
+                        >
+                        <p class="description">
+                            <?php
+                            esc_html_e('Enter the List id\'s in comma seperated.', RNOC_TEXT_DOMAIN);
+                            ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="<?php echo RNOC_PLUGIN_PREFIX . 'customer_status'; ?>"><?php
+			                esc_html_e('Customer Status', RNOC_TEXT_DOMAIN);
+			                ?></label>
+                    </th>
+                    <td>
+                        <select name="<?php echo RNOC_PLUGIN_PREFIX . 'customer_status'; ?>">
+                            <option value="unsubscribed" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'customer_status'] == 'unsubscribed') ? "selected='selected'":''; ?>>
+				                <?php esc_html_e('Un Subscribed', RNOC_TEXT_DOMAIN); ?></option>
+                            <option value="subscribed" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'customer_status'] == 'subscribed') ? "selected='selected'":''; ?>>
+				                <?php esc_html_e('Subscribed', RNOC_TEXT_DOMAIN); ?></option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table >
+    </div>
+    <div id="retainful-settings" class="card" >
     <table class="form-table" role="presentation">
         <tbody>
         <tr>
@@ -457,7 +513,8 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
             </td>
         </tr>
         </tbody>
-    </table>
+    </table class="form-table">
+    </div>
     <button type="submit" data-action="rnoc_save_settings"
             data-security="<?php echo wp_create_nonce('rnoc_save_settings') ?>"
             class="button button-primary button-right-fixed"><i

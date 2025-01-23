@@ -13,6 +13,11 @@ $can_hide_premium_feature = get_option('retainful_hide_premium_feature', 'no');
         echo "nav-tab-active";
     } ?>"
        href="<?php echo admin_url('admin.php?page=retainful_settings'); ?>"><?php esc_html_e('Settings', RNOC_TEXT_DOMAIN); ?></a>
+    <a class="nav-tab <?php if ($page == 'retainful_addons') {
+		echo "nav-tab-active";
+	} ?>"
+       href="<?php echo admin_url('admin.php?page=retainful_addons'); ?>"><?php esc_html_e('Addons', RNOC_TEXT_DOMAIN); ?></a>
+
     <?php if ($can_hide_next_order_coupon !== 'yes'): ?>
         <a class="nav-tab <?php if ($page == 'retainful') {
             echo "nav-tab-active";

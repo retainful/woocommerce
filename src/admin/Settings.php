@@ -47,7 +47,7 @@ class Settings
     function initAdminPageStyles()
     {
         $page = self::$input->get('page', null);
-        if (is_admin() && in_array($page, array('retainful', 'retainful_settings', 'retainful_premium', 'retainful_license'))) {
+        if (is_admin() && in_array($page, array('retainful', 'retainful_settings', 'retainful_premium', 'retainful_license','retainful_addons'))) {
             $this->addScript();
         }
     }
@@ -798,7 +798,7 @@ class Settings
     {
         WcFunctions::checkSecuritykey('rnoc_save_settings');
         $post = self::$input->post();
-        $validator = new Validator($post);
+	    $validator = new Validator($post);
         $validator->rule('in', RNOC_PLUGIN_PREFIX . 'cart_tracking_engine', ['js', 'php'])->message('This field contains invalid value');
         $validator->rule('in', array(
             RNOC_PLUGIN_PREFIX . 'track_zero_value_carts',
@@ -817,6 +817,13 @@ class Settings
         if (!$validator->validate()) {
             wp_send_json_error($validator->errors());
         }
+
+		if(!empty($post['rnoc_list_id'])) {
+			$list_ids = explode(',',$post['rnoc_list_id']);
+			if(count($list_ids) > 5 ) {
+				wp_send_json_error( ['rnoc_list_id' => 'List ID\'s field contains more then 5 id\'s'] );
+			}
+		}
         $cart_capture_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '');
         $post = self::$input->post();
         $data = $this->clean($post);
@@ -1001,12 +1008,56 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'varnish_check' => 'no',
         );
         $settings = wp_parse_args($settings, $default_settings);
-
         if (empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
             $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = 'Keep me up to date on news and exclusive offers';
         }
         require_once dirname(__FILE__) . '/templates/pages/settings.php';
     }
+
+	function retainfulAddonPage()
+	{
+		$page_slug = $this->slug . '_addons';
+		$addons = [
+			'rnoc-contact-form-7' => [
+				'name'         => 'Retainful for Contact Form 7 Add-On',
+				'label'        => 'Retainful for Contact Form 7 Add-On',
+				'author'       => 'Retainful',
+				'version'      => '1.0.0',
+				'description'  => 'Sends form data and contact information to Retainful automatically from Contact Form 7',
+				'icon_url'     => '',
+				'download_url' => '',
+				'plugin_file'  =>'rnoc_contact_form_7/rnoc-contact-form-7.php',
+				'show_activate' => self::isPluginactive('rnoc_contact_form_7/rnoc-contact-form-7.php'),
+			],
+		];
+		$activated_addons = apply_filters('rnoc_installed_addon_list', []);
+		if(!empty($activated_addons)) {
+			foreach ( $activated_addons as $addon_slug => $addon ) {
+				if (array_key_exists($addon_slug ,$addons)) {
+					unset($addons[$addon_slug]);
+				}
+			}
+		}
+		$available_addon_list = apply_filters('rnoc_available_addon_list', $addons);
+		$base_url = admin_url('admin.php?page=' . $page_slug);
+		require_once dirname(__FILE__) . '/templates/pages/addon.php';
+	}
+
+	public static function  isPluginActive($path){
+		$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins', [] ) );
+		if ( is_multisite() ) {
+			$active_plugins = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', [] ) );
+		}
+		if (!function_exists('get_plugins')) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+		$installed_plugin = \get_plugins();
+		$status = false;
+		if(array_key_exists($path,$installed_plugin)) {
+			$status =  in_array( $path, $active_plugins ) || array_key_exists( $path, $active_plugins ) ? false : true ;
+		}
+		return $status;
+	}
 
     function getRetainfulSettingValue($key, $default = null)
     {
@@ -1022,7 +1073,8 @@ class Settings
         add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat', 56);
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
-        $settings = $this->getAdminSettings();
+	    add_submenu_page('retainful_license', 'add-on', 'add-on', 'manage_woocommerce', 'retainful_addons', array($this, 'retainfulAddonPage'));
+	    $settings = $this->getAdminSettings();
 
         $is_next_order_disable = get_option('retainful_hide_next_order_coupon', 'no');
         if (!$this->isNextOrderCouponEnabled()) {
@@ -1048,14 +1100,14 @@ class Settings
             add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
         }
 
-        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium'))) {
+        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retianful_addon','retainful_license', 'retainful_settings', 'retainful_premium'))) {
             $legacy_notice = '<div style="padding: 10px 46px 10px 22px;font-size: 15px;line-height: 1.4;margin-left: -20px;">Unlock the power of fully customizable email capture forms, including Add to Cart and Exit Intent popups, right from your Retainful dashboard. Head over to the Signup Forms section to configure and activate them. Tailor each popup to your brand, track sign-ups efficiently, and entice subscribers with unique coupons. <br/><b style="font-size: 15px;">Please note: Legacy popups will be phased out by April 15. Need help transitioning to the new Sign Up forms? Reach out to us at <a href="mailto:support@retainful.com">support@retainful.com</a> for assistance.</b></div>';
             add_action('admin_notices', function () use ($legacy_notice) {
                 echo '<div class="error notice"><p>' . $legacy_notice . '</p></div>';
             });
         }
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
-        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()) {
+        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retianful_addon','retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()) {
             $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
             add_action('admin_notices', function () use ($message) {
                 echo '<div class="error notice"><p>' . $message . '</p></div>';
@@ -1676,9 +1728,11 @@ class Settings
     {
         $page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : "";
         $prefix = substr($page, 0, 9);
+
         if ($prefix != "retainful") {
             return;
         }
+
         $asset_path = plugins_url('', __FILE__);
         //product search select
         wp_enqueue_script('rnoc-select2-js', $this->getWooPluginUrl() . '/assets/js/select2/select2.full.min.js', array('jquery'));
@@ -2364,5 +2418,31 @@ class Settings
         }
         return !is_admin();
     }
+
+	/**
+	 * Perform add-on action.
+	 */
+	public function deactivatePlugin() {
+		WcFunctions::checkSecuritykey('deactivate_plugin_button');
+		$post = self::$input->post();
+		if ( ! is_array( $post ) || ! isset( $post['plugin_file'] ) ) {
+			wp_send_json_error(__('plugin deactivated Faild!', RNOC_TEXT_DOMAIN));
+		}
+		deactivate_plugins($post['plugin_file'] );
+		wp_send_json_success(__('plugin deactivated successfully!', RNOC_TEXT_DOMAIN));
+	}
+
+	/**
+	 * Perform add-on actiavte.
+	 */
+	public function activatePlugin() {
+		WcFunctions::checkSecuritykey('rnoc_activate_plugin');
+		$post = self::$input->post();
+		if ( ! is_array( $post ) || ! isset( $post['plugin_file'] ) ) {
+			wp_send_json_error(__('plugin deactivated Faild!', RNOC_TEXT_DOMAIN));
+		}
+		activate_plugin($post['plugin_file'] );
+		wp_send_json_success(__('plugin deactivated successfully!', RNOC_TEXT_DOMAIN));
+	}
 
 }

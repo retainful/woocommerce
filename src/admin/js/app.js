@@ -216,8 +216,12 @@
                 data: $(this).serialize(),
                 success: function (response) {
                     if (!response.success) {
+
                         for (const [key, value] of Object.entries(response.data)) {
+                            console.log(response.data);
+
                             var field = $('[name="' + key + '"]');
+
                             if (field.length === 0) {
                                 var field_name = key.replace('.*.', '[0][');
                                 field = $('[name="' + field_name + ']"]');
@@ -341,4 +345,95 @@
 
         viewPriview();
     });
+
+    $(document).on('click', '#deactivate_plugin_button', function (event) {
+        event.preventDefault();
+
+        // Get button data attributes
+        var action = $(this).data('action');
+        var security = $(this).data('security');
+        var plugin_file = $(this).data('plugin-file');
+
+        // Construct the URL dynamically
+        var url = retainful_admin.ajax_endpoint
+            .replace("{{action}}", action)
+            .replace("{{security}}", security);
+
+        // Disable the button to prevent multiple clicks
+        var button = $(this);
+        button.attr('disabled', true);
+
+        // Perform the AJAX request
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: "json",
+            data: {
+                plugin_file: plugin_file },
+            success: function (response) {
+                if (response.success) {
+                    // Optionally, show a success message
+                        window.location.reload(); // Reload the page
+                } else {
+                    alert('Error: ' + (response.data.message || 'Unable to deactivate plugin.'));
+                }
+            },
+            error: function () {
+                //alert('Please try again later.');
+            },
+            complete: function () {
+                // Re-enable the button
+                button.attr('disabled', false);
+            }
+        });
+    });
+    $(document).on('click', '#activate_plugin_button', function (event) {
+        event.preventDefault();
+        // Get button data attributes
+        var action = $(this).data('action');
+        var security = $(this).data('security');
+        var plugin_file = $(this).data('plugin-file');
+
+        // Construct the URL dynamically
+        var url = retainful_admin.ajax_endpoint
+            .replace("{{action}}", action)
+            .replace("{{security}}", security);
+
+        // Disable the button to prevent multiple clicks
+        var button = $(this);
+        button.attr('disabled', true);
+
+        // Perform the AJAX request
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: "json",
+            data: { plugin_file: plugin_file },
+            success: function (response) {
+                if (response.success) {
+                    // Optionally, show a success message
+                    window.location.reload(); // Reload the page
+                } else {
+                    alert('Error: ' + (response.data.message || 'Unable to activate plugin.'));
+                }
+            },
+            error: function () {
+                alert('Please try again later.');
+            },
+            complete: function () {
+                // Re-enable the button
+                button.attr('disabled', false);
+            }
+        });
+    });
+    $(document).on('click', '.rnoc-tab-item', function (event) {
+        const target = $(this).data('tab');
+        // Remove active classes from all tabs and contents
+        $('.rnoc-tab-item').removeClass('active');
+        $('.rnoc-tab-content').removeClass('active');
+        // Add active class to the clicked tab and its content
+        $(this).addClass('active');
+        $('#' + target).addClass('active');
+    });
+
 })(jQuery);

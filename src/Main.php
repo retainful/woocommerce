@@ -200,6 +200,9 @@ class Main {
 			if ( apply_filters( 'rnoc_show_order_token_in_order', false ) ) {
 				add_action( 'add_meta_boxes', array( $this->admin, 'addOrderDetailMetaBoxes' ), 20 );
 			}
+			//contact addon
+			add_action( 'wp_ajax_rnoc_deactivate_plugin', array( $this->admin, 'deactivatePlugin' ) );
+			add_action( 'wp_ajax_rnoc_activate_plugin', array( $this->admin, 'activatePlugin' ) );
 		}
 		//initialise currency helper
 		new Currency();

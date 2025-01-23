@@ -429,3 +429,30 @@ Premium
     margin-left: 5px;
     font-size: 12px;
 }
+
+.rnoc-tabs-menu {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+    border-bottom: 2px solid #ddd;
+}
+
+.rnoc-tab-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.rnoc-tab-item.active {
+    border-bottom-color: #0073aa;
+    font-weight: bold;
+}
+
+.rnoc-tab-content {
+    display: none;
+}
+
+.rnoc-tab-content.active {
+    display: block;
+}
