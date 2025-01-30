@@ -768,11 +768,15 @@ class RestApi
         if (!is_string($popup_consent)) {
             return false;
         }
-        //json_decode return type
-        $session_data = json_decode($popup_consent, true);
-        if (is_array($session_data) && !empty($session_data['consent'])) {
-            return true;
+        try {
+            $session_data = json_decode($popup_consent, true);
+            if (is_array($session_data) && !empty($session_data['consent'])) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            return false;
         }
+
         return false;
     }
 
