@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
     let default_retainful_cart_data = {
         "ajax_url": "",
@@ -9,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "api_url": "",
         "tracking_element_selector": "retainful-abandoned-cart-data",
         "cart_tracking_engine": "js",
-        "billing_email" : ""
+        "billing_email": ""
     };
     let rnoc_cart_js_data = {};
     if (typeof retainful_cart_data === "undefined") {
@@ -294,7 +293,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
              * sync cart to api
              */
             syncCart(cart_data = null, force_sync = false) {
-                if(!rnoc_cart_js_data.billing_email && !$("#billing_email").val() && !$(".wp-block-woocommerce-checkout input#email").val()) {
+                if (!rnoc_cart_js_data.billing_email && !$("#billing_email").val() && !$(".wp-block-woocommerce-checkout input#email").val()) {
                     return;
                 }
                 if (cart_data === null) {
@@ -379,18 +378,45 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             retainful.setIp(rnoc_cart_js_data.ip);
             retainful.setVersion(rnoc_cart_js_data.version);
             retainful.initCartTracking();
-            /*$(document).ready(function () {
-                retainful.syncCart();
-            });*/
-            $(window).on('load',function (){
-                retainful.syncCart();
+
+            let syncScheduled = false;
+
+            function scheduleSync() {
+                if (!syncScheduled) {
+                    syncScheduled = true;
+                    // Give both ready and load events a moment to occur
+                    setTimeout(function () {
+                        retainful.syncCart();
+                    }, 0);
+                }
+            }
+
+            // $(document).ready(function () {
+            //     retainful.syncCart();
+            // })
+            $(document).on("retainful-form-submitted", function (e, email) {
+                if (e.email === undefined) {
+                    return;
+                }
+                rnoc_cart_js_data.billing_email = e.email;
+                var guest_data = {
+                    action: 'rnoc_track_user_data'
+                };
+                updateCheckout(e.email, rnoc_phone = '', guest_data);
             });
+            // $(window).on('load', function () {
+            //     retainful.syncCart();
+            // });
+            $(document).ready(scheduleSync);
+            $(window).on('load', scheduleSync);
         }
+
+
         if (rnoc_cart_js_data.cart !== undefined) {
             let tracking_content = '<div id="' + rnoc_cart_js_data.tracking_element_selector + '" style="display:none;">' + JSON.stringify(rnoc_cart_js_data.cart) + '</div>';
             $(tracking_content).appendTo('body');
         }
-        $(document).on('change','input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone,input#rnoc_allow_gdpr', function () {
+        $(document).on('change', 'input#billing_email,input#billing_first_name,input#billing_last_name,input#billing_phone,input#rnoc_allow_gdpr', function () {
             var rnoc_phone = $("#billing_phone").val();
             var rnoc_email = $("#billing_email").val();
             var ship_to_bill = $("#ship-to-different-address-checkbox:checked").length;
@@ -423,7 +449,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
             };
             updateCheckout(rnoc_email, rnoc_phone, guest_data);
         });
-        $(document).on('change','.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
+        $(document).on('change', '.wp-block-woocommerce-checkout input#email,.wp-block-woocommerce-checkout input#phone,.wp-block-woocommerce-checkout input#rnoc_allow_gdpr', function () {
             var rnoc_email = $(".wp-block-woocommerce-checkout input#email").val();
             var rnoc_phone = $(".wp-block-woocommerce-checkout input#phone").val();
             var guest_data = {
