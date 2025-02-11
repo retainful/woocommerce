@@ -1161,12 +1161,22 @@ class Cart extends RestApi
             return NULL;
         }
         global $wpdb;
-        return $wpdb->get_var($wpdb->prepare("
-			SELECT post_id
-			FROM {$wpdb->postmeta}
-			WHERE meta_key = '{$this->cart_token_key_for_db}'
-			AND meta_value = %s
-		", $cart_token));
+	    if(isHPOSEnabled()) {
+		    $data = $wpdb->get_var($wpdb->prepare("
+					SELECT order_id
+					FROM {$wpdb->prefix}wc_orders_meta
+					WHERE meta_key = '{$this->cart_token_key_for_db}'
+					AND meta_value = %s
+				", $cart_token));
+	    }else{
+		    $data = $wpdb->get_var($wpdb->prepare("
+					SELECT post_id
+					FROM {$wpdb->prefix}posts
+					WHERE meta_key = '{$this->cart_token_key_for_db}'
+					AND meta_value = %s
+				", $cart_token));
+	    }
+	    return $data;
     }
 
     /**
@@ -1187,6 +1197,16 @@ class Cart extends RestApi
 			AND meta_value = %s
 		", $cart_token));
     }
+
+    public function isHPOSEnabled() {
+        if ( ! class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) ) {
+            return false;
+        }
+        if ( \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ) {
+            return true;
+        }
+        return false;
+}
 
     /**
      * Check the hash matches or not
