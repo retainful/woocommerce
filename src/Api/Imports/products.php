@@ -19,7 +19,6 @@ class products extends Order {
 	 */
 	protected function hashVerification( $data, $hash_value ) {
 		$reverse_hmac = $this->hashToken( $data );
-
 		return hash_equals( $reverse_hmac, $hash_value );
 	}
 
@@ -125,13 +124,13 @@ class products extends Order {
 
 
 		$products = $this->getProducts( $params );
-
 		//Do like his response
 		$response = array(
 			'success'       => true,
 			'RESPONSE_CODE' => 'Ok',
 			'items'         => array()
 		);
+
 		foreach ( $products as $product_data ) {
 			$response['items'][] = $this->setProductData( $product_data->ID );
 		}
@@ -270,54 +269,111 @@ class products extends Order {
 		$product_variation = array();
 		if ( $product->is_type( 'variable' ) ) {
 			$variations = self::$woocommerce->isMethodExists( $product, 'get_available_variations' ) ? $product->get_available_variations() : array();
-
 			foreach ( $variations as $variation ) {
 				$variation_id        = is_array( $variation ) && ! empty( $variation['variation_id'] ) ? $variation['variation_id'] : 0;
 				$variation_obj       = self::$woocommerce->getProduct( $variation_id );
 				$product_variation[] = [
-					'id'                     => $variation_id,
-					'title'                  => self::$woocommerce->getItemTitle( $variation_obj ),
-					'display_name'           => self::$woocommerce->isMethodExists( $variation_obj, 'get_name' ) ? $variation_obj->get_name() : '',
-					'description'            => self::$woocommerce->isMethodExists( $variation_obj, 'get_description' ) ? $variation_obj->get_description() : '',
+					'Id'                     => $this->generateUuid(),
+					'ExternalVariantId'      => $variation_id,
+					'AppId'                  =>  self::$settings->getApiKey(),
+					'ExternalProductId'      =>  $variation_obj->get_parent_id(),
+					'Title'                  => self::$woocommerce->getItemTitle( $variation_obj ),
+					'DisplayName'            => self::$woocommerce->isMethodExists( $variation_obj, 'get_name' ) ? $variation_obj->get_name() : '',
+					'Url'                    => function_exists( 'get_permalink' ) ? get_permalink( $variation_id ) : '',
 					'price'                  => self::$woocommerce->getItemPrice( $variation_obj ),
 					'sku'                    => self::$woocommerce->getItemSku( $variation_obj ),
-					'variant_stock_quantity' => self::$woocommerce->isMethodExists( $variation_obj, 'get_stock_quantity' ) ? $variation_obj->get_stock_quantity() : 0,
-					'variant_url'            => function_exists( 'get_permalink' ) ? get_permalink( $variation_id ) : '',
-					'variant_image_url'      => self::$woocommerce->getProductImageSrc( $variation_obj ),
-					'variant_total_sales'    => self::$woocommerce->isMethodExists( $variation_obj, 'get_total_sales' ) ? $variation_obj->get_total_sales() : 0,
-					'created_at'             => $this->formatToIso8601( self::$woocommerce->isMethodExists( $variation_obj, 'get_date_created' ) ? strtotime( $variation_obj->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
-					'updated_at'             => $this->formatToIso8601( self::$woocommerce->isMethodExists( $variation_obj, 'get_date_modified' ) ? strtotime( $variation_obj->get_date_modified() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
+					'CompareAtPrice'         => '',
+					'InventoryQuantity'      => self::$woocommerce->isMethodExists( $variation_obj, 'get_stock_quantity' ) ? $variation_obj->get_stock_quantity() : 0,
+					'InventoryPolicy'        => $this->getStockStatus($variation_obj),
+					'InventoryStatus'        => self::$woocommerce->isMethodExists( $variation_obj, 'get_manage_stock' ) && ! empty( $variation_obj->get_manage_stock() ) && $variation_obj->get_manage_stock(),
+					'CreatedAt'              => $this->formatToIso8601( self::$woocommerce->isMethodExists( $variation_obj, 'get_date_created' ) ? strtotime( $variation_obj->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
+					'UpdatedAt'              => $this->formatToIso8601( self::$woocommerce->isMethodExists( $variation_obj, 'get_date_modified' ) ? strtotime( $variation_obj->get_date_modified() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
+					"DeletedAt"              => '',
 				];
 			}
+		}else{
+			$product_variation[] = [
+				'Id'                     => $this->generateUuid(),
+				'ExternalVariantId'      => (int)$product_id,
+				'AppId'                  =>  self::$settings->getApiKey(),
+				'ExternalProductId'      => (int)$product_id,
+				'Title'                  => self::$woocommerce->getItemTitle( $product ),
+				'DisplayName'            => self::$woocommerce->isMethodExists( $product, 'get_name' ) ? $product->get_name() : '',
+				'Url'                    => function_exists( 'get_permalink' ) ? get_permalink( $product ) : '',
+				'price'                  => self::$woocommerce->getItemPrice( $product ),
+				'sku'                    => self::$woocommerce->getItemSku( $product ),
+				'CompareAtPrice'         => '',
+				'InventoryQuantity'      => self::$woocommerce->isMethodExists( $product, 'get_stock_quantity' ) ? $product->get_stock_quantity() : 0,
+				'InventoryPolicy'        => $this->getStockStatus($product),
+				'InventoryStatus'        => self::$woocommerce->isMethodExists( $product, 'get_manage_stock' ) && ! empty( $product->get_manage_stock() ) && $product->get_manage_stock(),
+				'CreatedAt'              => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_created' ) ? strtotime( $product->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
+				'UpdatedAt'              => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_modified' ) ? strtotime( $product->get_date_modified() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
+				"DeletedAt"              => '',
+			];
 		}
-		$product_category = function_exists( 'wp_get_post_terms' ) ? wp_get_post_terms( $product->get_id(), 'product_cat' ) : array();
-		$category         = array_map( function ( $product_cat ) {
-			return $product_cat->name;
-		}, $product_category );
 		$product_tag      = function_exists( 'wp_get_post_terms' ) ? wp_get_post_terms( $product->get_id(), 'product_tag' ) : array();
 		$tags             = array_map( function ( $tag ) {
 			return $tag->name;
 		}, $product_tag );
 
 		return [
-			'id'                     => self::$woocommerce->getItemId( $product ),
-			'title'                  => self::$woocommerce->getItemName( $product ),
-			'description'            => self::$woocommerce->isMethodExists( $product, 'get_description' ) ? $product->get_description() : '',
+			'Id'                     => $this->generateUuid(),
+			'ExternalProductId'      => self::$woocommerce->getItemId( $product ),
+			'AppId'                  =>  self::$settings->getApiKey(),
+			'ShopId'                 =>  '',// need to check,
+			'Title'                  => self::$woocommerce->getItemName( $product ),
+			'Description'            => self::$woocommerce->isMethodExists( $product, 'get_description' ) ? $product->get_description() : '',
+			'ProductSku'             => self::$woocommerce->getItemSku( $product ),
+			'ProductStatus'          => self::$woocommerce->isMethodExists( $product, 'get_status' ) ? $product->get_status() : '',
+			'ProductTags'            => ! empty( $tags ) ? $tags : array(),
+			'ProductType'            =>  self::$woocommerce->isMethodExists( $product, 'get_type' ) ? $product->get_type() : '',//"snowboard",,
+			'ProductCreatedAt'       => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_created' ) ? strtotime( $product->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
+			'ProductUpdatedAt'       => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_modified' ) ? strtotime( $product->get_date_modified() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
+			'ProductPublishedAt'     => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_created' ) ? strtotime( $product->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
+			'CreatedAt'              => date('Y-m-d H:i:s'),
+			'UpdatedAt'              => date('Y-m-d H:i:s'),
+			'DeletedAt'              => null,
+			'ProductStockQuantity'   => self::$woocommerce->isMethodExists( $product, 'get_stock_quantity' ) ? $product->get_stock_quantity() : 0,
+			'Vendor'                 => '', // need to check
 			'price'                  => self::$woocommerce->getItemPrice( $product ),
 			'currency'               => self::$woocommerce->getDefaultCurrency(),
-			'product_url'            => function_exists( 'get_permalink' ) ? get_permalink( $product_id ) : '',
-			'product_type'           => self::$woocommerce->isMethodExists( $product, 'get_type' ) ? $product->get_type() : '',
-			'created_at'             => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_created' ) ? strtotime( $product->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
-			'updated_at'             => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_modified' ) ? strtotime( $product->get_date_modified() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
-			'status'                 => self::$woocommerce->isMethodExists( $product, 'get_status' ) ? $product->get_status() : '',
-			'product_sku'            => self::$woocommerce->getItemSku( $product ),
-			'product_stock_quantity' => self::$woocommerce->isMethodExists( $product, 'get_stock_quantity' ) ? $product->get_stock_quantity() : 0,
-			'product_image_url'      => self::$woocommerce->getProductImageSrc( $product ),
-			'product_category'       => ! empty( $category ) ? $category : array(),
-			'product_tag'            => ! empty( $tags ) ? $tags : array(),
-			'total_sales'            => self::$woocommerce->isMethodExists( $product, 'get_total_sales' ) ? $product->get_total_sales() : 0,
+			'ImageUrl'               => self::$woocommerce->getProductImageSrc( $product ),
+			'PriceRange'             => $this->getPriceRange( $product ),
+			'TotalOrderedCount'      =>self::$woocommerce->isMethodExists( $product, 'get_total_sales' ) ? $product->get_total_sales() : 0,
+			'MetaData'               => '',
 			'variants'               => $product_variation,
 		];
+	}
+
+	public  function getStockStatus( $product ) {
+		$stock_status =  self::$woocommerce->isMethodExists( $product, 'get_manage_stock' ) && ! empty( $product->get_manage_stock() ) && $product->get_manage_stock();
+		if($stock_status) {
+			return 'CONTINUE';
+		}
+		return 'DENY';
+	}
+	public function getPriceRange($product){
+		if(empty($product) || !function_exists('wc_price')){
+			return '';
+		}
+		if ($product->is_type('variable')) {
+			$min_price = $product->get_variation_price('min'); // Minimum price
+			$max_price = $product->get_variation_price('max'); // Maximum price
+			return wc_price($min_price) . ' - ' . wc_price($max_price);
+		} else {
+			return wc_price($product->get_price()); // For simple products
+		}
+	}
+
+	public function generateUuid(){
+		return sprintf(
+			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+		);
 	}
 
 }
