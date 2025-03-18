@@ -60,6 +60,7 @@ class Checkout extends RestApi {
 			$cart_created_at            = $this->userCartCreatedAt();
 			$user_ip                    = $this->retrieveUserIp();
 			$is_buyer_accepts_marketing = ( $this->isBuyerAcceptsMarketing() ) ? 1 : 0;
+			$is_buyer_accepts_sms_marketing = ( $this->isSmsConsent() ) ? 1 : 0;
 			//$cart_hash = self::$storage->getValue('rnoc_current_cart_hash');
 			$cart_hash            = $this->generateCartHash();
 			$recovered_at         = self::$storage->getValue( 'rnoc_recovered_at' );
@@ -75,6 +76,7 @@ class Checkout extends RestApi {
 				$order_object->update_meta_data( $this->cart_tracking_started_key_for_db, $cart_created_at );
 				$order_object->update_meta_data( $this->user_ip_key_for_db, $user_ip );
 				$order_object->update_meta_data( $this->accepts_marketing_key_for_db, $is_buyer_accepts_marketing );
+				$order_object->update_meta_data( $this->accepts_sms_marketing_key_for_db, $is_buyer_accepts_sms_marketing );
 				$order_object->update_meta_data( '_rnoc_recovered_at', $recovered_at );
 				$order_object->update_meta_data( '_rnoc_recovered_by', $recovered_by );
 				$order_object->update_meta_data( '_rnoc_recovered_cart_token', $recovered_cart_token );

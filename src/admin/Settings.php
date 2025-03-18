@@ -993,6 +993,9 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance' => '0',
             RNOC_PLUGIN_PREFIX . 'cart_capture_msg' => 'Keep me up to date on news and exclusive offers',
             RNOC_PLUGIN_PREFIX . 'gdpr_display_position' => 'after_billing_email',
+            RNOC_PLUGIN_PREFIX . 'enable_sms_consent' => '0',
+            RNOC_PLUGIN_PREFIX . 'sms_capture_msg' => 'Keep me up to date on news and exclusive offers',
+            RNOC_PLUGIN_PREFIX . 'sms_consent_display_position' => 'after_billing_email',
             RNOC_PLUGIN_PREFIX . 'enable_ip_filter' => '0',
             RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' => '',
             RNOC_PLUGIN_PREFIX . 'enable_debug_log' => '0',
@@ -1005,7 +1008,11 @@ class Settings
         if (empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])) {
             $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = 'Keep me up to date on news and exclusive offers';
         }
-        require_once dirname(__FILE__) . '/templates/pages/settings.php';
+	    if (isset($settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg']) && empty($settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg'])) {
+		    $settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg'] = 'Keep me up to date on news and exclusive offers';
+	    }
+
+	    require_once dirname(__FILE__) . '/templates/pages/settings.php';
     }
 
     function getRetainfulSettingValue($key, $default = null)

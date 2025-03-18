@@ -295,6 +295,69 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
         </tr>
         <tr>
             <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_sms_consent'; ?>"><?php
+			        esc_html_e('SMS Consent', RNOC_TEXT_DOMAIN);
+			        ?></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_sms_consent'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_sms_consent_0'; ?>"
+                           value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent'] == '0') {
+				        echo "checked";
+			        } ?>>
+			        <?php esc_html_e('Implicit', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <label>
+                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'enable_sms_consent'; ?>" type="radio"
+                           id="<?php echo RNOC_PLUGIN_PREFIX . 'enable_sms_consent_1'; ?>"
+                           value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent'] == '1') {
+				        echo "checked";
+			        } ?>>
+			        <?php esc_html_e('Explicit', RNOC_TEXT_DOMAIN); ?>
+                </label>
+                <p class="description">
+			        <?php
+			        esc_html_e('If set to Explicit, it will add an opt-in checkbox at the checkout to capture the consent', RNOC_TEXT_DOMAIN);
+			        ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'sms_consent_display_position'; ?>"><?php
+			        esc_html_e('SMS Consent field position:', RNOC_TEXT_DOMAIN);
+			        ?></label>
+            </th>
+            <td>
+                <select name="<?php echo RNOC_PLUGIN_PREFIX . 'sms_consent_display_position'; ?>">
+                    <option value="after_billing_email" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'sms_consent_display_position'] == 'after_billing_email') ? "selected='selected'":''; ?>>
+				        <?php esc_html_e('Below Email Address field', RNOC_TEXT_DOMAIN); ?></option>
+                    <option value="after_term_and_condition" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'sms_consent_display_position'] == 'after_term_and_condition') ? "selected='selected'":''; ?>>
+				        <?php esc_html_e('Below Terms and Conditions section', RNOC_TEXT_DOMAIN); ?></option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="<?php echo RNOC_PLUGIN_PREFIX . 'cart_capture_msg'; ?>"><?php
+			        esc_html_e('SMS Text for the opt-in checkbox', RNOC_TEXT_DOMAIN);
+			        ?></label>
+            </th>
+            <td>
+              <textarea name="<?php echo RNOC_PLUGIN_PREFIX . 'sms_capture_msg'; ?>"
+                        id="<?php echo RNOC_PLUGIN_PREFIX . 'sms_capture_msg'; ?>" cols="60" rows="10"
+              ><?php echo rnocEscAttr(trim(isset($settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg'])) ? $settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg'] : '' ); ?>
+                </textarea>
+                <p class="description">
+			        <?php
+			        esc_html_e('Under GDPR, it is mandatory to inform the users when we track their cart activity in real-time.', RNOC_TEXT_DOMAIN);
+			        ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_ip_filter'; ?>"><?php
                     esc_html_e('Enable IP filter?', RNOC_TEXT_DOMAIN);
                     ?></label>
