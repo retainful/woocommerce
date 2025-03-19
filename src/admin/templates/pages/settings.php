@@ -25,23 +25,23 @@ require_once "tabs.php";
                     </p>
                 </td>
             </tr>
-            <tr>
-                <th scope="row">
-                    <label for="<?php echo RNOC_PLUGIN_PREFIX . 'list_id'; ?>"><?php
-						esc_html_e('List ID\'s', RNOC_TEXT_DOMAIN);
-						?></label>
-                </th>
-                <td>
-                    <input name="<?php echo RNOC_PLUGIN_PREFIX . 'list_id'; ?>" type="text"
-                           id="<?php echo RNOC_PLUGIN_PREFIX . 'list_id'; ?>" value="<?php echo !empty($settings[RNOC_PLUGIN_PREFIX . 'list_id']) ? rnocEscAttr(trim($settings[RNOC_PLUGIN_PREFIX . 'list_id'])) : ''; ?>"
-                    >
-                    <p class="description">
-						<?php
-						esc_html_e('Enter the List id\'s in comma seperated.', RNOC_TEXT_DOMAIN);
-						?>
-                    </p>
-                </td>
-            </tr>
+<!--            <tr>-->
+<!--                <th scope="row">-->
+<!--                    <label for="--><?php //echo RNOC_PLUGIN_PREFIX . 'list_id'; ?><!--">--><?php
+//						esc_html_e('List ID\'s', RNOC_TEXT_DOMAIN);
+//						?><!--</label>-->
+<!--                </th>-->
+<!--                <td>-->
+<!--                    <input name="--><?php //echo RNOC_PLUGIN_PREFIX . 'list_id'; ?><!--" type="text"-->
+<!--                           id="--><?php //echo RNOC_PLUGIN_PREFIX . 'list_id'; ?><!--" value="--><?php //echo !empty($settings[RNOC_PLUGIN_PREFIX . 'list_id']) ? rnocEscAttr(trim($settings[RNOC_PLUGIN_PREFIX . 'list_id'])) : ''; ?><!--"-->
+<!--                    >-->
+<!--                    <p class="description">-->
+<!--						--><?php
+//						esc_html_e('Enter the List id\'s in comma seperated.', RNOC_TEXT_DOMAIN);
+//						?>
+<!--                    </p>-->
+<!--                </td>-->
+<!--            </tr>-->
             <tr>
                 <th scope="row">
                     <label for="<?php echo RNOC_PLUGIN_PREFIX . 'customer_status'; ?>"><?php
