@@ -51,9 +51,11 @@ class products extends Order {
 			return array();
 		}
 		$limit = ! empty( $params['limit'] ) ? $params['limit'] : 10;
+		$since_id = ! empty( $params['since_id'] ) ? $params['since_id'] : 10;
+
 		global $wpdb;
 		$query = $wpdb->prepare( "SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s ORDER BY ID ASC LIMIT %d", array(
-			0,
+			$since_id,
 			'trash',
 			(int) $limit
 		) );
