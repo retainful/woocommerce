@@ -19,6 +19,8 @@ class products extends Order {
 	 */
 	protected function hashVerification( $data, $hash_value ) {
 		$reverse_hmac = $this->hashToken( $data );
+		echo '<pre>';print_r($reverse_hmac);echo '</pre>';
+
 		return hash_equals( $reverse_hmac, $hash_value );
 	}
 
@@ -96,8 +98,7 @@ class products extends Order {
 			//'last_days' => 0,
 			'digest' => ''
 		);
-		$params                 = wp_parse_args( $request_params, $default_request_params );
-
+		$params  = wp_parse_args( $request_params, $default_request_params );
 		self::$settings->logMessage( $params, 'API Product get request' );
 		if ( is_array( $params['limit'] ) || empty( $params['digest'] ) || ! is_string( $params['digest'] ) || empty( $params['limit'] ) || $params['since_id'] < 0 || $params['status'] != 'any' ) {
 			self::$settings->logMessage( $params, 'API Product data missing' );
@@ -274,6 +275,7 @@ class products extends Order {
 			foreach ( $variations as $variation ) {
 				$variation_id        = is_array( $variation ) && ! empty( $variation['variation_id'] ) ? $variation['variation_id'] : 0;
 				$variation_obj       = self::$woocommerce->getProduct( $variation_id );
+				$image_id  = $variation_obj->get_image_id();
 				$product_variation[] = [
 					'Id'                     => $this->generateUuid(),
 					'ExternalVariantId'      => $variation_id,
@@ -281,10 +283,11 @@ class products extends Order {
 					'ExternalProductId'      =>  $variation_obj->get_parent_id(),
 					'Title'                  => self::$woocommerce->getItemTitle( $variation_obj ),
 					'DisplayName'            => self::$woocommerce->isMethodExists( $variation_obj, 'get_name' ) ? $variation_obj->get_name() : '',
-					'Url'                    => function_exists( 'get_permalink' ) ? get_permalink( $variation_id ) : '',
+					'Url'                    => function_exists( 'get_permalink' ) ? \get_permalink( $variation_id ) : '',
 					'price'                  => self::$woocommerce->getItemPrice( $variation_obj ),
 					'sku'                    => self::$woocommerce->getItemSku( $variation_obj ),
 					'CompareAtPrice'         => '',
+					'ImageUrl'               => function_exists('wp_get_attachment_url') && !empty($image_id) ?  \wp_get_attachment_url($image_id) : '',
 					'InventoryQuantity'      => self::$woocommerce->isMethodExists( $variation_obj, 'get_stock_quantity' ) ? $variation_obj->get_stock_quantity() : 0,
 					'InventoryPolicy'        => $this->getStockStatus($variation_obj),
 					'InventoryStatus'        => self::$woocommerce->isMethodExists( $variation_obj, 'get_manage_stock' ) && ! empty( $variation_obj->get_manage_stock() ) && $variation_obj->get_manage_stock(),
@@ -301,11 +304,12 @@ class products extends Order {
 				'ExternalProductId'      => (int)$product_id,
 				'Title'                  => self::$woocommerce->getItemTitle( $product ),
 				'DisplayName'            => self::$woocommerce->isMethodExists( $product, 'get_name' ) ? $product->get_name() : '',
-				'Url'                    => function_exists( 'get_permalink' ) ? get_permalink( $product ) : '',
-				'price'                  => self::$woocommerce->getItemPrice( $product ),
-				'sku'                    => self::$woocommerce->getItemSku( $product ),
+				'Url'                    => function_exists( 'get_permalink' ) ? \get_permalink( $product->get_id() ) : '',
+				'Price'                  => (int)self::$woocommerce->getItemPrice( $product ),
+				'Sku'                    => self::$woocommerce->getItemSku( $product ),
 				'CompareAtPrice'         => '',
-				'InventoryQuantity'      => self::$woocommerce->isMethodExists( $product, 'get_stock_quantity' ) ? $product->get_stock_quantity() : 0,
+				'ImageUrl'               => self::$woocommerce->getProductImageSrc( $product ),
+				'InventoryQuantity'      => self::$woocommerce->isMethodExists( $product, 'get_stock_quantity' ) ?( !empty($product->get_stock_quantity()) ?$product->get_stock_quantity(): 0)  : 0,
 				'InventoryPolicy'        => $this->getStockStatus($product),
 				'InventoryStatus'        => self::$woocommerce->isMethodExists( $product, 'get_manage_stock' ) && ! empty( $product->get_manage_stock() ) && $product->get_manage_stock(),
 				'CreatedAt'              => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_created' ) ? strtotime( $product->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
@@ -326,6 +330,7 @@ class products extends Order {
 			'Title'                  => self::$woocommerce->getItemName( $product ),
 			'Description'            => self::$woocommerce->isMethodExists( $product, 'get_description' ) ? $product->get_description() : '',
 			'ProductSku'             => self::$woocommerce->getItemSku( $product ),
+			'ProductUrl'             => function_exists( 'get_permalink' ) ? \get_permalink( $product->get_id() ) : '',
 			'ProductStatus'          => self::$woocommerce->isMethodExists( $product, 'get_status' ) ? $product->get_status() : '',
 			'ProductTags'            => ! empty( $tags ) ? $tags : array(),
 			'ProductType'            =>  self::$woocommerce->isMethodExists( $product, 'get_type' ) ? $product->get_type() : '',//"snowboard",,
@@ -335,15 +340,15 @@ class products extends Order {
 			'CreatedAt'              => date('Y-m-d H:i:s'),
 			'UpdatedAt'              => date('Y-m-d H:i:s'),
 			'DeletedAt'              => null,
-			'ProductStockQuantity'   => self::$woocommerce->isMethodExists( $product, 'get_stock_quantity' ) ? $product->get_stock_quantity() : 0,
+			'ProductStockQuantity'   => self::$woocommerce->isMethodExists( $product, 'get_stock_quantity' ) ? (!empty($product->get_stock_quantity()) ? $product->get_stock_quantity() : 0 ) : 0,
 			'Vendor'                 => '', // need to check
-			'price'                  => self::$woocommerce->getItemPrice( $product ),
-			'currency'               => self::$woocommerce->getDefaultCurrency(),
+			'Price'                  => (int) self::$woocommerce->getItemPrice( $product ),
+			'Currency'               => self::$woocommerce->getDefaultCurrency(),
 			'ImageUrl'               => self::$woocommerce->getProductImageSrc( $product ),
 			'PriceRange'             => $this->getPriceRange( $product ),
 			'TotalOrderedCount'      =>self::$woocommerce->isMethodExists( $product, 'get_total_sales' ) ? $product->get_total_sales() : 0,
 			'MetaData'               => '',
-			'variants'               => $product_variation,
+			'Variants'               => $product_variation,
 		];
 	}
 
@@ -359,11 +364,15 @@ class products extends Order {
 			return '';
 		}
 		if ($product->is_type('variable')) {
-			$min_price = $product->get_variation_price('min'); // Minimum price
-			$max_price = $product->get_variation_price('max'); // Maximum price
-			return wc_price($min_price) . ' - ' . wc_price($max_price);
+			return [
+				'min' => (int) $product->get_variation_price('min'),
+				'max' => (int) $product->get_variation_price('max'),
+			];
 		} else {
-			return wc_price($product->get_price()); // For simple products
+			return [
+				'min' => (int) $product->get_price(),
+				'max' => (int) $product->get_price(),
+			];
 		}
 	}
 
