@@ -10,6 +10,7 @@ use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Api\Imports\Imports;
+use Rnoc\Retainful\Api\Imports\products;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Popup\Popup;
 use Rnoc\Retainful\Integrations\AfterPay;
@@ -85,16 +86,29 @@ class Main {
 
 	function registerSyncEndPoints() {
 		$import = new Imports();
-		register_rest_route( 'retainful-api/v1', '/orders', array(
-			'methods'             => 'GET',
+		register_rest_route('retainful-api/v1', '/orders', array(
+			'methods' => 'GET',
 			'permission_callback' => '__return_true',
-			'callback'            => array( $import, 'getSyncOrders' )
-		) );
-		register_rest_route( 'retainful-api/v1', '/orders/count', array(
-			'methods'             => 'GET',
+			'callback' => array($import, 'getSyncOrders')
+		));
+		register_rest_route('retainful-api/v1', '/orders/count', array(
+			'methods' => 'GET',
 			'permission_callback' => '__return_true',
-			'callback'            => array( $import, 'getSyncOrderCount' )
-		) );
+			'callback' => array($import, 'getSyncOrderCount')
+		));
+
+		$product = new products();
+		register_rest_route('retainful-api/v1', '/products', array(
+			'methods' => 'GET',
+			'permission_callback' => '__return_true',
+			'callback' => array($product, 'getSyncProducts')
+		));
+		register_rest_route('retainful-api/v1', '/products/count', array(
+			'methods' => 'GET',
+			'permission_callback' => '__return_true',
+			'callback' => array($product, 'getSyncProductCount')
+		));
+
 	}
 
 	/**

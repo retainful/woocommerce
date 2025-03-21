@@ -842,6 +842,15 @@ class Settings
                 if (isset($hook_status['order.created']) && !$hook_status['order.created']) {
                     $this->addNewWebHook('order.created');
                 }
+                if (isset($hook_status['product.updated']) && !$hook_status['product.updated']) {
+                    $this->addNewWebHook('product.updated');
+                }
+                if (isset($hook_status['product.created']) && !$hook_status['product.created']) {
+                    $this->addNewWebHook('product.created');
+                }
+                if (isset($hook_status['product.deleted']) && !$hook_status['product.deleted']) {
+                    $this->addNewWebHook('product.deleted');
+                }
             } else {
                 $this->removeWebhook();
             }
@@ -867,11 +876,13 @@ class Settings
             $webhooks = $data_store->search_webhooks($args);
             foreach ($webhooks as $webhook_id) {
                 $webhook = wc_get_webhook($webhook_id);
-                if (empty($webhook)) {
+                if (empty($webhook) || empty($webhook->get_topic())) {
                     continue;
                 }
+                $topic = $webhook->get_topic();
+
                 $delivery_url = $webhook->get_delivery_url();
-                $site_delivery_url = $this->getDeliveryUrl();
+                $site_delivery_url = $this->getDeliveryUrl($topic);
                 if ($delivery_url != $site_delivery_url) {
                     continue;
                 }
@@ -890,7 +901,10 @@ class Settings
     {
         $topics = [
             'order.updated' => false,
-            'order.created' => false
+            'order.created' => false,
+            'product.created' => false,
+            'product.updated' => false,
+            'product.deleted' => false
         ];
         try {
             if(!class_exists('WC_Data_Store')){
@@ -908,8 +922,11 @@ class Settings
                 if (empty($webhook)) {
                     continue;
                 }
+                $topic = $webhook->get_topic();
                 $delivery_url = $webhook->get_delivery_url();
-                $site_delivery_url = $this->getDeliveryUrl();
+                $site_delivery_url = $this->getDeliveryUrl($topic);
+
+
                 if ($delivery_url != $site_delivery_url) {
                     continue;
                 }
@@ -923,9 +940,16 @@ class Settings
         return $topics;
     }
 
-    function getDeliveryUrl()
+    function getDeliveryUrl($topic)
     {
-        return $this->api->getDomain() . 'woocommerce/webhooks/checkout';
+        if (empty($topic)) return;
+        $url = '';
+        if (in_array($topic, array('order.created', 'order.updated'))) {
+            $url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
+        } elseif (in_array($topic, array('product.created', 'product.updated', 'product.deleted'))) {
+            $url = 'https://5tzcs7zuy3.execute-api.us-east-2.amazonaws.com/development/v3/event/woocommerce/products';
+        }
+        return $url;
     }
 
     /**
@@ -936,22 +960,41 @@ class Settings
      */
     protected function addNewWebHook($topic = 'order.updated')
     {
-        if (!in_array($topic, array('order.updated', 'order.created'))) {
+        if (!in_array($topic, array('order.updated', 'order.created', 'product.updated', 'product.created', 'product.deleted'))) {
             return false;
         }
         try {
+            $name = '';
+            switch ($topic) {
+                case 'order.updated':
+                    $name = 'Retainful Order Update';
+                    break;
+                case 'order.created':
+                    $name = 'Retainful Order created';
+                    break;
+                case 'product.updated':
+                    $name = 'Retainful product Update';
+                    break;
+                case 'product.created':
+                    $name = 'Retainful product created';
+                    break;
+                case 'product.deleted':
+                    $name = 'Retainful product deleted';
+                    break;
+            }
+
             if(!class_exists('WC_Webhook')){
                 return false;
             }
             $webhook = new \WC_Webhook();
-            $name = $topic == 'order.updated' ? sanitize_text_field(wp_unslash('Retainful Order Update')) : sanitize_text_field(wp_unslash('Retainful Order Create'));
-            $webhook->set_name($name);
+            // $name = $topic == 'order.updated' ? sanitize_text_field(wp_unslash('Retainful Order Update')) : sanitize_text_field(wp_unslash('Retainful Order Create'));
+            $webhook->set_name(sanitize_text_field($name));
             if (!$webhook->get_user_id()) {
                 $webhook->set_user_id(get_current_user_id());
             }
             //
             $webhook->set_status('active');
-            $delivery_url = $this->getDeliveryUrl();
+            $delivery_url = $this->getDeliveryUrl($topic);
             $webhook->set_delivery_url($delivery_url);
             $secret = wp_generate_password(50, true, true);
             $webhook->set_secret($secret);
@@ -1079,7 +1122,10 @@ class Settings
         }
         $webhook_status = array(
             'order_created' => false,
-            'order_updated' => false
+            'order_updated' => false,
+            'product_created' => false,
+            'product_updated' => false,
+            'product_deleted' => false
         );
         try {
             $data_store = \WC_Data_Store::load('webhook');
@@ -1094,18 +1140,28 @@ class Settings
                 if (empty($webhook)) {
                     continue;
                 }
+                $topic = $webhook->get_topic();
                 $delivery_url = $webhook->get_delivery_url();
-                $site_delivery_url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
+                $site_delivery_url = $this->getDeliveryUrl($topic);
                 if ($delivery_url != $site_delivery_url) {
                     continue;
                 }
-                $topic = $webhook->get_topic();
+
                 $status = $webhook->get_status();
                 if ($status == 'active' && $topic == 'order.created') {
                     $webhook_status['order_created'] = true;
                 }
                 if ($status == 'active' && $topic == 'order.updated') {
                     $webhook_status['order_updated'] = true;
+                }
+                if ($status == 'active' && $topic == 'product.created') {
+                    $webhook_status['product_created'] = true;
+                }
+                if ($status == 'active' && $topic == 'product.updated') {
+                    $webhook_status['product_updated'] = true;
+                }
+                if ($status == 'active' && $topic == 'product.deleted') {
+                    $webhook_status['product_deleted'] = true;
                 }
             }
         } catch (\Exception $e) {
