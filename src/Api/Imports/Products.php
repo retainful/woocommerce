@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Rnoc\Retainful\Api\AbandonedCart\Order;
 
-class products extends Order {
+class Products extends Order {
 	/**
 	 * Hash verification.
 	 *
@@ -19,8 +19,6 @@ class products extends Order {
 	 */
 	protected function hashVerification( $data, $hash_value ) {
 		$reverse_hmac = $this->hashToken( $data );
-		echo '<pre>';print_r($reverse_hmac);echo '</pre>';
-
 		return hash_equals( $reverse_hmac, $hash_value );
 	}
 
@@ -95,7 +93,6 @@ class products extends Order {
 			'limit'  => 10,
 			'id'     => 0,
 			'status' => 'any',
-			//'last_days' => 0,
 			'digest' => ''
 		);
 		$params  = wp_parse_args( $request_params, $default_request_params );
@@ -217,8 +214,7 @@ class products extends Order {
 				return $http_args;
 			}
 			$product_data = $this->setProductData( $product_id );
-
-			if ( is_array( $product_data['id'] ) || empty( $product_data['created_at'] ) ) {
+			if ( is_array( $product_data['Id'] ) || empty( $product_data['CreatedAt'] ) ) {
 				self::$settings->logMessage( $product_data, 'API Product data missing' );
 				$status   = 400;
 				$response = array(
@@ -226,15 +222,18 @@ class products extends Order {
 					'RESPONSE_CODE' => 'DATA_MISSING',
 					'message'       => 'Invalid data!'
 				);
-
 				return new \WP_REST_Response( $response, $status );
 			}
+
 			$product_data['digest']     = $this->hashToken( array(
-				$product_data['id'],
-				$product_data['created_at'],
-				$product_data['title']
+				$product_data['Id'],
+				$product_data['CreatedAt'],
+				$product_data['Title']
 			) );
-			$product_data['event_type'] = $topic;
+			$product_data['eventType'] = $topic;
+			if($topic == 'product.deleted'){
+				$product_data['Variants']['DeletedAt'] = current_time('Y-m-d H:i:s');
+			}
 			if ( ! empty( $product_data ) ) {
 				$app_id        = self::$settings->getApiKey();
 				$extra_headers = array(
@@ -249,6 +248,7 @@ class products extends Order {
 					'data' => $product_data
 				);
 				$http_args['body'] = trim( wp_json_encode( $body ) );
+
 			}
 		} catch ( Exception $e ) {
 
@@ -270,7 +270,7 @@ class products extends Order {
 		}
 		$product           = self::$woocommerce->getProduct( $product_id );
 		$product_variation = array();
-		if ( $product->is_type( 'variable' ) ) {
+		if ( self::$woocommerce->isMethodExists( $product,'is_type') && $product->is_type( 'variable' ) ) {
 			$variations = self::$woocommerce->isMethodExists( $product, 'get_available_variations' ) ? $product->get_available_variations() : array();
 			foreach ( $variations as $variation ) {
 				$variation_id        = is_array( $variation ) && ! empty( $variation['variation_id'] ) ? $variation['variation_id'] : 0;
@@ -283,7 +283,7 @@ class products extends Order {
 					'ExternalProductId'      =>  $variation_obj->get_parent_id(),
 					'Title'                  => self::$woocommerce->getItemTitle( $variation_obj ),
 					'DisplayName'            => self::$woocommerce->isMethodExists( $variation_obj, 'get_name' ) ? $variation_obj->get_name() : '',
-					'Url'                    => function_exists( 'get_permalink' ) ? \get_permalink( $variation_id ) : '',
+					'Url'                    => self::$woocommerce->isMethodExists( $product, 'get_id' ) && function_exists( 'get_permalink' ) ? \get_permalink( $variation_id ) : '',
 					'price'                  => self::$woocommerce->getItemPrice( $variation_obj ),
 					'sku'                    => self::$woocommerce->getItemSku( $variation_obj ),
 					'CompareAtPrice'         => '',
@@ -304,7 +304,7 @@ class products extends Order {
 				'ExternalProductId'      => (int)$product_id,
 				'Title'                  => self::$woocommerce->getItemTitle( $product ),
 				'DisplayName'            => self::$woocommerce->isMethodExists( $product, 'get_name' ) ? $product->get_name() : '',
-				'Url'                    => function_exists( 'get_permalink' ) ? \get_permalink( $product->get_id() ) : '',
+				'Url'                    => self::$woocommerce->isMethodExists( $product, 'get_id' ) && function_exists( 'get_permalink' ) ? \get_permalink( $product->get_id() ) : '',
 				'Price'                  => (int)self::$woocommerce->getItemPrice( $product ),
 				'Sku'                    => self::$woocommerce->getItemSku( $product ),
 				'CompareAtPrice'         => '',
@@ -317,7 +317,7 @@ class products extends Order {
 				"DeletedAt"              => '',
 			];
 		}
-		$product_tag      = function_exists( 'wp_get_post_terms' ) ? wp_get_post_terms( $product->get_id(), 'product_tag' ) : array();
+		$product_tag      = self::$woocommerce->isMethodExists( $product, 'get_id' ) && function_exists( 'wp_get_post_terms' ) ? wp_get_post_terms( $product->get_id(), 'product_tag' ) : array();
 		$tags             = array_map( function ( $tag ) {
 			return $tag->name;
 		}, $product_tag );
@@ -330,7 +330,7 @@ class products extends Order {
 			'Title'                  => self::$woocommerce->getItemName( $product ),
 			'Description'            => self::$woocommerce->isMethodExists( $product, 'get_description' ) ? $product->get_description() : '',
 			'ProductSku'             => self::$woocommerce->getItemSku( $product ),
-			'ProductUrl'             => function_exists( 'get_permalink' ) ? \get_permalink( $product->get_id() ) : '',
+			'ProductUrl'             => self::$woocommerce->isMethodExists( $product, 'get_id' ) && function_exists( 'get_permalink' ) ? \get_permalink( $product->get_id() ) : '',
 			'ProductStatus'          => self::$woocommerce->isMethodExists( $product, 'get_status' ) ? $product->get_status() : '',
 			'ProductTags'            => ! empty( $tags ) ? $tags : array(),
 			'ProductType'            =>  self::$woocommerce->isMethodExists( $product, 'get_type' ) ? $product->get_type() : '',//"snowboard",,

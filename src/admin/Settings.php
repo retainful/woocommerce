@@ -833,7 +833,8 @@ class Settings
      */
     function createWebhook()
     {
-        if (is_admin()) {
+
+	    if (is_admin()) {
             if ($this->isConnectionActive()) {
                 $hook_status = $this->getWebHookStatus();
                 if (isset($hook_status['order.updated']) && !$hook_status['order.updated']) {
@@ -851,6 +852,15 @@ class Settings
                 if (isset($hook_status['product.deleted']) && !$hook_status['product.deleted']) {
                     $this->addNewWebHook('product.deleted');
                 }
+	            if (isset($hook_status['category.updated']) && !$hook_status['category.updated']) {
+		            $this->addNewWebHook('category.updated');
+	            }
+	            if (isset($hook_status['category.created']) && !$hook_status['category.created']) {
+		            $this->addNewWebHook('category.created');
+	            }
+	            if (isset($hook_status['category.deleted']) && !$hook_status['category.deleted']) {
+		            $this->addNewWebHook('category.deleted');
+	            }
             } else {
                 $this->removeWebhook();
             }
@@ -876,11 +886,12 @@ class Settings
             $webhooks = $data_store->search_webhooks($args);
             foreach ($webhooks as $webhook_id) {
                 $webhook = wc_get_webhook($webhook_id);
-                if (empty($webhook) || empty($webhook->get_topic())) {
-                    continue;
-                }
-                $topic = $webhook->get_topic();
+				$webhook_details = self::getWebhookDetails($webhook_id);
+	            if (empty($webhook_details) || !isset($webhook_details->topic)) {
+		            continue;
+	            }
 
+	            $topic = $webhook_details->topic;
                 $delivery_url = $webhook->get_delivery_url();
                 $site_delivery_url = $this->getDeliveryUrl($topic);
                 if ($delivery_url != $site_delivery_url) {
@@ -893,6 +904,12 @@ class Settings
         }
     }
 
+	public static function getWebhookDetails($webhook_id){
+		global $wpdb;
+		$webhook_id = intval($webhook_id); // Ensure it's an integer
+		$query = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}wc_webhooks WHERE webhook_id = %d", $webhook_id);
+		 return $wpdb->get_row($query);
+	}
     /**
      * Get Webhooks status.
      * @return array
@@ -904,7 +921,10 @@ class Settings
             'order.created' => false,
             'product.created' => false,
             'product.updated' => false,
-            'product.deleted' => false
+            'product.deleted' => false,
+	        'category.created' => false,
+            'category.updated' => false,
+            'category.deleted' => false
         ];
         try {
             if(!class_exists('WC_Data_Store')){
@@ -946,8 +966,8 @@ class Settings
         $url = '';
         if (in_array($topic, array('order.created', 'order.updated'))) {
             $url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
-        } elseif (in_array($topic, array('product.created', 'product.updated', 'product.deleted'))) {
-            $url = 'https://5tzcs7zuy3.execute-api.us-east-2.amazonaws.com/development/v3/event/woocommerce/products';
+        } elseif (in_array($topic, array('product.created', 'product.updated', 'product.deleted','category.created', 'category.updated', 'category.deleted'))) {
+            $url = apply_filters('change_product_webhook_delivery_url','https://5tzcs7zuy3.execute-api.us-east-2.amazonaws.com/development/v3/event/woocommerce/products');
         }
         return $url;
     }
@@ -960,7 +980,8 @@ class Settings
      */
     protected function addNewWebHook($topic = 'order.updated')
     {
-        if (!in_array($topic, array('order.updated', 'order.created', 'product.updated', 'product.created', 'product.deleted'))) {
+
+		if (!in_array($topic, array('order.updated', 'order.created', 'product.updated', 'product.created', 'product.deleted', 'category.updated', 'category.created', 'category.deleted'))) {
             return false;
         }
         try {
@@ -981,6 +1002,15 @@ class Settings
                 case 'product.deleted':
                     $name = 'Retainful product deleted';
                     break;
+	            case 'category.created':
+		            $name = 'Retainful Category Created';
+		            break;
+	            case 'category.updated':
+		            $name = 'Retainful Category Updated';
+		            break;
+	            case 'category.deleted':
+		            $name = 'Retainful Category Deleted';
+		            break;
             }
 
             if(!class_exists('WC_Webhook')){
@@ -998,10 +1028,15 @@ class Settings
             $webhook->set_delivery_url($delivery_url);
             $secret = wp_generate_password(50, true, true);
             $webhook->set_secret($secret);
-            if (wc_is_webhook_valid_topic($topic)) {
-                $webhook->set_topic($topic);
-            }
-            // API version.
+
+
+
+	        if (in_array($topic, ['category.created', 'category.updated', 'category.deleted'])) {
+		        $webhook->set_topic(  $topic );
+	        } elseif (wc_is_webhook_valid_topic($topic)) {
+		        $webhook->set_topic($topic);
+	        }
+
             $rest_api_versions = wc_get_webhook_rest_api_versions();
             $webhook->set_api_version(end($rest_api_versions)); // WPCS: input var okay, CSRF ok.
             $webhook_id = $webhook->save();
