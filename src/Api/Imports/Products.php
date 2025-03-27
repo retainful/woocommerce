@@ -232,8 +232,9 @@ class Products extends Order {
 			) );
 			$product_data['eventType'] = $topic;
 			if($topic == 'product.deleted'){
-				$product_data['Variants']['DeletedAt'] = current_time('Y-m-d H:i:s');
+				$product_data['DeletedAt'] = $this->formatToIso8601(strtotime(current_time('Y-m-d H:i:s')));
 			}
+
 			if ( ! empty( $product_data ) ) {
 				$app_id        = self::$settings->getApiKey();
 				$extra_headers = array(
@@ -284,8 +285,8 @@ class Products extends Order {
 					'Title'                  => self::$woocommerce->getItemTitle( $variation_obj ),
 					'DisplayName'            => self::$woocommerce->isMethodExists( $variation_obj, 'get_name' ) ? $variation_obj->get_name() : '',
 					'Url'                    => self::$woocommerce->isMethodExists( $product, 'get_id' ) && function_exists( 'get_permalink' ) ? \get_permalink( $variation_id ) : '',
-					'price'                  => self::$woocommerce->getItemPrice( $variation_obj ),
-					'sku'                    => self::$woocommerce->getItemSku( $variation_obj ),
+					'Price'                  => self::$woocommerce->getItemPrice( $variation_obj ),
+					'Sku'                    => self::$woocommerce->getItemSku( $variation_obj ),
 					'CompareAtPrice'         => '',
 					'ImageUrl'               => function_exists('wp_get_attachment_url') && !empty($image_id) ?  \wp_get_attachment_url($image_id) : '',
 					'InventoryQuantity'      => self::$woocommerce->isMethodExists( $variation_obj, 'get_stock_quantity' ) ? $variation_obj->get_stock_quantity() : 0,
@@ -337,8 +338,8 @@ class Products extends Order {
 			'ProductCreatedAt'       => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_created' ) ? strtotime( $product->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
 			'ProductUpdatedAt'       => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_modified' ) ? strtotime( $product->get_date_modified() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
 			'ProductPublishedAt'     => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_created' ) ? strtotime( $product->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
-			'CreatedAt'              => date('Y-m-d H:i:s'),
-			'UpdatedAt'              => date('Y-m-d H:i:s'),
+			'CreatedAt'              => $this->formatToIso8601(strtotime(date('Y-m-d H:i:s'))),
+			'UpdatedAt'              => $this->formatToIso8601(strtotime(date('Y-m-d H:i:s'))),
 			'DeletedAt'              => null,
 			'ProductStockQuantity'   => self::$woocommerce->isMethodExists( $product, 'get_stock_quantity' ) ? (!empty($product->get_stock_quantity()) ? $product->get_stock_quantity() : 0 ) : 0,
 			'Vendor'                 => '', // need to check
