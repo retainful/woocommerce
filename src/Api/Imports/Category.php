@@ -58,14 +58,16 @@ class Category extends Order {
 
 	}
 
-
 	public static function getProductIdsByCategoryId($category_id) {
 		global $wpdb;
 		$product_ids = $wpdb->get_col($wpdb->prepare("
-        SELECT object_id FROM {$wpdb->term_relationships}
-        WHERE term_taxonomy_id = %d
+        SELECT p.ID FROM {$wpdb->posts} p
+        INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+        INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+        WHERE tt.term_id = %d 
+        AND p.post_type = 'product' 
+        AND p.post_status = 'publish'
     ", $category_id));
-
 		return $product_ids;
 	}
 
