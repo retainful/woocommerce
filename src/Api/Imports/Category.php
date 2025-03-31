@@ -210,18 +210,18 @@ class Category extends Order {
 	}
 
 	public static function createCategory( $term_id, $taxonomy) {
-		self::categoryCreatedCallback( $term_id, $taxonomy,'created' );
+		self::categoryCallback( $term_id, $taxonomy,'created' );
 	}
 
 	public static function updateCategory($term_id, $taxonomy ) {
-		self::categoryCreatedCallback( $term_id, $taxonomy,'updated' );
+		self::categoryCallback( $term_id, $taxonomy,'updated' );
 	}
 
 	public static function deleteCategory( $term_id, $taxonomy ) {
-		self::categoryCreatedCallback( $term_id, $taxonomy,'deleted' );
+		self::categoryCallback( $term_id, $taxonomy,'deleted' );
 	}
 
-	public static function categoryCreatedCallback($term_id, $taxonomy, $action) {
+	public static function categoryCallback($term_id, $taxonomy, $action) {
 		$category = get_term($term_id, 'product_cat');
 		if (!$category || is_wp_error($category)) {
 			return;
