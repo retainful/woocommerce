@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 use Rnoc\Retainful\Api\AbandonedCart\Order;
+use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 
 class Category extends Order {
 
@@ -224,15 +225,9 @@ class Category extends Order {
 	}
 
 	public static function categoryCallback($term_id, $taxonomy, $action) {
-		$category = get_term($term_id, 'product_cat');
-		if (!$category || is_wp_error($category)) {
+		if (empty($term_id)) {
 			return;
 		}
-
-		// Get category details
-		$description = isset($category->description) ? $category->description : '';
-		$slug = isset($category->slug) ? $category->slug : '';
-
 		// Fetch active webhooks
 		$data_store = \WC_Data_Store::load('webhook');
 		$args = array(
@@ -249,27 +244,13 @@ class Category extends Order {
 		foreach ($webhooks as $webhook_id) {
 			$webhook = wc_get_webhook($webhook_id);
 			$topic = $webhook->get_topic();
-			if(!in_array($topic,['category.updated', 'category.created', 'category.updated'])){
+			if(!in_array($topic,['category.updated', 'category.created', 'category.deleted'])){
 				continue;
 			}
 			// Ensure topic is valid and matches our custom webhook
 			if (!empty($topic) && strpos($topic, 'category') !== false) {
 				if ($topic === "category.{$action}") {
-					$payload = [
-						'Id'                 => wp_generate_uuid4(),
-						'ExternalCategoryId' => $category->term_id,
-						'AppId'              => self::$settings->getApiKey(),
-						'ShopId'             => '',
-						'ExternalProductIds' => self::getProductIdsByCategoryId($category->term_id),
-						'Name'               => $category->name,
-						'Description'        => $description,
-						'handle'             => $slug,
-						'CreatedAt'          => current_time('Y-m-d H:i:s'),
-						'UpdatedAt'          => current_time('Y-m-d H:i:s'),
-						'CategoryUpdatedAt'  => current_time('Y-m-d H:i:s'),
-						'DeletedAt'          => null,
-						'EventType'          => $action,
-					];
+					$payload = $term_id;
 					// Deliver webhook
 					$webhook->deliver($payload);
 				}
@@ -277,5 +258,90 @@ class Category extends Order {
 		}
 	}
 
+	public static function changeWebHookHeaderCategory( $http_args,$term_id , $webhook_id){
+		if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! self::$settings->isConnectionActive() ) {
+			return $http_args;
+		}
+		$rest_api = new RestApi();
+		try {
+			$webhook      = new \WC_Webhook( $webhook_id );
+			$topic        = $webhook->get_topic();
+			if(!in_array($topic,['category.updated', 'category.created', 'category.deleted'])){
+				return $http_args;			}
+			$topic_status = self::$settings->getWebHookStatus();
 
+			if ( ! isset( $topic_status[ $topic ] ) || ! $topic_status[ $topic ] ) {
+				return $http_args;
+			}
+			$delivery_url      = $webhook->get_delivery_url();
+			$site_delivery_url = self::$settings->getDeliveryUrl( $topic );
+
+			if ( $delivery_url != $site_delivery_url ) {
+				return $http_args;
+			}
+			$category_data = self::getWebhookCategoryData( $term_id,$topic );
+
+			if ( empty( $category_data) ) {
+				self::$settings->logMessage( $category_data, 'API Product data missing' );
+				$status   = 400;
+				$response = array(
+					'success'       => false,
+					'RESPONSE_CODE' => 'DATA_MISSING',
+					'message'       => 'Invalid data!'
+				);
+				return new \WP_REST_Response( $response, $status );
+			}
+
+			if ( ! empty( $category_data ) ) {
+				$app_id        = self::$settings->getApiKey();
+				$extra_headers = array(
+					"X-Retainful-Version" => RNOC_VERSION,
+					"app_id"              => $app_id,
+					"Content-Type"        => 'application/json'
+				);
+				foreach ( $extra_headers as $key => $value ) {
+					$http_args['headers'][ $key ] = $value;
+				}
+				$body              = array(
+					'data' => $rest_api->encryptData( $category_data)
+				);
+				$http_args['body'] = trim( wp_json_encode( $body ) );
+			}
+		} catch ( Exception $e ) {
+
+		}
+
+		return $http_args;
+	}
+
+	public static function getWebhookCategoryData( $term_id,$topic ) {
+		if(empty($term_id)){
+			return [];
+		}
+		$category = get_term($term_id, 'product_cat');
+		if (empty( $category ) && empty($term_id)) {
+			return [];
+		}
+
+		// Get category details
+		$description = isset($category->description) ? $category->description : '';
+		$slug = isset($category->slug) ? $category->slug : '';
+		$payload = [
+						'Id'                 => function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : '',
+						'ExternalCategoryId' => $term_id,
+						'AppId'              => self::$settings->getApiKey(),
+						'ShopId'             => '',
+						'ExternalProductIds' => self::getProductIdsByCategoryId($term_id),
+						'Name'               => !empty($category->name) ? $category->name : '',
+						'Description'        => $description,
+						'handle'             => $slug,
+						'CreatedAt'          => current_time('Y-m-d H:i:s'),
+						'UpdatedAt'          => current_time('Y-m-d H:i:s'),
+						'CategoryUpdatedAt'  => current_time('Y-m-d H:i:s'),
+						'DeletedAt'          => $topic== 'category.deleted' ? current_time('Y-m-d H:i:s'): '' ,
+						'EventType'          => $topic,
+		];
+
+		return $payload;
+	}
 }

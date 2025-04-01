@@ -206,6 +206,9 @@ class Products extends Order {
 		try {
 			$webhook      = new \WC_Webhook( $webhook_id );
 			$topic        = $webhook->get_topic();
+			if(!in_array($topic,['product.updated', 'product.created', 'product.deleted'])){
+				return $http_args;
+			}
 			$topic_status = self::$settings->getWebHookStatus();
 
 			if ( ! isset( $topic_status[ $topic ] ) || ! $topic_status[ $topic ] ) {

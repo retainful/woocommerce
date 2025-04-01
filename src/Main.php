@@ -376,9 +376,29 @@ class Main {
 					'orderUpdatedShopBackend'
 				), 50, 2 );
 				$product = new Products();
+
 				//add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
-				add_filter( 'woocommerce_webhook_http_args', array( $checkout, 'changeWebHookHeader' ), 10, 3 );
-				add_filter('woocommerce_webhook_http_args', array($product, 'changeWebHookHeaderProduct'), 10, 3);
+				add_filter( 'woocommerce_webhook_http_args',function( $http_args, $order_id, $webhook_id) use ($product,$checkout){
+					if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! $this->admin->isConnectionActive() ) {
+						return $http_args;
+					}
+					try {
+						$webhook = new \WC_Webhook( $webhook_id );
+						$topic   = $webhook->get_topic();
+						if(preg_match("/category/i", $topic)) {
+							$http_args = Category::changeWebHookHeaderCategory( $http_args, $order_id, $webhook_id);
+						}elseif (preg_match("/order/i", $topic)){
+							$http_args = $checkout->changeWebHookHeader( $http_args, $order_id, $webhook_id);
+						}elseif (preg_match("/product/i", $topic)){
+							$http_args = $product->changeWebHookHeaderProduct( $http_args, $order_id, $webhook_id);
+						}
+					}catch ( \Exception $e) {
+
+					}
+					return $http_args;
+				}, 10, 3 );
+
+
 				add_filter( 'woocommerce_valid_webhook_resources',function($resources){
 					$resources[] = 'category';
 					return $resources;
