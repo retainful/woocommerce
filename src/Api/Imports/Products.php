@@ -54,9 +54,11 @@ class Products extends Order {
 		$since_id = ! empty( $params['since_id'] ) ? $params['since_id'] : 10;
 
 		global $wpdb;
-		$query = $wpdb->prepare( "SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s ORDER BY ID ASC LIMIT %d", array(
+		$query = $wpdb->prepare( "SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status NOT IN (%s, %s, %s) ORDER BY ID ASC LIMIT %d", array(
 			$since_id,
 			'trash',
+			'auto-draft',
+			'draft',
 			(int) $limit
 		) );
 
@@ -71,9 +73,11 @@ class Products extends Order {
 	 */
 	protected function getProductCount() {
 		global $wpdb;
-		$query = $wpdb->prepare( "SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status != %s", array(
+		$query = $wpdb->prepare( "SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status NOT IN (%s, %s, %s)", array(
 			0,
-			'trash'
+			'trash',
+			'auto-draft',
+			'draft'
 		) );
 
 		return $wpdb->get_var( $query );
