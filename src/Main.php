@@ -377,6 +377,11 @@ class Main {
 				), 50, 2 );
 				$product = new Products();
 
+				add_filter( 'woocommerce_valid_webhook_resources',function($resources){
+					$resources[] = 'category';
+					return $resources;
+				});
+
 				//add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
 				add_filter( 'woocommerce_webhook_http_args',function( $http_args, $order_id, $webhook_id) use ($product,$checkout){
 					if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! $this->admin->isConnectionActive() ) {
@@ -399,13 +404,12 @@ class Main {
 				}, 10, 3 );
 
 
-				add_filter( 'woocommerce_valid_webhook_resources',function($resources){
-					$resources[] = 'category';
-					return $resources;
-				});
+
 				add_action('created_product_cat', [Category::class,'createCategory'], 10, 2);
 				add_action('edited_product_cat', [Category::class,'updateCategory'], 10, 2);
 				add_action('delete_product_cat', [Category::class,'deleteCategory'], 10, 2);
+				add_action('retainful_category', [Category::class, 'categoryCallback'], 10, 2);
+
 				//Todo: multi currency and multi lingual
 				//add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
 				if ( $this->admin->isAfterPayEnabled() ) {

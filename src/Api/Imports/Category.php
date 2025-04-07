@@ -213,21 +213,32 @@ class Category extends Order {
 	}
 
 	public static function createCategory( $term_id, $taxonomy) {
-		self::categoryCallback( $term_id, $taxonomy,'created' );
+		$time = time() + 10 * 60;
+		if (!as_next_scheduled_action('retainful_category', ['term_id' => $term_id,'action' => 'created'])) {
+			as_schedule_single_action($time, 'retainful_category', ['term_id' => $term_id,'action' => 'created']);
+		}
 	}
 
 	public static function updateCategory($term_id, $taxonomy ) {
-		self::categoryCallback( $term_id, $taxonomy,'updated' );
+		$time = time() + 10 * 60;
+		if (!as_next_scheduled_action('retainful_category', ['term_id' => $term_id,'action' => 'updated'])) {
+			as_schedule_single_action($time, 'retainful_category', ['term_id' => $term_id,'action' => 'updated']);
+		}
 	}
 
 	public static function deleteCategory( $term_id, $taxonomy ) {
-		self::categoryCallback( $term_id, $taxonomy,'deleted' );
+		$time = time() + 10 * 60;
+		if (!as_next_scheduled_action('retainful_category', ['term_id' => $term_id,'action' => 'deleted'])) {
+			as_schedule_single_action($time, 'retainful_category', ['term_id' => $term_id,'action' => 'deleted']);
+		}
+		//self::categoryCallback( $term_id, $taxonomy,'deleted' );
 	}
 
-	public static function categoryCallback($term_id, $taxonomy, $action) {
+	public static function categoryCallback($term_id, $action) {
 		if (empty($term_id)) {
 			return;
 		}
+
 		// Fetch active webhooks
 		$data_store = \WC_Data_Store::load('webhook');
 		$args = array(
@@ -247,6 +258,7 @@ class Category extends Order {
 			if(!in_array($topic,['category.updated', 'category.created', 'category.deleted'])){
 				continue;
 			}
+
 			// Ensure topic is valid and matches our custom webhook
 			if (!empty($topic) && strpos($topic, 'category') !== false) {
 				if ($topic === "category.{$action}") {
@@ -259,6 +271,7 @@ class Category extends Order {
 	}
 
 	public static function changeWebHookHeaderCategory( $http_args,$term_id , $webhook_id){
+
 		if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! self::$settings->isConnectionActive() ) {
 			return $http_args;
 		}
@@ -269,7 +282,6 @@ class Category extends Order {
 			if(!in_array($topic,['category.updated', 'category.created', 'category.deleted'])){
 				return $http_args;			}
 			$topic_status = self::$settings->getWebHookStatus();
-
 			if ( ! isset( $topic_status[ $topic ] ) || ! $topic_status[ $topic ] ) {
 				return $http_args;
 			}
