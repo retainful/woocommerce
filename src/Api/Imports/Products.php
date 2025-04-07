@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 use Rnoc\Retainful\Api\AbandonedCart\Order;
+use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 
 class Products extends Order {
 	/**
@@ -203,6 +204,7 @@ class Products extends Order {
 		if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! self::$settings->isConnectionActive() ) {
 			return $http_args;
 		}
+		$rest_api = new RestApi();
 		try {
 			$webhook      = new \WC_Webhook( $webhook_id );
 			$topic        = $webhook->get_topic();
@@ -253,7 +255,7 @@ class Products extends Order {
 					$http_args['headers'][ $key ] = $value;
 				}
 				$body              = array(
-					'data' => $product_data
+					'data' => $rest_api->encryptData($product_data)
 				);
 				$http_args['body'] = trim( wp_json_encode( $body ) );
 
@@ -331,7 +333,7 @@ class Products extends Order {
 		}, $product_tag );
 
 		return [
-			'Id'                     => $this->generateUuid(),
+			'Id'                     => function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : '',
 			'ExternalProductId'      => self::$woocommerce->getItemId( $product ),
 			'AppId'                  =>  self::$settings->getApiKey(),
 			'ShopId'                 =>  '',// need to check,
@@ -382,17 +384,6 @@ class Products extends Order {
 				'max' => (int) $product->get_price(),
 			];
 		}
-	}
-
-	public function generateUuid(){
-		return sprintf(
-			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-			mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0x0fff) | 0x4000,
-			mt_rand(0, 0x3fff) | 0x8000,
-			mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-		);
 	}
 
 }
