@@ -114,16 +114,17 @@ if ( ! function_exists( 'rnocPluginActivation' ) ) {
 	 */
 	function rnocPluginActivation() {
 		if ( ! rnocIsEnvironmentCompatible() ) {
-			wp_die( sprintf( __( 'This plugin can not be activated because it requires minimum PHP version of %1$s.', RNOC_TEXT_DOMAIN ), RNOC_MINIMUM_PHP_VERSION ) );
+			/* translators: 1: Require php version */
+			wp_die( sprintf( esc_html__( 'This plugin can not be activated because it requires minimum PHP version of %1$s.', 'retainful-next-order-coupon-for-woocommerce' ), esc_html(RNOC_MINIMUM_PHP_VERSION )));
 		}
 		if ( ! rnocIsWordPressCompatible() ) {
-			exit( __( 'Woocommerce Email Customizer + requires at least Wordpress', RNOC_TEXT_DOMAIN ) . ' ' . RNOC_MINIMUM_WC_VERSION );
+			exit( esc_html__( 'Woocommerce Email Customizer + requires at least Wordpress', 'retainful-next-order-coupon-for-woocommerce' ) . ' ' . esc_html(RNOC_MINIMUM_WC_VERSION ));
 		}
 		if ( ! rnocIsWoocommerceActive() ) {
-			exit( __( 'Woocommerce must be installed and activated in-order to use Retainful!', RNOC_TEXT_DOMAIN ) );
+			exit( esc_html__( 'Woocommerce must be installed and activated in-order to use Retainful!', 'retainful-next-order-coupon-for-woocommerce' ) );
 		}
 		if ( ! rnocIsWooCompatible() ) {
-			exit( __( 'Woocommerce Email Customizer + requires at least Woocommerce', RNOC_TEXT_DOMAIN ) . ' ' . RNOC_MINIMUM_WC_VERSION );
+			exit( esc_html__( 'Woocommerce Email Customizer + requires at least Woocommerce', 'retainful-next-order-coupon-for-woocommerce' ) . ' ' . esc_html(RNOC_MINIMUM_WC_VERSION ));
 		}
 		do_action( 'retainful_plugin_activated' );
 
@@ -207,7 +208,7 @@ if ( ! function_exists( 'rnocGetInstalledWoocommerceVersion' ) ) {
 }
 if ( ! function_exists( 'rnocEscAttr' ) ) {
 	function rnocEscAttr( $txt ) {
-		return stripslashes( esc_attr__( $txt ) );
+		return stripslashes( esc_attr__( $txt,'retainful-next-order-coupon-for-woocommerce' ) ); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
 	}
 }
 /**
