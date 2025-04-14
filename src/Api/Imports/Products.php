@@ -18,8 +18,8 @@ class Products extends Order {
 	 *
 	 * @return bool
 	 */
-	protected function hashVerification( $data, $hash_value ) {
-		$reverse_hmac = $this->hashToken( $data );
+	public static function hashVerification( $data, $hash_value ) {
+		$reverse_hmac = self::hashToken( $data );
 		return hash_equals( $reverse_hmac, $hash_value );
 	}
 
@@ -30,7 +30,7 @@ class Products extends Order {
 	 *
 	 * @return string
 	 */
-	protected function hashToken( $data ) {
+	public static function hashToken( $data ) {
 		if ( ! is_array( $data ) ) {
 			return false;
 		}
@@ -111,7 +111,7 @@ class Products extends Order {
 		}
 		self::$settings->logMessage( $params, 'API Product data matched' );
 
-		if ( ! $this->hashVerification( array(
+		if ( ! self::hashVerification( array(
 			'limit'    => (int) $params['limit'],
 			'since_id' => (int) $params['since_id'],
 			'status'   => (string) $params['status']
@@ -129,6 +129,7 @@ class Products extends Order {
 
 
 		$products = $this->getProducts( $params );
+
 		//Do like his response
 		$response = array(
 			'success'       => true,
@@ -169,7 +170,7 @@ class Products extends Order {
 			return new \WP_REST_Response( $response, $status );
 		}
 		self::$settings->logMessage( $params, 'API Product Count data matched' );
-		if ( ! $this->hashVerification( array( 'status' => $params['status'] ), $params['digest'] ) ) {
+		if ( ! self::hashVerification( array( 'status' => $params['status'] ), $params['digest'] ) ) {
 			self::$settings->logMessage( $params, 'API Product Count request digest not matched' );
 			$status   = 400;
 			$response = array(

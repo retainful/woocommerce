@@ -352,8 +352,8 @@ class Category extends Order {
 						'CategoryUpdatedAt'  => current_time('Y-m-d H:i:s'),
 						'DeletedAt'          => $topic== 'category.deleted' ? current_time('Y-m-d H:i:s'): '' ,
 						'EventType'          => $topic,
+						'digest'             =>  Products::hashToken( [ $term_id, $category->name]),
 		];
-
 		return $payload;
 	}
 }
