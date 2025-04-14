@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) exit;
 class RetainfulApi
 {
     public $app_url = "https://app.retainful.com/";
-    public $domain = "https://api.retainful.com/v1/";
+    public $domain = "https://api.retainful.com/v2/";
     public $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
 
     /**
@@ -31,32 +31,46 @@ class RetainfulApi
         return apply_filters('retainful_abandoned_cart_api_url', $this->abandoned_cart_api_url);
     }
 
-    /**
-     * Validate API Key
-     * @param $api_key
-     * @param $body
-     * @return bool|array
-     */
-    function validateApi($api_key, $body)
+    function validateApi($api_key, $params, $connection_type = 'enable')
     {
-        $url = $this->getDomain() . 'app/' . $api_key;
-        $body = array(
-            'shop' => $body
-        );
-        if (is_array($body) || is_object($body)) {
-            $body = json_encode($body);
+        if(!is_string($api_key) || empty($api_key) || !is_array($params) || !is_string($connection_type) || !in_array($connection_type,array('enable','disable'))){
+            return null;
+        }
+        $url = trim($this->getDomain(),'/').'/app/'.$api_key.'/'.$connection_type;
+        if(!empty($params)){
+            $scheme = wc_site_is_https() ? 'https' : 'http';
+            $default_params = array(
+                'id' => null,
+                'secret_key' => '',
+                'zip' => get_option('woocommerce_store_postcode', NULL),
+                'city' => get_option('woocommerce_store_city', NULL),
+                'name' => get_option('blogname'),
+                'email' => get_option('admin_email'),
+                'domain' => get_home_url(null, null, $scheme),
+                'country' => null,
+                'address1' => get_option('woocommerce_store_address', NULL),
+                'address2' => get_option('woocommerce_store_address_2', NULL),
+                'currency' => '',
+                'timezone' => !empty(get_option('timezone_string')) ? get_option('timezone_string') : get_option('gmt_offset'),
+                'force_ssl' => (get_option('woocommerce_force_ssl_checkout', 'no') == 'yes'),
+                'weight_unit' => get_option('woocommerce_weight_unit'),
+                'country_code' => '',
+                'province_code' => '',
+                'primary_locale' => '',
+                'woocommerce_app_id' => '',
+                'enabled_presentment_currencies' => ''
+            );
+            $params = array_merge($default_params, $params);
         }
         $headers = array(
             'app_id' => $api_key,
             'Content-Type' => 'application/json'
         );
-        $response = $this->request($url, array(), 'post', $body, $headers);
-        //$response = $this->request($this->domain . 'app/' . $api_key);
+        $response = $this->request($url, array(), 'post', json_encode($params), $headers);
         if (isset($response->success) && $response->success) {
             return $this->getPlanDetails($response);
-        } else {
-            return isset($response->message) ? $response->message : NULL;
         }
+        return isset($response->message) ? $response->message : NULL;
     }
 
     /**
@@ -114,6 +128,7 @@ class RetainfulApi
                             'headers' => $headers
                         );
                         $result = wp_remote_post($url, $args);
+
                     } else {
                         $result = \Requests::post($url, $headers, $body);
                     }
