@@ -852,15 +852,15 @@ class Settings
                 if (isset($hook_status['product.deleted']) && !$hook_status['product.deleted']) {
                     $this->addNewWebHook('product.deleted');
                 }
-	            if (isset($hook_status['category.updated']) && !$hook_status['category.updated']) {
-		            $this->addNewWebHook('category.updated');
-	            }
-	            if (isset($hook_status['category.created']) && !$hook_status['category.created']) {
-		            $this->addNewWebHook('category.created');
-	            }
-	            if (isset($hook_status['category.deleted']) && !$hook_status['category.deleted']) {
-		            $this->addNewWebHook('category.deleted');
-	            }
+//	            if (isset($hook_status['category.updated']) && !$hook_status['category.updated']) {
+//		            $this->addNewWebHook('category.updated');
+//	            }
+//	            if (isset($hook_status['category.created']) && !$hook_status['category.created']) {
+//		            $this->addNewWebHook('category.created');
+//	            }
+//	            if (isset($hook_status['category.deleted']) && !$hook_status['category.deleted']) {
+//		            $this->addNewWebHook('category.deleted');
+//	            }
             } else {
                 $this->removeWebhook();
             }
