@@ -287,7 +287,7 @@ class Products extends Order {
 				$variation_obj       = self::$woocommerce->getProduct( $variation_id );
 				$image_id  = $variation_obj->get_image_id();
 				$product_variation[] = [
-					'Id'                     => $this->generateUuid(),
+					'Id'                     => function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : '',
 					'ExternalVariantId'      => $variation_id,
 					'AppId'                  =>  self::$settings->getApiKey(),
 					'ExternalProductId'      =>  $variation_obj->get_parent_id(),
@@ -308,7 +308,7 @@ class Products extends Order {
 			}
 		}else{
 			$product_variation[] = [
-				'Id'                     => $this->generateUuid(),
+				'Id'                     => function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : '',
 				'ExternalVariantId'      => (int)$product_id,
 				'AppId'                  =>  self::$settings->getApiKey(),
 				'ExternalProductId'      => (int)$product_id,
