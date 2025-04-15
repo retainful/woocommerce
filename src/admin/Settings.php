@@ -36,7 +36,7 @@ class Settings
     {
         if (!$this->isNewInstallation()) {
             $move_to_cloud_url = admin_url('admin.php?page=' . $this->slug . '_license&move_to_cloud=yes');
-            return '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("Manage your abandoned carts effectively in Retainful Dashboard & get more features ", RNOC_TEXT_DOMAIN) . '&nbsp; <a class="button-primary align-right" href="' . $move_to_cloud_url . '">' . esc_html("Switch to cloud!") . '</a>&nbsp;<a href="https://www.retainful.com/blog/abandoned-cart-solutions-cloud-based-solutions-vs-self-hosted-plugin-based-solutions" target="_blank">' . __("Learn more", RNOC_TEXT_DOMAIN) . '</a></p>';
+            return '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("Manage your abandoned carts effectively in Retainful Dashboard & get more features ", 'retainful-next-order-coupon-for-woocommerce') . '&nbsp; <a class="button-primary align-right" href="' . $move_to_cloud_url . '">' . esc_html("Switch to cloud!") . '</a>&nbsp;<a href="https://www.retainful.com/blog/abandoned-cart-solutions-cloud-based-solutions-vs-self-hosted-plugin-based-solutions" target="_blank">' . __("Learn more", 'retainful-next-order-coupon-for-woocommerce') . '</a></p>';
         }
         return NULL;
     }
@@ -103,8 +103,8 @@ class Settings
         if (!$is_production) {
             wp_send_json_error('You can only change you App-Id and Secret key in production store!', 500);
         }
-        $app_id = isset($_REQUEST['app_id']) ? sanitize_text_field($_REQUEST['app_id']) : '';
-        $secret_key = isset($_REQUEST['secret_key']) ? sanitize_text_field($_REQUEST['secret_key']) : '';
+        $app_id = isset($_REQUEST['app_id']) ? sanitize_text_field(wp_unslash($_REQUEST['app_id'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $secret_key = isset($_REQUEST['secret_key']) ? sanitize_text_field(wp_unslash($_REQUEST['secret_key'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $options_data = array(
             RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => '0',
             RNOC_PLUGIN_PREFIX . 'retainful_app_id' => $app_id,
@@ -125,7 +125,7 @@ class Settings
             } elseif (isset($api_response['error'])) {
                 $response['error'] = $api_response['error'];
             } else {
-                $response['error'] = __('Please check the entered details', RNOC_TEXT_DOMAIN);
+                $response['error'] = __('Please check the entered details', 'retainful-next-order-coupon-for-woocommerce');
             }
         }
         wp_send_json($response);
@@ -140,7 +140,7 @@ class Settings
         $license_details = get_option($this->slug . '_license', array());
         $license_details[RNOC_PLUGIN_PREFIX . 'is_retainful_connected'] = 0;
         update_option($this->slug . '_license', $license_details);
-        wp_send_json_success(__('App disconnected successfully!', RNOC_TEXT_DOMAIN));
+        wp_send_json_success(__('App disconnected successfully!', 'retainful-next-order-coupon-for-woocommerce'));
     }
 
     /**
@@ -369,7 +369,7 @@ class Settings
     function addOrderDetailMetaBoxes($post_type)
     {
         if ('shop_order' === $post_type) {
-            add_meta_box('retainful_order_meta', __('Retainful token', RNOC_TEXT_DOMAIN), array($this, 'orderMetaDetails'), $post_type, 'side', 'default');
+            add_meta_box('retainful_order_meta', __('Retainful token', 'retainful-next-order-coupon-for-woocommerce'), array($this, 'orderMetaDetails'), $post_type, 'side', 'default');
         }
     }
 
@@ -378,7 +378,7 @@ class Settings
         global $post_ID;
         $order = wc_get_order($post_ID);
         $order_id = $this->wc_functions->getOrderId($order);
-        echo '<p>' . $this->wc_functions->getOrderMeta($order, "_rnoc_user_cart_token") . '</p>';
+        echo '<p>' . esc_html($this->wc_functions->getOrderMeta($order, "_rnoc_user_cart_token")). '</p>';
     }
 
     /**
@@ -445,7 +445,7 @@ class Settings
         }
         $data_to_save = wp_parse_args($data, $settings);
         update_option($page_slug, $data_to_save);
-        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+        wp_send_json_success(__('Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce'));
     }
 
     /**
@@ -499,39 +499,39 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon' => 'automatically',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time' => '15',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text' => 'EXPIRED',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message' => __('Sorry! Instant Offer has expired.', RNOC_TEXT_DOMAIN),
+            RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message' => __('Sorry! Instant Offer has expired.', 'retainful-next-order-coupon-for-woocommerce'),
             RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload' => '0',
             RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
                 RNOC_PLUGIN_PREFIX . 'top_bottom_position' => 'top',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", 'retainful-next-order-coupon-for-woocommerce'),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
-                RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
             )),
             RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", 'retainful-next-order-coupon-for-woocommerce'),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'checkout_button_color' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color' => '#f27052',
-                RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'checkout_button_text' => __('Checkout Now', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'enable_checkout_button' => 1,
             )),
             RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'enable_position' => '1',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", RNOC_TEXT_DOMAIN),
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_message' => __("Make purchase quickly, your {{coupon_code}} will expire within {{coupon_timer}}", 'retainful-next-order-coupon-for-woocommerce'),
+                RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format' => __(" {{minutes}}M {{seconds}}S", 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_background' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_color' => '#000000',
                 RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color' => '#000000',
@@ -547,32 +547,32 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'modal_hide_pages' => array(),
             RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class' => '',
             RNOC_PLUGIN_PREFIX . 'modal_design_settings' => array(0 => array(
-                RNOC_PLUGIN_PREFIX . 'modal_heading' => __('Enter your email to add this item to cart', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_heading' => __('Enter your email to add this item to cart', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'modal_heading_color' => '#000000',
-                RNOC_PLUGIN_PREFIX . 'modal_email_placeholder' => __('Email address', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_email_placeholder' => __('Email address', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'modal_email_field_width' => 70,
-                RNOC_PLUGIN_PREFIX . 'modal_add_cart_text' => __('Add to Cart', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_add_cart_text' => __('Add to Cart', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'modal_button_field_width' => 70,
                 RNOC_PLUGIN_PREFIX . 'modal_add_cart_color' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color' => '#f27052',
                 RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color' => '#f27052',
                 RNOC_PLUGIN_PREFIX . 'modal_bg_color' => '#F8F0F0',
-                RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text' => __('No thanks! Add item to cart', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text' => __('No thanks! Add item to cart', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color' => '#f27052',
-                RNOC_PLUGIN_PREFIX . 'modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_terms_text' => __('*By completing this, you are signing up to receive our emails. You can unsubscribe at any time.', 'retainful-next-order-coupon-for-woocommerce'),
             )),
             RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
-                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', 'retainful-next-order-coupon-for-woocommerce'),
             )),
             RNOC_PLUGIN_PREFIX . 'modal_coupon_settings' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'need_coupon' => '0',
                 RNOC_PLUGIN_PREFIX . 'woo_coupon' => '',
-                RNOC_PLUGIN_PREFIX . 'modal_sub_heading' => __('Get a discount in your email!', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'modal_sub_heading' => __('Get a discount in your email!', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color' => '#333333',
                 RNOC_PLUGIN_PREFIX . 'show_woo_coupon' => 'send_via_email',
                 RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template' => '',
-                RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject' => __('Your coupon code', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject' => __('Your coupon code', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'coupon_mail_template' => '',
             )),
             RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal' => 0,
@@ -587,13 +587,13 @@ class Settings
             RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success' => 'checkout',
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance' => array(0 => array(
                 RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings' => 'no_need_gdpr',
-                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message' => __('I accept the <a href="#">Terms and conditions</a>', 'retainful-next-order-coupon-for-woocommerce'),
             )),
             RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design' => array(0 => array(
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder' => __('Enter E-mail address', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder' => __('Enter E-mail address', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height' => '46px',
                 RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width' => '100%',
-                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text' => __('Complete checkout', RNOC_TEXT_DOMAIN),
+                RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text' => __('Complete checkout', 'retainful-next-order-coupon-for-woocommerce'),
                 RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color' => '#ffffff',
                 RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color' => '#f20561',
                 RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height' => '100%',
@@ -686,7 +686,7 @@ class Settings
         $data[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] = $this->sanitizeBasicHtml($coupon_msg);
         $data[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] = $this->sanitizeBasicHtml($applied_coupon_msg);
         update_option($this->slug, $data);
-        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+        wp_send_json_success(__('Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce'));
     }
 
     /**
@@ -735,15 +735,15 @@ class Settings
         $is_app_connected = $this->isAppConnected();
         $expiry_date_format = $this->getDateFormatOptions();
         $apply_coupon_for = array(
-            'all' => __('Allow any one to apply coupon', RNOC_TEXT_DOMAIN),
-            'validate_on_checkout' => __('Allow the customer to apply coupon, but validate at checkout', RNOC_TEXT_DOMAIN),
-            'login_users' => __('Allow customer to apply coupon only after login (Not Recommended)', RNOC_TEXT_DOMAIN)
+            'all' => __('Allow any one to apply coupon', 'retainful-next-order-coupon-for-woocommerce'),
+            'validate_on_checkout' => __('Allow the customer to apply coupon, but validate at checkout', 'retainful-next-order-coupon-for-woocommerce'),
+            'login_users' => __('Allow customer to apply coupon only after login (Not Recommended)', 'retainful-next-order-coupon-for-woocommerce')
         );
         $display_coupon_after = array(
-            'woocommerce_email_order_details' => __('Order details', RNOC_TEXT_DOMAIN),
-            'woocommerce_email_order_meta' => __('Order meta', RNOC_TEXT_DOMAIN),
-            'woocommerce_email_customer_details' => __('Customer details', RNOC_TEXT_DOMAIN),
-            'none' => __('Do Not Show - Customers will not get next order coupon in the order confirmation email of WooCommerce', RNOC_TEXT_DOMAIN),
+            'woocommerce_email_order_details' => __('Order details', 'retainful-next-order-coupon-for-woocommerce'),
+            'woocommerce_email_order_meta' => __('Order meta', 'retainful-next-order-coupon-for-woocommerce'),
+            'woocommerce_email_customer_details' => __('Customer details', 'retainful-next-order-coupon-for-woocommerce'),
+            'none' => __('Do Not Show - Customers will not get next order coupon in the order confirmation email of WooCommerce', 'retainful-next-order-coupon-for-woocommerce'),
         );
         $order_status = $this->availableOrderStatuses();
         $user_roles = $this->getUserRoles();
@@ -822,7 +822,7 @@ class Settings
         $data = $this->clean($post);
         $data[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] = trim($this->sanitizeBasicHtml($cart_capture_msg));
         update_option($this->slug . '_settings', $data);
-        wp_send_json_success(__('Settings successfully saved!', RNOC_TEXT_DOMAIN));
+        wp_send_json_success(__('Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce'));
     }
 
 
@@ -907,8 +907,7 @@ class Settings
 	public static function getWebhookDetails($webhook_id){
 		global $wpdb;
 		$webhook_id = intval($webhook_id); // Ensure it's an integer
-		$query = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}wc_webhooks WHERE webhook_id = %d", $webhook_id);
-		 return $wpdb->get_row($query);
+		 return $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}wc_webhooks WHERE webhook_id = %d", $webhook_id)); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
     /**
      * Get Webhooks status.
@@ -1128,17 +1127,19 @@ class Settings
             add_submenu_page('retainful_license', 'Settings', 'Premium features', 'manage_woocommerce', 'retainful_premium', array($this, 'retainfulPremiumAddOnsPage'));
         }
 
-        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium'))) {
+		$page = isset($_REQUEST['page']) ? sanitize_text_field(wp_unslash($_REQUEST['page'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ($page && in_array($page, array('retainful_license', 'retainful_settings', 'retainful_premium'))) {
             $legacy_notice = '<div style="padding: 10px 46px 10px 22px;font-size: 15px;line-height: 1.4;margin-left: -20px;">Unlock the power of fully customizable email capture forms, including Add to Cart and Exit Intent popups, right from your Retainful dashboard. Head over to the Signup Forms section to configure and activate them. Tailor each popup to your brand, track sign-ups efficiently, and entice subscribers with unique coupons. <br/><b style="font-size: 15px;">Please note: Legacy popups will be phased out by April 15. Need help transitioning to the new Sign Up forms? Reach out to us at <a href="mailto:support@retainful.com">support@retainful.com</a> for assistance.</b></div>';
             add_action('admin_notices', function () use ($legacy_notice) {
-                echo '<div class="error notice"><p>' . $legacy_notice . '</p></div>';
+                echo '<div class="error notice"><p>' . wp_kses_post($legacy_notice) . '</p></div>';
             });
         }
         //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
-        if (isset($_REQUEST['page']) && in_array($_REQUEST['page'], array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()) {
-            $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', RNOC_TEXT_DOMAIN), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
+        if ($page && in_array($page, array('retainful_license', 'retainful_settings', 'retainful_premium')) && $this->isWebhookNoticeShow()) {
+	        /* translators: %s: Webhook redirect url */
+	        $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', 'retainful-next-order-coupon-for-woocommerce'), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
             add_action('admin_notices', function () use ($message) {
-                echo '<div class="error notice"><p>' . $message . '</p></div>';
+                echo '<div class="error notice"><p>' . wp_kses_post($message) . '</p></div>';
             });
         }
     }
@@ -1230,7 +1231,7 @@ class Settings
             'post_title' => $hook,
             'post_status' => 'pending',
             'post_type' => 'scheduled-action',
-            'meta_query' => array(
+            'meta_query' => array( //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
                 array(
                     'key' => $meta_key,
                     'value' => $meta_value,
@@ -1394,7 +1395,7 @@ class Settings
             global $wpdb;
             //when post table is using by scheduler
             $post_where = (!empty($status)) ? "AND post_status = '{$status}'" : "";
-            $scheduled_actions = $wpdb->get_results("SELECT ID from `{$wpdb->prefix}posts` where post_title ='{$post_title}' {$post_where} AND  post_type='scheduled-action' LIMIT 500");
+            $scheduled_actions = $wpdb->get_results($wpdb->prepare("SELECT ID from `{$wpdb->prefix}posts` where post_title =%s {$post_where} AND  post_type=%s LIMIT %d",$post_title,'scheduled-action',500)); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
             if (!empty($scheduled_actions)) {
                 foreach ($scheduled_actions as $action) {
                     if (wp_delete_post($action->ID, true)) {
@@ -1404,14 +1405,14 @@ class Settings
             }
             //When custom table is being used by scheduler
             $custom_table_name = $wpdb->base_prefix . 'actionscheduler_actions';
-            $query = $wpdb->prepare('SHOW TABLES LIKE %s', $custom_table_name);
-            $found_table = $wpdb->get_var($query);
-            if ($wpdb->get_var($query) == $custom_table_name) {
+            //$query = $wpdb->prepare('SHOW TABLES LIKE %s', $custom_table_name);
+            //$found_table = $wpdb->get_var($query);
+            if ($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $custom_table_name)) == $custom_table_name) { //phpcs:ignore  WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
                 $custom_table_where = (!empty($status)) ? "AND status = '{$status}'" : "";
-                $scheduled_actions = $wpdb->get_results("SELECT action_id from `{$custom_table_name}` where hook ='{$post_title}' {$custom_table_where} LIMIT 500");
+                $scheduled_actions = $wpdb->get_results("SELECT action_id from `{$custom_table_name}` where hook ='{$post_title}' {$custom_table_where} LIMIT 500"); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
                 if (!empty($scheduled_actions)) {
                     foreach ($scheduled_actions as $action) {
-                        $deleted = $wpdb->delete($custom_table_name, array('action_id' => $action->action_id), array('%d'));
+                        $deleted = $wpdb->delete($custom_table_name, array('action_id' => $action->action_id), array('%d')); //phpcs:ignore  WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
                         if (!empty($deleted)) {
                             do_action('action_scheduler_deleted_action', $action->action_id);
                         }
@@ -1456,22 +1457,40 @@ class Settings
      */
     function logMessage($message, $log_in_as = "checkout")
     {
-        $admin_settings = $this->getAdminSettings();
-        if (isset($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($message)) {
-            try {
-                if (is_array($message) || is_object($message)) {
-                    $message = json_encode($message);
-                }
-                $to_print = $log_in_as . ":\n";
-                $to_print .= $message;
-                $file = fopen(RNOC_LOG_FILE_PATH, 'a');
-                $content = "\n\n Time :" . current_time('mysql', true) . ' | ' . $to_print;
-                fwrite($file, $content);
-                fclose($file);
-            } catch (\Exception $e) {
-                $e->getMessage();
-            }
-        }
+	    $admin_settings = $this->getAdminSettings();
+
+	    if ( isset($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($message) ) {
+		    try {
+			    if (is_array($message) || is_object($message)) {
+				    $message = json_encode($message);
+			    }
+
+			    $to_print = $log_in_as . ":\n" . $message;
+			    $content = "\n\n Time :" . current_time('mysql', true) . ' | ' . $to_print;
+
+			    if ( ! function_exists( 'request_filesystem_credentials' ) ) {
+				    require_once ABSPATH . 'wp-admin/includes/file.php';
+			    }
+
+			    global $wp_filesystem;
+			    WP_Filesystem();
+
+			    $existing_content = '';
+			    if ( $wp_filesystem->exists(RNOC_LOG_FILE_PATH) ) {
+				    $existing_content = $wp_filesystem->get_contents(RNOC_LOG_FILE_PATH);
+			    }
+
+			    $wp_filesystem->put_contents(
+				    RNOC_LOG_FILE_PATH,
+				    $existing_content . $content,
+				    FS_CHMOD_FILE
+			    );
+
+		    } catch (\Exception $e) {
+			    // Optional: log this error somewhere else or trigger a notice
+			    error_log('Log write failed: ' . $e->getMessage()); //phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		    }
+	    }
     }
 
     /**
@@ -1495,7 +1514,7 @@ class Settings
     function isInstalledFresh()
     {
         global $wpdb;
-        $tables_list = $wpdb->get_results('SHOW TABLES', ARRAY_N);
+        $tables_list = $wpdb->get_results('SHOW TABLES', ARRAY_N); //phpcs:ignore  WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
         $required_tables = array($wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history', $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates');
         if (!empty($tables_list)) {
             foreach ($tables_list as $table_name) {
@@ -1632,11 +1651,11 @@ class Settings
     function getDateFormatOptions()
     {
         $date_formats = array(
-            'F j, Y' => get_date_from_gmt(date('Y-m-d h:i:s'), 'F j, Y'),
-            'Y-m-d' => get_date_from_gmt(date('Y-m-d h:i:s'), 'Y-m-d'),
-            'Y/m/d' => get_date_from_gmt(date('Y-m-d h:i:s'), 'Y/m/d'),
-            'd-m-Y' => get_date_from_gmt(date('Y-m-d h:i:s'), 'd-m-Y'),
-            'd/m/Y' => get_date_from_gmt(date('Y-m-d h:i:s'), 'd/m/Y'),
+            'F j, Y' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'F j, Y'),
+            'Y-m-d' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'Y-m-d'),
+            'Y/m/d' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'Y/m/d'),
+            'd-m-Y' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'd-m-Y'),
+            'd/m/Y' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'd/m/Y'),
         );
         return apply_filters('rnoc_dateformat_options', $date_formats);
     }
@@ -1692,14 +1711,14 @@ class Settings
         $args = array(
             'post_type' => 'shop_coupon',
             'posts_per_page' => 100,
-            'meta_query' => array(
+            'meta_query' => array(  //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
                 array(
                     'key' => '_rnoc_shop_coupon_type',
                     'value' => array('retainful', 'retainful-referral'),
                     'compare' => 'IN'
                 ), array(
                     'key' => 'date_expires',
-                    'value' => strtotime(date('Y-m-d h:i:s')),
+                    'value' => strtotime(gmdate('Y-m-d h:i:s')),
                     'compare' => '<'
                 ), array(
                     'key' => 'usage_count',
@@ -1740,7 +1759,7 @@ class Settings
                 $timestamp = strtotime($date);
                 $days_in_seconds = intval($days) * 86400;
                 $last_date_timestamp = $timestamp + $days_in_seconds;
-                $last_date = date('Y-m-d H:i:s', $last_date_timestamp);
+                $last_date = gmdate('Y-m-d H:i:s', $last_date_timestamp);
                 return $this->formatDate($last_date, \DateTime::ATOM);
             }
         }
@@ -1767,20 +1786,20 @@ class Settings
      */
     function addScript()
     {
-        $page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : "";
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : "";  //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $prefix = substr($page, 0, 9);
         if ($prefix != "retainful") {
             return;
         }
         $asset_path = plugins_url('', __FILE__);
         //product search select
-        wp_enqueue_script('rnoc-select2-js', $this->getWooPluginUrl() . '/assets/js/select2/select2.full.min.js', array('jquery'));
-        wp_enqueue_style('rnoc-select2-css', $this->getWooPluginUrl() . '/assets/css/select2.css');
+        wp_enqueue_script('rnoc-select2-js', $this->getWooPluginUrl() . '/assets/js/select2/select2.full.min.js', array('jquery'), RNOC_VERSION,['in_footer' => true]);
+        wp_enqueue_style('rnoc-select2-css', $this->getWooPluginUrl() . '/assets/css/select2.css',[],RNOC_VERSION);
         wp_enqueue_script('woocommerce_admin');
-        wp_enqueue_script('retainful-app-main', $asset_path . '/js/app.js', array(), RNOC_VERSION);
+        wp_enqueue_script('retainful-app-main', $asset_path . '/js/app.js', array(), RNOC_VERSION,['in_footer' => true]);
         wp_localize_script('retainful-app-main', 'retainful_admin', array(
             'i10n' => array(
-                'please_wait' => __('Please wait...', RNOC_TEXT_DOMAIN)
+                'please_wait' => __('Please wait...', 'retainful-next-order-coupon-for-woocommerce')
             ),
             'security' => array(
                 'get_search_coupon' => wp_create_nonce('rnoc_get_search_coupon'),
@@ -1844,10 +1863,11 @@ class Settings
     function getCategories()
     {
         $categories = array();
-        $category_list = get_terms('product_cat', array(
-            'orderby' => 'name',
-            'order' => 'asc',
-            'hide_empty' => false
+        $category_list = get_terms(array(
+	        'taxonomy'   => 'product_cat',
+	        'orderby'    => 'name',
+	        'order'      => 'asc',
+	        'hide_empty' => false,
         ));
         if (!empty($category_list)) {
             foreach ($category_list as $category) {
@@ -1868,7 +1888,7 @@ class Settings
     {
         global $wp_roles;
         $all_roles = $wp_roles->roles;
-        $user_roles = array('all' => __('All', RNOC_TEXT_DOMAIN));
+        $user_roles = array('all' => __('All', 'retainful-next-order-coupon-for-woocommerce'));
         if (!empty($all_roles)) {
             foreach ($all_roles as $role_name => $role) {
                 $user_roles[$role_name] = isset($role['name']) ? $role['name'] : '';
@@ -1925,7 +1945,7 @@ class Settings
      */
     function unlockPremiumLink()
     {
-        return '<a href="' . $this->api->upgradePremiumUrl() . '">' . __("Unlock this feature by upgrading to Premium", RNOC_TEXT_DOMAIN) . '</a>';
+        return '<a href="' . $this->api->upgradePremiumUrl() . '">' . __("Unlock this feature by upgrading to Premium", 'retainful-next-order-coupon-for-woocommerce') . '</a>';
     }
 
     /**
@@ -2127,9 +2147,9 @@ class Settings
     {
         $settings = get_option($this->slug, array());
         if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']) && !empty(isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']))) {
-            return __($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'], RNOC_TEXT_DOMAIN);
+            return __($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
         } else {
-            return __('<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>', RNOC_TEXT_DOMAIN);
+            return '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} '.__("Off On Your Next Purchase","retainful-next-order-coupon-for-woocommerce").'</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">'.__("To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!","retainful-next-order-coupon-for-woocommerce").'</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">'.__("Go!","retainful-next-order-coupon-for-woocommerce").' </a></p></div></div>';
         }
     }
 
@@ -2361,7 +2381,7 @@ class Settings
     {
         if (!apply_filters('rnoc_need_survey_form', true)) return false;
         $survey = new Survey();
-        $survey->init(RNOC_PLUGIN_SLUG, 'Retainful - next order coupon for woocommerce', RNOC_TEXT_DOMAIN);
+        $survey->init(RNOC_PLUGIN_SLUG, 'Retainful - next order coupon for woocommerce', 'retainful-next-order-coupon-for-woocommerce');
     }
 
     /**
