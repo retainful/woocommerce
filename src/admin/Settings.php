@@ -967,9 +967,9 @@ class Settings
         if (in_array($topic, array('order.created', 'order.updated'))) {
             $url = $this->api->getDomain() . 'woocommerce/webhooks/checkout';
         } elseif (in_array($topic, array('product.created', 'product.updated', 'product.deleted'))) {
-            $url = apply_filters('change_product_webhook_delivery_url','https://5tzcs7zuy3.execute-api.us-east-2.amazonaws.com/development/v3/event/woocommerce/products');
+            $url = apply_filters('change_product_webhook_delivery_url', $this->api->getProductDomain().'/event/woocommerce/products');
         } elseif (in_array($topic, array('category.created', 'category.updated', 'category.deleted'))) {
-	        $url = apply_filters('change_category_webhook_delivery_url','https://5tzcs7zuy3.execute-api.us-east-2.amazonaws.com/development/v3/event/woocommerce/category');
+	        $url = apply_filters('change_category_webhook_delivery_url',$this->api->getProductDomain().'/event/woocommerce/category');
         }
         return $url;
     }

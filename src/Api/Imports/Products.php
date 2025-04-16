@@ -222,6 +222,11 @@ class Products extends Order {
 			if ( $delivery_url != $site_delivery_url || $product_id <= 0 ) {
 				return $http_args;
 			}
+			$product           = self::$woocommerce->getProduct( $product_id );
+			$product_type = self::$woocommerce->isMethodExists( $product, 'get_type' ) ? $product->get_type() : '';
+			if(in_array($topic,['product.deleted','product.updated']) && $product_type == 'variation') {
+				return $http_args;
+			}
 			$product_data = $this->setProductData( $product_id );
 			if ( is_array( $product_data['Id'] ) || empty( $product_data['CreatedAt'] ) ) {
 				self::$settings->logMessage( $product_data, 'API Product data missing' );
