@@ -13,8 +13,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         function __construct()
         {
             parent::__construct();
-            $this->title = __('Exit Intent Popup', RNOC_TEXT_DOMAIN);
-            $this->description = __('When customers try to leave your store, stop them by showing a coupon code or just collect their email and catch them later.', RNOC_TEXT_DOMAIN);
+            $this->title = __('Exit Intent Popup', 'retainful-next-order-coupon-for-woocommerce');
+            $this->description = __('When customers try to leave your store, stop them by showing a coupon code or just collect their email and catch them later.', 'retainful-next-order-coupon-for-woocommerce');
             $this->version = '1.0.0';
             $this->slug = 'exit-intent-popup-editor';
             $this->icon = 'dashicons-external';
@@ -55,7 +55,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function getPopupTemplateToInsert()
         {
-            $template_id = (isset($_REQUEST['id'])) ? sanitize_key($_REQUEST['id']) : 0;
+            $template_id = (isset($_REQUEST['id'])) ? sanitize_key($_REQUEST['id']) : 0; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $content = '';
             $success = false;
             if (!empty($template_id)) {
@@ -69,7 +69,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     $content = $template;
                     $success = true;
                 } else {
-                    $content = __('Sorry, Template not found', RNOC_TEXT_DOMAIN);
+                    $content = __('Sorry, Template not found', 'retainful-next-order-coupon-for-woocommerce');
                 }
             }
             wp_send_json(array('success' => $success, 'content' => $content));
@@ -88,20 +88,20 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             <div class="rnoc-grid">
                 <div class="grid-column hover-design align-center">
                     <div class="template-preview"
-                         style='background-image: url("<?php echo $template_preview_url; ?>default.png")'>
+                         style='background-image: url("<?php echo esc_url($template_preview_url); ?>default.png")'>
                     </div>
                     <button data-template="default" type="button"
                             class="insert-exit-intent-popup-template insert-template">
-                        <?php echo __('Insert template', RNOC_TEXT_DOMAIN) ?>
+                        <?php echo esc_html__('Insert template', 'retainful-next-order-coupon-for-woocommerce') ?>
                     </button>
                 </div>
                 <div class="grid-column align-center hover-design">
                     <div class="template-preview"
-                         style='background-image: url("<?php echo $template_preview_url ?>default_email_collection.png")'>
+                         style='background-image: url("<?php echo esc_url($template_preview_url) ?>default_email_collection.png")'>
                     </div>
                     <button data-template="default_email_collection" type="button"
-                            class="insert-exit-intent-popup-template insert-template"><?php echo __('Insert template',
-                            RNOC_TEXT_DOMAIN) ?>
+                            class="insert-exit-intent-popup-template insert-template"><?php echo esc_html__('Insert template',
+                            'retainful-next-order-coupon-for-woocommerce') ?>
                     </button>
                 </div>
             </div>
@@ -183,8 +183,8 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
          */
         function applyCouponAutomatically()
         {
-            if (isset($_REQUEST['rnoc_on_exit_coupon_code']) && !is_admin()) {
-                $coupon_code = sanitize_text_field($_REQUEST['rnoc_on_exit_coupon_code']);
+	        $coupon_code = isset($_REQUEST['rnoc_on_exit_coupon_code']) ? sanitize_text_field(wp_unslash($_REQUEST['rnoc_on_exit_coupon_code'])) : '';//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	        if ($coupon_code &&  !is_admin()) {
                 $coupon_code = apply_filters("rnoc_exit_intent_before_applying_coupon_code", $coupon_code);
                 if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
                     $this->wc_functions->addDiscount($coupon_code);
@@ -201,7 +201,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $run_cart_externally = apply_filters('rnoc_need_to_run_ac_in_cloud', false);
             $message = '';
             $error = true;
-            $email = sanitize_email($_REQUEST['email']);
+            $email = !empty($_REQUEST['email']) ? sanitize_email(wp_unslash($_REQUEST['email'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $this->wc_functions->setCustomerEmail($email);
             $this->admin->setIdentity($email);
             $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
@@ -209,7 +209,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             if (in_array($need_gdpr, array("no_need_gdpr", "dont_show_checkbox"))) {
                 $is_buyer_accepting_marketing = 1;
             } else {
-                $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0;
+                $is_buyer_accepting_marketing = isset($_REQUEST['is_buyer_accepting_marketing']) ? sanitize_key($_REQUEST['is_buyer_accepting_marketing']) : 0; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             }
             $this->wc_functions->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             //Check the abandoned cart needs to run externally or not. If it need to run externally, donts process locally
@@ -247,7 +247,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         function addSiteScripts()
         {
             $load_exit_intent_popup_scripts_after = apply_filters('rnoc_load_exit_intent_popup_scripts_after', array('jquery'));
-            wp_enqueue_script('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/exit-intent-popup.js', $load_exit_intent_popup_scripts_after, RNOC_VERSION);
+            wp_enqueue_script('rnoc-exit-intent-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/js/exit-intent-popup.js', $load_exit_intent_popup_scripts_after, RNOC_VERSION,true);
             if (!wp_style_is('rnoc-popup')) {
                 wp_enqueue_style('rnoc-popup', RNOCPREMIUM_PLUGIN_URL . 'assets/css/popup.css', array(), RNOC_VERSION);
             }
@@ -329,7 +329,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     "no_thanks_action" => 1,
                     "is_email_mandatory" => 1
                 );
-                echo $this->getTemplateContent(RNOCPREMIUM_PLUGIN_PATH . 'templates/popup_display.php', $final_settings, $this->slug);
+                echo $this->getTemplateContent(RNOCPREMIUM_PLUGIN_PATH . 'templates/popup_display.php', $final_settings, $this->slug); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             }
         }
 
@@ -348,16 +348,16 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
             $form_designs = isset($form_designs[0]) ? $form_designs[0] : array();
             $gdpr_settings = (isset($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0]) && !empty($this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0])) ? $this->premium_addon_settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0] : array();
             $final_settings = array(
-                'place_holder' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder', __('Enter E-mail address', RNOC_TEXT_DOMAIN)),
+                'place_holder' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder', __('Enter E-mail address', 'retainful-next-order-coupon-for-woocommerce')),
                 'button_color' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color', '#ffffff'),
                 'button_bg_color' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color', '#f20561'),
-                'button_text' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text', __('Complete Checkout', RNOC_TEXT_DOMAIN)),
+                'button_text' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text', __('Complete Checkout', 'retainful-next-order-coupon-for-woocommerce')),
                 'button_width' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width', '100%'),
                 'button_height' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height', '100%'),
                 'input_height' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height', '46px'),
                 'input_width' => $this->getKeyFromArray($form_designs, RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width', '100%'),
                 'rnoc_gdpr_check_box_settings' => $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings', 'no_need_gdpr'),
-                'rnoc_gdpr_check_box_message' => $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message', __('I accept the <a href="#">Terms and conditions</a>', RNOC_TEXT_DOMAIN))
+                'rnoc_gdpr_check_box_message' => $this->getKeyFromArray($gdpr_settings, RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message', __('I accept the <a href="#">Terms and conditions</a>', 'retainful-next-order-coupon-for-woocommerce'))
             );
             return $this->getTemplateContent($template_path, $final_settings);
         }
@@ -401,52 +401,52 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'; ?>"><?php
-                                esc_html_e('Enable exit intent popup?', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_exit_intent_modal'; ?>"><?php
+                                esc_html_e('Enable exit intent popup?', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_exit_intent_modal'; ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'] == '1') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_exit_intent_modal'; ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal'] == '0') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <p class="description">
                                 <?php
-                                esc_html_e('Exit intent popup will show when, cart contains some items and user tries to leave the site.', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Exit intent popup will show when, cart contains some items and user tries to leave the site.', 'retainful-next-order-coupon-for-woocommerce');
                                 ?>
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'; ?>"><?php
-                                esc_html_e('Custom pages to display the pop-up modal on (Optional)', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_display_pages'; ?>"><?php
+                                esc_html_e('Custom pages to display the pop-up modal on (Optional)', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <select multiple="multiple"
-                                    name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages[]'; ?>"
+                                    name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_display_pages[]'; ?>"
                                     class="rnoc-multi-select"
-                                    id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'; ?>">
+                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_display_pages'; ?>">
                                 <?php
                                 if (!empty($pages)) {
                                     foreach ($pages as $key => $label) {
                                         ?>
-                                        <option value="<?php echo $key ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'])) {
+                                        <option value="<?php echo esc_attr($key) ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'])) {
                                             echo "selected";
-                                        } ?>><?php echo $label ?></option>
+                                        } ?>><?php echo esc_html($label) ?></option>
                                         <?php
                                     }
                                 }
@@ -454,58 +454,58 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             </select>
                             <p class="description">
                                 <?php
-                                echo __('The exit intent popup would be displayed only on the selected pages.If you wish to display the popup in all pages, leave this option empty.', RNOC_TEXT_DOMAIN);
+                                echo esc_html__('The exit intent popup would be displayed only on the selected pages.If you wish to display the popup in all pages, leave this option empty.', 'retainful-next-order-coupon-for-woocommerce');
                                 ?>
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'; ?>"><?php
-                                esc_html_e('Show exit intent popup', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_display_to'; ?>"><?php
+                                esc_html_e('Show exit intent popup', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_display_to'; ?>"
                                        type="radio"
                                        value="guest" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'] == 'guest') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Only for guest', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Only for guest', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_display_to'; ?>"
                                        type="radio"
                                        value="all" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'] == 'all') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Everyone', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Everyone', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_display_to'; ?>"
                                        type="radio"
                                        value="non_email_users" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_to'] == 'non_email_users') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('When a customer has not yet provided an email address', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('When a customer has not yet provided an email address', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"><?php
-                                esc_html_e('Choose the coupon code', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_coupon'; ?>"><?php
+                                esc_html_e('Choose the coupon code', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <input type="text"
-                                   name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
-                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'; ?>"
+                                   name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_coupon'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_coupon'; ?>"
                                    class="search-and-select-coupon"
                                    autocomplete="off"
-                                   placeholder="<?php esc_html_e('Search for a coupon code', RNOC_TEXT_DOMAIN); ?>"
-                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon']); ?>">
+                                   placeholder="<?php esc_html_e('Search for a coupon code', 'retainful-next-order-coupon-for-woocommerce'); ?>"
+                                   value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_coupon'],'retainful-next-order-coupon-for-woocommerce'); ?>"><?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons
@@ -514,33 +514,33 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'; ?>"><?php
-                                esc_html_e('Don\'t show exit intent popup once its coupon applied?', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_exit_intent_modal_after_coupon_applied'; ?>"><?php
+                                esc_html_e('Don\'t show exit intent popup once its coupon applied?', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_exit_intent_modal_after_coupon_applied'; ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'] == '1') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Yes, hide', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Yes, hide', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label><br>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_exit_intent_modal_after_coupon_applied'; ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied'] == '0') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('No, keep showing', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('No, keep showing', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
                             <label for="exit_intent_popup_show_option"><?php
-                                esc_html_e('Show exit popup', RNOC_TEXT_DOMAIN);
+                                esc_html_e('Show exit popup', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
@@ -548,30 +548,30 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                             $show_option = $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings']['show_option'];
                             $show_count = $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings']['show_count'];
                             ?>
-                            <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings[show_option]' ?>"
+                            <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_show_settings[show_option]' ?>"
                                     id="exit_intent_popup_show_option">
                                 <option <?php if ($show_option == 'once_per_page') {
                                     echo 'selected';
                                 } ?>
-                                        value="once_per_page"><?php esc_html_e('Only once per page', RNOC_TEXT_DOMAIN); ?></option>
+                                        value="once_per_page"><?php esc_html_e('Only once per page', 'retainful-next-order-coupon-for-woocommerce'); ?></option>
                                 <option <?php if ($show_option == 'every_time_on_customer_exists') {
                                     echo 'selected';
-                                } ?> value="every_time_on_customer_exists"><?php esc_html_e('Every time customer tries to exit', RNOC_TEXT_DOMAIN); ?></option>
+                                } ?> value="every_time_on_customer_exists"><?php esc_html_e('Every time customer tries to exit', 'retainful-next-order-coupon-for-woocommerce'); ?></option>
                                 <option <?php if ($show_option == 'show_x_times_per_page') {
                                     echo 'selected';
-                                } ?> value="show_x_times_per_page"><?php esc_html_e('X number of times per page on exit', RNOC_TEXT_DOMAIN); ?></option>
+                                } ?> value="show_x_times_per_page"><?php esc_html_e('X number of times per page on exit', 'retainful-next-order-coupon-for-woocommerce'); ?></option>
                                 <option <?php if ($show_option == 'once_per_session') {
                                     echo 'selected';
-                                } ?> value="once_per_session"><?php esc_html_e('Only once per session', RNOC_TEXT_DOMAIN); ?></option>
+                                } ?> value="once_per_session"><?php esc_html_e('Only once per session', 'retainful-next-order-coupon-for-woocommerce'); ?></option>
                             </select>
                             <label id="show_x_times_per_page_val">
-                                <?php echo __('Number of times', RNOC_TEXT_DOMAIN) ?>
-                                <select name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings[show_count]' ?>">
+                                <?php echo esc_html__('Number of times', 'retainful-next-order-coupon-for-woocommerce') ?>
+                                <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_show_settings[show_count]' ?>">
                                     <?php
                                     for ($i = 1; $i <= 10; $i++) {
                                         ?>
                                         <option <?php echo ($show_count == $i) ? "selected" : ""; ?>
-                                                value="<?php echo $i ?>"><?php echo $i; ?></option>
+                                                value="<?php echo esc_attr($i) ?>"><?php echo esc_html($i); ?></option>
                                         <?php
                                     }
                                     ?>
@@ -581,51 +581,51 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'; ?>"><?php
-                                esc_html_e('Cookie expiry days', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_cookie_life'; ?>"><?php
+                                esc_html_e('Cookie expiry days', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'; ?>"
-                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'; ?>"
+                            <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_cookie_life'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_cookie_life'; ?>"
                                    type="text" class="regular-text"
-                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life']); ?>">
+                                   value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life'],'retainful-next-order-coupon-for-woocommerce'); ?>"><?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'; ?>"><?php
-                                esc_html_e('Where to redirect after entering email?', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_redirect_on_success'; ?>"><?php
+                                esc_html_e('Where to redirect after entering email?', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_redirect_on_success'; ?>"
                                        type="radio"
                                        value="cart" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'] == 'cart') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Cart page', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Cart page', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_redirect_on_success'; ?>"
                                        type="radio"
                                        value="checkout" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'] == 'checkout') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Checkout page', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Checkout page', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_redirect_on_success'; ?>"
                                        type="radio"
                                        value="same" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_redirect_on_success'] == 'same') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Same page', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Same page', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <p class="description">
                                 <?php
-                                echo __('This controls whether or not the bounce dialog should be shown on every page view or only on the user\'s first.', RNOC_TEXT_DOMAIN);
+                                echo esc_html__('This controls whether or not the bounce dialog should be shown on every page view or only on the user\'s first.', 'retainful-next-order-coupon-for-woocommerce');
                                 ?>
                             </p>
                         </td>
@@ -634,7 +634,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 </table>
                 <div class="rnoc-tag">
                     <?php
-                    echo __('Mobile popup settings', RNOC_TEXT_DOMAIN)
+                    echo esc_html__('Mobile popup settings', 'retainful-next-order-coupon-for-woocommerce')
                     ?>
                 </div>
                 <table class="form-table" role="presentation">
@@ -644,26 +644,26 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_mobile_support'; ?>"><?php
-                                esc_html_e('Trigger popup when the back button is clicked in the mobile browser (default: No)', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_mobile_support'; ?>"><?php
+                                esc_html_e('Trigger popup when the back button is clicked in the mobile browser (default: No)', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_mobile_support]'; ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '1') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_mobile_support]'; ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_support'] == '0') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <p class="description">
                                 The following settings are used to trigger Exit Popup in mobile devices. Since there are
@@ -675,65 +675,65 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click'; ?>"><?php
-                                esc_html_e('Enable mobile back button trigger', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_mobile_back_click'; ?>"><?php
+                                esc_html_e('Enable mobile back button trigger', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_mobile_back_click]'; ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click'] == '1') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_mobile_back_click]'; ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click'] == '0') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'; ?>"><?php
-                                esc_html_e('Enable time delay based trigger', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_delay_trigger'; ?>"><?php
+                                esc_html_e('Enable time delay based trigger', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX). 'enable_delay_trigger]'; ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '1') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX). 'enable_delay_trigger]'; ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '0') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec'; ?>"><?php
-                                esc_html_e('Delay seconds', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_delay_sec'; ?>"><?php
+                                esc_html_e('Delay seconds', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX). 'exit_intent_popup_delay_sec]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec']); ?>">
+                                       value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec'],'retainful-next-order-coupon-for-woocommerce'); ?>"><?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>
                             </label>
                             <p class="description">
                                 Trigger the popup after these many seconds a visitor spent time
@@ -742,40 +742,40 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'; ?>"><?php
-                                esc_html_e('Enable Scroll based trigger', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_scroll_distance_trigger'; ?>"><?php
+                                esc_html_e('Enable Scroll based trigger', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX). 'enable_scroll_distance_trigger]'; ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '1') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('Yes', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX). 'enable_scroll_distance_trigger]'; ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '0') {
                                     echo "checked";
                                 } ?>>
-                                <?php esc_html_e('No', RNOC_TEXT_DOMAIN); ?>
+                                <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance'; ?>"><?php
-                                esc_html_e('Scroll distance', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_distance'; ?>"><?php
+                                esc_html_e('Scroll distance', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_distance]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance']); ?>">
+                                       value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance'],'retainful-next-order-coupon-for-woocommerce'); ?>"> <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                             </label>
                             <p class="description">
                                 Trigger the popup after a visitor scrolled the page to the set distance. Its a
@@ -787,7 +787,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 </table>
                 <div class="rnoc-tag">
                     <?php
-                    echo __('Popup design', RNOC_TEXT_DOMAIN)
+                    echo esc_html__('Popup design', 'retainful-next-order-coupon-for-woocommerce')
                     ?>
                 </div>
                 <table class="form-table" role="presentation">
@@ -795,46 +795,46 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tr>
                         <td colspan="2">
                             <?php
-                            echo $this->exitIntentPopInsertTemplate();
+                            echo wp_kses_post( $this->exitIntentPopInsertTemplate() );
                             ?>
                             <div class="rnoc-grid">
                                 <div class="grid-column">
-                                    <textarea id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'; ?>"
-                                              name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'; ?>"
+                                    <textarea id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_template'; ?>"
+                                              name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_template'; ?>"
                                               cols="50" rows="20"
                                     ><?php
                                         $template = $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'];
                                         if (empty($template)) {
                                             $template = $this->getDefaultPopupTemplate();
                                         }
-                                        echo $template;
+                                        echo wp_kses_post($template);
                                         ?>
                                     </textarea>
                                     <button type="button" class="insert-template"
-                                            id="rnoc_exit_intent_popup_template_show_preview"><?php echo __("Preview", RNOC_TEXT_DOMAIN); ?>
+                                            id="rnoc_exit_intent_popup_template_show_preview"><?php echo esc_html__("Preview", 'retainful-next-order-coupon-for-woocommerce'); ?>
                                     </button>
                                 </div>
                                 <div class="grid-column" id="exit-intent-popup-preview"></div>
                             </div>
                             <div>
                                 <?php
-                                echo __('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{cart_url}}</b> - Url to redirect to cart page<br><b>{{cart_url_without_coupon}}</b> - Url to redirect to cart page without auto applying coupon<br><b>{{checkout_url}}</b> - Url to redirect user to checkout page<br><b>{{checkout_url_without_coupon}}</b> - Url to redirect user to checkout page without auto apply coupon code<br><b>{{email_collection_form}}</b> - To display email collection form. Note: Email collection form will only show to Guest and Administrator.', RNOC_TEXT_DOMAIN)
+                                echo wp_kses_post(__('Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b> - Coupon code<br><b>{{cart_url}}</b> - Url to redirect to cart page<br><b>{{cart_url_without_coupon}}</b> - Url to redirect to cart page without auto applying coupon<br><b>{{checkout_url}}</b> - Url to redirect user to checkout page<br><b>{{checkout_url_without_coupon}}</b> - Url to redirect user to checkout page without auto apply coupon code<br><b>{{email_collection_form}}</b> - To display email collection form. Note: Email collection form will only show to Guest and Administrator.', 'retainful-next-order-coupon-for-woocommerce'))
                                 ?>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'; ?>"><?php
-                                esc_html_e('Custom CSS styles', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_custom_style'; ?>"><?php
+                                esc_html_e('Custom CSS styles', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <textarea id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'; ?>"
-                                      name="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'; ?>"
+                            <textarea id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_custom_style'; ?>"
+                                      name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_modal_custom_style'; ?>"
                                       cols="50" rows="10"
                             ><?php
-                                echo $settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'];
+                                echo esc_html($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style']);
                                 ?>
                             </textarea>
                         </td>
@@ -843,7 +843,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 </table>
                 <div class="rnoc-tag">
                     <?php
-                    echo __('Email collection form design', RNOC_TEXT_DOMAIN)
+                    echo esc_html__('Email collection form design', 'retainful-next-order-coupon-for-woocommerce')
                     ?>
                 </div>
                 <table class="form-table" role="presentation">
@@ -853,111 +853,111 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder'; ?>"><?php
-                                esc_html_e('Email input placeholder', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_email_placeholder'; ?>"><?php
+                                esc_html_e('Email input placeholder', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder]'; ?>"
+                            <input name="<?php echo esc_attr($email_Collection_form_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_email_placeholder]'; ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder'; ?>"
-                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder']); ?>">
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_email_placeholder'; ?>"
+                                   value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder'],'retainful-next-order-coupon-for-woocommerce'); ?>">  <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height'; ?>"><?php
-                                esc_html_e('Email input height', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_email_height'; ?>"><?php
+                                esc_html_e('Email input height', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height]'; ?>"
+                                <input name="<?php echo esc_attr($email_Collection_form_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_email_height]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height']); ?>">
+                                       value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height'],'retainful-next-order-coupon-for-woocommerce'); ?>">  <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width'; ?>"><?php
-                                esc_html_e('Email input width', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_email_width'; ?>"><?php
+                                esc_html_e('Email input width', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width]'; ?>"
+                                <input name="<?php echo esc_attr($email_Collection_form_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_email_width]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width']); ?>">
+                                       value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width'],'retainful-next-order-coupon-for-woocommerce'); ?>">  <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text'; ?>"><?php
-                                esc_html_e('Button text', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_text'; ?>"><?php
+                                esc_html_e('Button text', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text]'; ?>"
+                            <input name="<?php echo esc_attr($email_Collection_form_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_text]'; ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text'; ?>"
-                                   value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text']); ?>">
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_text'; ?>"
+                                   value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text'],'retainful-next-order-coupon-for-woocommerce'); ?>">  <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color'; ?>"><?php
-                                esc_html_e('Button color', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_color'; ?>"><?php
+                                esc_html_e('Button color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color]'; ?>"
+                                <input name="<?php echo esc_attr($email_Collection_form_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color']); ?>">
+                                       value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color'],'retainful-next-order-coupon-for-woocommerce'); ?>">  <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color'; ?>"><?php
-                                esc_html_e('Button background color', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_bg_color'; ?>"><?php
+                                esc_html_e('Button background color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color]'; ?>"
+                                <input name="<?php echo esc_attr($email_Collection_form_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX ). 'exit_intent_popup_form_button_bg_color]'; ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color']); ?>">
+                                       value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color'],'retainful-next-order-coupon-for-woocommerce'); ?>">  <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height'; ?>"><?php
-                                esc_html_e('Button height', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_height'; ?>"><?php
+                                esc_html_e('Button height', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height]'; ?>"
+                                <input name="<?php echo esc_attr($email_Collection_form_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_height]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height']); ?>">
+                                       value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height'],'retainful-next-order-coupon-for-woocommerce'); ?>">  <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width'; ?>"><?php
-                                esc_html_e('Button width', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_width'; ?>"><?php
+                                esc_html_e('Button width', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo $email_Collection_form_design_name . '[' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width]'; ?>"
+                                <input name="<?php echo esc_attr($email_Collection_form_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'exit_intent_popup_form_button_width]'; ?>"
                                        type="text" class="regular-text"
-                                       value="<?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width']); ?>">
+                                       value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width'],'retainful-next-order-coupon-for-woocommerce'); ?>">  <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                             </label>
                         </td>
                     </tr>
@@ -965,7 +965,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                 </table>
                 <div class="rnoc-tag">
                     <?php
-                    echo __('GDPR Compliance for collecting E-Mail', RNOC_TEXT_DOMAIN)
+                    echo esc_html__('GDPR Compliance for collecting E-Mail', 'retainful-next-order-coupon-for-woocommerce')
                     ?>
                 </div>
                 <table class="form-table" role="presentation">
@@ -975,19 +975,19 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'; ?>"><?php
-                                esc_html_e('Show GDPR Compliance checkbox', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_compliance_checkbox_settings'; ?>"><?php
+                                esc_html_e('Show GDPR Compliance checkbox', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <select name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'; ?>">
+                                <select name="<?php echo esc_attr($gdpr_compliance_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_compliance_checkbox_settings]'; ?>">
                                     <?php
                                     foreach ($this->complianceMessageOptions() as $key => $label) {
                                         ?>
-                                        <option value="<?php echo $key ?>" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'] == $key) {
+                                        <option value="<?php echo esc_attr($key) ?>" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'] == $key) {
                                             echo 'selected';
-                                        } ?> ><?php echo $label ?></option>
+                                        } ?> ><?php echo esc_html($label) ?></option>
                                         <?php
                                     }
                                     ?>
@@ -997,21 +997,21 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'; ?>"><?php
-                                esc_html_e('GDPR Compliance message', RNOC_TEXT_DOMAIN);
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_compliance_checkbox_message'; ?>"><?php
+                                esc_html_e('GDPR Compliance message', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
                             <textarea
-                                    name="<?php echo $gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'; ?>"
+                                    name="<?php echo esc_attr($gdpr_compliance_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_compliance_checkbox_message]'; ?>"
                                     rows="10"
-                                    cols="50"><?php echo rnocEscAttr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']); ?>
+                                    cols="50"><?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'],'retainful-next-order-coupon-for-woocommerce'); ?>  <?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	 ?>
                             </textarea>
                             </label>
                             <p class="description">
                                 <?php
-                                echo __('You can also use HTML content as well in the message.', RNOC_TEXT_DOMAIN)
+                                echo esc_html__('You can also use HTML content as well in the message.', 'retainful-next-order-coupon-for-woocommerce')
                                 ?>
                             </p>
                         </td>
