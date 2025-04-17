@@ -224,7 +224,7 @@ class Products extends Order {
 			}
 			$product           = self::$woocommerce->getProduct( $product_id );
 			$product_type = self::$woocommerce->isMethodExists( $product, 'get_type' ) ? $product->get_type() : '';
-			if(in_array($topic,['product.deleted','product.updated']) && $product_type == 'variation') {
+			if(in_array($topic,['product.deleted','product.updated','product.created']) && $product_type == 'variation') {
 				return $http_args;
 			}
 			$product_data = $this->setProductData( $product_id );
