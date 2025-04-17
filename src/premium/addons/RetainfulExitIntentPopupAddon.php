@@ -184,7 +184,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
         function applyCouponAutomatically()
         {
 	        $coupon_code = isset($_REQUEST['rnoc_on_exit_coupon_code']) ? sanitize_text_field(wp_unslash($_REQUEST['rnoc_on_exit_coupon_code'])) : '';//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	        if ($coupon_code &&  !is_admin()) {
+	        if (!empty($coupon_code) &&  !is_admin()) {
                 $coupon_code = apply_filters("rnoc_exit_intent_before_applying_coupon_code", $coupon_code);
                 if (!empty($coupon_code) && !$this->wc_functions->hasDiscount($coupon_code)) {
                     $this->wc_functions->addDiscount($coupon_code);
