@@ -19,7 +19,7 @@
                            id="rnoc-exit-intent-popup-buyer-accepts-marketing" <?php echo ($rnoc_gdpr_check_box_settings == 'show_and_check_checkbox') ? "checked" : "" ?>/>&nbsp;
                     <?php
                 }
-                echo wp_kses($rnoc_gdpr_check_box_message);
+                echo wp_kses_post($rnoc_gdpr_check_box_message);
                 ?>
             </label>
             <?php
