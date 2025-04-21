@@ -155,7 +155,7 @@ class Checkout extends RestApi {
 				return $http_args;
 			}
 			$delivery_url      = $webhook->get_delivery_url();
-			$site_delivery_url = self::$settings->getDeliveryUrl();
+			$site_delivery_url = self::$settings->getDeliveryUrl($topic);
 			if ( $delivery_url != $site_delivery_url || $order_id <= 0 ) {
 				return $http_args;
 			}
