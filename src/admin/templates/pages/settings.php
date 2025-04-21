@@ -9,22 +9,22 @@ require_once "tabs.php";
         <tbody>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'cart_tracking_engine'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'); ?>"><?php
                     esc_html_e('Cart tracking engine?', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'cart_tracking_engine'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'cart_tracking_engine_js'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'cart_tracking_engine_js'); ?>"
                            value="js" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] == 'js') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('JavaScript (Default,Recommended)', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'cart_tracking_engine'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'cart_tracking_engine_php'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'cart_tracking_engine_php'); ?>"
                            value="php" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'cart_tracking_engine'] == 'php') {
                         echo "checked";
                     } ?>>
@@ -34,22 +34,22 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_background_order_sync'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'); ?>"><?php
                     esc_html_e('Use only webhooks for tracking the order events in the background', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_background_order_sync'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_background_order_sync_yes'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_background_order_sync_yes'); ?>"
                            value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'] == 'yes') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_background_order_sync'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_background_order_sync_no'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_background_order_sync_no'); ?>"
                            value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_background_order_sync'] == 'no') {
                         echo "checked";
                     } ?>>
@@ -66,22 +66,22 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'track_zero_value_carts'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'); ?>"><?php
                     esc_html_e('Track Zero value carts / orders', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'track_zero_value_carts'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'track_zero_value_carts_yes'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'track_zero_value_carts_yes'); ?>"
                            value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'] == 'yes') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'track_zero_value_carts'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'track_zero_value_carts_no'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'track_zero_value_carts_no'); ?>"
                            value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'] == 'no') {
                         echo "checked";
                     } ?>>
@@ -91,24 +91,24 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_on_hold_as_abandoned_status'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status'); ?>"><?php
                     esc_html_e('Consider On-Hold order status as abandoned cart?', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_on_hold_as_abandoned_status'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status'); ?>"
                            type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_on_hold_as_abandoned_status_1'; ?>"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status_1'); ?>"
                            value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status'] == '1') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_on_hold_as_abandoned_status'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status'); ?>"
                            type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_on_hold_as_abandoned_status_0'; ?>"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status_0'); ?>"
                            value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'consider_on_hold_as_abandoned_status'] == '0') {
                         echo "checked";
                     } ?>>
@@ -118,24 +118,24 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_cancelled_as_abandoned_status'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'); ?>"><?php
                     esc_html_e('Consider Canceled order status as abandoned cart?', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_cancelled_as_abandoned_status'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'); ?>"
                            type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_cancelled_as_abandoned_status_1'; ?>"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status_1'); ?>"
                            value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'] == '1') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_cancelled_as_abandoned_status'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'); ?>"
                            type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_cancelled_as_abandoned_status_0'; ?>"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status_0'); ?>"
                            value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'consider_cancelled_as_abandoned_status'] == '0') {
                         echo "checked";
                     } ?>>
@@ -145,24 +145,24 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_failed_as_abandoned_status'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'); ?>"><?php
                     esc_html_e('Consider failed order status as abandoned cart?', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_failed_as_abandoned_status'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'); ?>"
                            type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_failed_as_abandoned_status_1'; ?>"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status_1'); ?>"
                            value="1" <?php if (isset($settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status']) && $settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'] == '1') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_failed_as_abandoned_status'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'); ?>"
                            type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'consider_failed_as_abandoned_status_0'; ?>"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status_0'); ?>"
                            value="0" <?php if (isset($settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status']) && $settings[RNOC_PLUGIN_PREFIX . 'consider_failed_as_abandoned_status'] == '0') {
                         echo "checked";
                     } ?>>
@@ -172,22 +172,22 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'refresh_fragments_on_page_load'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'); ?>"><?php
                     esc_html_e('Fix for Cart sync not working', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'refresh_fragments_on_page_load'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'refresh_fragments_on_page_load_1'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load_1'); ?>"
                            value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'] == '1') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'refresh_fragments_on_page_load'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'refresh_fragments_on_page_load_0'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load_0'); ?>"
                            value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'refresh_fragments_on_page_load'] == '0') {
                         echo "checked";
                     } ?>>
@@ -202,22 +202,22 @@ require_once "tabs.php";
         </tr>
         <tr >
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_dynamic_popup'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'); ?>"><?php
                     esc_html_e('Enable Signup Forms / Popups', 'retainful-next-order-coupon-for-woocommerce');
                     ?>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_dynamic_popup'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_dynamic_popup_no'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup_no'); ?>"
                            value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'] == 'no') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_dynamic_popup'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_dynamic_popup_yes'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup_yes'); ?>"
                            value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_dynamic_popup'] == 'yes') {
                         echo "checked";
                     } ?>>
@@ -232,22 +232,22 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_gdpr_compliance'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'); ?>"><?php
                     esc_html_e('Marketing Consent', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_gdpr_compliance'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_gdpr_compliance_0'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance_0'); ?>"
                            value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] == '0') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Implicit', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_gdpr_compliance'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_gdpr_compliance_1'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance_1'); ?>"
                            value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] == '1') {
                         echo "checked";
                     } ?>>
@@ -262,12 +262,12 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_display_position'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'gdpr_display_position'); ?>"><?php
                     esc_html_e('Consent field position:', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
-                <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_display_position'; ?>">
+                <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'gdpr_display_position'); ?>">
                     <option value="after_billing_email" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] == 'after_billing_email') ? "selected='selected'":''; ?>>
                         <?php esc_html_e('Below Email Address field', 'retainful-next-order-coupon-for-woocommerce'); ?></option>
                     <option value="after_term_and_condition" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] == 'after_term_and_condition') ? "selected='selected'":''; ?>>
@@ -277,13 +277,13 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'cart_capture_msg'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'cart_capture_msg'); ?>"><?php
                     esc_html_e('Text for the opt-in checkbox', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
-                <textarea name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'cart_capture_msg'; ?>"
-                          id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'cart_capture_msg'; ?>" cols="60" rows="10"
+                <textarea name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'cart_capture_msg'); ?>"
+                          id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'cart_capture_msg'); ?>" cols="60" rows="10"
                 ><?php echo esc_attr(trim($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'])); ?>
                 </textarea>
                 <p class="description">
@@ -295,22 +295,22 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_ip_filter'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_ip_filter'); ?>"><?php
                     esc_html_e('Enable IP filter?', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_ip_filter'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_ip_filter_1'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_ip_filter'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_ip_filter_1'); ?>"
                            value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter'] == '1') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_ip_filter'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_ip_filter_0'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_ip_filter'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_ip_filter_0'); ?>"
                            value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_ip_filter'] == '0') {
                         echo "checked";
                     } ?>>
@@ -320,13 +320,13 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'ignored_ip_addresses'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'); ?>"><?php
                     esc_html_e('Exclude capturing carts from these IP\'s', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
-                <textarea name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'ignored_ip_addresses'; ?>"
-                          id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'ignored_ip_addresses'; ?>" cols="60" rows="10"
+                <textarea name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'); ?>"
+                          id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'); ?>" cols="60" rows="10"
                 ><?php echo esc_attr(trim($settings[RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses'])); ?>
                 </textarea>
                 <p class="description">
@@ -338,22 +338,22 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_debug_log'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_debug_log'); ?>"><?php
                     esc_html_e('Enable debug log?', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_debug_log'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_debug_log_1'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_debug_log'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_debug_log_1'); ?>"
                            value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log'] == '1') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_debug_log'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_debug_log_0'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_debug_log'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_debug_log_0'); ?>"
                            value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log'] == '0') {
                         echo "checked";
                     } ?>>
@@ -363,22 +363,22 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'handle_storage_using'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'handle_storage_using'); ?>"><?php
                     esc_html_e('Session handler', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'handle_storage_using'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'handle_storage_using_woocommerce'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'handle_storage_using'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'handle_storage_using_woocommerce'); ?>"
                            value="woocommerce" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'handle_storage_using'] == 'woocommerce') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('WooCommerce session (Default)', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'handle_storage_using'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'handle_storage_using_cookie'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'handle_storage_using'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'handle_storage_using_cookie'); ?>"
                            value="cookie" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'handle_storage_using'] == 'cookie') {
                         echo "checked";
                     } ?>>
@@ -393,22 +393,22 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_afterpay_action'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'); ?>"><?php
                     esc_html_e('Enable AfterPay payment gateway support (only enable this option if you installed AfterPay plugin) ?', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_afterpay_action'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_afterpay_action_yes'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_afterpay_action_yes'); ?>"
                            value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'] == 'yes') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_afterpay_action'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_afterpay_action_no'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_afterpay_action_no'); ?>"
                            value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_afterpay_action'] == 'no') {
                         echo "checked";
                     } ?>>
@@ -418,22 +418,22 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'varnish_check'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'varnish_check'); ?>"><?php
                     esc_html_e('Varnish Cache Compatibility', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'varnish_check'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'varnish_check'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'varnish_check'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'varnish_check'); ?>"
                            value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'varnish_check'] == 'yes') {
                         echo "checked";
                     } ?>>
                     <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                 </label>
                 <label>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'varnish_check'; ?>" type="radio"
-                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'varnish_check'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'varnish_check'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'varnish_check'); ?>"
                            value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'varnish_check'] == 'no') {
                         echo "checked";
                     } ?>>
