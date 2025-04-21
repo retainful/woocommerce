@@ -538,25 +538,25 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_modal'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'need_modal'); ?>"><?php
                                 esc_html_e('Enable Add to cart popup modal?', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_modal'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'need_modal'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_modal_1'; ?>"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'need_modal'] == '1') {
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'need_modal_1'); ?>"
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_modal'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_modal'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'need_modal'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_modal_0'; ?>"
-                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'need_modal'] == '0') {
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'need_modal_0'); ?>"
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'need_modal'] == '0') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -565,23 +565,23 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_is_mandatory'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'); ?>"><?php
                                 esc_html_e('Email address is mandatory?', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_is_mandatory'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'); ?>"
                                        type="radio"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_is_mandatory'] == '1') {
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_is_mandatory'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'); ?>"
                                        type="radio"
-                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_is_mandatory'] == '0') {
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory'] == '0') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -590,23 +590,23 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_no_thanks_action'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'); ?>"><?php
                                 esc_html_e('No thanks action', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_no_thanks_action'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'); ?>"
                                        type="radio"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_no_thanks_action'] == '1') {
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Allow adding item to cart (Show "No thanks" link)', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label><br>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_no_thanks_action'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'); ?>"
                                        type="radio"
-                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_no_thanks_action'] == '0') {
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action'] == '0') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Do not allow adding the item to cart and Do not show "No thanks" link', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -615,23 +615,23 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'close_btn_behavior'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'close_btn_behavior'); ?>"><?php
                                 esc_html_e('Close button behavior', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'close_btn_behavior'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'close_btn_behavior'); ?>"
                                        type="radio"
-                                       value="add_and_close" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'close_btn_behavior'] == 'add_and_close') {
+                                       value="add_and_close" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'close_btn_behavior'] == 'add_and_close') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Add item to cart and close', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'close_btn_behavior'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'close_btn_behavior'); ?>"
                                        type="radio"
-                                       value="just_close" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'close_btn_behavior'] == 'just_close') {
+                                       value="just_close" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'close_btn_behavior'] == 'just_close') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Just close the popup', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -640,31 +640,31 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_show_popup_until'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'); ?>"><?php
                                 esc_html_e('Show E-mail collection popup', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_show_popup_until'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'); ?>"
                                        type="radio"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_show_popup_until'] == '1') {
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Until user provides an E-Mail address', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label><br>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_show_popup_until'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'); ?>"
                                        type="radio"
-                                       value="2" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_show_popup_until'] == '2') {
+                                       value="2" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'] == '2') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Until user clicks "No thanks" link (It will stop showing once user clicked no thanks)', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label><br>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_show_popup_until'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'); ?>"
                                        type="radio"
-                                       value="3" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_show_popup_until'] == '3') {
+                                       value="3" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_show_popup_until'] == '3') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Until user clicks close button of the popup (It will stop when user clicks the close button once)', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -673,20 +673,20 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row" style="display: none;">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_display_pages'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_display_pages'); ?>"><?php
                                 esc_html_e('Custom pages to display the pop-up modal on (Optional)', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td style="display: none;">
                             <select multiple="multiple"
-                                    name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_display_pages[]'; ?>"
+                                    name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_display_pages[]'); ?>"
                                     class="rnoc-multi-select"
-                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_display_pages'; ?>">
+                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_display_pages'); ?>">
                                 <?php
                                 if (!empty($pages)) {
                                     foreach ($pages as $key => $label) {
                                         ?>
-                                        <option value="<?php echo esc_attr($key) ?>" <?php if (in_array($key, $settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_display_pages'])) {
+                                        <option value="<?php echo esc_attr($key) ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'modal_display_pages'])) {
                                             echo "selected";
                                         } ?>><?php echo esc_html($label) ?></option>
                                         <?php
@@ -703,20 +703,20 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_hide_pages'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_hide_pages'); ?>"><?php
                                 esc_html_e('Custom pages to hide the pop-up modal on (Optional)', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <select multiple="multiple"
-                                    name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_hide_pages[]'; ?>"
+                                    name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_hide_pages[]'); ?>"
                                     class="rnoc-multi-select"
-                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_hide_pages'; ?>">
+                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_hide_pages'); ?>">
                                 <?php
                                 if (!empty($pages)) {
                                     foreach ($pages as $key => $label) {
                                         ?>
-                                        <option value="<?php echo esc_attr($key) ?>" <?php if (in_array($key, $settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_hide_pages'])) {
+                                        <option value="<?php echo esc_attr($key) ?>" <?php if (in_array($key, $settings[RNOC_PLUGIN_PREFIX . 'modal_hide_pages'])) {
                                             echo "selected";
                                         } ?>><?php echo esc_html($label) ?></option>
                                         <?php
@@ -733,14 +733,14 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_extra_class'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'); ?>"><?php
                                 esc_html_e('Custom classes', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                        <textarea name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_extra_class'; ?>"
+                        <textarea name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'); ?>"
                                   rows="5" cols="50"
-                                  id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_extra_class'; ?>"><?php echo  esc_attr__( ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_extra_class']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>
+                                  id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'); ?>"><?php echo  esc_attr__( ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_extra_class'])); ?>
                         </textarea>
                             <p class="description">
                                 <?php
@@ -751,25 +751,25 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'no_conflict_mode'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'no_conflict_mode'); ?>"><?php
                                 esc_html_e('Enable no conflict mode ?', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'no_conflict_mode'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'no_conflict_mode'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'no_conflict_mode_yes'; ?>"
-                                       value="yes" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'no_conflict_mode'] == 'yes') {
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'no_conflict_mode_yes'); ?>"
+                                       value="yes" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'no_conflict_mode'] == 'yes') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'no_conflict_mode'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'no_conflict_mode'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'no_conflict_mode_no'; ?>"
-                                       value="no" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'no_conflict_mode'] == 'no') {
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'no_conflict_mode_no'); ?>"
+                                       value="no" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'no_conflict_mode'] == 'no') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -805,178 +805,178 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_heading'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading'); ?>"><?php
                                 esc_html_e('Modal heading', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_heading]'; ?>"
+                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_heading'; ?>"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_heading']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading'); ?>"
+                                   value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_heading']); ?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_heading_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading_color'); ?>"><?php
                                 esc_html_e('Modal heading color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_heading_color]'; ?>"
+                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading_color]'); ?>"
                                    type="text" class="rnoc-color-field"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_heading_color'; ?>"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_heading_color']),'retainful-next-order-coupon-for-woocommerce');//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading_color'); ?>"
+                                   value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_heading_color']); ?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_placeholder'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_placeholder'); ?>"><?php
                                 esc_html_e('Email placeholder', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_placeholder]'; ?>"
+                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_placeholder]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_placeholder'; ?>"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_placeholder']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText?>">
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_placeholder'); ?>"
+                                   value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_placeholder']);?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_field_width'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_field_width'); ?>"><?php
                                 esc_html_e('Email field width(%)', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_field_width]'; ?>"
+                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_field_width]'); ?>"
                                    type="number" class="regular-text"
                                    step="any"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_email_field_width'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_field_width'); ?>"
                                    value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) ? floatval($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_field_width']) : 70; ?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_text'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_text'); ?>"><?php
                                 esc_html_e('Add to cart button text', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_text]'; ?>"
+                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_text]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_text'; ?>"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_text']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText?>">
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_text'); ?>"
+                                   value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_text']);?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_button_field_width'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_button_field_width'); ?>"><?php
                                 esc_html_e('Add to cart button width(%)', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_button_field_width]'; ?>"
+                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_button_field_width]'); ?>"
                                    type="number" class="regular-text"
                                    step="any"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_button_field_width'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_button_field_width'); ?>"
                                    value="<?php echo isset($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) ? floatval($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_button_field_width']) : 70; ?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_color'); ?>"><?php
                                 esc_html_e('Add to cart button color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_color]'; ?>"
+                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_color]'); ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_color']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
+                                       value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_color']); ?>">
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_bg_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color'); ?>"><?php
                                 esc_html_e('Add to cart button background color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_bg_color]'; ?>"
+                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color]'); ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
+                                       value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color']); ?>">
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_border_top_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color'); ?>"><?php
                                 esc_html_e('Popup top border color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_border_top_color]'; ?>"
+                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color]'); ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
+                                       value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color']); ?>">
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_bg_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_bg_color'); ?>"><?php
                                 esc_html_e('Add to cart popup background color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_bg_color]'; ?>"
+                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_bg_color]'); ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_bg_color'],'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
+                                       value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_bg_color']); ?>">
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_not_mandatory_text'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text'); ?>"><?php
                                 esc_html_e('Not mandatory text', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_not_mandatory_text]'; ?>"
+                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_not_mandatory_text'; ?>"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText?>">
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text'); ?>"
+                                   value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text']);?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_no_thanks_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color'); ?>"><?php
                                 esc_html_e('No thanks link color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_add_cart_no_thanks_color]'; ?>"
+                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color]'); ?>"
                                        type="text" class="rnoc-color-field"
-                                       value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color']),'retainful-next-order-coupon-for-woocommerce');  //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText?>">
+                                       value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color']);?>">
                             </label>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_terms_text'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_terms_text'); ?>"><?php
                                 esc_html_e('Terms', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_terms_text]'; ?>"
+                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_terms_text]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_terms_text'; ?>"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_terms_text']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_terms_text'); ?>"
+                                   value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_terms_text']); ?>">
                         </td>
                     </tr>
                     </tbody>
@@ -988,22 +988,22 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                 </div>
                 <table class="form-table" role="presentation">
                     <?php
-                    $gdpr_compliance_name = esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_popup_gdpr_compliance[0]'
+                    $gdpr_compliance_name = esc_attr(RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance[0]')
                     ?>
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_compliance_checkbox_settings'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'); ?>"><?php
                                 esc_html_e('Show GDPR Compliance checkbox', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <select name="<?php echo esc_attr($gdpr_compliance_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_compliance_checkbox_settings]'; ?>">
+                                <select name="<?php echo esc_attr($gdpr_compliance_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'); ?>">
                                     <?php
                                     foreach ($this->complianceMessageOptions() as $key => $label) {
                                         ?>
-                                        <option value="<?php echo esc_attr($key) ?>" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'] == $key) {
+                                        <option value="<?php echo esc_attr($key) ?>" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings'] == $key) {
                                             echo 'selected';
                                         } ?> ><?php echo esc_html($label) ?></option>
                                         <?php
@@ -1015,16 +1015,16 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_compliance_checkbox_message'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'); ?>"><?php
                                 esc_html_e('GDPR Compliance message', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
                             <textarea
-                                    name="<?php echo esc_attr($gdpr_compliance_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'gdpr_compliance_checkbox_message]'; ?>"
+                                    name="<?php echo esc_attr($gdpr_compliance_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'); ?>"
                                     rows="10"
-                                    cols="50"><?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>
+                                    cols="50"><?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'])); ?>
                             </textarea>
                             </label>
                             <p class="description">
@@ -1048,23 +1048,23 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'need_coupon'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'need_coupon'); ?>"><?php
                                 esc_html_e('Enable coupon reward for providing email address', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'need_coupon]'; ?>"
+                                <input name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'need_coupon]'); ?>"
                                        type="radio"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'need_coupon'] == '1') {
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'need_coupon'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'need_coupon]'; ?>"
+                                <input name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'need_coupon]'); ?>"
                                        type="radio"
-                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'need_coupon'] == '0') {
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'need_coupon'] == '0') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -1078,18 +1078,18 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'woo_coupon'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'woo_coupon'); ?>"><?php
                                 esc_html_e('Choose the coupon code for the reward', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <input type="text"
-                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'woo_coupon]'; ?>"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'woo_coupon'; ?>"
+                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'woo_coupon]'); ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'woo_coupon'); ?>"
                                    class="search-and-select-coupon"
                                    autocomplete="off"
                                    placeholder="<?php esc_html_e('Search for a coupon code', 'retainful-next-order-coupon-for-woocommerce'); ?>"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'woo_coupon']),'retainful-next-order-coupon-for-woocommerce');  //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText?>">
+                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'woo_coupon']));?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons
@@ -1098,16 +1098,16 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_sub_heading'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading'); ?>"><?php
                                 esc_html_e('Reward message to show on the popup', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <input type="text"
-                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_sub_heading]'; ?>"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_sub_heading'; ?>"
+                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading]'); ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading'); ?>"
                                    class="regular-text"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading']),'retainful-next-order-coupon-for-woocommerce');  //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText?>">
+                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading']));?>">
                             <p class="description">
                                 <b>Note</b>:You need to enable coupon
                             </p>
@@ -1115,27 +1115,27 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_sub_heading_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color'); ?>"><?php
                                 esc_html_e('Message text color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <input type="text"
-                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_sub_heading_color]'; ?>"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_sub_heading_color'; ?>"
+                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color]'); ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color'); ?>"
                                    class="rnoc-color-field"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color']),'retainful-next-order-coupon-for-woocommerce');  //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText?>">
+                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color']));?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'show_woo_coupon'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'show_woo_coupon'); ?>"><?php
                                 esc_html_e('Choose how to reveal the reward coupon', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <select name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'show_woo_coupon]'; ?>"
-                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'show_woo_coupon'; ?>">
+                            <select name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'show_woo_coupon]'); ?>"
+                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'show_woo_coupon'); ?>">
                                 <?php
                                 $options = array(
                                     "instantly" => __("Instantly using a popup", 'retainful-next-order-coupon-for-woocommerce'),
@@ -1162,17 +1162,17 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr id="row_atcp_template">
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_coupon_popup_template'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'); ?>"><?php
                                 esc_html_e('Response Popup template', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <?php
-                            $email_template = $settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'];
+                            $email_template = $settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'];
                             if (empty($email_template)) {
                                 $email_template = $this->getDefaultPopupTemplate();
                             }
-                            wp_editor($email_template, 'add_to_cart_coupon_popup_template', array('textarea_name' => $modal_coupon_settings_name . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_coupon_popup_template]'));
+                            wp_editor($email_template, 'add_to_cart_coupon_popup_template', array('textarea_name' => $modal_coupon_settings_name . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template]')));
                             ?>
                             <p class="description">
                                 Please use the below short codes to show the Coupon details in the message.<br><b>{{coupon_code}}</b>
@@ -1182,21 +1182,21 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                     </tr>
                     <tr class="row_atcp_mail_template">
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_mail_template_subject'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'); ?>"><?php
                                 esc_html_e('Email subject', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <input type="text"
-                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_mail_template_subject]'; ?>"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_mail_template_subject'; ?>"
+                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject]'); ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'); ?>"
                                    class="regular-text"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject']),'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
+                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'])); ?>">
                         </td>
                     </tr>
                     <tr class="row_atcp_mail_template">
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_mail_template'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_mail_template'); ?>"><?php
                                 esc_html_e('Email template (Used for the email that is sent when customer enters his email in the Add to Cart Popup)', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
