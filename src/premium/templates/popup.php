@@ -5,7 +5,7 @@
              style="color: <?php echo esc_attr($rnoc_modal_heading_color); ?>;"><?php echo esc_attr__($rnoc_modal_heading,'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	?></div>
         <p style="color: <?php echo esc_attr($rnoc_modal_sub_heading_color); ?>;"><?php echo esc_attr__($rnoc_modal_sub_heading,'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?></p>
     </div>
-    <?php echo esc_html($rnoc_popup_form_open) ?>
+    <?php echo wp_kses_post($rnoc_popup_form_open) ?>
     <div class="rnoc-lw-center">
         <div class="rnoc-lw-field rnoc-popup-form-block">
             <div class="rnoc-form-input-field" style="width:<?php echo floatval($rnoc_modal_email_field_width); ?>%;">
@@ -48,5 +48,5 @@
         ?>
         <span><?php echo esc_attr__($rnoc_modal_terms_text,'retainful-next-order-coupon-for-woocommerce') //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?></span>
     </div>
-    <?php echo wp_kses($rnoc_popup_form_close) ?>
+    <?php echo wp_kses_post($rnoc_popup_form_close) ?>
 </div>
