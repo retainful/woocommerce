@@ -90,7 +90,7 @@ class Cart extends RestApi
         $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
         if($enable_gdpr_compliance && $field_name == 'after_term_and_condition' && $message){
             echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
-            name="'.esc_attr(RNOC_PLUGIN_PREFIX).'allow_gdpr'.'" id="'.esc_attr(RNOC_PLUGIN_PREFIX).'allow_gdpr'.'" '.($this->isBuyerAcceptsMarketing() ? 'checked="checked"' : '').' />
+            name="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" id="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" '.($this->isBuyerAcceptsMarketing() ? 'checked="checked"' : '').' />
 					<span class="woocommerce-terms-and-conditions-checkbox-text">' .  esc_html__($message,'retainful-next-order-coupon-for-woocommerce') .' '. esc_html__('(optional)','retainful-next-order-coupon-for-woocommerce').'</span>'; //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
         }
     }
