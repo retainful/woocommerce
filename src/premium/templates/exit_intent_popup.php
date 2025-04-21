@@ -9,7 +9,7 @@
         </div>
     </div>
     <div class="rnoc-content">
-        <?php echo wp_kses($rnoc_popup_form_open) ?>
+        <?php echo wp_kses_post($rnoc_popup_form_open) ?>
         <div class="rnoc-popup-form-block"
              style="display: flex;align-items: center;flex-wrap: wrap;justify-content: space-between;">
             <input type="email" id="rnoc-popup-email-field"
@@ -25,7 +25,7 @@
             email.', 'retainful-next-order-coupon-for-woocommerce') ?></p>
         <p class="small-text"
            style="color: #6d6d6d;text-align: center;font-size: 14px;"><?php echo esc_attr__($rnoc_coupon_message,'retainful-next-order-coupon-for-woocommerce')  //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText?></p>
-        <?php echo wp_kses($rnoc_popup_form_close) ?>
+        <?php echo wp_kses_post($rnoc_popup_form_close) ?>
     </div>
     <div style="margin: 20px auto;color: #5f5f5f;text-align: center;"><?php echo esc_attr__($rnoc_exit_intent_modal_terms_text,'retainful-next-order-coupon-for-woocommerce')  //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?></div>
 </div>
