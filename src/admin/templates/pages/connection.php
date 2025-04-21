@@ -12,13 +12,13 @@ $admin_settings = new Rnoc\Retainful\Admin\Settings();
         <tbody>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_app_id'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_app_id'); ?>"><?php
                     esc_html_e('App ID', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
-                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_app_id'; ?>" type="text"
-                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_app_id'; ?>"
+                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_app_id'); ?>" type="text"
+                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_app_id'); ?>"
 x                       value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_id']); ?>" class="regular-text">
                 <p class="error" id="error_app_id" style="color: red;"></p>
                 <p class="description">
@@ -31,13 +31,13 @@ x                       value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX 
         </tr>
         <tr>
             <th scope="row">
-                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_app_secret'; ?>"><?php
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_app_secret'); ?>"><?php
                     esc_html_e('App Secret', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
             </th>
             <td>
-                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_app_secret'; ?>" type="password"
-                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_app_secret'; ?>"
+                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_app_secret'); ?>" type="password"
+                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_app_secret'); ?>"
                        value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'retainful_app_secret']); ?>"
                        class="regular-text">
                 <p class="error" id="error_secret_key" style="color: red;"></p>
