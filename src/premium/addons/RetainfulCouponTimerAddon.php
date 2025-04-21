@@ -381,7 +381,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'); ?>"
                                    placeholder="<?php esc_html_e('Search for a coupon code', 'retainful-next-order-coupon-for-woocommerce'); ?>"
                                    class="search-and-select-coupon" autocomplete="off"
-                                   value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'], 'retainful-next-order-coupon-for-woocommerce') 	?>">
+                                   value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon']) 	?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons
@@ -771,7 +771,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'); ?>"
                                        type="radio"
-                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings')][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '0') {
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '0') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -880,7 +880,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'); ?>"
                                        type="radio"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings')][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '1') {
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -888,7 +888,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'); ?>"
                                        type="radio"
-                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings')][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '0') {
+                                       value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '0') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -958,7 +958,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                             <label>
                                 <input name="<?php echo esc_attr($below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'); ?>"
                                        type="radio"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings')][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '1') {
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
