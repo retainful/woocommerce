@@ -30,7 +30,7 @@
                     if (in_array($rnoc_gdpr_check_box_settings, array('show_and_check_checkbox', 'show_checkbox'))) {
                         ?>
                         <input type="checkbox" name="add_to_cart_buyer_accepts_marketing"
-                               id="rnoc-popup-buyer-accepts-marketing" <?php echo esc_attr($rnoc_gdpr_check_box_settings == 'show_and_check_checkbox') ? "checked" : "" ?>/>&nbsp;
+                               id="rnoc-popup-buyer-accepts-marketing" <?php echo $rnoc_gdpr_check_box_settings == 'show_and_check_checkbox' ? "checked" : "" ?>/>&nbsp;
                         <?php
                     }
                     echo wp_kses_post($rnoc_gdpr_check_box_message);
