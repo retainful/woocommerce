@@ -810,7 +810,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading]'); ?>"
+                            <input name="<?php echo esc_attr($modal_design_name. '[' .RNOC_PLUGIN_PREFIX . 'modal_heading]'); ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading'); ?>"
                                    value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_heading']); ?>">
@@ -823,7 +823,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading_color]'); ?>"
+                            <input name="<?php echo esc_attr($modal_design_name. '[' .RNOC_PLUGIN_PREFIX . 'modal_heading_color]'); ?>"
                                    type="text" class="rnoc-color-field"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_heading_color'); ?>"
                                    value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_heading_color']); ?>">
@@ -836,7 +836,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_placeholder]'); ?>"
+                            <input name="<?php echo esc_attr($modal_design_name. '[' .RNOC_PLUGIN_PREFIX . 'modal_email_placeholder]'); ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_placeholder'); ?>"
                                    value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_email_placeholder']);?>">
@@ -849,7 +849,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_field_width]'); ?>"
+                            <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_email_field_width]'); ?>"
                                    type="number" class="regular-text"
                                    step="any"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_email_field_width'); ?>"
@@ -863,7 +863,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_text]'); ?>"
+                            <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_text]'); ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_text'); ?>"
                                    value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_text']);?>">
@@ -876,7 +876,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_button_field_width]'); ?>"
+                            <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_button_field_width]'); ?>"
                                    type="number" class="regular-text"
                                    step="any"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_button_field_width'); ?>"
@@ -891,7 +891,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_color]'); ?>"
+                                <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_color']); ?>">
                             </label>
@@ -905,7 +905,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color]'); ?>"
+                                <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color']); ?>">
                             </label>
@@ -919,7 +919,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color]'); ?>"
+                                <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color']); ?>">
                             </label>
@@ -933,7 +933,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_bg_color]'); ?>"
+                                <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_bg_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_bg_color']); ?>">
                             </label>
@@ -946,7 +946,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text]'); ?>"
+                            <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text]'); ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text'); ?>"
                                    value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_not_mandatory_text']);?>">
@@ -960,7 +960,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color]'); ?>"
+                                <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color']);?>">
                             </label>
@@ -973,7 +973,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($modal_design_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_terms_text]'); ?>"
+                            <input name="<?php echo esc_attr($modal_design_name . '[' . RNOC_PLUGIN_PREFIX . 'modal_terms_text]'); ?>"
                                    type="text" class="regular-text"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_terms_text'); ?>"
                                    value="<?php echo esc_attr ($settings[RNOC_PLUGIN_PREFIX . 'modal_design_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_terms_text']); ?>">
@@ -999,7 +999,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <label>
-                                <select name="<?php echo esc_attr($gdpr_compliance_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'); ?>">
+                                <select name="<?php echo esc_attr($gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings]'); ?>">
                                     <?php
                                     foreach ($this->complianceMessageOptions() as $key => $label) {
                                         ?>
@@ -1022,7 +1022,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         <td>
                             <label>
                             <textarea
-                                    name="<?php echo esc_attr($gdpr_compliance_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'); ?>"
+                                    name="<?php echo esc_attr($gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'); ?>"
                                     rows="10"
                                     cols="50"><?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'])); ?>
                             </textarea>
@@ -1054,7 +1054,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'need_coupon]'); ?>"
+                                <input name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'need_coupon]'); ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'need_coupon'] == '1') {
                                     echo "checked";
@@ -1062,7 +1062,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'need_coupon]'); ?>"
+                                <input name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'need_coupon]'); ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'need_coupon'] == '0') {
                                     echo "checked";
@@ -1084,7 +1084,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <input type="text"
-                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'woo_coupon]'); ?>"
+                                   name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'woo_coupon]'); ?>"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'woo_coupon'); ?>"
                                    class="search-and-select-coupon"
                                    autocomplete="off"
@@ -1104,7 +1104,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <input type="text"
-                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading]'); ?>"
+                                   name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading]'); ?>"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading'); ?>"
                                    class="regular-text"
                                    value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading']));?>">
@@ -1121,7 +1121,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <input type="text"
-                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color]'); ?>"
+                                   name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color]'); ?>"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color'); ?>"
                                    class="rnoc-color-field"
                                    value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color']));?>">
@@ -1134,7 +1134,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                 ?></label>
                         </th>
                         <td>
-                            <select name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'show_woo_coupon]'); ?>"
+                            <select name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'show_woo_coupon]'); ?>"
                                     id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'show_woo_coupon'); ?>">
                                 <?php
                                 $options = array(
@@ -1188,7 +1188,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         </th>
                         <td>
                             <input type="text"
-                                   name="<?php echo  esc_attr($modal_coupon_settings_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject]'); ?>"
+                                   name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject]'); ?>"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'); ?>"
                                    class="regular-text"
                                    value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'])); ?>">
