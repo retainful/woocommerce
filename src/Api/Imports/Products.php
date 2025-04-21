@@ -222,6 +222,11 @@ class Products extends Order {
 			if ( $delivery_url != $site_delivery_url || $product_id <= 0 ) {
 				return $http_args;
 			}
+			$product           = self::$woocommerce->getProduct( $product_id );
+			$product_type = self::$woocommerce->isMethodExists( $product, 'get_type' ) ? $product->get_type() : '';
+			if(in_array($topic,['product.deleted','product.updated','product.created']) && $product_type == 'variation') {
+				return $http_args;
+			}
 			$product_data = $this->setProductData( $product_id );
 			if ( is_array( $product_data['Id'] ) || empty( $product_data['CreatedAt'] ) ) {
 				self::$settings->logMessage( $product_data, 'API Product data missing' );
@@ -281,10 +286,11 @@ class Products extends Order {
 		$product           = self::$woocommerce->getProduct( $product_id );
 		$product_variation = array();
 		if ( self::$woocommerce->isMethodExists( $product,'is_type') && $product->is_type( 'variable' ) ) {
-			$variations = self::$woocommerce->isMethodExists( $product, 'get_available_variations' ) ? $product->get_available_variations() : array();
-			foreach ( $variations as $variation ) {
-				$variation_id        = is_array( $variation ) && ! empty( $variation['variation_id'] ) ? $variation['variation_id'] : 0;
+			$variations = self::$woocommerce->isMethodExists( $product, 'get_children' ) ? $product->get_children() : array();
+			foreach ( $variations as $variation_id ) {
+				//$variation_id        = is_array( $variation_id ) && ! empty( $variation['variation_id'] ) ? $variation['variation_id'] : 0;
 				$variation_obj       = self::$woocommerce->getProduct( $variation_id );
+				if( self::$woocommerce->isMethodExists( $variation_obj, 'get_status' )  && $variation_obj->get_status() != 'publish') continue;
 				$image_id  = $variation_obj->get_image_id();
 				$product_variation[] = [
 					'Id'                     => function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : '',
@@ -327,6 +333,7 @@ class Products extends Order {
 				"DeletedAt"              => '',
 			];
 		}
+
 		$product_tag      = self::$woocommerce->isMethodExists( $product, 'get_id' ) && function_exists( 'wp_get_post_terms' ) ? wp_get_post_terms( $product->get_id(), 'product_tag' ) : array();
 		$tags             = array_map( function ( $tag ) {
 			return $tag->name;
