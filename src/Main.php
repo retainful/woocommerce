@@ -390,12 +390,12 @@ class Main {
 					try {
 						$webhook = new \WC_Webhook( $webhook_id );
 						$topic   = $webhook->get_topic();
-//						if(preg_match("/category/i", $topic)) {
+//						if(in_array($topic,['category.updated', 'category.created', 'category.deleted'])) {
 //							$http_args = Category::changeWebHookHeaderCategory( $http_args, $order_id, $webhook_id);
 //						}else
-						if (preg_match("/order/i", $topic)){
+						if (in_array($topic,['order.updated', 'order.created'])){
 							$http_args = $checkout->changeWebHookHeader( $http_args, $order_id, $webhook_id);
-						}elseif (preg_match("/product/i", $topic)){
+						}elseif (in_array($topic,['product.updated', 'product.created', 'product.deleted'])){
 							$http_args = $product->changeWebHookHeaderProduct( $http_args, $order_id, $webhook_id);
 						}
 					}catch ( \Exception $e) {
