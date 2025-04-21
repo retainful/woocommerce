@@ -345,24 +345,24 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_timer'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'); ?>"><?php
                                 esc_html_e('Enable Coupon timer?', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_timer'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_timer_1'; ?>"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_timer'] == '1') {
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer_1'); ?>"
+                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer')] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_timer'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_timer_0'; ?>"
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer_0'); ?>"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_timer'] == '0') {
                                     echo "checked";
                                 } ?>>
@@ -372,13 +372,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'); ?>"><?php
                                 esc_html_e('Choose the coupon code', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input type="text" name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon'; ?>"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon'; ?>"
+                            <input type="text" name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'); ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'); ?>"
                                    placeholder="<?php esc_html_e('Search for a coupon code', 'retainful-next-order-coupon-for-woocommerce'); ?>"
                                    class="search-and-select-coupon" autocomplete="off"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon'], 'retainful-next-order-coupon-for-woocommerce') //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText	?>">
@@ -390,15 +390,15 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_pages'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'); ?>"><?php
                                 esc_html_e('Custom pages to display the coupon timer', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <select multiple="multiple"
-                                    name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_pages[]'; ?>"
+                                    name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages[]'); ?>"
                                     class="rnoc-multi-select"
-                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_pages'; ?>">
+                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'); ?>">
                                 <?php
                                 if (!empty($pages)) {
                                     foreach ($pages as $key => $label) {
@@ -415,24 +415,24 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_apply_coupon'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'); ?>"><?php
                                 esc_html_e('Apply coupon', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_apply_coupon'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_apply_coupon_automatically'; ?>"
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon_automatically'); ?>"
                                        value="automatically" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'] == 'automatically') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Automatically', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_apply_coupon'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_apply_coupon_manually'; ?>"
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon_manually'); ?>"
                                        value="manually" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon'] == 'manually') {
                                     echo "checked";
                                 } ?>>
@@ -442,14 +442,14 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_expire_time'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'); ?>"><?php
                                 esc_html_e('Time', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_expire_time'; ?>"
+                            <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'); ?>"
                                    type="number" class="regular-text number-only-field"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_expire_time'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'); ?>"
                                    value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time']); ?>">
                             <p class="description">
                                 <?php
@@ -460,14 +460,14 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_expire_message'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message'); ?>"><?php
                                 esc_html_e('Coupon expiry message', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_expire_message'; ?>"
+                            <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_expire_message'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message'], 'retainful-next-order-coupon-for-woocommerce');//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             <p class="description">
                                 <?php
@@ -478,14 +478,14 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_expired_text'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text'); ?>"><?php
                                 esc_html_e('Coupon timer expired text', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_expired_text'; ?>"
+                            <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_expired_text'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             <p class="description">
                                 <?php
@@ -496,24 +496,24 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'auto_fix_page_reload'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'); ?>"><?php
                                 esc_html_e('Fix repeat reloading of page when coupon expires?', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'auto_fix_page_reload'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'auto_fix_page_reload_1'; ?>"
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload_1'); ?>"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'auto_fix_page_reload'; ?>"
+                                <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'); ?>"
                                        type="radio"
-                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'auto_fix_page_reload_0'; ?>"
+                                       id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload_0'); ?>"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'auto_fix_page_reload'] == '0') {
                                     echo "checked";
                                 } ?>>
@@ -535,13 +535,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_position'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_position'); ?>"><?php
                                 esc_html_e('Enable Top / bottom position', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_position]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'); ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '1') {
                                     echo "checked";
@@ -549,7 +549,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_position]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'); ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '0') {
                                     echo "checked";
@@ -560,13 +560,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'top_bottom_position'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'top_bottom_position'); ?>"><?php
                                 esc_html_e('Position', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'top_bottom_position]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'top_bottom_position]'); ?>"
                                        type="radio"
                                        value="top" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'top_bottom_position'] == 'top') {
                                     echo "checked";
@@ -574,7 +574,7 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                                 <?php esc_html_e('Top', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'top_bottom_position]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'top_bottom_position]'); ?>"
                                        type="radio"
                                        value="bottom" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'top_bottom_position'] == 'bottom') {
                                     echo "checked";
@@ -585,14 +585,14 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_message'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_message'); ?>"><?php
                                 esc_html_e('Message', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_message]'; ?>"
+                            <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_message'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_message'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             <p class="description">
                                 <?php
@@ -603,14 +603,14 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_format'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'); ?>"><?php
                                 esc_html_e('Timer display format', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_format]'; ?>"
+                            <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX. 'coupon_timer_display_format]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_format'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             <p class="description">
                                 <?php
@@ -621,13 +621,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_background'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_background'); ?>"><?php
                                 esc_html_e('Background color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_background]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX. 'coupon_timer_background]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -635,13 +635,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_color'); ?>"><?php
                                 esc_html_e('Color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_color]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -649,13 +649,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_code_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color'); ?>"><?php
                                 esc_html_e('Coupon code color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_code_color]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name. '[' .RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -663,13 +663,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_timer_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color'); ?>"><?php
                                 esc_html_e('Coupon timer color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_timer_color]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color'], 'retainful-next-order-coupon-for-woocommerce');//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -677,21 +677,21 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_checkout_button'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_checkout_button'); ?>"><?php
                                 esc_html_e('Enable checkout button', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_checkout_button]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'); ?>"
                                        type="radio"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '1') {
+                                       value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_checkout_button]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'); ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '0') {
                                     echo "checked";
@@ -702,26 +702,26 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_text'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'checkout_button_text'); ?>"><?php
                                 esc_html_e('Call to action button text', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_text]'; ?>"
+                            <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_text]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_text'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'checkout_button_text'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_text'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'checkout_button_color'); ?>"><?php
                                 esc_html_e('Call to action button color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_color]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -729,13 +729,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_bg_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color'); ?>"><?php
                                 esc_html_e('Call to action button background color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($top_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_bg_color]'; ?>"
+                                <input name="<?php echo esc_attr($top_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -750,18 +750,18 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                 </div>
                 <table class="form-table" role="presentation">
                     <?php
-                    $above_cart_position_name = esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_above_cart_position_settings[0]'
+                    $above_cart_position_name = esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings[0]')
                     ?>
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_position'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_position'); ?>"><?php
                                 esc_html_e('Enable above cart position', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_position]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name. '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'); ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '1') {
                                     echo "checked";
@@ -769,9 +769,9 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_position]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'); ?>"
                                        type="radio"
-                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '0') {
+                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings')][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '0') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -780,14 +780,14 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_message1'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_message1'); ?>"><?php
                                 esc_html_e('Message', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_message]'; ?>"
+                            <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_message1'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_message1'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             <p class="description">
                                 <?php
@@ -798,14 +798,14 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_format1'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format1'); ?>"><?php
                                 esc_html_e('Timer display format', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_format]'; ?>"
+                            <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_format1'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format1'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             <p class="description">
                                 <?php
@@ -816,13 +816,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_background'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_background'); ?>"><?php
                                 esc_html_e('Background color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_background]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -830,13 +830,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_color'); ?>"><?php
                                 esc_html_e('Color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_color]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -844,13 +844,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_code_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color'); ?>"><?php
                                 esc_html_e('Coupon code color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_code_color]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -858,13 +858,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_timer_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color'); ?>"><?php
                                 esc_html_e('Coupon timer color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_timer_color]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -872,23 +872,23 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_checkout_button'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_checkout_button'); ?>"><?php
                                 esc_html_e('Enable checkout button', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_checkout_button]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'); ?>"
                                        type="radio"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '1') {
+                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings')][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_checkout_button]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button]'); ?>"
                                        type="radio"
-                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '0') {
+                                       value="0" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings')][0][RNOC_PLUGIN_PREFIX . 'enable_checkout_button'] == '0') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('No', 'retainful-next-order-coupon-for-woocommerce'); ?>
@@ -897,26 +897,26 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_text1'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'checkout_button_text1'); ?>"><?php
                                 esc_html_e('Call to action button text', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_text]'; ?>"
+                            <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_text]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_text1'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'checkout_button_text1'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_text'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'checkout_button_color'); ?>"><?php
                                 esc_html_e('Call to action button color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_color]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -924,13 +924,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_bg_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color'); ?>"><?php
                                 esc_html_e('Call to action button background color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($above_cart_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'checkout_button_bg_color]'; ?>"
+                                <input name="<?php echo esc_attr($above_cart_position_name . '[' . RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings'][0][RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -950,21 +950,21 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     <tbody>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_position'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_position'); ?>"><?php
                                 esc_html_e('Enable below applied coupon position', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($below_discount_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_position]'; ?>"
+                                <input name="<?php echo esc_attr($below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'); ?>"
                                        type="radio"
-                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '1') {
+                                       value="1" <?php if ($settings[esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings')][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '1') {
                                     echo "checked";
                                 } ?>>
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr($below_discount_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_position]'; ?>"
+                                <input name="<?php echo esc_attr($below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'enable_position]'); ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_position'] == '0') {
                                     echo "checked";
@@ -975,14 +975,14 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_message2'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_message2'); ?>"><?php
                                 esc_html_e('Message', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($below_discount_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_message]'; ?>"
+                            <input name="<?php echo esc_attr($below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_message2'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_message2)'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_message'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             <p class="description">
                                 <?php
@@ -993,14 +993,14 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_format2'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format2'); ?>"><?php
                                 esc_html_e('Timer display format', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
-                            <input name="<?php echo esc_attr($below_discount_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_format]'; ?>"
+                            <input name="<?php echo esc_attr($below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format]'); ?>"
                                    type="text" class="regular-text"
-                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_display_format2'; ?>"
+                                   id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format2'); ?>"
                                    value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format'], 'retainful-next-order-coupon-for-woocommerce');//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             <p class="description">
                                 <?php
@@ -1011,13 +1011,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_background'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_background'); ?>"><?php
                                 esc_html_e('Background color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($below_discount_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_background]'; ?>"
+                                <input name="<?php echo esc_attr($below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_background'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -1025,13 +1025,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_color'); ?>"><?php
                                 esc_html_e('Color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($below_discount_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_color]'; ?>"
+                                <input name="<?php echo esc_attr($below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_color'], 'retainful-next-order-coupon-for-woocommerce');//phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -1039,13 +1039,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_code_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color'); ?>"><?php
                                 esc_html_e('Coupon code color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($below_discount_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_code_color]'; ?>"
+                                <input name="<?php echo esc_attr($below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
@@ -1053,13 +1053,13 @@ if (!class_exists('RetainfulCouponTimerAddon')) {
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_timer_color'; ?>"><?php
+                            <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color'); ?>"><?php
                                 esc_html_e('Coupon timer color', 'retainful-next-order-coupon-for-woocommerce');
                                 ?></label>
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($below_discount_position_name) . '[' . esc_attr(RNOC_PLUGIN_PREFIX) . 'coupon_timer_coupon_timer_color]'; ?>"
+                                <input name="<?php echo esc_attr($below_discount_position_name . '[' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color]'); ?>"
                                        type="text" class="rnoc-color-field"
                                        value="<?php echo esc_attr__($settings[RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>">
                             </label>
