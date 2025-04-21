@@ -1,5 +1,5 @@
 <div class="rnoc-coupon-timer-container-<?php echo esc_attr($coupon_timer_position) ?>"><?php
-    echo esc_html($rnoc_coupon_timer_message);
+    echo wp_kses_post($rnoc_coupon_timer_message);
     if ($rnoc_enable_checkout_button && !empty($rnoc_enable_checkout_button)) {
         ?>
         <a href="<?php echo esc_url($rnoc_checkout_url); ?>"
