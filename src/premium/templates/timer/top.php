@@ -46,7 +46,7 @@
             ?>
             jQuery.post("<?php echo esc_url(admin_url('admin-ajax.php?action=rnoc_coupon_timer_expired')) ?>", function (data, status) {
                 if (data.success) {
-                    window.location.reload();-1
+                    window.location.reload();
 
                 }
             });
