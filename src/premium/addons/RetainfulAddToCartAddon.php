@@ -740,7 +740,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                         <td>
                         <textarea name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'); ?>"
                                   rows="5" cols="50"
-                                  id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'); ?>"><?php echo  esc_attr__( ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_extra_class'])); ?>
+                                  id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class'); ?>"><?php echo  esc_attr( ($settings[esc_attr(RNOC_PLUGIN_PREFIX) . 'add_to_cart_extra_class'])); ?>
                         </textarea>
                             <p class="description">
                                 <?php
@@ -1024,7 +1024,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                             <textarea
                                     name="<?php echo esc_attr($gdpr_compliance_name . '[' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message]'); ?>"
                                     rows="10"
-                                    cols="50"><?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'])); ?>
+                                    cols="50"><?php echo  esc_attr( ($settings[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'])); ?>
                             </textarea>
                             </label>
                             <p class="description">
@@ -1089,7 +1089,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                    class="search-and-select-coupon"
                                    autocomplete="off"
                                    placeholder="<?php esc_html_e('Search for a coupon code', 'retainful-next-order-coupon-for-woocommerce'); ?>"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'woo_coupon']));?>">
+                                   value="<?php echo  esc_attr( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'woo_coupon']));?>">
                             <p class="description">
                                 <b>Note</b>:This is a list of coupon codes from WooCommerce -> Coupons. If none found,
                                 please create the coupon code in WooCommerce -> Coupons
@@ -1107,7 +1107,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                    name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading]'); ?>"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading'); ?>"
                                    class="regular-text"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading']));?>">
+                                   value="<?php echo  esc_attr( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading']));?>">
                             <p class="description">
                                 <b>Note</b>:You need to enable coupon
                             </p>
@@ -1124,7 +1124,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                    name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color]'); ?>"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color'); ?>"
                                    class="rnoc-color-field"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color']));?>">
+                                   value="<?php echo  esc_attr( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color']));?>">
                         </td>
                     </tr>
                     <tr>
@@ -1191,7 +1191,7 @@ if (!class_exists('RetainfulAddToCartAddon')) {
                                    name="<?php echo  esc_attr($modal_coupon_settings_name. '[' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject]'); ?>"
                                    id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'); ?>"
                                    class="regular-text"
-                                   value="<?php echo  esc_attr__( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'])); ?>">
+                                   value="<?php echo  esc_attr( ($settings[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template_subject'])); ?>">
                         </td>
                     </tr>
                     <tr class="row_atcp_mail_template">
