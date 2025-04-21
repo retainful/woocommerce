@@ -160,7 +160,7 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_coupon_applicable_to'; ?>"
+                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to'); ?>"
                             id="retainful_coupon_applicable_to"
                             class="regular-text">
                         <?php
@@ -179,22 +179,22 @@ require_once "tabs.php";
             </tr>
             <tr>
                 <th scope="row">
-                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'automatically_generate_coupon'; ?>"><?php
+                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon'); ?>"><?php
                         esc_html_e('Allow next order coupons for orders created in the backend and also for old orders (when resending the email notification)', 'retainful-next-order-coupon-for-woocommerce');
                         ?></label>
                 </th>
                 <td>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'automatically_generate_coupon'; ?>" type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'automatically_generate_coupon_1'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon'); ?>" type="radio"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon_1'); ?>"
                                value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon'] == '1') {
                             echo "checked";
                         } ?>>
                         <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                     </label>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'automatically_generate_coupon'; ?>" type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'automatically_generate_coupon_0'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon'); ?>" type="radio"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon_0'); ?>"
                                value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon'] == '0') {
                             echo "checked";
                         } ?>>
@@ -209,24 +209,24 @@ require_once "tabs.php";
             </tr>
             <tr>
                 <th scope="row">
-                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'show_next_order_coupon_in_thankyou_page'; ?>"><?php
+                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page'); ?>"><?php
                         esc_html_e('Show next order coupon in order "Thank you" page?', 'retainful-next-order-coupon-for-woocommerce');
                         ?></label>
                 </th>
                 <td>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'show_next_order_coupon_in_thankyou_page'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page'); ?>"
                                type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'show_next_order_coupon_in_thankyou_page_1'; ?>"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page_1'); ?>"
                                value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page'] == '1') {
                             echo "checked";
                         } ?>>
                         <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                     </label>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'show_next_order_coupon_in_thankyou_page'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page'); ?>"
                                type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'show_next_order_coupon_in_thankyou_page_0'; ?>"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page_0'); ?>"
                                value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page'] == '0') {
                             echo "checked";
                         } ?>>
@@ -241,7 +241,7 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_add_coupon_message_to'; ?>"
+                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to'); ?>"
                             id="retainful_add_coupon_message_to"
                             class="regular-text">
                         <?php
@@ -301,7 +301,7 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'preferred_order_status[]'; ?>"
+                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'preferred_order_status[]'); ?>"
                             id="preferred_order_status" multiple
                             class="rnoc-multi-select">
                         <?php
@@ -337,7 +337,7 @@ require_once "tabs.php";
                     <?php
                     if ($is_pro_plan) {
                         ?>
-                        <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'preferred_user_roles[]'; ?>"
+                        <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'preferred_user_roles[]'); ?>"
                                 id="preferred_user_roles" multiple
                                 class="rnoc-multi-select">
                             <?php
@@ -374,7 +374,7 @@ require_once "tabs.php";
                     <?php
                     if ($is_pro_plan) {
                         ?>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'limit_per_user'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'limit_per_user'); ?>"
                                type="number"
                                id="limit_per_user"
                                value="<?php echo intval($settings[RNOC_PLUGIN_PREFIX . 'limit_per_user']); ?>"
@@ -401,7 +401,7 @@ require_once "tabs.php";
                     <?php
                     if ($is_pro_plan) {
                         ?>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'minimum_sub_total'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'minimum_sub_total'); ?>"
                                type="number"
                                id="minimum_sub_total"
                                value="<?php echo intval($settings[RNOC_PLUGIN_PREFIX . 'minimum_sub_total']); ?>"
@@ -428,7 +428,7 @@ require_once "tabs.php";
                     <?php
                     if ($is_pro_plan) {
                         ?>
-                        <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exclude_generating_coupon_for_products[]'; ?>"
+                        <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products[]'); ?>"
                                 id="exclude_generating_coupon_for_products" multiple
                                 class="wc-product-search"
                                 data-placeholder="<?php esc_attr_e('Search for a product&hellip;', 'retainful-next-order-coupon-for-woocommerce'); ?>"
@@ -469,7 +469,7 @@ require_once "tabs.php";
                     <?php
                     if ($is_pro_plan) {
                         ?>
-                        <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exclude_generating_coupon_for_categories[]'; ?>"
+                        <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories[]'); ?>"
                                 id="exclude_generating_coupon_for_categories" multiple
                                 class="rnoc-multi-select">
                             <?php
@@ -519,7 +519,7 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'minimum_spend'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'minimum_spend'); ?>"
                            type="number"
                            id="minimum_spend"
                            value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'minimum_spend']); ?>"
@@ -538,7 +538,7 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'maximum_spend'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'maximum_spend'); ?>"
                            type="number"
                            id="maximum_spend"
                            value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'maximum_spend']); ?>"
@@ -557,12 +557,12 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <label><input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'individual_use_only'; ?>"
+                    <label><input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'individual_use_only'); ?>"
                                   type="checkbox"
                                   id="individual_use_only"
                                   value="1" <?php if (isset($settings[RNOC_PLUGIN_PREFIX . 'individual_use_only'])) {
                             echo 'checked';
-                        }; ?>
+                        } ?>
                                   class="regular-text">
                         <?php
                         esc_html_e('Check this box if the coupon cannot be used in conjunction with other coupons.', 'retainful-next-order-coupon-for-woocommerce');
@@ -577,12 +577,12 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <label><input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exclude_sale_items'; ?>"
+                    <label><input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'exclude_sale_items'); ?>"
                                   type="checkbox"
                                   id="exclude_sale_items"
                                   value="1" <?php if (isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_sale_items'])) {
                             echo 'checked';
-                        }; ?> class="regular-text">
+                        } ?> class="regular-text">
                         <?php
                         esc_html_e('Check this box if the coupon should not apply to items on sale. Per-item coupons will only work if the item is not on sale. Per-cart coupons will only work if there are items in the cart that are not on sale.', 'retainful-next-order-coupon-for-woocommerce');
                         ?>
@@ -596,7 +596,7 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'products[]'; ?>"
+                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'products[]'); ?>"
                             id="products" multiple
                             class="wc-product-search"
                             data-placeholder="<?php esc_attr_e('Search for a product&hellip;', 'retainful-next-order-coupon-for-woocommerce'); ?>"
@@ -625,7 +625,7 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exclude_products[]'; ?>"
+                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'exclude_products[]'); ?>"
                             id="exclude_products" multiple
                             class="wc-product-search"
                             data-placeholder="<?php esc_attr_e('Search for a product&hellip;', 'retainful-next-order-coupon-for-woocommerce'); ?>"
@@ -655,7 +655,7 @@ require_once "tabs.php";
                     </label>
                 </th>
                 <td>
-                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'product_categories[]'; ?>"
+                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'product_categories[]'); ?>"
                             id="product_categories" multiple="multiple"
                             class="rnoc-multi-select">
                         <?php
@@ -685,7 +685,7 @@ require_once "tabs.php";
                     </label>
                 </th>
                 <td>
-                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'exclude_product_categories[]'; ?>"
+                    <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'exclude_product_categories[]'); ?>"
                             id="exclude_product_categories" multiple="multiple"
                             class="rnoc-multi-select">
                         <?php
@@ -725,22 +725,22 @@ require_once "tabs.php";
             <tbody>
             <tr>
                 <th scope="row">
-                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_applied_popup'; ?>"><?php
+                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'); ?>"><?php
                         esc_html_e('Enable response popup', 'retainful-next-order-coupon-for-woocommerce');
                         ?></label>
                 </th>
                 <td>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_applied_popup'; ?>" type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_applied_popup_1'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'); ?>" type="radio"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup_1'); ?>"
                                value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'] == '1') {
                             echo "checked";
                         } ?>>
                         <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                     </label>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_applied_popup'; ?>" type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_coupon_applied_popup_0'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'); ?>" type="radio"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup_0'); ?>"
                                value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'] == '0') {
                             echo "checked";
                         } ?>>
