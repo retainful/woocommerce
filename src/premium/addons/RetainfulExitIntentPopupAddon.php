@@ -714,7 +714,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX). 'enable_delay_trigger]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX. 'enable_delay_trigger]'); ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '0') {
                                     echo "checked";
@@ -731,7 +731,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX). 'exit_intent_popup_delay_sec]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX. 'exit_intent_popup_delay_sec]'); ?>"
                                        type="text" class="regular-text"
                                        value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec']); ?>"><?php //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>
                             </label>
@@ -748,7 +748,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX). 'enable_scroll_distance_trigger]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX. 'enable_scroll_distance_trigger]'); ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '1') {
                                     echo "checked";
@@ -756,7 +756,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                                 <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                             </label>
                             <label>
-                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX). 'enable_scroll_distance_trigger]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX. 'enable_scroll_distance_trigger]'); ?>"
                                        type="radio"
                                        value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger'] == '0') {
                                     echo "checked";
