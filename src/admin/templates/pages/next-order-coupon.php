@@ -19,22 +19,22 @@ require_once "tabs.php";
             <tbody>
             <tr>
                 <th scope="row">
-                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_next_order_coupon'; ?>"><?php
+                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon'); ?>"><?php
                         esc_html_e('Enable next order coupon?', 'retainful-next-order-coupon-for-woocommerce');
                         ?></label>
                 </th>
                 <td>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_next_order_coupon'; ?>" type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_next_order_coupon_1'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon'); ?>" type="radio"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon_1'); ?>"
                                value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon'] == '1') {
                             echo "checked";
                         } ?>>
                         <?php esc_html_e('Yes', 'retainful-next-order-coupon-for-woocommerce'); ?>
                     </label>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_next_order_coupon'; ?>" type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'enable_next_order_coupon_0'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon'); ?>" type="radio"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon_0'); ?>"
                                value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon'] == '0') {
                             echo "checked";
                         } ?>>
@@ -51,22 +51,22 @@ require_once "tabs.php";
             </tr>
             <tr>
                 <th scope="row">
-                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_coupon_type'; ?>"><?php
+                    <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'); ?>"><?php
                         esc_html_e('Coupon type', 'retainful-next-order-coupon-for-woocommerce');
                         ?></label>
                 </th>
                 <td>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_coupon_type'; ?>" type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_coupon_type_0'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'); ?>" type="radio"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_coupon_type_0'); ?>"
                                value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] == '0') {
                             echo "checked";
                         } ?>>
                         <?php esc_html_e('Percentage', 'retainful-next-order-coupon-for-woocommerce'); ?>
                     </label>
                     <label>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_coupon_type'; ?>" type="radio"
-                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_coupon_type_1'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'); ?>" type="radio"
+                               id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_coupon_type_1'); ?>"
                                value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] == '1') {
                             echo "checked";
                         } ?>>
@@ -81,7 +81,7 @@ require_once "tabs.php";
                         ?></label>
                 </th>
                 <td>
-                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_coupon_amount'; ?>"
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'); ?>"
                            type="number"
                            id="app_coupon_value"
                            value="<?php echo floatval($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']); ?>"
@@ -103,7 +103,7 @@ require_once "tabs.php";
                             ?></label>
                     </th>
                     <td>
-                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'retainful_expire_days'; ?>"
+                        <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'retainful_expire_days'); ?>"
                                type="number"
                                id="retainful_expire_days"
                                value="<?php echo intval($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']); ?>"
@@ -133,7 +133,7 @@ require_once "tabs.php";
                             ?></label>
                     </th>
                     <td>
-                        <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX) . 'expire_date_format'; ?>"
+                        <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'expire_date_format'); ?>"
                                 id="expire_date_format"
                                 class="regular-text">
                             <?php
