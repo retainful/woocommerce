@@ -10,7 +10,7 @@ class Cookie extends Base
      */
     function hasKey($key)
     {
-        return (isset($_COOKIE[$key]));
+        return (isset($_COOKIE[$key])); //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
     }
 
     /**
