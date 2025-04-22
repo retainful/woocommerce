@@ -59,8 +59,7 @@ require_once "tabs.php";
                     <?php
                     $scheduled_action = admin_url('tools.php?page=action-scheduler');
                     /* translators: %s: Real time tracking url */
-                    echo wp_kses_post(__("Turning on this option will stop real-time tracking of order activities like order placement. Instead, the Retainful API will rely on WooCommerce's Webhooks to send the order information as a background task.<br>Remember: WooCommerce uses the <a target='_blank' href='".esc_url($scheduled_action)."'>Scheduled Actions</a> to execute webhooks in the background for this. So, make sure your cron setup is correct. If cron isn't working, order details won't reach Retainful API, and your workflow triggers won't work right.", 'retainful-next-order-coupon-for-woocommerce')); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
-                    ?>
+                    echo wp_kses_post(sprintf(__("Turning on this option will stop real-time tracking of order activities like order placement. Instead, the Retainful API will rely on WooCommerce's Webhooks to send the order information as a background task.<br>Remember: WooCommerce uses the %s to execute webhooks in the background for this. So, make sure your cron setup is correct. If cron isn't working, order details won't reach Retainful API, and your workflow triggers won't work right.", 'retainful-next-order-coupon-for-woocommerce'),"<a target='_blank' href='".esc_url($scheduled_action)."'>".esc_html__("Scheduled Actions","retainful-next-order-coupon-for-woocommerce")."</a>"));                    ?>
                 </p>
             </td>
         </tr>
