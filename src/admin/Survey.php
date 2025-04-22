@@ -37,8 +37,6 @@ class Survey
         if (is_user_logged_in()) {
             if (function_exists('wp_get_current_user')) {
                 $user = wp_get_current_user();
-            } elseif (function_exists('get_currentuserinfo')) {
-                $user = get_currentuserinfo();
             }
             if (!empty($user)) {
                 $display_name = isset($user->display_name) ? $user->display_name : '';
@@ -47,8 +45,8 @@ class Survey
         ?>
         <script type="text/javascript">
             jQuery(function ($) {
-                var $deactivateLink = $('#the-list').find('[data-slug="<?php echo $this->plugin; ?>"] span.deactivate a'),
-                    $overlay = $('#plugin-deactivate-survey-<?php echo $this->plugin; ?>'),
+                var $deactivateLink = $('#the-list').find('[data-slug="<?php echo esc_js($this->plugin); ?>"] span.deactivate a'),
+                    $overlay = $('#plugin-deactivate-survey-<?php echo esc_js($this->plugin); ?>'),
                     $form = $overlay.find('form'),
                     formOpen = false;
                 // Plugin listing table deactivate link.
@@ -56,22 +54,22 @@ class Survey
                     event.preventDefault();
                     $overlay.css('display', 'table');
                     formOpen = true;
-                    $form.find('.<?php echo $this->plugin; ?>-deactivate-survey-option:first-of-type input[type=radio]').focus();
+                    $form.find('.<?php echo esc_js($this->plugin); ?>-deactivate-survey-option:first-of-type input[type=radio]').focus();
                 });
                 // Survey radio option selected.
                 $form.on('change', 'input[type=radio]', function (event) {
                     event.preventDefault();
                     $form.find('input[type=text], .error').hide();
-                    $form.find('.<?php echo $this->plugin; ?>-deactivate-survey-option').removeClass('selected');
-                    $(this).closest('.<?php echo $this->plugin; ?>-deactivate-survey-option').addClass('selected').find('input[type=text]').show();
+                    $form.find('.<?php echo esc_js($this->plugin); ?>-deactivate-survey-option').removeClass('selected');
+                    $(this).closest('.<?php echo esc_js($this->plugin); ?>-deactivate-survey-option').addClass('selected').find('input[type=text]').show();
                 });
                 // Survey Skip & Deactivate.
-                $form.on('click', '.<?php echo $this->plugin; ?>-deactivate-survey-deactivate', function (event) {
+                $form.on('click', '.<?php echo esc_js($this->plugin); ?>-deactivate-survey-deactivate', function (event) {
                     event.preventDefault();
                     location.href = $deactivateLink.attr('href');
                 });
                 // close button
-                $form.on('click', '.<?php echo $this->plugin; ?>-deactivate-survey-close', function (event) {
+                $form.on('click', '.<?php echo esc_js($this->plugin); ?>-deactivate-survey-close', function (event) {
                     event.preventDefault();
                     $overlay.css('display', 'none');
                     formOpen = false;
@@ -80,11 +78,11 @@ class Survey
                 $form.submit(function (event) {
                     event.preventDefault();
                     if (!$form.find('input[type=radio]:checked').val()) {
-                        $form.find('.<?php echo $this->plugin; ?>-deactivate-survey-footer').prepend('<span class="error"><?php echo esc_js(__('Please select an option', $this->plugin_text_domain)); ?></span>');
+                        $form.find('.<?php echo esc_js($this->plugin); ?>-deactivate-survey-footer').prepend('<span class="error"><?php echo esc_js(__('Please select an option', 'retainful-next-order-coupon-for-woocommerce')); ?></span>');
                         return;
                     }
-                    $form.find('.<?php echo $this->plugin; ?>-deactivate-survey-submit').html('<?php echo esc_js(__('Sending Feedback', $this->plugin_text_domain)); ?>').attr("disabled", true).removeClass('button-primary');
-                    var reason = $form.find('.selected .<?php echo $this->plugin; ?>-deactivate-survey-option-reason').val();
+                    $form.find('.<?php echo esc_js($this->plugin); ?>-deactivate-survey-submit').html('<?php echo esc_js(__('Sending Feedback', 'retainful-next-order-coupon-for-woocommerce')); ?>').attr("disabled", true).removeClass('button-primary');
+                    var reason = $form.find('.selected .<?php echo esc_js($this->plugin); ?>-deactivate-survey-option-reason').val();
                     if (reason === "Other") {
                         reason = $form.find('.selected input[type=text]').val();
                     }
@@ -92,13 +90,13 @@ class Survey
                         "subject": "Woocommerce retainful plugin deactivation survey form!",
                         "message": reason,
                         "url": "<?php echo esc_url(home_url()); ?>",
-                        "name": "<?php echo $display_name; ?>",
+                        "name": "<?php echo esc_js($display_name); ?>",
                         "code": $form.find('.selected input[type=radio]').val(),
-                        "token": "<?php echo $this->token ?>"
+                        "token": "<?php echo esc_js($this->token) ?>"
                     };
                     var submitSurvey = $.ajax(
                         {
-                            url: "<?php echo $this->endpoint; ?>",
+                            url: "<?php echo esc_url($this->endpoint); ?>",
                             type: "POST",
                             data: JSON.stringify(post_data),
                             dataType: 'json',
@@ -133,7 +131,7 @@ class Survey
     {
         ?>
         <style type="text/css">
-            .<?php echo $this->plugin; ?>-deactivate-survey-modal {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-modal {
                 display: none;
                 table-layout: fixed;
                 position: fixed;
@@ -147,12 +145,12 @@ class Survey
                 background: rgba(0, 0, 0, 0.8);
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-wrap {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-wrap {
                 display: table-cell;
                 vertical-align: middle;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey {
                 background-color: #fff;
                 max-width: 550px;
                 margin: 0 auto;
@@ -160,13 +158,13 @@ class Survey
                 text-align: left;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey .error {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey .error {
                 display: block;
                 color: red;
                 margin: 0 0 10px 0;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-header {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-header {
                 display: block;
                 font-size: 18px;
                 font-weight: 700;
@@ -177,11 +175,11 @@ class Survey
                 position: relative;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-title {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-title {
                 text-align: left;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-close {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-close {
                 text-align: right;
                 position: absolute;
                 right: 0px;
@@ -189,36 +187,36 @@ class Survey
                 cursor: pointer;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-title span {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-title span {
                 color: #999;
                 margin-right: 10px;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-desc {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-desc {
                 display: block;
                 font-weight: 600;
                 margin: 0 0 18px 0;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-option {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option {
                 margin: 0 0 10px 0;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-option-input {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option-input {
                 margin-right: 10px !important;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-option-details {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option-details {
                 display: none;
                 width: 90%;
                 margin: 10px 0 0 30px;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-footer {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-footer {
                 margin-top: 18px;
             }
 
-            .<?php echo $this->plugin; ?>-deactivate-survey-deactivate {
+            .<?php echo esc_attr($this->plugin); ?>-deactivate-survey-deactivate {
                 float: right;
                 font-size: 13px;
                 color: #ccc;
@@ -236,94 +234,94 @@ class Survey
     {
         $options = array(
             1 => array(
-                'title' => esc_html__('I could not connect to Retainful', $this->plugin_text_domain),
+                'title' => esc_html__('I could not connect to Retainful', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'I could not connect to Retainful'
             ),
             2 => array(
-                'title' => esc_html__('The carts are not synchronizing to Retainful', $this->plugin_text_domain),
+                'title' => esc_html__('The carts are not synchronizing to Retainful', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'The carts are not synchronizing to Retainful'
             ),
             3 => array(
-                'title' => esc_html__('Abandoned Cart mails are not sending', $this->plugin_text_domain),
+                'title' => esc_html__('Abandoned Cart mails are not sending', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'Abandoned Cart mails are not sending'
             ),
             4 => array(
-                'title' => esc_html__('Next order coupons are not working', $this->plugin_text_domain),
+                'title' => esc_html__('Next order coupons are not working', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'Next order coupons are not working'
             ),
             5 => array(
-                'title' => esc_html__('Plugin conflicts with another', $this->plugin_text_domain),
+                'title' => esc_html__('Plugin conflicts with another', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'Plugin conflicts with another'
             ),
             6 => array(
-                'title' => esc_html__('I find too complex to configure', $this->plugin_text_domain),
+                'title' => esc_html__('I find too complex to configure', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'I find too complex to configure'
             ),
             7 => array(
-                'title' => esc_html__('I am looking for more features', $this->plugin_text_domain),
+                'title' => esc_html__('I am looking for more features', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'I am looking for more features'
             ),
             8 => array(
-                'title' => esc_html__('Its a temporary deactivation', $this->plugin_text_domain),
+                'title' => esc_html__('Its a temporary deactivation', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'Its a temporary deactivation'
             ),
             9 => array(
-                'title' => esc_html__('Retainful Support has asked to deactivate the plugin', $this->plugin_text_domain),
+                'title' => esc_html__('Retainful Support has asked to deactivate the plugin', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'Retainful Support has asked to deactivate the plugin'
             ),
             10 => array(
-                'title' => esc_html__('Other', $this->plugin_text_domain),
+                'title' => esc_html__('Other', 'retainful-next-order-coupon-for-woocommerce'),
                 'reason' => 'Other',
-                'details' => esc_html__('Please share the reason', $this->plugin_text_domain),
+                'details' => esc_html__('Please share the reason', 'retainful-next-order-coupon-for-woocommerce'),
             ),
         );
         ?>
-        <div class="<?php echo $this->plugin; ?>-deactivate-survey-modal"
-             id="plugin-deactivate-survey-<?php echo $this->plugin; ?>">
-            <div class="<?php echo $this->plugin; ?>-deactivate-survey-wrap">
-                <form class="<?php echo $this->plugin; ?>-deactivate-survey" method="post">
-						<span class="<?php echo $this->plugin; ?>-deactivate-survey-header">
+        <div class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-modal"
+             id="plugin-deactivate-survey-<?php echo esc_attr($this->plugin); ?>">
+            <div class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-wrap">
+                <form class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey" method="post">
+						<span class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-header">
 							<span class="dashicons dashicons-testimonial"></span>
-							<?php echo ' ' . esc_html__('Quick Feedback', $this->plugin_text_domain); ?>
-							<span title="<?php esc_attr_e('Close', $this->plugin_text_domain); ?> "
-                                  class="<?php echo $this->plugin; ?>-deactivate-survey-close">✕</span>
+							<?php echo ' ' . esc_html__('Quick Feedback', 'retainful-next-order-coupon-for-woocommerce'); ?>
+							<span title="<?php esc_attr_e('Close', 'retainful-next-order-coupon-for-woocommerce'); ?> "
+                                  class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-close">✕</span>
 						</span>
-                    <span class="<?php echo $this->plugin; ?>-deactivate-survey-desc">
+                    <span class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-desc">
 							<?php
                             printf(
                             /* translators: %s - plugin name. */
-                                esc_html__('If you have a moment, please share why you are deactivating %s:', $this->plugin_text_domain),
-                                esc_html__('Retainful - Next order coupon for Woocommerce', $this->plugin_text_domain)
+                                esc_html__('If you have a moment, please share why you are deactivating %s:', 'retainful-next-order-coupon-for-woocommerce'),
+                                esc_html__('Retainful - Next order coupon for Woocommerce', 'retainful-next-order-coupon-for-woocommerce')
                             );
                             ?>
 						</span>
-                    <div class="<?php echo $this->plugin; ?>-deactivate-survey-options">
+                    <div class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-options">
                         <?php foreach ($options as $id => $option) : ?>
-                            <div class="<?php echo $this->plugin; ?>-deactivate-survey-option">
-                                <label for="<?php echo $this->plugin; ?>-deactivate-survey-option-<?php echo $this->plugin; ?>-<?php echo $id; ?>"
-                                       class="<?php echo $this->plugin; ?>-deactivate-survey-option-label">
-                                    <input id="<?php echo $this->plugin; ?>-deactivate-survey-option-<?php echo $this->plugin; ?>-<?php echo $id; ?>"
-                                           class="<?php echo $this->plugin; ?>-deactivate-survey-option-input"
+                            <div class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option">
+                                <label for="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option-<?php echo esc_attr($this->plugin); ?>-<?php echo esc_attr($id); ?>"
+                                       class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option-label">
+                                    <input id="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option-<?php echo esc_attr($this->plugin); ?>-<?php echo esc_attr($id); ?>"
+                                           class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option-input"
                                            type="radio"
-                                           name="code" value="<?php echo $id; ?>"/>
-                                    <span class="<?php echo $this->plugin; ?>-deactivate-survey-option-title"><?php echo $option['title']; ?></span>
-                                    <input class="<?php echo $this->plugin; ?>-deactivate-survey-option-reason"
+                                           name="code" value="<?php echo esc_attr($id); ?>"/>
+                                    <span class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option-title"><?php echo esc_html($option['title']); ?></span>
+                                    <input class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option-reason"
                                            type="hidden"
-                                           value="<?php echo $option['reason']; ?>"/>
+                                           value="<?php echo esc_attr($option['reason']); ?>"/>
                                 </label>
                                 <?php if (!empty($option['details'])) : ?>
-                                    <input class="<?php echo $this->plugin; ?>-deactivate-survey-option-details"
+                                    <input class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-option-details"
                                            type="text"
-                                           placeholder="<?php echo $option['details']; ?>"/>
+                                           placeholder="<?php echo esc_attr($option['details']); ?>"/>
                                 <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    <div class="<?php echo $this->plugin; ?>-deactivate-survey-footer">
+                    <div class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-footer">
                         <button type="submit"
-                                class="<?php echo $this->plugin; ?>-deactivate-survey-submit button button-primary button-large"><?php echo esc_html__('Submit & Deactivate', $this->plugin_text_domain); ?></button>
+                                class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-submit button button-primary button-large"><?php echo esc_html__('Submit & Deactivate', 'retainful-next-order-coupon-for-woocommerce'); ?></button>
                         <a href="#"
-                           class="<?php echo $this->plugin; ?>-deactivate-survey-deactivate"><?php echo esc_html__('Skip & Deactivate', $this->plugin_text_domain); ?></a>
+                           class="<?php echo esc_attr($this->plugin); ?>-deactivate-survey-deactivate"><?php echo esc_html__('Skip & Deactivate', 'retainful-next-order-coupon-for-woocommerce'); ?></a>
                     </div>
                 </form>
             </div>
@@ -366,7 +364,7 @@ class Survey
         if (false === strpos($url, 'http://') && false === strpos($url, 'https://')) {
             $url = 'http://' . $url;
         }
-        $url_parts = parse_url($url);
+        $url_parts = function_exists('wp_parse_url') ? wp_parse_url($url): '';
         $host = !empty($url_parts['host']) ? $url_parts['host'] : false;
         if (!empty($url) && !empty($host)) {
             if (false !== ip2long($host)) {
