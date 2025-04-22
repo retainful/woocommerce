@@ -293,33 +293,31 @@ class Category extends Order {
 			}
 			$category_data = self::getWebhookCategoryData( $term_id,$topic );
 
-			if ( is_array( $category_data['ExternalCategoryId'] ) || empty( $category_data['AppId'] ) ) {
+			if ( empty( $category_data['ExternalCategoryId'] ) || empty( $category_data['AppId'] ) ) {
 				self::$settings->logMessage( $category_data, 'API category data missing' );
 				$status   = 400;
-				$response = array(
+				$response = [
 					'success'       => false,
 					'RESPONSE_CODE' => 'DATA_MISSING',
 					'message'       => 'Invalid data!'
-				);
+				];
 				return new \WP_REST_Response( $response, $status );
 			}
-			$category_data['digest']     = self::hashToken( array(
+			$category_data['digest']     = self::hashToken( [
 				$category_data['ExternalCategoryId'],
 				$category_data['AppId'],
-			) );
+			] );
 			if ( ! empty( $category_data ) ) {
 				$app_id        = self::$settings->getApiKey();
-				$extra_headers = array(
+				$extra_headers = [
 					"X-Retainful-Version" => RNOC_VERSION,
 					"app_id"              => $app_id,
 					"Content-Type"        => 'application/json'
-				);
+				];
 				foreach ( $extra_headers as $key => $value ) {
 					$http_args['headers'][ $key ] = $value;
 				}
-				$body              = array(
-					'data' => $rest_api->encryptData( $category_data)
-				);
+				$body              = [ 'data' => $rest_api->encryptData( $category_data) ];
 				$http_args['body'] = trim( wp_json_encode( $body ) );
 			}
 		} catch ( Exception $e ) {

@@ -228,14 +228,14 @@ class Products extends Order {
 				return $http_args;
 			}
 			$product_data = $this->setProductData( $product_id );
-			if ( is_array( $product_data['Id'] ) || empty( $product_data['CreatedAt'] ) ) {
+			if ( empty( $product_data['Id'] ) || empty( $product_data['CreatedAt'] ) ) {
 				self::$settings->logMessage( $product_data, 'API Product data missing' );
 				$status   = 400;
-				$response = array(
+				$response = [
 					'success'       => false,
 					'RESPONSE_CODE' => 'DATA_MISSING',
 					'message'       => 'Invalid data!'
-				);
+				];
 				return new \WP_REST_Response( $response, $status );
 			}
 
