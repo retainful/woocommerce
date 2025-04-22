@@ -36,7 +36,7 @@ class Settings
     {
         if (!$this->isNewInstallation()) {
             $move_to_cloud_url = admin_url('admin.php?page=' . $this->slug . '_license&move_to_cloud=yes');
-            return '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("Manage your abandoned carts effectively in Retainful Dashboard & get more features ", 'retainful-next-order-coupon-for-woocommerce') . '&nbsp; <a class="button-primary align-right" href="' . $move_to_cloud_url . '">' . esc_html("Switch to cloud!") . '</a>&nbsp;<a href="https://www.retainful.com/blog/abandoned-cart-solutions-cloud-based-solutions-vs-self-hosted-plugin-based-solutions" target="_blank">' . __("Learn more", 'retainful-next-order-coupon-for-woocommerce') . '</a></p>';
+            return '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("Manage your abandoned carts effectively in Retainful Dashboard & get more features ", 'retainful-next-order-coupon-for-woocommerce') . '&nbsp; <a class="button-primary align-right" href="' . $move_to_cloud_url . '">' . esc_html__("Switch to cloud!", 'retainful-next-order-coupon-for-woocommerce') . '</a>&nbsp;<a href="https://www.retainful.com/blog/abandoned-cart-solutions-cloud-based-solutions-vs-self-hosted-plugin-based-solutions" target="_blank">' . __("Learn more", 'retainful-next-order-coupon-for-woocommerce') . '</a></p>';
         }
         return NULL;
     }
