@@ -706,7 +706,7 @@ if (!class_exists('RetainfulExitIntentPopupAddon')) {
                         </th>
                         <td>
                             <label>
-                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX). 'enable_delay_trigger]'; ?>"
+                                <input name="<?php echo esc_attr($mobile_popup_settings . '[' . RNOC_PLUGIN_PREFIX. 'enable_delay_trigger]'); ?>"
                                        type="radio"
                                        value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings'][0][RNOC_PLUGIN_PREFIX . 'enable_delay_trigger'] == '1') {
                                     echo "checked";
