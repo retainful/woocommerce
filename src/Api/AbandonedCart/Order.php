@@ -175,7 +175,7 @@ class Order extends RestApi
                 if ($is_order_recovered == false && self::$woocommerce->getOrderMeta($order, '_rnoc_recovered_by') == 1) {
                     $order->delete_meta_data($this->pending_recovery_key_for_db);
                     $order->update_meta_data($this->order_recovered_key_for_db, true);
-                    $order->add_order_note(__('Order recovered by Retainful.', RNOC_TEXT_DOMAIN));
+                    $order->add_order_note(__('Order recovered by Retainful.', 'retainful-next-order-coupon-for-woocommerce'));
                     do_action('rnoc_abandoned_order_recovered', $order);
                 }
             }
@@ -416,7 +416,7 @@ class Order extends RestApi
         if ($fees = self::$woocommerce->getOrderFees($order)) {
             foreach ($fees as $id => $fee) {
                 $fee_items[] = array(
-                    'title' => html_entity_decode($fee['name'] ? $fee['name'] : __('Fee', RNOC_TEXT_DOMAIN)),
+                    'title' => html_entity_decode($fee['name'] ? $fee['name'] : __('Fee', 'retainful-next-order-coupon-for-woocommerce')),
                     'key' => $id,
                     'amount' => $this->formatDecimalPrice(($excluding_tax) ? $fee['line_total'] : $fee['line_total'] + $fee['line_tax'])
                 );
