@@ -17,7 +17,7 @@ require_once "tabs.php";
             ?>
             <ul class="rnoc-premium-addon-nav">
                 <li>
-                    <a class="" href="<?php echo $base_url; ?>"><i class="dashicons dashicons-admin-plugins"></i>&nbsp;Add-ons
+                    <a class="" href="<?php echo esc_url($base_url); ?>"><i class="dashicons dashicons-admin-plugins"></i>&nbsp;Add-ons
                         list</a>
                 </li>
                 <?php
@@ -32,8 +32,8 @@ require_once "tabs.php";
                         echo "active";
                     } ?>">
                         <a class=""
-                           href="<?php echo add_query_arg(array('add-on' => $slug), $base_url) ?>"
-                        ><i class="dashicons <?php echo $addon->icon(); ?>"></i>&nbsp;<?php echo $title; ?>
+                           href="<?php echo esc_url(add_query_arg(array('add-on' => $slug), $base_url)) ?>"
+                        ><i class="dashicons <?php echo esc_attr($addon->icon()); ?>"></i>&nbsp;<?php echo esc_html($title); ?>
                         </a>
                     </li>
                     <?php
@@ -46,9 +46,9 @@ require_once "tabs.php";
     </div>
     <div class="card" style="width: 74%;float: left;margin-left: 5px;">
         <button type="submit" data-action="rnoc_save_premium_addon_settings"
-                data-security="<?php echo wp_create_nonce('rnoc_save_premium_addon_settings') ?>"
+                data-security="<?php echo esc_attr(wp_create_nonce('rnoc_save_premium_addon_settings')) ?>"
                 class="button button-primary button-right-fixed"><i
-                    class="dashicons dashicons-yes"></i>&nbsp;&nbsp;<span><?php esc_html_e('save', RNOC_TEXT_DOMAIN); ?></span>
+                    class="dashicons dashicons-yes"></i>&nbsp;&nbsp;<span><?php esc_html_e('save', 'retainful-next-order-coupon-for-woocommerce'); ?></span>
         </button>
         <?php
         do_action('rnoc_premium_addon_settings_page_' . $add_on_slug, $settings, $base_url, $add_on_slug);
@@ -60,8 +60,8 @@ require_once "tabs.php";
                 </th>
                 <td>
                     <button type="submit" data-action="rnoc_save_premium_addon_settings"
-                            data-security="<?php echo wp_create_nonce('rnoc_save_premium_addon_settings') ?>"
-                            class="button button-primary"><?php esc_html_e('save', RNOC_TEXT_DOMAIN); ?></button>
+                            data-security="<?php echo esc_attr(wp_create_nonce('rnoc_save_premium_addon_settings')) ?>"
+                            class="button button-primary"><?php esc_html_e('save', 'retainful-next-order-coupon-for-woocommerce'); ?></button>
                 </td>
             </tr>
             </tbody>
