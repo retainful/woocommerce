@@ -46,29 +46,22 @@ class Category extends Order {
 		}
 		$limit = ! empty( $params['limit'] ) ? $params['limit'] : 10;
 		$since_id = ! empty( $params['since_id'] ) ? $params['since_id'] : 10;
-
 		global $wpdb;
-		$query = $wpdb->prepare("SELECT t.term_id, t.name, tt.taxonomy FROM {$wpdb->terms} t
-        INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
-        WHERE tt.taxonomy = %s AND t.term_id > %d
-        ORDER BY t.term_id ASC
-        LIMIT %d
-    ", 'product_cat', $since_id, $limit);
-
-		return $wpdb->get_results($query);
+		return $wpdb->get_results($wpdb->prepare("SELECT t.term_id, t.name, tt.taxonomy FROM {$wpdb->terms} t INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id WHERE tt.taxonomy = %s AND t.term_id > %d ORDER BY t.term_id ASC LIMIT %d", 'product_cat', $since_id, $limit)); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	}
 
 	public static function getProductIdsByCategoryId($category_id) {
 		global $wpdb;
-		$product_ids = $wpdb->get_col($wpdb->prepare("
-        SELECT p.ID FROM {$wpdb->posts} p
-        INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
-        INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
-        WHERE tt.term_id = %d 
-        AND p.post_type = 'product' 
-        AND p.post_status = 'publish'
-    ", $category_id));
+		$product_ids = $wpdb->get_col( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(" 
+		        SELECT p.ID FROM {$wpdb->posts} p
+		        INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+		        INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+		        WHERE tt.term_id = %d 
+		        AND p.post_type = 'product' 
+		        AND p.post_status = 'publish'
+		    ", $category_id));
 		return $product_ids;
 	}
 
@@ -200,8 +193,7 @@ class Category extends Order {
 
 			return new \WP_REST_Response( $response, $status );
 		}
-		$total_categories = function_exists('wp_count_terms') ? wp_count_terms( 'product_cat', array( 'hide_empty' => false ) ) : '';
-
+		$total_categories = function_exists('wp_count_terms') ? wp_count_terms( array( 'taxonomy'   => 'product_cat', 'hide_empty' => false, ) ) : '' ;
 		$response = array(
 			'success'       => true,
 			'RESPONSE_CODE' => 'Ok',
