@@ -53,17 +53,8 @@ class Products extends Order {
 		}
 		$limit = ! empty( $params['limit'] ) ? $params['limit'] : 10;
 		$since_id = ! empty( $params['since_id'] ) ? $params['since_id'] : 10;
-
 		global $wpdb;
-		$query = $wpdb->prepare( "SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status NOT IN (%s, %s, %s) ORDER BY ID ASC LIMIT %d", array(
-			$since_id,
-			'trash',
-			'auto-draft',
-			'draft',
-			(int) $limit
-		) );
-
-		return $wpdb->get_results( $query );
+		return $wpdb->get_results( $wpdb->prepare( "SELECT {$wpdb->prefix}posts.ID FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status NOT IN (%s, %s, %s) ORDER BY ID ASC LIMIT %d", array($since_id, 'trash', 'auto-draft', 'draft', (int) $limit ) ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	}
 
@@ -74,14 +65,7 @@ class Products extends Order {
 	 */
 	protected function getProductCount() {
 		global $wpdb;
-		$query = $wpdb->prepare( "SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status NOT IN (%s, %s, %s)", array(
-			0,
-			'trash',
-			'auto-draft',
-			'draft'
-		) );
-
-		return $wpdb->get_var( $query );
+		return $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT {$wpdb->prefix}posts.ID) FROM {$wpdb->prefix}posts WHERE post_type IN ('product') AND ID > %d AND post_status NOT IN (%s, %s, %s)", array( 0, 'trash', 'auto-draft', 'draft' ) ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -354,8 +338,8 @@ class Products extends Order {
 			'ProductCreatedAt'       => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_created' ) ? strtotime( $product->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
 			'ProductUpdatedAt'       => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_modified' ) ? strtotime( $product->get_date_modified() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
 			'ProductPublishedAt'     => $this->formatToIso8601( self::$woocommerce->isMethodExists( $product, 'get_date_created' ) ? strtotime( $product->get_date_created() ) : strtotime( '0000-00-00T00:00:00+00:00' ) ),
-			'CreatedAt'              => $this->formatToIso8601(strtotime(date('Y-m-d H:i:s'))),
-			'UpdatedAt'              => $this->formatToIso8601(strtotime(date('Y-m-d H:i:s'))),
+			'CreatedAt'              => $this->formatToIso8601(strtotime(gmdate('Y-m-d H:i:s'))),
+			'UpdatedAt'              => $this->formatToIso8601(strtotime(gmdate('Y-m-d H:i:s'))),
 			'DeletedAt'              => null,
 			'ProductStockQuantity'   => self::$woocommerce->isMethodExists( $product, 'get_stock_quantity' ) ? (!empty($product->get_stock_quantity()) ? $product->get_stock_quantity() : 0 ) : 0,
 			'Vendor'                 => '', // need to check
