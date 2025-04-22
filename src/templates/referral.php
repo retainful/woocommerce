@@ -8,17 +8,17 @@
         !function (e) {
             const o = c.createElement("script");
             o.type = "application/javascript", o.src = e, c.body.appendChild(o)
-        }("<?php echo $params['referral_url'] ?>")
+        }("<?php echo esc_attr($params['referral_url']) ?>")
     }(window, document);
 </script>
-<div id="rtl-shopify-init" data-app-key="<?php echo $params['api_key']; ?>"
-     data-customer-accepts-marketing="<?php echo $params['accepts_marketing']; ?>"
-     data-customer-email="<?php echo $params['email']; ?>"
-     data-customer-first-name="<?php echo $params['first_name']; ?>"
-     data-customer-id="<?php echo $params['id']; ?>"
-     data-customer-last-name="<?php echo $params['last_name']; ?>"
-     data-customer-tags="<?php echo $params['tags']; ?>"
-     data-digest="<?php echo $params['digest']; ?>"
+<div id="rtl-shopify-init" data-app-key="<?php echo esc_attr($params['api_key']); ?>"
+     data-customer-accepts-marketing="<?php echo esc_attr($params['accepts_marketing']); ?>"
+     data-customer-email="<?php echo esc_attr($params['email']); ?>"
+     data-customer-first-name="<?php echo esc_attr($params['first_name']); ?>"
+     data-customer-id="<?php echo esc_attr($params['id']); ?>"
+     data-customer-last-name="<?php echo esc_attr($params['last_name']); ?>"
+     data-customer-tags="<?php echo esc_attr($params['tags']); ?>"
+     data-digest="<?php echo esc_attr($params['digest']); ?>"
 >
 </div>
 <script type="application/javascript">
