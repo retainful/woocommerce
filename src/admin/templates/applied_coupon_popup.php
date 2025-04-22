@@ -5,7 +5,7 @@
                 <span class="close" id="close-rnoc-applied-coupon-popup"
                       style="color: #aaaaaa;cursor: pointer;float: right;font-size: 28px;font-weight: bold;">&times;</span>
         <?php
-        echo $popup_content
+        echo wp_kses_post($popup_content)
         ?>
     </div>
 </div>
