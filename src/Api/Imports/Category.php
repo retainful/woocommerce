@@ -293,8 +293,8 @@ class Category extends Order {
 			}
 			$category_data = self::getWebhookCategoryData( $term_id,$topic );
 
-			if ( empty( $category_data) ) {
-				self::$settings->logMessage( $category_data, 'API Product data missing' );
+			if ( is_array( $category_data['ExternalCategoryId'] ) || empty( $category_data['AppId'] ) ) {
+				self::$settings->logMessage( $category_data, 'API category data missing' );
 				$status   = 400;
 				$response = array(
 					'success'       => false,
@@ -303,7 +303,10 @@ class Category extends Order {
 				);
 				return new \WP_REST_Response( $response, $status );
 			}
-
+			$category_data['digest']     = self::hashToken( array(
+				$category_data['ExternalCategoryId'],
+				$category_data['AppId'],
+			) );
 			if ( ! empty( $category_data ) ) {
 				$app_id        = self::$settings->getApiKey();
 				$extra_headers = array(
