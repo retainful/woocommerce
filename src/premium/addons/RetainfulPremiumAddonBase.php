@@ -195,10 +195,10 @@ if (!class_exists('RetainfulPremiumAddonBase')) {
         function complianceMessageOptions()
         {
             return array(
-                'no_need_gdpr' => __('Disabled', RNOC_TEXT_DOMAIN),
-                'dont_show_checkbox' => __('Don\'t show checkbox, but show GDPR compliance message', RNOC_TEXT_DOMAIN),
-                'show_checkbox' => __('Show checkbox - default un checked', RNOC_TEXT_DOMAIN),
-                'show_and_check_checkbox' => __('Show checkbox - default checked', RNOC_TEXT_DOMAIN),
+                'no_need_gdpr' => __('Disabled', 'retainful-next-order-coupon-for-woocommerce'),
+                'dont_show_checkbox' => __('Don\'t show checkbox, but show GDPR compliance message', 'retainful-next-order-coupon-for-woocommerce'),
+                'show_checkbox' => __('Show checkbox - default un checked', 'retainful-next-order-coupon-for-woocommerce'),
+                'show_and_check_checkbox' => __('Show checkbox - default checked', 'retainful-next-order-coupon-for-woocommerce'),
             );
         }
 
