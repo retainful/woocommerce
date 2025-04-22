@@ -243,7 +243,7 @@ class Input
                 $text = $stati[$code];
             }
         }
-        $server_protocol = (isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], array('HTTP/1.0', 'HTTP/1.1', 'HTTP/2'), TRUE)) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1'; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $server_protocol = (isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], array('HTTP/1.0', 'HTTP/1.1', 'HTTP/2'), TRUE)) ? sanitize_text_field(wp_unslash($_SERVER['SERVER_PROTOCOL'])) : 'HTTP/1.1';
         header($server_protocol . ' ' . $code . ' ' . $text, TRUE, $code);
     }
 
@@ -707,13 +707,13 @@ class Input
         if (function_exists('apache_request_headers')) {
             $this->headers = apache_request_headers();
         } else {
-            isset($_SERVER['CONTENT_TYPE']) && $this->headers['Content-Type'] = $_SERVER['CONTENT_TYPE']; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+            isset($_SERVER['CONTENT_TYPE']) && $this->headers['Content-Type'] = sanitize_text_field(wp_unslash($_SERVER['CONTENT_TYPE']));
             foreach ($_SERVER as $key => $val) {
                 if (sscanf($key, 'HTTP_%s', $header) === 1) {
                     // take SOME_HEADER and turn it into Some-Header
                     $header = str_replace('_', ' ', strtolower($header));
                     $header = str_replace(' ', '-', ucwords($header));
-                    $this->headers[$header] = !empty($_SERVER[$key]) ?  $_SERVER[$key] : ''; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                    $this->headers[$header] = !empty($_SERVER[$key]) ?  sanitize_text_field(wp_unslash($_SERVER[$key])) : '';
                 }
             }
         }
