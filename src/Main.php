@@ -33,8 +33,6 @@ class Main {
 		add_action( 'woocommerce_init', array( $this, 'includePluginFiles' ) );
 		//add_action('woocommerce_init',array($this->admin,'createWebhook'));
 		add_action( 'woocommerce_init', array( $this->admin, 'setIdentityData' ) );
-		//init the retainful premium
-		new \Rnoc\Retainful\Premium\RetainfulPremiumMain();
 	}
 
 	/**
@@ -229,7 +227,6 @@ class Main {
 				'retainful_license',
 				'retainful_settings',
 				'retainful',
-				'retainful_premium'
 			) );
 		if ( is_admin() && $show_deprecate_message && $this->admin->isNextOrderCouponEnabled() && $can_hide_next_order_coupon == 'no' ) {
 			$notice = '<p>' . __( "The Next Order Coupon feature inside the plugin and its tab/menu will soon be removed from the Retainful plugin. Migrate your Next Order Coupon campaign to the Automations now. A detailed guide <a href='https://help.retainful.com/migration#next-order-coupon' target='_blank'>here</a>", 'retainful-next-order-coupon-for-woocommerce' ) . '</p>';
