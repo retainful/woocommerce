@@ -528,7 +528,8 @@ class Main {
 		if ( empty( $default_template ) ) {
 			$template_subject = "Hey {{customer_name}}!! You left something in your cart";
 			// Prepare insert query with multiple rows
-			$wpdb->query( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->query(
 				$wpdb->prepare(
 					"INSERT INTO `$table` (subject, body, is_active, frequency, day_or_hour, default_template, template_name) VALUES   (%s, %s, %d, %d, %s, %d, %s),(%s, %s, %d, %d, %s, %d, %s),(%s, %s, %d, %d, %s, %d, %s)",//phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared	
 					$template_subject, $email_body, 1, 1, 'Hours', 1, 'initial',

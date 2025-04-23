@@ -447,7 +447,7 @@ class Settings
         update_option($page_slug, $data_to_save);
         wp_send_json_success(__('Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce'));
     }
-	
+
 
     /**
      * clean the data
