@@ -224,7 +224,8 @@ class Main {
 		//initialise currency helper
 		new Currency();
 		$can_hide_next_order_coupon = get_option( 'retainful_hide_next_order_coupon', 'no' );
-		$show_deprecate_message     = isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], array( //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$show_deprecate_message     = isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], array(
 				'retainful_license',
 				'retainful_settings',
 				'retainful',
@@ -527,7 +528,6 @@ class Main {
 		$content2    = ob_get_clean();
 		$email_body2 = addslashes( $content2 );
 		global $wpdb;
-		$table = esc_sql( $table );
 		$default_template = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM ' . $table . ' WHERE default_template = %d", 1 ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		if ( empty( $default_template ) ) {
 			$template_subject = "Hey {{customer_name}}!! You left something in your cart";
@@ -631,7 +631,7 @@ class Main {
 	function showAdminNotice( $message = "" ) {
 		if ( ! empty( $message ) ) {
 			add_action( 'admin_notices', function () use ( $message ) {
-				echo '<div class="error notice"><p>' . esc_html($message) . '</p></div>';
+				echo wp_kses_post('<div class="error notice"><p>' . esc_html($message) . '</p></div>');
 			} );
 		}
 	}
