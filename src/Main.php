@@ -224,6 +224,7 @@ class Main {
 		//initialise currency helper
 		new Currency();
 		$can_hide_next_order_coupon = get_option( 'retainful_hide_next_order_coupon', 'no' );
+		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$show_deprecate_message     = isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], array(
 				'retainful_license',
 				'retainful_settings',
@@ -231,7 +232,7 @@ class Main {
 				'retainful_premium'
 			) );
 		if ( is_admin() && $show_deprecate_message && $this->admin->isNextOrderCouponEnabled() && $can_hide_next_order_coupon == 'no' ) {
-			$notice = '<p>' . __( "The Next Order Coupon feature inside the plugin and its tab/menu will soon be removed from the Retainful plugin. Migrate your Next Order Coupon campaign to the Automations now. A detailed guide <a href='https://help.retainful.com/migration#next-order-coupon' target='_blank'>here</a>", RNOC_TEXT_DOMAIN ) . '</p>';
+			$notice = '<p>' . __( "The Next Order Coupon feature inside the plugin and its tab/menu will soon be removed from the Retainful plugin. Migrate your Next Order Coupon campaign to the Automations now. A detailed guide <a href='https://help.retainful.com/migration#next-order-coupon' target='_blank'>here</a>", 'retainful-next-order-coupon-for-woocommerce' ) . '</p>';
 			$this->showAdminNotice( $notice );
 		}
 		if ( $this->admin->isNextOrderCouponEnabled() ) {
@@ -418,8 +419,8 @@ class Main {
 
 			} else {
 				if ( is_admin() ) {
-					$connect_txt = ( ! empty( $secret_key ) && ! empty( $app_id ) ) ? __( 'connect', RNOC_TEXT_DOMAIN ) : __( 're-connect', RNOC_TEXT_DOMAIN );
-					$notice      = '<p>' . sprintf( __( "Please <a href='" . admin_url( 'admin.php?page=retainful_license' ) . "'>%s</a> with Retainful to track and manage abandoned carts. ", RNOC_TEXT_DOMAIN ), $connect_txt ) . '</p>';
+					$connect_txt = ( ! empty( $secret_key ) && ! empty( $app_id ) ) ? __( 'connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 're-connect', 'retainful-next-order-coupon-for-woocommerce' );
+					$notice      = '<p>' . sprintf( __( "Please with Retainful to track and manage abandoned carts. ", 'retainful-next-order-coupon-for-woocommerce' ), "<a href='".esc_url(admin_url( 'admin.php?page=retainful_license' ))."'>$connect_txt</a>" ) . '</p>';
 					$this->showAdminNotice( $notice );
 				}
 			}
@@ -526,11 +527,18 @@ class Main {
 		$content2    = ob_get_clean();
 		$email_body2 = addslashes( $content2 );
 		global $wpdb;
-		$default_template = $wpdb->get_row( 'SELECT id FROM ' . $table . ' WHERE default_template = "1"' );
+		$default_template = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM ' . $table . ' WHERE default_template = %d", 1 ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		if ( empty( $default_template ) ) {
 			$template_subject = "Hey {{customer_name}}!! You left something in your cart";
-			$query            = 'INSERT INTO `' . $table . '` ( subject, body, is_active, frequency, day_or_hour, default_template,template_name )VALUES ( "' . $template_subject . '","' . $email_body . '","1","1","Hours","1","initial"),( "' . $template_subject . '","' . $email_body1 . '","0","1","Hours","6","After 6 hours"),( "' . $template_subject . '","' . $email_body2 . '","0","1","Days","1","After 1 day")';
-			$wpdb->query( $query );
+			// Prepare insert query with multiple rows
+			$wpdb->query( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"INSERT INTO `$table` (subject, body, is_active, frequency, day_or_hour, default_template, template_name) VALUES   (%s, %s, %d, %d, %s, %d, %s),(%s, %s, %d, %d, %s, %d, %s),(%s, %s, %d, %d, %s, %d, %s)",//phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared	
+					$template_subject, $email_body, 1, 1, 'Hours', 1, 'initial',
+					$template_subject, $email_body1, 0, 1, 'Hours', 6, 'After 6 hours',
+					$template_subject, $email_body2, 0, 1, 'Days', 1, 'After 1 day'
+				)
+			);
 		}
 	}
 
@@ -574,10 +582,10 @@ class Main {
 	 */
 	function checkDependencies() {
 		if ( ! defined( 'WC_VERSION' ) ) {
-			$this->showAdminNotice( __( 'Woocommerce must be activated for Retainful-Woocommerce to work', RNOC_TEXT_DOMAIN ) );
+			$this->showAdminNotice( __( 'Woocommerce must be activated for Retainful-Woocommerce to work', 'retainful-next-order-coupon-for-woocommerce' ) );
 		} else {
 			if ( version_compare( WC_VERSION, '2.5', '<' ) ) {
-				$this->showAdminNotice( __( 'Your woocommerce version is ', RNOC_TEXT_DOMAIN ) . WC_VERSION . __( '. Some of the features of Retainful-Woocommerce will not work properly on this woocommerce version.', RNOC_TEXT_DOMAIN ) );
+				$this->showAdminNotice( __( 'Your woocommerce version is ', 'retainful-next-order-coupon-for-woocommerce' ) . WC_VERSION . __( '. Some of the features of Retainful-Woocommerce will not work properly on this woocommerce version.', 'retainful-next-order-coupon-for-woocommerce' ) );
 			}
 		}
 		if ( is_admin() ) {
@@ -622,7 +630,7 @@ class Main {
 	function showAdminNotice( $message = "" ) {
 		if ( ! empty( $message ) ) {
 			add_action( 'admin_notices', function () use ( $message ) {
-				echo '<div class="error notice"><p>' . $message . '</p></div>';
+				echo wp_kses_post('<div class="error notice"><p>' . esc_html($message) . '</p></div>');
 			} );
 		}
 	}
