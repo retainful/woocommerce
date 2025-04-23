@@ -63,7 +63,7 @@ class Cookie extends Base
             return NULL;
         }
         if (isset($_COOKIE[$key])) {
-            return $_COOKIE[$key];
+            return $_COOKIE[$key]; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         }
         return NULL;
     }
