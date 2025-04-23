@@ -447,45 +447,7 @@ class Settings
         update_option($page_slug, $data_to_save);
         wp_send_json_success(__('Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce'));
     }
-
-    /**
-     * render premium addon page
-     */
-    function retainfulPremiumAddOnsPage()
-    {
-        $page_slug = $this->slug . '_premium';
-        $available_addon_list = apply_filters('rnoc_get_premium_addon_list', array());
-        $base_url = admin_url('admin.php?page=' . $page_slug);
-        $add_on = self::$input->get('add-on', null);
-        if (!empty($add_on)) {
-            $settings = get_option($page_slug, array());
-            $default_settings = $this->getDefaultPremiumAddonsValues();
-            $check_default_value_of_multi_dim_array = array(
-                'coupon_timer_top_position_settings',
-                'coupon_timer_above_cart_position_settings',
-                'coupon_timer_below_discount_position_settings',
-                'modal_design_settings',
-                'add_to_cart_popup_gdpr_compliance',
-                'modal_coupon_settings',
-                'exit_intent_popup_gdpr_compliance',
-                'exit_intent_popup_form_design',
-                'exit_intent_popup_mobile_settings'
-
-            );
-            foreach ($check_default_value_of_multi_dim_array as $key) {
-                if (isset($settings[RNOC_PLUGIN_PREFIX . $key]) && isset($settings[RNOC_PLUGIN_PREFIX . $key][0]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key]) && isset($default_settings[RNOC_PLUGIN_PREFIX . $key][0])
-                    && is_array($settings[RNOC_PLUGIN_PREFIX . $key][0]) && is_array($default_settings[RNOC_PLUGIN_PREFIX . $key][0])) {
-                    $settings[RNOC_PLUGIN_PREFIX . $key][0] = array_merge($default_settings[RNOC_PLUGIN_PREFIX . $key][0], $settings[RNOC_PLUGIN_PREFIX . $key][0]);
-                }
-            }
-            $settings = wp_parse_args($settings, $default_settings);
-            $add_on_slug = sanitize_text_field($add_on);
-            require_once dirname(__FILE__) . '/templates/pages/premium-addon-settings.php';
-        } else {
-            require_once dirname(__FILE__) . '/templates/pages/premium-addons.php';
-        }
-    }
-
+	
 
     /**
      * clean the data
