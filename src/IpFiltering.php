@@ -18,19 +18,19 @@ class IpFiltering
     function getClientIp()
     {
         if (isset($_SERVER['HTTP_X_REAL_IP'])) {
-            $client_ip = $_SERVER['HTTP_X_REAL_IP'];
+            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_REAL_IP']));
         } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
-            $client_ip = $_SERVER['HTTP_CLIENT_IP'];
+            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_CLIENT_IP']));
         } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED_FOR']));
         } elseif (isset($_SERVER['HTTP_X_FORWARDED'])) {
-            $client_ip = $_SERVER['HTTP_X_FORWARDED'];
+            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED']));
         } elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
-            $client_ip = $_SERVER['HTTP_FORWARDED_FOR'];
+            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_FORWARDED_FOR']));
         } elseif (isset($_SERVER['HTTP_FORWARDED'])) {
-            $client_ip = $_SERVER['HTTP_FORWARDED'];
+            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_FORWARDED']));
         } elseif (isset($_SERVER['REMOTE_ADDR'])) {
-            $client_ip = $_SERVER['REMOTE_ADDR'];
+            $client_ip = sanitize_text_field(wp_unslash( $_SERVER['REMOTE_ADDR']));
         } else {
             $client_ip = '';
         }
