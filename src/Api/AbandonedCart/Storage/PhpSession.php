@@ -46,7 +46,7 @@ class PhpSession extends Base
             return NULL;
         }
         if (isset($_SESSION[$key])) {
-            return $_SESSION[$key];
+            return $_SESSION[$key]; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         }
         return NULL;
     }
