@@ -839,7 +839,7 @@ class WcFunctions
      * @param $key
      * @return array|string|null
      */
-    function getPHSession($key)
+    function getPHPSession($key)
     {
         if (empty($key))
             return NULL;
