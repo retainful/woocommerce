@@ -73,7 +73,7 @@ class Cart extends RestApi
         $field_name = isset($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) ? $settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] : 'after_billing_email';
         if ($enable_gdpr_compliance && $field_name == 'after_billing_email' && $message && isset($fields['billing']['billing_email'])) {
             $fields['billing'][RNOC_PLUGIN_PREFIX.'allow_gdpr'] = [
-                'label' => __($message,RNOC_TEXT_DOMAIN),
+                'label' => __($message,'retainful-next-order-coupon-for-woocommerce'), //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
                 'type' => 'checkbox',
                 'priority' => $fields['billing']['billing_email']['priority'],
                 'default' => (int)$this->isBuyerAcceptsMarketing()
@@ -90,8 +90,8 @@ class Cart extends RestApi
         $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
         if($enable_gdpr_compliance && $field_name == 'after_term_and_condition' && $message){
             echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
-            name="'.RNOC_PLUGIN_PREFIX.'allow_gdpr'.'" id="'.RNOC_PLUGIN_PREFIX.'allow_gdpr'.'" '.($this->isBuyerAcceptsMarketing() ? 'checked="checked"' : '').' />
-					<span class="woocommerce-terms-and-conditions-checkbox-text">' .  __($message,RNOC_TEXT_DOMAIN) .' '. __('(optional)',RNOC_TEXT_DOMAIN).'</span>';
+            name="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" id="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" '.($this->isBuyerAcceptsMarketing() ? 'checked="checked"' : '').' />
+					<span class="woocommerce-terms-and-conditions-checkbox-text">' .  esc_html__($message,'retainful-next-order-coupon-for-woocommerce') .' '. esc_html__('(optional)','retainful-next-order-coupon-for-woocommerce').'</span>'; //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
         }
     }
 
@@ -104,7 +104,7 @@ class Cart extends RestApi
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
         $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
         if ($enable_gdpr_compliance && $message) {
-            echo "<p><small>" . __($message, RNOC_TEXT_DOMAIN) . "</small></p>";
+            echo "<p><small>" . __($message, 'retainful-next-order-coupon-for-woocommerce') . "</small></p>";
         }
     }*/
 
@@ -113,21 +113,22 @@ class Cart extends RestApi
      */
     function setCustomerData()
     {
-        if (isset($_POST['billing_email'])) {
+	    $billing_email = !empty($_POST['billing_email']) ? sanitize_email(wp_unslash($_POST['billing_email'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Missing
+	    if ($billing_email) {
             $billing_address = array();
             $shipping_address = array();
             //billing address fields
             $address_fields = $this->getAddressMapFields();
             foreach ($address_fields as $field) {
                 $billing_field_name = 'billing_' . $field;
-                if (isset($_POST[$billing_field_name]) && array_key_exists($billing_field_name, $_POST) && $billing_field_name != 'billing_email') {
-                    $billing_address[$billing_field_name] = sanitize_text_field($_POST[$billing_field_name]);
+                if (isset($_POST[$billing_field_name]) && array_key_exists($billing_field_name, $_POST) && $billing_field_name != 'billing_email') { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+                    $billing_address[$billing_field_name] = sanitize_text_field(wp_unslash($_POST[$billing_field_name])); //phpcs:ignore WordPress.Security.NonceVerification.Missing
                 }
             }
             $settings = self::$settings->getAdminSettings();
             $is_buyer_accepting_marketing = true;
             if(isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance']) && $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] ){
-                $is_buyer_accepting_marketing = (isset($_POST['allow_gdpr']) && $_POST['allow_gdpr'] == 'true');
+                $is_buyer_accepting_marketing = (isset($_POST['allow_gdpr']) && $_POST['allow_gdpr'] == 'true');  //phpcs:ignore WordPress.Security.NonceVerification.Missing
             }
             self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
             $this->setCustomerBillingDetails($billing_address);
@@ -135,12 +136,12 @@ class Cart extends RestApi
             //shipping address fields
             foreach ($address_fields as $field) {
                 $shipping_field_name = 'shipping_' . $field;
-                if (isset($_POST[$shipping_field_name]) && array_key_exists($shipping_field_name, $_POST)) {
-                    $shipping_address[$shipping_field_name] = sanitize_text_field($_POST[$shipping_field_name]);
+                if (isset($_POST[$shipping_field_name]) && array_key_exists($shipping_field_name, $_POST)) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+                    $shipping_address[$shipping_field_name] = sanitize_text_field(wp_unslash($_POST[$shipping_field_name])); //phpcs:ignore WordPress.Security.NonceVerification.Missing
                 }
             }
             //Shipping to same billing address
-            $ship_to_billing = (isset($_POST['ship_to_billing'])) ? $_POST['ship_to_billing'] : 0;
+            $ship_to_billing = (isset($_POST['ship_to_billing'])) ? sanitize_text_field(wp_unslash($_POST['ship_to_billing'])) : 0; //phpcs:ignore WordPress.Security.NonceVerification.Missing
             if (intval($ship_to_billing) < 1) {
                 foreach ($address_fields as $field) {
                     $shipping_field_name = 'shipping_' . $field;
@@ -150,7 +151,6 @@ class Cart extends RestApi
             }
             $this->setSessionShippingDetails($shipping_address);
             //Billing email
-            $billing_email = sanitize_email($_POST['billing_email']);
             self::$woocommerce->setCustomerEmail($billing_email);
             self::$settings->setIdentity($billing_email);
             //Set update and created date
@@ -162,8 +162,8 @@ class Cart extends RestApi
         }
         if ($this->isValidCartToTrack()) {
             $cart_token = $this->retrieveCartToken();
-            if(empty($cart_token) && !empty($_POST['cart_token'])){
-                $this->setCartToken($_POST['cart_token']);
+            if(empty($cart_token) && !empty($_POST['cart_token'])){ //phpcs:ignore WordPress.Security.NonceVerification.Missing
+                $this->setCartToken(sanitize_text_field(wp_unslash($_POST['cart_token']))); //phpcs:ignore WordPress.Security.NonceVerification.Missing
             }
             $cart = $this->getUserCart();
             $encrypted_cart = $this->encryptData($cart);
@@ -240,7 +240,7 @@ class Cart extends RestApi
     {
         if (false !== strpos($original_url, 'data-cfasync')) {
             remove_filter('clean_url', 'unclean_url', 10);
-            $url_parts = parse_url($good_protocol_url);
+            $url_parts = wp_parse_url($good_protocol_url);
             return $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'] . "' data-cfasync='false";
         }
         return $good_protocol_url;
@@ -256,7 +256,7 @@ class Cart extends RestApi
     {
         if ($handle === RNOC_PLUGIN_PREFIX . 'track-user-cart') {
             $escapedHandle = esc_attr($handle);
-            $scriptTag = "<script src='{$src}' id='{$escapedHandle}-js' data-cfasync='false' defer></script>";
+            $scriptTag = "<script src='{$src}' id='{$escapedHandle}-js' data-cfasync='false' defer></script>"; //phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
             return apply_filters('rnoc_add_attr_script', $scriptTag, $handle, $src);
         }
         return $tag;
@@ -268,7 +268,7 @@ class Cart extends RestApi
     function recoverUserCart()
     {
         // recovery URL
-        if (!empty($_REQUEST['token']) && !empty($_REQUEST['hash'])) {
+        if (!empty($_REQUEST['token']) && !empty($_REQUEST['hash'])) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $this->recoverCart();
         }
     }
@@ -279,9 +279,8 @@ class Cart extends RestApi
     function applyAbandonedCartCoupon()
     {
         if(is_admin()) return;
-
-        if (isset($_REQUEST['retainful_ac_coupon']) && !empty($_REQUEST['retainful_ac_coupon'])) {
-            $coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
+	    $coupon_code = !empty($_REQUEST['retainful_ac_coupon']) ?  sanitize_text_field(wp_unslash($_REQUEST['retainful_ac_coupon'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ($coupon_code) {
             self::$storage->setValue('rnoc_ac_coupon', $coupon_code);
         }
         $session_coupon = self::$storage->getValue('rnoc_ac_coupon');
@@ -718,8 +717,9 @@ class Cart extends RestApi
             $this->reCreateCart();
         } catch (Exception $exception) {
         }
-        if (!empty($_GET)) {
-            foreach ($_GET as $key => $value) {
+        $get_data = !empty($_GET) ? $_GET : []; //phpcs:ignore  WordPress.Security.NonceVerification.Recommended
+        if (!$get_data) {
+            foreach ($get_data as $key => $value) {
                 if (!in_array($key, array("token", "hash", "wc-api"))) {
                     $checkout_url = add_query_arg($key, $value, $checkout_url);
                 }
@@ -750,8 +750,8 @@ class Cart extends RestApi
      */
     function reCreateCart()
     {
-        $data = wc_clean(rawurldecode($_REQUEST['token']));
-        $hash = wc_clean($_REQUEST['hash']);
+        $data = !empty($_REQUEST['token']) ? sanitize_text_field(wp_unslash($_REQUEST['token'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $hash = !empty($_REQUEST['hash']) ? sanitize_text_field(wp_unslash($_REQUEST['hash'])): ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ($this->isHashMatches($hash, $data)) {
             // decode
             $data = json_decode(base64_decode($data));
@@ -769,7 +769,7 @@ class Cart extends RestApi
                 }
                 do_action('rnoc_before_recreate_cart', $data);
                 $order_id = $this->getOrderIdFromCartToken($cart_token);
-                $note = __('Customer visited Retainful order recovery URL.', RNOC_TEXT_DOMAIN);
+                $note = __('Customer visited Retainful order recovery URL.', 'retainful-next-order-coupon-for-woocommerce');
                 if ($order_id && $order = self::$woocommerce->getOrder($order_id)) {
                     // If the order status is not checkout-draft, then proceed payment step
                     // This issue occurred when using checkout-block
@@ -872,7 +872,7 @@ class Cart extends RestApi
         if ($this->isValidCartToTrack() && !empty($cart_created_at)) {
             $data = $this->getTrackingCartData();
         }
-        echo $this->getCartTrackingDiv($data);
+        echo wp_kses_post($this->getCartTrackingDiv($data));
     }
 
     /**
@@ -1126,7 +1126,7 @@ class Cart extends RestApi
                     $logged_in = true;
                     // safety check fail: do not let an admin to be logged in automatically
                 } else {
-                    wc_add_notice(__('Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', RNOC_TEXT_DOMAIN));
+                    wc_add_notice(__('Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', 'retainful-next-order-coupon-for-woocommerce'));
                     //"Not logging in user {$user_id} with admin rights"
                 }
             } else {
@@ -1142,7 +1142,7 @@ class Cart extends RestApi
                 $logged_in = true;
                 // safety check fail: do not let an admin to be logged in automatically
             } else {
-                wc_add_notice(__('Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', RNOC_TEXT_DOMAIN));
+                wc_add_notice(__('Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest.', 'retainful-next-order-coupon-for-woocommerce'));
                 //"Not logging in user {$user_id} with admin rights"
             }
         }
@@ -1161,12 +1161,7 @@ class Cart extends RestApi
             return NULL;
         }
         global $wpdb;
-        return $wpdb->get_var($wpdb->prepare("
-			SELECT post_id
-			FROM {$wpdb->postmeta}
-			WHERE meta_key = '{$this->cart_token_key_for_db}'
-			AND meta_value = %s
-		", $cart_token));
+        return $wpdb->get_var($wpdb->prepare("SELECT post_id	FROM {$wpdb->postmeta}	WHERE meta_key = '{$this->cart_token_key_for_db}'	AND meta_value = %s	", $cart_token)); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
     }
 
     /**
@@ -1180,12 +1175,7 @@ class Cart extends RestApi
             return NULL;
         }
         global $wpdb;
-        return $wpdb->get_var($wpdb->prepare("
-			SELECT user_id
-			FROM {$wpdb->usermeta}
-			WHERE meta_key = '{$this->cart_token_key_for_db}'
-			AND meta_value = %s
-		", $cart_token));
+        return $wpdb->get_var($wpdb->prepare("SELECT user_id	FROM {$wpdb->usermeta}	WHERE meta_key = '{$this->cart_token_key_for_db}'	AND meta_value = %s	", $cart_token)); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
     }
 
     /**
