@@ -168,7 +168,7 @@ class RetainfulApi
     function siteURL()
     {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ? "https://" : "http://";
-        $domainName = !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] . '/' : ''; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+        $domainName = !empty($_SERVER['SERVER_NAME']) ? sanitize_text_field(wp_unslash($_SERVER['SERVER_NAME'] . '/')) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         return $protocol . $domainName;
     }
 
