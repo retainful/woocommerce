@@ -1313,6 +1313,19 @@ class WcFunctions
         return NULL;
     }
 
+	/**
+	 * Get Item price from Item object
+	 * @param $item
+	 * @return null
+	 */
+	function getItemRegularPrice($item)
+	{
+		if ($this->isMethodExists($item, 'get_regular_price')) {
+			return $item->get_regular_price();
+		}
+		return NULL;
+	}
+
     /**
      * Get category Id of product
      * @param $item

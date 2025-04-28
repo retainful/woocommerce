@@ -10,6 +10,9 @@ class RetainfulApi
 {
     public $app_url = "https://app.retainful.com/";
     public $domain = "https://api.retainful.com/v1/";
+
+	public $product_domain = "https://webhooks.retainful.net/v3";
+
     public $abandoned_cart_api_url = "https://api.retainful.com/v1/woocommerce/";
 
     /**
@@ -25,6 +28,11 @@ class RetainfulApi
     {
         return apply_filters('retainful_domain_url', $this->domain);
     }
+
+	function getProductDomain()
+	{
+		return apply_filters('retainful_product_sync_domain_url', $this->product_domain);
+	}
 
     function getAbandonedCartApiUrl()
     {
