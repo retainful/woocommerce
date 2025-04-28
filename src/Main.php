@@ -10,6 +10,8 @@ use Rnoc\Retainful\Api\AbandonedCart\Cart;
 use Rnoc\Retainful\Api\AbandonedCart\Checkout;
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
 use Rnoc\Retainful\Api\Imports\Imports;
+use Rnoc\Retainful\Api\Imports\Products;
+use Rnoc\Retainful\Api\Imports\Category;
 use Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement;
 use Rnoc\Retainful\Api\Popup\Popup;
 use Rnoc\Retainful\Integrations\AfterPay;
@@ -85,16 +87,39 @@ class Main {
 
 	function registerSyncEndPoints() {
 		$import = new Imports();
-		register_rest_route( 'retainful-api/v1', '/orders', array(
-			'methods'             => 'GET',
+		register_rest_route('retainful-api/v1', '/orders', array(
+			'methods' => 'GET',
 			'permission_callback' => '__return_true',
-			'callback'            => array( $import, 'getSyncOrders' )
-		) );
-		register_rest_route( 'retainful-api/v1', '/orders/count', array(
-			'methods'             => 'GET',
+			'callback' => array($import, 'getSyncOrders')
+		));
+		register_rest_route('retainful-api/v1', '/orders/count', array(
+			'methods' => 'GET',
 			'permission_callback' => '__return_true',
-			'callback'            => array( $import, 'getSyncOrderCount' )
-		) );
+			'callback' => array($import, 'getSyncOrderCount')
+		));
+
+		$product = new Products();
+		register_rest_route('retainful-api/v1', '/products', array(
+			'methods' => 'GET',
+			'permission_callback' => '__return_true',
+			'callback' => array($product, 'getSyncProducts')
+		));
+		register_rest_route('retainful-api/v1', '/products/count', array(
+			'methods' => 'GET',
+			'permission_callback' => '__return_true',
+			'callback' => array($product, 'getSyncProductCount')
+		));
+		register_rest_route('retainful-api/v1', '/category/count', array(
+			'methods' => 'GET',
+			'permission_callback' => '__return_true',
+			'callback' => array(Category::class, 'getCategoryCount')
+		));
+		register_rest_route('retainful-api/v1', '/category', array(
+			'methods' => 'GET',
+			'permission_callback' => '__return_true',
+			'callback' => array(Category::class, 'getCategory')
+		));
+
 	}
 
 	/**
@@ -350,9 +375,41 @@ class Main {
 					$checkout,
 					'orderUpdatedShopBackend'
 				), 50, 2 );
+				$product = new Products();
+
+				add_filter( 'woocommerce_valid_webhook_resources',function($resources){
+					$resources[] = 'category';
+					return $resources;
+				});
 
 				//add_action('woocommerce_update_order', array($checkout, 'orderUpdated'), 10, 1);
-				add_filter( 'woocommerce_webhook_http_args', array( $checkout, 'changeWebHookHeader' ), 10, 3 );
+				add_filter( 'woocommerce_webhook_http_args',function( $http_args, $order_id, $webhook_id) use ($product,$checkout){
+					if ( $webhook_id <= 0 || ! class_exists( 'WC_Webhook' ) || ! $this->admin->isConnectionActive() ) {
+						return $http_args;
+					}
+					try {
+						$webhook = new \WC_Webhook( $webhook_id );
+						$topic   = $webhook->get_topic();
+						if(in_array($topic,['category.updated', 'category.created', 'category.deleted'])) {
+							$http_args = Category::changeWebHookHeaderCategory( $http_args, $order_id, $webhook_id);
+						}elseif (in_array($topic,['order.updated', 'order.created'])){
+							$http_args = $checkout->changeWebHookHeader( $http_args, $order_id, $webhook_id);
+						}elseif (in_array($topic,['product.updated', 'product.created', 'product.deleted'])){
+							$http_args = $product->changeWebHookHeaderProduct( $http_args, $order_id, $webhook_id);
+						}
+					}catch ( \Exception $e) {
+
+					}
+					return $http_args;
+				}, 10, 3 );
+
+
+
+				add_action('created_product_cat', [Category::class,'createCategory'], 10, 2);
+				add_action('edited_product_cat', [Category::class,'updateCategory'], 10, 2);
+				add_action('delete_product_cat', [Category::class,'deleteCategory'], 10, 2);
+				add_action('retainful_category', [Category::class, 'categoryCallback'], 10, 2);
+
 				//Todo: multi currency and multi lingual
 				//add_action('wp_login', array($this->abandoned_cart_api, 'userCartUpdated'));
 				if ( $this->admin->isAfterPayEnabled() ) {
