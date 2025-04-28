@@ -1017,19 +1017,11 @@ class Settings
 	function retainfulAddonPage()
 	{
 		$page_slug = $this->slug . '_addons';
-		$addons = [
-			'rnoc-contact-form-7' => [
-				'name'         => 'Retainful for Contact Form 7 Add-On',
-				'label'        => 'Retainful for Contact Form 7 Add-On',
-				'author'       => 'Retainful',
-				'version'      => '1.0.0',
-				'description'  => 'Sends form data and contact information to Retainful automatically from Contact Form 7',
-				'icon_url'     => '',
-				'download_url' => '',
-				'plugin_file'  =>'rnoc-contact-form-7/rnoc-contact-form-7.php',
-				'show_activate' => self::isPluginactive('rnoc-contact-form-7/rnoc-contact-form-7.php'),
-			],
-		];
+		$addons = self::getAddonsList();
+		foreach( $addons as $plugin_name => &$addon_data){
+			$addon_data['show_activate'] =  self::isPluginactive($addon_data['plugin_file']);
+		}
+
 		$activated_addons = apply_filters('rnoc_installed_addon_list', []);
 		if(!empty($activated_addons)) {
 			foreach ( $activated_addons as $addon_slug => $addon ) {
@@ -1057,6 +1049,29 @@ class Settings
 			$status =  in_array( $path, $active_plugins ) || array_key_exists( $path, $active_plugins ) ? false : true ;
 		}
 		return $status;
+	}
+
+	/**
+	 * Get remote add-ons list.
+	 *
+	 * @return array
+	 */
+	private static function getAddonsList(): array {
+		$addon_data = (array) apply_filters( 'wdr_remote_addon_requirement', [
+			'file_url' => 'https://static.flycart.net/retainful/add-ons.json',
+			'force'    => false
+		] );
+		$addons     = '';//get_transient( 'wdr_remote_addons_list' );
+		if ( empty( $addons ) || ( isset( $addon_data['force'] ) && $addon_data['force'] ) ) {
+			$addons   = [];
+			$response = wp_remote_get( $addon_data['file_url'] );
+			if ( ! is_wp_error( $response ) ) {
+				$addons = (array) json_decode( wp_remote_retrieve_body( $response ), true );
+				set_transient( 'wdr_remote_addons_list', $addons, 24 * 60 * 60 );
+			}
+		}
+
+		return $addons;
 	}
 
     function getRetainfulSettingValue($key, $default = null)

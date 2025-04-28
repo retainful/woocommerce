@@ -165,7 +165,7 @@ input[type="text"], input[type="number"] {
     line-height: 1.7;
     height: auto;
     margin: 0;
-    padding: 10px 30px;
+    padding: 10px 14px;
     cursor: pointer;
     border-width: 0;
     border-style: solid;
@@ -198,6 +198,7 @@ input[type="text"], input[type="number"] {
     padding: 0 0;
     position: relative;
     right: 2px;
+    width: inherit;
 }
 
 @media only screen and (max-width: 1350px) {
