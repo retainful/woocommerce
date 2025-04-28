@@ -254,6 +254,7 @@ You can reach out to our experts [here](https://www.retainful.com/support).
 == Changelog ==
 = 2.6.40 =
 - Added: Product syn event
+- Added: Category syn event
 
 = 2.6.39 =
 - Added: Coupon include/exclude product id.
