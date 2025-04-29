@@ -817,13 +817,6 @@ class Settings
         if (!$validator->validate()) {
             wp_send_json_error($validator->errors());
         }
-
-		if(!empty($post['rnoc_list_id'])) {
-			$list_ids = explode(',',$post['rnoc_list_id']);
-			if(count($list_ids) > 5 ) {
-				wp_send_json_error( ['rnoc_list_id' => 'List ID\'s field contains more then 5 id\'s'] );
-			}
-		}
         $cart_capture_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'cart_capture_msg', '');
         $post = self::$input->post();
         $data = $this->clean($post);
