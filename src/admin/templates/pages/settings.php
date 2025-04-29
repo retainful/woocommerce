@@ -5,7 +5,6 @@
 require_once "tabs.php";
 ?>
 <form id="retainful-settings-form" class="card">
-    <div id="retainful-settings" class="card" >
     <table class="form-table" role="presentation">
         <tbody>
         <tr>
@@ -458,8 +457,7 @@ Remember: WooCommerce uses the <a target='_blank' href='%s'>Scheduled Actions</a
             </td>
         </tr>
         </tbody>
-    </table class="form-table">
-    </div>
+    </table>
     <button type="submit" data-action="rnoc_save_settings"
             data-security="<?php echo wp_create_nonce('rnoc_save_settings') ?>"
             class="button button-primary button-right-fixed"><i
