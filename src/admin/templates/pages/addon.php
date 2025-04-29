@@ -32,7 +32,7 @@ require_once "tabs.php";
 							?>
                             <div class="rnoc-grid-cell retainful_premium_grid">
                                 <div class="avatar-lg-bg">
-                                    <img class="retain-icon-premium" style="width:100%" src="<?php echo $addon['icon_url']; ?>">
+                                    <img class="retain-icon-premium" src="<?php echo $addon['icon_url']; ?>">
                                 </div>
                                 <div class="header retainful_premium_heading">
 									<?php echo $title; ?>
