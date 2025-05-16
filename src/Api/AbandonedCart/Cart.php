@@ -101,11 +101,22 @@ class Cart extends RestApi
         $enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_gdpr_compliance'] : 0;
         $field_name = isset($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position']) ? $settings[RNOC_PLUGIN_PREFIX . 'gdpr_display_position'] : 'after_billing_email';
         $message = isset($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'cart_capture_msg'] : 'Keep me up to date on news and exclusive offers';
-        if($enable_gdpr_compliance && $field_name == 'after_term_and_condition' && $message){
+	    //sms consent settings
+	    $enable_sms_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent'] : 0;
+	    $sms_message = isset($settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg']) ? $settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg'] : 'Keep me up to date on news and exclusive offers';
+	    $sms_field_name = isset($settings[RNOC_PLUGIN_PREFIX . 'sms_consent_display_position']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'sms_consent_display_position']) ? $settings[RNOC_PLUGIN_PREFIX . 'sms_consent_display_position'] : 'after_billing_email';
+
+
+	    if($enable_gdpr_compliance && $field_name == 'after_term_and_condition' && $message){
             echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
             name="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" id="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" '.($this->isBuyerAcceptsMarketing() ? 'checked="checked"' : '').' />
 					<span class="woocommerce-terms-and-conditions-checkbox-text">' .  esc_html__($message,'retainful-next-order-coupon-for-woocommerce') .' '. esc_html__('(optional)','retainful-next-order-coupon-for-woocommerce').'</span><br>'; //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
         }
+	    if($enable_sms_compliance && $sms_field_name == 'after_term_and_condition' && $sms_message){
+		    echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
+            name="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" id="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" '.($this->isSmsConsent() ? 'checked="checked"' : '').' />
+					<span class="woocommerce-terms-and-conditions-checkbox-text">' .  esc_html__($sms_message,'retainful-next-order-coupon-for-woocommerce') .' '. esc_html__('(optional)','retainful-next-order-coupon-for-woocommerce').'</span><br>'; //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
+	    }
     }
 
     /**
@@ -146,7 +157,7 @@ class Cart extends RestApi
             self::$woocommerce->setSession('is_buyer_accepting_marketing', $is_buyer_accepting_marketing);
 	        $is_sms_consent = true;
 	        if(isset($settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent']) && $settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent'] ){
-		        $is_sms_consent = (isset($_POST['sms_consent']) && $_POST['sms_consent'] == 'true');
+		        $is_sms_consent = (isset($_POST['sms_consent']) && $_POST['sms_consent'] == 'true');  //phpcs:ignore WordPress.Security.NonceVerification.Missing
 	        }
 	        self::$woocommerce->setSession('is_buyer_accepting_sms_marketing', $is_sms_consent);
             $this->setCustomerBillingDetails($billing_address);
