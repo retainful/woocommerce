@@ -114,7 +114,7 @@ class Cart extends RestApi
         }
 	    if($enable_sms_compliance && $sms_field_name == 'after_term_and_condition' && $sms_message){
 		    echo '<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" 
-            name="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" id="'.esc_attr(RNOC_PLUGIN_PREFIX.'allow_gdpr').'" '.($this->isSmsConsent() ? 'checked="checked"' : '').' />
+            name="'.esc_attr(RNOC_PLUGIN_PREFIX.'sms_consent').'" id="'.esc_attr(RNOC_PLUGIN_PREFIX.'sms_consent').'" '.($this->isSmsConsent() ? 'checked="checked"' : '').' />
 					<span class="woocommerce-terms-and-conditions-checkbox-text">' .  esc_html__($sms_message,'retainful-next-order-coupon-for-woocommerce') .' '. esc_html__('(optional)','retainful-next-order-coupon-for-woocommerce').'</span><br>'; //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
 	    }
     }
