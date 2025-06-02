@@ -685,6 +685,7 @@ class Cart extends RestApi
             'abandoned_checkout_url' => $this->getRecoveryLink($cart_token),
             'total_line_items_price' => $this->formatDecimalPrice(self::$woocommerce->getCartTotal()),
             'buyer_accepts_marketing' => $this->isBuyerAcceptsMarketing(),
+            'buyer_accepts_sms_marketing' => $this->isSmsConsent(),
             'client_session' => self::$woocommerce->getClientSession(),
             'woocommerce_totals' => $this->getCartTotals(),
             'recovered_at' => (!empty($recovered_at)) ? $this->formatToIso8601($recovered_at) : NULL,
