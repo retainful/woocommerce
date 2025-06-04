@@ -22,6 +22,7 @@ class RestApi
     protected $order_note_key = "rnoc_order_note", $order_note_key_for_db = "_rnoc_order_note";
     protected $order_recovered_key = "rnoc_order_recovered", $order_recovered_key_for_db = "_rnoc_order_recovered";
     protected $accepts_marketing_key_for_db = "_rnoc_is_buyer_accepts_marketing";
+	protected $accepts_sms_marketing_key_for_db = "_rnoc_is_buyer_accepts_sms_marketing";
     protected $previous_cart_hash_key = "rnoc_previous_cart_hash";
     protected $cart_hash_key_for_db = "_rnoc_cart_hash";
     /** The cipher method name to use to encrypt the cart data */
@@ -806,6 +807,33 @@ class RestApi
         }
         return false;*/
     }
+
+
+	/**
+	 * Check is buyer accepts marketing
+	 * @return bool
+	 */
+	function isSmsConsent()
+	{
+
+		$settings = self::$settings->getAdminSettings();
+		$enable_gdpr_compliance = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent'] : 0;
+		if ($enable_gdpr_compliance) {
+			return in_array(self::$woocommerce->getSession('is_buyer_accepting_sms_marketing'), array(1, 'true'));
+		}
+
+		return true;
+		/*if (is_user_logged_in()) {
+			return true;
+		} else {
+			$is_buyer_accepts_marketing = self::$woocommerce->getSession('is_buyer_accepting_marketing');
+			if ($is_buyer_accepts_marketing == 1) {
+				return true;
+			}
+		}
+		return false;*/
+	}
+
 
     /**
      * need to track carts or not

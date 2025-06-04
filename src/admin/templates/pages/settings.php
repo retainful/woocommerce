@@ -294,6 +294,68 @@ require_once "tabs.php";
         </tr>
         <tr>
             <th scope="row">
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_sms_consent'); ?>"><?php
+			        esc_html_e('Phone Consent', 'retainful-next-order-coupon-for-woocommerce');
+			        ?></label>
+            </th>
+            <td>
+                <label>
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_sms_consent'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_sms_consent_0'); ?>"
+                           value="0" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent'] == '0') {
+				        echo "checked";
+			        } ?>>
+			        <?php esc_html_e('Implicit', 'retainful-next-order-coupon-for-woocommerce'); ?>
+                </label>
+                <label>
+                    <input name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_sms_consent'); ?>" type="radio"
+                           id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_sms_consent_1'); ?>"
+                           value="1" <?php if ($settings[RNOC_PLUGIN_PREFIX . 'enable_sms_consent'] == '1') {
+				        echo "checked";
+			        } ?>>
+			        <?php esc_html_e('Explicit', 'retainful-next-order-coupon-for-woocommerce'); ?>
+                </label>
+                <p class="description">
+			        <?php
+			        esc_html_e('If set to Explicit, it will add an opt-in checkbox at the checkout to capture the consent', 'retainful-next-order-coupon-for-woocommerce');
+			        ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'sms_consent_display_position'); ?>"><?php esc_html_e('Phone Consent field position:', 'retainful-next-order-coupon-for-woocommerce');
+			        ?></label>
+            </th>
+            <td>
+                <select name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'sms_consent_display_position'); ?>">
+                    <option value="after_billing_email" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'sms_consent_display_position'] == 'after_billing_email') ? "selected='selected'":''; ?>>
+				        <?php esc_html_e('Below Email Address field', 'retainful-next-order-coupon-for-woocommerce'); ?></option>
+                    <option value="after_term_and_condition" <?php echo  ($settings[RNOC_PLUGIN_PREFIX . 'sms_consent_display_position'] == 'after_term_and_condition') ? "selected='selected'":''; ?>>
+				        <?php esc_html_e('Below Terms and Conditions section', 'retainful-next-order-coupon-for-woocommerce'); ?></option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'cart_capture_msg'); ?>"><?php
+			        esc_html_e('Phone Text for the opt-in checkbox', 'retainful-next-order-coupon-for-woocommerce');
+			        ?></label>
+            </th>
+            <td>
+              <textarea name="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'sms_capture_msg'); ?>"
+                        id="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'sms_capture_msg'); ?>" cols="60" rows="10"
+              ><?php echo esc_attr(trim(isset($settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg'])) ? $settings[RNOC_PLUGIN_PREFIX . 'sms_capture_msg'] : '' ); ?>
+                </textarea>
+                <p class="description">
+			        <?php
+			        esc_html_e('Under GDPR, it is mandatory to inform the users when we track their cart activity in real-time.', 'retainful-next-order-coupon-for-woocommerce');
+			        ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
                 <label for="<?php echo esc_attr(RNOC_PLUGIN_PREFIX . 'enable_ip_filter'); ?>"><?php
                     esc_html_e('Enable IP filter?', 'retainful-next-order-coupon-for-woocommerce');
                     ?></label>
