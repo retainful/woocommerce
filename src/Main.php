@@ -417,7 +417,8 @@ class Main {
 			} else {
 				if ( is_admin() ) {
 					$connect_txt = ( ! empty( $secret_key ) && ! empty( $app_id ) ) ? __( 'connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 're-connect', 'retainful-next-order-coupon-for-woocommerce' );
-					$notice      = '<p>' . sprintf( __( "Please with Retainful to track and manage abandoned carts. ", 'retainful-next-order-coupon-for-woocommerce' ), "<a href='".esc_url(admin_url( 'admin.php?page=retainful_license' ))."'>$connect_txt</a>" ) . '</p>';
+					/* translators: %s: get connection url */
+					$notice      = sprintf(__('Please with Retainful to track and manage abandoned carts. %s' ,'retainful-next-order-coupon-for-woocommerce'),"<a href='".esc_url(admin_url( 'admin.php?page=retainful_license' ))."'>$connect_txt</a>");
 					$this->showAdminNotice( $notice );
 				}
 			}
@@ -628,7 +629,7 @@ class Main {
 	function showAdminNotice( $message = "" ) {
 		if ( ! empty( $message ) ) {
 			add_action( 'admin_notices', function () use ( $message ) {
-				echo wp_kses_post('<div class="error notice"><p>' . esc_html($message) . '</p></div>');
+				echo wp_kses_post('<div class="error notice"><p>' . wp_kses_post($message) . '</p></div>');
 			} );
 		}
 	}
