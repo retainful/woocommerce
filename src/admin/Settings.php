@@ -1004,7 +1004,10 @@ class Settings
             'order_updated' => false,
             'product_created' => false,
             'product_updated' => false,
-            'product_deleted' => false
+            'product_deleted' => false,
+	        'category_created' => false,
+            'category_updated' => false,
+            'category_deleted' => false,
         );
         try {
             $data_store = \WC_Data_Store::load('webhook');
@@ -1042,6 +1045,15 @@ class Settings
                 if ($status == 'active' && $topic == 'product.deleted') {
                     $webhook_status['product_deleted'] = true;
                 }
+	            if ($status == 'active' && $topic == 'category.created') {
+		            $webhook_status['category_created'] = true;
+	            }
+	            if ($status == 'active' && $topic == 'category.updated') {
+		            $webhook_status['category_updated'] = true;
+	            }
+	            if ($status == 'active' && $topic == 'category.deleted') {
+		            $webhook_status['category_deleted'] = true;
+	            }
             }
         } catch (\Exception $e) {
 
