@@ -21,7 +21,7 @@ class RetainfulApi
      */
     function upgradePremiumUrl()
     {
-        return $this->app_url . '?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
+        return $this->app_url .'app/settings/billing/plans?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
     }
 
     function getDomain()
