@@ -381,73 +381,6 @@ class Settings
         echo '<p>' . esc_html($this->wc_functions->getOrderMeta($order, "_rnoc_user_cart_token")). '</p>';
     }
 
-    /**
-     * save premium addon settings
-     */
-    function savePremiumAddOnSettings()
-    {
-        WcFunctions::checkSecuritykey('rnoc_save_premium_addon_settings');
-        $post = self::$input->post();
-        $validator = new Validator($post);
-        Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
-        Validator::addRule('basicTags', array(__CLASS__, 'validateBasicHtmlTags'), 'Only br, strong, span,div, p tags accepted');
-        Validator::addRule('color', array(__CLASS__, 'validateColor'), 'must contain only hex color code');
-        $this->validateCouponTimer($validator);
-        $this->validateExitIntentPopup($validator);
-        $this->validateAddToCartPopup($validator);
-        $page_slug = $this->slug . '_premium';
-        $modal_coupon_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'modal_coupon_settings', array(), false);
-        $exit_intent_popup_template = self::$input->post(RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template', '', false);
-        $add_to_cart_coupon_popup_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] : '';
-        $coupon_mail_template = isset($modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template']) ? $modal_coupon_settings[0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] : '';
-        $atc_gdpr_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance', array(), false);
-        $add_to_cart_gdpr_message = isset($atc_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $atc_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
-        $ei_gdpr_settings = self::$input->post(RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance', array(), false);
-        $ei_gdpr_message = isset($ei_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message']) ? $ei_gdpr_settings[0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] : '';
-        $data = $this->clean($post);
-        if (!empty($exit_intent_popup_template)) {
-            $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template'] = $this->sanitizeBasicHtml($exit_intent_popup_template);
-        }
-        if (!empty($add_to_cart_coupon_popup_template)) {
-            $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template'] = $this->sanitizeBasicHtml($add_to_cart_coupon_popup_template);
-        }
-        if (!empty($add_to_cart_gdpr_message)) {
-            $data[RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] = $this->sanitizeBasicHtml($add_to_cart_gdpr_message);
-        }
-        if (!empty($ei_gdpr_message)) {
-            $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance'][0][RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message'] = $this->sanitizeBasicHtml($ei_gdpr_message);
-        }
-        if (!empty($coupon_mail_template)) {
-            $data[RNOC_PLUGIN_PREFIX . 'modal_coupon_settings'][0][RNOC_PLUGIN_PREFIX . 'coupon_mail_template'] = $this->sanitizeBasicHtml($coupon_mail_template);
-        }
-        $settings = get_option($page_slug, array());
-        $page = self::$input->post('addon', 'atcp');
-        switch ($page) {
-            default:
-            case "atcp":
-                if (!isset($data[RNOC_PLUGIN_PREFIX . 'modal_display_pages'])) {
-                    $data[RNOC_PLUGIN_PREFIX . 'modal_display_pages'] = array();
-                }
-                if (!isset($data[RNOC_PLUGIN_PREFIX . 'modal_hide_pages'])) {
-                    $data[RNOC_PLUGIN_PREFIX . 'modal_hide_pages'] = array();
-                }
-                break;
-            case "ct":
-                if (!isset($data[RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'])) {
-                    $data[RNOC_PLUGIN_PREFIX . 'coupon_timer_display_pages'] = array();
-                }
-                break;
-            case "eip":
-                if (!isset($data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'])) {
-                    $data[RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages'] = array();
-                }
-                break;
-        }
-        $data_to_save = wp_parse_args($data, $settings);
-        update_option($page_slug, $data_to_save);
-        wp_send_json_success(__('Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce'));
-    }
-
 
     /**
      * clean the data
@@ -463,133 +396,6 @@ class Settings
         }
     }
 
-    /**
-     * save the next order coupon settings
-     */
-    function saveNocSettings()
-    {
-        WcFunctions::checkSecuritykey('rnoc_save_noc_settings');
-        $post = self::$input->post();
-        $validator = new Validator($post);
-        Validator::addRule('float', array(__CLASS__, 'validateFloat'), 'must contain only numbers 0-9 and one dot');
-        Validator::addRule('basicTags', array(__CLASS__, 'validateBasicHtmlTags'), 'Only br, strong, span,div, p tags accepted');
-        $validator->rule('regex', RNOC_PLUGIN_PREFIX . 'expire_date_format', '/^[a-zA-Z0-9 ,\/:-]+$/')->message('This filed should accepts number, alphabets, hypen, comma, colon and space');
-        $validator->rule('array', array(
-            RNOC_PLUGIN_PREFIX . 'preferred_order_status',
-            RNOC_PLUGIN_PREFIX . 'preferred_user_roles',
-            RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products',
-            RNOC_PLUGIN_PREFIX . 'exclude_product_categories',
-            RNOC_PLUGIN_PREFIX . 'product_categories',
-            RNOC_PLUGIN_PREFIX . 'exclude_products',
-            RNOC_PLUGIN_PREFIX . 'products',
-        ));
-        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to', ['all', 'validate_on_checkout', 'login_users'])->message('This field contains invalid value');
-        $validator->rule('in', RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to', ['woocommerce_email_order_details', 'woocommerce_email_order_meta', 'woocommerce_email_customer_details', 'none'])->message('This field contains invalid value');
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon',
-            RNOC_PLUGIN_PREFIX . 'retainful_coupon_type',
-            RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon',
-            RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page',
-            RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup',
-        ), ['0', '1'])->message('This field contains invalid value');
-        $validator->rule('float', array(
-            RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount',
-            RNOC_PLUGIN_PREFIX . 'minimum_sub_total',
-            RNOC_PLUGIN_PREFIX . 'minimum_spend',
-            RNOC_PLUGIN_PREFIX . 'maximum_spend',
-        ))->message('This field contains invalid value');
-        $validator->rule('min', array(
-            RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount',
-            RNOC_PLUGIN_PREFIX . 'minimum_sub_total',
-            RNOC_PLUGIN_PREFIX . 'minimum_spend',
-            RNOC_PLUGIN_PREFIX . 'maximum_spend',
-            RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
-            RNOC_PLUGIN_PREFIX . 'limit_per_user',
-        ), 0)->message('This field should accepts only positive value');
-        $validator->rule('integer', array(
-            RNOC_PLUGIN_PREFIX . 'retainful_expire_days',
-            RNOC_PLUGIN_PREFIX . 'limit_per_user',
-        ))->message('This field contains invalid value');;
-        $validator->rule('basicTags', array(
-            RNOC_PLUGIN_PREFIX . 'retainful_coupon_message',
-            RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design',
-        ))->message('This field contains invalid tags script or iframe');;
-        if (!$validator->validate()) {
-            wp_send_json_error($validator->errors());
-        }
-        $coupon_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'retainful_coupon_message', '', false);
-        $applied_coupon_msg = self::$input->post(RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design', '', false);
-        $post = self::$input->post();
-        $data = $this->clean($post);
-        $data[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'] = $this->sanitizeBasicHtml($coupon_msg);
-        $data[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] = $this->sanitizeBasicHtml($applied_coupon_msg);
-        update_option($this->slug, $data);
-        wp_send_json_success(__('Settings successfully saved!', 'retainful-next-order-coupon-for-woocommerce'));
-    }
-
-    /**
-     * default noc settings
-     * @return mixed|void
-     */
-    function getDefaultNocSettings()
-    {
-        $default_settings = array(
-            RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon' => '0',
-            RNOC_PLUGIN_PREFIX . 'retainful_coupon_type' => '0',
-            RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount' => '10',
-            RNOC_PLUGIN_PREFIX . 'retainful_expire_days' => '60',
-            RNOC_PLUGIN_PREFIX . 'expire_date_format' => 'F j, Y',
-            RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to' => 'all',
-            RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon' => '1',
-            RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page' => '0',
-            RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to' => 'woocommerce_email_customer_details',
-            RNOC_PLUGIN_PREFIX . 'retainful_coupon_message' => '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} Off On Your Next Purchase</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">Go! </a></p></div></div>',
-            RNOC_PLUGIN_PREFIX . 'preferred_order_status' => array('wc-processing', 'wc-completed'),
-            RNOC_PLUGIN_PREFIX . 'preferred_user_roles' => array('all'),
-            RNOC_PLUGIN_PREFIX . 'limit_per_user' => 99,
-            RNOC_PLUGIN_PREFIX . 'minimum_sub_total' => '',
-            RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products' => array(),
-            RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories' => array(),
-            RNOC_PLUGIN_PREFIX . 'minimum_spend' => '',
-            RNOC_PLUGIN_PREFIX . 'maximum_spend' => '',
-            RNOC_PLUGIN_PREFIX . 'products' => array(),
-            RNOC_PLUGIN_PREFIX . 'exclude_products' => array(),
-            RNOC_PLUGIN_PREFIX . 'product_categories' => array(),
-            RNOC_PLUGIN_PREFIX . 'exclude_product_categories' => array(),
-            RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup' => '1',
-            RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design' => $this->appliedCouponDefaultTemplate(),
-        );
-        return apply_filters('rnoc_get_default_noc_settings', $default_settings);
-    }
-
-    /**
-     * next order coupon page
-     */
-    function nextOrderCouponPage()
-    {
-        $settings = get_option($this->slug, array());
-        $default_settings = $this->getDefaultNocSettings();
-        $settings = wp_parse_args($settings, $default_settings);
-        $is_app_connected = $this->isAppConnected();
-        $expiry_date_format = $this->getDateFormatOptions();
-        $apply_coupon_for = array(
-            'all' => __('Allow any one to apply coupon', 'retainful-next-order-coupon-for-woocommerce'),
-            'validate_on_checkout' => __('Allow the customer to apply coupon, but validate at checkout', 'retainful-next-order-coupon-for-woocommerce'),
-            'login_users' => __('Allow customer to apply coupon only after login (Not Recommended)', 'retainful-next-order-coupon-for-woocommerce')
-        );
-        $display_coupon_after = array(
-            'woocommerce_email_order_details' => __('Order details', 'retainful-next-order-coupon-for-woocommerce'),
-            'woocommerce_email_order_meta' => __('Order meta', 'retainful-next-order-coupon-for-woocommerce'),
-            'woocommerce_email_customer_details' => __('Customer details', 'retainful-next-order-coupon-for-woocommerce'),
-            'none' => __('Do Not Show - Customers will not get next order coupon in the order confirmation email of WooCommerce', 'retainful-next-order-coupon-for-woocommerce'),
-        );
-        $order_status = $this->availableOrderStatuses();
-        $user_roles = $this->getUserRoles();
-        $categories = $this->getCategories();
-        $is_pro_plan = $this->isProPlan();
-        $unlock_premium_link = $this->unlockPremiumLink();
-        require_once dirname(__FILE__) . '/templates/pages/next-order-coupon.php';
-    }
 
     /**
      * validate the value is float or not
@@ -946,36 +752,7 @@ class Settings
         add_menu_page('Retainful', 'Retainful', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'), 'dashicons-controls-repeat', 56);
         add_submenu_page('retainful_license', 'Connection', 'Connection', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         add_submenu_page('retainful_license', 'Settings', 'Settings', 'manage_woocommerce', 'retainful_settings', array($this, 'retainfulSettingsPage'));
-        $settings = $this->getAdminSettings();
-
-        $is_next_order_disable = get_option('retainful_hide_next_order_coupon', 'no');
-        if (!$this->isNextOrderCouponEnabled()) {
-            if (($is_next_order_disable === 'no' || empty($is_next_order_disable)) && (empty($settings) || count($settings) < 3)) {
-                update_option('retainful_hide_next_order_coupon', 'yes');
-            }
-        }
-
-        $page_slug = $this->slug . '_premium';
-        $permium_page_settings = get_option($page_slug, array());
-        $is_premium_feature_disable = get_option('retainful_hide_premium_feature', 'no');
-        if (($is_premium_feature_disable === 'no' || empty($is_premium_feature_disable)) && empty($permium_page_settings)) {
-            update_option('retainful_hide_premium_feature', 'yes');
-        }
-
-        $can_hide_next_order_coupon = get_option('retainful_hide_next_order_coupon', 'no');
-        if ($can_hide_next_order_coupon !== 'yes') {
-            add_submenu_page('retainful_license', 'Settings', 'Next order coupon', 'manage_woocommerce', 'retainful', array($this, 'nextOrderCouponPage'));
-        }
-
-
 		$page = isset($_REQUEST['page']) ? sanitize_text_field(wp_unslash($_REQUEST['page'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        if ($page && in_array($page, array('retainful_license', 'retainful_settings'))) {
-            $legacy_notice = '<div style="padding: 10px 46px 10px 22px;font-size: 15px;line-height: 1.4;margin-left: -20px;">Unlock the power of fully customizable email capture forms, including Add to Cart and Exit Intent popups, right from your Retainful dashboard. Head over to the Signup Forms section to configure and activate them. Tailor each popup to your brand, track sign-ups efficiently, and entice subscribers with unique coupons. <br/><b style="font-size: 15px;">Please note: Legacy popups will be phased out by April 15. Need help transitioning to the new Sign Up forms? Reach out to us at <a href="mailto:support@retainful.com">support@retainful.com</a> for assistance.</b></div>';
-            add_action('admin_notices', function () use ($legacy_notice) {
-                echo '<div class="error notice"><p>' . wp_kses_post($legacy_notice) . '</p></div>';
-            });
-        }
-        //add_submenu_page('woocommerce', 'Retainful', 'Retainful - Abandoned cart', 'manage_woocommerce', 'retainful_license', array($this, 'retainfulLicensePage'));
         if ($page && in_array($page, array('retainful_license', 'retainful_settings')) && $this->isWebhookNoticeShow()) {
 	        /* translators: %s: Webhook redirect url */
 	        $message = sprintf(__('Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href="%s" target="_blank">webhooks section</a> and activate them.', 'retainful-next-order-coupon-for-woocommerce'), admin_url('admin.php?page=wc-settings&tab=advanced&section=webhooks'));
@@ -1473,45 +1250,9 @@ class Settings
         return (isset($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'])) ? $settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'] : 'no';
     }
 
-    /**
-     * Get the abandoned cart settings
-     * @return array|mixed
-     */
-    function getPremiumAddonSettings()
-    {
-        $abandoned_cart = get_option($this->slug . '_premium', array());
-        if (empty($abandoned_cart))
-            $abandoned_cart = array();
-        return $abandoned_cart;
-    }
 
-    /**
-     * Get the abandoned cart settings
-     * @return array|mixed
-     */
-    function getEmailTemplatesSettings()
-    {
-        $abandoned_cart_email_templates = get_option($this->slug . '_abandoned_cart_email_templates', array());
-        if (empty($abandoned_cart_email_templates))
-            $abandoned_cart_email_templates = array();
-        return $abandoned_cart_email_templates;
-    }
 
-    /**
-     * Coupon expire date format list
-     * @return array
-     */
-    function getDateFormatOptions()
-    {
-        $date_formats = array(
-            'F j, Y' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'F j, Y'),
-            'Y-m-d' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'Y-m-d'),
-            'Y/m/d' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'Y/m/d'),
-            'd-m-Y' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'd-m-Y'),
-            'd/m/Y' => get_date_from_gmt(gmdate('Y-m-d h:i:s'), 'd/m/Y'),
-        );
-        return apply_filters('rnoc_dateformat_options', $date_formats);
-    }
+
 
     /**
      *
@@ -1992,19 +1733,6 @@ class Settings
         return $time_zone;
     }
 
-    /**
-     * Get Admin API key
-     * @return String|null
-     */
-    function getCouponMessage()
-    {
-        $settings = get_option($this->slug, array());
-        if (!empty($settings) && isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']) && !empty(isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message']))) {
-            return __($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_message'], 'retainful-next-order-coupon-for-woocommerce'); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
-        } else {
-            return '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_amount}} '.__("Off On Your Next Purchase","retainful-next-order-coupon-for-woocommerce").'</h3><p style="font-size: 16px; font-weight: 500; color: #555; line-height: 1.6; margin: 15px 0 20px;">'.__("To thank you for being a loyal customer we want to offer you an exclusive voucher for {{coupon_amount}} off your next order!","retainful-next-order-coupon-for-woocommerce").'</p><p style="text-align: center;"><span style="line-height: 1.6; font-size: 18px; font-weight: 500; background: #ffffff; padding: 10px 20px; border: 2px dashed #8D71DB; color: #8d71db; text-decoration: none;">{{coupon_code}}</span></p><p style="text-align: center; margin: 0;"><a style="line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff; text-decoration: none;" href="{{coupon_url}}">'.__("Go!","retainful-next-order-coupon-for-woocommerce").' </a></p></div></div>';
-        }
-    }
 
     /**
      * Check is next order coupon enabled
@@ -2016,166 +1744,6 @@ class Settings
         return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_next_order_coupon']);
     }
 
-    /**
-     * get coupon settings from admin
-     * @return array
-     */
-    function getCouponSettings()
-    {
-        $coupon = array();
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            $coupon['coupon_type'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_type'] : 0;
-            $coupon['coupon_applicable_to'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_applicable_to'] : 'all';
-            $coupon['coupon_amount'] = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount']) && ($settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] > 0) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_coupon_amount'] : 0;
-            $coupon['product_ids'] = isset($settings[RNOC_PLUGIN_PREFIX . 'products']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'products']) ? $settings[RNOC_PLUGIN_PREFIX . 'products'] : array();
-            $coupon['exclude_product_ids'] = isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_products']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'exclude_products']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_products'] : array();
-            $coupon['minimum_amount'] = isset($settings[RNOC_PLUGIN_PREFIX . 'minimum_spend']) && ($settings[RNOC_PLUGIN_PREFIX . 'minimum_spend'] > 0) ? $settings[RNOC_PLUGIN_PREFIX . 'minimum_spend'] : 0;
-            $coupon['maximum_amount'] = isset($settings[RNOC_PLUGIN_PREFIX . 'maximum_spend']) && ($settings[RNOC_PLUGIN_PREFIX . 'maximum_spend'] > 0) ? $settings[RNOC_PLUGIN_PREFIX . 'maximum_spend'] : 0;
-            $coupon['individual_use'] = isset($settings[RNOC_PLUGIN_PREFIX . 'individual_use_only']) && ($settings[RNOC_PLUGIN_PREFIX . 'individual_use_only'] == 1) ? 'yes' : 'no';
-            $coupon['exclude_sale_items'] = isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_sale_items']) && ($settings[RNOC_PLUGIN_PREFIX . 'exclude_sale_items'] == 1) ? 'yes' : 'no';
-            $coupon['product_categories'] = isset($settings[RNOC_PLUGIN_PREFIX . 'product_categories']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'product_categories']) ? $settings[RNOC_PLUGIN_PREFIX . 'product_categories'] : array();
-            $coupon['exclude_product_categories'] = isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_product_categories']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'exclude_product_categories']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_product_categories'] : array();
-        }
-        return $coupon;
-    }
-
-    /**
-     * get coupon settings from admin
-     * @return array
-     */
-    function getCouponValidOrderStatuses()
-    {
-        $statuses = array('wc-processing', 'wc-completed');
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            return isset($settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status']) ? $settings[RNOC_PLUGIN_PREFIX . 'preferred_order_status'] : $statuses;
-        }
-        return $statuses;
-    }
-
-    /**
-     * get coupon settings from admin
-     * @return string
-     */
-    function showCouponInThankYouPage()
-    {
-        $show_on_thankyou_page = 0;
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            return isset($settings[RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page']) ? $settings[RNOC_PLUGIN_PREFIX . 'show_next_order_coupon_in_thankyou_page'] : $show_on_thankyou_page;
-        }
-        return $show_on_thankyou_page;
-    }
-
-    /**
-     * get coupon settings from admin
-     * @return string
-     */
-    function enableCouponResponsePopup()
-    {
-        $enable = 1;
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            return isset($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup']) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'] : $enable;
-        }
-        return $enable;
-    }
-
-    /**
-     * get coupon settings from admin
-     * @return array
-     */
-    function getCouponValidUserRoles()
-    {
-        $roles = array('all');
-        if ($this->isProPlan()) {
-            $usage_restrictions = get_option($this->slug, array());
-            if (!empty($usage_restrictions)) {
-                return isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'preferred_user_roles']) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'preferred_user_roles'] : $roles;
-            }
-        }
-        return $roles;
-    }
-
-    /**
-     * get coupon Limit per email
-     * @return integer
-     */
-    function getCouponLimitPerUser()
-    {
-        $limit = 99;
-        if ($this->isProPlan()) {
-            $settings = get_option($this->slug, array());
-            if (!empty($settings)) {
-                return isset($settings[RNOC_PLUGIN_PREFIX . 'limit_per_user']) ? $settings[RNOC_PLUGIN_PREFIX . 'limit_per_user'] : $limit;
-            }
-        }
-        return $limit;
-    }
-
-    /**
-     * get coupon Limit per email
-     * @return integer
-     */
-    function getMinimumOrderTotalForCouponGeneration()
-    {
-        $minimum_sub_total = 0;
-        if ($this->isProPlan()) {
-            $settings = get_option($this->slug, array());
-            if (!empty($settings)) {
-                return isset($settings[RNOC_PLUGIN_PREFIX . 'minimum_sub_total']) ? $settings[RNOC_PLUGIN_PREFIX . 'minimum_sub_total'] : $minimum_sub_total;
-            }
-        }
-        return $minimum_sub_total;
-    }
-
-    /**
-     * get invalid products for coupon creation
-     * @return array
-     */
-    function getInvalidProductsForCoupon()
-    {
-        $products = array();
-        if ($this->isProPlan()) {
-            $settings = get_option($this->slug, array());
-            if (!empty($settings)) {
-                return isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_products'] : $products;
-            }
-        }
-        return $products;
-    }
-
-    /**
-     * get invalid categories for coupon creation
-     * @return array
-     */
-    function getInvalidCategoriesForCoupon()
-    {
-        $categories = array();
-        if ($this->isProPlan()) {
-            $settings = get_option($this->slug, array());
-            if (!empty($settings)) {
-                return isset($settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories']) ? $settings[RNOC_PLUGIN_PREFIX . 'exclude_generating_coupon_for_categories'] : $categories;
-            }
-        }
-        return $categories;
-    }
-
-    /**
-     * get coupon settings from admin
-     * @return bool
-     */
-    function autoGenerateCouponsForOldOrders()
-    {
-        $settings = get_option($this->slug, array());
-        if (!empty($settings)) {
-            if (isset($settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon']) && $settings[RNOC_PLUGIN_PREFIX . 'automatically_generate_coupon'] == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * Coupon only applicable for
@@ -2191,41 +1759,6 @@ class Settings
         return $coupon_applicable_for;
     }
 
-    /**
-     * Coupon only applicable for
-     * @return string
-     */
-    function couponMessageHook()
-    {
-        $hook = 'woocommerce_email_customer_details';
-        $settings = get_option($this->slug, array());
-        if (!empty($settings) && is_array($settings)) {
-            $hook = (isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) && $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to']) ? $settings[RNOC_PLUGIN_PREFIX . 'retainful_add_coupon_message_to'] : 'woocommerce_email_customer_details';
-        }
-        return $hook;
-    }
-
-    /**
-     * Send Coupon details to server
-     * @param $url
-     * @param $params
-     * @return bool
-     */
-    function sendCouponDetails($url, $params)
-    {
-        if (!isset($params['app_id'])) {
-            $params['app_id'] = $this->getApiKey();
-        }
-        $url = $this->api->domain . $url;
-        $response = $this->api->request($url, $params);
-        if (isset($response->success) && $response->success) {
-            //Do any stuff if success
-            return true;
-        } else {
-            //Log messages if request get failed
-            return false;
-        }
-    }
 
     /**
      * Show up the survey form

@@ -132,16 +132,7 @@ class Checkout extends RestApi {
 		}
 	}
 
-	/**
-	 * @return mixed|void
-	 */
-	function generateNocCouponForManualOrders() {
-		$is_enabled           = self::$settings->isNextOrderCouponEnabled();
-		$has_backorder_coupon = self::$settings->autoGenerateCouponsForOldOrders();
-		$need_noc_coupon      = ( $is_enabled && $has_backorder_coupon && is_admin() );
 
-		return apply_filters( 'rnoc_generate_noc_coupon_for_manual_orders', $need_noc_coupon, $this );
-	}
 
 	function changeWebHookHeader( $http_args, $order_id, $webhook_id ) {
 
