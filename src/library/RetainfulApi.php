@@ -21,7 +21,7 @@ class RetainfulApi
      */
     function upgradePremiumUrl()
     {
-        return $this->app_url . '?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
+        return $this->app_url .'app/settings/billing/plans?utm_source=retainful-free&utm_medium=plugin&utm_campaign=inline-addon&utm_content=premium-addon';
     }
 
     function getDomain()
@@ -167,8 +167,8 @@ class RetainfulApi
      */
     function siteURL()
     {
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-        $domainName = $_SERVER['SERVER_NAME'] . '/';
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ? "https://" : "http://";
+        $domainName = !empty($_SERVER['SERVER_NAME']) ? sanitize_text_field(wp_unslash($_SERVER['SERVER_NAME'] . '/')) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         return $protocol . $domainName;
     }
 
@@ -236,22 +236,18 @@ class RetainfulApi
      */
     function broadCastEvent($url, $body, $headers)
     {
-        $parts = parse_url($url);
-        $port = isset($parts['port']) ? $parts['port'] : 80;
-        $fp = fsockopen($parts['host'], $port, $errno, $errstr, 30);
-        $out = "POST " . $parts['path'] . " HTTP/1.1\r\n";
-        $out .= "Host: " . $parts['host'] . "\r\n";
-        if (!empty($headers)) {
-            foreach ($headers as $key => $value) {
-                $out .= "$key: $value\r\n";
-            }
-        }
-        $out .= "Content-Length: " . strlen($body) . "\r\n";
-        $out .= "Connection: Close\r\n\r\n";
-        if (isset($body)) $out .= $body;
-        fwrite($fp, $out);
-        fclose($fp);
-        return true;
+	    $response = wp_remote_post($url, [
+		    'headers' => $headers,
+		    'body'    => $body,
+		    'timeout' => 15,
+	    ]);
+
+	    if (is_wp_error($response)) {
+		    // Optional: handle error logging here
+		    return false;
+	    }
+
+	    return true;
     }
 
     /**
@@ -269,7 +265,7 @@ class RetainfulApi
         );
         $response = $this->request($url, array(), 'get', '', $headers);
         if (isset($response->success) && $response->success) {
-            $referrer_automation_id = isset($_REQUEST['referrer_automation_id']) && !empty($_REQUEST['referrer_automation_id']) ? wc_clean($_REQUEST['referrer_automation_id']) : 0;
+            $referrer_automation_id = isset($_REQUEST['referrer_automation_id']) && !empty($_REQUEST['referrer_automation_id']) ? wp_unslash($_REQUEST['referrer_automation_id']) : 0; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Recommended
             if (!empty($referrer_automation_id)) {
                 $woocommerce = new WcFunctions();
                 $woocommerce->setSession($cart_token . '_referrer_automation_id', $referrer_automation_id);

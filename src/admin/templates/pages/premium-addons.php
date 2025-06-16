@@ -18,19 +18,19 @@ require_once "tabs.php";
                     ?>
                     <div class="rnoc-grid-cell retainful_premium_grid">
                         <div class="avatar-lg-bg">
-                            <i class="dashicons <?php echo $addon->icon(); ?> retain-icon-premium"></i>
+                            <i class="dashicons <?php echo esc_attr($addon->icon()); ?> retain-icon-premium"></i>
                         </div>
-                        <div class="header retainful_premium_heading"><?php echo $title; ?></div>
+                        <div class="header retainful_premium_heading"><?php echo esc_html($title); ?></div>
                         <div class="retainful_premium_para">
                             <p><?php
-                                echo $addon->description();
+                                echo esc_html($addon->description());
                                 ?>
                             </p>
                         </div>
                         <div class="footer">
                             <a class="view-addon-btn button button-premium"
-                               href="<?php echo add_query_arg(array('add-on' => $slug), $base_url) ?>"
-                            ><?php echo __('Go to Configuration', RNOC_TEXT_DOMAIN); ?></a>
+                               href="<?php echo esc_url(add_query_arg(array('add-on' => $slug), $base_url)) ?>"
+                            ><?php echo esc_html__('Go to Configuration', 'retainful-next-order-coupon-for-woocommerce'); ?></a>
                         </div>
                     </div>
                     <?php
@@ -42,18 +42,18 @@ require_once "tabs.php";
     } else {
         $available_addon_list = array(
             array(
-                'title' => __('Add-to-Cart Email Collection Popup (Premium)', RNOC_TEXT_DOMAIN),
-                'description' => __('Collect customer email at the time of adding to cart. This will help you recover the cart even if they abandon before checkout.', RNOC_TEXT_DOMAIN),
+                'title' => __('Add-to-Cart Email Collection Popup (Premium)', 'retainful-next-order-coupon-for-woocommerce'),
+                'description' => __('Collect customer email at the time of adding to cart. This will help you recover the cart even if they abandon before checkout.', 'retainful-next-order-coupon-for-woocommerce'),
                 'icon' => 'dashicons-cart'
             ),
             array(
-                'title' => __('Countdown Timer (Premium)', RNOC_TEXT_DOMAIN),
-                'description' => __('Give a clear deadline to grab the offer and create a sense of urgency using Countdown Timer', RNOC_TEXT_DOMAIN),
+                'title' => __('Countdown Timer (Premium)', 'retainful-next-order-coupon-for-woocommerce'),
+                'description' => __('Give a clear deadline to grab the offer and create a sense of urgency using Countdown Timer', 'retainful-next-order-coupon-for-woocommerce'),
                 'icon' => 'dashicons-clock'
             ),
             array(
-                'title' => __('Exit Intent Popup (Premium)', RNOC_TEXT_DOMAIN),
-                'description' => __('When customers try to leave your store, stop them by showing a coupon code or just collect their email and catch them later.', RNOC_TEXT_DOMAIN),
+                'title' => __('Exit Intent Popup (Premium)', 'retainful-next-order-coupon-for-woocommerce'),
+                'description' => __('When customers try to leave your store, stop them by showing a coupon code or just collect their email and catch them later.', 'retainful-next-order-coupon-for-woocommerce'),
                 'icon' => 'dashicons-external'
             )
         );
@@ -66,17 +66,17 @@ require_once "tabs.php";
                 ?>
                 <div class="rnoc-grid-cell retainful_premium_grid">
                     <div class="avatar-lg-bg">
-                        <i class="dashicons <?php echo $addon['icon']; ?> retain-icon-premium"></i>
+                        <i class="dashicons <?php echo esc_attr($addon['icon']); ?> retain-icon-premium"></i>
                     </div>
-                    <div class="header retainful_premium_heading"><?php echo $addon['title']; ?></div>
+                    <div class="header retainful_premium_heading"><?php echo esc_html($addon['title']); ?></div>
                     <div class="retainful_premium_para"><p><?php
-                            echo $addon['description'];
+                            echo esc_html($addon['description']);
                             ?></p>
                     </div>
                     <div class="footer">
-                        <a href="<?php echo $premium_url; ?>"
+                        <a href="<?php echo esc_url($premium_url); ?>"
                            target="_blank"
-                           class="button button-premium"><?php echo __('Upgrade to a Paid Plan', RNOC_TEXT_DOMAIN); ?></a>
+                           class="button button-premium"><?php echo esc_html__('Upgrade to a Paid Plan', 'retainful-next-order-coupon-for-woocommerce'); ?></a>
                     </div>
                 </div>
                 <?php

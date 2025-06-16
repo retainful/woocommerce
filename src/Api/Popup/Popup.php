@@ -125,11 +125,11 @@ class Popup
 		$input = new Input();
 		$coupon_code = $input->get_post('coupon_code','');
 		if(empty($coupon_code)){
-			wp_send_json_error(['is_redirect' => false, 'message' => __('Coupon code invalid', RNOC_TEXT_DOMAIN)]);
+			wp_send_json_error(['is_redirect' => false, 'message' => __('Coupon code invalid', 'retainful-next-order-coupon-for-woocommerce')]);
 		}
 		$wc_function = new WcFunctions();
 		$wc_function->setSession('rnoc_popup_coupon_code',$coupon_code);
-		wp_send_json_success(['is_redirect' => true, 'message' => __('Coupon added into the Session', RNOC_TEXT_DOMAIN)]);
+		wp_send_json_success(['is_redirect' => true, 'message' => __('Coupon added into the Session', 'retainful-next-order-coupon-for-woocommerce')]);
 	}
 
 	/**

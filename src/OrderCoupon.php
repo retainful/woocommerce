@@ -25,15 +25,15 @@ class OrderCoupon
     {
         if ($this->admin->runAbandonedCartExternally()) {
             $action_links = array(
-                'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('Connection', RNOC_TEXT_DOMAIN) . '</a>',
-                //'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', RNOC_TEXT_DOMAIN) . '</a>',
+                'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('Connection', 'retainful-next-order-coupon-for-woocommerce') . '</a>',
+                //'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', 'retainful-next-order-coupon-for-woocommerce') . '</a>',
             );
         } else {
             $action_links = array(
-                'abandoned_carts' => '<a href="' . admin_url('admin.php?page=retainful_abandoned_cart') . '">' . __('Abandoned carts', RNOC_TEXT_DOMAIN) . '</a>',
-                //'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', RNOC_TEXT_DOMAIN) . '</a>',
-                'settings' => '<a href="' . admin_url('admin.php?page=retainful_settings') . '">' . __('Settings', RNOC_TEXT_DOMAIN) . '</a>',
-                'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('License', RNOC_TEXT_DOMAIN) . '</a>',
+                'abandoned_carts' => '<a href="' . admin_url('admin.php?page=retainful_abandoned_cart') . '">' . __('Abandoned carts', 'retainful-next-order-coupon-for-woocommerce') . '</a>',
+                //'premium_add_ons' => '<a href="' . admin_url('admin.php?page=retainful_premium') . '">' . __('Add-ons', 'retainful-next-order-coupon-for-woocommerce') . '</a>',
+                'settings' => '<a href="' . admin_url('admin.php?page=retainful_settings') . '">' . __('Settings', 'retainful-next-order-coupon-for-woocommerce') . '</a>',
+                'license' => '<a href="' . admin_url('admin.php?page=retainful_license') . '">' . __('License', 'retainful-next-order-coupon-for-woocommerce') . '</a>',
             );
         }
         return array_merge($action_links, $links);
@@ -199,7 +199,7 @@ class OrderCoupon
                 }
             }
             $message = apply_filters('rnoc_before_displaying_next_order_coupon', $message, $order);
-            echo $message;
+            echo wp_kses_post($message);
             do_action('rnoc_after_displaying_next_order_coupon');
         }
     }
@@ -215,7 +215,7 @@ class OrderCoupon
         if (empty($date))
             return NULL;
         if (function_exists('get_date_from_gmt')) {
-            return get_date_from_gmt(date('Y-m-d H:i:s', strtotime($date)), $format);
+            return get_date_from_gmt(gmdate('Y-m-d H:i:s', strtotime($date)), $format);
         } else {
             try {
                 $date = new \DateTime($date);
@@ -247,11 +247,12 @@ class OrderCoupon
      */
     function showAppliedCouponPopup()
     {
-        if (isset($_GET['noc-cta']) && $_GET['noc-cta'] == 1) {
+        if (isset($_GET['noc-cta']) && $_GET['noc-cta'] == 1) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             return;
         }
-        if (isset($_GET['retainful_coupon_code']) && !empty($_GET['retainful_coupon_code'])) {
-            $coupon_code = sanitize_text_field($_GET['retainful_coupon_code']);
+		$retainful_coupon_code = isset($_GET['retainful_coupon_code']) && !empty($_GET['retainful_coupon_code']); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( $retainful_coupon_code ) {
+            $coupon_code = sanitize_text_field($retainful_coupon_code);
             $settings = $this->admin->getUsageRestrictions();
             $need_popup = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_coupon_applied_popup'] : 1;
             $popup_content = (isset($settings[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'])) ? $settings[RNOC_PLUGIN_PREFIX . 'coupon_applied_popup_design'] : $this->admin->appliedCouponDefaultTemplate();
@@ -379,11 +380,14 @@ class OrderCoupon
     function setCouponToSession()
     {
         $request_coupon_code = null;
-        if (isset($_REQUEST['retainful_coupon_code'])) {
-            $request_coupon_code = sanitize_text_field($_REQUEST['retainful_coupon_code']);
+	    $retainful_coupon_code = isset($_REQUEST['retainful_coupon_code']) ? sanitize_text_field(wp_unslash($_REQUEST['retainful_coupon_code'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+	    if ($retainful_coupon_code) {
+            $request_coupon_code = $retainful_coupon_code;
         }
-        if (isset($_REQUEST['retainful_ac_coupon'])) {
-            $request_coupon_code = sanitize_text_field($_REQUEST['retainful_ac_coupon']);
+		$retainful_ac_coupon = isset($_REQUEST['retainful_ac_coupon']) ?sanitize_text_field(wp_unslash( $_REQUEST['retainful_ac_coupon'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ($retainful_ac_coupon) {
+            $request_coupon_code = $retainful_ac_coupon;
         }
         $coupon_code = $this->wc_functions->getSession('retainful_coupon_code');
         if (!empty($request_coupon_code) && empty($coupon_code)) {
@@ -419,7 +423,7 @@ class OrderCoupon
                 if ($coupon_type == 0)
                     $discount_type = 'percent';
                 $coupon = array(
-                    'id' => 321123 . rand(2, 9),
+                    'id' =>  321123 . wp_rand(2, 9),
                     'amount' => $coupon_value,
                     'individual_use' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'individual_use_only'])) ? true : false,
                     'product_ids' => (isset($usage_restrictions[RNOC_PLUGIN_PREFIX . 'products'])) ? $usage_restrictions[RNOC_PLUGIN_PREFIX . 'products'] : array(),
@@ -650,12 +654,7 @@ class OrderCoupon
         $limit = $this->admin->getCouponLimitPerUser();
         if (!empty($limit)) {
             $order_email = $this->wc_functions->getOrderEmail($order);
-            $args = array(
-                'posts_per_page' => -1,
-                'post_type' => array('rnoc_order_coupon', 'shop_coupon'),
-                'meta_key' => 'email',
-                'meta_value' => $order_email
-            );
+            $args = array( 'posts_per_page' => -1, 'post_type' => array('rnoc_order_coupon', 'shop_coupon'), 'meta_key' => 'email', 'meta_value' => $order_email ); //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value
             $posts_query = new \WP_Query($args);
             $count = $posts_query->post_count;
             if ($count >= $limit) {
@@ -762,7 +761,7 @@ class OrderCoupon
         $email = $this->wc_functions->getOrderEmail($order);
         //Sometime email not found in the order object when order created from backend. So, get  from the request
         if (empty($email)) {
-            $email = (isset($_REQUEST['_billing_email']) && !empty($_REQUEST['_billing_email'])) ? $_REQUEST['_billing_email'] : '';
+            $email = (isset($_REQUEST['_billing_email']) && !empty($_REQUEST['_billing_email'])) ? sanitize_text_field(wp_unslash($_REQUEST['_billing_email'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         }
         $coupon = $this->isCouponFound($order_id);
         $order_date = $this->wc_functions->getOrderDate($order);
@@ -842,17 +841,17 @@ class OrderCoupon
      */
     function getCurrentEmail()
     {
-        $postData = isset($_REQUEST['post_data']) ? wc_clean($_REQUEST['post_data']) : '';
+        $postData = isset($_REQUEST['post_data']) ? sanitize_text_field(wp_unslash($_REQUEST['post_data'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $postDataArray = array();
         if (is_string($postData) && $postData != '') {
             parse_str($postData, $postDataArray);
         }
-        $postBillingEmail = isset($_REQUEST['billing_email']) ? sanitize_email($_REQUEST['billing_email']) : '';
+        $postBillingEmail = isset($_REQUEST['billing_email']) ? sanitize_email(wp_unslash($_REQUEST['billing_email'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ($postBillingEmail != '') {
             $postDataArray['billing_email'] = $postBillingEmail;
         }
         if (!get_current_user_id()) {
-            $order_id = isset($_REQUEST['order-received']) ? sanitize_key($_REQUEST['order-received']) : 0;
+            $order_id = isset($_REQUEST['order-received']) ? sanitize_key($_REQUEST['order-received']) : 0; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             if ($order_id) {
                 $order = $this->wc_functions->getOrder($order_id);
                 $postDataArray['billing_email'] = $this->wc_functions->getOrderEmail($order);
@@ -966,12 +965,12 @@ class OrderCoupon
     function isCouponFound($order_id)
     {
         if (empty($order_id)) return NULL;
-        $post_args = array('post_type' => array('rnoc_order_coupon', 'shop_coupon'), 'numberposts' => '1', 'meta_key' => 'order_id', 'meta_value' => $order_id);
+        $post_args = array('post_type' => array('rnoc_order_coupon', 'shop_coupon'), 'numberposts' => '1', 'meta_key' => 'order_id', 'meta_value' => $order_id); //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value
         $posts = get_posts($post_args);
         if (!empty($posts)) {
             foreach ($posts as $post) {
                 if (isset($post->ID)) {
-                    $post_order_id = get_post_meta($post->ID, 'order_id', true);
+                    $post_order_id = get_post_meta($post->ID, 'order_id', true); //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value
                     if (($post_order_id == $order_id) && isset($post->post_title)) {
                         return $post->post_title;
                     }

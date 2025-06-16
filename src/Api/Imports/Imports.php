@@ -55,7 +55,7 @@ class Imports extends Order {
 			) );
 		}
 
-		return $wpdb->get_col( $query );
+		return $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 	/**
@@ -80,7 +80,7 @@ class Imports extends Order {
 			) );
 		}
 
-		return $wpdb->get_var( $query );
+		return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 	/**
@@ -300,6 +300,7 @@ class Imports extends Order {
 			'abandoned_checkout_url'    => $this->getRecoveryLink( $cart_token ),
 			'total_line_items_price'    => $this->formatDecimalPrice( $this->getOrderItemsTotal( $order ) ),
 			'buyer_accepts_marketing'   => true,
+			'buyer_accepts_sms_marketing' => true,
 			'cancelled_at'              => self::$woocommerce->getOrderMeta( $order, $this->order_cancelled_date_key_for_db ),
 			'woocommerce_totals'        => $this->getOrderTotals( $order, $excluding_tax ),
 			'recovered_by_retainful'    => (bool) self::$woocommerce->getOrderMeta( $order, '_rnoc_recovered_by' ),

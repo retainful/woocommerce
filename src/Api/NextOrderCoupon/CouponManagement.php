@@ -112,7 +112,7 @@ class CouponManagement
                     } else {
                         $new_coupon = array(
                             'post_title' => $data['coupon_code'],
-                            'post_name' => $data['coupon_code'] . '-' . rand(1, 2000000),
+                            'post_name' => $data['coupon_code'] . '-' . wp_rand(1, 2000000),
                             'post_content' => '',
                             'post_type' => 'shop_coupon',
                             'post_status' => 'publish'
@@ -204,7 +204,7 @@ class CouponManagement
                 $order = wc_get_order($order_id);
                 if (is_object($order) && method_exists($order, 'get_edit_order_url')) {
                     $order_url = $order->get_edit_order_url();
-                    echo '<p class="form-field "><label>Coupon generated for</label><span>Order #' . $order_id . ' | <a target="_blank" href="' . $order_url . '">View Order</a></span></p>';
+                    echo '<p class="form-field "><label>Coupon generated for</label><span>Order #' . esc_html($order_id) . ' | <a target="_blank" href="' . esc_url($order_url) . '">View Order</a></span></p>';
                 }
             }
         }
@@ -215,9 +215,9 @@ class CouponManagement
         $input = new Input();
         $post_type = $input->post_get('post_type', '');
         if ($post_type === 'shop_coupon' && $which === 'top') {
-            echo '<a id="delete-expired-rtl-coupons"  class="button" style="margin-left: 10%;">' . __('Delete Expired retainful coupons', 'woocommerce') . '</a><script>
+            echo '<a id="delete-expired-rtl-coupons"  class="button" style="margin-left: 10%;">' . esc_html__('Delete Expired retainful coupons', 'retainful-next-order-coupon-for-woocommerce') . '</a><script>
                   jQuery(document).on("click","#delete-expired-rtl-coupons",function (){
-                      jQuery.post( "' . admin_url("admin-ajax.php") . '?action=rnoc_delete_expired_coupons&security=' . wp_create_nonce('rnoc_delete_expired_coupons') . '", function( data ) {
+                      jQuery.post( "' . esc_url(admin_url("admin-ajax.php")) . '?action=rnoc_delete_expired_coupons&security=' . esc_js(wp_create_nonce('rnoc_delete_expired_coupons')) . '", function( data ) {
                           window.location.reload();
                       });
                   })
@@ -234,15 +234,15 @@ class CouponManagement
     {
         // Add NOC link.
         if (current_user_can('manage_woocommerce')) {
-            $class = (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == $_GET['filter-by']) ? 'current' : '';
+            $class = (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == $_GET['filter-by']) ? 'current' : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $admin_url = admin_url('edit.php?post_type=shop_coupon');
             $query_string = add_query_arg(array('filter-by' => rawurlencode('retainful-next-order-coupon')), $admin_url);
-            $query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful'));
-            $types['retainful'] = '<a href="' . esc_url($query_string) . '" class="' . esc_attr($class) . '">' . __('Retainful - Next order coupons', 'woocommerce') . ' (' . $query->found_posts . ')</a>';
-            $referral_class = (isset($_GET['filter-by']) && 'retainful-referral-coupon' == $_GET['filter-by']) ? 'current' : '';
+            $query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful')); //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+            $types['retainful'] = '<a href="' . esc_url($query_string) . '" class="' . esc_attr($class) . '">' . __('Retainful - Next order coupons', 'retainful-next-order-coupon-for-woocommerce') . ' (' . $query->found_posts . ')</a>';
+            $referral_class = (isset($_GET['filter-by']) && 'retainful-referral-coupon' == $_GET['filter-by']) ? 'current' : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $referral_query_string = add_query_arg(array('filter-by' => rawurlencode('retainful-referral-coupon')), $admin_url);
-            $referral_query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful-referral'));
-            $types['retainful_referral'] = '<a href="' . esc_url($referral_query_string) . '" class="' . esc_attr($referral_class) . '">' . __('Retainful - coupons', 'woocommerce') . ' (' . $referral_query->found_posts . ')</a>';
+            $referral_query = new \WP_Query(array('post_type' => 'shop_coupon', 'meta_key' => '_rnoc_shop_coupon_type', 'meta_value' => 'retainful-referral')); //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+            $types['retainful_referral'] = '<a href="' . esc_url($referral_query_string) . '" class="' . esc_attr($referral_class) . '">' . __('Retainful - coupons', 'retainful-next-order-coupon-for-woocommerce') . ' (' . $referral_query->found_posts . ')</a>';
         }
         return $types;
     }
@@ -256,12 +256,12 @@ class CouponManagement
     {
         global $typenow;
         if ($typenow == "shop_coupon") {
-            if (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == sanitize_text_field($_GET['filter-by'])) {
-                $query_vars['meta_key'] = "_rnoc_shop_coupon_type";
-                $query_vars['meta_value'] = "retainful";
-            } else if (isset($_GET['filter-by']) && 'retainful-referral-coupon' == sanitize_text_field($_GET['filter-by'])) {
-                $query_vars['meta_key'] = "_rnoc_shop_coupon_type";
-                $query_vars['meta_value'] = "retainful-referral";
+            if (isset($_GET['filter-by']) && 'retainful-next-order-coupon' == sanitize_text_field(wp_unslash($_GET['filter-by']))) {  //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $query_vars['meta_key'] = "_rnoc_shop_coupon_type"; //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+                $query_vars['meta_value'] = "retainful"; //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+            } else if (isset($_GET['filter-by']) && 'retainful-referral-coupon' == sanitize_text_field(wp_unslash($_GET['filter-by']))) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $query_vars['meta_key'] = "_rnoc_shop_coupon_type"; //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+                $query_vars['meta_value'] = "retainful-referral"; //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
             }
         }
         return $query_vars;
