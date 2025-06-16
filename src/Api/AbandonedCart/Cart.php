@@ -3,6 +3,7 @@
 namespace Rnoc\Retainful\Api\AbandonedCart;
 
 use Exception;
+use Rnoc\Retainful\Api\Imports\Imports;
 use Rnoc\Retainful\Integrations\MultiLingual;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use stdClass;
@@ -1191,7 +1192,12 @@ class Cart extends RestApi
             return NULL;
         }
         global $wpdb;
-        return $wpdb->get_var($wpdb->prepare("SELECT post_id	FROM {$wpdb->postmeta}	WHERE meta_key = '{$this->cart_token_key_for_db}'	AND meta_value = %s	", $cart_token)); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	    if(Imports::isHPOSEnabled()) {
+		    $data = $wpdb->get_var($wpdb->prepare("SELECT order_id FROM {$wpdb->prefix}wc_orders_meta WHERE meta_key = '{$this->cart_token_key_for_db}' AND meta_value = %s", $cart_token));//phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	    }else{
+		    $data = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM {$wpdb->prefix}posts WHERE meta_key = '{$this->cart_token_key_for_db}' AND meta_value = %s", $cart_token));//phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	    }
+        return $data;
     }
 
     /**
