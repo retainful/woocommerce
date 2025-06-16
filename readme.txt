@@ -3,9 +3,9 @@ Contributors: retainful
 Tags: abandoned cart, email marketing, newsletter, forms, woocommerce
 Requires at least: 4.6.1
 Tested up to: 6.8
-WC tested up to: 9.8
+WC tested up to: 9.9
 Requires PHP: 5.6
-Stable tag: 2.6.40
+Stable tag: 2.6.41
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -252,6 +252,11 @@ You can reach out to our experts [here](https://www.retainful.com/support).
 7. Retainful Contacts
 
 == Changelog ==
+= 2.6.41 =
+- Fix: Plugin check
+- Removed: Premium add-on
+- Fix: HPOS Support
+
 = 2.6.40 =
 - Added: Product syn event
 - Added: Category syn event
