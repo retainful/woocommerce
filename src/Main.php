@@ -210,8 +210,6 @@ class Main {
 			add_action( 'wp_ajax_rnoc_disconnect_license', array( $this->admin, 'disconnectLicense' ) );
 			add_action( 'wp_ajax_rnoc_save_settings', array( $this->admin, 'saveAcSettings' ) );
 			//add_filter('wp_ajax_rnoc_create_order_update_webhook',array($this->admin,'saveNewWebhook'),10);
-			add_action( 'wp_ajax_rnoc_save_noc_settings', array( $this->admin, 'saveNocSettings' ) );
-			add_action( 'wp_ajax_rnoc_save_premium_addon_settings', array( $this->admin, 'savePremiumAddOnSettings' ) );
 			add_action( 'wp_ajax_rnoc_delete_expired_coupons', array( $this->admin, 'deleteUnusedExpiredCoupons' ) );
 			//Settings link
 			add_filter( 'plugin_action_links_' . RNOC_BASE_FILE, array( $this->rnoc, 'pluginActionLinks' ) );
@@ -221,65 +219,7 @@ class Main {
 		}
 		//initialise currency helper
 		new Currency();
-		$can_hide_next_order_coupon = get_option( 'retainful_hide_next_order_coupon', 'no' );
-		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$show_deprecate_message     = isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], array(
-				'retainful_license',
-				'retainful_settings',
-				'retainful',
-			) );
-		if ( is_admin() && $show_deprecate_message && $this->admin->isNextOrderCouponEnabled() && $can_hide_next_order_coupon == 'no' ) {
-			$notice = '<p>' . __( "The Next Order Coupon feature inside the plugin and its tab/menu will soon be removed from the Retainful plugin. Migrate your Next Order Coupon campaign to the Automations now. A detailed guide <a href='https://help.retainful.com/migration#next-order-coupon' target='_blank'>here</a>", 'retainful-next-order-coupon-for-woocommerce' ) . '</p>';
-			$this->showAdminNotice( $notice );
-		}
-		if ( $this->admin->isNextOrderCouponEnabled() ) {
-			//Get events
-			add_action( 'woocommerce_checkout_update_order_meta', array( $this->rnoc, 'createNewCoupon' ), 10, 2 );
-			add_action( 'woocommerce_order_status_changed', array( $this->rnoc, 'onAfterPayment' ), 10, 1 );
-			add_action( 'woocommerce_get_shop_coupon_data', array( $this->rnoc, 'addVirtualCoupon' ), 10, 2 );
-			add_action( 'rnoc_create_new_next_order_coupon', array( $this->rnoc, 'createNewCoupon' ), 10, 2 );
-			add_action( 'rnoc_initiated', array( $this->rnoc, 'setCouponToSession' ) );
-			add_action( 'wp_loaded', array( $this->rnoc, 'addCouponToCheckout' ), 10 );
-			//Attach coupon to email
-			$hook = $this->admin->couponMessageHook();
-			if ( ! empty( $hook ) && $hook != "none" ) {
-				add_action( $hook, array( $this->rnoc, 'attachOrderCoupon' ), 10, 4 );
-			}
-			//add action for filter
-			add_action( 'rnoc_show_order_coupon', array( $this->rnoc, 'attachOrderCoupon' ), 10, 4 );
-			//Sync the coupon details with retainful
-			add_action( 'retainful_cron_sync_coupon_details', array( $this->rnoc, 'cronSendCouponDetails' ), 1 );
-			//Remove coupon code after placing order
-			add_action( 'woocommerce_thankyou', array( $this->rnoc, 'removeCouponFromSession' ), 10, 1 );
-			// Show coupon in order thankyou page
-			add_action( 'woocommerce_thankyou', array( $this->rnoc, 'showCouponInThankYouPage' ), 10, 1 );
-			//Remove Code from session
-			add_action( 'woocommerce_removed_coupon', array( $this->rnoc, 'removeCouponFromCart' ) );
-			/*
-			 * Support for woocommerce email customizer
-			 */
-			add_filter( 'woo_email_drag_and_drop_builder_retainful_settings_url', array(
-				$this->rnoc,
-				'wooEmailCustomizerRetainfulSettingsUrl'
-			) );
-			//Tell Email customizes about handling coupons..
-			add_filter( 'woo_email_drag_and_drop_builder_handling_retainful', '__return_true' );
-			//set coupon details for Email customizer
-			add_filter( 'woo_email_drag_and_drop_builder_retainful_next_order_coupon_data', array(
-				$this->rnoc,
-				'wooEmailCustomizerRetainfulCouponContent'
-			), 10, 3 );
-			//sent retainful additional short codes
-			add_filter( 'woo_email_drag_and_drop_builder_load_additional_shortcode', array(
-				$this->rnoc,
-				'wooEmailCustomizerRegisterRetainfulShortCodes'
-			), 10 );
-			add_filter( 'woo_email_drag_and_drop_builder_load_additional_shortcode_data', array(
-				$this->rnoc,
-				'wooEmailCustomizerRetainfulShortCodesValues'
-			), 10, 3 );
-			add_filter( 'wp_footer', array( $this->rnoc, 'showAppliedCouponPopup' ) );
-		}
+
 		/**
 		 * Ip filtering
 		 */
@@ -506,40 +446,6 @@ class Main {
 		$this->admin->removeFinishedHooks( 'rnocp_check_user_plan', 'publish' );
 	}
 
-	/**
-	 * Insert default email template
-	 *
-	 * @param $table
-	 */
-	function insertDefaultEmailTemplate( $table ) {
-		ob_start();
-		include( RNOC_PLUGIN_PATH . 'src/admin/templates/default-1.html' );
-		$content    = ob_get_clean();
-		$email_body = addslashes( $content );
-		ob_start();
-		include( RNOC_PLUGIN_PATH . 'src/admin/templates/default-2.html' );
-		$content1    = ob_get_clean();
-		$email_body1 = addslashes( $content1 );
-		ob_start();
-		include( RNOC_PLUGIN_PATH . 'src/admin/templates/default-3.html' );
-		$content2    = ob_get_clean();
-		$email_body2 = addslashes( $content2 );
-		global $wpdb;
-		$default_template = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM ' . $table . ' WHERE default_template = %d", 1 ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		if ( empty( $default_template ) ) {
-			$template_subject = "Hey {{customer_name}}!! You left something in your cart";
-			// Prepare insert query with multiple rows
-			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->query(
-				$wpdb->prepare(
-					"INSERT INTO `$table` (subject, body, is_active, frequency, day_or_hour, default_template, template_name) VALUES   (%s, %s, %d, %d, %s, %d, %s),(%s, %s, %d, %d, %s, %d, %s),(%s, %s, %d, %d, %s, %d, %s)",//phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared	
-					$template_subject, $email_body, 1, 1, 'Hours', 1, 'initial',
-					$template_subject, $email_body1, 0, 1, 'Hours', 6, 'After 6 hours',
-					$template_subject, $email_body2, 0, 1, 'Days', 1, 'After 1 day'
-				)
-			);
-		}
-	}
 
 	/**
 	 * Initiate the plugin
@@ -549,19 +455,7 @@ class Main {
 		return self::$init = ( self::$init == null ) ? new self() : self::$init;
 	}
 
-	function removeDependentTables() {
-	}
 
-	/**
-	 * All tables required for retainful abandoned cart
-	 * @return array
-	 */
-	function getAbandonedCartTables() {
-		return array(
-			RNOC_PLUGIN_PREFIX . 'abandoned_cart_history',
-			RNOC_PLUGIN_PREFIX . 'guest_abandoned_cart_history'
-		);
-	}
 
 	/**
 	 * detect woocommerce have been deactivated

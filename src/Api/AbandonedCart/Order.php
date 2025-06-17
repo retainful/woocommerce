@@ -332,42 +332,6 @@ class Order extends RestApi
         return apply_filters('rnoc_get_order_language', $selected_language);
     }
 
-    /**
-     * next order coupon details
-     * @param $order
-     * @return array
-     */
-    function getNextOrderCouponDetails($order)
-    {
-        $order_id = self::$woocommerce->getOrderId($order);
-        $data = array();
-        $next_order_coupon = self::$woocommerce->getPostMeta($order_id, '_rnoc_next_order_coupon');
-        $order_coupon_obj = new OrderCoupon();
-        if (empty($next_order_coupon) && self::$settings->isNextOrderCouponEnabled()) {
-            $next_order_coupon = $order_coupon_obj->createNewCoupon($order_id, array());
-        }
-        if (!empty($next_order_coupon)) {
-            $coupon_details = $order_coupon_obj->getCouponByCouponCode($next_order_coupon);
-            if (!empty($coupon_details)) {
-                $coupon_id = $coupon_details->ID;
-                $coupon_expiry_date = get_post_meta($coupon_id, 'coupon_expired_on', true);
-                $ends_at = null;
-                if (!empty($coupon_expiry_date)) {
-                    $expiry_date = get_gmt_from_date($coupon_expiry_date);
-                    $ends_at = strtotime($expiry_date);
-                }
-                $data[] = array(
-                    'id' => $coupon_id,
-                    'code' => $next_order_coupon,
-                    'ends_at' => $ends_at,
-                    'created_at' => strtotime($coupon_details->post_date_gmt),
-                    'updated_at' => strtotime($coupon_details->post_modified_gmt),
-                    'usage_count' => 1
-                );
-            }
-        }
-        return $data;
-    }
 
     /**
      * get the subtotal from order
