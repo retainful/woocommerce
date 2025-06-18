@@ -77,7 +77,6 @@ x                       value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX 
             <td colspan="2">
                 <?php
                 if ($is_app_connected) {
-                    $plan = $admin_settings->getUserActivePlan();
                     ?>
                     <div style="display:block;background: #fff;border: 1px solid #eee;color:#333;padding: 20px;max-width: 600px;width: 100%;text-align:center;border-radius: 4px;box-shadow: 0 0 5px 0 #ddd;margin: 20px auto;">
                         <p style="margin: 20px 0 10px;">
@@ -90,21 +89,6 @@ x                       value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX 
                                 <a href="<?php echo esc_url($api->app_url) ?>" target="_blank"
                                    style="display: inline-block;font-size: 16px;padding: 10px 20px;text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;line-height:1.8;margin-bottom: 20px;"><?php echo esc_html__('Visit Your Dashboard', 'retainful-next-order-coupon-for-woocommerce'); ?></a>
                             </div>
-                            <?php
-                            if (!$admin_settings->isProPlan()) {
-                                ?>
-                                <div class="premium-msg">
-                                    <p style="margin: 15px 0;color:#777;font-size: 17px;line-height:1.6;">
-                                        <?php echo esc_html__('Upgrade to Premium and get more features like Email Collection during add to cart and Coupon for email entry.', 'retainful-next-order-coupon-for-woocommerce'); ?>
-                                    </p>
-                                    <p style="margin: 20px 0 0;">
-                                        <a href="<?php echo esc_url($api->upgradePremiumUrl()); ?>" target="_blank"
-                                           style="display: inline-block;font-size: 16px;padding: 10px 20px;text-decoration: none;color:#fff;background:#F27052;border-radius: 4px;font-weight: 600;line-height:1.8;margin-bottom: 20px;"><?php echo esc_html__('Upgrade to Premium', 'retainful-next-order-coupon-for-woocommerce'); ?></a>
-                                    </p>
-                                </div>
-                                <?php
-                            }
-                            ?>
                         </div>
                     </div>
                     <?php
