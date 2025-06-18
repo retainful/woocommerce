@@ -28,18 +28,6 @@ class Settings
         }
     }
 
-    /**
-     * switch to cloud notice
-     * @return string
-     */
-    function switchToCloudNotice()
-    {
-        if (!$this->isNewInstallation()) {
-            $move_to_cloud_url = admin_url('admin.php?page=' . $this->slug . '_license&move_to_cloud=yes');
-            return '<p style="padding: 2em;background: #ffffff;border: 1px solid #e9e9e9;box-shadow: 0 1px 1px rgba(0,0,0,.05);">' . esc_html__("Manage your abandoned carts effectively in Retainful Dashboard & get more features ", 'retainful-next-order-coupon-for-woocommerce') . '&nbsp; <a class="button-primary align-right" href="' . $move_to_cloud_url . '">' . esc_html__("Switch to cloud!", 'retainful-next-order-coupon-for-woocommerce') . '</a>&nbsp;<a href="https://www.retainful.com/blog/abandoned-cart-solutions-cloud-based-solutions-vs-self-hosted-plugin-based-solutions" target="_blank">' . __("Learn more", 'retainful-next-order-coupon-for-woocommerce') . '</a></p>';
-        }
-        return NULL;
-    }
 
     /**
      * page styles
@@ -52,22 +40,6 @@ class Settings
         }
     }
 
-    /**
-     * generate plugin activate,de-activate or delete link
-     * @param $plugin
-     * @param string $action
-     * @return string
-     */
-    function pluginActionLink($plugin, $action = 'activate')
-    {
-        if (strpos($plugin, '/')) {
-            $plugin = str_replace('\/', '%2F', $plugin);
-        }
-        $url = sprintf(admin_url('plugins.php?action=' . $action . '&plugin=%s&plugin_status=all&paged=1&s'), $plugin);
-        $_REQUEST['plugin'] = $plugin;
-        $url = wp_nonce_url($url, $action . '-plugin_' . $plugin);
-        return $url;
-    }
 
     /**
      * render retainful license page
@@ -114,7 +86,6 @@ class Settings
         //Save app id before validate key
         update_option($slug . '_license', $options_data);
         $response = array();
-        $this->updateUserAsFreeUser();
         if (empty($response)) {
             $api_response = $this->isApiEnabled($app_id, $secret_key);
             if (isset($api_response['success'])) {
@@ -180,191 +151,6 @@ class Settings
         }
     }
 
-    /**
-     * validate input against the alpha numeric and spaces
-     * @param $field
-     * @param $value
-     * @param array $params
-     * @param array $fields
-     * @return bool
-     */
-    static function validateColor($field, $value, array $params, array $fields)
-    {
-        return (bool)preg_match('/^#(([0-9a-fA-F]{2}){3}|([0-9a-fA-F]){3})$/', $value);
-    }
-
-    /**
-     * validate coupon timer post data
-     * @param $validator
-     */
-    function validateCouponTimer($validator)
-    {
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'enable_coupon_timer',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_position',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_position',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_checkout_button',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_position',
-        ), ['0', '1'])->message('This field contains invalid value');
-        $validator->rule('color', array(
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'checkout_button_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'checkout_button_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'checkout_button_bg_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_background',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_code_color',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon_timer_color',
-        ))->message('This field accepts only hex color code');
-        $validator->rule('min', array(
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'
-        ), 0)->message('This field should accepts only positive value');
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_apply_coupon',
-        ), ['automatically', 'manually'])->message('This field contains invalid value');
-        $validator->rule('basicTags', array(
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_message',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_expired_text',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_below_discount_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_above_cart_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'checkout_button_text',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_display_format',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_timer_message',
-            RNOC_PLUGIN_PREFIX . 'coupon_timer_top_position_settings.*.' . RNOC_PLUGIN_PREFIX . 'checkout_button_text',
-        ))->message('Script tag and iframe tag were not allowed ');
-        if (self::$input->has_post(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer') && self::$input->post(RNOC_PLUGIN_PREFIX . 'enable_coupon_timer', '1') == 1) {
-            $validator->rule('required', array(
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_coupon',
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'
-            ))->message('This field is required');
-            $validator->rule('integer', array(
-                RNOC_PLUGIN_PREFIX . 'coupon_timer_expire_time'
-            ))->message('This fields should contains only number');
-        }
-        if (!$validator->validate()) {
-            wp_send_json_error($validator->errors());
-        }
-    }
-
-    /**
-     * validate coupon timer post data
-     * @param $validator
-     */
-    function validateExitIntentPopup($validator)
-    {
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal',
-            RNOC_PLUGIN_PREFIX . 'need_exit_intent_modal_after_coupon_applied',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_mobile_support',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_mobile_back_click',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_delay_trigger',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'enable_scroll_distance_trigger',
-        ), ['0', '1'])->message('This field contains invalid value');
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings.show_option',
-        ), ['once_per_page', 'every_time_on_customer_exists', 'show_x_times_per_page', 'once_per_session'])->message('This field contains invalid value');
-        $validator->rule('array', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_display_pages',
-        ), ['0', '1'])->message('This field contains invalid value');
-        $validator->rule('min', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
-        ), 1)->message('This field accepts only value greater than or equal to 1');
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_settings',
-        ), ['no_need_gdpr', 'dont_show_checkbox', 'show_and_check_checkbox', 'show_checkbox'])->message('This field contains invalid value');
-        $validator->rule('integer', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_delay_sec',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_mobile_settings.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_modal_distance',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_cookie_life',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_show_settings.show_count',
-        ))->message('This field should only accepts number');
-        $validator->rule('color', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_color',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_bg_color',
-        ))->message('This field accepts only hex color code');
-        $validator->rule('basicTags', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_template',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'
-        ))->message('Script tag and iframe tag were not allowed ');
-        /*$validator->rule('regex', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_text',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_placeholder',
-        ), '/^[\p{L}\p{Nd} .-]+$/')->message('This field should only accepts numbers, alphabets and spaces');*/
-        /*        $validator->rule('regex', array(
-                    RNOC_PLUGIN_PREFIX . 'exit_intent_modal_custom_style'
-                ), '/^[a-z0-9%:\n\t {};.#\[\]"!]+$/')->message('This field should only accepts css values');*/
-        $validator->rule('regex', array(
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_width',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_button_height',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_width',
-            RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_design.*.' . RNOC_PLUGIN_PREFIX . 'exit_intent_popup_form_email_height',
-        ), '/^[a-z0-9%]+$/')->message('This field should only accepts numbers, lowercase alphabets and percentage symbol');
-        if (!$validator->validate()) {
-            wp_send_json_error($validator->errors());
-        }
-    }
-
-    /**
-     * validate coupon timer post data
-     * @param $validator
-     */
-    function validateAddToCartPopup($validator)
-    {
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'need_modal',
-            RNOC_PLUGIN_PREFIX . 'modal_email_is_mandatory',
-            RNOC_PLUGIN_PREFIX . 'modal_no_thanks_action',
-            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'need_coupon',
-        ), ['0', '1'])->message('This field contains invalid value');
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'modal_show_popup_until',
-        ), ['1', '2', '3'])->message('This field contains invalid value');
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'close_btn_behavior',
-        ), ['add_and_close', 'just_close'])->message('This field contains invalid value');
-        $validator->rule('array', array(
-            RNOC_PLUGIN_PREFIX . 'modal_display_pages',
-        ))->message('This field contains invalid value');
-        $validator->rule('regex', array(
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_email_field_width',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_button_field_width',
-        ), '/^(\d*\.)?\d+$/')->message('This field should only accepts numbers and decimals');
-        $validator->rule('color', array(
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_heading_color',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_color',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_bg_color',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_border_top_color',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_bg_color',
-            RNOC_PLUGIN_PREFIX . 'modal_design_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_add_cart_no_thanks_color',
-            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'modal_sub_heading_color',
-        ))->message('This field accepts only hex color code');
-        $validator->rule('basicTags', array(
-            RNOC_PLUGIN_PREFIX . 'add_to_cart_extra_class',
-            RNOC_PLUGIN_PREFIX . 'add_to_cart_popup_gdpr_compliance.*.' . RNOC_PLUGIN_PREFIX . 'gdpr_compliance_checkbox_message',
-            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'add_to_cart_coupon_popup_template',
-            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'coupon_mail_template',
-        ))->message('Script tag and iframe tag were not allowed ');
-        $validator->rule('in', array(
-            RNOC_PLUGIN_PREFIX . 'modal_coupon_settings.*.' . RNOC_PLUGIN_PREFIX . 'show_woo_coupon',
-        ), ['instantly', 'send_via_email', 'both', 'auto_apply_and_redirect', 'send_mail_auto_apply_and_redirect_cart', 'send_mail_auto_apply_and_redirect', 'auto_apply_and_redirect_cart'])->message('This field contains invalid value');
-        if (!$validator->validate()) {
-            wp_send_json_error($validator->errors());
-        }
-    }
 
     function addOrderDetailMetaBoxes($post_type)
     {
@@ -394,45 +180,6 @@ class Settings
         } else {
             return is_scalar($var) ? sanitize_text_field($var) : $var;
         }
-    }
-
-
-    /**
-     * validate the value is float or not
-     * @param $field
-     * @param $value
-     * @param array $params
-     * @param array $fields
-     * @return bool
-     */
-    static function validateFloat($field, $value, array $params, array $fields)
-    {
-        return (is_numeric($value) || is_float($value));
-    }
-
-    /**
-     * validate Input Text Html Tags
-     *
-     * @param $field
-     * @param $value
-     * @param array $params
-     * @param array $fields
-     * @return bool
-     */
-    static function validateBasicHtmlTags($field, $value, array $params, array $fields)
-    {
-        $value = stripslashes($value);
-        $value = html_entity_decode($value);
-        $invalid_tags = array("script", "iframe");
-        foreach ($invalid_tags as $tag_name) {
-            $pattern = "#<\s*?$tag_name\b[^>]*>(.*?)</$tag_name\b[^>]*>#s";;
-            preg_match($pattern, $value, $matches);
-            //script or iframe found
-            if (!empty($matches)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -840,15 +587,6 @@ class Settings
     }
 
     /**
-     * applied Coupon Default Template
-     * @return string
-     */
-    function appliedCouponDefaultTemplate()
-    {
-        return '<div style="text-align: center;"><div class="coupon-block"><h3 style="font-size: 25px; font-weight: 500; color: #222; margin: 0 0 15px;">{{coupon_code}} was successfully applied to your cart!</h3><p style="margin:10px auto; ">Enjoy your shopping :)</p><p style="text-align: center; margin: 0;"><a href="{{shop_url}}" style="text-decoration: none;line-height: 1.8; font-size: 16px; font-weight: 500; background: #8D71DB; display: block; padding: 10px; border: 1px solid #8D71DB; border-radius: 4px; color: #ffffff;">Continue shopping!</a></p></div></div>';
-    }
-
-    /**
      * Check any pending hooks already exists
      * @param $meta_value
      * @param $hook
@@ -879,16 +617,8 @@ class Settings
     function unScheduleHooks()
     {
         $this->removeFinishedHooks('rnoc_abandoned_clear_abandoned_carts', 'pending');
-        $this->removeFinishedHooks('rnoc_abandoned_cart_send_email', 'pending');
     }
 
-    /**
-     * Schedule events to check plan
-     */
-    function schedulePlanChecker()
-    {
-        $this->scheduleEvents('rnocp_check_user_plan', current_time('timestamp'), array(), 'recurring', 604800);
-    }
 
     /**
      * Add post meta
@@ -1006,7 +736,7 @@ class Settings
      */
     protected function availableScheduledActions()
     {
-        return array('rnocp_check_user_plan', 'rnoc_abandoned_clear_abandoned_carts', 'rnoc_abandoned_cart_send_email');
+        return array( 'rnoc_abandoned_clear_abandoned_carts');
     }
 
     /**
@@ -1054,14 +784,6 @@ class Settings
         }
     }
 
-    /**
-     * Set the option to manage Abandoned cart to manage in cloud
-     */
-    function setAbandonedCartToManageInCloud()
-    {
-        $this->unScheduleHooks();
-        update_option('retainful_run_abandoned_cart_in_cloud', 1);
-    }
 
     /**
      * @return mixed|void
@@ -1138,62 +860,6 @@ class Settings
     }
 
     /**
-     * Check the current installation is new or not
-     * @return bool
-     */
-    function isInstalledFresh()
-    {
-        global $wpdb;
-        $tables_list = $wpdb->get_results('SHOW TABLES', ARRAY_N); //phpcs:ignore  WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-        $required_tables = array($wpdb->prefix . RNOC_PLUGIN_PREFIX . 'abandoned_cart_history', $wpdb->prefix . RNOC_PLUGIN_PREFIX . 'email_templates');
-        if (!empty($tables_list)) {
-            foreach ($tables_list as $table_name) {
-                if (count(array_intersect($required_tables, $table_name)) > 0) {
-                    return 0;
-                }
-            }
-        }
-        return 1;
-    }
-
-    /**
-     * get all available order statuses
-     * @return array
-     */
-    function availableOrderStatuses()
-    {
-        $woo_functions = new WcFunctions();
-        $woo_statuses = $woo_functions->getAvailableOrderStatuses();
-        if (is_array($woo_statuses)) {
-            if (isset($woo_statuses['wc-pending'])) {
-                unset($woo_statuses['wc-pending']);
-            }
-            return $woo_statuses;
-        }
-        return array();
-    }
-
-    /**
-     * Get the user current plan
-     * @return mixed|string
-     */
-    function getUserActivePlan()
-    {
-        $plan_details = $this->getPlanDetails();
-        return strtolower(trim(isset($plan_details['plan']) ? $plan_details['plan'] : 'free'));
-    }
-
-    /**
-     * Get the user current plan
-     * @return mixed|string
-     */
-    function getUserPlanStatus()
-    {
-        $plan_details = $this->getPlanDetails();
-        return strtolower(trim(isset($plan_details['status']) ? $plan_details['status'] : 'inactive'));
-    }
-
-    /**
      * Get the abandoned cart settings
      * @return array|mixed
      */
@@ -1222,17 +888,6 @@ class Settings
         return apply_filters("retainful_enable_popup_widget", ($need_widget === "yes"));
     }
 
-    /**
-     * is embeded referral widget is required in my account page
-     * @return mixed|void
-     */
-    function needEmbededReferralWidget()
-    {
-        $settings = $this->getAdminSettings();
-        $need_widget = (isset($settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'])) ? $settings[RNOC_PLUGIN_PREFIX . 'enable_embeded_referral_widget'] : 'yes';
-        return apply_filters("enable_embeded_referral_widget", ($need_widget === "yes"));
-    }
-
     function isAfterPayEnabled()
     {
         $settings = $this->getAdminSettings();
@@ -1249,9 +904,6 @@ class Settings
         $settings = $this->getAdminSettings();
         return (isset($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts']) && !empty($settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'])) ? $settings[RNOC_PLUGIN_PREFIX . 'track_zero_value_carts'] : 'no';
     }
-
-
-
 
 
     /**
@@ -1323,42 +975,6 @@ class Settings
         return get_posts($args);
     }
 
-    /**
-     * Make coupon expire date from order date
-     * @param $ordered_date
-     * @return array
-     */
-    function getCouponExpireDate($ordered_date)
-    {
-        $response = array(
-            'woo_coupons' => null,
-            'retainful_coupons' => null
-        );
-        if (empty($ordered_date))
-            return $response;
-        $settings = get_option($this->slug, array());
-        $expire_days = isset($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) ? intval($settings[RNOC_PLUGIN_PREFIX . 'retainful_expire_days']) : 0;
-        if ($this->isAppConnected() && $expire_days > 0) {
-            $response['retainful_coupons'] = $this->addDaysToDate($ordered_date, $expire_days);
-            $response['woo_coupons'] = $this->addDaysToDate($ordered_date, $expire_days + 1);
-        }
-        return $response;
-    }
-
-    function addDaysToDate($date, $days)
-    {
-        if ($date && intval($days) > 0) {
-            $date = $this->formatDate($date, 'Y-m-d');
-            if (!empty($date)) {
-                $timestamp = strtotime($date);
-                $days_in_seconds = intval($days) * 86400;
-                $last_date_timestamp = $timestamp + $days_in_seconds;
-                $last_date = gmdate('Y-m-d H:i:s', $last_date_timestamp);
-                return $this->formatDate($last_date, \DateTime::ATOM);
-            }
-        }
-        return null;
-    }
 
     /**
      * @param $date
@@ -1437,112 +1053,6 @@ class Settings
     }
 
     /**
-     * get coupon date format
-     * @return mixed|string
-     */
-    function getExpireDateFormat()
-    {
-        $usage_restriction = $this->getUsageRestrictions();
-        if (isset($usage_restriction[RNOC_PLUGIN_PREFIX . 'expire_date_format']) && !empty($usage_restriction[RNOC_PLUGIN_PREFIX . 'expire_date_format'])) {
-            return $usage_restriction[RNOC_PLUGIN_PREFIX . 'expire_date_format'];
-        }
-        return 'F j, Y, g:i a';
-    }
-
-    /**
-     *
-     * Get all categories
-     * @return array - list of all categories
-     */
-    function getCategories()
-    {
-        $categories = array();
-        $category_list = get_terms(array(
-	        'taxonomy'   => 'product_cat',
-	        'orderby'    => 'name',
-	        'order'      => 'asc',
-	        'hide_empty' => false,
-        ));
-        if (!empty($category_list)) {
-            foreach ($category_list as $category) {
-                if (is_object($category) && isset($category->term_id) && isset($category->name)) {
-                    $categories[$category->term_id] = $category->name;
-                }
-            }
-        }
-        return $categories;
-    }
-
-    /**
-     *
-     * Get all user roles
-     * @return array - list of all user roles
-     */
-    function getUserRoles()
-    {
-        global $wp_roles;
-        $all_roles = $wp_roles->roles;
-        $user_roles = array('all' => __('All', 'retainful-next-order-coupon-for-woocommerce'));
-        if (!empty($all_roles)) {
-            foreach ($all_roles as $role_name => $role) {
-                $user_roles[$role_name] = isset($role['name']) ? $role['name'] : '';
-            }
-        }
-        return $user_roles;
-    }
-
-    /**
-     * get the plan details of the API
-     * @return array|mixed
-     */
-    function getPlanDetails()
-    {
-        $plan_details = get_option('rnoc_plan_details', array());
-        if (empty($plan_details)) {
-            $api_key = $this->getApiKey();
-            $secret_key = $this->getSecretKey();
-            if (!empty($api_key)) {
-                $api_obj = new RestApi();
-                $store_data = array(
-                    'secret_key' => $api_obj->encryptData($api_key, $secret_key));
-                $this->isApiEnabled($api_key, $secret_key, $store_data);
-            } else {
-                $this->updateUserAsFreeUser();
-            }
-            $plan_details = get_option('rnoc_plan_details', array());
-        }
-        if (empty($plan_details)) {
-            $plan_details = array(
-                'plan' => 'free',
-                'status' => 'active',
-                'expired_on' => 'never'
-            );
-        }
-        return $plan_details;
-    }
-
-    /**
-     * Check the user plan is pro
-     * @return bool
-     */
-    function isProPlan()
-    {
-        $plan = $this->getUserActivePlan();
-        $status = $this->getUserPlanStatus();
-        $plan = strtolower($plan);
-        return (in_array($plan, array('pro', 'business', 'professional', 'essential')) && in_array($status, array('active', 'trialing')));
-    }
-
-    /**
-     * Link to unlock premium
-     * @return string
-     */
-    function unlockPremiumLink()
-    {
-        return '<a href="' . $this->api->upgradePremiumUrl() . '">' . __("Unlock this feature by upgrading to Premium", 'retainful-next-order-coupon-for-woocommerce') . '</a>';
-    }
-
-    /**
      * Check fo entered API key is valid or not
      * @param string $api_key
      * @param string $secret_key
@@ -1563,40 +1073,18 @@ class Settings
         if (!empty($api_key)) {
             if ($details = $this->api->validateApi($api_key, $store_data)) {
                 if (empty($details) || is_string($details)) {
-                    $this->updateUserAsFreeUser();
                     return array('error' => $details);
                 } else {
-                    $this->updatePlanDetails($details);
                     return array('success' => isset($details['message']) ? $details['message'] : NULL);
                 }
             } else {
-                $this->updateUserAsFreeUser();
                 return false;
             }
         } else {
-            $this->updateUserAsFreeUser();
             return false;
         }
     }
 
-    /**
-     * update user as Free user
-     */
-    function updateUserAsFreeUser()
-    {
-        $details = $this->api->getPlanDetails();
-        $this->updatePlanDetails($details);
-    }
-
-    /**
-     * update the plan details
-     * @param array $details
-     */
-    function updatePlanDetails($details = array())
-    {
-        update_option('rnoc_plan_details', $details);
-        update_option('rnoc_last_plan_checked', current_time('timestamp'));
-    }
 
     /**
      * License settings

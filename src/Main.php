@@ -236,9 +236,7 @@ class Main {
 			$app_id = $this->admin->getApiKey();*/
 			if ( $is_app_connected && ! empty( $secret_key ) && ! empty( $app_id ) ) {
 				add_action( 'rest_api_init', array( $this, 'registerSyncEndPoints' ) );
-				if ( is_admin() ) {
-					add_action( 'wp_after_admin_bar_render', array( $this->admin, 'schedulePlanChecker' ) );
-				}
+
 				/*
 				* Retainful abandoned cart api
 				*/
@@ -365,16 +363,10 @@ class Main {
 		} else {
 			//remove
 		}
+
 		//Premium check
-		add_action( 'rnocp_check_user_plan', array( $this, 'checkUserPlan' ) );
 		do_action( 'rnoc_initiated' );
-		if ( is_admin() ) {
-			$is_retainful_v2_0_1_migration_completed = get_option( 'is_retainful_v2_0_1_migration_completed', 0 );
-			if ( ! $is_retainful_v2_0_1_migration_completed ) {
-				$this->migrationV201();
-			}
-			$this->checkApi();
-		}
+
 	}
 
 	function canActivateIPFilter() {
@@ -388,17 +380,6 @@ class Main {
 		}
 	}
 
-	/**
-	 * Migration for 2.1.0
-	 */
-	function migrationV201() {
-		$premium_settings                                              = get_option( $this->admin->slug . '_premium' );
-		$admin_settings                                                = $this->admin->getAdminSettings();
-		$admin_settings[ RNOC_PLUGIN_PREFIX . 'enable_ip_filter' ]     = isset( $premium_settings[ RNOC_PLUGIN_PREFIX . 'enable_ip_filter' ] ) ? $premium_settings[ RNOC_PLUGIN_PREFIX . 'enable_ip_filter' ] : 0;
-		$admin_settings[ RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' ] = isset( $premium_settings[ RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' ] ) ? $premium_settings[ RNOC_PLUGIN_PREFIX . 'ignored_ip_addresses' ] : '';
-		update_option( $this->admin->slug . '_settings', $admin_settings );
-		update_option( 'is_retainful_v2_0_1_migration_completed', 1 );
-	}
 
 	/**
 	 * Run when our plugin get deactivated
@@ -414,36 +395,6 @@ class Main {
 	 */
 	function removeAllScheduledActions() {
 		$this->admin->removeFinishedHooks( 'rnoc_abandoned_clear_abandoned_carts' );
-		$this->admin->removeFinishedHooks( 'rnoc_abandoned_cart_send_email' );
-		$this->admin->removeFinishedHooks( 'rnocp_check_user_plan' );
-	}
-
-	/**
-	 * check api is valid or not on 3 days once
-	 */
-	function checkApi() {
-		$last_checked = get_option( 'rnoc_last_plan_checked', null );
-		if ( empty( $last_checked ) || ( current_time( 'timestamp' ) > intval( $last_checked ) + 259200 ) ) {
-			$this->checkUserPlan();
-		}
-	}
-
-	/**
-	 * Check and update the user plan
-	 */
-	function checkUserPlan() {
-		$api_key    = $this->admin->getApiKey();
-		$secret_key = $this->admin->getSecretKey();
-		if ( ! empty( $api_key ) && ! empty( $secret_key ) ) {
-			$api_obj    = new RestApi();
-			$store_data = array(
-				'secret_key' => $api_obj->encryptData( $api_key, $secret_key )
-			);
-			$this->admin->isApiEnabled( $api_key, $secret_key, $store_data );
-		} else {
-			$this->admin->updateUserAsFreeUser();
-		}
-		$this->admin->removeFinishedHooks( 'rnocp_check_user_plan', 'publish' );
 	}
 
 
@@ -481,39 +432,9 @@ class Main {
 				$this->showAdminNotice( __( 'Your woocommerce version is ', 'retainful-next-order-coupon-for-woocommerce' ) . WC_VERSION . __( '. Some of the features of Retainful-Woocommerce will not work properly on this woocommerce version.', 'retainful-next-order-coupon-for-woocommerce' ) );
 			}
 		}
-		if ( is_admin() ) {
-			$this->doMigration();
-		}
 	}
 
-	/**
-	 * Migrate data required for v 1.1.3
-	 */
-	function doMigration() {
-		$is_migrated = get_option( 'retainful_v_1_1_3_migration_completed', 0 );
-		if ( ! $is_migrated ) {
-			$slug                   = $this->admin->slug;
-			$retainful_page         = get_option( $slug, array() );
-			$licence_page           = get_option( $slug . '_license', array() );
-			$usage_restriction_page = get_option( $slug . '_usage_restriction', array() );
-			if ( empty( $licence_page ) ) {
-				$licence_data = array(
-					RNOC_PLUGIN_PREFIX . 'is_retainful_connected' => ( isset( $retainful_page[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ] ) ) ? $retainful_page[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ] : 0,
-					RNOC_PLUGIN_PREFIX . 'retainful_app_id'       => ( isset( $retainful_page[ RNOC_PLUGIN_PREFIX . 'retainful_app_id' ] ) ) ? $retainful_page[ RNOC_PLUGIN_PREFIX . 'retainful_app_id' ] : '',
-					RNOC_PLUGIN_PREFIX . 'retainful_app_secret'   => ( isset( $retainful_page[ RNOC_PLUGIN_PREFIX . 'retainful_app_secret' ] ) ) ? $retainful_page[ RNOC_PLUGIN_PREFIX . 'retainful_app_secret' ] : ''
-				);
-				update_option( $slug . '_license', $licence_data );
-			}
-			unset( $retainful_page[ RNOC_PLUGIN_PREFIX . 'is_retainful_connected' ], $retainful_page[ RNOC_PLUGIN_PREFIX . 'retainful_app_id' ] );
-			$retainful_data = array_merge( $retainful_page, $usage_restriction_page );
-			update_option( $slug, $retainful_data );
-			delete_option( $slug . '_usage_restriction' );
-			$abandoned_cart_data = get_option( $slug . '_abandoned_cart_settings', array() );
-			update_option( $slug . '_settings', $abandoned_cart_data );
-			delete_option( $slug . '_abandoned_cart_settings' );
-			update_option( 'retainful_v_1_1_3_migration_completed', 1 );
-		}
-	}
+
 
 	/**
 	 * Show notices for user..if anything unusually happen in our plugin
