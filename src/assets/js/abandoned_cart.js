@@ -316,7 +316,7 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 }
                 if (this.force_refresh_carts !== null && !this.is_force_synced) {
                     this.is_force_synced = true;
-                    let response = retainful.request(this.ajax_url, {action: 'rnoc_track_user_data', rnoc_nonce : rnoc_cart_js_data.rnoc_nonce }, {}, "json", "POST", false);
+                    let response = retainful.request(this.ajax_url, {action: 'rnoc_track_user_data'}, {}, "json", "POST", false);
                     if (response.success && response.data) {
                         retainful.syncCart(response.data, true);
                     }
@@ -401,7 +401,6 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 rnoc_cart_js_data.billing_email = e.email;
                 var guest_data = {
                     action: 'rnoc_track_user_data',
-                    rnoc_nonce : rnoc_cart_js_data.rnoc_nonce
                 };
                 updateCheckout(e.email, rnoc_phone = '', guest_data);
             });
@@ -448,7 +447,6 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 sms_consent: $('input#rnoc_sms_consent').is(':checked'),
                 cart_token: localStorage.getItem('retainful_ac_cart_token'),
                 action: 'rnoc_track_user_data',
-                rnoc_nonce : rnoc_cart_js_data.rnoc_nonce
             };
             updateCheckout(rnoc_email, rnoc_phone, guest_data);
         });
@@ -469,7 +467,6 @@ function initJqueryRetainfulAbandonedCartsTracking(rnoc_cart_js_data) {
                 ship_to_billing: 1,
                 cart_token: localStorage.getItem('retainful_ac_cart_token'),
                 action: 'rnoc_track_user_data',
-                rnoc_nonce : rnoc_cart_js_data.rnoc_nonce
             };
             updateCheckout(rnoc_email, rnoc_phone, guest_data);
         });

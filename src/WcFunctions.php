@@ -1,7 +1,6 @@
 <?php
 
 namespace Rnoc\Retainful;
-use Rnoc\Retainful\Helpers\Input;
 
 if (!defined('ABSPATH')) exit;
 
@@ -2132,42 +2131,6 @@ class WcFunctions
         return apply_filters('rnoc_custom_default_currency', $currency);
     }
 
-	/**
-	 * Check the validity of a security nonce and the admin privilege.
-	 *
-	 * @param string $nonce_name The name of the nonce.
-	 * @return bool
-	 */
-	public static function isSecurityValid($nonce_name = ''): bool
-	{
-		if (!is_string($nonce_name) || empty($nonce_name)) return false;
-		$input = new Input();
-		$wdr_nonce = $input->post('rnoc_nonce', '');
-		if (!self::hasAdminPrivilege() || !self::verifyNonce($wdr_nonce, $nonce_name)) return false;
-		return true;
-	}
 
-	/**
-	 * Has admin privilege.
-	 *
-	 * @return bool
-	 */
-	public static function hasAdminPrivilege(): bool
-	{
-		return current_user_can('manage_woocommerce');
-	}
-
-	/**
-	 * Verify nonce.
-	 *
-	 * @param string $nonce Nonce.
-	 * @param string $action Action.
-	 * @return bool
-	 */
-	public static function verifyNonce($nonce, $action = ''): bool
-	{
-		if (!is_string($nonce) || empty($nonce) || empty($action)) return false;
-		return wp_verify_nonce($nonce, $action);
-	}
 
 }
