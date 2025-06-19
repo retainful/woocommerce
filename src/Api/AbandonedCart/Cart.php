@@ -6,6 +6,7 @@ use Exception;
 use Rnoc\Retainful\Api\Imports\Imports;
 use Rnoc\Retainful\Integrations\MultiLingual;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
+use Rnoc\Retainful\WcFunctions;
 use stdClass;
 
 class Cart extends RestApi
@@ -138,8 +139,19 @@ class Cart extends RestApi
      */
     function setCustomerData()
     {
+	    if (!WcFunctions::isSecurityValid('rnoc-nonce')) {
+		    $data['message'] = __('Authentication required', 'retainful-next-order-coupon-for-woocommerce');
+		    wp_send_json_error($data);
+	    }
 	    $billing_email = !empty($_POST['billing_email']) ? sanitize_email(wp_unslash($_POST['billing_email'])) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Missing
 	    if ($billing_email) {
+		    // Validate email format
+		    if (!is_email($billing_email)) {
+			    wp_send_json_error([
+				    'success' => false,
+				    'message' => __('Invalid email format', 'retainful-next-order-coupon-for-woocommerce')
+			    ]);
+		    }
             $billing_address = array();
             $shipping_address = array();
             //billing address fields
@@ -252,7 +264,8 @@ class Cart extends RestApi
                 'api_url' => self::$api->getAbandonedCartEndPoint(),
                 'billing_email' => !empty( self::$woocommerce->getCustomerEmail()) ?self::$woocommerce->getCustomerEmail() : '',
                 'tracking_element_selector' => $this->getTrackingElementId(),
-                'cart_tracking_engine' => self::$settings->getCartTrackingEngine()
+                'cart_tracking_engine' => self::$settings->getCartTrackingEngine(),
+                'rnoc_nonce' => wp_create_nonce('rnoc-nonce')
             ];
             $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
 	        wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);

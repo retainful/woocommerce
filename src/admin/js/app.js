@@ -34,64 +34,7 @@
         })
     });
     $(document).ready(function () {
-        $(document).on("click", "#rnoc_retainful #submit-cmb", function (event) {
-            var is_noc_explained = $('[name="rnoc_enable_next_order_coupon"]:checked').val();
-            var noc_coupon_val = $('[name="rnoc_retainful_coupon_amount"]').val();
-            if (parseInt(is_noc_explained) === 1 && (parseInt(noc_coupon_val) <= 0 || noc_coupon_val === "")) {
-                alert("Please enter a coupon value. Example: 10 (to provide a 10% coupon for next order.)");
-                return false;
-            }
-        })
-        $(document).on("change", "#exit_intent_popup_show_option", function (event) {
-            var val = $(this).val();
-            eip_show_option(val);
-        })
-        $(document).on("change", "#rnoc_show_woo_coupon", function (event) {
-            var val = $(this).val();
-            atcp_show_woo_coupon(val);
-        })
-        $(document).ready(function () {
-            var val = $("#exit_intent_popup_show_option").val();
-            eip_show_option(val);
-            var show_coupon_field = $("#rnoc_show_woo_coupon").val();
-            atcp_show_woo_coupon(show_coupon_field)
-        })
 
-        function eip_show_option(val) {
-            var input = $("#show_x_times_per_page_val");
-            if (val === "show_x_times_per_page") {
-                input.show();
-            } else {
-                input.hide();
-            }
-        }
-
-        function atcp_show_woo_coupon(val) {
-            var popup = $("#row_atcp_template");
-            var email = $(".row_atcp_mail_template");
-            if (val === "instantly" || val === "both" || val === "auto_apply_and_redirect" || val === "auto_apply_and_redirect_cart") {
-                popup.show();
-            } else {
-                popup.hide();
-            }
-            if (val === "send_via_email" || val === "both" || val === "send_mail_auto_apply_and_redirect" || val === "send_mail_auto_apply_and_redirect_cart") {
-                email.show();
-            } else {
-                email.hide();
-            }
-        }
-
-        /*$(document).on("keypress keyup blur", "#app_coupon_value", function (event) {
-            $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
-            if ((event.which !== 46 || $(this).val().indexOf('.') !== -1) && (event.which < 48 || event.which > 57)) {
-                event.preventDefault();
-            }
-        });*/
-        $(document).on("keypress keyup blur", "#app_coupon_expire_days,.number_only_field", function (event) {
-            if ((event.which < 48 || event.which > 57)) {
-                event.preventDefault();
-            }
-        });
         $(document).on("change", "#rnoc_cart_abandoned_time", function (event) {
             let value = $(this).val();
             let consider_time = parseInt(value);
@@ -248,13 +191,7 @@
             });
             submit.attr('disabled', false);
         });
-        $(document).on('change', '#exit_intent_popup_show_option', function () {
-            if ($(this).val() === 'show_x_times_per_page') {
-                $('#show_x_times_per_page_val').show();
-            } else {
-                $('#show_x_times_per_page_val').hide();
-            }
-        });
+
         $('.rnoc-multi-select').select2({width: '100%', placeholder: 'Select values'});
         $('.rnoc-select2-select').select2({width: '100%', placeholder: 'Select value'});
         $('.wc-product-search').each(function () {
@@ -300,45 +237,5 @@
         });
         $('.rnoc-color-field').wpColorPicker();
     });
-    $(document).ready(function () {
 
-
-        var editor = $("#rnoc_exit_intent_popup_template");
-        $(document).on('click', '.insert-exit-intent-popup-template', function () {
-            var template_id = $(this).data('template');
-            $.ajax({
-                url: retainful_admin.ajax_endpoint.replace("{{action}}", "rnocp_get_exit_intent_popup_template"),
-                type: 'POST',
-                dataType: "json",
-                data: {
-                    id: template_id
-                },
-                success: function (response) {
-                    if (response.success) {
-                        var value = response.content;
-                        value = value.replace(/\\/g, '');
-                        editor.val('');
-                        editor.val(value);
-                        viewPriview();
-                        /*console.log(tinyMCE.activeEditor);
-                        if (tinyMCE.activeEditor != null) {
-                            tinyMCE.activeEditor.setContent(value);
-                        }*/
-                    }
-                }
-            });
-        });
-        $(document).on('click', '#rnoc_exit_intent_popup_template_show_preview', function () {
-            viewPriview();
-        });
-
-        function viewPriview() {
-            let val = editor.val();
-            let custom_css = $("#rnoc_exit_intent_modal_custom_style").val();
-            $("#custom-style-container").html(custom_css);
-            $('#exit-intent-popup-preview').html(val);
-        }
-
-        viewPriview();
-    });
 })(jQuery);

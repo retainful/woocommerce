@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Rnoc\Retainful\Api\AbandonedCart\Order;
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
+use Valitron\Validator;
 
 class Category extends Order {
 
@@ -46,6 +47,11 @@ class Category extends Order {
 		}
 		$limit = ! empty( $params['limit'] ) ? $params['limit'] : 10;
 		$since_id = ! empty( $params['since_id'] ) ? $params['since_id'] : 10;
+
+		// Enforce reasonable limits
+		$limit = min(max($limit, 1), 1000); // Between 1-1000
+		$since_id = max($since_id, 0); // Non-negative
+
 		global $wpdb;
 		return $wpdb->get_results($wpdb->prepare("SELECT t.term_id, t.name, tt.taxonomy FROM {$wpdb->terms} t INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id WHERE tt.taxonomy = %s AND t.term_id > %d ORDER BY t.term_id ASC LIMIT %d", 'product_cat', $since_id, $limit)); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
@@ -114,6 +120,27 @@ class Category extends Order {
 			'digest' => ''
 		);
 		$params  = wp_parse_args( $request_params, $default_request_params );
+		$validator = new Validator($params);
+		$validator->rule('required', ['limit', 'status', 'digest'])->message('{field} is required');
+		$validator->rule('integer', ['limit', 'since_id'])->message('This {field} contains invalid value');
+		$validator->rule('min', 'limit', 1)->message('Limit must be at least 1');
+		$validator->rule('max', 'limit', 1000)->message('Limit must not exceed 1000');
+		// Run validation
+		if (!$validator->validate()) {
+			$error_message = [];
+			foreach ($validator->errors() as $field => $messages) {
+				foreach ($messages as $msg) {
+					$error_message[] = $msg;
+				}
+			}
+			$status   = 400;
+			$response = array(
+				'success'       => false,
+				'RESPONSE_CODE' => 'SECURITY_BREACH',
+				'message'       => implode(' ,', $error_message),
+			);
+			return new \WP_REST_Response( $response, $status );
+		}
 		self::$settings->logMessage( $params, 'API Product get request' );
 		if ( is_array( $params['limit'] ) || empty( $params['digest'] ) || ! is_string( $params['digest'] ) || empty( $params['limit'] ) || !isset($params['since_id']) || $params['since_id'] < 0 || $params['status'] != 'any' ) {
 			self::$settings->logMessage( $params, 'API Product data missing' );

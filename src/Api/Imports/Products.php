@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Rnoc\Retainful\Api\AbandonedCart\Order;
 use Rnoc\Retainful\Api\AbandonedCart\RestApi;
+use Valitron\Validator;
 
 class Products extends Order {
 	/**
@@ -85,6 +86,27 @@ class Products extends Order {
 			'digest' => ''
 		);
 		$params  = wp_parse_args( $request_params, $default_request_params );
+		$validator = new Validator($params);
+		$validator->rule('required', ['limit', 'status', 'digest'])->message('{field} is required');
+		$validator->rule('integer', ['limit', 'since_id'])->message('This {field} contains invalid value');
+		$validator->rule('min', 'limit', 1)->message('Limit must be at least 1');
+		$validator->rule('max', 'limit', 1000)->message('Limit must not exceed 1000');
+		// Run validation
+		if (!$validator->validate()) {
+			$error_message = [];
+			foreach ($validator->errors() as $field => $messages) {
+				foreach ($messages as $msg) {
+					$error_message[] = $msg;
+				}
+			}
+			$status   = 400;
+			$response = array(
+				'success'       => false,
+				'RESPONSE_CODE' => 'SECURITY_BREACH',
+				'message'       => implode(' ,', $error_message),
+			);
+			return new \WP_REST_Response( $response, $status );
+		}
 		self::$settings->logMessage( $params, 'API Product get request' );
 		if ( is_array( $params['limit'] ) || empty( $params['digest'] ) || ! is_string( $params['digest'] ) || empty( $params['limit'] ) || $params['since_id'] < 0 || $params['status'] != 'any' ) {
 			self::$settings->logMessage( $params, 'API Product data missing' );
