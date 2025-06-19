@@ -92,13 +92,41 @@ class Imports extends Order {
 	 */
 	function getSyncOrders( \WP_REST_Request $request ) {
 		$request_params         = $request->get_params();
-		$default_request_params = array(
-			'limit'    => 10,
-			'since_id' => 0,
-			'status'   => 'any',
-			'digest'   => ''
-		);
-		$params                 = wp_parse_args( $request_params, $default_request_params );
+		// Define validation rules
+		$validation_rules = [
+			'limit' => [
+				'required' => true,
+				'type' => 'integer',
+				'min' => 1,
+				'max' => 1000
+			],
+			'since_id' => [
+				'required' => true,
+				'type' => 'integer',
+				'min' => 0
+			],
+			'status' => [
+				'required' => true,
+				'type' => 'string',
+				'allowed' => ['any']
+			],
+			'digest' => [
+				'required' => true,
+				'type' => 'string',
+				'min_length' => 32
+			]
+		];
+		// Validate parameters
+		$validation_result = self::validateParams($request_params, $validation_rules);
+		if (!$validation_result['valid']) {
+			self::$settings->logMessage($validation_result['errors'], 'API Category validation failed');
+			return new \WP_REST_Response([
+				'success' => false,
+				'RESPONSE_CODE' => 'VALIDATION_FAILED',
+				'message' => 'Invalid parameters: ' . implode(', ', $validation_result['errors'])
+			], 400);
+		}
+		$params = $validation_result['data'];
 		self::$settings->logMessage( $params, 'API Orders get request' );
 		if ( is_array( $params['limit'] ) || empty( $params['digest'] ) || ! is_string( $params['digest'] ) || empty( $params['limit'] ) || $params['since_id'] < 0 || $params['status'] != 'any' ) {
 			self::$settings->logMessage( $params, 'API Orders data missing' );

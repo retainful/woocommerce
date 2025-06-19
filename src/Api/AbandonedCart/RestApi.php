@@ -349,26 +349,28 @@ class RestApi
      */
     function getClientIp()
     {
-        if (isset($_SERVER['HTTP_X_REAL_IP'])) {
-            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_REAL_IP']));
-        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
-            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_CLIENT_IP']));
-        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED_FOR']));
-        } elseif (isset($_SERVER['HTTP_X_FORWARDED'])) {
-            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED']));
-        } elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
-            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_FORWARDED_FOR']));
-        } elseif (isset($_SERVER['HTTP_FORWARDED'])) {
-            $client_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_FORWARDED']));
-        } elseif (isset($_SERVER['REMOTE_ADDR'])) {
-            $client_ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
-        } else {
-            $client_ip = '';
-        }
 
-        return $client_ip;
-    }
+	    $ip_headers = [
+		    'HTTP_X_REAL_IP',
+		    'HTTP_CLIENT_IP',
+		    'HTTP_X_FORWARDED_FOR',
+		    'HTTP_X_FORWARDED',
+		    'HTTP_FORWARDED_FOR',
+		    'HTTP_FORWARDED',
+		    'REMOTE_ADDR'
+	    ];
+	    $client_ip = '';
+	    foreach ($ip_headers as $header) {
+		    if ( ! empty( $_SERVER[ $header ] ) ) {
+			    $ip = sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) );
+				if(!empty($ip)) {
+					$client_ip = $ip;
+					break;
+				}
+		    }
+	    }
+		return $client_ip;
+	}
 
     /**
      * retrieve User IP address

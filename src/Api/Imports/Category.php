@@ -46,6 +46,11 @@ class Category extends Order {
 		}
 		$limit = ! empty( $params['limit'] ) ? $params['limit'] : 10;
 		$since_id = ! empty( $params['since_id'] ) ? $params['since_id'] : 10;
+
+		// Enforce reasonable limits
+		$limit = min(max($limit, 1), 1000); // Between 1-1000
+		$since_id = max($since_id, 0); // Non-negative
+
 		global $wpdb;
 		return $wpdb->get_results($wpdb->prepare("SELECT t.term_id, t.name, tt.taxonomy FROM {$wpdb->terms} t INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id WHERE tt.taxonomy = %s AND t.term_id > %d ORDER BY t.term_id ASC LIMIT %d", 'product_cat', $since_id, $limit)); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
@@ -106,14 +111,41 @@ class Category extends Order {
 	 */
 	public static function getCategory( \WP_REST_Request $request ) {
 		$request_params = $request->get_params();
-		$default_request_params = array(
-			'limit'  => 10,
-			'id'     => 0,
-			'status' => 'any',
-			//'last_days' => 0,
-			'digest' => ''
-		);
-		$params  = wp_parse_args( $request_params, $default_request_params );
+		// Define validation rules
+		$validation_rules = [
+			'limit' => [
+				'required' => true,
+				'type' => 'integer',
+				'min' => 1,
+				'max' => 1000
+			],
+			'since_id' => [
+				'required' => true,
+				'type' => 'integer',
+				'min' => 0
+			],
+			'status' => [
+				'required' => true,
+				'type' => 'string',
+				'allowed' => ['any']
+			],
+			'digest' => [
+				'required' => true,
+				'type' => 'string',
+				'min_length' => 32
+			]
+		];
+		// Validate parameters
+		$validation_result = self::validateParams($request_params, $validation_rules);
+		if (!$validation_result['valid']) {
+			self::$settings->logMessage($validation_result['errors'], 'API Category validation failed');
+			return new \WP_REST_Response([
+				'success' => false,
+				'RESPONSE_CODE' => 'VALIDATION_FAILED',
+				'message' => 'Invalid parameters: ' . implode(', ', $validation_result['errors'])
+			], 400);
+		}
+		$params = $validation_result['data'];
 		self::$settings->logMessage( $params, 'API Product get request' );
 		if ( is_array( $params['limit'] ) || empty( $params['digest'] ) || ! is_string( $params['digest'] ) || empty( $params['limit'] ) || !isset($params['since_id']) || $params['since_id'] < 0 || $params['status'] != 'any' ) {
 			self::$settings->logMessage( $params, 'API Product data missing' );
@@ -342,4 +374,6 @@ class Category extends Order {
 
 		return $payload;
 	}
+
+	// Helper method for parameter validation
 }
