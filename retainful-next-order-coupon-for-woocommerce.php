@@ -14,6 +14,7 @@
  * Contributers: Sathyaseelan
  * WC requires at least: 6.0.0
  * WC tested up to: 9.9
+ * Requires Plugins: woocommerce
  */
 if (!defined('ABSPATH')) {
     exit;
