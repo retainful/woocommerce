@@ -2,9 +2,10 @@
   "name": "retainful/woocommerce",
   "description": "Simple plugin to give coupons for users next order",
   "require": {
-    "jaybizzle/crawler-detect": "1.*",
+    "php": "7.4.*",
+    "jaybizzle/crawler-detect": "1.3.*",
     "ext-openssl": "*",
-    "vlucas/valitron": "*",
+    "vlucas/valitron": "v1.4.*",
     "ext-json": "*"
   },
   "minimum-stability": "stable",
