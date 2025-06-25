@@ -1,10 +1,10 @@
 === Retainful - WooCommerce Abandoned Cart, Newsletters, Email Marketing, Signup Forms and Automation ===
 Contributors: retainful
 Tags: abandoned cart, email marketing, newsletter, forms, woocommerce
-Requires at least: 4.6.1
+Requires at least: 6.0.0
 Tested up to: 6.8
 WC tested up to: 9.9
-Requires PHP: 5.6
+Requires PHP: 7.4
 Stable tag: 2.6.41
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html

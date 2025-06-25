@@ -10,7 +10,7 @@
  * Text Domain: retainful-next-order-coupon-for-woocommerce
  * Domain Path: /i18n/languages/
  * Plugin URI: https://www.retainful.com
- * Requires at least: 4.7.0
+ * Requires at least: 6.0.0
  * Contributers: Sathyaseelan
  * WC requires at least: 6.0.0
  * WC tested up to: 9.9
@@ -99,10 +99,10 @@ if (!defined('RNOC_MINIMUM_WC_VERSION')) {
     define('RNOC_MINIMUM_WC_VERSION', '6.0.0');
 }
 if (!defined('RNOC_MINIMUM_WP_VERSION')) {
-    define('RNOC_MINIMUM_WP_VERSION', '4.7.0');
+    define('RNOC_MINIMUM_WP_VERSION', '6.0.0');
 }
 if (!defined('RNOC_MINIMUM_PHP_VERSION')) {
-    define('RNOC_MINIMUM_PHP_VERSION', '5.6.0');
+    define('RNOC_MINIMUM_PHP_VERSION', '7.4.0');
 }
 if (!defined('REQUESTS_SILENCE_PSR0_DEPRECATIONS')) {
     define('REQUESTS_SILENCE_PSR0_DEPRECATIONS', true);
@@ -119,13 +119,13 @@ if ( ! function_exists( 'rnocPluginActivation' ) ) {
 			wp_die( sprintf( esc_html__( 'This plugin can not be activated because it requires minimum PHP version of %1$s.', 'retainful-next-order-coupon-for-woocommerce' ), esc_html(RNOC_MINIMUM_PHP_VERSION )));
 		}
 		if ( ! rnocIsWordPressCompatible() ) {
-			exit( esc_html__( 'Woocommerce Email Customizer + requires at least Wordpress', 'retainful-next-order-coupon-for-woocommerce' ) . ' ' . esc_html(RNOC_MINIMUM_WC_VERSION ));
+			exit( esc_html__( 'Retainful requires at least Wordpress', 'retainful-next-order-coupon-for-woocommerce' ) . ' ' . esc_html(RNOC_MINIMUM_WC_VERSION ));
 		}
 		if ( ! rnocIsWoocommerceActive() ) {
 			exit( esc_html__( 'Woocommerce must be installed and activated in-order to use Retainful!', 'retainful-next-order-coupon-for-woocommerce' ) );
 		}
 		if ( ! rnocIsWooCompatible() ) {
-			exit( esc_html__( 'Woocommerce Email Customizer + requires at least Woocommerce', 'retainful-next-order-coupon-for-woocommerce' ) . ' ' . esc_html(RNOC_MINIMUM_WC_VERSION ));
+			exit( esc_html__( 'Retainful requires at least Woocommerce', 'retainful-next-order-coupon-for-woocommerce' ) . ' ' . esc_html(RNOC_MINIMUM_WC_VERSION ));
 		}
 		do_action( 'retainful_plugin_activated' );
 
