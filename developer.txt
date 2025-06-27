@@ -7,7 +7,7 @@ svn add trunk/*
 3. Commit code
 svn ci -m 'Adding first version of my plugin'
 or
-svn ci -m 'v2.6.41 release' --username retainful
+svn ci -m 'v2.6.42 release' --username retainful
 
 4. check upto date code
 svn up
@@ -17,8 +17,8 @@ svn stat
 svn diff
 
 6. Tagging New Version
-svn cp trunk tags/2.6.41
-svn ci -m "tagging version 2.6.41"
+svn cp trunk tags/2.6.42
+svn ci -m "tagging version 2.6.42"
 
 
 Release Checklist:
@@ -34,7 +34,7 @@ Release Checklist:
     3. WordPress version
     4. Change log of current version
 5. Update Developer.txt command plugin version
-6. Run retainful.sh file
+6. Run plugin.sh file
 7. Copy Generated file to svn trunk folder
 8. Run svn commit command
 9. Check svn stat, diff using svn command
