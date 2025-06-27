@@ -809,6 +809,7 @@ class Settings
      */
     function logMessage($message, $log_in_as = "checkout")
     {
+		return;
 	    $admin_settings = $this->getAdminSettings();
 
 	    if ( isset($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($admin_settings[RNOC_PLUGIN_PREFIX . 'enable_debug_log']) && !empty($message) ) {

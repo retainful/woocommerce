@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-25T08:04:58+00:00\n"
+"POT-Creation-Date: 2025-06-27T04:07:15+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: retainful-next-order-coupon-for-woocommerce\n"
@@ -73,7 +73,7 @@ msgstr ""
 msgid "Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href=\"%s\" target=\"_blank\">webhooks section</a> and activate them."
 msgstr ""
 
-#: src/admin/Settings.php:1012
+#: src/admin/Settings.php:1020
 msgid "Please wait..."
 msgstr ""
 
