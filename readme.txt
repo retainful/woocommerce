@@ -5,7 +5,7 @@ Requires at least: 6.0.0
 Tested up to: 6.8
 WC tested up to: 9.9
 Requires PHP: 7.4
-Stable tag: 2.6.41
+Stable tag: 2.6.42
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -252,6 +252,9 @@ You can reach out to our experts [here](https://www.retainful.com/support).
 7. Retainful Contacts
 
 == Changelog ==
+= 2.6.42 =
+- Logging Improvement.
+
 = 2.6.41 =
 - Fix: Plugin check
 - Removed: Premium add-on
