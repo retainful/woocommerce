@@ -224,3 +224,7 @@ require __DIR__ . '/vendor/autoload.php';
 use Rnoc\Retainful\Main;
 
 Main::instance();
+
+add_action('wp_footer', function(){
+	echo "<pre> Cookie retrieved after updating the cookie";print_r(WC()->session->get('viewed_product_data', []));echo "</pre>";
+},10);

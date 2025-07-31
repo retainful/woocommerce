@@ -17,6 +17,7 @@ use Rnoc\Retainful\Api\Popup\Popup;
 use Rnoc\Retainful\Integrations\AfterPay;
 use Rnoc\Retainful\Integrations\Currency;
 use Rnoc\Retainful\library\RetainfulApi;
+use Rnoc\Retainful\Api\TrackProduct\TrackProduct;
 
 class Main {
 	public static $init;
@@ -307,10 +308,8 @@ class Main {
 				// handle placed orders
 				add_action( 'woocommerce_order_status_changed', array( $checkout, 'orderUpdated' ), 11, 1 );
 				//triggers when admin pdate the order
-				add_action( 'woocommerce_process_shop_order_meta', array(
-					$checkout,
-					'orderUpdatedShopBackend'
-				), 50, 2 );
+				add_action( 'woocommerce_process_shop_order_meta', array( $checkout, 'orderUpdatedShopBackend' ), 50, 2 );
+
 				$product = new Products();
 
 				add_filter( 'woocommerce_valid_webhook_resources',function($resources){
@@ -339,8 +338,8 @@ class Main {
 					return $http_args;
 				}, 10, 3 );
 
-
-
+		        //track viewed product
+				add_action('template_redirect',[ TrackProduct::class, 'trackViewedProduct' ]);
 				add_action('created_product_cat', [Category::class,'createCategory'], 10, 2);
 				add_action('edited_product_cat', [Category::class,'updateCategory'], 10, 2);
 				add_action('delete_product_cat', [Category::class,'deleteCategory'], 10, 2);
