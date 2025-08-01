@@ -6,7 +6,7 @@ namespace Rnoc\Retainful\Api\TrackProduct;
 use Rnoc\Retainful\Admin\Settings;
 use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
 use Rnoc\Retainful\library\RetainfulApi;
-
+use Rnoc\Retainful\WcFunctions;
 class  TrackProduct {
 
 	public static function RequestUrl(){
@@ -94,22 +94,23 @@ class  TrackProduct {
 	}
 
 	public static function getProductDate($product_id) {
-		$product = wc_get_product( $product_id );
+		$WC = new WcFunctions();
+		$product = $WC->getProduct( $product_id );
 		if ( ! $product ) {
 			return [];
 		}
 		$product_data = [
-			"variantId" =>  $product->get_id(),
-			"variantTitle" => $product->get_name(),
-			"variantUntranslatedTitle" => $product->get_name(),
-			"sku" => $product->get_sku(),
-			"priceAmount" => $product->get_price(),
+			"variantId" =>  $WC->getItemId($product),
+			"variantTitle" => $WC->getItemTitle($product),
+			"variantUntranslatedTitle" => $WC->getItemName($product),
+			"sku" => $WC->getItemSku($product),
+			"priceAmount" =>  $WC->getItemPrice($product),
 			"currencyCode" => function_exists('get_woocommerce_currency') ? get_woocommerce_currency() : '',
-			"productId" => $product->get_id(),
+			"productId" => $WC->getItemId($product),
 			"productVendor" => '',
-			"productTitle" => $product->get_name(),
-			"productUrl" => $product->get_permalink(),
-			"productType" =>  $product->get_type(),
+			"productTitle" => $WC->getItemTitle($product),
+			"productUrl" => method_exists($product,'get_permalink') ? $product->get_permalink() : '',
+			"productType" =>   method_exists($product,'get_type') ? $product->get_type() : '',
 			'viewed_count' => 1,
 			"viewedAt" => current_time('Y-m-d H:i:s'),
 		];
