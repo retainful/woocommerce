@@ -111,7 +111,8 @@ class RetainfulApi
                 $use_wp_requests = false;
                 \Requests::register_autoloader();
             }
-            switch ($method) {
+
+	        switch ($method) {
                 case 'post':
                     if ($use_wp_requests) {
                         $args = array(
@@ -121,9 +122,10 @@ class RetainfulApi
                             'blocking' => $blocking,
                             'headers' => $headers
                         );
-                        $result = wp_remote_post($url, $args);
+	                    $result = wp_remote_post($url, $args);
                     } else {
-                        $result = \Requests::post($url, $headers, $body);
+
+	                    $result = \Requests::post($url, $headers, $body);
                     }
                     break;
                 default:

@@ -285,7 +285,7 @@ class Products extends Order {
 	 *
 	 * @return array|void
 	 */
-	public function setProductData( $product_id ) {
+	protected function setProductData( $product_id ) {
 		if ( empty( $product_id ) ) {
 			return;
 		}

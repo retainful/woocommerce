@@ -3,12 +3,14 @@
 
 namespace Rnoc\Retainful\Api\TrackProduct;
 
+use Rnoc\Retainful\Admin\Settings;
+use Rnoc\Retainful\Api\AbandonedCart\Storage\Cookie;
 use Rnoc\Retainful\library\RetainfulApi;
 
 class  TrackProduct {
 
 	public static function RequestUrl(){
-		return apply_filters( 'retainful_track_product_api_url', 'https://api-beta.retainful.com/v1/woocommerce/');
+		return apply_filters( 'retainful_track_product_api_url', 'https://5tzcs7zuy3.execute-api.us-east-2.amazonaws.com/development/v3/event/shopify/product/viewed');
 	}
 
 	/**
@@ -23,30 +25,49 @@ class  TrackProduct {
 		if ( ! is_product()  ) {
 			return;
 		}
-//		if(!is_user_logged_in() ) {
-//
-//		}
+		if(!is_user_logged_in() ) {
+			$email = function_exists('wp_get_current_user') ? wp_get_current_user()->user_email: '';
+			if(empty($email) ){
+				$cookie = new Cookie();
+				$cookie_data = json_decode(base64_decode($cookie->getValue('_wc_rnoc_tk_session')));
+				if( !empty($cookie_data) && is_object($cookie_data) && isset($cookie_data->email) && !empty($cookie_data->email) ) {
+					$email = $cookie_data->email;
+				}
+			}
+		}
+
+		if(empty($email) || !is_email($email)) {
+			return;
+		}
 
 		$product_id = get_the_ID(); // Safer than using $post->ID
 		if ( ! $product_id || ! is_numeric( $product_id ) ) {
 			return;
 		}
+		$session_id = self::getValueSessionValue('rnoc_session_id_track_product') ?? self::generateSessionID();
 		$get_product_data = self::getProductDate($product_id);
 		$decode_data = [];
-
 		if( !empty($get_product_data) ) {
-
-			$decode_data = json_decode(base64_decode(self::getValueSessionValue('viewed_product_data')) ,true);
-
-			if( !empty($decode_data) && array_key_exists($product_id,$decode_data) ) {
-				$decode_data[$product_id]['viewed_count'] = (int)$decode_data[$product_id]['viewed_count'] + 1  ;
-		    }else{
-			    $decode_data[$product_id] = $get_product_data;
-		    }
+			$decode_data = json_decode(base64_decode(self::getValueSessionValue($session_id)) ,true);
+			$need_to_update = true;
+			if(!empty($decode_data)) {
+				foreach ( $decode_data['products'] as &$product_data ) {
+					if ( is_array( $product_data ) && ! empty( $product_data['variantId'] ) && $product_data['variantId'] == $product_id ) {
+						$product_data['viewed_count'] = (int) $product_data['viewed_count'] + 1;
+						$need_to_update = false;
+						break;
+					}
+				}
+			}
+			if($need_to_update){
+				$decode_data['products'][]= $get_product_data;
+			}
 		}
-		$encode_data = base64_encode(json_encode($decode_data));
-		self::setValueWithTimeout('viewed_product_data',$encode_data,86400); // 24 hours timeout
-		self::sendApiRequest($decode_data);
+		$request_data = self::apiRequestData($session_id, $email, $decode_data);
+		$encode_data = base64_encode(json_encode($request_data));
+
+		self::setValueWithTimeout($session_id,$encode_data,86400); // 86400 24 hours timeout
+		self::sendApiRequest($encode_data);
 
 	}
 
@@ -77,31 +98,67 @@ class  TrackProduct {
 		if ( ! $product ) {
 			return [];
 		}
-
 		$product_data = [
-			'id' => $product->get_id(),
-			'name' => $product->get_name(),
-			'price' => $product->get_price(),
-			'permalink' => $product->get_permalink(),
-			'image' => wp_get_attachment_url( $product->get_image_id() ),
-			'sku' => $product->get_sku(),
-			'type' => $product->get_type(),
+			"variantId" =>  $product->get_id(),
+			"variantTitle" => $product->get_name(),
+			"variantUntranslatedTitle" => $product->get_name(),
+			"sku" => $product->get_sku(),
+			"priceAmount" => $product->get_price(),
+			"currencyCode" => function_exists('get_woocommerce_currency') ? get_woocommerce_currency() : '',
+			"productId" => $product->get_id(),
+			"productVendor" => '',
+			"productTitle" => $product->get_name(),
+			"productUrl" => $product->get_permalink(),
+			"productType" =>  $product->get_type(),
 			'viewed_count' => 1,
-			'stock_status' => $product->get_stock_status(),
-			'categories' => wp_get_post_terms( $product_id, 'product_cat', ['fields' => 'names'] ),
-			'tags' => wp_get_post_terms( $product_id, 'product_tag', ['fields' => 'names'] ),
+			"viewedAt" => current_time('Y-m-d H:i:s'),
 		];
 
-		return $product_data;
+		return  $product_data;
 	}
 
 	public static function sendApiRequest($data) {
 		if (empty($data)) {
 			return;
 		}
+		$body =json_encode(['data' => $data]);
 		$url = self::RequestUrl();
 		$api = new RetainfulApi();
-		$api->request($url , [], 'post', json_encode($data), ['Content-Type' => 'application/json']);
+		$response = $api->request($url , [], 'post', $body, ['Content-Type' => 'application/json']);
+	}
 
+	public static function generateSessionID() {
+		$session_id =  sprintf(
+			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+		);
+		self::setValueWithTimeout('rnoc_session_id_track_product', $session_id, 86400); // 24 hours timeout
+		return $session_id;
+	}
+
+
+	public static function apiRequestData($session_id, $email, $data) {
+		if(empty($email) || !is_email($email) || empty($session_id) || !is_string($session_id)) {
+			return [];
+		}
+		$user = get_user_by_email($email);
+		return [
+			'eventHash' =>  bin2hex(random_bytes(32)),
+			'session_id' => $session_id,
+			'customer' => [
+				'id' => $user && !empty($user->ID) ? $user->ID : 0,
+				'email' => $email,
+				'firstName' => $user &&  !empty($user->first_name) ? $user->first_name : '',
+				'lastName' => $user &&  !empty($user->last_name) ? $user->last_name : '',
+				 "phone" => $user && !empty($user->phone ) ? $user->phone : '',
+                 "ordersCount" => $user && function_exists('wc_get_customer_order_count') ? wc_get_customer_order_count($user->ID) : 0,
+			],
+			'products' => $data['products'] ?? [],
+			'shopId' => (new Settings())->getApiKey()
+		];
 	}
 }
