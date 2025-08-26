@@ -10,7 +10,7 @@ use Rnoc\Retainful\WcFunctions;
 class  TrackProduct {
 
 	public static function RequestUrl(){
-		return apply_filters( 'retainful_track_product_api_url', 'https://5tzcs7zuy3.execute-api.us-east-2.amazonaws.com/development/v3/event/shopify/product/viewed');
+		return apply_filters( 'retainful_track_product_api_url', 'https://webhooks.retainful.net/v3/event/woocommerce/product/viewed');
 	}
 
 	/**
@@ -25,8 +25,8 @@ class  TrackProduct {
 		if ( ! is_product()  ) {
 			return;
 		}
+		$email = function_exists('wp_get_current_user') ? wp_get_current_user()->user_email: '';
 		if(!is_user_logged_in() ) {
-			$email = function_exists('wp_get_current_user') ? wp_get_current_user()->user_email: '';
 			if(empty($email) ){
 				$cookie = new Cookie();
 				$cookie_data = json_decode(base64_decode($cookie->getValue('_wc_rnoc_tk_session')));
@@ -112,6 +112,7 @@ class  TrackProduct {
 			"productUrl" => method_exists($product,'get_permalink') ? $product->get_permalink() : '',
 			"productType" =>   method_exists($product,'get_type') ? $product->get_type() : '',
 			'viewed_count' => 1,
+			'imageUrl' => $WC->getProductImageSrc($product),
 			"viewedAt" => current_time('Y-m-d H:i:s'),
 		];
 
@@ -146,10 +147,10 @@ class  TrackProduct {
 		if(empty($email) || !is_email($email) || empty($session_id) || !is_string($session_id)) {
 			return [];
 		}
-		$user = get_user_by_email($email);
+		$user = get_user_by('email', $email);
 		return [
 			'eventHash' =>  bin2hex(random_bytes(32)),
-			'session_id' => $session_id,
+			'sessionUUID' => $session_id,
 			'customer' => [
 				'id' => $user && !empty($user->ID) ? $user->ID : 0,
 				'email' => $email,
