@@ -240,7 +240,7 @@ class Cart extends RestApi
             wp_enqueue_script('wc-cart-fragments');
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
-	        $pop_coupon_url =  apply_filters('rnoc_popup_coupon_url',RNOC_PLUGIN_URL . '/src/assets/js/popup_coupon.js');
+	        $pop_coupon_url =  apply_filters('rnoc_popup_coupon_url',rtrim(RNOC_PLUGIN_URL, '/')  . '/src/assets/js/popup_coupon.js');
 	        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart',$this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
 	        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popup-coupon', $pop_coupon_url, array('jquery', RNOC_PLUGIN_PREFIX . 'track-user-cart' ), RNOC_VERSION, false);
 	        $popup_data = [
