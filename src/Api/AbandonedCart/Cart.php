@@ -231,6 +231,62 @@ class Cart extends RestApi
         return apply_filters('rnoc_get_abandoned_cart_tracking_js_engine_url', 'https://js.retainful.com/woocommerce/v2/retainful.js?ver=' . RNOC_VERSION);
     }
 
+    function getInventoryProductData(){
+	    global $post;
+	    $product = '';
+	    if (! is_product() ) {
+		    return $product;
+	    }
+	    $product_id = !empty($post->ID) ?$post->ID : '' ;
+	    if(!empty($product_id)) {
+		    $product_data = self::$woocommerce->getProduct( $product_id );
+		    $product_variation = [];
+		    if ( self::$woocommerce->isMethodExists( $product_data,'is_type') && $product_data->is_type( 'variable' ) ) {
+			    $variations = self::$woocommerce->isMethodExists( $product_data, 'get_children' ) ? $product_data->get_children() : array();
+			    foreach ( $variations as $variation_id ) {
+
+				    $variation_obj       = self::$woocommerce->getProduct( $variation_id );
+				    $inventory_policy = self::$woocommerce->isMethodExists( $variation_obj, 'get_manage_stock' ) && ! empty( $variation_obj->get_manage_stock() ) && $variation_obj->get_manage_stock();
+				    if(!$inventory_policy) {
+                        continue ;
+                    }
+				    if( self::$woocommerce->isMethodExists( $variation_obj, 'get_status' )  && $variation_obj->get_status() != 'publish') continue;
+				    $product_variation[] = [
+					    'Id'      => $variation_id,
+					    'Title'                  => self::$woocommerce->getItemTitle( $variation_obj ),
+					    'Sku'                    => self::$woocommerce->getItemSku( $variation_obj ),
+					    'InventoryQuantity'      => self::$woocommerce->isMethodExists( $variation_obj, 'get_stock_quantity' ) ? $variation_obj->get_stock_quantity() : 0,
+					    'InventoryPolicy'        => self::$woocommerce->isMethodExists( $variation_obj, 'get_manage_stock' ) && ! empty( $variation_obj->get_manage_stock() ) && $product_data->get_manage_stock(),
+					    'InventoryStatus'        => self::$woocommerce->isMethodExists( $variation_obj, 'get_manage_stock' ) && ! empty( $variation_obj->get_manage_stock() ) && $variation_obj->get_manage_stock(),
+				    ];
+			    }
+		    }else{
+			    $inventory_policy = self::$woocommerce->isMethodExists( $product_data, 'get_manage_stock' ) && ! empty( $product_data->get_manage_stock() ) && $product_data->get_manage_stock();
+				    if(!$inventory_policy) {
+					    return $product;
+				    }
+                $product_variation[] = [
+				    'Id'      => (int)$product_id,
+				    'ExternalProductId'      => (int)$product_id,
+				    'Title'                  => self::$woocommerce->getItemTitle( $product_data ),
+				    'Sku'                    => self::$woocommerce->getItemSku( $product_data ),
+				    'InventoryQuantity'      => self::$woocommerce->isMethodExists( $product_data, 'get_stock_quantity' ) ? $product_data->get_stock_quantity() : 0,
+				    'InventoryPolicy'        => self::$woocommerce->isMethodExists( $product_data, 'get_manage_stock' ) && ! empty( $product_data->get_manage_stock() ) && $product_data->get_manage_stock(),
+				    'InventoryStatus'        => self::$woocommerce->isMethodExists( $product_data, 'get_manage_stock' ) && ! empty( $product_data->get_manage_stock() ) && $product_data->get_manage_stock(),
+			    ];
+		    }
+		    $product = [
+			    "productId"         => self::$woocommerce->getItemId( $product_data ),
+			    "handle"            => self::$woocommerce->getItemSku( $product_data ),
+			    "title"             => self::$woocommerce->getItemName( $product_data ),
+			    "selectedVariantId" => '',
+			    "variants"          => $product_variation,
+			    "totalAvailable"    => 0,
+		    ];
+	    }
+        return $product;
+    }
+
     /**
      * Adding the script to track user cart
      */
@@ -240,7 +296,7 @@ class Cart extends RestApi
             wp_enqueue_script('wc-cart-fragments');
         }
         if (!wp_script_is(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'enqueued')) {
-	        $pop_coupon_url =  apply_filters('rnoc_popup_coupon_url',RNOC_PLUGIN_URL . '/src/assets/js/popup_coupon.js');
+	        $pop_coupon_url =  apply_filters('rnoc_popup_coupon_url',rtrim(RNOC_PLUGIN_URL, '/')  . '/src/assets/js/popup_coupon.js');
 	        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'track-user-cart',$this->getAbandonedCartJsEngineUrl(), array('jquery'), RNOC_VERSION, false);
 	        wp_enqueue_script(RNOC_PLUGIN_PREFIX . 'popup-coupon', $pop_coupon_url, array('jquery', RNOC_PLUGIN_PREFIX . 'track-user-cart' ), RNOC_VERSION, false);
 	        $popup_data = [
@@ -261,6 +317,7 @@ class Cart extends RestApi
                 'billing_email' => !empty( self::$woocommerce->getCustomerEmail()) ?self::$woocommerce->getCustomerEmail() : '',
                 'tracking_element_selector' => $this->getTrackingElementId(),
                 'cart_tracking_engine' => self::$settings->getCartTrackingEngine(),
+                'products' => is_product() ? $this->getInventoryProductData() : '',
             ];
             $data = apply_filters('rnoc_add_cart_tracking_scripts', $data);
 	        wp_localize_script(RNOC_PLUGIN_PREFIX . 'track-user-cart', 'retainful_cart_data', $data);
