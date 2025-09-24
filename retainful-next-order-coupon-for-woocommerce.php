@@ -13,7 +13,7 @@
  * Requires at least: 6.0.0
  * Contributers: Sathyaseelan
  * WC requires at least: 6.0.0
- * WC tested up to: 9.9
+ * WC tested up to: 10.1
  * Requires Plugins: woocommerce
  */
 if (!defined('ABSPATH')) {
