@@ -29,7 +29,7 @@ class  TrackProduct {
 		if(!is_user_logged_in() ) {
 			if(empty($email) ){
 				$cookie = new Cookie();
-				$cookie_data = json_decode(base64_decode($cookie->getValue('_wc_rnoc_tk_session')));
+				$cookie_data = !empty($cookie->getValue('_wc_rnoc_tk_session')) ? json_decode(base64_decode($cookie->getValue('_wc_rnoc_tk_session'))) : '';
 				if( !empty($cookie_data) && is_object($cookie_data) && isset($cookie_data->email) && !empty($cookie_data->email) ) {
 					$email = $cookie_data->email;
 				}
