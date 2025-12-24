@@ -48,7 +48,10 @@ class  TrackProduct {
 		$get_product_data = self::getProductDate($product_id);
 		$decode_data = [];
 		if( !empty($get_product_data) ) {
-			$decode_data = json_decode(base64_decode(self::getValueSessionValue($session_id)) ,true);
+			$encoded_session_data = self::getValueSessionValue($session_id);
+			if(!empty($encoded_session_data)){
+				$decode_data = json_decode(base64_decode($encoded_session_data) ,true);
+			}
 			$need_to_update = true;
 			if(!empty($decode_data)) {
 				foreach ( $decode_data['products'] as &$product_data ) {
