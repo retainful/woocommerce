@@ -29,7 +29,11 @@ class  TrackProduct {
 		if(!is_user_logged_in() ) {
 			if(empty($email) ){
 				$cookie = new Cookie();
-				$cookie_data = json_decode(base64_decode($cookie->getValue('_wc_rnoc_tk_session')));
+				$value = $cookie->getValue('_wc_rnoc_tk_session');
+				if(empty($value) || !is_string($value)) {
+					return;
+				}
+				$cookie_data = json_decode(base64_decode($value));
 				if( !empty($cookie_data) && is_object($cookie_data) && isset($cookie_data->email) && !empty($cookie_data->email) ) {
 					$email = $cookie_data->email;
 				}
@@ -48,7 +52,10 @@ class  TrackProduct {
 		$get_product_data = self::getProductDate($product_id);
 		$decode_data = [];
 		if( !empty($get_product_data) ) {
-			$decode_data = json_decode(base64_decode(self::getValueSessionValue($session_id)) ,true);
+			$encoded_session_data = self::getValueSessionValue($session_id);
+			if(!empty($encoded_session_data)){
+				$decode_data = json_decode(base64_decode($encoded_session_data) ,true);
+			}
 			$need_to_update = true;
 			if(!empty($decode_data)) {
 				foreach ( $decode_data['products'] as &$product_data ) {
