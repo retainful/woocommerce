@@ -224,3 +224,25 @@ require __DIR__ . '/vendor/autoload.php';
 use Rnoc\Retainful\Main;
 
 Main::instance();
+
+add_action('admin_notices', function () {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+    $link = '<a href="https://wordpress.org/plugins/retainful/" target="_blank" class="retainful-link">' . esc_html__('Email Marketing for WordPress and WooCommerce – Retainful', 'retainful-next-order-coupon-for-woocommerce') . '</a>';
+    ?>
+    <div class="retainful-custom-notice">
+        <div class="retainful-notice-content">
+            <strong><?php esc_html_e('Plugin Deprecated:', 'retainful-next-order-coupon-for-woocommerce'); ?></strong>
+            <span>
+                <?php
+                printf(
+                    esc_html__('This plugin is deprecated. Please use our new app: %s', 'retainful-next-order-coupon-for-woocommerce'),
+                    wp_kses_post($link)
+                );
+                ?>
+            </span>
+        </div>
+    </div>
+    <?php
+});
