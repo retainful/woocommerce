@@ -429,3 +429,82 @@ Premium
     margin-left: 5px;
     font-size: 12px;
 }
+
+
+/* Danger Notice Banner */
+.rnoc-notice-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: linear-gradient(135deg, #c63235, #a61f22);
+    border-left: 6px solid #ffb3b3;
+
+    padding: 18px 22px;
+    margin: 15px 10px;
+    border-radius: 8px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+    animation: rnocFadeIn 0.4s ease-in-out;
+}
+
+/* Title */
+.rnoc-notice-container h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+}
+
+/* Content */
+.rnoc-notice-container p {
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.6;
+    color: #ffeaea;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.rnoc-notice-container p a:focus {
+    outline: 1px solid #a61f22;
+    outline-offset: 2px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px #a61f22;
+    transition: all 0.25s ease;
+}
+
+/* CTA Button */
+.rnoc-notice-container p a {
+    display: inline-block;
+    width: fit-content;
+    text-decoration: none;
+    background: #ffffff;
+    color: #a61f22;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 16px  !important;
+
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+/* Button Hover */
+.rnoc-notice-container p a:hover {
+    background: #ffe5e5;
+    transform: translateY(-1px);
+}
+/* Animation */
+@keyframes rnocFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

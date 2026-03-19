@@ -362,6 +362,12 @@ class Main {
 		} else {
 			//remove
 		}
+		$current_page_slug = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+		if(is_admin() && $current_page_slug !== 'retainful_license' && $this->admin->isAppConnected()) {
+			$notice = '<strong>Retainful V3 — Migration Required by April 15th</strong>
+					<p>We\'ve rebuilt Retainful from the ground up with a new secure WooCommerce REST API. Your store needs to be reconnected on the new platform to continue sending emails. All your contacts, lists, and flows carry over. Migrate now — it takes a few minutes.<br/><a class="button button-primary" style="margin-top: 10px;" href="https://app.retainful.com/" target="_blank">Migrate My Account</a></p>';
+			$this->showAdminNotice( $notice );
+		}
 
 		//Premium check
 		do_action( 'rnoc_initiated' );
