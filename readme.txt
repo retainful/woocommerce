@@ -17,6 +17,12 @@ This plugin will be deprecated soon in favour of our new plugin that has a robus
 = Best WooCommerce Abandoned Cart Recovery, Email Marketing, Newsletters, Automation, Popups & Signup Forms plugin for WooCommerce =
 **[Retainful](https://www.retainful.com/?utm_source=wp_repo&utm_medium=wp_description&utm_campaign=retainful&utm_id=wp_retainful)** is an all-in-one WooCommerce email marketing plugin, trusted by over 16,000+ ecommerce stores worldwide to recover abandoned carts, build powerful email lists, send irresistible targeted campaigns, automate workflows and track success.
 
+**⚠️ THIS PLUGIN HAS BEEN DEPRECATED**
+We've rebuilt Retainful platform from the ground up with a completely new architecture and powerful features.
+= What You Need to Do =
+Install the new Retainful plugin to continue using our email marketing and cart recovery features.
+👉 [Download New Retainful Plugin](https://wordpress.org/plugins/retainful)
+
 Retainful is tailor-made for WooCommerce, helping you to build your email list with signup forms & popups, send personalized email marketing campaigns & newsletters, automate order follow-ups to save time, recover WooCommerce abandoned carts and grow revenue without the complexity and high costs. 16,000+ e-commerce store owners chose us for cost-effective email marketing and ease of use.
 
 Join them & get started free!
