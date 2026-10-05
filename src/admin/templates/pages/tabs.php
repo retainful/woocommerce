@@ -12,7 +12,7 @@ $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : 
         <div class="rnoc-deprecated-icon"><span class="dashicons dashicons-warning" aria-hidden="true"></span></div>
         <h2 id="rnoc-deprecated-title"><?php esc_html_e('Action required: Update Retainful', 'retainful-next-order-coupon-for-woocommerce'); ?></h2>
         <p><?php echo wp_kses_post(__('This version of Retainful is <strong>no longer supported</strong>. Install the latest plugin to continue managing your Retainful account.', 'retainful-next-order-coupon-for-woocommerce')); ?></p>
-        <a class="rnoc-deprecated-btn" href="https://downloads.wordpress.org/plugin/retainful.zip"><span class="dashicons dashicons-download" aria-hidden="true"></span><?php esc_html_e('Install Latest Plugin', 'retainful-next-order-coupon-for-woocommerce'); ?></a>
+        <a class="rnoc-deprecated-btn" href="<?php echo esc_url(network_admin_url('plugin-install.php?s=retainful&tab=search&type=term')); ?>"><span class="dashicons dashicons-admin-plugins" aria-hidden="true"></span><?php esc_html_e('Install Latest Plugin', 'retainful-next-order-coupon-for-woocommerce'); ?></a>
         <p class="rnoc-deprecated-note"><?php echo wp_kses_post(__('After installing, <strong>uninstall this old plugin</strong>. You won\'t be able to make changes here until the latest version is installed.', 'retainful-next-order-coupon-for-woocommerce')); ?></p>
     </div>
 </div>

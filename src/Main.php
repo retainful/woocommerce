@@ -454,7 +454,7 @@ class Main {
 		<div class="notice notice-error">
 			<h2><?php esc_html_e( 'Action required: Update Retainful', 'retainful-next-order-coupon-for-woocommerce' ); ?></h2>
 			<p><?php echo wp_kses_post( __( 'This version of Retainful is <strong>no longer supported</strong>. Install the latest plugin to continue managing your Retainful account.', 'retainful-next-order-coupon-for-woocommerce' ) ); ?></p>
-			<p><a class="button button-primary" href="https://downloads.wordpress.org/plugin/retainful.zip"><?php esc_html_e( 'Install Latest Plugin', 'retainful-next-order-coupon-for-woocommerce' ); ?></a></p>
+			<p><a class="button button-primary" href="<?php echo esc_url( network_admin_url( 'plugin-install.php?s=retainful&tab=search&type=term' ) ); ?>"><?php esc_html_e( 'Install Latest Plugin', 'retainful-next-order-coupon-for-woocommerce' ); ?></a></p>
 			<p><?php echo wp_kses_post( __( 'After installing, <strong>uninstall this old plugin</strong>. You won\'t be able to make changes here until the latest version is installed.', 'retainful-next-order-coupon-for-woocommerce' ) ); ?></p>
 		</div>
 		<?php
