@@ -1,15 +1,15 @@
-# Copyright (C) 2025 Retainful
+# Copyright (C) 2026 Retainful
 # This file is distributed under the same license as the Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms & Popups plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms & Popups 2.6.42\n"
+"Project-Id-Version: Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms & Popups 2.6.45\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/retainful-next-order-coupon-for-woocommerce\n"
 "Last-Translator: Retainful <support@retainful.com>\n"
 "Language-Team: Retainful <support@retainful.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-27T06:00:31+00:00\n"
+"POT-Creation-Date: 2026-10-05T08:48:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: retainful-next-order-coupon-for-woocommerce\n"
@@ -36,19 +36,19 @@ msgid "Retainful"
 msgstr ""
 
 #. translators: 1: Require php version
-#: retainful-next-order-coupon-for-woocommerce.php:119
+#: retainful-next-order-coupon-for-woocommerce.php:121
 msgid "This plugin can not be activated because it requires minimum PHP version of %1$s."
 msgstr ""
 
-#: retainful-next-order-coupon-for-woocommerce.php:122
+#: retainful-next-order-coupon-for-woocommerce.php:124
 msgid "Retainful requires at least Wordpress"
 msgstr ""
 
-#: retainful-next-order-coupon-for-woocommerce.php:125
+#: retainful-next-order-coupon-for-woocommerce.php:127
 msgid "Woocommerce must be installed and activated in-order to use Retainful!"
 msgstr ""
 
-#: retainful-next-order-coupon-for-woocommerce.php:128
+#: retainful-next-order-coupon-for-woocommerce.php:130
 msgid "Retainful requires at least Woocommerce"
 msgstr ""
 
@@ -73,7 +73,7 @@ msgstr ""
 msgid "Webhooks for Retainful seem not present or de-activated. Please go to the WooCommerce <a href=\"%s\" target=\"_blank\">webhooks section</a> and activate them."
 msgstr ""
 
-#: src/admin/Settings.php:1020
+#: src/admin/Settings.php:990
 msgid "Please wait..."
 msgstr ""
 
@@ -154,260 +154,280 @@ msgstr ""
 msgid "Skip & Deactivate"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:16
+#: src/admin/templates/pages/connection.php:17
 msgid "App ID"
 msgstr ""
 
 #. translators: %s: get api url
-#: src/admin/templates/pages/connection.php:27
+#: src/admin/templates/pages/connection.php:28
 msgid "Get your App-id %s"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:35
+#: src/admin/templates/pages/connection.php:36
 msgid "App Secret"
 msgstr ""
 
 #. translators: %s: get api key url
-#: src/admin/templates/pages/connection.php:47
+#: src/admin/templates/pages/connection.php:48
 msgid "Get your secret key %s"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:58
+#: src/admin/templates/pages/connection.php:59
 msgid "Connect"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:58
+#: src/admin/templates/pages/connection.php:59
 msgid "Re-Connect"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:64
+#: src/admin/templates/pages/connection.php:65
 msgid "Dis-connect"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:66
-#: src/admin/templates/pages/connection.php:90
+#: src/admin/templates/pages/connection.php:67
+#: src/admin/templates/pages/connection.php:91
 msgid "Visit Your Dashboard"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:72
+#: src/admin/templates/pages/connection.php:73
 msgid "Successfully connected to Retainful"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:87
+#: src/admin/templates/pages/connection.php:88
 msgid "Manage abandoned carts, emails & next order coupons"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:100
+#: src/admin/templates/pages/connection.php:101
 msgid "Recover abandoned carts and drive repeat purchases."
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:102
+#: src/admin/templates/pages/connection.php:103
 msgid "Stop cart abandonment and recover the lost revenue with Retainful. Increase sales by 10x. Capture emails and automatically send a series of recovery emails."
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:105
+#: src/admin/templates/pages/connection.php:106
 msgid "Get unlimited emails, drag and drop email editor, exit popups and more"
 msgstr ""
 
-#: src/admin/templates/pages/connection.php:109
+#: src/admin/templates/pages/connection.php:110
 msgid "Get started for FREE"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:13
+#: src/admin/templates/pages/settings.php:14
 msgid "Cart tracking engine?"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:23
+#: src/admin/templates/pages/settings.php:24
 msgid "JavaScript (Default,Recommended)"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:31
+#: src/admin/templates/pages/settings.php:32
 msgid "PHP"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:38
+#: src/admin/templates/pages/settings.php:39
 msgid "Use only webhooks for tracking the order events in the background"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:48
-#: src/admin/templates/pages/settings.php:79
-#: src/admin/templates/pages/settings.php:105
-#: src/admin/templates/pages/settings.php:132
-#: src/admin/templates/pages/settings.php:159
-#: src/admin/templates/pages/settings.php:185
-#: src/admin/templates/pages/settings.php:223
-#: src/admin/templates/pages/settings.php:370
-#: src/admin/templates/pages/settings.php:413
-#: src/admin/templates/pages/settings.php:468
-#: src/admin/templates/pages/settings.php:493
+#: src/admin/templates/pages/settings.php:49
+#: src/admin/templates/pages/settings.php:80
+#: src/admin/templates/pages/settings.php:106
+#: src/admin/templates/pages/settings.php:133
+#: src/admin/templates/pages/settings.php:160
+#: src/admin/templates/pages/settings.php:186
+#: src/admin/templates/pages/settings.php:224
+#: src/admin/templates/pages/settings.php:371
+#: src/admin/templates/pages/settings.php:414
+#: src/admin/templates/pages/settings.php:469
+#: src/admin/templates/pages/settings.php:494
 msgid "Yes"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:56
-#: src/admin/templates/pages/settings.php:87
-#: src/admin/templates/pages/settings.php:114
-#: src/admin/templates/pages/settings.php:141
-#: src/admin/templates/pages/settings.php:168
-#: src/admin/templates/pages/settings.php:193
-#: src/admin/templates/pages/settings.php:215
-#: src/admin/templates/pages/settings.php:378
-#: src/admin/templates/pages/settings.php:421
-#: src/admin/templates/pages/settings.php:476
-#: src/admin/templates/pages/settings.php:501
+#: src/admin/templates/pages/settings.php:57
+#: src/admin/templates/pages/settings.php:88
+#: src/admin/templates/pages/settings.php:115
+#: src/admin/templates/pages/settings.php:142
+#: src/admin/templates/pages/settings.php:169
+#: src/admin/templates/pages/settings.php:194
+#: src/admin/templates/pages/settings.php:216
+#: src/admin/templates/pages/settings.php:379
+#: src/admin/templates/pages/settings.php:422
+#: src/admin/templates/pages/settings.php:477
+#: src/admin/templates/pages/settings.php:502
 msgid "No"
 msgstr ""
 
 #. translators: %s: Real time tracking url
-#: src/admin/templates/pages/settings.php:62
+#: src/admin/templates/pages/settings.php:63
 msgid "Turning on this option will stop real-time tracking of order activities like order placement. Instead, the Retainful API will rely on WooCommerce's Webhooks to send the order information as a background task.<br>Remember: WooCommerce uses the %s to execute webhooks in the background for this. So, make sure your cron setup is correct. If cron isn't working, order details won't reach Retainful API, and your workflow triggers won't work right."
 msgstr ""
 
 #. translators: %s: Real time tracking url
-#: src/admin/templates/pages/settings.php:62
+#: src/admin/templates/pages/settings.php:63
 msgid "Scheduled Actions"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:69
+#: src/admin/templates/pages/settings.php:70
 msgid "Track Zero value carts / orders"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:94
+#: src/admin/templates/pages/settings.php:95
 msgid "Consider On-Hold order status as abandoned cart?"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:121
+#: src/admin/templates/pages/settings.php:122
 msgid "Consider Canceled order status as abandoned cart?"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:148
+#: src/admin/templates/pages/settings.php:149
 msgid "Consider failed order status as abandoned cart?"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:175
+#: src/admin/templates/pages/settings.php:176
 msgid "Fix for Cart sync not working"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:197
+#: src/admin/templates/pages/settings.php:198
 msgid "Enable this option only when you dont see your carts in Retainful dashboard "
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:205
+#: src/admin/templates/pages/settings.php:206
 msgid "Enable Signup Forms / Popups"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:227
+#: src/admin/templates/pages/settings.php:228
 msgid "Enable this option if you are using the signup forms / popups in Retainful to build your audience list."
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:235
+#: src/admin/templates/pages/settings.php:236
 msgid "Marketing Consent"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:245
-#: src/admin/templates/pages/settings.php:308
+#: src/admin/templates/pages/settings.php:246
+#: src/admin/templates/pages/settings.php:309
 msgid "Implicit"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:253
-#: src/admin/templates/pages/settings.php:316
+#: src/admin/templates/pages/settings.php:254
+#: src/admin/templates/pages/settings.php:317
 msgid "Explicit"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:257
-#: src/admin/templates/pages/settings.php:320
+#: src/admin/templates/pages/settings.php:258
+#: src/admin/templates/pages/settings.php:321
 msgid "If set to Explicit, it will add an opt-in checkbox at the checkout to capture the consent"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:265
+#: src/admin/templates/pages/settings.php:266
 msgid "Consent field position:"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:271
-#: src/admin/templates/pages/settings.php:333
+#: src/admin/templates/pages/settings.php:272
+#: src/admin/templates/pages/settings.php:334
 msgid "Below Email Address field"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:273
-#: src/admin/templates/pages/settings.php:335
+#: src/admin/templates/pages/settings.php:274
+#: src/admin/templates/pages/settings.php:336
 msgid "Below Terms and Conditions section"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:280
+#: src/admin/templates/pages/settings.php:281
 msgid "Text for the opt-in checkbox"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:290
-#: src/admin/templates/pages/settings.php:352
+#: src/admin/templates/pages/settings.php:291
+#: src/admin/templates/pages/settings.php:353
 msgid "Under GDPR, it is mandatory to inform the users when we track their cart activity in real-time."
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:298
+#: src/admin/templates/pages/settings.php:299
 msgid "Phone Consent"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:327
+#: src/admin/templates/pages/settings.php:328
 msgid "Phone Consent field position:"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:342
+#: src/admin/templates/pages/settings.php:343
 msgid "Phone Text for the opt-in checkbox"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:360
+#: src/admin/templates/pages/settings.php:361
 msgid "Enable IP filter?"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:385
+#: src/admin/templates/pages/settings.php:386
 msgid "Exclude capturing carts from these IP's"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:395
+#: src/admin/templates/pages/settings.php:396
 msgid "The plugin will not track carts from these IP's . Enter IP in comma seperated format . Example 192.168.1.10,192.168.1.11 . Alternatively you can also use 192.168 .* , 192.168.10 .*, 192.168.1.1 - 192.168.1.255"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:403
+#: src/admin/templates/pages/settings.php:404
 msgid "Enable debug log?"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:428
+#: src/admin/templates/pages/settings.php:429
 msgid "Session handler"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:438
+#: src/admin/templates/pages/settings.php:439
 msgid "WooCommerce session (Default)"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:446
+#: src/admin/templates/pages/settings.php:447
 msgid "Cookie"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:450
+#: src/admin/templates/pages/settings.php:451
 msgid "DO NOT change this setting unless you are instructed by the Retainful Support team. WooCommerce session will work for 99% of the shops."
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:458
+#: src/admin/templates/pages/settings.php:459
 msgid "Enable AfterPay payment gateway support (only enable this option if you installed AfterPay plugin) ?"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:483
+#: src/admin/templates/pages/settings.php:484
 msgid "Varnish Cache Compatibility"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:506
+#: src/admin/templates/pages/settings.php:507
 msgid "DO NOT change this setting unless you are instructed by the Retainful Support team. Use this option only when you are using the server side caching with Varnish. Certain features may not work if enabled. So check with the Support team before enabling this option"
 msgstr ""
 
-#: src/admin/templates/pages/settings.php:517
-#: src/admin/templates/pages/settings.php:525
+#: src/admin/templates/pages/settings.php:518
+#: src/admin/templates/pages/settings.php:526
 msgid "save"
 msgstr ""
 
-#: src/admin/templates/pages/tabs.php:9
+#: src/admin/templates/pages/tabs.php:13
+#: src/Main.php:455
+msgid "Action required: Update Retainful"
+msgstr ""
+
+#: src/admin/templates/pages/tabs.php:14
+#: src/Main.php:456
+msgid "This version of Retainful is <strong>no longer supported</strong>. Install the latest plugin to continue managing your Retainful account."
+msgstr ""
+
+#: src/admin/templates/pages/tabs.php:15
+#: src/Main.php:457
+msgid "Install Latest Plugin"
+msgstr ""
+
+#: src/admin/templates/pages/tabs.php:16
+#: src/Main.php:458
+msgid "After installing, <strong>uninstall this old plugin</strong>. You won't be able to make changes here until the latest version is installed."
+msgstr ""
+
+#: src/admin/templates/pages/tabs.php:23
 #: src/OrderCoupon.php:28
 msgid "Connection"
 msgstr ""
 
-#: src/admin/templates/pages/tabs.php:13
+#: src/admin/templates/pages/tabs.php:27
 #: src/OrderCoupon.php:33
 msgid "Settings"
 msgstr ""
@@ -421,12 +441,12 @@ msgstr ""
 msgid "Invalid email format"
 msgstr ""
 
-#: src/Api/AbandonedCart/Cart.php:811
+#: src/Api/AbandonedCart/Cart.php:868
 msgid "Customer visited Retainful order recovery URL."
 msgstr ""
 
-#: src/Api/AbandonedCart/Cart.php:1168
-#: src/Api/AbandonedCart/Cart.php:1184
+#: src/Api/AbandonedCart/Cart.php:1225
+#: src/Api/AbandonedCart/Cart.php:1241
 msgid "Note: Auto-login disabled when recreating cart for WordPress Admin account. Checking out as guest."
 msgstr ""
 
@@ -459,28 +479,15 @@ msgstr ""
 msgid "Coupon added into the Session"
 msgstr ""
 
-#: src/Main.php:357
-msgid "connect"
-msgstr ""
-
-#: src/Main.php:357
-msgid "re-connect"
-msgstr ""
-
-#. translators: %s: get connection url
-#: src/Main.php:359
-msgid "Please with Retainful to track and manage abandoned carts. %s"
-msgstr ""
-
-#: src/Main.php:429
+#: src/Main.php:436
 msgid "Woocommerce must be activated for Retainful-Woocommerce to work"
 msgstr ""
 
-#: src/Main.php:432
+#: src/Main.php:439
 msgid "Your woocommerce version is "
 msgstr ""
 
-#: src/Main.php:432
+#: src/Main.php:439
 msgid ". Some of the features of Retainful-Woocommerce will not work properly on this woocommerce version."
 msgstr ""
 

@@ -205,11 +205,13 @@ class Main {
 			add_filter( 'request', array( $coupon_api, 'requestQuery' ) );
 			add_action( 'admin_menu', array( $this->admin, 'registerMenu' ) );
 			$this->admin->initAdminPageStyles();
+			//Plugin deprecated: show notice and block connect, disconnect and save settings
+			add_action( 'admin_notices', array( $this, 'showDeprecationNotice' ) );
 			//Validate key
-			add_action( 'wp_ajax_validate_app_key', array( $this->admin, 'validateAppKey' ) );
+			//add_action( 'wp_ajax_validate_app_key', array( $this->admin, 'validateAppKey' ) );
 			add_action( 'wp_ajax_rnoc_get_search_coupon', array( $this->admin, 'getSearchedCoupons' ) );
-			add_action( 'wp_ajax_rnoc_disconnect_license', array( $this->admin, 'disconnectLicense' ) );
-			add_action( 'wp_ajax_rnoc_save_settings', array( $this->admin, 'saveAcSettings' ) );
+			//add_action( 'wp_ajax_rnoc_disconnect_license', array( $this->admin, 'disconnectLicense' ) );
+			//add_action( 'wp_ajax_rnoc_save_settings', array( $this->admin, 'saveAcSettings' ) );
 			//add_filter('wp_ajax_rnoc_create_order_update_webhook',array($this->admin,'saveNewWebhook'),10);
 			add_action( 'wp_ajax_rnoc_delete_expired_coupons', array( $this->admin, 'deleteUnusedExpiredCoupons' ) );
 			//Settings link
@@ -351,23 +353,23 @@ class Main {
 					new AfterPay();
 				}
 
-			} else {
+			} /*else {
 				if ( is_admin() ) {
 					$connect_txt = ( ! empty( $secret_key ) && ! empty( $app_id ) ) ? __( 'connect', 'retainful-next-order-coupon-for-woocommerce' ) : __( 're-connect', 'retainful-next-order-coupon-for-woocommerce' );
-					/* translators: %s: get connection url */
+					// translators: %s: get connection url
 					$notice      = sprintf(__('Please with Retainful to track and manage abandoned carts. %s' ,'retainful-next-order-coupon-for-woocommerce'),"<a href='".esc_url(admin_url( 'admin.php?page=retainful_license' ))."'>$connect_txt</a>");
 					$this->showAdminNotice( $notice );
 				}
-			}
+			}*/
 		} else {
 			//remove
 		}
-		$current_page_slug = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+		/*$current_page_slug = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
 		if(is_admin() && $current_page_slug !== 'retainful_license' && $this->admin->isAppConnected()) {
 			$notice = '<strong>Retainful V3 — Migration Required by April 15th</strong>
 					<p>We\'ve rebuilt Retainful from the ground up with a new secure WooCommerce REST API. Your store needs to be reconnected on the new platform to continue sending emails. All your contacts, lists, and flows carry over. Migrate now — it takes a few minutes.<br/><a class="button button-primary" style="margin-top: 10px;" href="https://app.retainful.com/" target="_blank">Migrate My Account</a></p>';
 			$this->showAdminNotice( $notice );
-		}
+		}*/
 
 		//Premium check
 		do_action( 'rnoc_initiated' );
@@ -440,6 +442,23 @@ class Main {
 	}
 
 
+
+	/**
+	 * Plugin deprecated: ask admins to install the new Retainful plugin
+	 */
+	function showDeprecationNotice() {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			return;
+		}
+		?>
+		<div class="notice notice-error">
+			<h2><?php esc_html_e( 'Action required: Update Retainful', 'retainful-next-order-coupon-for-woocommerce' ); ?></h2>
+			<p><?php echo wp_kses_post( __( 'This version of Retainful is <strong>no longer supported</strong>. Install the latest plugin to continue managing your Retainful account.', 'retainful-next-order-coupon-for-woocommerce' ) ); ?></p>
+			<p><a class="button button-primary" href="https://downloads.wordpress.org/plugin/retainful.zip"><?php esc_html_e( 'Install Latest Plugin', 'retainful-next-order-coupon-for-woocommerce' ); ?></a></p>
+			<p><?php echo wp_kses_post( __( 'After installing, <strong>uninstall this old plugin</strong>. You won\'t be able to make changes here until the latest version is installed.', 'retainful-next-order-coupon-for-woocommerce' ) ); ?></p>
+		</div>
+		<?php
+	}
 
 	/**
 	 * Show notices for user..if anything unusually happen in our plugin

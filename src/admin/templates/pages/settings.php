@@ -5,6 +5,7 @@
 require_once "tabs.php";
 ?>
 <form id="retainful-settings-form" class="card">
+<fieldset disabled style="border:0;margin:0;padding:0;min-width:0;">
     <table class="form-table" role="presentation">
         <tbody>
         <tr>
@@ -524,4 +525,5 @@ require_once "tabs.php";
             class="button button-primary button-right-fixed"><i
                 class="dashicons dashicons-yes"></i>&nbsp;&nbsp;<span><?php esc_html_e('save', 'retainful-next-order-coupon-for-woocommerce'); ?></span>
     </button>
+</fieldset>
 </form>
