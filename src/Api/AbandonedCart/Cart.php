@@ -1287,11 +1287,7 @@ class Cart extends RestApi
      */
     function isHashMatches($hash, $data)
     {
-        $is_valid_hash = false;
-        if (hash_equals($this->hashTheData($data), $hash)) {
-            $is_valid_hash = true;
-        }
-        return $is_valid_hash;
+        return self::$settings->isValidDigest($data, $hash);
     }
 
     /**

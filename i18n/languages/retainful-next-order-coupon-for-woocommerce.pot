@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms & Popups plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms & Popups 2.6.45\n"
+"Project-Id-Version: Retainful - WooCommerce Abandoned Cart Recovery, Email Campaigns, Newsletters, Signup Forms & Popups 2.6.46\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/retainful-next-order-coupon-for-woocommerce\n"
 "Last-Translator: Retainful <support@retainful.com>\n"
 "Language-Team: Retainful <support@retainful.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-05T08:58:50+00:00\n"
+"POT-Creation-Date: 2026-10-27T06:10:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: retainful-next-order-coupon-for-woocommerce\n"
@@ -403,22 +403,22 @@ msgid "save"
 msgstr ""
 
 #: src/admin/templates/pages/tabs.php:13
-#: src/Main.php:455
+#: src/Main.php:453
 msgid "Action required: Update Retainful"
 msgstr ""
 
 #: src/admin/templates/pages/tabs.php:14
-#: src/Main.php:456
+#: src/Main.php:454
 msgid "This version of Retainful is <strong>no longer supported</strong>. Install the latest plugin to continue managing your Retainful account."
 msgstr ""
 
 #: src/admin/templates/pages/tabs.php:15
-#: src/Main.php:457
+#: src/Main.php:455
 msgid "Install Latest Plugin"
 msgstr ""
 
 #: src/admin/templates/pages/tabs.php:16
-#: src/Main.php:458
+#: src/Main.php:456
 msgid "After installing, <strong>uninstall this old plugin</strong>. You won't be able to make changes here until the latest version is installed."
 msgstr ""
 
@@ -459,15 +459,15 @@ msgstr ""
 msgid "Fee"
 msgstr ""
 
-#: src/Api/NextOrderCoupon/CouponManagement.php:218
+#: src/Api/NextOrderCoupon/CouponManagement.php:216
 msgid "Delete Expired retainful coupons"
 msgstr ""
 
-#: src/Api/NextOrderCoupon/CouponManagement.php:241
+#: src/Api/NextOrderCoupon/CouponManagement.php:239
 msgid "Retainful - Next order coupons"
 msgstr ""
 
-#: src/Api/NextOrderCoupon/CouponManagement.php:245
+#: src/Api/NextOrderCoupon/CouponManagement.php:243
 msgid "Retainful - coupons"
 msgstr ""
 
@@ -479,15 +479,15 @@ msgstr ""
 msgid "Coupon added into the Session"
 msgstr ""
 
-#: src/Main.php:436
+#: src/Main.php:434
 msgid "Woocommerce must be activated for Retainful-Woocommerce to work"
 msgstr ""
 
-#: src/Main.php:439
+#: src/Main.php:437
 msgid "Your woocommerce version is "
 msgstr ""
 
-#: src/Main.php:439
+#: src/Main.php:437
 msgid ". Some of the features of Retainful-Woocommerce will not work properly on this woocommerce version."
 msgstr ""
 

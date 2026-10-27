@@ -72,50 +72,48 @@ class Main {
 			'permission_callback' => '__return_true',
 			'callback'            => array( $this, 'verifyAppId' )
 		) );
+		//Coupon creation is HMAC signed with the app secret, so allow it only when the store is connected
 		register_rest_route( 'retainful-api/v1', '/coupon', array(
 			'methods'             => 'POST',
-			'permission_callback' => '__return_true',
+			'permission_callback' => array( $this->admin, 'isConnectionActive' ),
 			'callback'            => 'Rnoc\Retainful\Api\NextOrderCoupon\CouponManagement::createRestCoupon'
-		) );
-		register_rest_route( 'retainful-api/v1', '/customer', array(
-			'methods'             => 'GET',
-			'permission_callback' => '__return_true',
-			'callback'            => 'Rnoc\Retainful\Api\Referral\ReferralManagement::getCustomer'
 		) );
 	}
 
 	function registerSyncEndPoints() {
+		//Sync data is HMAC signed with the app secret, so allow it only when the store is connected
+		$is_connected = array( $this->admin, 'isConnectionActive' );
 		$import = new Imports();
 		register_rest_route('retainful-api/v1', '/orders', array(
 			'methods' => 'GET',
-			'permission_callback' => '__return_true',
+			'permission_callback' => $is_connected,
 			'callback' => array($import, 'getSyncOrders')
 		));
 		register_rest_route('retainful-api/v1', '/orders/count', array(
 			'methods' => 'GET',
-			'permission_callback' => '__return_true',
+			'permission_callback' => $is_connected,
 			'callback' => array($import, 'getSyncOrderCount')
 		));
 
 		$product = new Products();
 		register_rest_route('retainful-api/v1', '/products', array(
 			'methods' => 'GET',
-			'permission_callback' => '__return_true',
+			'permission_callback' => $is_connected,
 			'callback' => array($product, 'getSyncProducts')
 		));
 		register_rest_route('retainful-api/v1', '/products/count', array(
 			'methods' => 'GET',
-			'permission_callback' => '__return_true',
+			'permission_callback' => $is_connected,
 			'callback' => array($product, 'getSyncProductCount')
 		));
 		register_rest_route('retainful-api/v1', '/category/count', array(
 			'methods' => 'GET',
-			'permission_callback' => '__return_true',
+			'permission_callback' => $is_connected,
 			'callback' => array(Category::class, 'getCategoryCount')
 		));
 		register_rest_route('retainful-api/v1', '/category', array(
 			'methods' => 'GET',
-			'permission_callback' => '__return_true',
+			'permission_callback' => $is_connected,
 			'callback' => array(Category::class, 'getCategory')
 		));
 

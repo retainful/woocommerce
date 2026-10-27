@@ -684,8 +684,7 @@ class RestApi
 		$secret = self::$settings->getSecretKey();
 		$string = base64_decode($data_hash);
 		list($iv, $hmac, $cipher_text_raw) = explode(':retainful:', $string);
-		$reverse_hmac = hash_hmac(self::HMAC_ALGORITHM, $cipher_text_raw, $secret, true);
-		if (hash_equals($reverse_hmac, $hmac)) {
+		if (self::$settings->isValidDigest($cipher_text_raw, $hmac, true)) {
 			return openssl_decrypt($cipher_text_raw, self::CIPHER_METHOD, $secret, OPENSSL_RAW_DATA, $iv);
 		}
 

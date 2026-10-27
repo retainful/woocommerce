@@ -15,14 +15,7 @@ class Imports extends Order {
 	 * @return bool
 	 */
 	protected function hashVerification( $data, $hash_value ) {
-		if ( ! is_array( $data ) || ! is_string( $hash_value ) ) {
-			return false;
-		}
-		$data         = json_encode( $data );
-		$secret       = self::$settings->getSecretKey();
-		$reverse_hmac = hash_hmac( 'sha256', $data, $secret );
-
-		return hash_equals( $reverse_hmac, $hash_value );
+		return is_array( $data ) && self::$settings->isValidDigest( json_encode( $data ), $hash_value );
 	}
 
 	/**

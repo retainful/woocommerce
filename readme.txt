@@ -3,9 +3,9 @@ Contributors: retainful
 Tags: abandoned cart, email marketing, newsletter, forms, woocommerce
 Requires at least: 6.0.0
 Tested up to: 7.1
-WC tested up to: 11.1
+WC tested up to: 11.2
 Requires PHP: 7.4
-Stable tag: 2.6.45
+Stable tag: 2.6.46
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -254,6 +254,9 @@ You can reach out to our experts [here](https://www.retainful.com/support).
 7. Retainful Contacts
 
 == Changelog ==
+= 2.6.46 =
+- Fix: Security hardening for the coupon REST endpoint
+
 = 2.6.45 =
 - Added: Plugin deprecated notice
 

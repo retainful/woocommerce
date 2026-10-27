@@ -55,16 +55,14 @@ class CouponManagement
         $params = wp_parse_args($requestParams, $defaultRequestParams);
         $admin->logMessage($params, 'API coupon created request');
         if (is_array($params['discount_rule']) && !empty($params['discount_rule']) && is_string($params['digest']) && !empty($params['digest'])) {
-            $secret = $admin->getSecretKey();
             $to_hash = array(
                 'value_type' => (isset($params['discount_rule']['value_type'])) ? $params['discount_rule']['value_type'] : "",
                 'value' => (isset($params['discount_rule']['value'])) ? $params['discount_rule']['value'] : "",
                 'coupon_code' => (isset($params['discount_rule']['coupon_code'])) ? $params['discount_rule']['coupon_code'] : "",
             );
             $cipher_text_raw = json_encode($to_hash, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $reverse_hmac = hash_hmac('sha256', $cipher_text_raw, $secret);
-            if (hash_equals($reverse_hmac, $params['digest'])) {
-                $admin->logMessage($reverse_hmac, 'API request digest matched');
+            if ($admin->isValidDigest($cipher_text_raw, $params['digest'])) {
+                $admin->logMessage($params['digest'], 'API request digest matched');
                 $defaultRuleParams = array(
                     'coupon_code' => null,
                     'usage_limit' => 1,
@@ -138,7 +136,7 @@ class CouponManagement
                     $response = $errors;
                 }
             } else {
-                $admin->logMessage($reverse_hmac, 'API request digest not matched');
+                $admin->logMessage($params['digest'], 'API request digest not matched');
                 $status = 400;
                 $response = array('success' => false, 'RESPONSE_CODE' => 'SECURITY_BREACH', 'message' => 'Security validation failed!');
             }
