@@ -3,7 +3,7 @@ Contributors: retainful
 Tags: abandoned cart, email marketing, newsletter, forms, woocommerce
 Requires at least: 6.0.0
 Tested up to: 7.1
-WC tested up to: 11.1
+WC tested up to: 11.2
 Requires PHP: 7.4
 Stable tag: 2.6.46
 License: GPLv3 or later
