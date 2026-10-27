@@ -21,8 +21,7 @@ class Category extends Order {
 	 * @return bool
 	 */
 	protected static function hashVerification( $data, $hash_value ) {
-		$reverse_hmac = self::hashToken( $data );
-		return hash_equals( $reverse_hmac, $hash_value );
+		return is_array( $data ) && self::$settings->isValidDigest( json_encode( $data ), $hash_value );
 	}
 
 	/**

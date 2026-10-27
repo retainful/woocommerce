@@ -1089,6 +1089,23 @@ class Settings
     }
 
     /**
+     * Verify the digest signed by Retainful with the app secret.
+     * Fails when the store is not connected, because an empty secret makes the digest forgeable.
+     *
+     * @param string $data
+     * @param string $digest
+     * @param bool $binary
+     * @return bool
+     */
+    function isValidDigest($data, $digest, $binary = false)
+    {
+        if (!$this->isConnectionActive() || !is_string($data) || !is_string($digest) || $digest === '') {
+            return false;
+        }
+        return hash_equals(hash_hmac('sha256', $data, $this->getSecretKey(), $binary), $digest);
+    }
+
+    /**
      * Check fo entered API key is valid or not
      * @return bool
      */
