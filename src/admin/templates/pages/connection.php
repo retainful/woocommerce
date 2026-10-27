@@ -8,6 +8,7 @@ $api = new \Rnoc\Retainful\library\RetainfulApi();
 $admin_settings = new Rnoc\Retainful\Admin\Settings();
 ?>
 <form id="retainful-license-form" class="card">
+<fieldset disabled style="border:0;margin:0;padding:0;min-width:0;">
     <table class="form-table" role="presentation">
         <tbody>
         <tr>
@@ -116,4 +117,5 @@ x                       value="<?php echo esc_attr($settings[RNOC_PLUGIN_PREFIX 
         </tr>
         </tbody>
     </table>
+</fieldset>
 </form>
